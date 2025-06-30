@@ -9,7 +9,7 @@ resource "azurerm_storage_account" "storage_account" {
   access_tier              = var.access_tier
 
   # Security settings
-  enable_https_traffic_only       = var.security_settings.enable_https_traffic_only
+  https_traffic_only_enabled      = var.security_settings.enable_https_traffic_only
   min_tls_version                 = var.security_settings.min_tls_version
   shared_access_key_enabled       = var.security_settings.shared_access_key_enabled
   allow_nested_items_to_be_public = var.security_settings.allow_nested_items_to_be_public
@@ -269,7 +269,7 @@ resource "azurerm_storage_container" "storage_container" {
   for_each = { for c in var.containers : c.name => c }
 
   name                  = each.value.name
-  storage_account_name  = azurerm_storage_account.storage_account.name
+  storage_account_id    = azurerm_storage_account.storage_account.id
   container_access_type = each.value.container_access_type
   metadata             = each.value.metadata
 }
