@@ -414,4 +414,193 @@ These commands make AI calls and may take up to a minute:
 
 ---
 
-_This guide ensures Claude Code has immediate access to Task Master's essential functionality for agentic development workflows._
+## Multi-Agent Development Workflow
+
+### Agent Coordination Principles
+
+This repository supports **parallel development** using multiple Claude Code sessions (agents), each specialized for different aspects of the project. This approach maximizes efficiency and allows for concurrent work on complex infrastructure modules.
+
+### Agent Specialization Matrix
+
+#### 🏗️ Module Development Agent
+**Primary Responsibility**: Core Terraform module implementation
+- **Focus Areas**: `main.tf`, `variables.tf`, `outputs.tf`, `versions.tf`
+- **Tools**: Context7 MCP for Terraform documentation, Gemini Zen for code review
+- **Tasks**: Variable definitions, resource implementations, output structures
+- **Coordination**: Communicates module interfaces to other agents
+
+#### 🔄 Workflow/CI Agent  
+**Primary Responsibility**: GitHub Actions and automation setup
+- **Focus Areas**: `.github/workflows/`, automation scripts, release processes
+- **Tools**: Context7 MCP for GitHub Actions docs, security scanning configs
+- **Tasks**: CI/CD pipelines, security scanning, automated testing triggers
+- **Coordination**: Ensures workflows match module structure from Module Agent
+
+#### 📚 Documentation Agent
+**Primary Responsibility**: Examples, README files, and user guides
+- **Focus Areas**: `examples/`, `README.md`, documentation generation
+- **Tools**: terraform-docs integration, markdown generation
+- **Tasks**: Usage examples, module documentation, user guides
+- **Coordination**: Uses module interfaces from Module Agent for accurate examples
+
+#### 🧪 Testing Agent
+**Primary Responsibility**: Terratest suites and validation
+- **Focus Areas**: `tests/`, validation scripts, test scenarios
+- **Tools**: Go/Terratest documentation, Azure testing patterns
+- **Tasks**: Test suite implementation, validation scenarios, performance tests
+- **Coordination**: Tests against module implementations from Module Agent
+
+#### 🔒 Security Agent
+**Primary Responsibility**: Security configurations and compliance
+- **Focus Areas**: Security defaults, compliance frameworks, audit configs
+- **Tools**: Azure security documentation, compliance frameworks
+- **Tasks**: Security baselines, compliance validation, threat modeling
+- **Coordination**: Reviews and enhances Module Agent implementations
+
+### Parallel Workflow Coordination
+
+#### Phase 1: Planning and Interface Definition
+1. **Module Agent** defines core module structure and interfaces
+2. **All Agents** review and agree on module contracts
+3. **TaskMaster** creates detailed task breakdown for each agent
+
+#### Phase 2: Parallel Development
+```bash
+# Terminal 1: Module Development
+cd project && claude
+task-master show 6.1  # Initialize Module Directory Structure
+task-master set-status --id=6.1 --status=in-progress
+
+# Terminal 2: Workflow/CI Development  
+cd project && claude
+task-master show 2    # Basic Validation Workflow
+task-master set-status --id=2 --status=in-progress
+
+# Terminal 3: Documentation Development
+cd project && claude  
+task-master show 4    # terraform-docs Generation
+task-master set-status --id=4 --status=in-progress
+
+# Terminal 4: Testing Framework
+cd project && claude
+task-master show 5    # Terratest Framework Setup
+task-master set-status --id=5 --status=in-progress
+
+# Terminal 5: Security Configuration
+cd project && claude
+task-master show 7    # Enterprise and Security Features
+task-master set-status --id=7 --status=in-progress
+```
+
+#### Phase 3: Integration and Validation
+1. **All Agents** complete their parallel tasks
+2. **Integration testing** across all components
+3. **Cross-agent review** and validation
+4. **Final coordination** and release preparation
+
+### Communication Protocols
+
+#### Context Sharing
+Each agent maintains awareness through:
+- **TaskMaster updates**: `task-master update-subtask --id=X.Y --prompt="progress notes"`
+- **Shared Context7**: Common documentation sources
+- **Gemini Zen consultation**: Cross-validation of approaches
+- **Git synchronization**: Regular commits with task references
+
+#### Dependency Management
+```bash
+# Example: Testing Agent waits for Module Agent
+task-master show 6.4  # Check if core resource implementation is complete
+# Only proceed with test development when Module Agent marks 6.4 as done
+```
+
+#### Quality Gates
+- **Module Agent**: All resources properly implemented and validated
+- **Workflow Agent**: CI/CD passes all quality checks
+- **Documentation Agent**: Examples work with actual module
+- **Testing Agent**: All tests pass against module implementation
+- **Security Agent**: Security scan results are clean
+
+### Agent Interaction Patterns
+
+#### Pattern 1: Sequential Dependencies
+```
+Module Agent (6.1-6.4) → Testing Agent (8.1-8.3)
+Module Agent (6.7) → Documentation Agent (README examples)
+```
+
+#### Pattern 2: Parallel Independent Work
+```
+Workflow Agent (2.1-2.4) || Documentation Agent (examples/) || Security Agent (7.1-7.3)
+```
+
+#### Pattern 3: Cross-Agent Validation
+```
+Module Agent implements → Security Agent reviews → Module Agent adjusts
+Documentation Agent creates examples → Testing Agent validates → Documentation Agent updates
+```
+
+### Coordination Tools and Commands
+
+#### TaskMaster Coordination Commands
+```bash
+# Check what other agents are working on
+task-master get-tasks --status=in-progress
+
+# Update progress for coordination
+task-master update-subtask --id=6.2 --prompt="Variable definitions complete, interface available for Testing Agent"
+
+# Research coordination
+task-master research --query="Azure Storage Account security best practices" --save-to=6.3
+```
+
+#### Context7 Shared Research
+```bash
+# All agents can access shared Terraform documentation
+context7: terraform azurerm storage account latest provider documentation
+context7: github actions workflow terraform validation best practices
+context7: terratest azure testing patterns
+```
+
+#### Gemini Zen Cross-Validation
+```bash
+# Agent consultation pattern
+gemini-zen: "Review this storage account module implementation for HashiCorp best practices"
+gemini-zen: "Validate this CI/CD workflow against enterprise security requirements"
+gemini-zen: "Assess test coverage completeness for this Azure module"
+```
+
+### Anti-Patterns to Avoid
+
+#### ❌ Don't Do This
+- **Duplicate Work**: Multiple agents implementing the same feature
+- **Interface Conflicts**: Changing module interfaces without coordination
+- **Resource Conflicts**: Multiple agents modifying the same files simultaneously
+- **Dependency Deadlock**: Circular dependencies between agent tasks
+
+#### ✅ Do This Instead
+- **Clear Ownership**: Each agent owns specific files/directories
+- **Interface Contracts**: Agree on module contracts before parallel work
+- **Regular Sync**: Use TaskMaster for progress coordination
+- **Conflict Resolution**: Use Git branching for experimental work
+
+### Multi-Agent Success Metrics
+
+#### Efficiency Gains
+- **Parallel Development**: 4-5x faster than sequential development
+- **Specialized Expertise**: Each agent focuses on their strengths
+- **Reduced Context Switching**: Agents maintain focused context
+
+#### Quality Improvements
+- **Cross-Agent Review**: Multiple perspectives on each component
+- **Specialized Validation**: Security, testing, and documentation experts
+- **Comprehensive Coverage**: All aspects covered by specialized agents
+
+#### Coordination Quality
+- **Task Completion Rate**: >90% of parallel tasks complete on schedule
+- **Integration Issues**: <5% of integration issues due to coordination failures
+- **Rework Rate**: <10% rework due to interface mismatches
+
+---
+
+_This multi-agent workflow enables efficient, high-quality development of complex Terraform infrastructure modules._

@@ -1,0 +1,301 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Repository and Directory Structure Setup",
+        "description": "Initialize the Git repository on GitHub. Create the standard multi-module directory structure, including directories for modules, examples, and GitHub Actions workflows. Add foundational files like .gitignore, .editorconfig, and a root README.md.",
+        "details": "Create a flat directory structure as per best practices. \n- `/modules`: Contains individual module directories (e.g., `storage_account`, `virtual_network`).\n- `/examples`: Contains usage examples, mirroring the module structure (e.g., `storage_account/simple`, `storage_account/complete`).\n- `/.github/workflows`: For CI/CD YAML files.\n- `/.tflint.hcl`: Configuration for tflint.\n- `/.checkov.yaml`: Configuration for Checkov.\n- Use a standard Terraform .gitignore file from github/gitignore.",
+        "testStrategy": "Verify the repository is created on GitHub and the directory structure and essential configuration files (.gitignore, .editorconfig) exist on the main branch.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "CI/CD Foundation: Basic Validation Workflow",
+        "description": "Create a foundational CI/CD pipeline using GitHub Actions that triggers on pull requests. This workflow will perform basic validation checks on the Terraform code.",
+        "details": "Create a workflow file (e.g., `.github/workflows/validation.yml`). Use `actions/checkout@v4` and `hashicorp/setup-terraform@v3` with Terraform version `~> 1.8`. The workflow should have jobs for: \n1. `terraform fmt -check`: Checks formatting.\n2. `terraform init`: Initializes the backend for validation.\n3. `terraform validate`: Validates syntax. \nSet the workflow to trigger on `pull_request` events targeting the `main` branch.",
+        "testStrategy": "Create a pull request with a correctly formatted Terraform file. The action should pass. Create another PR with a formatting error; the action should fail on the format check.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "CI/CD Integration: tflint and Checkov",
+        "description": "Integrate static code analysis tools into the CI/CD pipeline to enforce code quality and security standards. This includes setting up tflint for linting and Checkov for security scanning.",
+        "details": "Add new jobs to the `validation.yml` workflow. \n- **tflint**: Use `terraform-linters/setup-tflint-action@v4`. Configure `.tflint.hcl` to enable the Azure plugin and recommended rulesets. \n- **Checkov**: Use `bridgecrewio/checkov-action@v12`. Configure it to scan the `modules` directory and fail the build on medium or higher severity issues. Set a baseline with a `.checkov.yaml` file if needed.",
+        "testStrategy": "Submit a PR with a Terraform resource that violates a tflint rule (e.g., non-standard tag). The tflint job should fail. Submit a PR with a security misconfiguration (e.g., a storage account allowing public access). The Checkov job should fail.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "CI/CD Automation: terraform-docs Generation",
+        "description": "Automate the generation of module documentation using terraform-docs. The CI/CD pipeline should update the README.md file within each module directory to reflect its inputs, outputs, and resources.",
+        "details": "Create a new GitHub Actions workflow (`.github/workflows/docs.yml`) or add a job to the existing one. Use an action like `terraform-docs/gh-actions@v1`. Configure it to read a `.terraform-docs.yml` config file in each module's directory. The action should generate the documentation and commit the changes back to the feature branch if updates are detected.",
+        "testStrategy": "Make a change to a module's `variables.tf` or `outputs.tf` file. Push the change to a PR branch. Verify that the GitHub Action automatically runs, generates updated documentation, and commits the new README.md to the branch.",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Terratest Framework and Helper Setup",
+        "description": "Set up the Go environment and Terratest framework for end-to-end testing of modules. This includes creating a test directory, setting up helper functions for Azure authentication, and establishing a basic test case structure.",
+        "details": "Create a `test/` directory at the root. Inside, initialize a Go module (`go mod init <repo_url>/test`). Add Terratest as a dependency: `go get github.com/gruntwork-io/terratest/modules/terraform`. Create a `helpers.go` file for common functions, such as authenticating to Azure using environment variables for a service principal, which will be provided as secrets in GitHub Actions.",
+        "testStrategy": "Create a simple placeholder test file (`root_test.go`) that initializes Go modules and can be executed with `go test`. The test should pass, confirming the Go environment is correctly configured.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Storage Account Module: Core Implementation",
+        "description": "Develop the core Storage Account module (`azurerm_storage_account`). This initial version will support essential features like account type, replication options, and basic blob/file share configuration.",
+        "details": "Create the directory `modules/storage_account`. Implement `main.tf`, `variables.tf`, and `outputs.tf`. \n`main.tf` will contain the `azurerm_storage_account` resource. \n`variables.tf` will define inputs for `name`, `resource_group_name`, `location`, `account_tier` (Standard/Premium), `account_replication_type` (LRS/GRS/etc.), and `tags`. Use validation blocks for inputs. \n`outputs.tf` will expose the storage account ID, primary connection string, and other key attributes.",
+        "testStrategy": "Manually deploy the module to an Azure environment using `terraform apply` from a simple example configuration. Verify the storage account is created in the Azure portal with the specified tier and replication settings.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize Module Directory Structure",
+            "description": "Create the necessary directory for the new storage account module.",
+            "dependencies": [],
+            "details": "Create a new directory named `storage_account` inside the `modules/` directory. This will house all the Terraform files for this module.",
+            "status": "pending",
+            "testStrategy": "Verify that the `modules/storage_account` directory exists in the repository structure."
+          },
+          {
+            "id": 2,
+            "title": "Define Input Variables in `variables.tf`",
+            "description": "Create the `variables.tf` file and define all the necessary input variables for the storage account module.",
+            "dependencies": [
+              1
+            ],
+            "details": "In `modules/storage_account/variables.tf`, define variables for `name`, `resource_group_name`, `location`, `account_tier`, `account_replication_type`, and `tags`. Include clear descriptions and appropriate types for each.",
+            "status": "pending",
+            "testStrategy": "Create a root module that calls this module. Run `terraform plan` and ensure that Terraform prompts for any variables that do not have default values."
+          },
+          {
+            "id": 3,
+            "title": "Implement Input Validation",
+            "description": "Add validation blocks to the input variables to enforce specific constraints and prevent misconfiguration.",
+            "dependencies": [
+              2
+            ],
+            "details": "In `variables.tf`, add `validation` blocks to the `account_tier` and `account_replication_type` variables. The `account_tier` should only allow 'Standard' or 'Premium'. The `account_replication_type` should only allow valid Azure replication types (e.g., 'LRS', 'GRS', 'ZRS', 'RAGRS').",
+            "status": "pending",
+            "testStrategy": "Attempt to run `terraform plan` with invalid values for `account_tier` (e.g., 'Basic') and `account_replication_type` (e.g., 'INVALID'). Verify that the plan fails with the custom error messages from the validation blocks."
+          },
+          {
+            "id": 4,
+            "title": "Implement Core `azurerm_storage_account` Resource",
+            "description": "Create the `main.tf` file and define the core `azurerm_storage_account` resource using the defined variables.",
+            "dependencies": [
+              3
+            ],
+            "details": "In `modules/storage_account/main.tf`, add an `azurerm_storage_account` resource block. Map the resource arguments (`name`, `resource_group_name`, `location`, `account_tier`, `account_replication_type`, `tags`) to their corresponding input variables.",
+            "status": "pending",
+            "testStrategy": "Run `terraform apply` using a root module with valid inputs. Verify in the Azure Portal or via Azure CLI that the storage account is created with the specified configuration."
+          },
+          {
+            "id": 5,
+            "title": "Configure Basic Blob Service Properties",
+            "description": "Enhance the storage account resource to support basic blob service configurations.",
+            "dependencies": [
+              4
+            ],
+            "details": "In `main.tf`, add a `blob_properties` block to the `azurerm_storage_account` resource. Add a new optional variable to control the `delete_retention_policy` days for blobs.",
+            "status": "pending",
+            "testStrategy": "Apply the configuration with a specific value for the blob delete retention policy. Verify in the Azure Portal that the 'Soft delete for blobs' setting on the storage account matches the configured value."
+          },
+          {
+            "id": 6,
+            "title": "Configure Basic File Share Properties",
+            "description": "Enhance the storage account resource to support basic file share service configurations.",
+            "dependencies": [
+              4
+            ],
+            "details": "In `main.tf`, add a `share_properties` block to the `azurerm_storage_account` resource. Add a new optional variable to control the `delete_retention_policy` days for file shares.",
+            "status": "pending",
+            "testStrategy": "Apply the configuration with a specific value for the file share delete retention policy. Verify in the Azure Portal that the 'Soft delete for file shares' setting on the storage account matches the configured value."
+          },
+          {
+            "id": 7,
+            "title": "Define Module Outputs in `outputs.tf`",
+            "description": "Create the `outputs.tf` file to expose key attributes of the created storage account for use by other modules.",
+            "dependencies": [
+              4
+            ],
+            "details": "In `modules/storage_account/outputs.tf`, define outputs for `id`, `name`, `primary_location`, `primary_blob_endpoint`, `primary_connection_string`. Mark the connection string as `sensitive = true`.",
+            "status": "pending",
+            "testStrategy": "After a successful `terraform apply`, run `terraform output` in the root module. Verify that all defined outputs are present and display correct, non-null values. Check that the sensitive connection string is redacted."
+          },
+          {
+            "id": 8,
+            "title": "Create Initial Module Documentation (README.md)",
+            "description": "Create a `README.md` file to document the module's purpose, usage, inputs, and outputs.",
+            "dependencies": [
+              3,
+              7
+            ],
+            "details": "Create a `README.md` file in the `modules/storage_account` directory. Include a brief description of the module, a usage example block, and tables detailing all input variables (including type, description, and default) and all outputs.",
+            "status": "pending",
+            "testStrategy": "Perform a peer review of the `README.md` file. Ensure it is clear, accurate, and provides a complete usage example that can be copied and used directly."
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Storage Account Module: Enterprise and Security Features",
+        "description": "Enhance the Storage Account module with enterprise-grade security and operational features, including diagnostic settings, private endpoint support, network rules, and customer-managed key integration.",
+        "details": "Add resources and variables to the Storage Account module: \n- `azurerm_monitor_diagnostic_setting`: To send logs and metrics to a Log Analytics Workspace. \n- `azurerm_private_endpoint`: Conditionally created based on a variable. \n- `network_rules` block within `azurerm_storage_account`: To configure firewall settings. \n- `customer_managed_key` block: To integrate with Azure Key Vault. \n- Enforce `min_tls_version = \"1.2\"` and `https_only = true` as secure defaults, which can be overridden if necessary.",
+        "testStrategy": "Extend the manual deployment test. Deploy the module with diagnostic settings enabled and verify logs are flowing to Log Analytics. Deploy with a private endpoint and confirm public network access is denied. Check security settings in the Azure portal.",
+        "priority": "high",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Storage Account Module: Terratest Suite and Examples",
+        "description": "Create a comprehensive test suite for the Storage Account module using Terratest. Develop simple and complete usage examples in the `/examples` directory.",
+        "details": "In the `test/` directory, create `storage_account_test.go`. Write test cases using `t.Run` for different scenarios: \n1. A minimal deployment. \n2. A complex deployment with private endpoints and network rules. \nUse `terraform.InitAndApply` and `defer terraform.Destroy`. Use `azure.GetStorageAccount` from Terratest helpers to assert that the created resource has the correct properties. Create corresponding `examples/storage_account/simple` and `examples/storage_account/complete` directories with `main.tf` files demonstrating usage.",
+        "testStrategy": "Run `go test -v -timeout 15m ./...` from the `test/` directory. The GitHub Actions workflow for testing should execute this command against a test Azure subscription. All tests must pass, and resources must be successfully destroyed.",
+        "priority": "high",
+        "dependencies": [
+          5,
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Virtual Network Module: Core Implementation",
+        "description": "Develop the Virtual Network module (`azurerm_virtual_network`). This module will manage VNet creation, address spaces, and the configuration of one or more subnets with associated Network Security Groups (NSGs).",
+        "details": "Create `modules/virtual_network`. The module should accept a variable for the main address space and a complex variable (e.g., a map of objects) for defining subnets. For each subnet, allow specifying its name, address prefix, and an option to create a default NSG. Use a `for_each` loop to create `azurerm_subnet` and `azurerm_network_security_group` resources based on the input map.",
+        "testStrategy": "Manually deploy the module with a configuration for a VNet and two subnets. Verify in the Azure portal that the VNet and subnets are created with the correct address prefixes and that the NSGs are associated correctly.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Virtual Network Module: Terratest Suite and Examples",
+        "description": "Create a comprehensive test suite for the Virtual Network module using Terratest and develop corresponding usage examples.",
+        "details": "Create `test/virtual_network_test.go`. Write Terratest cases to validate: \n1. VNet and subnet creation with correct CIDR blocks. \n2. NSG association. \nUse `azure.GetVirtualNetwork` and `azure.GetSubnet` to fetch the deployed resources and assert their properties. Create `examples/virtual_network/simple` (VNet with one subnet) and `examples/virtual_network/complete` (VNet with multiple subnets and custom NSG rules).",
+        "testStrategy": "Execute the Terratest suite for the VNet module via the CI pipeline. All tests should pass, confirming resource creation and properties, followed by successful cleanup.",
+        "priority": "medium",
+        "dependencies": [
+          5,
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Key Vault Module: Core Implementation",
+        "description": "Develop the Key Vault module (`azurerm_key_vault`). The module will handle Key Vault creation, access policies, SKU selection, and secure defaults like soft delete and purge protection.",
+        "details": "Create `modules/key_vault`. The `main.tf` should include the `azurerm_key_vault` resource. Implement secure defaults: `soft_delete_retention_days = 7` and `purge_protection_enabled = true`. Use a dynamic block to configure `access_policy` based on a list of object IDs. Include support for private endpoints and diagnostic settings, similar to the Storage Account module.",
+        "testStrategy": "Manually deploy the module. Verify in the Azure portal that the Key Vault is created with soft delete and purge protection enabled by default. Check that the specified access policies are correctly configured.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Key Vault Module: Terratest Suite and Examples",
+        "description": "Create a comprehensive test suite for the Key Vault module using Terratest and develop corresponding usage examples.",
+        "details": "Create `test/key_vault_test.go`. Write Terratest cases to validate: \n1. Key Vault creation with correct SKU and security settings. \n2. Correct application of access policies. \nUse `azure.GetKeyVault` to assert properties. Create `examples/key_vault/simple` and `examples/key_vault/with_private_endpoint` to demonstrate different use cases.",
+        "testStrategy": "Execute the Terratest suite for the Key Vault module via the CI pipeline. All tests must pass, confirming resource creation and properties, followed by successful cleanup.",
+        "priority": "medium",
+        "dependencies": [
+          5,
+          11
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Application Gateway Module: Core Implementation",
+        "description": "Develop the Application Gateway module (`azurerm_application_gateway`). This complex module will manage the gateway itself, public IP, listeners, backend pools, and routing rules.",
+        "details": "Create `modules/application_gateway`. This module will require a complex variable structure to define the frontend/backend configuration. The `main.tf` will orchestrate `azurerm_public_ip`, `azurerm_application_gateway`, and its sub-resources (`frontend_ip_configuration`, `frontend_port`, `backend_address_pool`, `http_listener`, `request_routing_rule`). The module must depend on a VNet and subnet created by the Virtual Network module.",
+        "testStrategy": "Due to its complexity, initial testing will be a manual deployment. Deploy the module into a pre-existing VNet. Verify in the Azure portal that all components (gateway, IP, listener, rules) are configured as specified in the input variables.",
+        "priority": "low",
+        "dependencies": [
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Application Gateway Module: Terratest Suite and Examples",
+        "description": "Create a comprehensive test suite for the Application Gateway module using Terratest and develop corresponding usage examples.",
+        "details": "Create `test/application_gateway_test.go`. This test will be more involved. It should deploy a prerequisite VNet and a backend VM (using a simple VM module or local-exec provisioner) to act as a target. The test will then deploy the Application Gateway and make an HTTP request to its public IP to verify a `200 OK` response. Create `examples/application_gateway/simple_gateway` to show a basic setup.",
+        "testStrategy": "Execute the Terratest suite for the Application Gateway. This test will take longer but must verify end-to-end functionality by successfully receiving an HTTP response from the backend through the gateway.",
+        "priority": "low",
+        "dependencies": [
+          5,
+          13
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "CI/CD Automation: Semantic Versioning and Release Workflow",
+        "description": "Implement a GitHub Actions workflow for release management. The workflow will automate the process of tagging and releasing new module versions based on semantic versioning and conventional commits.",
+        "details": "Create a workflow (`.github/workflows/release.yml`) that triggers on pushes to the `main` branch. Use a tool like `go-semantic-release` or a custom script to: \n1. Analyze commit messages since the last tag (following Conventional Commits). \n2. Determine the next version number (patch, minor, or major). \n3. Create and push a new Git tag in the format `<module-name>/vX.Y.Z`. \n4. Create a GitHub Release with auto-generated release notes. \nThis requires a strategy to identify which module was changed in a commit.",
+        "testStrategy": "Make a `feat:` commit to the Storage Account module on a feature branch and merge it to `main`. Verify that the release workflow triggers, creates a new tag (e.g., `storage_account/v1.0.0`), and publishes a corresponding GitHub Release.",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          4,
+          8,
+          10,
+          12,
+          14
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-06-30T11:02:09.199Z",
+      "updated": "2025-06-30T11:02:09.199Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
