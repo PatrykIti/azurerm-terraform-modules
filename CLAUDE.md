@@ -4,7 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is a Terraform module development guide and template repository for creating professional, scalable Terraform modules for Azure (azurerm provider). It serves as a knowledge base consolidating best practices from production modules and provides comprehensive guidance for teams developing Azure Terraform modules.
+This is a multi-module Terraform repository for creating professional, scalable Terraform modules for Azure (azurerm provider). Unlike traditional single-module repositories, this repo follows a monorepo approach where each Azure resource type has its own module directory with independent versioning. Each module directory (e.g., `azurerm_storage_account`, `azurerm_virtual_network`) contains its own complete module structure and GitHub Actions workflow for independent releases.
+
+### Multi-Module Repository Benefits
+- **Centralized Development**: All Azure modules in one place for easier maintenance and cross-module consistency
+- **Independent Versioning**: Each module can be versioned independently (e.g., `SAv1.0.0` for Storage Account, `VNv2.1.0` for Virtual Network)
+- **Shared Standards**: Common tooling, documentation patterns, and CI/CD workflows across all modules
+- **Open Source Ready**: Structured for public consumption with clear module boundaries and documentation
 
 ## Common Development Commands
 
@@ -70,26 +76,71 @@ checkov -d . --framework terraform
 
 ## Architecture and Structure
 
-### Standard Module Directory Structure
+### Multi-Module Repository Structure
 ```
-terraform-azurerm-<resource-name>/
-├── .azuredevops/                 # CI/CD pipelines
-│   ├── semanticversion.yml       # Automatic versioning
-│   ├── sonarqube.yml            # Code quality analysis
-│   └── terraformdocs.yml        # Documentation generation
-├── examples/                     # Usage examples
-│   ├── simple/                  # Basic example
-│   └── complete/                # Advanced example
-├── modules/                     # Sub-modules (optional)
-├── tests/                       # Automated tests (Terratest)
-├── main.tf                      # Main implementation
-├── variables.tf                 # Input variable definitions
-├── outputs.tf                   # Output definitions
-├── versions.tf                  # Version requirements
-├── README.md                    # Module documentation
-├── CHANGELOG.md                 # Change history
-└── CONTRIBUTING.md              # Contribution guidelines
+azurerm-terraform-modules/
+├── .github/
+│   ├── workflows/
+│   │   ├── module-storage-account.yml    # CI/CD for storage account module
+│   │   ├── module-virtual-network.yml    # CI/CD for virtual network module
+│   │   └── shared-workflows.yml          # Reusable workflow components
+│   └── ISSUE_TEMPLATE/
+├── docs/                                  # Shared documentation
+│   ├── CONTRIBUTING.md                    # Global contribution guidelines
+│   ├── SECURITY.md                       # Security policy
+│   └── module-standards.md               # Module development standards
+├── scripts/                               # Shared automation scripts
+│   ├── validate-module.sh                # Module validation script
+│   ├── generate-docs.sh                  # Documentation generation
+│   └── tag-release.sh                    # Release tagging script
+├── azurerm_storage_account/               # Storage Account module
+│   ├── .github/
+│   │   └── workflows/
+│   │       └── release.yml               # Module-specific release workflow
+│   ├── examples/
+│   │   ├── simple/                       # Basic usage example
+│   │   └── complete/                     # Advanced usage example
+│   ├── modules/                          # Sub-modules (optional)
+│   │   ├── private_endpoint/
+│   │   └── diagnostics/
+│   ├── tests/                            # Terratest tests
+│   ├── main.tf                           # Main implementation
+│   ├── variables.tf                      # Input variables
+│   ├── outputs.tf                        # Output definitions
+│   ├── versions.tf                       # Provider requirements
+│   ├── README.md                         # Module-specific documentation
+│   └── CHANGELOG.md                      # Module version history
+├── azurerm_virtual_network/               # Virtual Network module
+│   ├── .github/
+│   │   └── workflows/
+│   │       └── release.yml
+│   ├── examples/
+│   ├── tests/
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   ├── versions.tf
+│   ├── README.md
+│   └── CHANGELOG.md
+├── azurerm_key_vault/                     # Key Vault module
+├── azurerm_application_gateway/           # Application Gateway module
+├── .gitignore                             # Repository-wide gitignore
+├── README.md                              # Repository overview
+└── CLAUDE.md                              # This file
 ```
+
+### Module Versioning Strategy
+Each module follows semantic versioning with a descriptive prefix:
+- **Storage Account**: `SAv1.0.0`, `SAv1.1.0`, `SAv2.0.0`
+- **Virtual Network**: `VNv1.0.0`, `VNv1.1.0`, `VNv2.0.0`  
+- **Key Vault**: `KVv1.0.0`, `KVv1.1.0`, `KVv2.0.0`
+- **Application Gateway**: `AGv1.0.0`, `AGv1.1.0`, `AGv2.0.0`
+
+This approach allows:
+- Independent module evolution and release cycles
+- Clear identification of which module version is being used
+- Simplified dependency management for consumers
+- Easy rollback to previous module versions
 
 ### Key Documentation Files
 - `_docs/terraform-module-best-practices-guide.md` - Comprehensive best practices guide (Polish)
@@ -98,28 +149,90 @@ terraform-azurerm-<resource-name>/
 
 ## Development Guidelines
 
-### Variable Definition Patterns
-- Use `optional()` function for optional object attributes with defaults
-- Implement comprehensive validation with helpful error messages
-- Group related configurations into objects
-- Set secure defaults (e.g., `https_only = true`, `minimum_tls_version = "1.2"`)
+### HashiCorp Best Practices
 
-### Resource Implementation
-- Use count/for_each for conditional resource creation
-- Implement dynamic blocks for flexible configurations
-- Follow security-by-default principles
-- Always include diagnostic settings for Azure resources
+#### Module Structure and Composition
+- **Flat Module Tree**: Maintain a flat module structure to avoid deep nesting and complexity
+- **Module Composition**: Use module composition over inheritance - combine multiple focused modules rather than creating one large module
+- **Single Responsibility**: Each module should have a clear, single purpose (e.g., storage account, virtual network)
+- **Dependency Inversion**: Use data sources to reference existing resources instead of tight coupling between modules
 
-### Testing Strategy
-- Write Terratest tests for module validation
-- Test both simple and complex configurations
-- Include negative test cases for validation rules
+#### Variable Definition Patterns
+- **Use `optional()` function**: For optional object attributes with sensible defaults
+```hcl
+variable "storage_account_config" {
+  type = object({
+    account_tier             = string
+    account_replication_type = string
+    enable_https_traffic     = optional(bool, true)
+    min_tls_version         = optional(string, "TLS1_2")
+    network_rules = optional(object({
+      default_action = optional(string, "Allow")
+      ip_rules       = optional(list(string), [])
+      subnet_ids     = optional(list(string), [])
+    }), {})
+  })
+}
+```
+- **Comprehensive Validation**: Implement validation rules with clear error messages
+- **Group Related Configurations**: Use object types to group related settings
+- **Secure Defaults**: Always set secure defaults (e.g., `https_only = true`, `minimum_tls_version = "TLS1_2"`)
 
-### Documentation Standards
-- Use terraform-docs for auto-generated documentation
-- Include usage examples for common scenarios
-- Document all variables, outputs, and requirements
-- Maintain CHANGELOG.md with semantic versioning
+#### Resource Implementation Best Practices
+- **Conditional Resource Creation**: Use `count` or `for_each` for optional resources
+```hcl
+resource "azurerm_storage_account_network_rules" "this" {
+  count = var.network_rules != null ? 1 : 0
+  # ...
+}
+```
+- **Dynamic Blocks**: Use dynamic blocks for flexible, repeatable configurations
+- **Provider Configuration**: Declare required provider versions without defining provider blocks
+```hcl
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 3.0"
+    }
+  }
+}
+```
+- **Security by Default**: Implement secure defaults for all resources
+- **Enterprise Features**: Always include support for diagnostic settings, private endpoints, and monitoring
+
+#### Module Input/Output Patterns
+- **Minimal Required Inputs**: Only require inputs that have no sensible defaults
+- **Structured Outputs**: Export structured objects rather than individual attributes
+```hcl
+output "storage_account" {
+  description = "Storage account configuration and attributes"
+  value = {
+    id                   = azurerm_storage_account.this.id
+    name                 = azurerm_storage_account.this.name
+    primary_blob_endpoint = azurerm_storage_account.this.primary_blob_endpoint
+    # ... other relevant attributes
+  }
+}
+```
+- **Sensitive Output Handling**: Mark sensitive outputs appropriately
+
+#### Testing Strategy
+- **Terratest Framework**: Use Terratest for comprehensive module testing
+- **Test Pyramid**: Include unit tests (validation), integration tests (examples), and end-to-end tests
+- **Negative Testing**: Test validation rules and error conditions
+- **Example-Based Testing**: Every example should have corresponding tests
+- **Multi-Environment Testing**: Test across different Azure regions and configurations
+
+#### Documentation Standards
+- **Auto-Generated Docs**: Use terraform-docs for consistent documentation generation
+```bash
+terraform-docs markdown table . > README.md
+```
+- **Usage Examples**: Provide both simple and complete usage examples
+- **Variable Documentation**: Document purpose, type, default, and validation rules for every variable
+- **Output Documentation**: Explain what each output provides and when to use it
+- **Changelog Maintenance**: Follow semantic versioning in CHANGELOG.md
 
 ## Conventional Commit Format
 ```
@@ -133,17 +246,86 @@ BREAKING CHANGE: Renamed variable 'enable_logs' to 'enable_diagnostic_settings'
 ```
 
 ## CI/CD Integration
-The repository uses Azure DevOps pipelines for:
-- Automated documentation generation
-- Code quality analysis with SonarQube
-- Semantic versioning and releases
-- Terraform validation and testing
+
+### GitHub Actions Workflows
+The repository uses GitHub Actions for automated CI/CD:
+
+#### Shared Workflows (.github/workflows/)
+- **`shared-workflows.yml`**: Reusable workflow components for validation, testing, and documentation
+- **`module-validation.yml`**: Common validation steps (terraform fmt, validate, tflint, checkov)
+- **`terratest-runner.yml`**: Standardized Terratest execution
+
+#### Module-Specific Workflows
+Each module has its own `.github/workflows/release.yml`:
+```yaml
+name: Release Storage Account Module
+on:
+  push:
+    paths:
+      - 'azurerm_storage_account/**'
+    branches: [main]
+  pull_request:
+    paths:
+      - 'azurerm_storage_account/**'
+
+jobs:
+  validate:
+    uses: ./.github/workflows/module-validation.yml
+    with:
+      module_path: azurerm_storage_account
+      
+  test:
+    uses: ./.github/workflows/terratest-runner.yml
+    with:
+      module_path: azurerm_storage_account
+      
+  release:
+    if: github.event_name == 'push'
+    needs: [validate, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: SAv${{ github.run_number }}
+          release_name: Storage Account Module v${{ github.run_number }}
+```
+
+#### Automation Features
+- **Path-based triggering**: Only affected modules trigger their CI/CD
+- **Independent releases**: Each module can be released separately
+- **Semantic versioning**: Automated version tagging with module prefixes
+- **Quality gates**: Mandatory validation, security scanning, and testing
+- **Documentation generation**: Auto-update README.md with terraform-docs
 
 ## Important Notes
-- This is primarily a documentation and template repository
-- Actual Terraform module implementations should follow the patterns documented here
-- All modules should support enterprise features: diagnostics, monitoring, private endpoints
+- This is a multi-module repository with independent versioning per module
+- Each module directory contains a complete, production-ready Terraform module
+- All modules follow HashiCorp best practices and Azure security standards
+- Modules support enterprise features: diagnostics, monitoring, private endpoints
 - Focus on reusability, security, and maintainability
+- Open source repository designed for community consumption and contribution
+
+## Repository Standards
+
+### Naming Conventions
+- **Module Directories**: Use Azure resource type naming (e.g., `azurerm_storage_account`)
+- **Version Tags**: Use abbreviated prefixes (e.g., `SAv1.0.0`, `VNv2.1.0`)
+- **Branch Names**: Use conventional naming (`feature/sa-private-endpoints`, `fix/vn-subnet-validation`)
+- **Variable Names**: Use clear, descriptive names with Azure naming conventions
+
+### Code Quality Standards
+- **Terraform Format**: All code must pass `terraform fmt -check`
+- **Validation**: All configurations must pass `terraform validate`
+- **Security Scanning**: All modules must pass Checkov security analysis
+- **Linting**: All modules must pass tflint validation
+- **Testing**: All modules must have Terratest tests with >80% coverage
+
+### Documentation Requirements
+- **README.md**: Each module must have comprehensive documentation
+- **CHANGELOG.md**: Track all changes with semantic versioning
+- **examples/**: Provide both simple and complete usage examples
+- **terraform-docs**: Auto-generated documentation must be current
 
 ## MCP Tools Usage Rules (MANDATORY)
 
