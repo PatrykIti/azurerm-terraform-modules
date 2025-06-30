@@ -145,7 +145,7 @@ resource "azurerm_storage_management_policy" "storage_management_policy" {
 
 # Private endpoints
 resource "azurerm_private_endpoint" "private_endpoint" {
-  for_each = { for idx, pe in var.private_endpoints : pe.name => pe }
+  for_each = { for private_endpoint in var.private_endpoints : private_endpoint.name => private_endpoint }
 
   name                = "${var.name}-pe-${each.key}"
   location            = var.location
@@ -246,7 +246,7 @@ resource "azurerm_monitor_diagnostic_setting" "blob_diagnostic_setting" {
 
 # Storage Containers
 resource "azurerm_storage_container" "storage_container" {
-  for_each = { for c in var.containers : c.name => c }
+  for_each = { for container in var.containers : container.name => container }
 
   name                  = each.value.name
   storage_account_id    = azurerm_storage_account.storage_account.id
@@ -256,7 +256,7 @@ resource "azurerm_storage_container" "storage_container" {
 
 # Storage Queues
 resource "azurerm_storage_queue" "storage_queue" {
-  for_each = { for q in var.queues : q.name => q }
+  for_each = { for queue in var.queues : queue.name => queue }
 
   name                 = each.value.name
   storage_account_name = azurerm_storage_account.storage_account.name
@@ -265,7 +265,7 @@ resource "azurerm_storage_queue" "storage_queue" {
 
 # Storage Tables
 resource "azurerm_storage_table" "storage_table" {
-  for_each = { for t in var.tables : t.name => t }
+  for_each = { for table in var.tables : table.name => table }
 
   name                 = each.value.name
   storage_account_name = azurerm_storage_account.storage_account.name
@@ -273,7 +273,7 @@ resource "azurerm_storage_table" "storage_table" {
 
 # File Shares
 resource "azurerm_storage_share" "storage_share" {
-  for_each = { for fs in var.file_shares : fs.name => fs }
+  for_each = { for file_share in var.file_shares : file_share.name => file_share }
 
   name                 = each.value.name
   storage_account_id   = azurerm_storage_account.storage_account.id
