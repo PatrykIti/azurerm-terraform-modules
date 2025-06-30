@@ -148,5 +148,57 @@ output "private_endpoints" {
 
 output "lifecycle_management_policy_id" {
   description = "The ID of the Storage Account Management Policy"
-  value       = try(azurerm_storage_management_policy.this[0].id, null)
+  value       = try(azurerm_storage_management_policy.storage_management_policy[0].id, null)
+}
+
+output "containers" {
+  description = "Map of created storage containers"
+  value = {
+    for k, v in azurerm_storage_container.storage_container : k => {
+      id   = v.id
+      name = v.name
+    }
+  }
+}
+
+output "queues" {
+  description = "Map of created storage queues"
+  value = {
+    for k, v in azurerm_storage_queue.storage_queue : k => {
+      id   = v.id
+      name = v.name
+    }
+  }
+}
+
+output "tables" {
+  description = "Map of created storage tables"
+  value = {
+    for k, v in azurerm_storage_table.storage_table : k => {
+      id   = v.id
+      name = v.name
+    }
+  }
+}
+
+output "file_shares" {
+  description = "Map of created file shares"
+  value = {
+    for k, v in azurerm_storage_share.storage_share : k => {
+      id   = v.id
+      name = v.name
+      url  = v.url
+    }
+  }
+}
+
+output "private_endpoints" {
+  description = "Map of created private endpoints"
+  value = {
+    for k, v in azurerm_private_endpoint.private_endpoint : k => {
+      id               = v.id
+      name             = v.name
+      private_ip_address = try(v.private_service_connection[0].private_ip_address, null)
+    }
+  }
 }
