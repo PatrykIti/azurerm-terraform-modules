@@ -1,0 +1,39 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
+      "alwaysAllow": [
+        "resolve-library-id",
+        "get-library-docs"
+      ]
+    },
+    "taskmaster-ai": {
+      "command": "npx",
+      "args": ["-y", "--package=task-master-ai", "task-master-ai"],
+      "env": {
+        "GOOGLE_API_KEY": "AIzaSyCUBbR9uAU0x0UXFc5QtAB38Sdr1OR52q0"
+      }
+    },
+    "zen": {
+      "command": "docker",
+      "args": [
+        "run", "--rm", "-i",
+        "-e", "GEMINI_API_KEY=AIzaSyCUBbR9uAU0x0UXFc5QtAB38Sdr1OR52q0",
+        "-v", "/Users/pciechanski/Documents/_moje_projekty/HomeRun:/Users/pciechanski/Documents/_moje_projekty/HomeRun",
+        "ghcr.io/patrykiti/zen-mcp-server:latest"
+      ]
+    },
+    "wix-mcp-remote": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@wix/mcp-remote",
+        "https://mcp.wix.com/sse"
+      ]
+    }
+  }
+}
