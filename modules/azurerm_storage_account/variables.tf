@@ -293,6 +293,63 @@ variable "lifecycle_rules" {
   default = []
 }
 
+# Storage Containers
+variable "containers" {
+  description = "List of storage containers to create."
+  type = list(object({
+    name                  = string
+    container_access_type = optional(string, "private")
+    metadata             = optional(map(string), {})
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for c in var.containers : contains(["private", "blob", "container"], c.container_access_type)
+    ])
+    error_message = "Container access type must be 'private', 'blob', or 'container'."
+  }
+}
+
+# Storage Queues
+variable "queues" {
+  description = "List of storage queues to create."
+  type = list(object({
+    name     = string
+    metadata = optional(map(string), {})
+  }))
+  default = []
+}
+
+# Storage Tables
+variable "tables" {
+  description = "List of storage tables to create."
+  type = list(object({
+    name = string
+  }))
+  default = []
+}
+
+# File Shares
+variable "file_shares" {
+  description = "List of file shares to create."
+  type = list(object({
+    name             = string
+    quota            = optional(number, 5120)
+    access_tier      = optional(string, "Hot")
+    enabled_protocol = optional(string, "SMB")
+    metadata         = optional(map(string), {})
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for fs in var.file_shares : contains(["Hot", "Cool", "TransactionOptimized", "Premium"], fs.access_tier)
+    ])
+    error_message = "File share access tier must be 'Hot', 'Cool', 'TransactionOptimized', or 'Premium'."
+  }
+}
+
 # Tags
 variable "tags" {
   description = "A mapping of tags to assign to the resource."

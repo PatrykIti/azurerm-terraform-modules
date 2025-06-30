@@ -263,3 +263,42 @@ resource "azurerm_monitor_diagnostic_setting" "blob_diagnostic_setting" {
     }
   }
 }
+
+# Storage Containers
+resource "azurerm_storage_container" "storage_container" {
+  for_each = { for c in var.containers : c.name => c }
+
+  name                  = each.value.name
+  storage_account_name  = azurerm_storage_account.storage_account.name
+  container_access_type = each.value.container_access_type
+  metadata             = each.value.metadata
+}
+
+# Storage Queues
+resource "azurerm_storage_queue" "storage_queue" {
+  for_each = { for q in var.queues : q.name => q }
+
+  name                 = each.value.name
+  storage_account_name = azurerm_storage_account.storage_account.name
+  metadata            = each.value.metadata
+}
+
+# Storage Tables
+resource "azurerm_storage_table" "storage_table" {
+  for_each = { for t in var.tables : t.name => t }
+
+  name                 = each.value.name
+  storage_account_name = azurerm_storage_account.storage_account.name
+}
+
+# File Shares
+resource "azurerm_storage_share" "storage_share" {
+  for_each = { for fs in var.file_shares : fs.name => fs }
+
+  name                 = each.value.name
+  storage_account_name = azurerm_storage_account.storage_account.name
+  quota               = each.value.quota
+  access_tier         = each.value.access_tier
+  enabled_protocol    = each.value.enabled_protocol
+  metadata            = each.value.metadata
+}
