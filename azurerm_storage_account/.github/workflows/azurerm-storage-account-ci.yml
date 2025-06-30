@@ -1,0 +1,422 @@
+name: Azure Storage Account Module - CI
+
+on:
+  pull_request:
+    paths:
+      - 'azurerm_storage_account/**'
+      - '!azurerm_storage_account/.github/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'azurerm_storage_account/**'
+      - '!azurerm_storage_account/.github/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+  statuses: write
+
+env:
+  MODULE_NAME: azurerm_storage_account
+  MODULE_PATH: ./azurerm_storage_account
+
+jobs:
+  validate:
+    name: Validate Module
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+      
+      - name: Cache Terraform plugins
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.terraform.d/plugin-cache
+            ${{ env.MODULE_PATH }}/.terraform
+          key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
+      
+      - name: Terraform Format Check
+        id: fmt
+        run: |
+          cd ${{ env.MODULE_PATH }}
+          terraform fmt -check -recursive -diff
+        continue-on-error: true
+      
+      - name: Terraform Init
+        id: init
+        run: |
+          cd ${{ env.MODULE_PATH }}
+          terraform init -backend=false
+      
+      - name: Terraform Validate
+        id: validate
+        run: |
+          cd ${{ env.MODULE_PATH }}
+          terraform validate -no-color
+      
+      - name: Comment PR - Validation Results
+        if: github.event_name == 'pull_request' && (steps.fmt.outcome == 'failure' || steps.init.outcome == 'failure' || steps.validate.outcome == 'failure')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const output = `### Terraform Validation Results - \`${{ env.MODULE_NAME }}\`
+            
+            #### Terraform Format and Style 🖌 \`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️ \`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖 \`${{ steps.validate.outcome }}\`
+            
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            });
+
+  lint:
+    name: Lint Module
+    runs-on: ubuntu-latest
+    needs: validate
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+      
+      - name: Init TFLint
+        run: |
+          cd ${{ env.MODULE_PATH }}
+          tflint --init
+          
+          # Create .tflint.hcl if it doesn't exist
+          if [[ ! -f .tflint.hcl ]]; then
+            cat > .tflint.hcl << 'EOF'
+          plugin "azurerm" {
+            enabled = true
+            version = "0.25.0"
+            source  = "github.com/terraform-linters/tflint-ruleset-azurerm"
+          }
+          
+          rule "terraform_module_pinned_source" {
+            enabled = true
+          }
+          
+          rule "terraform_naming_convention" {
+            enabled = true
+          }
+          
+          rule "terraform_documented_variables" {
+            enabled = true
+          }
+          
+          rule "terraform_documented_outputs" {
+            enabled = true
+          }
+          EOF
+          fi
+      
+      - name: Run TFLint
+        id: tflint
+        run: |
+          cd ${{ env.MODULE_PATH }}
+          tflint --format=json > tflint-results.json || true
+          
+          # Parse results
+          if [[ -f tflint-results.json ]]; then
+            issues_count=$(jq '.issues | length' tflint-results.json)
+            echo "issues_count=$issues_count" >> $GITHUB_OUTPUT
+            
+            if [[ $issues_count -gt 0 ]]; then
+              echo "❌ TFLint found $issues_count issues"
+              jq -r '.issues[] | "- [\(.rule.name)] \(.message) at \(.range.filename):\(.range.start.line)"' tflint-results.json
+            else
+              echo "✅ TFLint found no issues"
+            fi
+          fi
+
+  security:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    needs: validate
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run Checkov
+        id: checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: ${{ env.MODULE_PATH }}
+          framework: terraform
+          output_format: json
+          output_file_path: checkov-results.json
+          soft_fail: true
+      
+      - name: Run tfsec
+        id: tfsec
+        run: |
+          # Install tfsec
+          curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+          sudo mv tfsec /usr/local/bin/
+          
+          cd ${{ env.MODULE_PATH }}
+          tfsec . --format=json --soft-fail > tfsec-results.json || true
+          
+          # Parse results
+          if [[ -f tfsec-results.json ]]; then
+            high_issues=$(jq '[.results[] | select(.severity == "HIGH")] | length' tfsec-results.json)
+            critical_issues=$(jq '[.results[] | select(.severity == "CRITICAL")] | length' tfsec-results.json)
+            
+            echo "high_issues=$high_issues" >> $GITHUB_OUTPUT
+            echo "critical_issues=$critical_issues" >> $GITHUB_OUTPUT
+            
+            if [[ $critical_issues -gt 0 ]]; then
+              echo "❌ Found $critical_issues CRITICAL security issues"
+              exit 1
+            elif [[ $high_issues -gt 0 ]]; then
+              echo "⚠️ Found $high_issues HIGH security issues"
+            else
+              echo "✅ No HIGH or CRITICAL security issues found"
+            fi
+          fi
+      
+      - name: Upload security results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-scan-results
+          path: |
+            checkov-results.json
+            ${{ env.MODULE_PATH }}/tfsec-results.json
+
+  test:
+    name: Test Module
+    runs-on: ubuntu-latest
+    needs: [validate, lint]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      
+      - name: Run tests
+        id: test
+        run: |
+          cd ${{ env.MODULE_PATH }}/tests
+          
+          # Initialize go module if not exists
+          if [[ ! -f go.mod ]]; then
+            go mod init test
+            go get github.com/gruntwork-io/terratest/modules/terraform
+            go get github.com/stretchr/testify/assert
+            go mod tidy
+          fi
+          
+          # Run tests with coverage
+          go test -v -timeout 30m -coverprofile=coverage.out ./... | tee test-results.txt
+          
+          # Generate coverage report
+          go tool cover -html=coverage.out -o coverage.html
+          
+          # Extract coverage percentage
+          coverage=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
+          echo "coverage=$coverage" >> $GITHUB_OUTPUT
+          
+          # Check coverage threshold
+          if (( $(echo "$coverage < 80" | bc -l) )); then
+            echo "⚠️ Test coverage is below 80%: $coverage%"
+          else
+            echo "✅ Test coverage: $coverage%"
+          fi
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: |
+            ${{ env.MODULE_PATH }}/tests/test-results.txt
+            ${{ env.MODULE_PATH }}/tests/coverage.html
+            ${{ env.MODULE_PATH }}/tests/coverage.out
+
+  documentation:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    needs: validate
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install terraform-docs
+        run: |
+          curl -sSLo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.17.0/terraform-docs-v0.17.0-linux-amd64.tar.gz
+          tar -xzf terraform-docs.tar.gz
+          chmod +x terraform-docs
+          sudo mv terraform-docs /usr/local/bin/
+      
+      - name: Check documentation
+        id: docs
+        run: |
+          cd ${{ env.MODULE_PATH }}
+          
+          # Generate documentation
+          terraform-docs markdown table . > README.md.tmp
+          
+          # Check if documentation is up to date
+          if ! diff -q README.md README.md.tmp > /dev/null 2>&1; then
+            echo "❌ Documentation is not up to date"
+            echo "docs_outdated=true" >> $GITHUB_OUTPUT
+            
+            # Show diff for PR comment
+            diff -u README.md README.md.tmp > docs.diff || true
+          else
+            echo "✅ Documentation is up to date"
+            echo "docs_outdated=false" >> $GITHUB_OUTPUT
+          fi
+          
+          rm -f README.md.tmp
+
+  example-validation:
+    name: Validate Examples
+    runs-on: ubuntu-latest
+    needs: validate
+    strategy:
+      matrix:
+        example: [simple, complete]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+      
+      - name: Validate ${{ matrix.example }} example
+        run: |
+          example_path="${{ env.MODULE_PATH }}/examples/${{ matrix.example }}"
+          
+          if [[ -d "$example_path" ]]; then
+            echo "Validating ${{ matrix.example }} example..."
+            cd "$example_path"
+            
+            # Check formatting
+            terraform fmt -check -recursive
+            
+            # Initialize and validate
+            terraform init -backend=false
+            terraform validate
+            
+            # Plan (dry run)
+            terraform plan -input=false -out=tfplan || true
+            
+            echo "✅ ${{ matrix.example }} example validated successfully"
+          else
+            echo "⚠️ ${{ matrix.example }} example not found at $example_path"
+          fi
+
+  quality-summary:
+    name: Quality Summary
+    runs-on: ubuntu-latest
+    needs: [validate, lint, security, test, documentation, example-validation]
+    if: always()
+    
+    steps:
+      - name: Generate quality report
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const jobs = ${{ toJSON(needs) }};
+            const moduleName = '${{ env.MODULE_NAME }}';
+            
+            let comment = `## 📊 CI Results for \`${moduleName}\`\n\n`;
+            comment += '| Check | Status |\n';
+            comment += '|-------|--------|\n';
+            
+            const jobDescriptions = {
+              'validate': 'Terraform Validation',
+              'lint': 'Code Linting',
+              'security': 'Security Scanning',
+              'test': 'Module Tests',
+              'documentation': 'Documentation Check',
+              'example-validation': 'Example Validation'
+            };
+            
+            let allPassed = true;
+            for (const [job, result] of Object.entries(jobs)) {
+              const status = result.result === 'success' ? '✅ Passed' : 
+                           result.result === 'skipped' ? '⏭️ Skipped' : '❌ Failed';
+              if (result.result === 'failure') allPassed = false;
+              comment += `| ${jobDescriptions[job] || job} | ${status} |\n`;
+            }
+            
+            comment += '\n';
+            
+            if (allPassed) {
+              comment += '### ✅ All checks passed!\n';
+            } else {
+              comment += '### ❌ Some checks failed\n';
+              comment += 'Please review the failing checks and address any issues.\n';
+            }
+            
+            if (context.eventName === 'pull_request') {
+              // Find existing comment or create new one
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number
+              });
+              
+              const botComment = comments.find(comment => 
+                comment.user.type === 'Bot' && 
+                comment.body.includes(`CI Results for \`${moduleName}\``)
+              );
+              
+              if (botComment) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: botComment.id,
+                  body: comment
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: comment
+                });
+              }
+            }

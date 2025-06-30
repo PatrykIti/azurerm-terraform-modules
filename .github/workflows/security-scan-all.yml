@@ -1,0 +1,277 @@
+name: Security Scan - All Modules
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      severity_threshold:
+        description: 'Minimum severity level to report (LOW, MEDIUM, HIGH, CRITICAL)'
+        required: false
+        default: 'MEDIUM'
+        type: choice
+        options:
+          - LOW
+          - MEDIUM
+          - HIGH
+          - CRITICAL
+
+permissions:
+  contents: read
+  security-events: write
+  issues: write
+
+jobs:
+  discover-modules:
+    name: Discover Terraform Modules
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.discover.outputs.modules }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Discover modules
+        id: discover
+        run: |
+          modules=()
+          for dir in */; do
+            if [[ -f "${dir}main.tf" || -f "${dir}versions.tf" ]]; then
+              if [[ "${dir}" != "_docs/" && "${dir}" != "examples/" && "${dir}" != "scripts/" && "${dir}" != "tests/" && "${dir}" != "modules/" ]]; then
+                modules+=("${dir%/}")
+              fi
+            fi
+          done
+          
+          json_modules=$(printf '%s\n' "${modules[@]}" | jq -R . | jq -s .)
+          echo "modules=${json_modules}" >> $GITHUB_OUTPUT
+
+  security-scan:
+    name: Security Scan - ${{ matrix.module }}
+    runs-on: ubuntu-latest
+    needs: discover-modules
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.discover-modules.outputs.modules) }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install security tools
+        run: |
+          pip install checkov
+          pip install tfsec
+          
+          # Install tfsec
+          curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+          sudo mv tfsec /usr/local/bin/
+          
+          # Install terrascan
+          curl -L "$(curl -s https://api.github.com/repos/tenable/terrascan/releases/latest | grep -o -E "https://.+?_Linux_x86_64.tar.gz")" > terrascan.tar.gz
+          tar -xf terrascan.tar.gz terrascan && rm terrascan.tar.gz
+          sudo mv terrascan /usr/local/bin/
+      
+      - name: Run Checkov scan
+        id: checkov
+        continue-on-error: true
+        run: |
+          severity_threshold="${{ github.event.inputs.severity_threshold || 'MEDIUM' }}"
+          
+          checkov -d ${{ matrix.module }} \
+            --framework terraform \
+            --output json \
+            --soft-fail \
+            --check-list $severity_threshold \
+            > ${{ matrix.module }}-checkov-results.json
+          
+          # Parse results
+          failed_checks=$(jq '.summary.failed' ${{ matrix.module }}-checkov-results.json)
+          echo "checkov_failed=$failed_checks" >> $GITHUB_OUTPUT
+      
+      - name: Run tfsec scan
+        id: tfsec
+        continue-on-error: true
+        run: |
+          tfsec ${{ matrix.module }} \
+            --format json \
+            --soft-fail \
+            --minimum-severity ${{ github.event.inputs.severity_threshold || 'MEDIUM' }} \
+            > ${{ matrix.module }}-tfsec-results.json
+          
+          # Parse results
+          issues_count=$(jq '.results | length' ${{ matrix.module }}-tfsec-results.json)
+          echo "tfsec_issues=$issues_count" >> $GITHUB_OUTPUT
+      
+      - name: Run Terrascan
+        id: terrascan
+        continue-on-error: true
+        run: |
+          terrascan scan -i terraform \
+            -d ${{ matrix.module }} \
+            -o json \
+            > ${{ matrix.module }}-terrascan-results.json || true
+          
+          # Parse results
+          violations=$(jq '.results.scan_summary.violated_policies' ${{ matrix.module }}-terrascan-results.json 2>/dev/null || echo "0")
+          echo "terrascan_violations=$violations" >> $GITHUB_OUTPUT
+      
+      - name: Upload scan results
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-scan-results-${{ matrix.module }}
+          path: |
+            ${{ matrix.module }}-checkov-results.json
+            ${{ matrix.module }}-tfsec-results.json
+            ${{ matrix.module }}-terrascan-results.json
+      
+      - name: Generate security report
+        run: |
+          cat > ${{ matrix.module }}-security-report.md << EOF
+          # Security Scan Report: ${{ matrix.module }}
+          
+          **Scan Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Severity Threshold**: ${{ github.event.inputs.severity_threshold || 'MEDIUM' }}
+          
+          ## Summary
+          
+          | Tool | Issues Found | Status |
+          |------|--------------|--------|
+          | Checkov | ${{ steps.checkov.outputs.checkov_failed }} | $([ "${{ steps.checkov.outputs.checkov_failed }}" -eq 0 ] && echo "✅ Passed" || echo "❌ Failed") |
+          | tfsec | ${{ steps.tfsec.outputs.tfsec_issues }} | $([ "${{ steps.tfsec.outputs.tfsec_issues }}" -eq 0 ] && echo "✅ Passed" || echo "❌ Failed") |
+          | Terrascan | ${{ steps.terrascan.outputs.terrascan_violations }} | $([ "${{ steps.terrascan.outputs.terrascan_violations }}" -eq 0 ] && echo "✅ Passed" || echo "❌ Failed") |
+          
+          ## Action Required
+          
+          EOF
+          
+          if [[ "${{ steps.checkov.outputs.checkov_failed }}" -gt 0 ]] || \
+             [[ "${{ steps.tfsec.outputs.tfsec_issues }}" -gt 0 ]] || \
+             [[ "${{ steps.terrascan.outputs.terrascan_violations }}" -gt 0 ]]; then
+            echo "⚠️ Security issues detected. Please review the detailed scan results and address the findings." >> ${{ matrix.module }}-security-report.md
+          else
+            echo "✅ No security issues detected at the configured severity threshold." >> ${{ matrix.module }}-security-report.md
+          fi
+      
+      - name: Upload security report
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report-${{ matrix.module }}
+          path: ${{ matrix.module }}-security-report.md
+      
+      - name: Fail if critical issues found
+        if: |
+          github.event.inputs.severity_threshold == 'CRITICAL' &&
+          (steps.checkov.outputs.checkov_failed > 0 ||
+           steps.tfsec.outputs.tfsec_issues > 0 ||
+           steps.terrascan.outputs.terrascan_violations > 0)
+        run: |
+          echo "❌ Critical security issues found in ${{ matrix.module }}"
+          exit 1
+
+  consolidate-results:
+    name: Consolidate Security Results
+    runs-on: ubuntu-latest
+    needs: security-scan
+    if: always()
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: security-artifacts
+      
+      - name: Generate consolidated report
+        run: |
+          cat > SECURITY_SCAN_REPORT.md << 'EOF'
+          # Repository-Wide Security Scan Report
+          
+          **Scan Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Scan Type**: Weekly Security Scan
+          **Severity Threshold**: ${{ github.event.inputs.severity_threshold || 'MEDIUM' }}
+          
+          ## Module Security Status
+          
+          | Module | Checkov | tfsec | Terrascan | Overall Status |
+          |--------|---------|-------|-----------|----------------|
+          EOF
+          
+          # Process each module's report
+          for report_dir in security-artifacts/security-report-*; do
+            if [[ -d "$report_dir" ]]; then
+              module_name=$(basename "$report_dir" | sed 's/security-report-//')
+              report_file="$report_dir/${module_name}-security-report.md"
+              
+              if [[ -f "$report_file" ]]; then
+                # Extract status from report (simplified parsing)
+                checkov_status=$(grep -A1 "Checkov" "$report_file" | tail -1 | grep -o "✅ Passed\|❌ Failed" || echo "⚠️ Unknown")
+                tfsec_status=$(grep -A1 "tfsec" "$report_file" | tail -1 | grep -o "✅ Passed\|❌ Failed" || echo "⚠️ Unknown")
+                terrascan_status=$(grep -A1 "Terrascan" "$report_file" | tail -1 | grep -o "✅ Passed\|❌ Failed" || echo "⚠️ Unknown")
+                
+                if [[ "$checkov_status" == "✅ Passed" ]] && \
+                   [[ "$tfsec_status" == "✅ Passed" ]] && \
+                   [[ "$terrascan_status" == "✅ Passed" ]]; then
+                  overall="✅ Secure"
+                else
+                  overall="⚠️ Issues Found"
+                fi
+                
+                echo "| $module_name | $checkov_status | $tfsec_status | $terrascan_status | $overall |" >> SECURITY_SCAN_REPORT.md
+              fi
+            fi
+          done
+          
+          echo "" >> SECURITY_SCAN_REPORT.md
+          echo "## Next Steps" >> SECURITY_SCAN_REPORT.md
+          echo "" >> SECURITY_SCAN_REPORT.md
+          echo "1. Review detailed scan results for each module with security issues" >> SECURITY_SCAN_REPORT.md
+          echo "2. Address HIGH and CRITICAL severity findings immediately" >> SECURITY_SCAN_REPORT.md
+          echo "3. Plan remediation for MEDIUM severity findings" >> SECURITY_SCAN_REPORT.md
+          echo "4. Consider addressing LOW severity findings as part of regular maintenance" >> SECURITY_SCAN_REPORT.md
+      
+      - name: Create issue if needed
+        if: needs.security-scan.result == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `Security Scan Alert - ${new Date().toISOString().split('T')[0]}`;
+            const body = `## Security Scan Results
+            
+            The weekly security scan has detected issues that require attention.
+            
+            **Scan Date**: ${new Date().toUTCString()}
+            **Severity Threshold**: ${{ github.event.inputs.severity_threshold || 'MEDIUM' }}
+            
+            Please review the [security scan workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for detailed results.
+            
+            ### Priority Actions
+            1. Review all HIGH and CRITICAL findings
+            2. Create remediation tasks for each finding
+            3. Update modules to address security issues
+            
+            cc: @${{ github.repository_owner }}`;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['security', 'automated', 'high-priority']
+            });
+      
+      - name: Upload consolidated report
+        uses: actions/upload-artifact@v3
+        with:
+          name: consolidated-security-report
+          path: SECURITY_SCAN_REPORT.md

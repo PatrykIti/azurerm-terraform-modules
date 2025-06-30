@@ -1,0 +1,290 @@
+name: Module Inventory and Validation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/main.tf'
+      - '**/versions.tf'
+      - '**/variables.tf'
+      - '**/outputs.tf'
+  pull_request:
+    paths:
+      - '**/main.tf'
+      - '**/versions.tf'
+      - '**/variables.tf'
+      - '**/outputs.tf'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  module-discovery:
+    name: Discover and Validate Modules
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install validation tools
+        run: |
+          # Install terraform-docs
+          curl -sSLo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.17.0/terraform-docs-v0.17.0-linux-amd64.tar.gz
+          tar -xzf terraform-docs.tar.gz
+          chmod +x terraform-docs
+          sudo mv terraform-docs /usr/local/bin/
+          
+          # Install tflint
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+      
+      - name: Discover all modules
+        id: discover
+        run: |
+          echo "## Discovering Terraform modules..."
+          
+          # Arrays to store different types of modules
+          valid_modules=()
+          new_modules=()
+          invalid_modules=()
+          
+          # Check if this is a PR
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # Get list of changed files in PR
+            changed_files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+            echo "Changed files in PR:"
+            echo "$changed_files"
+          fi
+          
+          # Scan for modules
+          for dir in */; do
+            # Skip non-module directories
+            if [[ "${dir}" == "_docs/" || "${dir}" == "examples/" || "${dir}" == "scripts/" || "${dir}" == "tests/" || "${dir}" == "modules/" || "${dir}" == ".github/" ]]; then
+              continue
+            fi
+            
+            # Check if directory contains Terraform files
+            if [[ -f "${dir}main.tf" || -f "${dir}versions.tf" ]]; then
+              module_name="${dir%/}"
+              
+              # Check if module follows naming convention
+              if [[ ! "$module_name" =~ ^azurerm_ ]]; then
+                invalid_modules+=("$module_name:naming")
+                continue
+              fi
+              
+              # Check if this is a new module (in PR context)
+              is_new=false
+              if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+                if echo "$changed_files" | grep -q "^${module_name}/"; then
+                  # Check if main.tf is new
+                  if git diff --name-status origin/${{ github.base_ref }}...HEAD | grep -q "^A.*${module_name}/main.tf"; then
+                    is_new=true
+                    new_modules+=("$module_name")
+                  fi
+                fi
+              fi
+              
+              valid_modules+=("$module_name")
+            fi
+          done
+          
+          # Output results
+          echo "valid_modules=$(printf '%s\n' "${valid_modules[@]}" | jq -R . | jq -s .)" >> $GITHUB_OUTPUT
+          echo "new_modules=$(printf '%s\n' "${new_modules[@]}" | jq -R . | jq -s .)" >> $GITHUB_OUTPUT
+          echo "invalid_modules=$(printf '%s\n' "${invalid_modules[@]}" | jq -R . | jq -s .)" >> $GITHUB_OUTPUT
+          
+          # Display summary
+          echo "### Discovery Summary"
+          echo "Valid modules: ${#valid_modules[@]}"
+          echo "New modules: ${#new_modules[@]}"
+          echo "Invalid modules: ${#invalid_modules[@]}"
+      
+      - name: Validate module structure
+        id: validate
+        run: |
+          valid_modules='${{ steps.discover.outputs.valid_modules }}'
+          modules=$(echo "$valid_modules" | jq -r '.[]')
+          
+          validation_report="# Module Validation Report\n\n"
+          validation_report+="Generated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")\n\n"
+          
+          all_valid=true
+          
+          for module in $modules; do
+            echo "## Validating module: $module"
+            validation_report+="## Module: $module\n\n"
+            
+            module_valid=true
+            issues=()
+            
+            # Check required files
+            required_files=("main.tf" "variables.tf" "outputs.tf" "versions.tf" "README.md")
+            for file in "${required_files[@]}"; do
+              if [[ ! -f "${module}/${file}" ]]; then
+                issues+=("Missing required file: $file")
+                module_valid=false
+              fi
+            done
+            
+            # Check for examples
+            if [[ ! -d "${module}/examples" ]]; then
+              issues+=("Missing examples directory")
+              module_valid=false
+            elif [[ ! -f "${module}/examples/simple/main.tf" && ! -f "${module}/examples/complete/main.tf" ]]; then
+              issues+=("No example configurations found")
+              module_valid=false
+            fi
+            
+            # Check for tests
+            if [[ ! -d "${module}/tests" ]]; then
+              issues+=("Missing tests directory")
+              module_valid=false
+            fi
+            
+            # Terraform validation
+            if [[ -f "${module}/main.tf" ]]; then
+              cd "$module"
+              
+              # Format check
+              if ! terraform fmt -check > /dev/null 2>&1; then
+                issues+=("Terraform formatting issues")
+                module_valid=false
+              fi
+              
+              # Initialize without backend
+              if terraform init -backend=false > /dev/null 2>&1; then
+                # Validate configuration
+                if ! terraform validate > /dev/null 2>&1; then
+                  issues+=("Terraform validation failed")
+                  module_valid=false
+                fi
+              else
+                issues+=("Terraform init failed")
+                module_valid=false
+              fi
+              
+              # TFLint check
+              if command -v tflint > /dev/null 2>&1; then
+                if ! tflint --module > /dev/null 2>&1; then
+                  issues+=("TFLint found issues")
+                  module_valid=false
+                fi
+              fi
+              
+              cd - > /dev/null
+            fi
+            
+            # Check documentation
+            if [[ -f "${module}/README.md" ]]; then
+              # Check if README has minimum required sections
+              if ! grep -q "## Requirements" "${module}/README.md"; then
+                issues+=("README missing Requirements section")
+                module_valid=false
+              fi
+              if ! grep -q "## Providers" "${module}/README.md"; then
+                issues+=("README missing Providers section")
+                module_valid=false
+              fi
+              if ! grep -q "## Inputs" "${module}/README.md"; then
+                issues+=("README missing Inputs section")
+                module_valid=false
+              fi
+              if ! grep -q "## Outputs" "${module}/README.md"; then
+                issues+=("README missing Outputs section")
+                module_valid=false
+              fi
+            fi
+            
+            # Update report
+            if [[ "$module_valid" == "true" ]]; then
+              validation_report+="✅ **Status**: Valid\n\n"
+            else
+              validation_report+="❌ **Status**: Invalid\n\n"
+              validation_report+="**Issues found:**\n"
+              for issue in "${issues[@]}"; do
+                validation_report+="- $issue\n"
+              done
+              validation_report+="\n"
+              all_valid=false
+            fi
+          done
+          
+          # Save report
+          echo -e "$validation_report" > module-validation-report.md
+          
+          # Set output
+          echo "all_valid=$all_valid" >> $GITHUB_OUTPUT
+      
+      - name: Comment on PR with validation results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('module-validation-report.md', 'utf8');
+            
+            // Check if we have new modules
+            const newModules = ${{ steps.discover.outputs.new_modules }};
+            let comment = '## 📋 Module Inventory Update\n\n';
+            
+            if (newModules.length > 0) {
+              comment += '### 🆕 New Modules Detected\n\n';
+              comment += 'The following new modules have been added:\n';
+              newModules.forEach(module => {
+                comment += `- \`${module}\`\n`;
+              });
+              comment += '\n';
+            }
+            
+            comment += '### 🔍 Validation Results\n\n';
+            comment += report;
+            
+            // Add checklist for new modules
+            if (newModules.length > 0) {
+              comment += '\n### ✅ New Module Checklist\n\n';
+              comment += 'Please ensure all new modules meet these requirements:\n\n';
+              comment += '- [ ] Module follows `azurerm_<resource_name>` naming convention\n';
+              comment += '- [ ] All required files are present (main.tf, variables.tf, outputs.tf, versions.tf, README.md)\n';
+              comment += '- [ ] Examples directory contains at least one working example\n';
+              comment += '- [ ] Tests directory contains Terratest tests\n';
+              comment += '- [ ] README.md is generated with terraform-docs\n';
+              comment += '- [ ] Module passes terraform fmt and validate\n';
+              comment += '- [ ] Security scanning shows no critical issues\n';
+            }
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+      
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: module-validation-report
+          path: module-validation-report.md
+      
+      - name: Fail if validation failed
+        if: steps.validate.outputs.all_valid == 'false'
+        run: |
+          echo "❌ Module validation failed. Please check the validation report for details."
+          exit 1

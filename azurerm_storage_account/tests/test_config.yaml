@@ -1,0 +1,69 @@
+# Test configuration for CI/CD integration
+test_suites:
+  - name: "Basic Tests"
+    tests:
+      - TestBasicStorageAccount
+    parallel: true
+    timeout: 15m
+    
+  - name: "Complete Feature Tests"
+    tests:
+      - TestCompleteStorageAccount
+      - TestStorageAccountSecurity
+      - TestStorageAccountNetworkRules
+      - TestStorageAccountPrivateEndpoint
+    parallel: true
+    timeout: 30m
+    
+  - name: "Validation Tests"
+    tests:
+      - TestStorageAccountValidationRules
+    parallel: true
+    timeout: 10m
+    
+  - name: "Performance Tests"
+    tests:
+      - BenchmarkStorageAccountCreation
+    parallel: false
+    timeout: 60m
+    benchmark: true
+
+# Test environment requirements
+environment:
+  required_vars:
+    - ARM_SUBSCRIPTION_ID
+    - ARM_TENANT_ID
+    - ARM_CLIENT_ID
+    - ARM_CLIENT_SECRET
+  
+  azure_regions:
+    - northeurope
+    - westeurope
+  
+  resource_limits:
+    max_storage_accounts: 10
+    max_resource_groups: 5
+
+# Code coverage settings
+coverage:
+  enabled: true
+  threshold: 80
+  exclude_patterns:
+    - "test_helpers.go"
+    - "*_test.go"
+  
+# Test report settings
+reporting:
+  format: junit
+  output_dir: test-results/
+  include_logs: true
+  
+# Retry configuration
+retry:
+  max_attempts: 3
+  backoff_seconds: 30
+  retryable_errors:
+    - "ResourceGroupNotFound"
+    - "StorageAccountAlreadyTaken"
+    - "timeout"
+    - "TooManyRequests"

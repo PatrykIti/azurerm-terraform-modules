@@ -1,0 +1,142 @@
+name: Documentation Generation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/README.md'
+      - '**/main.tf'
+      - '**/variables.tf'
+      - '**/outputs.tf'
+      - '**/versions.tf'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate-module-inventory:
+    name: Generate Module Inventory
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Discover modules
+        id: discover
+        run: |
+          echo "## Discovering Terraform modules..."
+          modules=()
+          for dir in */; do
+            if [[ -f "${dir}main.tf" || -f "${dir}versions.tf" ]]; then
+              if [[ "${dir}" != "_docs/" && "${dir}" != "examples/" && "${dir}" != "scripts/" && "${dir}" != "tests/" && "${dir}" != "modules/" ]]; then
+                modules+=("${dir%/}")
+              fi
+            fi
+          done
+          
+          # Convert array to JSON
+          json_modules=$(printf '%s\n' "${modules[@]}" | jq -R . | jq -s .)
+          echo "modules=${json_modules}" >> $GITHUB_OUTPUT
+          echo "Found modules: ${modules[@]}"
+      
+      - name: Generate module inventory
+        run: |
+          cat > MODULE_INVENTORY.md << 'EOF'
+          # Terraform Module Inventory
+
+          This document provides an overview of all Terraform modules in this repository.
+
+          Last updated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+          ## Available Modules
+
+          | Module | Description | Latest Version | Status |
+          |--------|-------------|----------------|--------|
+          EOF
+          
+          # Parse modules from previous step
+          modules=$(echo '${{ steps.discover.outputs.modules }}' | jq -r '.[]')
+          
+          for module in $modules; do
+            echo "Processing module: $module"
+            
+            # Extract description from README or main.tf
+            description="No description available"
+            if [[ -f "${module}/README.md" ]]; then
+              desc_line=$(grep -m 1 -E "^#.*${module}|^This module" "${module}/README.md" | head -1)
+              if [[ -n "$desc_line" ]]; then
+                description=$(echo "$desc_line" | sed 's/^#*\s*//g' | sed 's/^This module //g')
+              fi
+            fi
+            
+            # Get latest version tag for this module
+            module_prefix=$(echo "$module" | sed 's/azurerm_//' | sed 's/_//g' | tr '[:lower:]' '[:upper:]')
+            latest_tag=$(git tag -l "${module_prefix}v*" | sort -V | tail -1)
+            if [[ -z "$latest_tag" ]]; then
+              latest_tag="Not released"
+            fi
+            
+            # Check if terraform fmt is clean
+            if terraform fmt -check -recursive "${module}" > /dev/null 2>&1; then
+              status="✅ Active"
+            else
+              status="⚠️ Needs formatting"
+            fi
+            
+            echo "| [${module}](./${module}) | ${description} | ${latest_tag} | ${status} |" >> MODULE_INVENTORY.md
+          done
+          
+          echo "" >> MODULE_INVENTORY.md
+          echo "## Module Naming Convention" >> MODULE_INVENTORY.md
+          echo "" >> MODULE_INVENTORY.md
+          echo "- Module directories: \`azurerm_<resource_name>\`" >> MODULE_INVENTORY.md
+          echo "- Version tags: \`<PREFIX>v<major>.<minor>.<patch>\`" >> MODULE_INVENTORY.md
+          echo "  - Example: \`SAv1.0.0\` for storage account module" >> MODULE_INVENTORY.md
+          echo "" >> MODULE_INVENTORY.md
+          echo "## Contributing" >> MODULE_INVENTORY.md
+          echo "" >> MODULE_INVENTORY.md
+          echo "See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on adding new modules." >> MODULE_INVENTORY.md
+      
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet MODULE_INVENTORY.md; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create Pull Request
+        if: steps.check_changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "docs: update module inventory"
+          title: "docs: Update module inventory"
+          body: |
+            ## Description
+            This PR updates the module inventory documentation.
+            
+            ### Changes
+            - Updated MODULE_INVENTORY.md with latest module information
+            - Refreshed module descriptions and versions
+            
+            ---
+            *This PR was automatically generated by the Documentation Generation workflow.*
+          branch: update-module-inventory
+          delete-branch: true
+          labels: |
+            documentation
+            automated

@@ -1,0 +1,306 @@
+name: Azure Storage Account Module - Release
+
+on:
+  push:
+    tags:
+      - 'SAv*'
+
+permissions:
+  contents: write
+  packages: write
+  issues: write
+  pull-requests: write
+
+env:
+  MODULE_NAME: azurerm_storage_account
+  MODULE_PREFIX: SA
+
+jobs:
+  validate-tag:
+    name: Validate Release Tag
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
+      
+    steps:
+      - name: Extract version from tag
+        id: extract
+        run: |
+          TAG_NAME="${{ github.ref_name }}"
+          
+          # Validate tag format
+          if [[ ! "$TAG_NAME" =~ ^SAv[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$ ]]; then
+            echo "❌ Invalid tag format: $TAG_NAME"
+            echo "Expected format: SAv<major>.<minor>.<patch>[-prerelease][+build]"
+            exit 1
+          fi
+          
+          # Extract version without prefix
+          VERSION="${TAG_NAME#SAv}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "✅ Valid version tag: $VERSION"
+
+  quality-checks:
+    name: Pre-release Quality Checks
+    runs-on: ubuntu-latest
+    needs: validate-tag
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: module
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+      
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      
+      - name: Install tools
+        run: |
+          # Install terraform-docs
+          curl -sSLo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.17.0/terraform-docs-v0.17.0-linux-amd64.tar.gz
+          tar -xzf terraform-docs.tar.gz
+          chmod +x terraform-docs
+          sudo mv terraform-docs /usr/local/bin/
+          
+          # Install tfsec
+          curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+          sudo mv tfsec /usr/local/bin/
+          
+          # Install checkov
+          pip install checkov
+      
+      - name: Terraform Format Check
+        run: |
+          cd module/${{ env.MODULE_NAME }}
+          if ! terraform fmt -check -recursive; then
+            echo "❌ Terraform files are not formatted"
+            exit 1
+          fi
+          echo "✅ Terraform formatting check passed"
+      
+      - name: Terraform Validation
+        run: |
+          cd module/${{ env.MODULE_NAME }}
+          terraform init -backend=false
+          terraform validate
+          echo "✅ Terraform validation passed"
+      
+      - name: Documentation Check
+        run: |
+          cd module/${{ env.MODULE_NAME }}
+          
+          # Generate current docs
+          terraform-docs markdown table . > README.md.tmp
+          
+          # Check if docs are up to date
+          if ! diff -q README.md README.md.tmp > /dev/null 2>&1; then
+            echo "❌ Documentation is not up to date"
+            echo "Please run: terraform-docs markdown table . > README.md"
+            exit 1
+          fi
+          
+          rm README.md.tmp
+          echo "✅ Documentation is up to date"
+      
+      - name: Security Scan
+        run: |
+          cd module/${{ env.MODULE_NAME }}
+          
+          # Run tfsec
+          echo "Running tfsec..."
+          tfsec . --minimum-severity MEDIUM || true
+          
+          # Run checkov
+          echo "Running checkov..."
+          checkov -d . --framework terraform --soft-fail
+          
+          echo "✅ Security scans completed"
+      
+      - name: Run Tests
+        id: tests
+        run: |
+          cd module/${{ env.MODULE_NAME }}/tests
+          
+          if [[ -f go.mod ]]; then
+            echo "Running Terratest..."
+            go mod download
+            go test -v -timeout 30m ./... | tee test-results.txt
+            
+            # Extract test coverage if available
+            if grep -q "coverage:" test-results.txt; then
+              coverage=$(grep "coverage:" test-results.txt | tail -1 | grep -oE '[0-9]+\.[0-9]+')
+              echo "test_coverage=$coverage" >> $GITHUB_OUTPUT
+              
+              # Check if coverage meets threshold
+              if (( $(echo "$coverage < 80" | bc -l) )); then
+                echo "⚠️ Test coverage is below 80%: $coverage%"
+              else
+                echo "✅ Test coverage: $coverage%"
+              fi
+            fi
+          else
+            echo "⚠️ No Go tests found"
+            echo "test_coverage=0" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Example Validation
+        run: |
+          cd module/${{ env.MODULE_NAME }}
+          
+          # Check simple example
+          if [[ -d examples/simple ]]; then
+            echo "Validating simple example..."
+            cd examples/simple
+            terraform init -backend=false
+            terraform validate
+            cd ../..
+          fi
+          
+          # Check complete example
+          if [[ -d examples/complete ]]; then
+            echo "Validating complete example..."
+            cd examples/complete
+            terraform init -backend=false
+            terraform validate
+            cd ../..
+          fi
+          
+          echo "✅ Examples validated successfully"
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [validate-tag, quality-checks]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get previous tag for this module
+          CURRENT_TAG="${{ github.ref_name }}"
+          PREVIOUS_TAG=$(git tag -l "${MODULE_PREFIX}v*" | grep -v "$CURRENT_TAG" | sort -V | tail -1)
+          
+          if [[ -z "$PREVIOUS_TAG" ]]; then
+            echo "First release for ${{ env.MODULE_NAME }}"
+            PREVIOUS_TAG=$(git rev-list --max-parents=0 HEAD)
+          fi
+          
+          echo "Generating changelog from $PREVIOUS_TAG to $CURRENT_TAG"
+          
+          # Generate changelog
+          cat > CHANGELOG_ENTRY.md << EOF
+          ## What's Changed
+          
+          ### Commits
+          EOF
+          
+          # Get commits between tags
+          git log --pretty=format:"- %s (%h)" "$PREVIOUS_TAG".."$CURRENT_TAG" -- "${{ env.MODULE_NAME }}/" >> CHANGELOG_ENTRY.md
+          
+          echo "" >> CHANGELOG_ENTRY.md
+          echo "### Full Changelog" >> CHANGELOG_ENTRY.md
+          echo "[$PREVIOUS_TAG...$CURRENT_TAG](https://github.com/${{ github.repository }}/compare/$PREVIOUS_TAG...$CURRENT_TAG)" >> CHANGELOG_ENTRY.md
+      
+      - name: Create module archive
+        run: |
+          # Create a clean archive of the module
+          mkdir -p release
+          cp -r ${{ env.MODULE_NAME }} release/
+          
+          # Remove unnecessary files
+          find release/${{ env.MODULE_NAME }} -name ".terraform*" -type d -exec rm -rf {} + 2>/dev/null || true
+          find release/${{ env.MODULE_NAME }} -name "*.tfstate*" -type f -delete 2>/dev/null || true
+          find release/${{ env.MODULE_NAME }} -name ".DS_Store" -type f -delete 2>/dev/null || true
+          
+          # Create archives
+          cd release
+          tar -czf ../${{ env.MODULE_NAME }}-${{ needs.validate-tag.outputs.version }}.tar.gz ${{ env.MODULE_NAME }}
+          zip -r ../${{ env.MODULE_NAME }}-${{ needs.validate-tag.outputs.version }}.zip ${{ env.MODULE_NAME }}
+          cd ..
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "${{ env.MODULE_NAME }} v${{ needs.validate-tag.outputs.version }}"
+          body_path: CHANGELOG_ENTRY.md
+          draft: false
+          prerelease: ${{ contains(needs.validate-tag.outputs.version, '-') }}
+          files: |
+            ${{ env.MODULE_NAME }}-${{ needs.validate-tag.outputs.version }}.tar.gz
+            ${{ env.MODULE_NAME }}-${{ needs.validate-tag.outputs.version }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Update module registry
+        run: |
+          # Create/update a module registry file
+          cat > ${{ env.MODULE_NAME }}/MODULE_METADATA.json << EOF
+          {
+            "name": "${{ env.MODULE_NAME }}",
+            "version": "${{ needs.validate-tag.outputs.version }}",
+            "description": "Terraform module for Azure Storage Account",
+            "source": "https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}/${{ env.MODULE_NAME }}",
+            "published_at": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "downloads": {
+              "tar": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/${{ env.MODULE_NAME }}-${{ needs.validate-tag.outputs.version }}.tar.gz",
+              "zip": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/${{ env.MODULE_NAME }}-${{ needs.validate-tag.outputs.version }}.zip"
+            }
+          }
+          EOF
+      
+      - name: Notify release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ needs.validate-tag.outputs.version }}';
+            const moduleName = '${{ env.MODULE_NAME }}';
+            
+            // Create an issue to announce the release
+            const issueBody = `## 🎉 New Release: ${moduleName} v${version}
+            
+            A new version of the ${moduleName} module has been released!
+            
+            ### 📦 Installation
+            
+            \`\`\`hcl
+            module "storage_account" {
+              source  = "github.com/${{ github.repository }}//azurerm_storage_account?ref=SAv${version}"
+              # ... configuration ...
+            }
+            \`\`\`
+            
+            ### 📥 Downloads
+            - [Source Archive (tar.gz)](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/${moduleName}-${version}.tar.gz)
+            - [Source Archive (zip)](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/${moduleName}-${version}.zip)
+            
+            ### 📋 Release Notes
+            See the full release notes [here](https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}).
+            
+            ---
+            *This issue was automatically created by the release workflow.*`;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Release: ${moduleName} v${version}`,
+              body: issueBody,
+              labels: ['release', 'module:storage-account']
+            });

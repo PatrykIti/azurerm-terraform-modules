@@ -1,0 +1,130 @@
+provider "azurerm" {
+  features {}
+}
+
+resource "random_string" "suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
+resource "azurerm_resource_group" "test" {
+  name     = "rg-test-storage-complete-${var.random_suffix}"
+  location = var.location
+}
+
+# Virtual network for network rules testing
+resource "azurerm_virtual_network" "test" {
+  name                = "vnet-test-${var.random_suffix}"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
+}
+
+resource "azurerm_subnet" "test" {
+  name                 = "subnet-storage"
+  resource_group_name  = azurerm_resource_group.test.name
+  virtual_network_name = azurerm_virtual_network.test.name
+  address_prefixes     = ["10.0.1.0/24"]
+  
+  service_endpoints = ["Microsoft.Storage"]
+}
+
+# Log Analytics workspace for diagnostics
+resource "azurerm_log_analytics_workspace" "test" {
+  name                = "law-test-${var.random_suffix}"
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
+
+module "storage_account" {
+  source = "../../../"
+  
+  name                     = "stgcomplete${random_string.suffix.result}"
+  resource_group_name      = azurerm_resource_group.test.name
+  location                 = azurerm_resource_group.test.location
+  account_tier             = "Standard"
+  account_replication_type = "ZRS"
+  
+  # Advanced features
+  enable_https_traffic_only        = true
+  minimum_tls_version              = "TLS1_2"
+  allow_blob_public_access         = false
+  enable_infrastructure_encryption = true
+  
+  # Blob properties
+  blob_properties = {
+    versioning_enabled = true
+    change_feed_enabled = true
+    delete_retention_days = 7
+    container_delete_retention_days = 7
+    restore_policy_days = 6
+  }
+  
+  # Containers
+  containers = [
+    {
+      name                  = "data"
+      container_access_type = "private"
+    },
+    {
+      name                  = "logs"
+      container_access_type = "private"
+    },
+    {
+      name                  = "backups"
+      container_access_type = "private"
+    }
+  ]
+  
+  # Network rules
+  network_rules = {
+    default_action = "Deny"
+    ip_rules       = ["203.0.113.0/24"]
+    subnet_ids     = [azurerm_subnet.test.id]
+    bypass         = "AzureServices"
+  }
+  
+  # Diagnostic settings
+  diagnostic_settings = {
+    enabled = true
+    log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
+    metrics = {
+      enabled = true
+      retention_policy = {
+        enabled = true
+        days    = 30
+      }
+    }
+  }
+  
+  # Tags
+  tags = {
+    Environment = "Test"
+    TestType    = "Complete"
+    CostCenter  = "Engineering"
+    Owner       = "terratest"
+  }
+}
+
+output "storage_account_name" {
+  value = module.storage_account.name
+}
+
+output "storage_account_id" {
+  value = module.storage_account.id
+}
+
+output "resource_group_name" {
+  value = azurerm_resource_group.test.name
+}
+
+output "primary_blob_endpoint" {
+  value = module.storage_account.primary_blob_endpoint
+}
+
+output "container_names" {
+  value = module.storage_account.container_names
+}
