@@ -20,6 +20,14 @@
    - Use **lists of objects** for iteration (more readable than maps in Terraform)
    - Always provide secure defaults in object variables
 
+5. **Iteration Best Practices**:
+   - Use descriptive variable names in for loops, not shortcuts
+   - `for container in var.containers` ✅ Correct  
+   - `for c in var.containers` ❌ Wrong
+   - `for file_share in var.file_shares` ✅ Correct
+   - `for fs in var.file_shares` ❌ Wrong
+   - This improves code readability for all developers, especially juniors
+
 4. **Example Structure**:
    ```hcl
    variable "security_settings" {
@@ -46,6 +54,7 @@
 3. Use dynamic blocks for optional configurations
 4. Lists of objects for resources that need iteration
 5. Comprehensive validation with helpful error messages
+6. Clear and descriptive iteration patterns - always use full variable names
 
 # Task Master AI - Claude Code Integration Guide
 
