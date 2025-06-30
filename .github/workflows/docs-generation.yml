@@ -38,11 +38,10 @@ jobs:
         run: |
           echo "## Discovering Terraform modules..."
           modules=()
-          for dir in */; do
+          for dir in modules/*/; do
             if [[ -f "${dir}main.tf" || -f "${dir}versions.tf" ]]; then
-              if [[ "${dir}" != "_docs/" && "${dir}" != "examples/" && "${dir}" != "scripts/" && "${dir}" != "tests/" && "${dir}" != "modules/" ]]; then
-                modules+=("${dir%/}")
-              fi
+              module_name=$(basename "${dir}")
+              modules+=("${module_name}")
             fi
           done
           
@@ -74,8 +73,8 @@ jobs:
             
             # Extract description from README or main.tf
             description="No description available"
-            if [[ -f "${module}/README.md" ]]; then
-              desc_line=$(grep -m 1 -E "^#.*${module}|^This module" "${module}/README.md" | head -1)
+            if [[ -f "modules/${module}/README.md" ]]; then
+              desc_line=$(grep -m 1 -E "^#.*${module}|^This module" "modules/${module}/README.md" | head -1)
               if [[ -n "$desc_line" ]]; then
                 description=$(echo "$desc_line" | sed 's/^#*\s*//g' | sed 's/^This module //g')
               fi
@@ -89,13 +88,13 @@ jobs:
             fi
             
             # Check if terraform fmt is clean
-            if terraform fmt -check -recursive "${module}" > /dev/null 2>&1; then
+            if terraform fmt -check -recursive "modules/${module}" > /dev/null 2>&1; then
               status="✅ Active"
             else
               status="⚠️ Needs formatting"
             fi
             
-            echo "| [${module}](./${module}) | ${description} | ${latest_tag} | ${status} |" >> MODULE_INVENTORY.md
+            echo "| [${module}](./modules/${module}) | ${description} | ${latest_tag} | ${status} |" >> MODULE_INVENTORY.md
           done
           
           echo "" >> MODULE_INVENTORY.md

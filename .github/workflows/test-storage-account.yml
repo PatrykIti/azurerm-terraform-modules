@@ -4,18 +4,18 @@ on:
   push:
     branches: [ main, develop ]
     paths:
-      - 'azurerm_storage_account/**'
+      - 'modules/azurerm_storage_account/**'
       - '.github/workflows/test-storage-account.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'azurerm_storage_account/**'
+      - 'modules/azurerm_storage_account/**'
       - '.github/workflows/test-storage-account.yml'
 
 env:
   GO_VERSION: '1.21'
   TERRAFORM_VERSION: '1.5.0'
-  MODULE_PATH: 'azurerm_storage_account'
+  MODULE_PATH: 'modules/azurerm_storage_account'
 
 jobs:
   validate:

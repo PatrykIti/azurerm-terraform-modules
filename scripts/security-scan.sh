@@ -67,9 +67,9 @@ fi
 echo "Checking security defaults..."
 
 # Check storage account module for secure defaults
-if [ -f "azurerm_storage_account/variables.tf" ]; then
+if [ -f "modules/azurerm_storage_account/variables.tf" ]; then
     # Check HTTPS enforcement
-    if grep -q 'default.*=.*true.*# Security by default' azurerm_storage_account/variables.tf; then
+    if grep -q 'default.*=.*true.*# Security by default' modules/azurerm_storage_account/variables.tf; then
         echo -e "${GREEN}✓ Security defaults are properly configured${NC}"
     else
         echo -e "${YELLOW}⚠ Some security defaults might be missing${NC}"

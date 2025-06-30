@@ -72,16 +72,17 @@ jobs:
             echo "$changed_files"
           fi
           
-          # Scan for modules
-          for dir in */; do
-            # Skip non-module directories
-            if [[ "${dir}" == "_docs/" || "${dir}" == "examples/" || "${dir}" == "scripts/" || "${dir}" == "tests/" || "${dir}" == "modules/" || "${dir}" == ".github/" ]]; then
-              continue
+          # Scan for modules in the modules directory
+          for dir in modules/*/; do
+            # Skip if modules directory doesn't exist
+            if [[ ! -d "modules" ]]; then
+              echo "No modules directory found"
+              exit 0
             fi
             
             # Check if directory contains Terraform files
             if [[ -f "${dir}main.tf" || -f "${dir}versions.tf" ]]; then
-              module_name="${dir%/}"
+              module_name=$(basename "${dir}")
               
               # Check if module follows naming convention
               if [[ ! "$module_name" =~ ^azurerm_ ]]; then
