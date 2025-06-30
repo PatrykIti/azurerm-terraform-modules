@@ -9,7 +9,7 @@ resource "azurerm_storage_account" "storage_account" {
   access_tier              = var.access_tier
 
   # Security settings
-  https_traffic_only_enabled      = var.security_settings.enable_https_traffic_only
+  https_traffic_only_enabled      = var.security_settings.https_traffic_only_enabled
   min_tls_version                 = var.security_settings.min_tls_version
   shared_access_key_enabled       = var.security_settings.shared_access_key_enabled
   allow_nested_items_to_be_public = var.security_settings.allow_nested_items_to_be_public
@@ -192,11 +192,6 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_setting" {
     }
     content {
       category = enabled_log.key
-
-      retention_policy {
-        enabled = true
-        days    = var.diagnostic_settings.logs.retention_days
-      }
     }
   }
 
@@ -209,11 +204,6 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_setting" {
     }
     content {
       category = metric.key
-
-      retention_policy {
-        enabled = true
-        days    = var.diagnostic_settings.metrics.retention_days
-      }
     }
   }
 }
@@ -238,11 +228,6 @@ resource "azurerm_monitor_diagnostic_setting" "blob_diagnostic_setting" {
     }
     content {
       category = enabled_log.key
-
-      retention_policy {
-        enabled = true
-        days    = var.diagnostic_settings.logs.retention_days
-      }
     }
   }
 
@@ -255,11 +240,6 @@ resource "azurerm_monitor_diagnostic_setting" "blob_diagnostic_setting" {
     }
     content {
       category = metric.key
-
-      retention_policy {
-        enabled = true
-        days    = var.diagnostic_settings.metrics.retention_days
-      }
     }
   }
 }
@@ -296,7 +276,7 @@ resource "azurerm_storage_share" "storage_share" {
   for_each = { for fs in var.file_shares : fs.name => fs }
 
   name                 = each.value.name
-  storage_account_name = azurerm_storage_account.storage_account.name
+  storage_account_id   = azurerm_storage_account.storage_account.id
   quota               = each.value.quota
   access_tier         = each.value.access_tier
   enabled_protocol    = each.value.enabled_protocol

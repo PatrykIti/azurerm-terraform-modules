@@ -67,7 +67,7 @@ variable "access_tier" {
 variable "security_settings" {
   description = "Security configuration for the storage account."
   type = object({
-    enable_https_traffic_only       = optional(bool, true)
+    https_traffic_only_enabled      = optional(bool, true)
     min_tls_version                 = optional(string, "TLS1_2")
     shared_access_key_enabled       = optional(bool, false)
     allow_nested_items_to_be_public = optional(bool, false)
@@ -77,8 +77,8 @@ variable "security_settings" {
   default = {}
 
   validation {
-    condition     = contains(["TLS1_0", "TLS1_1", "TLS1_2"], var.security_settings.min_tls_version)
-    error_message = "Valid TLS versions are TLS1_0, TLS1_1, TLS1_2."
+    condition     = contains(["TLS1_2"], var.security_settings.min_tls_version)
+    error_message = "Valid TLS version is TLS1_2. TLS1_0 and TLS1_1 are no longer supported."
   }
 }
 
