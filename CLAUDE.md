@@ -1,3 +1,52 @@
+# Terraform Azure Modules - Development Guide
+
+## Terraform Module Best Practices
+
+### Resource Naming Convention
+1. **Local Resource Names**: For any `azurerm_*` resource, the local name should be the resource type without the provider prefix:
+   - `resource "azurerm_storage_account" "storage_account"` ❌ Wrong
+   - `resource "azurerm_storage_account" "this"` ❌ Wrong  
+   - `resource "azurerm_storage_account" "storage_account"` ✅ Correct
+   - `resource "azurerm_virtual_network" "virtual_network"` ✅ Correct
+   - `resource "azurerm_key_vault" "key_vault"` ✅ Correct
+
+2. **Module Simplicity**: Modules should be the simplest possible layer:
+   - NO `create_*` variables - if someone wants the resource, they use the module
+   - NO conditional creation unless absolutely necessary for the resource logic
+   - Complex logic only when required for different configuration scenarios
+
+3. **Variable Organization**:
+   - Group related configurations into objects (e.g., `security_settings`, `network_settings`)
+   - Use **lists of objects** for iteration (more readable than maps in Terraform)
+   - Always provide secure defaults in object variables
+
+4. **Example Structure**:
+   ```hcl
+   variable "security_settings" {
+     type = object({
+       enable_https_traffic_only = optional(bool, true)
+       min_tls_version          = optional(string, "TLS1_2")
+       shared_access_key_enabled = optional(bool, false)
+     })
+     default = {}
+   }
+   
+   variable "containers" {
+     type = list(object({
+       name                  = string
+       container_access_type = optional(string, "private")
+     }))
+     default = []
+   }
+   ```
+
+### Module Structure Principles
+1. Flat module tree - no nested modules
+2. Security by default - all security settings should be enabled by default
+3. Use dynamic blocks for optional configurations
+4. Lists of objects for resources that need iteration
+5. Comprehensive validation with helpful error messages
+
 # Task Master AI - Claude Code Integration Guide
 
 ## Essential Commands

@@ -63,40 +63,23 @@ variable "access_tier" {
   }
 }
 
-# Security Variables with secure defaults
-variable "min_tls_version" {
-  description = "The minimum supported TLS version for the storage account."
-  type        = string
-  default     = "TLS1_2"
+# Security Settings
+variable "security_settings" {
+  description = "Security configuration for the storage account."
+  type = object({
+    enable_https_traffic_only       = optional(bool, true)
+    min_tls_version                 = optional(string, "TLS1_2")
+    shared_access_key_enabled       = optional(bool, false)
+    allow_nested_items_to_be_public = optional(bool, false)
+    infrastructure_encryption_enabled = optional(bool, true)
+    enable_advanced_threat_protection = optional(bool, true)
+  })
+  default = {}
 
   validation {
-    condition     = contains(["TLS1_0", "TLS1_1", "TLS1_2"], var.min_tls_version)
+    condition     = contains(["TLS1_0", "TLS1_1", "TLS1_2"], var.security_settings.min_tls_version)
     error_message = "Valid TLS versions are TLS1_0, TLS1_1, TLS1_2."
   }
-}
-
-variable "allow_nested_items_to_be_public" {
-  description = "Allow or disallow nested items within this Account to opt into being public."
-  type        = bool
-  default     = false # Security by default
-}
-
-variable "shared_access_key_enabled" {
-  description = "Indicates whether the storage account permits requests to be authorized with the account access key via Shared Key."
-  type        = bool
-  default     = false # Security by default - prefer Azure AD authentication
-}
-
-variable "infrastructure_encryption_enabled" {
-  description = "Is infrastructure encryption enabled? Changing this forces a new resource to be created."
-  type        = bool
-  default     = true # Security by default
-}
-
-variable "enable_advanced_threat_protection" {
-  description = "Should Advanced Threat Protection be enabled for this storage account?"
-  type        = bool
-  default     = true # Security by default
 }
 
 # Network Security
@@ -125,13 +108,20 @@ variable "network_rules" {
 
 # Private Endpoints
 variable "private_endpoints" {
-  description = "Map of private endpoints to create. Keys should be subresource names (blob, file, queue, table, web)."
-  type = map(object({
-    name                 = string
-    subnet_id            = string
-    private_dns_zone_ids = optional(list(string))
+  description = "List of private endpoints to create for the storage account."
+  type = list(object({
+    name                              = string
+    subresource_names                 = list(string)
+    subnet_id                        = string
+    private_dns_zone_ids             = optional(list(string), [])
+    private_service_connection_name   = optional(string)
+    is_manual_connection             = optional(bool, false)
+    request_message                  = optional(string)
+    private_dns_zone_group_name      = optional(string, "default")
+    custom_network_interface_name    = optional(string)
+    tags                            = optional(map(string), {})
   }))
-  default = {}
+  default = []
 }
 
 # Azure AD Authentication
@@ -155,25 +145,27 @@ variable "azure_files_authentication" {
 variable "blob_properties" {
   description = "Blob service properties including soft delete and versioning."
   type = object({
-    versioning_enabled  = optional(bool, true) # Security by default
-    change_feed_enabled = optional(bool, true) # Security by default
+    versioning_enabled       = optional(bool, true)
+    change_feed_enabled      = optional(bool, true)
+    last_access_time_enabled = optional(bool, false)
+    default_service_version  = optional(string)
     delete_retention_policy = optional(object({
-      days = optional(number, 7) # Security by default
-    }), { days = 7 })
+      enabled = optional(bool, true)
+      days    = optional(number, 7)
+    }), { enabled = true, days = 7 })
     container_delete_retention_policy = optional(object({
-      days = optional(number, 7) # Security by default
-    }), { days = 7 })
+      enabled = optional(bool, true)
+      days    = optional(number, 7)
+    }), { enabled = true, days = 7 })
+    cors_rules = optional(list(object({
+      allowed_headers    = list(string)
+      allowed_methods    = list(string)
+      allowed_origins    = list(string)
+      exposed_headers    = list(string)
+      max_age_in_seconds = number
+    })), [])
   })
-  default = {
-    versioning_enabled  = true
-    change_feed_enabled = true
-    delete_retention_policy = {
-      days = 7
-    }
-    container_delete_retention_policy = {
-      days = 7
-    }
-  }
+  default = {}
 }
 
 # Queue Properties with logging
@@ -231,21 +223,74 @@ variable "customer_managed_key" {
 variable "diagnostic_settings" {
   description = "Diagnostic settings configuration for audit logging."
   type = object({
-    name                           = string
-    log_analytics_workspace_id     = optional(string)
-    log_analytics_destination_type = optional(string, "Dedicated")
-    storage_account_id             = optional(string)
-    eventhub_authorization_rule_id = optional(string)
-    eventhub_name                  = optional(string)
-    logs = list(object({
-      category = string
-    }))
-    metrics = list(object({
-      category = string
-      enabled  = optional(bool, true)
-    }))
+    enabled                    = optional(bool, true)
+    log_analytics_workspace_id = optional(string)
+    storage_account_id         = optional(string)
+    eventhub_auth_rule_id      = optional(string)
+    logs = optional(object({
+      storage_read   = optional(bool, true)
+      storage_write  = optional(bool, true)
+      storage_delete = optional(bool, true)
+      retention_days = optional(number, 7)
+    }), {})
+    metrics = optional(object({
+      transaction    = optional(bool, true)
+      capacity       = optional(bool, true)
+      retention_days = optional(number, 7)
+    }), {})
   })
-  default = null
+  default = {
+    enabled = false
+  }
+}
+
+# Encryption Configuration
+variable "encryption" {
+  description = "Encryption configuration for the storage account."
+  type = object({
+    enabled                         = optional(bool, true)
+    infrastructure_encryption_enabled = optional(bool, true)
+    key_vault_key_id               = optional(string)
+    user_assigned_identity_id      = optional(string)
+  })
+  default = {
+    enabled = true
+    infrastructure_encryption_enabled = true
+  }
+}
+
+# Lifecycle Rules
+variable "lifecycle_rules" {
+  description = "List of lifecycle management rules for the storage account."
+  type = list(object({
+    name    = string
+    enabled = optional(bool, true)
+    filters = object({
+      blob_types   = list(string)
+      prefix_match = optional(list(string), [])
+    })
+    actions = object({
+      base_blob = optional(object({
+        tier_to_cool_after_days_since_modification_greater_than        = optional(number)
+        tier_to_archive_after_days_since_modification_greater_than     = optional(number)
+        delete_after_days_since_modification_greater_than              = optional(number)
+        tier_to_cool_after_days_since_last_access_time_greater_than    = optional(number)
+        tier_to_archive_after_days_since_last_access_time_greater_than = optional(number)
+        delete_after_days_since_last_access_time_greater_than          = optional(number)
+      }))
+      snapshot = optional(object({
+        change_tier_to_archive_after_days_since_creation = optional(number)
+        change_tier_to_cool_after_days_since_creation    = optional(number)
+        delete_after_days_since_creation_greater_than    = optional(number)
+      }))
+      version = optional(object({
+        change_tier_to_archive_after_days_since_creation = optional(number)
+        change_tier_to_cool_after_days_since_creation    = optional(number)
+        delete_after_days_since_creation                 = optional(number)
+      }))
+    })
+  }))
+  default = []
 }
 
 # Tags

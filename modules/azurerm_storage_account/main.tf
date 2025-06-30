@@ -1,5 +1,4 @@
-resource "azurerm_storage_account" "this" {
-  count = var.create_storage_account ? 1 : 0
+resource "azurerm_storage_account" "storage_account" {
 
   name                     = var.name
   resource_group_name      = var.resource_group_name
@@ -13,7 +12,7 @@ resource "azurerm_storage_account" "this" {
   enable_https_traffic_only       = var.security_settings.enable_https_traffic_only
   min_tls_version                 = var.security_settings.min_tls_version
   shared_access_key_enabled       = var.security_settings.shared_access_key_enabled
-  allow_nested_items_to_be_public = false
+  allow_nested_items_to_be_public = var.security_settings.allow_nested_items_to_be_public
   
   # Infrastructure encryption
   infrastructure_encryption_enabled = var.encryption.infrastructure_encryption_enabled
@@ -93,10 +92,10 @@ resource "azurerm_storage_account" "this" {
 }
 
 # Lifecycle management
-resource "azurerm_storage_management_policy" "this" {
-  count = var.create_storage_account && length(var.lifecycle_rules) > 0 ? 1 : 0
+resource "azurerm_storage_management_policy" "storage_management_policy" {
+  count = length(var.lifecycle_rules) > 0 ? 1 : 0
 
-  storage_account_id = azurerm_storage_account.this[0].id
+  storage_account_id = azurerm_storage_account.storage_account.id
 
   dynamic "rule" {
     for_each = var.lifecycle_rules
@@ -145,8 +144,8 @@ resource "azurerm_storage_management_policy" "this" {
 }
 
 # Private endpoints
-resource "azurerm_private_endpoint" "this" {
-  for_each = var.create_storage_account ? var.private_endpoints : {}
+resource "azurerm_private_endpoint" "private_endpoint" {
+  for_each = { for idx, pe in var.private_endpoints : pe.name => pe }
 
   name                = "${var.name}-pe-${each.key}"
   location            = var.location
@@ -155,7 +154,7 @@ resource "azurerm_private_endpoint" "this" {
 
   private_service_connection {
     name                           = coalesce(each.value.private_service_connection_name, "${var.name}-psc-${each.key}")
-    private_connection_resource_id = azurerm_storage_account.this[0].id
+    private_connection_resource_id = azurerm_storage_account.storage_account.id
     is_manual_connection           = each.value.is_manual_connection
     subresource_names              = each.value.subresource_names
     request_message                = each.value.is_manual_connection ? each.value.request_message : null
@@ -174,11 +173,11 @@ resource "azurerm_private_endpoint" "this" {
 }
 
 # Diagnostic settings
-resource "azurerm_monitor_diagnostic_setting" "this" {
-  count = var.create_storage_account && var.diagnostic_settings.enabled ? 1 : 0
+resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_setting" {
+  count = var.diagnostic_settings.enabled ? 1 : 0
 
   name                           = "${var.name}-diag"
-  target_resource_id             = azurerm_storage_account.this[0].id
+  target_resource_id             = azurerm_storage_account.storage_account.id
   log_analytics_workspace_id     = var.diagnostic_settings.log_analytics_workspace_id
   storage_account_id             = var.diagnostic_settings.storage_account_id
   eventhub_authorization_rule_id = var.diagnostic_settings.eventhub_auth_rule_id
@@ -220,11 +219,11 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
 }
 
 # Blob service diagnostic settings
-resource "azurerm_monitor_diagnostic_setting" "blob" {
-  count = var.create_storage_account && var.diagnostic_settings.enabled && var.account_kind != "FileStorage" ? 1 : 0
+resource "azurerm_monitor_diagnostic_setting" "blob_diagnostic_setting" {
+  count = var.diagnostic_settings.enabled && var.account_kind != "FileStorage" ? 1 : 0
 
   name                           = "${var.name}-blob-diag"
-  target_resource_id             = "${azurerm_storage_account.this[0].id}/blobServices/default"
+  target_resource_id             = "${azurerm_storage_account.storage_account.id}/blobServices/default"
   log_analytics_workspace_id     = var.diagnostic_settings.log_analytics_workspace_id
   storage_account_id             = var.diagnostic_settings.storage_account_id
   eventhub_authorization_rule_id = var.diagnostic_settings.eventhub_auth_rule_id
