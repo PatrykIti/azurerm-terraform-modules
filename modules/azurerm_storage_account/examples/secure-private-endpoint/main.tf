@@ -45,7 +45,7 @@ resource "azurerm_subnet" "private_endpoints" {
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
   
-  private_endpoint_network_policies_enabled = true
+  private_endpoint_network_policies = "Disabled"
 }
 
 # Subnet for Application
