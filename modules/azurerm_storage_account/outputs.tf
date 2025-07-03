@@ -140,7 +140,7 @@ output "private_endpoints" {
     for k, v in azurerm_private_endpoint.private_endpoint : k => {
       id                   = v.id
       name                 = v.name
-      private_ip_addresses = v.network_interface[0].private_ip_addresses
+      private_ip_addresses = [v.private_service_connection[0].private_ip_address]
       fqdn                 = try(v.custom_dns_configs[0].fqdn, null)
     }
   }
