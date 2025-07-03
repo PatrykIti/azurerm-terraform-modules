@@ -90,7 +90,7 @@
         "id": 6,
         "title": "Storage Account Module: Core Implementation",
         "description": "Refactor the core Storage Account module (`azurerm_storage_account`) to comply with AzureRM provider v5.0. This involves replacing deprecated inline blocks with separate resources, updating variable structures, and ensuring all features like static websites, queue properties, and lifecycle rules are implemented using the latest best practices.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           1
         ],
@@ -102,7 +102,7 @@
             "id": 2,
             "title": "Define Input Variables in `variables.tf`",
             "description": "Create the `variables.tf` file and define all the necessary input variables for the storage account module.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               1
             ],
@@ -113,7 +113,7 @@
             "id": 3,
             "title": "Implement Input Validation",
             "description": "Add validation blocks to the input variables to enforce specific constraints and prevent misconfiguration.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               2
             ],
@@ -124,7 +124,7 @@
             "id": 4,
             "title": "Implement Core `azurerm_storage_account` Resource",
             "description": "Create the `main.tf` file and define the core `azurerm_storage_account` resource using the defined variables.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               3
             ],
@@ -135,7 +135,7 @@
             "id": 5,
             "title": "Configure Basic Blob Service Properties",
             "description": "Enhance the storage account resource to support basic blob service configurations.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               4
             ],
@@ -146,7 +146,7 @@
             "id": 6,
             "title": "Configure Basic File Share Properties",
             "description": "Enhance the storage account resource to support basic file share service configurations.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               4
             ],
@@ -157,7 +157,7 @@
             "id": 7,
             "title": "Define Module Outputs in `outputs.tf`",
             "description": "Create the `outputs.tf` file to expose key attributes of the created storage account for use by other modules.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               4
             ],
@@ -168,7 +168,7 @@
             "id": 8,
             "title": "Create Initial Module Documentation (README.md)",
             "description": "Create a `README.md` file to document the module's purpose, usage, inputs, and outputs.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               3,
               7
@@ -180,7 +180,7 @@
             "id": 9,
             "title": "Implement `azurerm_storage_account_static_website` Resource",
             "description": "Create the standalone resource for static website hosting, replacing the deprecated inline block.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               4
             ],
@@ -191,7 +191,7 @@
             "id": 10,
             "title": "Implement `azurerm_storage_account_queue_properties` Resource",
             "description": "Create the standalone resource for queue properties, replacing the deprecated inline block.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               4
             ],
@@ -202,7 +202,7 @@
             "id": 11,
             "title": "Implement Storage Lifecycle Management Rules",
             "description": "Add support for `azurerm_storage_management_lifecycle_rule` to manage data lifecycle.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               4
             ],
@@ -367,7 +367,7 @@
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-03T09:12:32.659Z",
+      "updated": "2025-07-03T13:24:16.362Z",
       "description": "Tasks for master context"
     }
   }
