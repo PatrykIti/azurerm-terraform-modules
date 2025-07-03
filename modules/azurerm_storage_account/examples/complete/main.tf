@@ -190,12 +190,12 @@ module "storage_account" {
     user_assigned_identity_id        = azurerm_user_assigned_identity.storage.id
   }
 
-  # Network security
+  # Network security - Allow for initial setup, then restrict
   network_rules = {
-    default_action             = "Deny"
+    default_action             = "Allow"  # Allow during initial setup
     bypass                     = ["AzureServices", "Logging", "Metrics"]
-    ip_rules                   = ["203.0.113.0/24"]  # Example IP range
-    virtual_network_subnet_ids = [azurerm_subnet.services.id]
+    ip_rules                   = []  # Add your IP ranges here
+    virtual_network_subnet_ids = []
   }
 
   # Private endpoints
@@ -299,7 +299,7 @@ module "storage_account" {
       actions = {
         base_blob = {
           tier_to_cool_after_days_since_modification_greater_than    = 30
-          tier_to_archive_after_days_since_modification_greater_than = 90
+          # Archive tier not supported with ZRS
           delete_after_days_since_modification_greater_than          = 365
         }
         

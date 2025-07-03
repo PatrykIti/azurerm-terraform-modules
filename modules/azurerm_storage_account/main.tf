@@ -180,7 +180,7 @@ resource "azurerm_private_endpoint" "private_endpoint" {
   tags                          = merge(var.tags, each.value.tags)
 }
 
-# Diagnostic settings
+# Diagnostic settings for storage account level metrics
 resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_setting" {
   count = var.diagnostic_settings.enabled ? 1 : 0
 
@@ -194,19 +194,7 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_setting" {
     azurerm_storage_account.storage_account
   ]
 
-  dynamic "enabled_log" {
-    for_each = {
-      for k, v in {
-        "StorageRead"   = var.diagnostic_settings.logs.storage_read
-        "StorageWrite"  = var.diagnostic_settings.logs.storage_write
-        "StorageDelete" = var.diagnostic_settings.logs.storage_delete
-      } : k => v if v
-    }
-    content {
-      category = enabled_log.key
-    }
-  }
-
+  # Storage account level only has metrics, no logs
   dynamic "metric" {
     for_each = {
       for k, v in {
