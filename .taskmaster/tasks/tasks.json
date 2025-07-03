@@ -89,15 +89,126 @@
       {
         "id": 6,
         "title": "Storage Account Module: Core Implementation",
-        "description": "Develop the core Storage Account module (`azurerm_storage_account`). This initial version will support essential features like account type, replication options, and basic blob/file share configuration.",
-        "details": "Create the directory `modules/storage_account`. Implement `main.tf`, `variables.tf`, and `outputs.tf`. \n`main.tf` will contain the `azurerm_storage_account` resource. \n`variables.tf` will define inputs for `name`, `resource_group_name`, `location`, `account_tier` (Standard/Premium), `account_replication_type` (LRS/GRS/etc.), and `tags`. Use validation blocks for inputs. \n`outputs.tf` will expose the storage account ID, primary connection string, and other key attributes.",
-        "testStrategy": "Manually deploy the module to an Azure environment using `terraform apply` from a simple example configuration. Verify the storage account is created in the Azure portal with the specified tier and replication settings.",
-        "priority": "high",
+        "description": "Refactor the core Storage Account module (`azurerm_storage_account`) to comply with AzureRM provider v5.0. This involves replacing deprecated inline blocks with separate resources, updating variable structures, and ensuring all features like static websites, queue properties, and lifecycle rules are implemented using the latest best practices.",
+        "status": "pending",
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "priority": "high",
+        "details": "Update the module to align with `azurerm` provider v5.0. Key changes include:\n1. Removing the deprecated `static_website` and `queue_properties` blocks from the `azurerm_storage_account` resource.\n2. Implementing these features using the new standalone resources: `azurerm_storage_account_static_website` and `azurerm_storage_account_queue_properties`.\n3. Refactoring input variables (e.g., `static_website`, `queue_properties`) to be complex objects with empty object `{}` defaults, moving default values into `optional()` parameters.\n4. Adding conditional creation logic for the new resources based on whether the corresponding input variable object is empty.",
+        "testStrategy": "Update and execute all existing examples (simple, complete, multi-region, secure, secure-private-endpoint) to validate the refactored module. Specifically verify:\n1. Correct creation of the main storage account.\n2. Conditional creation of the `azurerm_storage_account_static_website` and `azurerm_storage_account_queue_properties` resources.\n3. Functionality of lifecycle rules, noting the incompatibility of the 'Archive' tier with ZRS accounts.\n4. All outputs, including new ones for static website and corrected private endpoint references, are populated correctly.",
         "subtasks": [
+          {
+            "id": 2,
+            "title": "Define Input Variables in `variables.tf`",
+            "description": "Create the `variables.tf` file and define all the necessary input variables for the storage account module.",
+            "status": "pending",
+            "dependencies": [
+              1
+            ],
+            "details": "In `modules/storage_account/variables.tf`, refactor all input variables to follow modern Terraform best practices. This includes defining complex object variables for `static_website` and `queue_properties` to control the new standalone resources. Set the default value for these optional configurations to an empty object `{}` and define nested attribute defaults using the `optional()` function.",
+            "testStrategy": "Create a root module that calls this module. Run `terraform plan` and ensure that Terraform prompts for any variables that do not have default values."
+          },
+          {
+            "id": 3,
+            "title": "Implement Input Validation",
+            "description": "Add validation blocks to the input variables to enforce specific constraints and prevent misconfiguration.",
+            "status": "pending",
+            "dependencies": [
+              2
+            ],
+            "details": "In `variables.tf`, add `validation` blocks to the `account_tier` and `account_replication_type` variables. The `account_tier` should only allow 'Standard' or 'Premium'. The `account_replication_type` should only allow valid Azure replication types (e.g., 'LRS', 'GRS', 'ZRS', 'RAGRS'). For complex object variables, validation is handled by their type constraints and `optional()` definitions.",
+            "testStrategy": "Attempt to run `terraform plan` with invalid values for `account_tier` (e.g., 'Basic') and `account_replication_type` (e.g., 'INVALID'). Verify that the plan fails with the custom error messages from the validation blocks."
+          },
+          {
+            "id": 4,
+            "title": "Implement Core `azurerm_storage_account` Resource",
+            "description": "Create the `main.tf` file and define the core `azurerm_storage_account` resource using the defined variables.",
+            "status": "pending",
+            "dependencies": [
+              3
+            ],
+            "details": "In `modules/storage_account/main.tf`, update the `azurerm_storage_account` resource block. **Crucially, remove the deprecated `static_website` and `queue_properties` inline blocks.** Ensure all other arguments (`name`, `resource_group_name`, `location`, etc.) are correctly mapped from their input variables.",
+            "testStrategy": "Run `terraform apply` using a root module with valid inputs. Verify in the Azure Portal or via Azure CLI that the storage account is created with the specified configuration."
+          },
+          {
+            "id": 5,
+            "title": "Configure Basic Blob Service Properties",
+            "description": "Enhance the storage account resource to support basic blob service configurations.",
+            "status": "pending",
+            "dependencies": [
+              4
+            ],
+            "details": "In `main.tf`, add a `blob_properties` block to the `azurerm_storage_account` resource. Add a new optional variable to control the `delete_retention_policy` days for blobs.",
+            "testStrategy": "Apply the configuration with a specific value for the blob delete retention policy. Verify in the Azure Portal that the 'Soft delete for blobs' setting on the storage account matches the configured value."
+          },
+          {
+            "id": 6,
+            "title": "Configure Basic File Share Properties",
+            "description": "Enhance the storage account resource to support basic file share service configurations.",
+            "status": "pending",
+            "dependencies": [
+              4
+            ],
+            "details": "In `main.tf`, add a `share_properties` block to the `azurerm_storage_account` resource. Add a new optional variable to control the `delete_retention_policy` days for file shares.",
+            "testStrategy": "Apply the configuration with a specific value for the file share delete retention policy. Verify in the Azure Portal that the 'Soft delete for file shares' setting on the storage account matches the configured value."
+          },
+          {
+            "id": 7,
+            "title": "Define Module Outputs in `outputs.tf`",
+            "description": "Create the `outputs.tf` file to expose key attributes of the created storage account for use by other modules.",
+            "status": "pending",
+            "dependencies": [
+              4
+            ],
+            "details": "In `modules/storage_account/outputs.tf`, update and add outputs to reflect the new resources. Add outputs for the `azurerm_storage_account_static_website` (e.g., `static_website_endpoints`) and `azurerm_storage_account_queue_properties` resources. Ensure existing outputs like `primary_connection_string` (marked as sensitive) are preserved. Use `try()` for safe access to outputs from conditionally created resources.",
+            "testStrategy": "After a successful `terraform apply`, run `terraform output` in the root module. Verify that all defined outputs are present and display correct, non-null values. Check that the sensitive connection string is redacted."
+          },
+          {
+            "id": 8,
+            "title": "Create Initial Module Documentation (README.md)",
+            "description": "Create a `README.md` file to document the module's purpose, usage, inputs, and outputs.",
+            "status": "pending",
+            "dependencies": [
+              3,
+              7
+            ],
+            "details": "Update the `README.md` file to reflect the module's new structure and variable formats. Update the usage examples to show how to configure the static website and queue properties using the new complex object variables. Ensure the input and output tables are accurate and document the new conditional resources.",
+            "testStrategy": "Perform a peer review of the `README.md` file. Ensure it is clear, accurate, and provides a complete usage example that can be copied and used directly."
+          },
+          {
+            "id": 9,
+            "title": "Implement `azurerm_storage_account_static_website` Resource",
+            "description": "Create the standalone resource for static website hosting, replacing the deprecated inline block.",
+            "status": "pending",
+            "dependencies": [
+              4
+            ],
+            "details": "In `main.tf`, add a new `azurerm_storage_account_static_website` resource. Use a `count` or `for_each` meta-argument to create this resource conditionally, only when the `var.static_website` object is not empty. Map the resource arguments to the attributes of the `var.static_website` variable.",
+            "testStrategy": "Deploy the module with the `static_website` variable configured. Verify the resource is created and the static website feature is enabled on the storage account in the Azure Portal. Deploy again with an empty object to verify the resource is destroyed."
+          },
+          {
+            "id": 10,
+            "title": "Implement `azurerm_storage_account_queue_properties` Resource",
+            "description": "Create the standalone resource for queue properties, replacing the deprecated inline block.",
+            "status": "pending",
+            "dependencies": [
+              4
+            ],
+            "details": "In `main.tf`, add a new `azurerm_storage_account_queue_properties` resource. Use a `count` or `for_each` meta-argument to create this resource conditionally, only when the `var.queue_properties` object is not empty. Map the resource arguments to the attributes of the `var.queue_properties` variable.",
+            "testStrategy": "Deploy the module with the `queue_properties` variable configured (e.g., with logging). Verify the resource is created and the queue properties are set correctly in the Azure Portal. Deploy again with an empty object to verify the resource is destroyed."
+          },
+          {
+            "id": 11,
+            "title": "Implement Storage Lifecycle Management Rules",
+            "description": "Add support for `azurerm_storage_management_lifecycle_rule` to manage data lifecycle.",
+            "status": "pending",
+            "dependencies": [
+              4
+            ],
+            "details": "Add support for `azurerm_storage_management_lifecycle_rule` resources. Create a new complex object variable `lifecycle_rules` to define rule sets. Implement the resource using a `for_each` loop over the variable. Ensure documentation and examples note that the 'Archive' tier action is not compatible with ZRS replication types.",
+            "testStrategy": "Deploy the module with a lifecycle rule defined for a non-ZRS account. Verify the rule is created in the Azure Portal. Attempt to deploy a rule with an 'Archive' action for a ZRS account and verify that if not handled, it fails as expected."
+          },
           {
             "id": 1,
             "title": "Initialize Module Directory Structure",
@@ -106,84 +217,6 @@
             "details": "Create a new directory named `storage_account` inside the `modules/` directory. This will house all the Terraform files for this module.",
             "status": "done",
             "testStrategy": "Verify that the `modules/storage_account` directory exists in the repository structure."
-          },
-          {
-            "id": 2,
-            "title": "Define Input Variables in `variables.tf`",
-            "description": "Create the `variables.tf` file and define all the necessary input variables for the storage account module.",
-            "dependencies": [
-              1
-            ],
-            "details": "In `modules/storage_account/variables.tf`, define variables for `name`, `resource_group_name`, `location`, `account_tier`, `account_replication_type`, and `tags`. Include clear descriptions and appropriate types for each.",
-            "status": "pending",
-            "testStrategy": "Create a root module that calls this module. Run `terraform plan` and ensure that Terraform prompts for any variables that do not have default values."
-          },
-          {
-            "id": 3,
-            "title": "Implement Input Validation",
-            "description": "Add validation blocks to the input variables to enforce specific constraints and prevent misconfiguration.",
-            "dependencies": [
-              2
-            ],
-            "details": "In `variables.tf`, add `validation` blocks to the `account_tier` and `account_replication_type` variables. The `account_tier` should only allow 'Standard' or 'Premium'. The `account_replication_type` should only allow valid Azure replication types (e.g., 'LRS', 'GRS', 'ZRS', 'RAGRS').\n<info added on 2025-07-03T10:40:36.041Z>\nImplemented comprehensive changes to handle deprecated Azure provider blocks:\n\n1. Replaced deprecated blocks with new resources:\n   - Added `azurerm_storage_account_queue_properties` resource to replace deprecated `queue_properties` block\n   - Added `azurerm_storage_account_static_website` resource to replace deprecated `static_website` block\n\n2. Updated variables following best practices:\n   - Fixed `queue_properties` variable:\n     - Moved default values to the optional() function parameters\n     - Set main default to empty object `{}`\n     - Enabled security defaults (logging enabled by default)\n   - Fixed `static_website` variable:\n     - Set default to empty object `{}`\n     - Made configuration completely optional\n\n3. Updated resource implementations:\n   - Added proper conditional logic using `try()` functions\n   - Added explicit `depends_on` blocks for proper resource ordering\n   - Used `storage_account_id` for new resources (as per v5.0 requirements)\n\n4. Updated outputs:\n   - Added `queue_properties_id` output\n   - Added comprehensive `static_website` output with endpoints\n   - Used `try()` functions for safe access\n\nAll changes follow the established patterns in CLAUDE.md:\n- Empty object defaults for optional configurations\n- Security features enabled by default\n- Proper error handling with try() functions\n- Clean conditional resource creation\n</info added on 2025-07-03T10:40:36.041Z>",
-            "status": "pending",
-            "testStrategy": "Attempt to run `terraform plan` with invalid values for `account_tier` (e.g., 'Basic') and `account_replication_type` (e.g., 'INVALID'). Verify that the plan fails with the custom error messages from the validation blocks."
-          },
-          {
-            "id": 4,
-            "title": "Implement Core `azurerm_storage_account` Resource",
-            "description": "Create the `main.tf` file and define the core `azurerm_storage_account` resource using the defined variables.",
-            "dependencies": [
-              3
-            ],
-            "details": "In `modules/storage_account/main.tf`, add an `azurerm_storage_account` resource block. Map the resource arguments (`name`, `resource_group_name`, `location`, `account_tier`, `account_replication_type`, `tags`) to their corresponding input variables.",
-            "status": "pending",
-            "testStrategy": "Run `terraform apply` using a root module with valid inputs. Verify in the Azure Portal or via Azure CLI that the storage account is created with the specified configuration."
-          },
-          {
-            "id": 5,
-            "title": "Configure Basic Blob Service Properties",
-            "description": "Enhance the storage account resource to support basic blob service configurations.",
-            "dependencies": [
-              4
-            ],
-            "details": "In `main.tf`, add a `blob_properties` block to the `azurerm_storage_account` resource. Add a new optional variable to control the `delete_retention_policy` days for blobs.",
-            "status": "pending",
-            "testStrategy": "Apply the configuration with a specific value for the blob delete retention policy. Verify in the Azure Portal that the 'Soft delete for blobs' setting on the storage account matches the configured value."
-          },
-          {
-            "id": 6,
-            "title": "Configure Basic File Share Properties",
-            "description": "Enhance the storage account resource to support basic file share service configurations.",
-            "dependencies": [
-              4
-            ],
-            "details": "In `main.tf`, add a `share_properties` block to the `azurerm_storage_account` resource. Add a new optional variable to control the `delete_retention_policy` days for file shares.",
-            "status": "pending",
-            "testStrategy": "Apply the configuration with a specific value for the file share delete retention policy. Verify in the Azure Portal that the 'Soft delete for file shares' setting on the storage account matches the configured value."
-          },
-          {
-            "id": 7,
-            "title": "Define Module Outputs in `outputs.tf`",
-            "description": "Create the `outputs.tf` file to expose key attributes of the created storage account for use by other modules.",
-            "dependencies": [
-              4
-            ],
-            "details": "In `modules/storage_account/outputs.tf`, define outputs for `id`, `name`, `primary_location`, `primary_blob_endpoint`, `primary_connection_string`. Mark the connection string as `sensitive = true`.\n<info added on 2025-07-03T10:51:42.824Z>\nSimple example tested and works perfectly after all the recent changes:\n- Deprecated blocks replaced with new resources (queue_properties, static_website)\n- Variables follow best practices with empty object defaults\n- Security defaults properly configured\n- Resource created successfully in 1m18s\n- Queue properties resource created successfully\n- All outputs returned correctly\n- Clean destroy completed\n\nThe module is fully functional with the new structure.\n</info added on 2025-07-03T10:51:42.824Z>\n<info added on 2025-07-03T11:12:16.864Z>\nFixed all errors in the complete example, which now works correctly with the updated module structure.\n- Fixed deprecated private_endpoint_network_policies_enabled attribute to private_endpoint_network_policies = \"Disabled\".\n- Fixed output reference from non-existent private_endpoint_ids to private_endpoints.\n- Fixed private endpoint output to use correct attribute path: private_service_connection[0].private_ip_address.\n- All containers, queues, tables, and file shares are properly configured.\n- Static website configuration is working with the new separate resource.\n- Queue properties with logging are configured correctly.\n- Terraform plan now completes successfully with 34 resources to be created.\n</info added on 2025-07-03T11:12:16.864Z>",
-            "status": "pending",
-            "testStrategy": "After a successful `terraform apply`, run `terraform output` in the root module. Verify that all defined outputs are present and display correct, non-null values. Check that the sensitive connection string is redacted."
-          },
-          {
-            "id": 8,
-            "title": "Create Initial Module Documentation (README.md)",
-            "description": "Create a `README.md` file to document the module's purpose, usage, inputs, and outputs.",
-            "dependencies": [
-              3,
-              7
-            ],
-            "details": "Create a `README.md` file in the `modules/storage_account` directory. Include a brief description of the module, a usage example block, and tables detailing all input variables (including type, description, and default) and all outputs.\n<info added on 2025-07-03T10:59:09.580Z>\nAll storage account examples have been updated to work with the recent module changes:\n\nSimple example:\n- Tested successfully - creates and destroys properly\n- Storage account created in 1m18s\n- Queue properties resource created successfully\n- All outputs work correctly\n\nSecure example:\n- Updated all deprecated attributes to new structure\n- Fixed security_settings, encryption, private_endpoints, diagnostic_settings\n- Removed unsupported attributes\n- Added shared_access_key_enabled = true for Terraform management\n\nSecure-private-endpoint example:\n- Updated to match new variable structure\n- Fixed all deprecated blocks\n- Properly configured private endpoints as list\n\nMulti-region example:\n- Updated all 4 storage account modules\n- Fixed security settings, encryption, monitoring\n- Added tables and queues to replication metadata module\n- Removed unsupported attributes\n\nComplete example:\n- Most comprehensive updates\n- Added containers, queues, tables, and file shares examples\n- Fixed all deprecated attributes\n- Showcases all module features including static website\n\nAll examples now:\n- Use proper security_settings object structure\n- Have encryption configuration separated\n- Use list format for private_endpoints\n- Have shared_access_key_enabled = true for Terraform management\n- Follow the established best practices from CLAUDE.md\n</info added on 2025-07-03T10:59:09.580Z>\n<info added on 2025-07-03T11:17:33.009Z>\nAll storage account module examples have been successfully updated and fixed: The simple example is tested and working perfectly. The secure example is updated with the new module structure. The secure-private-endpoint example has the deprecated private_endpoint_network_policies_enabled attribute fixed. For the multi-region example, all 4 storage accounts are updated. In the complete example, all errors are fixed, including private endpoint output issues. All examples now validate successfully and are ready for deployment. The module fully complies with the updated azurerm provider documentation.\n</info added on 2025-07-03T11:17:33.009Z>",
-            "status": "pending",
-            "testStrategy": "Perform a peer review of the `README.md` file. Ensure it is clear, accurate, and provides a complete usage example that can be copied and used directly."
           }
         ]
       },

@@ -188,7 +188,7 @@ module "secondary_storage" {
     }
   }
 
-  # Lifecycle rules for cost optimization
+  # Lifecycle rules for cost optimization (no archive tier for ZRS)
   lifecycle_rules = [
     {
       name    = "archive-inactive-data"
@@ -201,7 +201,7 @@ module "secondary_storage" {
       actions = {
         base_blob = {
           tier_to_cool_after_days_since_modification_greater_than    = 30
-          tier_to_archive_after_days_since_modification_greater_than = 90
+          # Archive tier not supported with ZRS
           delete_after_days_since_modification_greater_than          = 365
         }
       }

@@ -51,7 +51,6 @@ output "storage_account_identities" {
     primary   = module.primary_storage.identity.principal_id
     secondary = module.secondary_storage.identity.principal_id
     dr        = module.dr_storage.identity.principal_id
-    metadata  = module.replication_metadata.identity.principal_id
   }
 }
 
