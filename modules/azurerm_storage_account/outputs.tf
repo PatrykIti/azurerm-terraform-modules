@@ -137,7 +137,7 @@ output "identity" {
 output "private_endpoints" {
   description = "Map of private endpoints created for the storage account"
   value = {
-    for k, v in azurerm_private_endpoint.this : k => {
+    for k, v in azurerm_private_endpoint.private_endpoint : k => {
       id                   = v.id
       name                 = v.name
       private_ip_addresses = v.network_interface[0].private_ip_address
@@ -192,13 +192,3 @@ output "file_shares" {
   }
 }
 
-output "private_endpoints" {
-  description = "Map of created private endpoints"
-  value = {
-    for k, v in azurerm_private_endpoint.private_endpoint : k => {
-      id               = v.id
-      name             = v.name
-      private_ip_address = try(v.private_service_connection[0].private_ip_address, null)
-    }
-  }
-}

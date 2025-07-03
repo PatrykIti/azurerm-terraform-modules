@@ -203,7 +203,7 @@ variable "identity" {
   validation {
     condition = var.identity == null || contains(
       ["SystemAssigned", "UserAssigned", "SystemAssigned, UserAssigned"],
-      var.identity.type
+      try(var.identity.type, "")
     )
     error_message = "Identity type must be 'SystemAssigned', 'UserAssigned', or 'SystemAssigned, UserAssigned'."
   }
