@@ -1,94 +1,53 @@
 # Contributing to Azure Storage Account Module
 
-Thank you for your interest in contributing to the Azure Storage Account Terraform module! This guide will help you get started.
+This guide covers specific contribution guidelines for the Azure Storage Account module. For general repository contribution guidelines, see the [main CONTRIBUTING.md](../../CONTRIBUTING.md).
 
-## Development Setup
+## 📦 Module Overview
 
-### Prerequisites
-- Terraform >= 1.3.0
-- Azure CLI
-- Go >= 1.19 (for testing)
-- terraform-docs
-- tflint
-- checkov (for security scanning)
+The Azure Storage Account module manages the lifecycle of Azure Storage Accounts with enterprise-grade features including:
+- Security-by-default configuration
+- Private endpoint support
+- Customer-managed key encryption
+- Static website hosting (via separate resource)
+- Queue properties management (via separate resource)
+- Lifecycle management rules
 
-### Local Development
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   # Install terraform-docs
-   brew install terraform-docs
-   
-   # Install tflint
-   brew install tflint
-   
-   # Install checkov
-   pip install checkov
-   ```
+## 🏗️ Module Structure
 
-## Development Workflow
-
-### 1. Create a Feature Branch
-```bash
-git checkout -b feature/your-feature-name
 ```
+modules/azurerm_storage_account/
+├── main.tf                    # Core storage account and related resources
+├── variables.tf               # Input variables with secure defaults
+├── outputs.tf                 # Output values including sensitive data
+├── versions.tf                # Provider version (pinned to 4.35.0)
+├── README.md                  # Auto-generated documentation
+├── examples/
+│   ├── simple/               # Basic usage example
+│   ├── complete/             # All features example
+│   ├── secure/               # Security-focused example
+│   ├── secure-private-endpoint/ # Private endpoint example
+│   └── multi-region/         # Multi-region deployment
+└── .github/workflows/        # Module-specific CI/CD
+    ├── azurerm-storage-account-ci.yml
+    └── azurerm-storage-account-release.yml
 
-### 2. Make Your Changes
-- Update Terraform code
-- Add/update tests
-- Update documentation
-- Update examples if needed
+## 🔧 Module-Specific Guidelines
 
-### 3. Validate Your Changes
+### Important Deprecations (azurerm v5.0)
 
-#### Terraform Validation
-```bash
-# Format code
-terraform fmt -recursive
+This module has been refactored to comply with azurerm provider v5.0:
+- ❌ `static_website` block in `azurerm_storage_account` → ✅ `azurerm_storage_account_static_website` resource
+- ❌ `queue_properties` block in `azurerm_storage_account` → ✅ `azurerm_storage_account_queue_properties` resource
 
-# Initialize
-terraform init -backend=false
+Always use the separate resources for these features.
 
-# Validate
-terraform validate
-```
+### Known Limitations
 
-#### Linting
-```bash
-# Run tflint
-tflint
+1. **Archive Tier + ZRS**: Archive lifecycle tier is not supported with Zone-Redundant Storage (ZRS)
+2. **Diagnostic Categories**: Only metrics are supported at storage account level, not logs
+3. **Private Endpoints**: Each storage service requires its own private endpoint
 
-# Run checkov security scan
-checkov -d . --framework terraform
-```
-
-#### Documentation
-```bash
-# Generate documentation
-./generate-docs.sh
-```
-
-### 4. Test Your Changes
-
-#### Manual Testing
-1. Navigate to an example directory
-2. Create `terraform.tfvars` with your test values
-3. Run:
-   ```bash
-   terraform init
-   terraform plan
-   terraform apply
-   ```
-
-#### Automated Testing
-```bash
-cd tests
-go mod init test
-go mod tidy
-go test -v -timeout 30m
-```
-
-## Code Standards
+## 📝 Code Standards
 
 ### Variable Naming
 - Use descriptive names
@@ -109,43 +68,55 @@ go test -v -timeout 30m
 - Explain security implications
 - Reference Azure documentation
 
-## Adding New Features
+## 🚀 Adding New Features
 
-### 1. Variable Definition
+### 1. Check for Deprecations
+Before implementing, verify the feature isn't deprecated in azurerm v5.0. Check if it requires a separate resource.
+
+### 2. Variable Definition
+Follow the established pattern with secure defaults:
 ```hcl
-variable "new_feature_enabled" {
-  description = "Enable the new feature. Requires XYZ."
-  type        = bool
-  default     = false
+variable "new_feature" {
+  description = "Configuration for the new feature. Set to null to disable."
+  type = object({
+    enabled = optional(bool, true)
+    setting = optional(string, "secure_default")
+  })
+  default = {}
 }
 ```
 
-### 2. Implementation
+### 3. Implementation
+For features requiring separate resources:
 ```hcl
-dynamic "new_feature" {
-  for_each = var.new_feature_enabled ? [1] : []
-  content {
-    # Implementation
-  }
+resource "azurerm_storage_account_new_feature" "new_feature" {
+  count = try(var.new_feature.enabled, false) ? 1 : 0
+  
+  storage_account_id = azurerm_storage_account.storage_account.id
+  setting           = var.new_feature.setting
+  
+  depends_on = [
+    azurerm_storage_account.storage_account
+  ]
 }
 ```
 
-### 3. Output
+### 4. Output
 ```hcl
-output "new_feature_attribute" {
-  description = "The new feature attribute"
-  value       = try(azurerm_storage_account.main.new_feature[0].attribute, null)
+output "new_feature_id" {
+  description = "The ID of the new feature"
+  value       = try(azurerm_storage_account_new_feature.new_feature[0].id, null)
 }
 ```
 
-### 4. Documentation
-- Update README.md
-- Add example usage
-- Update CHANGELOG.md
-
-### 5. Testing
-- Add test case
-- Update existing tests if needed
+### 5. Update Examples
+Add usage to at least the `complete` example:
+```hcl
+new_feature = {
+  enabled = true
+  setting = "custom_value"
+}
+```
 
 ## Security Considerations
 
@@ -160,106 +131,61 @@ output "new_feature_attribute" {
 - Use insecure defaults
 - Bypass security validations
 
-## Testing Guidelines
+## 🧪 Testing Requirements
 
-### Unit Tests
-- Test each configuration variant
-- Test validation rules
-- Test error conditions
-
-### Integration Tests
-- Test with real Azure resources
-- Test upgrade scenarios
-- Test cross-feature interactions
-
-### Example Test Structure
-```go
-func TestStorageAccountBasic(t *testing.T) {
-    // Test implementation
-}
-
-func TestStorageAccountComplete(t *testing.T) {
-    // Test implementation
-}
-
-func TestStorageAccountSecure(t *testing.T) {
-    // Test implementation
-}
+### Example Testing
+Each example must be tested before submission:
+```bash
+cd examples/simple
+terraform init
+terraform plan
+terraform apply -auto-approve
+# Verify resources in Azure Portal
+terraform destroy -auto-approve
 ```
 
-## Pull Request Process
+### Test Coverage Areas
+1. **Basic Functionality**: Simple example
+2. **All Features**: Complete example  
+3. **Security**: Secure and secure-private-endpoint examples
+4. **Multi-Region**: Multi-region example
 
-### PR Title
-Use conventional commits format:
-- `feat: Add support for X`
-- `fix: Resolve issue with Y`
-- `docs: Update README`
-- `refactor: Simplify Z logic`
+### Common Test Scenarios
+- Storage account with lifecycle rules (non-ZRS)
+- Private endpoints for each storage service
+- Customer-managed keys with Key Vault
+- Static website hosting
+- Queue logging configuration
 
-### PR Description Template
-```markdown
-## Description
-Brief description of changes
+## 📋 Module-Specific Checklist
 
-## Type of Change
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Breaking change
-- [ ] Documentation update
+Before submitting a PR for this module:
 
-## Testing
-- [ ] Terraform fmt
-- [ ] Terraform validate
-- [ ] tflint
-- [ ] checkov
-- [ ] Manual testing
-- [ ] Automated tests
+- [ ] Verified no deprecated blocks are used (static_website, queue_properties)
+- [ ] Tested with azurerm provider 4.35.0
+- [ ] All 5 examples tested and working
+- [ ] Considered ZRS limitations for lifecycle rules
+- [ ] Security defaults maintained (HTTPS only, TLS 1.2)
+- [ ] Outputs use `try()` for conditional resources
+- [ ] README.md regenerated with terraform-docs
 
-## Checklist
-- [ ] CHANGELOG.md updated
-- [ ] Documentation updated
-- [ ] Examples updated
-- [ ] Tests added/updated
-```
+## 🏷️ Release Process
 
-### Review Process
-1. Automated checks must pass
-2. Code review by maintainer
-3. Security review for sensitive changes
-4. Testing confirmation
+This module uses independent versioning:
+- **Tag Format**: `SAv<major>.<minor>.<patch>` (e.g., `SAv1.0.0`)
+- **CI/CD**: Module-specific workflows in `.github/workflows/`
 
-## Release Process
+## 📚 Module Resources
 
-### Version Bump
-Follow semantic versioning:
-- Major: Breaking changes
-- Minor: New features
-- Patch: Bug fixes
+- [Azure Storage Account Documentation](https://docs.microsoft.com/azure/storage/common/storage-account-overview)
+- [Terraform azurerm_storage_account Resource](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_account)
+- [Static Website Resource](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_account_static_website)
+- [Queue Properties Resource](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_account_queue_properties)
 
-### Release Steps
-1. Update CHANGELOG.md
-2. Update version in documentation
-3. Create PR with release notes
-4. Tag release after merge
-5. Update module registry
+## ❓ Need Help?
 
-## Getting Help
+- Check existing issues for similar problems
+- Review the examples for implementation patterns
+- Consult the main [CONTRIBUTING.md](../../CONTRIBUTING.md) for general guidelines
 
-### Resources
-- [Azure Storage Documentation](https://docs.microsoft.com/azure/storage/)
-- [Terraform AzureRM Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest)
-- [Module Best Practices](../_docs/terraform-module-best-practices-guide.md)
-
-### Communication
-- Open an issue for bugs
-- Discuss features before implementing
-- Ask questions in discussions
-
-## Code of Conduct
-
-- Be respectful
-- Be constructive
-- Focus on the code
-- Welcome newcomers
-
-Thank you for contributing!
+Thank you for contributing to the Storage Account module!
