@@ -14,6 +14,7 @@ terraform {
 
 provider "azurerm" {
   features {}
+  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
 }
 
 # Random suffix for unique names
@@ -64,13 +65,18 @@ module "primary_storage" {
   access_tier              = "Hot"
 
   # Security settings
-  min_tls_version                  = "TLS1_2"
-  enable_https_traffic_only        = true
-  allow_nested_items_to_be_public  = false
-  enable_infrastructure_encryption = true
-
-  # Failover configuration
-  failover_enabled = true
+  security_settings = {
+    https_traffic_only_enabled      = true
+    min_tls_version                 = "TLS1_2"
+    shared_access_key_enabled       = true  # Required for Terraform to manage the resource
+    allow_nested_items_to_be_public = false
+  }
+  
+  # Encryption settings
+  encryption = {
+    enabled                           = true
+    infrastructure_encryption_enabled = true
+  }
   
   # Network rules (adjust for your environment)
   network_rules = {
@@ -82,8 +88,15 @@ module "primary_storage" {
   diagnostic_settings = {
     enabled                    = true
     log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
-    metrics                    = ["AllMetrics"]
-    logs                       = ["StorageRead", "StorageWrite", "StorageDelete"]
+    logs = {
+      storage_read   = true
+      storage_write  = true
+      storage_delete = true
+    }
+    metrics = {
+      transaction = true
+      capacity    = true
+    }
   }
 
   # Blob properties for replication
@@ -93,10 +106,12 @@ module "primary_storage" {
     last_access_time_enabled = true
     
     delete_retention_policy = {
+      enabled = true
       days = 30
     }
     
     container_delete_retention_policy = {
+      enabled = true
       days = 30
     }
   }
@@ -128,10 +143,18 @@ module "secondary_storage" {
   access_tier              = "Cool" # Cost optimization for secondary
 
   # Security settings
-  min_tls_version                  = "TLS1_2"
-  enable_https_traffic_only        = true
-  allow_nested_items_to_be_public  = false
-  enable_infrastructure_encryption = true
+  security_settings = {
+    https_traffic_only_enabled      = true
+    min_tls_version                 = "TLS1_2"
+    shared_access_key_enabled       = true  # Required for Terraform to manage the resource
+    allow_nested_items_to_be_public = false
+  }
+  
+  # Encryption settings
+  encryption = {
+    enabled                           = true
+    infrastructure_encryption_enabled = true
+  }
 
   # Network rules
   network_rules = {
@@ -143,8 +166,15 @@ module "secondary_storage" {
   diagnostic_settings = {
     enabled                    = true
     log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
-    metrics                    = ["AllMetrics"]
-    logs                       = ["StorageRead", "StorageWrite", "StorageDelete"]
+    logs = {
+      storage_read   = true
+      storage_write  = true
+      storage_delete = true
+    }
+    metrics = {
+      transaction = true
+      capacity    = true
+    }
   }
 
   # Blob properties
@@ -153,6 +183,7 @@ module "secondary_storage" {
     change_feed_enabled = true
     
     delete_retention_policy = {
+      enabled = true
       days = 30
     }
   }
@@ -204,10 +235,18 @@ module "dr_storage" {
   access_tier              = "Cool"
 
   # Security settings
-  min_tls_version                  = "TLS1_2"
-  enable_https_traffic_only        = true
-  allow_nested_items_to_be_public  = false
-  enable_infrastructure_encryption = true
+  security_settings = {
+    https_traffic_only_enabled      = true
+    min_tls_version                 = "TLS1_2"
+    shared_access_key_enabled       = true  # Required for Terraform to manage the resource
+    allow_nested_items_to_be_public = false
+  }
+  
+  # Encryption settings
+  encryption = {
+    enabled                           = true
+    infrastructure_encryption_enabled = true
+  }
 
   # Network rules
   network_rules = {
@@ -219,8 +258,15 @@ module "dr_storage" {
   diagnostic_settings = {
     enabled                    = true
     log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
-    metrics                    = ["AllMetrics"]
-    logs                       = ["StorageRead", "StorageWrite", "StorageDelete"]
+    logs = {
+      storage_read   = true
+      storage_write  = true
+      storage_delete = true
+    }
+    metrics = {
+      transaction = true
+      capacity    = true
+    }
   }
 
   # Blob properties optimized for archive
@@ -229,6 +275,7 @@ module "dr_storage" {
     change_feed_enabled = false  # Not needed for archive
     
     delete_retention_policy = {
+      enabled = true
       days = 90  # Extended retention for DR
     }
   }
@@ -279,21 +326,39 @@ module "replication_metadata" {
   account_replication_type = "GRS"  # Geo-redundant for metadata
   access_tier              = "Hot"
 
-  # Table storage for replication tracking
-  table_storage_enabled = true
+  # Tables for replication tracking
+  tables = [
+    { name = "replicationstatus" },
+    { name = "replicationlog" }
+  ]
 
-  # Queue storage for replication events
-  queue_storage_enabled = true
+  # Queues for replication events
+  queues = [
+    { name = "replicationevents" },
+    { name = "replicationerrors" }
+  ]
 
   # Security settings
-  min_tls_version           = "TLS1_2"
-  enable_https_traffic_only = true
+  security_settings = {
+    https_traffic_only_enabled      = true
+    min_tls_version                 = "TLS1_2"
+    shared_access_key_enabled       = true  # Required for Terraform to manage the resource
+    allow_nested_items_to_be_public = false
+  }
 
   # Monitoring
   diagnostic_settings = {
     enabled                    = true
     log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
-    metrics                    = ["AllMetrics"]
+    logs = {
+      storage_read   = true
+      storage_write  = true
+      storage_delete = true
+    }
+    metrics = {
+      transaction = true
+      capacity    = true
+    }
   }
 
   tags = {

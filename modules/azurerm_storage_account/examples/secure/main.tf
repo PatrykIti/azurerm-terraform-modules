@@ -19,6 +19,7 @@ provider "azurerm" {
       recover_soft_deleted_key_vaults = true
     }
   }
+  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
 }
 
 # Random suffix for unique names
@@ -163,13 +164,20 @@ module "storage_account" {
   account_replication_type = "ZRS"  # Zone redundancy
 
   # Maximum security settings
-  min_tls_version                  = "TLS1_2"
-  enable_https_traffic_only        = true
-  shared_access_key_enabled        = false  # Enforce Azure AD auth only
-  allow_nested_items_to_be_public  = false
-  enable_infrastructure_encryption = true
-  cross_tenant_replication_enabled = false
-  public_network_access_enabled    = false  # Complete network isolation
+  security_settings = {
+    https_traffic_only_enabled      = true
+    min_tls_version                 = "TLS1_2"
+    shared_access_key_enabled       = true  # Required for Terraform to manage the resource
+    allow_nested_items_to_be_public = false
+  }
+  
+  # Additional encryption settings
+  encryption = {
+    enabled                           = true
+    infrastructure_encryption_enabled = true
+    key_vault_key_id                 = azurerm_key_vault_key.storage.id
+    user_assigned_identity_id        = azurerm_user_assigned_identity.storage.id
+  }
 
   # Strict network rules (deny all)
   network_rules = {
@@ -180,38 +188,40 @@ module "storage_account" {
   }
 
   # Private endpoints for all services
-  private_endpoints = {
-    blob = {
-      subnet_id            = azurerm_subnet.private_endpoints.id
+  private_endpoints = [
+    {
+      name                = "blob"
+      subresource_names   = ["blob"]
+      subnet_id           = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.storage["blob"].id]
-    }
-    web = {
-      subnet_id            = azurerm_subnet.private_endpoints.id
+    },
+    {
+      name                = "web"
+      subresource_names   = ["web"]
+      subnet_id           = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.storage["web"].id]
-    }
-    dfs = {
-      subnet_id            = azurerm_subnet.private_endpoints.id
+    },
+    {
+      name                = "dfs"
+      subresource_names   = ["dfs"]
+      subnet_id           = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.storage["dfs"].id]
     }
-  }
+  ]
 
   # Comprehensive monitoring and auditing
   diagnostic_settings = {
     enabled                    = true
     log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    metrics                    = ["AllMetrics"]
-    logs = [
-      "StorageRead",
-      "StorageWrite",
-      "StorageDelete",
-      "Transaction",
-      "Audit"
-    ]
-    retention_days = 90
-    
-    # Additional security monitoring
-    enable_data_plane_logging = true
-    log_version              = "2.0"
+    logs = {
+      storage_read   = true
+      storage_write  = true
+      storage_delete = true
+    }
+    metrics = {
+      transaction = true
+      capacity    = true
+    }
   }
 
   # Identity configuration
@@ -220,32 +230,25 @@ module "storage_account" {
     identity_ids = [azurerm_user_assigned_identity.storage.id]
   }
 
-  # Customer Managed Key with HSM
-  customer_managed_key = {
-    key_vault_key_id          = azurerm_key_vault_key.storage.id
-    user_assigned_identity_id = azurerm_user_assigned_identity.storage.id
-  }
 
   # Blob properties with maximum protection
   blob_properties = {
     versioning_enabled       = true
     change_feed_enabled      = true
-    change_feed_retention_in_days = 365  # One year retention
     last_access_time_enabled = true
+    default_service_version  = "2021-12-02"
     
     delete_retention_policy = {
-      days = 365  # One year soft delete
+      enabled = true
+      days    = 365  # One year soft delete
     }
     
     container_delete_retention_policy = {
-      days = 365  # One year container retention
+      enabled = true
+      days    = 365  # One year container retention
     }
     
-    # Immutability policy default
-    default_service_version = "2021-12-02"
-    
-    # No CORS for security
-    cors_rule = []
+    cors_rules = []  # No CORS for security
   }
 
   # Lifecycle rules for compliance
@@ -268,9 +271,6 @@ module "storage_account" {
       }
     }
   ]
-
-  # Advanced threat protection
-  advanced_threat_protection_enabled = true
 
   # Security tags
   tags = {

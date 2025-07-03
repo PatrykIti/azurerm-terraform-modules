@@ -14,6 +14,7 @@ terraform {
 
 provider "azurerm" {
   features {}
+  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
 }
 
 # Resource Group
@@ -183,12 +184,20 @@ module "secure_storage" {
   account_kind             = "StorageV2"
 
   # Maximum security settings
-  min_tls_version                   = "TLS1_2"
-  enable_https_traffic_only         = true
-  allow_nested_items_to_be_public   = false
-  shared_access_key_enabled         = false
-  infrastructure_encryption_enabled = true
-  enable_advanced_threat_protection = true
+  security_settings = {
+    https_traffic_only_enabled      = true
+    min_tls_version                 = "TLS1_2"
+    shared_access_key_enabled       = true  # Required for Terraform to manage the resource
+    allow_nested_items_to_be_public = false
+  }
+  
+  # Encryption settings
+  encryption = {
+    enabled                           = true
+    infrastructure_encryption_enabled = true
+    key_vault_key_id                 = azurerm_key_vault_key.storage.id
+    user_assigned_identity_id        = azurerm_user_assigned_identity.storage.id
+  }
 
   # Network security - deny all by default
   network_rules = {
@@ -199,28 +208,32 @@ module "secure_storage" {
   }
 
   # Private endpoints for all services
-  private_endpoints = {
-    blob = {
-      name                 = "pe-blob-${random_string.suffix.result}"
+  private_endpoints = [
+    {
+      name                 = "blob"
+      subresource_names    = ["blob"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
-    }
-    file = {
-      name                 = "pe-file-${random_string.suffix.result}"
+    },
+    {
+      name                 = "file"
+      subresource_names    = ["file"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.file.id]
-    }
-    queue = {
-      name                 = "pe-queue-${random_string.suffix.result}"
+    },
+    {
+      name                 = "queue"
+      subresource_names    = ["queue"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.queue.id]
-    }
-    table = {
-      name                 = "pe-table-${random_string.suffix.result}"
+    },
+    {
+      name                 = "table"
+      subresource_names    = ["table"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.table.id]
     }
-  }
+  ]
 
   # Identity for managed authentication
   identity = {
@@ -228,37 +241,34 @@ module "secure_storage" {
     identity_ids = [azurerm_user_assigned_identity.storage.id]
   }
 
-  # Customer managed key encryption
-  customer_managed_key = {
-    key_vault_key_id          = azurerm_key_vault_key.storage.id
-    user_assigned_identity_id = azurerm_user_assigned_identity.storage.id
-  }
 
   # Enhanced data protection
   blob_properties = {
     versioning_enabled  = true
     change_feed_enabled = true
     delete_retention_policy = {
+      enabled = true
       days = 30
     }
     container_delete_retention_policy = {
+      enabled = true
       days = 30
     }
   }
 
   # Comprehensive logging
   diagnostic_settings = {
-    name                       = "diag-storage-secure"
+    enabled                    = true
     log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    logs = [
-      { category = "StorageRead" },
-      { category = "StorageWrite" },
-      { category = "StorageDelete" }
-    ]
-    metrics = [
-      { category = "Transaction" },
-      { category = "Capacity" }
-    ]
+    logs = {
+      storage_read   = true
+      storage_write  = true
+      storage_delete = true
+    }
+    metrics = {
+      transaction = true
+      capacity    = true
+    }
   }
 
   tags = {
