@@ -350,6 +350,19 @@ variable "file_shares" {
   }
 }
 
+# Static Website Configuration
+variable "static_website" {
+  description = "Static website configuration."
+  type = object({
+    enabled              = optional(bool, false)
+    index_document       = optional(string)
+    error_404_document   = optional(string)
+  })
+  default = {
+    enabled = false
+  }
+}
+
 # Tags
 variable "tags" {
   description = "A mapping of tags to assign to the resource."

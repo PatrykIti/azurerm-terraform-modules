@@ -96,6 +96,10 @@ resource "azurerm_storage_management_policy" "storage_management_policy" {
   count = length(var.lifecycle_rules) > 0 ? 1 : 0
 
   storage_account_id = azurerm_storage_account.storage_account.id
+  
+  depends_on = [
+    azurerm_storage_account.storage_account
+  ]
 
   dynamic "rule" {
     for_each = var.lifecycle_rules
@@ -151,6 +155,10 @@ resource "azurerm_private_endpoint" "private_endpoint" {
   location            = var.location
   resource_group_name = var.resource_group_name
   subnet_id           = each.value.subnet_id
+  
+  depends_on = [
+    azurerm_storage_account.storage_account
+  ]
 
   private_service_connection {
     name                           = coalesce(each.value.private_service_connection_name, "${var.name}-psc-${each.key}")
@@ -181,6 +189,10 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_setting" {
   log_analytics_workspace_id     = var.diagnostic_settings.log_analytics_workspace_id
   storage_account_id             = var.diagnostic_settings.storage_account_id
   eventhub_authorization_rule_id = var.diagnostic_settings.eventhub_auth_rule_id
+  
+  depends_on = [
+    azurerm_storage_account.storage_account
+  ]
 
   dynamic "enabled_log" {
     for_each = {
@@ -217,6 +229,10 @@ resource "azurerm_monitor_diagnostic_setting" "blob_diagnostic_setting" {
   log_analytics_workspace_id     = var.diagnostic_settings.log_analytics_workspace_id
   storage_account_id             = var.diagnostic_settings.storage_account_id
   eventhub_authorization_rule_id = var.diagnostic_settings.eventhub_auth_rule_id
+  
+  depends_on = [
+    azurerm_storage_account.storage_account
+  ]
 
   dynamic "enabled_log" {
     for_each = {
@@ -252,6 +268,10 @@ resource "azurerm_storage_container" "storage_container" {
   storage_account_id    = azurerm_storage_account.storage_account.id
   container_access_type = each.value.container_access_type
   metadata             = each.value.metadata
+  
+  depends_on = [
+    azurerm_storage_account.storage_account
+  ]
 }
 
 # Storage Queues
@@ -261,6 +281,10 @@ resource "azurerm_storage_queue" "storage_queue" {
   name                 = each.value.name
   storage_account_name = azurerm_storage_account.storage_account.name
   metadata            = each.value.metadata
+  
+  depends_on = [
+    azurerm_storage_account.storage_account
+  ]
 }
 
 # Storage Tables
@@ -269,6 +293,10 @@ resource "azurerm_storage_table" "storage_table" {
 
   name                 = each.value.name
   storage_account_name = azurerm_storage_account.storage_account.name
+  
+  depends_on = [
+    azurerm_storage_account.storage_account
+  ]
 }
 
 # File Shares
@@ -281,4 +309,43 @@ resource "azurerm_storage_share" "storage_share" {
   access_tier         = each.value.access_tier
   enabled_protocol    = each.value.enabled_protocol
   metadata            = each.value.metadata
+  
+  depends_on = [
+    azurerm_storage_account.storage_account
+  ]
+}
+
+# Queue Properties (separate resource as queue_properties block is deprecated)
+resource "azurerm_storage_account_queue_properties" "queue_properties" {
+  count = var.queue_properties != null ? 1 : 0
+  
+  storage_account_id = azurerm_storage_account.storage_account.id
+  
+  dynamic "logging" {
+    for_each = var.queue_properties.logging != null ? [var.queue_properties.logging] : []
+    content {
+      delete                = logging.value.delete
+      read                  = logging.value.read
+      write                 = logging.value.write
+      version               = logging.value.version
+      retention_policy_days = logging.value.retention_policy_days
+    }
+  }
+  
+  depends_on = [
+    azurerm_storage_account.storage_account
+  ]
+}
+
+# Static Website (separate resource as static_website block is deprecated)
+resource "azurerm_storage_account_static_website" "static_website" {
+  count = var.static_website.enabled && var.static_website.index_document != null ? 1 : 0
+  
+  storage_account_id = azurerm_storage_account.storage_account.id
+  index_document     = var.static_website.index_document
+  error_404_document = var.static_website.error_404_document
+  
+  depends_on = [
+    azurerm_storage_account.storage_account
+  ]
 }
