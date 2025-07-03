@@ -3,14 +3,14 @@ name: Azure Storage Account Module - CI
 on:
   pull_request:
     paths:
-      - 'azurerm_storage_account/**'
-      - '!azurerm_storage_account/.github/**'
+      - 'modules/azurerm_storage_account/**'
+      - '!modules/azurerm_storage_account/.github/**'
   push:
     branches:
       - main
     paths:
-      - 'azurerm_storage_account/**'
-      - '!azurerm_storage_account/.github/**'
+      - 'modules/azurerm_storage_account/**'
+      - '!modules/azurerm_storage_account/.github/**'
 
 permissions:
   contents: read
@@ -19,7 +19,7 @@ permissions:
 
 env:
   MODULE_NAME: azurerm_storage_account
-  MODULE_PATH: ./azurerm_storage_account
+  MODULE_PATH: modules/azurerm_storage_account
 
 jobs:
   validate:

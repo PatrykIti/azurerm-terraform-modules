@@ -78,7 +78,7 @@ jobs:
       
       - name: Terraform Format Check
         run: |
-          cd module/${{ env.MODULE_NAME }}
+          cd module/modules/${{ env.MODULE_NAME }}
           if ! terraform fmt -check -recursive; then
             echo "❌ Terraform files are not formatted"
             exit 1
@@ -87,14 +87,14 @@ jobs:
       
       - name: Terraform Validation
         run: |
-          cd module/${{ env.MODULE_NAME }}
+          cd module/modules/${{ env.MODULE_NAME }}
           terraform init -backend=false
           terraform validate
           echo "✅ Terraform validation passed"
       
       - name: Documentation Check
         run: |
-          cd module/${{ env.MODULE_NAME }}
+          cd module/modules/${{ env.MODULE_NAME }}
           
           # Generate current docs
           terraform-docs markdown table . > README.md.tmp
@@ -111,7 +111,7 @@ jobs:
       
       - name: Security Scan
         run: |
-          cd module/${{ env.MODULE_NAME }}
+          cd module/modules/${{ env.MODULE_NAME }}
           
           # Run tfsec
           echo "Running tfsec..."
@@ -126,7 +126,7 @@ jobs:
       - name: Run Tests
         id: tests
         run: |
-          cd module/${{ env.MODULE_NAME }}/tests
+          cd module/modules/${{ env.MODULE_NAME }}/tests
           
           if [[ -f go.mod ]]; then
             echo "Running Terratest..."
@@ -152,7 +152,7 @@ jobs:
       
       - name: Example Validation
         run: |
-          cd module/${{ env.MODULE_NAME }}
+          cd module/modules/${{ env.MODULE_NAME }}
           
           # Check simple example
           if [[ -d examples/simple ]]; then
@@ -212,7 +212,7 @@ jobs:
           EOF
           
           # Get commits between tags
-          git log --pretty=format:"- %s (%h)" "$PREVIOUS_TAG".."$CURRENT_TAG" -- "${{ env.MODULE_NAME }}/" >> CHANGELOG_ENTRY.md
+          git log --pretty=format:"- %s (%h)" "$PREVIOUS_TAG".."$CURRENT_TAG" -- "modules/${{ env.MODULE_NAME }}/" >> CHANGELOG_ENTRY.md
           
           echo "" >> CHANGELOG_ENTRY.md
           echo "### Full Changelog" >> CHANGELOG_ENTRY.md
@@ -222,7 +222,7 @@ jobs:
         run: |
           # Create a clean archive of the module
           mkdir -p release
-          cp -r ${{ env.MODULE_NAME }} release/
+          cp -r modules/${{ env.MODULE_NAME }} release/
           
           # Remove unnecessary files
           find release/${{ env.MODULE_NAME }} -name ".terraform*" -type d -exec rm -rf {} + 2>/dev/null || true
@@ -252,12 +252,12 @@ jobs:
       - name: Update module registry
         run: |
           # Create/update a module registry file
-          cat > ${{ env.MODULE_NAME }}/MODULE_METADATA.json << EOF
+          cat > modules/${{ env.MODULE_NAME }}/MODULE_METADATA.json << EOF
           {
             "name": "${{ env.MODULE_NAME }}",
             "version": "${{ needs.validate-tag.outputs.version }}",
             "description": "Terraform module for Azure Storage Account",
-            "source": "https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}/${{ env.MODULE_NAME }}",
+            "source": "https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}/modules/${{ env.MODULE_NAME }}",
             "published_at": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
             "downloads": {
               "tar": "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/${{ env.MODULE_NAME }}-${{ needs.validate-tag.outputs.version }}.tar.gz",
@@ -282,7 +282,7 @@ jobs:
             
             \`\`\`hcl
             module "storage_account" {
-              source  = "github.com/${{ github.repository }}//azurerm_storage_account?ref=SAv${version}"
+              source  = "github.com/${{ github.repository }}//modules/azurerm_storage_account?ref=SAv${version}"
               # ... configuration ...
             }
             \`\`\`
