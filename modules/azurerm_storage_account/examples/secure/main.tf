@@ -19,7 +19,6 @@ provider "azurerm" {
       recover_soft_deleted_key_vaults = true
     }
   }
-  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
 }
 
 # Random suffix for unique names
@@ -50,7 +49,7 @@ resource "azurerm_subnet" "private_endpoints" {
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
 
-  private_endpoint_network_policies_enabled = false
+  private_endpoint_network_policies = "Disabled"
 }
 
 # Log Analytics Workspace for security monitoring

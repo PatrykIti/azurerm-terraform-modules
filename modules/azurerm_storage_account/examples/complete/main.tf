@@ -18,7 +18,6 @@ provider "azurerm" {
       purge_soft_delete_on_destroy = true
     }
   }
-  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
 }
 
 # Random suffix for unique names
