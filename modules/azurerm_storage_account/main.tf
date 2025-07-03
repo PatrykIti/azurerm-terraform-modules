@@ -317,7 +317,7 @@ resource "azurerm_storage_share" "storage_share" {
 
 # Queue Properties (separate resource as queue_properties block is deprecated)
 resource "azurerm_storage_account_queue_properties" "queue_properties" {
-  count = var.queue_properties != null ? 1 : 0
+  count = var.queue_properties.logging != null ? 1 : 0
   
   storage_account_id = azurerm_storage_account.storage_account.id
   
@@ -339,11 +339,11 @@ resource "azurerm_storage_account_queue_properties" "queue_properties" {
 
 # Static Website (separate resource as static_website block is deprecated)
 resource "azurerm_storage_account_static_website" "static_website" {
-  count = var.static_website.enabled && var.static_website.index_document != null ? 1 : 0
+  count = try(var.static_website.enabled, false) && try(var.static_website.index_document, null) != null ? 1 : 0
   
   storage_account_id = azurerm_storage_account.storage_account.id
-  index_document     = var.static_website.index_document
-  error_404_document = var.static_website.error_404_document
+  index_document     = try(var.static_website.index_document, null)
+  error_404_document = try(var.static_website.error_404_document, null)
   
   depends_on = [
     azurerm_storage_account.storage_account

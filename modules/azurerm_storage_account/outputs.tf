@@ -199,7 +199,7 @@ output "queue_properties_id" {
 
 output "static_website" {
   description = "Static website properties"
-  value = var.static_website.enabled && var.static_website.index_document != null ? {
+  value = try(var.static_website.enabled, false) && try(var.static_website.index_document, null) != null ? {
     enabled              = true
     index_document       = azurerm_storage_account_static_website.static_website[0].index_document
     error_404_document   = azurerm_storage_account_static_website.static_website[0].error_404_document

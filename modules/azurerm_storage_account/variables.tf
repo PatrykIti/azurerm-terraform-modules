@@ -178,17 +178,15 @@ variable "queue_properties" {
       write                 = optional(bool, true)
       version               = optional(string, "1.0")
       retention_policy_days = optional(number, 7)
-    }))
-  })
-  default = {
-    logging = {
+    }), {
       delete                = true
       read                  = true
       write                 = true
       version               = "1.0"
       retention_policy_days = 7
-    }
-  }
+    })
+  })
+  default = {}
 }
 
 # Identity configuration
@@ -358,9 +356,7 @@ variable "static_website" {
     index_document       = optional(string)
     error_404_document   = optional(string)
   })
-  default = {
-    enabled = false
-  }
+  default = {}
 }
 
 # Tags
