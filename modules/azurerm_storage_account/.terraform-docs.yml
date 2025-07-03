@@ -22,7 +22,7 @@ content: |-
 
   ## Description
 
-  {{ .Description }}
+  This module creates a comprehensive Azure Storage Account with support for all enterprise features including security, monitoring, private endpoints, and lifecycle management.
 
   ## Usage
 
