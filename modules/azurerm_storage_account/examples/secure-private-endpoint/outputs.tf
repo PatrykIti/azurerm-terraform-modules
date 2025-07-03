@@ -36,15 +36,15 @@ output "virtual_network_id" {
 output "security_configuration" {
   description = "Summary of security settings applied"
   value = {
-    https_only                = true
-    min_tls_version           = "TLS1_2"
-    public_access_disabled    = true
-    shared_key_disabled       = true
-    infrastructure_encryption = true
+    https_only                 = true
+    min_tls_version            = "TLS1_2"
+    public_access_disabled     = true
+    shared_key_disabled        = true
+    infrastructure_encryption  = true
     advanced_threat_protection = true
-    network_default_action    = "Deny"
-    private_endpoints_enabled = true
-    customer_managed_key      = true
-    diagnostic_logging        = true
+    network_default_action     = "Deny"
+    private_endpoints_enabled  = true
+    customer_managed_key       = true
+    diagnostic_logging         = true
   }
 }

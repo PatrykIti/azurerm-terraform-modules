@@ -4,7 +4,7 @@ variable "name" {
   type        = string
 
   validation {
-    condition = can(regex("^[a-z0-9]{3,24}$", var.name))
+    condition     = can(regex("^[a-z0-9]{3,24}$", var.name))
     error_message = "Storage account name must be between 3 and 24 characters long and use numbers and lower-case letters only."
   }
 }
@@ -67,10 +67,10 @@ variable "access_tier" {
 variable "security_settings" {
   description = "Security configuration for the storage account."
   type = object({
-    https_traffic_only_enabled      = optional(bool, true)
-    min_tls_version                 = optional(string, "TLS1_2")
-    shared_access_key_enabled       = optional(bool, false)
-    allow_nested_items_to_be_public = optional(bool, false)
+    https_traffic_only_enabled        = optional(bool, true)
+    min_tls_version                   = optional(string, "TLS1_2")
+    shared_access_key_enabled         = optional(bool, false)
+    allow_nested_items_to_be_public   = optional(bool, false)
     infrastructure_encryption_enabled = optional(bool, true)
     enable_advanced_threat_protection = optional(bool, true)
   })
@@ -110,15 +110,15 @@ variable "network_rules" {
 variable "private_endpoints" {
   description = "List of private endpoints to create for the storage account."
   type = list(object({
-    name                              = string
-    subresource_names                 = list(string)
-    subnet_id                        = string
-    private_dns_zone_ids             = optional(list(string), [])
-    private_service_connection_name   = optional(string)
-    is_manual_connection             = optional(bool, false)
-    request_message                  = optional(string)
-    private_dns_zone_group_name      = optional(string, "default")
-    custom_network_interface_name    = optional(string)
+    name                            = string
+    subresource_names               = list(string)
+    subnet_id                       = string
+    private_dns_zone_ids            = optional(list(string), [])
+    private_service_connection_name = optional(string)
+    is_manual_connection            = optional(bool, false)
+    request_message                 = optional(string)
+    private_dns_zone_group_name     = optional(string, "default")
+    custom_network_interface_name   = optional(string)
     tags                            = optional(map(string), {})
   }))
   default = []
@@ -178,7 +178,7 @@ variable "queue_properties" {
       write                 = optional(bool, true)
       version               = optional(string, "1.0")
       retention_policy_days = optional(number, 7)
-    }), {
+      }), {
       delete                = true
       read                  = true
       write                 = true
@@ -246,13 +246,13 @@ variable "diagnostic_settings" {
 variable "encryption" {
   description = "Encryption configuration for the storage account."
   type = object({
-    enabled                         = optional(bool, true)
+    enabled                           = optional(bool, true)
     infrastructure_encryption_enabled = optional(bool, true)
-    key_vault_key_id               = optional(string)
-    user_assigned_identity_id      = optional(string)
+    key_vault_key_id                  = optional(string)
+    user_assigned_identity_id         = optional(string)
   })
   default = {
-    enabled = true
+    enabled                           = true
     infrastructure_encryption_enabled = true
   }
 }
@@ -297,7 +297,7 @@ variable "containers" {
   type = list(object({
     name                  = string
     container_access_type = optional(string, "private")
-    metadata             = optional(map(string), {})
+    metadata              = optional(map(string), {})
   }))
   default = []
 
@@ -352,9 +352,9 @@ variable "file_shares" {
 variable "static_website" {
   description = "Static website configuration."
   type = object({
-    enabled              = optional(bool, false)
-    index_document       = optional(string)
-    error_404_document   = optional(string)
+    enabled            = optional(bool, false)
+    index_document     = optional(string)
+    error_404_document = optional(string)
   })
   default = {}
 }

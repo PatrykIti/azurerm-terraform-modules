@@ -15,7 +15,7 @@ terraform {
 provider "azurerm" {
   features {
     key_vault {
-      purge_soft_delete_on_destroy = false
+      purge_soft_delete_on_destroy    = false
       recover_soft_deleted_key_vaults = true
     }
   }
@@ -58,7 +58,7 @@ resource "azurerm_log_analytics_workspace" "example" {
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
-  retention_in_days   = 90  # Extended retention for security
+  retention_in_days   = 90 # Extended retention for security
 }
 
 # User Assigned Identity for CMK
@@ -74,7 +74,7 @@ resource "azurerm_key_vault" "example" {
   location                        = azurerm_resource_group.example.location
   resource_group_name             = azurerm_resource_group.example.name
   tenant_id                       = data.azurerm_client_config.current.tenant_id
-  sku_name                        = "premium"  # HSM-backed keys
+  sku_name                        = "premium" # HSM-backed keys
   soft_delete_retention_days      = 90
   purge_protection_enabled        = true
   enabled_for_disk_encryption     = false
@@ -84,7 +84,7 @@ resource "azurerm_key_vault" "example" {
   network_acls {
     default_action = "Deny"
     bypass         = "AzureServices"
-    ip_rules       = []  # Add your management IPs here
+    ip_rules       = [] # Add your management IPs here
   }
 
   access_policy {
@@ -111,8 +111,8 @@ resource "azurerm_key_vault" "example" {
 resource "azurerm_key_vault_key" "storage" {
   name         = "storage-encryption-key"
   key_vault_id = azurerm_key_vault.example.id
-  key_type     = "RSA-HSM"  # HSM-protected key
-  key_size     = 4096       # Maximum key size
+  key_type     = "RSA-HSM" # HSM-protected key
+  key_size     = 4096      # Maximum key size
 
   key_opts = [
     "decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"
@@ -132,7 +132,7 @@ resource "azurerm_key_vault_key" "storage" {
 # Private DNS Zones for all storage services
 resource "azurerm_private_dns_zone" "storage" {
   for_each = toset(["blob", "file", "queue", "table", "web", "dfs"])
-  
+
   name                = "privatelink.${each.key}.core.windows.net"
   resource_group_name = azurerm_resource_group.example.name
 }
@@ -140,7 +140,7 @@ resource "azurerm_private_dns_zone" "storage" {
 # Link DNS zones to VNet
 resource "azurerm_private_dns_zone_virtual_network_link" "storage" {
   for_each = azurerm_private_dns_zone.storage
-  
+
   name                  = "${each.key}-dns-link"
   resource_group_name   = azurerm_resource_group.example.name
   private_dns_zone_name = each.value.name
@@ -158,52 +158,52 @@ module "storage_account" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  account_kind             = "BlockBlobStorage"  # Premium performance
+  account_kind             = "BlockBlobStorage" # Premium performance
   account_tier             = "Premium"
-  account_replication_type = "ZRS"  # Zone redundancy
+  account_replication_type = "ZRS" # Zone redundancy
 
   # Maximum security settings
   security_settings = {
     https_traffic_only_enabled      = true
     min_tls_version                 = "TLS1_2"
-    shared_access_key_enabled       = true  # Required for Terraform to manage the resource
+    shared_access_key_enabled       = true # Required for Terraform to manage the resource
     allow_nested_items_to_be_public = false
   }
-  
+
   # Additional encryption settings
   encryption = {
     enabled                           = true
     infrastructure_encryption_enabled = true
-    key_vault_key_id                 = azurerm_key_vault_key.storage.id
-    user_assigned_identity_id        = azurerm_user_assigned_identity.storage.id
+    key_vault_key_id                  = azurerm_key_vault_key.storage.id
+    user_assigned_identity_id         = azurerm_user_assigned_identity.storage.id
   }
 
   # Strict network rules (deny all)
   network_rules = {
-    default_action = "Deny"
-    bypass         = []  # No bypass, not even for Azure services
-    ip_rules       = []  # No public IPs allowed
-    virtual_network_subnet_ids = []  # Only private endpoints
+    default_action             = "Deny"
+    bypass                     = [] # No bypass, not even for Azure services
+    ip_rules                   = [] # No public IPs allowed
+    virtual_network_subnet_ids = [] # Only private endpoints
   }
 
   # Private endpoints for all services
   private_endpoints = [
     {
-      name                = "blob"
-      subresource_names   = ["blob"]
-      subnet_id           = azurerm_subnet.private_endpoints.id
+      name                 = "blob"
+      subresource_names    = ["blob"]
+      subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.storage["blob"].id]
     },
     {
-      name                = "web"
-      subresource_names   = ["web"]
-      subnet_id           = azurerm_subnet.private_endpoints.id
+      name                 = "web"
+      subresource_names    = ["web"]
+      subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.storage["web"].id]
     },
     {
-      name                = "dfs"
-      subresource_names   = ["dfs"]
-      subnet_id           = azurerm_subnet.private_endpoints.id
+      name                 = "dfs"
+      subresource_names    = ["dfs"]
+      subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.storage["dfs"].id]
     }
   ]
@@ -225,7 +225,7 @@ module "storage_account" {
 
   # Identity configuration
   identity = {
-    type = "SystemAssigned, UserAssigned"
+    type         = "SystemAssigned, UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.storage.id]
   }
 
@@ -236,18 +236,18 @@ module "storage_account" {
     change_feed_enabled      = true
     last_access_time_enabled = true
     default_service_version  = "2021-12-02"
-    
+
     delete_retention_policy = {
       enabled = true
-      days    = 365  # One year soft delete
+      days    = 365 # One year soft delete
     }
-    
+
     container_delete_retention_policy = {
       enabled = true
-      days    = 365  # One year container retention
+      days    = 365 # One year container retention
     }
-    
-    cors_rules = []  # No CORS for security
+
+    cors_rules = [] # No CORS for security
   }
 
   # Lifecycle rules for compliance
@@ -255,12 +255,12 @@ module "storage_account" {
     {
       name    = "compliance-retention"
       enabled = true
-      
+
       filters = {
         blob_types   = ["blockBlob"]
         prefix_match = ["audit/", "compliance/"]
       }
-      
+
       actions = {
         base_blob = {
           # Never delete compliance data
@@ -273,15 +273,15 @@ module "storage_account" {
 
   # Security tags
   tags = {
-    Environment     = "Production"
-    SecurityLevel   = "Maximum"
-    DataClass       = "Highly Confidential"
-    Compliance      = "SOC2,ISO27001,HIPAA"
-    EncryptionType  = "Customer-Managed-HSM"
-    NetworkAccess   = "Private-Only"
-    Authentication  = "Azure-AD-Only"
-    Owner           = "Security Team"
-    ManagedBy       = "Terraform"
+    Environment    = "Production"
+    SecurityLevel  = "Maximum"
+    DataClass      = "Highly Confidential"
+    Compliance     = "SOC2,ISO27001,HIPAA"
+    EncryptionType = "Customer-Managed-HSM"
+    NetworkAccess  = "Private-Only"
+    Authentication = "Azure-AD-Only"
+    Owner          = "Security Team"
+    ManagedBy      = "Terraform"
   }
 
   depends_on = [

@@ -26,7 +26,7 @@ resource "azurerm_subnet" "test" {
   resource_group_name  = azurerm_resource_group.test.name
   virtual_network_name = azurerm_virtual_network.test.name
   address_prefixes     = ["10.0.1.0/24"]
-  
+
   service_endpoints = ["Microsoft.Storage"]
 }
 
@@ -41,28 +41,28 @@ resource "azurerm_log_analytics_workspace" "test" {
 
 module "storage_account" {
   source = "../../../"
-  
+
   name                     = "stgcomplete${random_string.suffix.result}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"
   account_replication_type = "ZRS"
-  
+
   # Advanced features
   enable_https_traffic_only        = true
   minimum_tls_version              = "TLS1_2"
   allow_blob_public_access         = false
   enable_infrastructure_encryption = true
-  
+
   # Blob properties
   blob_properties = {
-    versioning_enabled = true
-    change_feed_enabled = true
-    delete_retention_days = 7
+    versioning_enabled              = true
+    change_feed_enabled             = true
+    delete_retention_days           = 7
     container_delete_retention_days = 7
-    restore_policy_days = 6
+    restore_policy_days             = 6
   }
-  
+
   # Containers
   containers = [
     {
@@ -78,7 +78,7 @@ module "storage_account" {
       container_access_type = "private"
     }
   ]
-  
+
   # Network rules
   network_rules = {
     default_action = "Deny"
@@ -86,10 +86,10 @@ module "storage_account" {
     subnet_ids     = [azurerm_subnet.test.id]
     bypass         = "AzureServices"
   }
-  
+
   # Diagnostic settings
   diagnostic_settings = {
-    enabled = true
+    enabled                    = true
     log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
     metrics = {
       enabled = true
@@ -99,7 +99,7 @@ module "storage_account" {
       }
     }
   }
-  
+
   # Tags
   tags = {
     Environment = "Test"

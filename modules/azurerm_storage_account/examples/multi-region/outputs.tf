@@ -66,11 +66,11 @@ output "region_mapping" {
 output "replication_endpoints" {
   description = "Endpoints for setting up cross-region replication"
   value = {
-    source_primary      = module.primary_storage.primary_blob_endpoint
-    source_secondary    = module.primary_storage.secondary_blob_endpoint
-    target_secondary    = module.secondary_storage.primary_blob_endpoint
-    target_dr           = module.dr_storage.primary_blob_endpoint
-    metadata_table      = module.replication_metadata.primary_table_endpoint
-    metadata_queue      = module.replication_metadata.primary_queue_endpoint
+    source_primary   = module.primary_storage.primary_blob_endpoint
+    source_secondary = module.primary_storage.secondary_blob_endpoint
+    target_secondary = module.secondary_storage.primary_blob_endpoint
+    target_dr        = module.dr_storage.primary_blob_endpoint
+    metadata_table   = module.replication_metadata.primary_table_endpoint
+    metadata_queue   = module.replication_metadata.primary_queue_endpoint
   }
 }

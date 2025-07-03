@@ -363,11 +363,25 @@
         ],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 17,
+        "title": "Standardize azurerm Provider Version to 4.35.0",
+        "description": "Pin the `azurerm` provider version to exactly `4.35.0` across all Terraform modules. This ensures consistent behavior and predictable deployments by preventing automatic provider upgrades.",
+        "details": "For each module in the `modules/` directory (e.g., `storage_account`, `virtual_network`, `key_vault`, `application_gateway`), locate or create a `versions.tf` file. Inside this file, add or update the `terraform` block to specify the exact provider version. The configuration should be: `terraform { required_providers { azurerm = { source = \"hashicorp/azurerm\", version = \"= 4.35.0\" } } }`. After updating the files, run `terraform init` within each module's primary example directory to update the `.terraform.lock.hcl` file. Commit both the changes to the `versions.tf` files and the updated lock file to the repository.",
+        "testStrategy": "1. Verify that every module directory under `modules/` contains a `versions.tf` file with the `azurerm` provider pinned to version `= 4.35.0`. 2. Pull the changes locally and run `terraform init` in at least two different module example directories (e.g., `examples/storage_account/simple` and `examples/application_gateway/simple_gateway`) to confirm successful initialization with the specified provider version. 3. Push the changes to a new branch and create a pull request. The CI/CD validation workflow must pass, confirming that `terraform validate` and `tflint` succeed for all modules with the pinned provider version.",
+        "status": "pending",
+        "dependencies": [
+          13,
+          16
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-03T13:24:16.362Z",
+      "updated": "2025-07-03T13:36:01.340Z",
       "description": "Tasks for master context"
     }
   }

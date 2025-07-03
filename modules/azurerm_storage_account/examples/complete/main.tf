@@ -177,23 +177,23 @@ module "storage_account" {
   security_settings = {
     https_traffic_only_enabled      = true
     min_tls_version                 = "TLS1_2"
-    shared_access_key_enabled       = true  # Required for Terraform to manage the resource
+    shared_access_key_enabled       = true # Required for Terraform to manage the resource
     allow_nested_items_to_be_public = false
   }
-  
+
   # Encryption settings
   encryption = {
     enabled                           = true
     infrastructure_encryption_enabled = true
-    key_vault_key_id                 = azurerm_key_vault_key.storage.id
-    user_assigned_identity_id        = azurerm_user_assigned_identity.storage.id
+    key_vault_key_id                  = azurerm_key_vault_key.storage.id
+    user_assigned_identity_id         = azurerm_user_assigned_identity.storage.id
   }
 
   # Network security - Allow for initial setup, then restrict
   network_rules = {
-    default_action             = "Allow"  # Allow during initial setup
+    default_action             = "Allow" # Allow during initial setup
     bypass                     = ["AzureServices", "Logging", "Metrics"]
-    ip_rules                   = []  # Add your IP ranges here
+    ip_rules                   = [] # Add your IP ranges here
     virtual_network_subnet_ids = []
   }
 
@@ -242,7 +242,7 @@ module "storage_account" {
 
   # Identity
   identity = {
-    type = "SystemAssigned, UserAssigned"
+    type         = "SystemAssigned, UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.storage.id]
   }
 
@@ -252,17 +252,17 @@ module "storage_account" {
     versioning_enabled       = true
     change_feed_enabled      = true
     last_access_time_enabled = true
-    
+
     delete_retention_policy = {
       enabled = true
-      days = 30
+      days    = 30
     }
-    
+
     container_delete_retention_policy = {
       enabled = true
-      days = 30
+      days    = 30
     }
-    
+
     cors_rules = [{
       allowed_headers    = ["*"]
       allowed_methods    = ["GET", "HEAD", "POST", "PUT"]
@@ -289,23 +289,23 @@ module "storage_account" {
     {
       name    = "archive-old-blobs"
       enabled = true
-      
+
       filters = {
         blob_types   = ["blockBlob"]
         prefix_match = ["logs/"]
       }
-      
+
       actions = {
         base_blob = {
-          tier_to_cool_after_days_since_modification_greater_than    = 30
+          tier_to_cool_after_days_since_modification_greater_than = 30
           # Archive tier not supported with ZRS
-          delete_after_days_since_modification_greater_than          = 365
+          delete_after_days_since_modification_greater_than = 365
         }
-        
+
         snapshot = {
           delete_after_days_since_creation_greater_than = 90
         }
-        
+
         version = {
           delete_after_days_since_creation = 90
         }
@@ -314,12 +314,12 @@ module "storage_account" {
     {
       name    = "delete-temp-data"
       enabled = true
-      
+
       filters = {
         blob_types   = ["blockBlob", "appendBlob"]
         prefix_match = ["temp/"]
       }
-      
+
       actions = {
         base_blob = {
           delete_after_days_since_modification_greater_than = 7
@@ -397,13 +397,13 @@ module "storage_account" {
 
 
   tags = {
-    Environment   = "Production"
-    Example       = "Complete"
-    Compliance    = "PCI-DSS"
-    DataClass     = "Confidential"
-    CostCenter    = "IT-Security"
-    Owner         = "Platform Team"
-    ManagedBy     = "Terraform"
+    Environment = "Production"
+    Example     = "Complete"
+    Compliance  = "PCI-DSS"
+    DataClass   = "Confidential"
+    CostCenter  = "IT-Security"
+    Owner       = "Platform Team"
+    ManagedBy   = "Terraform"
   }
 
   depends_on = [

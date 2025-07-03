@@ -60,26 +60,26 @@ module "primary_storage" {
 
   account_kind             = "StorageV2"
   account_tier             = "Standard"
-  account_replication_type = "RAGRS"  # Read-access geo-redundant storage
+  account_replication_type = "RAGRS" # Read-access geo-redundant storage
   access_tier              = "Hot"
 
   # Security settings
   security_settings = {
     https_traffic_only_enabled      = true
     min_tls_version                 = "TLS1_2"
-    shared_access_key_enabled       = true  # Required for Terraform to manage the resource
+    shared_access_key_enabled       = true # Required for Terraform to manage the resource
     allow_nested_items_to_be_public = false
   }
-  
+
   # Encryption settings
   encryption = {
     enabled                           = true
     infrastructure_encryption_enabled = true
   }
-  
+
   # Network rules (adjust for your environment)
   network_rules = {
-    default_action = "Allow"  # Adjust based on security requirements
+    default_action = "Allow" # Adjust based on security requirements
     bypass         = ["AzureServices", "Logging", "Metrics"]
   }
 
@@ -103,15 +103,15 @@ module "primary_storage" {
     versioning_enabled       = true
     change_feed_enabled      = true
     last_access_time_enabled = true
-    
+
     delete_retention_policy = {
       enabled = true
-      days = 30
+      days    = 30
     }
-    
+
     container_delete_retention_policy = {
       enabled = true
-      days = 30
+      days    = 30
     }
   }
 
@@ -145,10 +145,10 @@ module "secondary_storage" {
   security_settings = {
     https_traffic_only_enabled      = true
     min_tls_version                 = "TLS1_2"
-    shared_access_key_enabled       = true  # Required for Terraform to manage the resource
+    shared_access_key_enabled       = true # Required for Terraform to manage the resource
     allow_nested_items_to_be_public = false
   }
-  
+
   # Encryption settings
   encryption = {
     enabled                           = true
@@ -180,10 +180,10 @@ module "secondary_storage" {
   blob_properties = {
     versioning_enabled  = true
     change_feed_enabled = true
-    
+
     delete_retention_policy = {
       enabled = true
-      days = 30
+      days    = 30
     }
   }
 
@@ -192,16 +192,16 @@ module "secondary_storage" {
     {
       name    = "archive-inactive-data"
       enabled = true
-      
+
       filters = {
         blob_types = ["blockBlob"]
       }
-      
+
       actions = {
         base_blob = {
-          tier_to_cool_after_days_since_modification_greater_than    = 30
+          tier_to_cool_after_days_since_modification_greater_than = 30
           # Archive tier not supported with ZRS
-          delete_after_days_since_modification_greater_than          = 365
+          delete_after_days_since_modification_greater_than = 365
         }
       }
     }
@@ -230,17 +230,17 @@ module "dr_storage" {
 
   account_kind             = "StorageV2"
   account_tier             = "Standard"
-  account_replication_type = "LRS"  # Local redundancy sufficient for DR archive
+  account_replication_type = "LRS" # Local redundancy sufficient for DR archive
   access_tier              = "Cool"
 
   # Security settings
   security_settings = {
     https_traffic_only_enabled      = true
     min_tls_version                 = "TLS1_2"
-    shared_access_key_enabled       = true  # Required for Terraform to manage the resource
+    shared_access_key_enabled       = true # Required for Terraform to manage the resource
     allow_nested_items_to_be_public = false
   }
-  
+
   # Encryption settings
   encryption = {
     enabled                           = true
@@ -271,11 +271,11 @@ module "dr_storage" {
   # Blob properties optimized for archive
   blob_properties = {
     versioning_enabled  = true
-    change_feed_enabled = false  # Not needed for archive
-    
+    change_feed_enabled = false # Not needed for archive
+
     delete_retention_policy = {
       enabled = true
-      days = 90  # Extended retention for DR
+      days    = 90 # Extended retention for DR
     }
   }
 
@@ -284,12 +284,12 @@ module "dr_storage" {
     {
       name    = "immediate-archive"
       enabled = true
-      
+
       filters = {
         blob_types   = ["blockBlob"]
         prefix_match = ["archive/", "backup/"]
       }
-      
+
       actions = {
         base_blob = {
           tier_to_cool_after_days_since_modification_greater_than    = 1
@@ -322,7 +322,7 @@ module "replication_metadata" {
 
   account_kind             = "StorageV2"
   account_tier             = "Standard"
-  account_replication_type = "GRS"  # Geo-redundant for metadata
+  account_replication_type = "GRS" # Geo-redundant for metadata
   access_tier              = "Hot"
 
   # Tables for replication tracking
@@ -341,7 +341,7 @@ module "replication_metadata" {
   security_settings = {
     https_traffic_only_enabled      = true
     min_tls_version                 = "TLS1_2"
-    shared_access_key_enabled       = true  # Required for Terraform to manage the resource
+    shared_access_key_enabled       = true # Required for Terraform to manage the resource
     allow_nested_items_to_be_public = false
   }
 

@@ -20,7 +20,7 @@ provider "azurerm" {
 resource "azurerm_resource_group" "example" {
   name     = "rg-storage-secure-example"
   location = "West Europe"
-  
+
   tags = {
     Environment        = "Production"
     SecurityLevel      = "High"
@@ -43,7 +43,7 @@ resource "azurerm_subnet" "private_endpoints" {
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
-  
+
   private_endpoint_network_policies = "Disabled"
 }
 
@@ -53,7 +53,7 @@ resource "azurerm_subnet" "app" {
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.2.0/24"]
-  
+
   service_endpoints = ["Microsoft.Storage"]
 }
 
@@ -186,23 +186,23 @@ module "secure_storage" {
   security_settings = {
     https_traffic_only_enabled      = true
     min_tls_version                 = "TLS1_2"
-    shared_access_key_enabled       = true  # Required for Terraform to manage the resource
+    shared_access_key_enabled       = true # Required for Terraform to manage the resource
     allow_nested_items_to_be_public = false
   }
-  
+
   # Encryption settings
   encryption = {
     enabled                           = true
     infrastructure_encryption_enabled = true
-    key_vault_key_id                 = azurerm_key_vault_key.storage.id
-    user_assigned_identity_id        = azurerm_user_assigned_identity.storage.id
+    key_vault_key_id                  = azurerm_key_vault_key.storage.id
+    user_assigned_identity_id         = azurerm_user_assigned_identity.storage.id
   }
 
   # Network security - deny all by default
   network_rules = {
     default_action             = "Deny"
     bypass                     = ["AzureServices"]
-    ip_rules                   = []  # No public IPs allowed
+    ip_rules                   = [] # No public IPs allowed
     virtual_network_subnet_ids = [azurerm_subnet.app.id]
   }
 
@@ -247,11 +247,11 @@ module "secure_storage" {
     change_feed_enabled = true
     delete_retention_policy = {
       enabled = true
-      days = 30
+      days    = 30
     }
     container_delete_retention_policy = {
       enabled = true
-      days = 30
+      days    = 30
     }
   }
 

@@ -200,11 +200,11 @@ output "queue_properties_id" {
 output "static_website" {
   description = "Static website properties"
   value = try(var.static_website.enabled, false) && try(var.static_website.index_document, null) != null ? {
-    enabled              = true
-    index_document       = azurerm_storage_account_static_website.static_website[0].index_document
-    error_404_document   = azurerm_storage_account_static_website.static_website[0].error_404_document
-    primary_endpoint     = try(azurerm_storage_account.storage_account.primary_web_endpoint, null)
-    secondary_endpoint   = try(azurerm_storage_account.storage_account.secondary_web_endpoint, null)
+    enabled            = true
+    index_document     = azurerm_storage_account_static_website.static_website[0].index_document
+    error_404_document = azurerm_storage_account_static_website.static_website[0].error_404_document
+    primary_endpoint   = try(azurerm_storage_account.storage_account.primary_web_endpoint, null)
+    secondary_endpoint = try(azurerm_storage_account.storage_account.secondary_web_endpoint, null)
   } : null
 }
 

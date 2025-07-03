@@ -26,7 +26,7 @@ resource "azurerm_subnet" "storage" {
   resource_group_name  = azurerm_resource_group.test.name
   virtual_network_name = azurerm_virtual_network.test.name
   address_prefixes     = ["10.0.1.0/24"]
-  
+
   service_endpoints = ["Microsoft.Storage"]
 }
 
@@ -35,26 +35,26 @@ resource "azurerm_subnet" "app" {
   resource_group_name  = azurerm_resource_group.test.name
   virtual_network_name = azurerm_virtual_network.test.name
   address_prefixes     = ["10.0.2.0/24"]
-  
+
   service_endpoints = ["Microsoft.Storage"]
 }
 
 module "storage_account" {
   source = "../../../"
-  
+
   name                     = "stgnetwork${random_string.suffix.result}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
-  
+
   # Network rules with multiple configurations
   network_rules = {
     default_action = "Deny"
     ip_rules = [
-      "203.0.113.0/24",    # Test IP range 1
-      "198.51.100.0/24",   # Test IP range 2
-      "192.0.2.1"          # Single IP
+      "203.0.113.0/24",  # Test IP range 1
+      "198.51.100.0/24", # Test IP range 2
+      "192.0.2.1"        # Single IP
     ]
     subnet_ids = [
       azurerm_subnet.storage.id,
@@ -62,7 +62,7 @@ module "storage_account" {
     ]
     bypass = "AzureServices"
   }
-  
+
   # CORS rules for blob service
   cors_rules = [
     {
@@ -73,7 +73,7 @@ module "storage_account" {
       max_age_in_seconds = 3600
     }
   ]
-  
+
   tags = {
     Environment = "Test"
     TestType    = "Network"

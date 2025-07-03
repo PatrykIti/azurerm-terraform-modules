@@ -15,13 +15,13 @@ resource "azurerm_resource_group" "test" {
 
 module "storage_account" {
   source = "../../../"
-  
+
   name                     = "stgsimple${random_string.suffix.result}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
-  
+
   tags = {
     Environment = "Test"
     TestType    = "Simple"
