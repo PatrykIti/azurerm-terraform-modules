@@ -39,9 +39,9 @@ output "identity" {
   value       = module.storage_account.identity
 }
 
-output "private_endpoint_ids" {
-  description = "Map of private endpoint IDs"
-  value       = module.storage_account.private_endpoint_ids
+output "private_endpoints" {
+  description = "Map of private endpoints"
+  value       = module.storage_account.private_endpoints
 }
 
 output "key_vault_id" {

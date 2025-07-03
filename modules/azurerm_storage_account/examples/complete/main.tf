@@ -18,6 +18,7 @@ provider "azurerm" {
       purge_soft_delete_on_destroy = true
     }
   }
+  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
 }
 
 # Random suffix for unique names
@@ -48,7 +49,7 @@ resource "azurerm_subnet" "private_endpoints" {
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
 
-  private_endpoint_network_policies_enabled = false
+  private_endpoint_network_policies = "Disabled"
 }
 
 # Subnet for allowed services
@@ -174,12 +175,20 @@ module "storage_account" {
   access_tier              = "Hot"
 
   # Security settings
-  min_tls_version                  = "TLS1_2"
-  enable_https_traffic_only        = true
-  shared_access_key_enabled        = false
-  allow_nested_items_to_be_public  = false
-  enable_infrastructure_encryption = true
-  cross_tenant_replication_enabled = false
+  security_settings = {
+    https_traffic_only_enabled      = true
+    min_tls_version                 = "TLS1_2"
+    shared_access_key_enabled       = true  # Required for Terraform to manage the resource
+    allow_nested_items_to_be_public = false
+  }
+  
+  # Encryption settings
+  encryption = {
+    enabled                           = true
+    infrastructure_encryption_enabled = true
+    key_vault_key_id                 = azurerm_key_vault_key.storage.id
+    user_assigned_identity_id        = azurerm_user_assigned_identity.storage.id
+  }
 
   # Network security
   network_rules = {
@@ -190,37 +199,46 @@ module "storage_account" {
   }
 
   # Private endpoints
-  private_endpoints = {
-    blob = {
+  private_endpoints = [
+    {
+      name                 = "blob"
+      subresource_names    = ["blob"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
-    }
-    file = {
+    },
+    {
+      name                 = "file"
+      subresource_names    = ["file"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.file.id]
-    }
-    queue = {
+    },
+    {
+      name                 = "queue"
+      subresource_names    = ["queue"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.queue.id]
-    }
-    table = {
+    },
+    {
+      name                 = "table"
+      subresource_names    = ["table"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.table.id]
     }
-  }
+  ]
 
   # Monitoring
   diagnostic_settings = {
     enabled                    = true
     log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    metrics                    = ["AllMetrics"]
-    logs = [
-      "StorageRead",
-      "StorageWrite",
-      "StorageDelete",
-      "Transaction"
-    ]
-    retention_days = 30
+    logs = {
+      storage_read   = true
+      storage_write  = true
+      storage_delete = true
+    }
+    metrics = {
+      transaction = true
+      capacity    = true
+    }
   }
 
   # Identity
@@ -229,28 +247,24 @@ module "storage_account" {
     identity_ids = [azurerm_user_assigned_identity.storage.id]
   }
 
-  # Customer Managed Key encryption
-  customer_managed_key = {
-    key_vault_key_id          = azurerm_key_vault_key.storage.id
-    user_assigned_identity_id = azurerm_user_assigned_identity.storage.id
-  }
 
   # Blob properties
   blob_properties = {
     versioning_enabled       = true
     change_feed_enabled      = true
-    change_feed_retention_in_days = 30
     last_access_time_enabled = true
     
     delete_retention_policy = {
+      enabled = true
       days = 30
     }
     
     container_delete_retention_policy = {
+      enabled = true
       days = 30
     }
     
-    cors_rule = [{
+    cors_rules = [{
       allowed_headers    = ["*"]
       allowed_methods    = ["GET", "HEAD", "POST", "PUT"]
       allowed_origins    = ["https://example.com"]
@@ -261,14 +275,6 @@ module "storage_account" {
 
   # Queue properties
   queue_properties = {
-    cors_rule = [{
-      allowed_headers    = ["*"]
-      allowed_methods    = ["GET", "HEAD", "POST"]
-      allowed_origins    = ["https://example.com"]
-      exposed_headers    = ["*"]
-      max_age_in_seconds = 3600
-    }]
-    
     logging = {
       delete                = true
       read                  = true
@@ -276,43 +282,8 @@ module "storage_account" {
       version               = "1.0"
       retention_policy_days = 30
     }
-    
-    hour_metrics = {
-      enabled               = true
-      version               = "1.0"
-      include_apis          = true
-      retention_policy_days = 30
-    }
-    
-    minute_metrics = {
-      enabled               = true
-      version               = "1.0"
-      include_apis          = true
-      retention_policy_days = 30
-    }
   }
 
-  # Share properties
-  share_properties = {
-    cors_rule = [{
-      allowed_headers    = ["*"]
-      allowed_methods    = ["GET", "HEAD", "POST"]
-      allowed_origins    = ["https://example.com"]
-      exposed_headers    = ["*"]
-      max_age_in_seconds = 3600
-    }]
-    
-    retention_policy = {
-      days = 30
-    }
-    
-    smb = {
-      versions                        = ["SMB3.0", "SMB3.1.1"]
-      authentication_types            = ["Kerberos", "NTLMv2"]
-      kerberos_ticket_encryption_type = ["AES-256", "RC4-HMAC"]
-      channel_encryption_type         = ["AES-128-CCM", "AES-128-GCM", "AES-256-GCM"]
-    }
-  }
 
   # Lifecycle management rules
   lifecycle_rules = [
@@ -360,12 +331,71 @@ module "storage_account" {
 
   # Static website (optional)
   static_website = {
+    enabled            = true
     index_document     = "index.html"
     error_404_document = "404.html"
   }
 
-  # Advanced threat protection
-  advanced_threat_protection_enabled = true
+  # Storage containers
+  containers = [
+    {
+      name                  = "data"
+      container_access_type = "private"
+    },
+    {
+      name                  = "logs"
+      container_access_type = "private"
+      metadata = {
+        environment = "production"
+        retention   = "365days"
+      }
+    },
+    {
+      name                  = "backups"
+      container_access_type = "private"
+    }
+  ]
+
+  # Storage queues
+  queues = [
+    {
+      name = "processing-queue"
+      metadata = {
+        purpose = "async-processing"
+      }
+    },
+    {
+      name = "notification-queue"
+    }
+  ]
+
+  # Storage tables
+  tables = [
+    {
+      name = "auditlog"
+    },
+    {
+      name = "configuration"
+    }
+  ]
+
+  # File shares
+  file_shares = [
+    {
+      name        = "shared-data"
+      quota       = 100
+      access_tier = "Hot"
+      metadata = {
+        department = "engineering"
+      }
+    },
+    {
+      name        = "backups"
+      quota       = 5120
+      access_tier = "Cool"
+    }
+  ]
+
 
   tags = {
     Environment   = "Production"
