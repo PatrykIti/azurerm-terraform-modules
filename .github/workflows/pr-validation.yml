@@ -194,6 +194,114 @@ jobs:
             exit 1
           fi
 
+  tflint:
+    name: TFLint Analysis
+    runs-on: ubuntu-latest
+    needs: terraform-fmt
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Cache tflint plugins
+        uses: actions/cache@v3
+        with:
+          path: ~/.tflint.d/plugins
+          key: ${{ runner.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-tflint-
+      
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+      
+      - name: Initialize TFLint
+        run: |
+          tflint --init
+          echo "TFLint version:"
+          tflint --version
+      
+      - name: Run TFLint on all modules
+        id: tflint
+        run: |
+          # Find all modules
+          modules=$(find modules -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
+          
+          tflint_failed=false
+          tflint_output=""
+          
+          for module in $modules; do
+            echo "## Running TFLint on: $module"
+            
+            # Run tflint and capture output
+            if output=$(tflint --format=default --force "$module" 2>&1); then
+              echo "✅ TFLint passed for: $module"
+              echo "$output"
+            else
+              echo "❌ TFLint found issues in: $module"
+              echo "$output"
+              tflint_failed=true
+              tflint_output="${tflint_output}\n### Module: $module\n\`\`\`\n${output}\n\`\`\`\n"
+            fi
+            echo ""
+          done
+          
+          # Also run on examples
+          if [[ -d "examples" ]]; then
+            examples=$(find examples -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
+            for example in $examples; do
+              echo "## Running TFLint on example: $example"
+              
+              if output=$(tflint --format=default --force "$example" 2>&1); then
+                echo "✅ TFLint passed for: $example"
+                echo "$output"
+              else
+                echo "❌ TFLint found issues in: $example"
+                echo "$output"
+                tflint_failed=true
+                tflint_output="${tflint_output}\n### Example: $example\n\`\`\`\n${output}\n\`\`\`\n"
+              fi
+              echo ""
+            done
+          fi
+          
+          if [ "$tflint_failed" = true ]; then
+            echo "tflint_failed=true" >> $GITHUB_OUTPUT
+            echo "tflint_output<<EOF" >> $GITHUB_OUTPUT
+            echo -e "$tflint_output" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "tflint_failed=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Comment TFLint results
+        if: failure() && steps.tflint.outputs.tflint_failed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const output = `${{ steps.tflint.outputs.tflint_output }}`;
+            const comment = `## ⚠️ TFLint Found Issues
+            
+            TFLint has identified code quality issues that need to be addressed:
+            
+            ${output}
+            
+            Please fix these issues before merging. You can run TFLint locally with:
+            
+            \`\`\`bash
+            tflint --init
+            tflint --format=default --force <module-directory>
+            \`\`\``;
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
   documentation-check:
     name: Documentation Check
     runs-on: ubuntu-latest
@@ -306,7 +414,7 @@ jobs:
   quality-gates:
     name: Quality Gates Summary
     runs-on: ubuntu-latest
-    needs: [validate-pr-title, validate-commits, terraform-fmt, terraform-validate, documentation-check, security-scan]
+    needs: [validate-pr-title, validate-commits, terraform-fmt, terraform-validate, tflint, documentation-check, security-scan]
     if: always()
     
     steps:
@@ -320,6 +428,7 @@ jobs:
               'validate-commits': 'Commit Message Validation',
               'terraform-fmt': 'Terraform Formatting',
               'terraform-validate': 'Terraform Validation',
+              'tflint': 'TFLint Analysis',
               'documentation-check': 'Documentation Check',
               'security-scan': 'Security Scan'
             };

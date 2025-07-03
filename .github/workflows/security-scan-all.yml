@@ -80,6 +80,17 @@ jobs:
           tar -xf terrascan.tar.gz terrascan && rm terrascan.tar.gz
           sudo mv terrascan /usr/local/bin/
       
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+      
+      - name: Initialize TFLint
+        run: |
+          tflint --init
+          echo "TFLint version:"
+          tflint --version
+      
       - name: Run Checkov scan
         id: checkov
         continue-on-error: true
@@ -124,6 +135,31 @@ jobs:
           violations=$(jq '.results.scan_summary.violated_policies' ${{ matrix.module }}-terrascan-results.json 2>/dev/null || echo "0")
           echo "terrascan_violations=$violations" >> $GITHUB_OUTPUT
       
+      - name: Run TFLint scan
+        id: tflint
+        continue-on-error: true
+        run: |
+          # Run tflint and capture both exit code and output
+          tflint_output=$(tflint --format=json --force "${{ matrix.module }}" 2>&1 || true)
+          echo "$tflint_output" > ${{ matrix.module }}-tflint-results.json
+          
+          # Parse results - count issues
+          if [[ -f "${{ matrix.module }}-tflint-results.json" ]] && [[ -s "${{ matrix.module }}-tflint-results.json" ]]; then
+            # Check if it's valid JSON
+            if jq empty "${{ matrix.module }}-tflint-results.json" 2>/dev/null; then
+              issues_count=$(jq '.issues | length' "${{ matrix.module }}-tflint-results.json" 2>/dev/null || echo "0")
+              errors_count=$(jq '.errors | length' "${{ matrix.module }}-tflint-results.json" 2>/dev/null || echo "0")
+              total_issues=$((issues_count + errors_count))
+            else
+              # If not JSON, count lines as issues (fallback for text output)
+              total_issues=$(grep -c "Warning\|Error" "${{ matrix.module }}-tflint-results.json" || echo "0")
+            fi
+          else
+            total_issues=0
+          fi
+          
+          echo "tflint_issues=$total_issues" >> $GITHUB_OUTPUT
+      
       - name: Upload scan results
         uses: actions/upload-artifact@v3
         with:
@@ -132,6 +168,7 @@ jobs:
             ${{ matrix.module }}-checkov-results.json
             ${{ matrix.module }}-tfsec-results.json
             ${{ matrix.module }}-terrascan-results.json
+            ${{ matrix.module }}-tflint-results.json
       
       - name: Generate security report
         run: |
@@ -148,6 +185,7 @@ jobs:
           | Checkov | ${{ steps.checkov.outputs.checkov_failed }} | $([ "${{ steps.checkov.outputs.checkov_failed }}" -eq 0 ] && echo "✅ Passed" || echo "❌ Failed") |
           | tfsec | ${{ steps.tfsec.outputs.tfsec_issues }} | $([ "${{ steps.tfsec.outputs.tfsec_issues }}" -eq 0 ] && echo "✅ Passed" || echo "❌ Failed") |
           | Terrascan | ${{ steps.terrascan.outputs.terrascan_violations }} | $([ "${{ steps.terrascan.outputs.terrascan_violations }}" -eq 0 ] && echo "✅ Passed" || echo "❌ Failed") |
+          | TFLint | ${{ steps.tflint.outputs.tflint_issues }} | $([ "${{ steps.tflint.outputs.tflint_issues }}" -eq 0 ] && echo "✅ Passed" || echo "❌ Failed") |
           
           ## Action Required
           
@@ -155,7 +193,8 @@ jobs:
           
           if [[ "${{ steps.checkov.outputs.checkov_failed }}" -gt 0 ]] || \
              [[ "${{ steps.tfsec.outputs.tfsec_issues }}" -gt 0 ]] || \
-             [[ "${{ steps.terrascan.outputs.terrascan_violations }}" -gt 0 ]]; then
+             [[ "${{ steps.terrascan.outputs.terrascan_violations }}" -gt 0 ]] || \
+             [[ "${{ steps.tflint.outputs.tflint_issues }}" -gt 0 ]]; then
             echo "⚠️ Security issues detected. Please review the detailed scan results and address the findings." >> ${{ matrix.module }}-security-report.md
           else
             echo "✅ No security issues detected at the configured severity threshold." >> ${{ matrix.module }}-security-report.md
@@ -172,7 +211,8 @@ jobs:
           github.event.inputs.severity_threshold == 'CRITICAL' &&
           (steps.checkov.outputs.checkov_failed > 0 ||
            steps.tfsec.outputs.tfsec_issues > 0 ||
-           steps.terrascan.outputs.terrascan_violations > 0)
+           steps.terrascan.outputs.terrascan_violations > 0 ||
+           steps.tflint.outputs.tflint_issues > 0)
         run: |
           echo "❌ Critical security issues found in ${{ matrix.module }}"
           exit 1
@@ -203,8 +243,8 @@ jobs:
           
           ## Module Security Status
           
-          | Module | Checkov | tfsec | Terrascan | Overall Status |
-          |--------|---------|-------|-----------|----------------|
+          | Module | Checkov | tfsec | Terrascan | TFLint | Overall Status |
+          |--------|---------|-------|-----------|--------|----------------|
           EOF
           
           # Process each module's report
@@ -218,16 +258,18 @@ jobs:
                 checkov_status=$(grep -A1 "Checkov" "$report_file" | tail -1 | grep -o "✅ Passed\|❌ Failed" || echo "⚠️ Unknown")
                 tfsec_status=$(grep -A1 "tfsec" "$report_file" | tail -1 | grep -o "✅ Passed\|❌ Failed" || echo "⚠️ Unknown")
                 terrascan_status=$(grep -A1 "Terrascan" "$report_file" | tail -1 | grep -o "✅ Passed\|❌ Failed" || echo "⚠️ Unknown")
+                tflint_status=$(grep -A1 "TFLint" "$report_file" | tail -1 | grep -o "✅ Passed\|❌ Failed" || echo "⚠️ Unknown")
                 
                 if [[ "$checkov_status" == "✅ Passed" ]] && \
                    [[ "$tfsec_status" == "✅ Passed" ]] && \
-                   [[ "$terrascan_status" == "✅ Passed" ]]; then
+                   [[ "$terrascan_status" == "✅ Passed" ]] && \
+                   [[ "$tflint_status" == "✅ Passed" ]]; then
                   overall="✅ Secure"
                 else
                   overall="⚠️ Issues Found"
                 fi
                 
-                echo "| $module_name | $checkov_status | $tfsec_status | $terrascan_status | $overall |" >> SECURITY_SCAN_REPORT.md
+                echo "| $module_name | $checkov_status | $tfsec_status | $terrascan_status | $tflint_status | $overall |" >> SECURITY_SCAN_REPORT.md
               fi
             fi
           done
