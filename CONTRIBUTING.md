@@ -13,7 +13,7 @@ azurerm-terraform-modules/
 │   └── ...
 ├── .github/workflows/          # CI/CD workflows
 ├── .taskmaster/               # Task management
-├── _docs/                     # Global documentation
+├── docs/                     # Global documentation
 └── tests/                     # Global test helpers
 ```
 
@@ -224,7 +224,7 @@ go test -v -timeout 30m
 ### Documentation
 - [Terraform Best Practices](https://www.terraform-best-practices.com/)
 - [Azure Terraform Documentation](https://docs.microsoft.com/azure/developer/terraform/)
-- [Module Development Guide](_docs/terraform-module-best-practices-guide.md)
+- [Module Development Guide](docs/TERRAFORM_BEST_PRACTISES_GUIDE.md)
 
 ### Communication
 - **Issues**: For bugs and feature requests
