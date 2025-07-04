@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/owner/azurerm-terraform-modules/discussions
+    about: Ask questions and share ideas with the community
+  - name: 📚 Documentation
+    url: https://github.com/owner/azurerm-terraform-modules/tree/main/docs
+    about: Check our documentation for answers
+  - name: 🔍 Search Issues
+    url: https://github.com/owner/azurerm-terraform-modules/issues
+    about: Please search existing issues before creating a new one

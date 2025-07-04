@@ -6,15 +6,39 @@ Thank you for your interest in contributing to our Azure Terraform Modules repos
 
 ```
 azurerm-terraform-modules/
-├── modules/                    # Individual Terraform modules
-│   ├── azurerm_storage_account/
-│   ├── azurerm_virtual_network/
-│   ├── azurerm_key_vault/
-│   └── ...
-├── .github/workflows/          # CI/CD workflows
-├── .taskmaster/               # Task management
-├── docs/                     # Global documentation
-└── tests/                     # Global test helpers
+├── modules/                        # Individual Terraform modules
+│   └── <module_name>/
+│       ├── .github/
+│       │   ├── actions/           # Module-specific composite actions
+│       │   │   ├── validate/      # Validation logic
+│       │   │   ├── test/          # Testing logic
+│       │   │   ├── security/      # Security scanning
+│       │   │   └── release/       # Release preparation
+│       │   └── module-config.yml  # Module metadata
+│       ├── main.tf                # Main resource definitions
+│       ├── variables.tf           # Input variables
+│       ├── outputs.tf             # Output values
+│       ├── versions.tf            # Provider requirements
+│       ├── README.md              # Auto-generated documentation
+│       ├── CONTRIBUTING.md        # Module-specific guidelines
+│       ├── examples/              # Usage examples
+│       └── tests/                 # Terratest files
+├── .github/
+│   ├── workflows/                 # Repository-wide workflows
+│   │   ├── module-ci.yml         # Main CI dispatcher
+│   │   ├── module-release.yml    # Release workflow
+│   │   ├── module-docs.yml       # Documentation automation
+│   │   ├── pr-validation.yml     # PR quality checks
+│   │   └── repo-maintenance.yml  # Scheduled maintenance
+│   └── actions/                   # Shared composite actions
+│       ├── detect-modules/        # Module detection logic
+│       └── terraform-setup/       # Terraform environment setup
+├── docs/                          # Global documentation
+│   ├── WORKFLOWS.md              # GitHub Actions documentation
+│   ├── TERRAFORM_BEST_PRACTISES_GUIDE.md
+│   └── TERRAFORM_TESTING_GUIDE.md
+└── .claude/                       # Development guidelines
+    └── references/                # Workflow patterns and guidelines
 ```
 
 ## 🚀 Getting Started
@@ -63,21 +87,17 @@ git checkout -b feature/module-name-description
 #### 🆕 Adding a New Module
 
 1. Create module directory: `modules/azurerm_<resource_name>/`
-2. Follow the standard module structure:
+2. Copy the structure from an existing module as a template
+3. Create the composite actions structure:
+   ```bash
+   mkdir -p modules/azurerm_<resource_name>/.github/actions/{validate,test,security,release}
    ```
-   modules/azurerm_<resource_name>/
-   ├── main.tf           # Main resource definitions
-   ├── variables.tf      # Input variables
-   ├── outputs.tf        # Output values
-   ├── versions.tf       # Provider requirements
-   ├── README.md         # Module documentation
-   ├── CONTRIBUTING.md   # Module-specific guidelines
-   ├── examples/         # Usage examples
-   │   ├── simple/
-   │   ├── complete/
-   │   └── ...
-   └── tests/           # Terratest files
-   ```
+4. Update workflow configurations:
+   - Add module to `.github/workflows/module-ci.yml` filters
+   - Add module to `.github/workflows/module-release.yml` options
+5. Create module configuration: `.github/module-config.yml`
+
+See [docs/WORKFLOWS.md](docs/WORKFLOWS.md#adding-new-modules) for detailed instructions.
 
 #### 🔧 Modifying Existing Modules
 
@@ -148,54 +168,65 @@ Use conventional commits:
 - `fix(virtual-network): correct subnet CIDR validation`
 - `docs(key-vault): update access policy examples`
 - `chore(deps): update azurerm provider to 4.35.0`
+- `ci(workflows): update module detection logic`
+- `test(storage-account): add integration tests`
 
-### PR Template
+### Automated CI/CD
 
-Your PR description should include:
+When you create a PR, the following workflows will run automatically:
 
-```markdown
-## Description
-Brief description of what this PR does
+1. **PR Validation** (`pr-validation.yml`):
+   - Validates PR title and commit messages
+   - Checks Terraform formatting
+   - Runs TFLint analysis
+   - Verifies documentation is up-to-date
+   - Quick security scan
 
-## Type of Change
-- [ ] Bug fix (non-breaking change)
-- [ ] New feature (non-breaking change)
-- [ ] Breaking change
-- [ ] Documentation update
-
-## Testing
-- [ ] Terraform fmt/validate/plan
-- [ ] Manual testing completed
-- [ ] Automated tests pass
-- [ ] Examples validated
-
-## Checklist
-- [ ] Code follows repository standards
-- [ ] Self-review completed
-- [ ] Documentation updated
-- [ ] Tests added/updated
-```
+2. **Module CI** (`module-ci.yml`):
+   - Detects changed modules
+   - Runs module-specific validation
+   - Executes tests (if configured)
+   - Performs security scanning
+   - Posts summary comment on PR
 
 ### Review Process
 
-1. **Automated Checks**: CI/CD must pass
-2. **Code Review**: At least one maintainer approval
-3. **Testing**: Evidence of testing required
+1. **Automated Checks**: All CI/CD checks must pass
+2. **Code Review**: At least one maintainer approval required
+3. **Testing**: Evidence of testing required (automated or manual)
 4. **Documentation**: Must be complete and accurate
+5. **Security**: No security vulnerabilities introduced
 
 ## 🏷️ Release Process
 
 ### Module Versioning
 
-Each module is versioned independently using tags:
-- Format: `<MODULE_PREFIX>v<MAJOR>.<MINOR>.<PATCH>`
-- Example: `SAv1.0.0` for Storage Account module
+Each module is versioned independently:
+- **Tag Format**: `<module_name>/v<MAJOR>.<MINOR>.<PATCH>`
+- **Example**: `azurerm_storage_account/v1.0.0`
 
 ### Version Guidelines
 
-- **Major**: Breaking changes
+- **Major**: Breaking changes (incompatible API changes)
 - **Minor**: New features (backwards compatible)
-- **Patch**: Bug fixes
+- **Patch**: Bug fixes and minor improvements
+
+### Release Workflow
+
+Releases are managed through the `module-release.yml` workflow:
+
+1. Go to Actions → Module Release
+2. Click "Run workflow"
+3. Select:
+   - Module to release
+   - Version number
+   - Release notes (optional)
+4. Workflow will:
+   - Validate version format
+   - Run final validation
+   - Update module-config.yml
+   - Create git tag
+   - Create GitHub release
 
 ## 🧪 Testing
 

@@ -16,20 +16,29 @@ The Azure Storage Account module manages the lifecycle of Azure Storage Accounts
 
 ```
 modules/azurerm_storage_account/
-├── main.tf                    # Core storage account and related resources
-├── variables.tf               # Input variables with secure defaults
-├── outputs.tf                 # Output values including sensitive data
-├── versions.tf                # Provider version (pinned to 4.35.0)
-├── README.md                  # Auto-generated documentation
+├── .github/
+│   ├── actions/              # Module-specific composite actions
+│   │   ├── validate/         # Terraform validation and linting
+│   │   ├── test/            # Unit and integration tests
+│   │   ├── security/        # Security scanning (Checkov, Trivy)
+│   │   └── release/         # Release preparation
+│   └── module-config.yml     # Module metadata and CI configuration
+├── main.tf                   # Core storage account and related resources
+├── variables.tf              # Input variables with secure defaults
+├── outputs.tf                # Output values including sensitive data
+├── versions.tf               # Provider version requirements
+├── README.md                 # Auto-generated documentation
+├── CHANGELOG.md              # Version history
 ├── examples/
-│   ├── simple/               # Basic usage example
-│   ├── complete/             # All features example
-│   ├── secure/               # Security-focused example
+│   ├── simple/              # Basic usage example
+│   ├── complete/            # All features example
+│   ├── secure/              # Security-focused example
 │   ├── secure-private-endpoint/ # Private endpoint example
-│   └── multi-region/         # Multi-region deployment
-└── .github/workflows/        # Module-specific CI/CD
-    ├── azurerm-storage-account-ci.yml
-    └── azurerm-storage-account-release.yml
+│   └── multi-region/        # Multi-region deployment
+└── tests/                    # Terratest integration tests
+    ├── go.mod
+    ├── storage_account_test.go
+    └── test_helpers.go
 
 ## 🔧 Module-Specific Guidelines
 
@@ -46,6 +55,24 @@ Always use the separate resources for these features.
 1. **Archive Tier + ZRS**: Archive lifecycle tier is not supported with Zone-Redundant Storage (ZRS)
 2. **Diagnostic Categories**: Only metrics are supported at storage account level, not logs
 3. **Private Endpoints**: Each storage service requires its own private endpoint
+
+### CI/CD Integration
+
+This module is integrated with the repository's automated workflows:
+
+1. **Pull Request Checks**:
+   - Automatic validation when changes are made
+   - Security scanning with Checkov and Trivy
+   - Test execution (if configured)
+   - Documentation verification
+
+2. **Documentation**:
+   - README.md is auto-generated from terraform-docs
+   - Updates are automated via `module-docs.yml`
+
+3. **Testing**:
+   - Tests run automatically on PR
+   - Integration tests require Azure credentials
 
 ## 📝 Code Standards
 
@@ -172,8 +199,15 @@ Before submitting a PR for this module:
 ## 🏷️ Release Process
 
 This module uses independent versioning:
-- **Tag Format**: `SAv<major>.<minor>.<patch>` (e.g., `SAv1.0.0`)
-- **CI/CD**: Module-specific workflows in `.github/workflows/`
+- **Tag Format**: `azurerm_storage_account/v<major>.<minor>.<patch>`
+- **Example**: `azurerm_storage_account/v1.0.0`
+- **Release Workflow**: Use the repository-wide `module-release.yml`
+
+To release a new version:
+1. Ensure all tests pass
+2. Update CHANGELOG.md
+3. Go to Actions → Module Release
+4. Select `azurerm_storage_account` and provide version
 
 ## 📚 Module Resources
 
