@@ -152,3 +152,14 @@ Contains: Standard development workflow, tag introduction patterns, iterative im
 - Integrating pre-commit hooks with GitHub Actions
 
 Contains: Comprehensive patterns for GitHub Actions workflows including validation, pre-commit integration, Azure OIDC authentication, security scanning, documentation generation, matrix strategies, caching, and error handling.
+
+### 8. [GitHub Actions Monorepo Guidelines](.claude/references/github-actions-monorepo-guidelines.md)
+**MANDATORY REVIEW** when:
+- Organizing workflows for Terraform modules monorepo
+- Implementing per-module CI/CD pipelines
+- Setting up dynamic workflow discovery for multiple modules
+- Creating composite actions for module-specific logic
+- Designing scalable workflow architecture for dozens of modules
+- Migrating from flat workflow structure to modular organization
+
+Contains: Dynamic discovery pattern with composite actions, directory structure for module-level CI/CD, implementation examples for dispatcher workflows, module configuration patterns, best practices for monorepo workflow organization, and solutions for maintaining logical separation while working within GitHub Actions constraints.
