@@ -1,60 +1,6 @@
 # Terraform Azure Modules - Development Guide
 
-## Terraform Module Best Practices
-
-### Resource Naming Convention
-1. **Local Resource Names**: For any `azurerm_*` resource, the local name should be the resource type without the provider prefix:
-   - `resource "azurerm_storage_account" "storage_account"` ❌ Wrong
-   - `resource "azurerm_storage_account" "this"` ❌ Wrong  
-   - `resource "azurerm_storage_account" "storage_account"` ✅ Correct
-   - `resource "azurerm_virtual_network" "virtual_network"` ✅ Correct
-   - `resource "azurerm_key_vault" "key_vault"` ✅ Correct
-
-2. **Module Simplicity**: Modules should be the simplest possible layer:
-   - NO `create_*` variables - if someone wants the resource, they use the module
-   - NO conditional creation unless absolutely necessary for the resource logic
-   - Complex logic only when required for different configuration scenarios
-
-3. **Variable Organization**:
-   - Group related configurations into objects (e.g., `security_settings`, `network_settings`)
-   - Use **lists of objects** for iteration (more readable than maps in Terraform)
-   - Always provide secure defaults in object variables
-
-5. **Iteration Best Practices**:
-   - Use descriptive variable names in for loops, not shortcuts
-   - `for container in var.containers` ✅ Correct  
-   - `for c in var.containers` ❌ Wrong
-   - `for file_share in var.file_shares` ✅ Correct
-   - `for fs in var.file_shares` ❌ Wrong
-   - This improves code readability for all developers, especially juniors
-
-4. **Example Structure**:
-   ```hcl
-   variable "security_settings" {
-     type = object({
-       enable_https_traffic_only = optional(bool, true)
-       min_tls_version          = optional(string, "TLS1_2")
-       shared_access_key_enabled = optional(bool, false)
-     })
-     default = {}
-   }
-   
-   variable "containers" {
-     type = list(object({
-       name                  = string
-       container_access_type = optional(string, "private")
-     }))
-     default = []
-   }
-   ```
-
-### Module Structure Principles
-1. Flat module tree - no nested modules
-2. Security by default - all security settings should be enabled by default
-3. Use dynamic blocks for optional configurations
-4. Lists of objects for resources that need iteration
-5. Comprehensive validation with helpful error messages
-6. Clear and descriptive iteration patterns - always use full variable names
+This document contains references to mandatory guidelines for Terraform module development in this project.
 
 # important-instruction-reminders
 Do what has been asked; nothing more, nothing less.
@@ -163,3 +109,15 @@ Contains: Comprehensive patterns for GitHub Actions workflows including validati
 - Migrating from flat workflow structure to modular organization
 
 Contains: Dynamic discovery pattern with composite actions, directory structure for module-level CI/CD, implementation examples for dispatcher workflows, module configuration patterns, best practices for monorepo workflow organization, and solutions for maintaining logical separation while working within GitHub Actions constraints.
+
+### 9. [Terraform Best Practices Guide](docs/TERRAFORM_BEST_PRACTISES_GUIDE.md)
+**MANDATORY REVIEW** when:
+- Creating new Terraform modules
+- Contributing to existing modules
+- Understanding module structure and naming conventions
+- Implementing security best practices
+- Writing module documentation
+- Setting up module testing
+- Following iteration patterns and variable design principles
+
+Contains: Comprehensive guide for Terraform module development including resource naming conventions, module structure, variable design patterns, security best practices, testing requirements, documentation standards, contribution process, and common pitfalls to avoid. This is the primary reference for all Terraform module development standards in this repository.
