@@ -106,7 +106,7 @@ jobs:
         id: fmt
         run: |
           # Find all directories with Terraform files
-          tf_dirs=$(find . -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
+          tf_dirs=$(find modules -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
           
           fmt_issues=()
           for dir in $tf_dirs; do
@@ -167,7 +167,7 @@ jobs:
       - name: Validate Terraform configurations
         run: |
           # Find all modules
-          modules=$(find . -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | xargs -I {} dirname {} | sort -u)
+          modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | xargs -I {} dirname {} | sort -u)
           
           validation_failed=false
           for module in $modules; do
@@ -321,7 +321,7 @@ jobs:
         id: docs
         run: |
           # Find all modules
-          modules=$(find . -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | xargs -I {} dirname {} | sort -u | grep -E "^\\./azurerm_")
+          modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | xargs -I {} dirname {} | sort -u)
           
           docs_outdated=()
           for module in $modules; do
@@ -365,7 +365,7 @@ jobs:
             
             Or update all modules:
             \`\`\`bash
-            find . -name "main.tf" -exec dirname {} \\; | xargs -I {} terraform-docs markdown table --output-file {}/README.md {}
+            find modules -name "main.tf" -exec dirname {} \\; | xargs -I {} terraform-docs markdown table --output-file {}/README.md {}
             \`\`\``;
             
             await github.rest.issues.createComment({

@@ -37,11 +37,10 @@ jobs:
         id: discover
         run: |
           modules=()
-          for dir in */; do
+          for dir in modules/*/; do
             if [[ -f "${dir}main.tf" || -f "${dir}versions.tf" ]]; then
-              if [[ "${dir}" != "_docs/" && "${dir}" != "examples/" && "${dir}" != "scripts/" && "${dir}" != "tests/" && "${dir}" != "modules/" ]]; then
-                modules+=("${dir%/}")
-              fi
+              module_name=$(basename "${dir}")
+              modules+=("${module_name}")
             fi
           done
           
@@ -97,7 +96,7 @@ jobs:
         run: |
           severity_threshold="${{ github.event.inputs.severity_threshold || 'MEDIUM' }}"
           
-          checkov -d ${{ matrix.module }} \
+          checkov -d modules/${{ matrix.module }} \
             --framework terraform \
             --output json \
             --soft-fail \
@@ -112,7 +111,7 @@ jobs:
         id: tfsec
         continue-on-error: true
         run: |
-          tfsec ${{ matrix.module }} \
+          tfsec modules/${{ matrix.module }} \
             --format json \
             --soft-fail \
             --minimum-severity ${{ github.event.inputs.severity_threshold || 'MEDIUM' }} \
@@ -127,7 +126,7 @@ jobs:
         continue-on-error: true
         run: |
           terrascan scan -i terraform \
-            -d ${{ matrix.module }} \
+            -d modules/${{ matrix.module }} \
             -o json \
             > ${{ matrix.module }}-terrascan-results.json || true
           
@@ -140,7 +139,7 @@ jobs:
         continue-on-error: true
         run: |
           # Run tflint and capture both exit code and output
-          tflint_output=$(tflint --format=json --force "${{ matrix.module }}" 2>&1 || true)
+          tflint_output=$(tflint --format=json --force "modules/${{ matrix.module }}" 2>&1 || true)
           echo "$tflint_output" > ${{ matrix.module }}-tflint-results.json
           
           # Parse results - count issues
