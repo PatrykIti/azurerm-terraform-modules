@@ -142,3 +142,13 @@ Contains: TaskMaster multi-agent commands and Context7 + Gemini Zen coordination
 - Resolving merge conflicts in tasks
 
 Contains: Standard development workflow, tag introduction patterns, iterative implementation cycle, master list strategy, and research integration patterns.
+
+### 7. [Terraform GitHub Actions Guidelines](.claude/references/terraform-github-actions.md)
+**MANDATORY REVIEW** when:
+- Creating new GitHub Actions workflows for Terraform
+- Setting up CI/CD pipelines for infrastructure code
+- Implementing validation, security scanning, or deployment workflows
+- Configuring automated testing for Terraform modules
+- Integrating pre-commit hooks with GitHub Actions
+
+Contains: Comprehensive patterns for GitHub Actions workflows including validation, pre-commit integration, Azure OIDC authentication, security scanning, documentation generation, matrix strategies, caching, and error handling.
