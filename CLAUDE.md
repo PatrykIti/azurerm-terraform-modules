@@ -121,3 +121,16 @@ Contains: Dynamic discovery pattern with composite actions, directory structure 
 - Following iteration patterns and variable design principles
 
 Contains: Comprehensive guide for Terraform module development including resource naming conventions, module structure, variable design patterns, security best practices, testing requirements, documentation standards, contribution process, and common pitfalls to avoid. This is the primary reference for all Terraform module development standards in this repository.
+
+### 10. [Terraform Testing Guide](docs/TERRAFORM_TESTING_GUIDE.md)
+**MANDATORY REVIEW** when:
+- Setting up testing for new modules
+- Writing unit tests with native Terraform test framework
+- Implementing integration tests with Terratest
+- Creating end-to-end test scenarios
+- Configuring CI/CD testing pipelines
+- Implementing security and compliance testing
+- Optimizing test performance and costs
+- Using mock strategies for expensive resources
+
+Contains: Comprehensive testing strategies including testing pyramid (static analysis, unit, integration, E2E), native Terraform test examples with mock providers, Terratest patterns for Azure resources, security and compliance testing, performance testing, CI/CD integration with GitHub Actions, test organization best practices, and cost optimization strategies for testing infrastructure.
