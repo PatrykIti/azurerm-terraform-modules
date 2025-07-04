@@ -1,0 +1,143 @@
+name: Module Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      module:
+        description: 'Module to release'
+        required: true
+        type: choice
+        options:
+          - azurerm_storage_account
+      version:
+        description: 'Version to release (e.g., 1.2.0)'
+        required: true
+        type: string
+      release_notes:
+        description: 'Release notes (optional)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  validate-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.validate.outputs.version }}
+      tag: ${{ steps.validate.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Validate version format
+        id: validate
+        run: |
+          VERSION="${{ inputs.version }}"
+          
+          # Validate semver format
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$'; then
+            echo "❌ Invalid version format. Please use semantic versioning (e.g., 1.2.0, 1.2.0-beta.1)"
+            exit 1
+          fi
+          
+          # Check if version already exists
+          TAG="${{ inputs.module }}/v${VERSION}"
+          if git tag -l "$TAG" | grep -q "$TAG"; then
+            echo "❌ Version $VERSION already exists for module ${{ inputs.module }}"
+            exit 1
+          fi
+          
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+  release:
+    needs: validate-version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Setup Terraform
+        uses: ./.github/actions/terraform-setup
+        with:
+          terraform-version: '1.10.3'
+          install-terraform-docs: true
+      
+      - name: Final validation before release
+        uses: ./modules/${{ inputs.module }}/.github/actions/validate
+        with:
+          terraform-version: '1.10.3'
+      
+      - name: Update module version
+        run: |
+          # Update version in module-config.yml
+          CONFIG_FILE="modules/${{ inputs.module }}/.github/module-config.yml"
+          if [[ -f "$CONFIG_FILE" ]]; then
+            sed -i "s/^version: .*/version: ${{ needs.validate-version.outputs.version }}/" "$CONFIG_FILE"
+          fi
+          
+          # Update CHANGELOG.md
+          CHANGELOG="modules/${{ inputs.module }}/CHANGELOG.md"
+          if [[ -f "$CHANGELOG" ]]; then
+            DATE=$(date +%Y-%m-%d)
+            sed -i "/^## \[Unreleased\]/a\\
+\\
+## [${{ needs.validate-version.outputs.version }}] - $DATE\\
+${{ inputs.release_notes }}" "$CHANGELOG"
+          fi
+      
+      - name: Generate updated documentation
+        run: |
+          cd modules/${{ inputs.module }}
+          terraform-docs markdown table --output-file README.md .
+          cd -
+      
+      - name: Create release commit
+        run: |
+          git add modules/${{ inputs.module }}/
+          git commit -m "chore(${{ inputs.module }}): release version ${{ needs.validate-version.outputs.version }}"
+      
+      - name: Create and push tag
+        run: |
+          git tag -a "${{ needs.validate-version.outputs.tag }}" -m "Release ${{ inputs.module }} version ${{ needs.validate-version.outputs.version }}"
+          git push origin HEAD
+          git push origin "${{ needs.validate-version.outputs.tag }}"
+      
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.validate-version.outputs.tag }}
+          release_name: ${{ inputs.module }} v${{ needs.validate-version.outputs.version }}
+          body: |
+            ## Module: ${{ inputs.module }}
+            ## Version: ${{ needs.validate-version.outputs.version }}
+            
+            ${{ inputs.release_notes }}
+            
+            ### Installation
+            
+            ```hcl
+            module "${{ inputs.module }}" {
+              source  = "git::https://github.com/${{ github.repository }}.git//modules/${{ inputs.module }}?ref=${{ needs.validate-version.outputs.tag }}"
+              # ... configuration ...
+            }
+            ```
+            
+            ### Documentation
+            
+            See the [module README](https://github.com/${{ github.repository }}/tree/${{ needs.validate-version.outputs.tag }}/modules/${{ inputs.module }}/README.md) for detailed documentation.
+          draft: false
+          prerelease: ${{ contains(needs.validate-version.outputs.version, '-') }}
