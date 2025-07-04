@@ -89,26 +89,25 @@ Contains: TaskMaster multi-agent commands and Context7 + Gemini Zen coordination
 
 Contains: Standard development workflow, tag introduction patterns, iterative implementation cycle, master list strategy, and research integration patterns.
 
-### 7. [Terraform GitHub Actions Guidelines](.claude/references/terraform-github-actions.md)
+### 7. [Terraform GitHub Actions Guidelines](.claude/references/terraform-github-actions.md) - **PATTERNS & BEST PRACTICES**
 **MANDATORY REVIEW** when:
-- Creating new GitHub Actions workflows for Terraform
-- Setting up CI/CD pipelines for infrastructure code
-- Implementing validation, security scanning, or deployment workflows
-- Configuring automated testing for Terraform modules
-- Integrating pre-commit hooks with GitHub Actions
+- Learning how to create GitHub Actions workflows for Terraform
+- Understanding best practices for CI/CD pipelines
+- Looking for workflow patterns and examples
+- Needing guidance on security scanning, testing, or deployment workflows
+- Learning about pre-commit hooks integration
 
-Contains: Comprehensive patterns for GitHub Actions workflows including validation, pre-commit integration, Azure OIDC authentication, security scanning, documentation generation, matrix strategies, caching, and error handling.
+Contains: General patterns and best practices for creating GitHub Actions workflows for Terraform projects. Includes example workflows for validation, security scanning, testing, deployment, and various CI/CD patterns. This is a REFERENCE GUIDE for workflow patterns.
 
-### 8. [GitHub Actions Monorepo Guidelines](.claude/references/github-actions-monorepo-guidelines.md)
+### 8. [GitHub Actions Monorepo Guidelines](.claude/references/github-actions-monorepo-guidelines.md) - **ARCHITECTURE PATTERNS**
 **MANDATORY REVIEW** when:
-- Organizing workflows for Terraform modules monorepo
-- Implementing per-module CI/CD pipelines
-- Setting up dynamic workflow discovery for multiple modules
-- Creating composite actions for module-specific logic
-- Designing scalable workflow architecture for dozens of modules
-- Migrating from flat workflow structure to modular organization
+- Understanding the monorepo pattern for Terraform modules
+- Learning about dynamic module discovery
+- Designing scalable workflow architectures
+- Understanding composite actions pattern
+- Planning migration from flat to modular structure
 
-Contains: Dynamic discovery pattern with composite actions, directory structure for module-level CI/CD, implementation examples for dispatcher workflows, module configuration patterns, best practices for monorepo workflow organization, and solutions for maintaining logical separation while working within GitHub Actions constraints.
+Contains: Architectural patterns and guidelines for organizing GitHub Actions in a monorepo with multiple Terraform modules. Describes the dynamic discovery pattern, composite actions architecture, and scalability considerations. This is the DESIGN PATTERN that our implementation follows.
 
 ### 9. [Terraform Best Practices Guide](docs/TERRAFORM_BEST_PRACTISES_GUIDE.md)
 **MANDATORY REVIEW** when:
@@ -134,3 +133,16 @@ Contains: Comprehensive guide for Terraform module development including resourc
 - Using mock strategies for expensive resources
 
 Contains: Comprehensive testing strategies including testing pyramid (static analysis, unit, integration, E2E), native Terraform test examples with mock providers, Terratest patterns for Azure resources, security and compliance testing, performance testing, CI/CD integration with GitHub Actions, test organization best practices, and cost optimization strategies for testing infrastructure.
+
+### 11. [GitHub Actions Workflows Documentation](docs/WORKFLOWS.md)
+**MANDATORY REVIEW** when:
+- Understanding the current GitHub Actions workflow architecture
+- Debugging workflow issues or failures
+- Adding new Terraform modules to the repository
+- Modifying existing CI/CD pipelines
+- Understanding how workflows interact with each other
+- Troubleshooting module detection or composite actions
+
+Contains: Comprehensive documentation of the implemented GitHub Actions workflow system including architecture overview with diagrams, detailed description of each workflow (module-ci, module-release, module-docs, pr-validation, repo-maintenance), shared actions documentation, module-specific composite actions, workflow interaction flows, step-by-step guide for adding new modules, and troubleshooting guide.
+
+**Note**: This document describes the ACTUAL IMPLEMENTATION of workflows in this repository, while documents #7 and #8 above provide general GUIDELINES and PATTERNS for creating GitHub Actions workflows.
