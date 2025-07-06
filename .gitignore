@@ -131,6 +131,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 dev-debug.log
+
 # Dependency directories
 # Environment variables
 # Editor directories and files
@@ -141,6 +142,7 @@ dev-debug.log
 *.njsproj
 *.sln
 *.sw?
+
 # OS specific
 
 # Task files
@@ -148,4 +150,4 @@ dev-debug.log
 # tasks/
 
 # MCP configuration (contains API keys)
-.mcp.json 
+.mcp.json
