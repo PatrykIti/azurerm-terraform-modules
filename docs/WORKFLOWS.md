@@ -129,32 +129,37 @@ azurerm-terraform-modules/
 
 ### 2. Module Release (`module-release.yml`)
 
-**Purpose**: Manages semantic versioning and releases for individual modules.
+**Purpose**: Automated semantic versioning and releases using semantic-release.
 
 **Triggers**:
 - Manual workflow dispatch with inputs:
   - `module`: Module to release (dropdown)
-  - `version`: Semantic version (e.g., 1.2.0)
-  - `release_notes`: Optional release notes
+  - `dry_run`: Optional dry run mode (boolean)
 
 **Jobs**:
 
-#### `validate-version`
+#### `semantic-release`
 ```yaml
-- Validates semantic version format
-- Checks if version already exists
-- Generates tag name: <module>/v<version>
+- Sets up Node.js environment
+- Installs semantic-release dependencies
+- Validates module with Terraform
+- Runs semantic-release which automatically:
+  - Analyzes commits since last release
+  - Determines version bump (major/minor/patch)
+  - Updates CHANGELOG.md following Keep a Changelog
+  - Updates module-config.yml version
+  - Creates git tag with module prefix (e.g., SAv1.2.3)
+  - Commits changes
+  - Creates GitHub release with notes
+- Updates documentation with terraform-docs if needed
 ```
 
-#### `release`
-```yaml
-- Runs final validation
-- Updates module-config.yml with new version
-- Updates CHANGELOG.md
-- Regenerates documentation
-- Creates git tag and GitHub release
-- Includes installation instructions in release
-```
+**Key Features**:
+- Zero manual version decisions
+- Automatic CHANGELOG generation
+- Conventional commit enforcement
+- Module-specific versioning
+- Dry run capability for testing
 
 ### 3. Module Documentation (`module-docs.yml`)
 
@@ -492,16 +497,65 @@ env:
 ## Best Practices
 
 1. **Module Independence**: Each module should be self-contained with its own tests and documentation
-2. **Semantic Versioning**: Follow semver for module releases
+2. **Automated Versioning**: Use semantic-release for automatic version management
 3. **Security First**: Always include security scanning in CI/CD
 4. **Documentation**: Keep README.md updated with terraform-docs
 5. **Testing**: Write comprehensive tests for all modules
-6. **Conventional Commits**: Use for clear change history
+6. **Conventional Commits**: Required for semantic-release automation
+
+## Semantic Release Configuration
+
+### Overview
+This repository uses [semantic-release](https://semantic-release.gitbook.io/) for fully automated version management and CHANGELOG generation.
+
+### Module Configuration
+Each module requires a `.releaserc.js` file:
+
+```javascript
+module.exports = {
+  branches: ['main'],
+  tagFormat: 'SAv${version}',  // Module-specific prefix
+  plugins: [
+    '@semantic-release/commit-analyzer',
+    '@semantic-release/release-notes-generator',
+    '@semantic-release/changelog',
+    '@semantic-release/git',
+    '@semantic-release/github'
+  ]
+};
+```
+
+### Commit Message Format
+Commits MUST follow conventional format with module scope:
+
+```bash
+feat(storage-account): add new encryption feature
+fix(storage-account): resolve validation bug
+
+BREAKING CHANGE: renamed variable 'enable_logs' to 'diagnostic_settings'
+```
+
+### Version Determination
+- `feat:` commits trigger minor version bump (1.0.0 → 1.1.0)
+- `fix:` commits trigger patch version bump (1.0.0 → 1.0.1)
+- `BREAKING CHANGE:` triggers major version bump (1.0.0 → 2.0.0)
+
+### Release Process
+1. Merge PR with conventional commits to main
+2. Manually trigger module-release workflow
+3. Semantic-release automatically:
+   - Analyzes commits
+   - Determines version
+   - Updates CHANGELOG.md
+   - Creates git tag
+   - Publishes GitHub release
 
 ## References
 
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Composite Actions Guide](https://docs.github.com/en/actions/creating-actions/creating-a-composite-action)
+- [Semantic Release Documentation](https://semantic-release.gitbook.io/)
+- [Conventional Commits](https://www.conventionalcommits.org/)
 - [Terraform Documentation](https://www.terraform.io/docs)
 - [terraform-docs](https://terraform-docs.io/)
 - [TFLint](https://github.com/terraform-linters/tflint)

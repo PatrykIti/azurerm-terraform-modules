@@ -9,64 +9,42 @@ on:
         type: choice
         options:
           - azurerm_storage_account
-      version:
-        description: 'Version to release (e.g., 1.2.0)'
-        required: true
-        type: string
-      release_notes:
-        description: 'Release notes (optional)'
+      dry_run:
+        description: 'Perform a dry run without creating release'
         required: false
-        type: string
+        type: boolean
+        default: false
 
 permissions:
   contents: write
   pull-requests: write
+  issues: write
 
 jobs:
-  validate-version:
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.validate.outputs.version }}
-      tag: ${{ steps.validate.outputs.tag }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      
-      - name: Validate version format
-        id: validate
-        run: |
-          VERSION="${{ inputs.version }}"
-          
-          # Validate semver format
-          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$'; then
-            echo "❌ Invalid version format. Please use semantic versioning (e.g., 1.2.0, 1.2.0-beta.1)"
-            exit 1
-          fi
-          
-          # Check if version already exists
-          TAG="${{ inputs.module }}/v${VERSION}"
-          if git tag -l "$TAG" | grep -q "$TAG"; then
-            echo "❌ Version $VERSION already exists for module ${{ inputs.module }}"
-            exit 1
-          fi
-          
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-
-  release:
-    needs: validate-version
+  semantic-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
       
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      
+      - name: Install dependencies
+        run: npm ci
       
       - name: Setup Terraform
         uses: ./.github/actions/terraform-setup
@@ -74,70 +52,72 @@ jobs:
           terraform-version: '1.10.3'
           install-terraform-docs: true
       
-      - name: Final validation before release
+      - name: Validate module before release
         uses: ./modules/${{ inputs.module }}/.github/actions/validate
         with:
           terraform-version: '1.10.3'
       
-      - name: Update module version
+      - name: Get module configuration
+        id: module-config
         run: |
-          # Update version in module-config.yml
-          CONFIG_FILE="modules/${{ inputs.module }}/.github/module-config.yml"
-          if [[ -f "$CONFIG_FILE" ]]; then
-            sed -i "s/^version: .*/version: ${{ needs.validate-version.outputs.version }}/" "$CONFIG_FILE"
+          MODULE_DIR="modules/${{ inputs.module }}"
+          
+          # Extract module prefix from .releaserc.json
+          if [[ -f "$MODULE_DIR/.releaserc.json" ]]; then
+            PREFIX=$(jq -r '.tagFormat' "$MODULE_DIR/.releaserc.json" | sed 's/\${version}//')
+            echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Missing .releaserc.json in $MODULE_DIR"
+            exit 1
           fi
           
-          # Update CHANGELOG.md
-          CHANGELOG="modules/${{ inputs.module }}/CHANGELOG.md"
-          if [[ -f "$CHANGELOG" ]]; then
-            DATE=$(date +%Y-%m-%d)
-            sed -i "/^## \[Unreleased\]/a\\
-\\
-## [${{ needs.validate-version.outputs.version }}] - $DATE\\
-${{ inputs.release_notes }}" "$CHANGELOG"
-          fi
+          # Extract module scope for commit filtering
+          case "${{ inputs.module }}" in
+            azurerm_storage_account) SCOPE="storage-account" ;;
+            azurerm_virtual_network) SCOPE="virtual-network" ;;
+            azurerm_key_vault) SCOPE="key-vault" ;;
+            azurerm_application_gateway) SCOPE="app-gateway" ;;
+            *) SCOPE="${{ inputs.module }}" ;;
+          esac
+          echo "scope=$SCOPE" >> $GITHUB_OUTPUT
       
-      - name: Generate updated documentation
-        run: |
-          cd modules/${{ inputs.module }}
-          terraform-docs markdown table --output-file README.md .
-          cd -
-      
-      - name: Create release commit
-        run: |
-          git add modules/${{ inputs.module }}/
-          git commit -m "chore(${{ inputs.module }}): release version ${{ needs.validate-version.outputs.version }}"
-      
-      - name: Create and push tag
-        run: |
-          git tag -a "${{ needs.validate-version.outputs.tag }}" -m "Release ${{ inputs.module }} version ${{ needs.validate-version.outputs.version }}"
-          git push origin HEAD
-          git push origin "${{ needs.validate-version.outputs.tag }}"
-      
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
+      - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ needs.validate-version.outputs.tag }}
-          release_name: ${{ inputs.module }} v${{ needs.validate-version.outputs.version }}
-          body: |
-            ## Module: ${{ inputs.module }}
-            ## Version: ${{ needs.validate-version.outputs.version }}
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
+        run: |
+          cd modules/${{ inputs.module }}
+          
+          # Run semantic-release with module-specific config
+          if [[ "${{ inputs.dry_run }}" == "true" ]]; then
+            echo "🔍 Running semantic-release in dry-run mode..."
+            npx semantic-release --dry-run
+          else
+            echo "🚀 Running semantic-release for ${{ inputs.module }}..."
+            npx semantic-release
+          fi
+      
+      - name: Update module documentation
+        if: ${{ inputs.dry_run != 'true' }}
+        run: |
+          cd modules/${{ inputs.module }}
+          
+          # Check if any release was made
+          if git diff --name-only HEAD~1 | grep -q "CHANGELOG.md"; then
+            echo "📝 Updating module documentation..."
+            terraform-docs markdown table --output-file README.md .
             
-            ${{ inputs.release_notes }}
-            
-            ### Installation
-            
-            ```hcl
-            module "${{ inputs.module }}" {
-              source  = "git::https://github.com/${{ github.repository }}.git//modules/${{ inputs.module }}?ref=${{ needs.validate-version.outputs.tag }}"
-              # ... configuration ...
-            }
-            ```
-            
-            ### Documentation
-            
-            See the [module README](https://github.com/${{ github.repository }}/tree/${{ needs.validate-version.outputs.tag }}/modules/${{ inputs.module }}/README.md) for detailed documentation.
-          draft: false
-          prerelease: ${{ contains(needs.validate-version.outputs.version, '-') }}
+            # Commit documentation updates if changed
+            if git diff --exit-code README.md; then
+              echo "No documentation changes needed."
+            else
+              git add README.md
+              git commit -m "docs(${{ steps.module-config.outputs.scope }}): update terraform-docs [skip ci]"
+              git push origin HEAD
+            fi
+          else
+            echo "No release was made, skipping documentation update."
+          fi

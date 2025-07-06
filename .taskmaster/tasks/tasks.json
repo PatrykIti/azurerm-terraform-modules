@@ -90,7 +90,7 @@
             "title": "Integrate semantic-release for automated CHANGELOG management",
             "description": "Replace manual CHANGELOG updates in module-release workflow with semantic-release integration for fully automated versioning and changelog generation",
             "details": "Implement semantic-release integration in the module-release.yml workflow to automate:\n1. Version determination based on conventional commits\n2. CHANGELOG generation following Keep a Changelog format\n3. Git tagging with module-specific prefixes (e.g., SAv1.2.3)\n4. GitHub release creation\n5. Automatic commit of updated files\n\nKey tasks:\n- Modify module-release.yml to use semantic-release instead of manual updates\n- Create shared .releaserc.js template for all modules\n- Ensure monorepo compatibility (each module releases independently)\n- Configure semantic-release to only analyze commits for specific module paths\n- Update documentation in WORKFLOWS.md and CLAUDE.md",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 5
           }
@@ -391,7 +391,7 @@
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-03T13:36:01.340Z",
+      "updated": "2025-07-06T10:38:44.538Z",
       "description": "Tasks for master context"
     }
   }
