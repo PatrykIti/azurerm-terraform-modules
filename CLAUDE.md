@@ -146,3 +146,14 @@ Contains: Comprehensive testing strategies including testing pyramid (static ana
 Contains: Comprehensive documentation of the implemented GitHub Actions workflow system including architecture overview with diagrams, detailed description of each workflow (module-ci, module-release, module-docs, pr-validation, repo-maintenance), shared actions documentation, module-specific composite actions, workflow interaction flows, step-by-step guide for adding new modules, and troubleshooting guide.
 
 **Note**: This document describes the ACTUAL IMPLEMENTATION of workflows in this repository, while documents #7 and #8 above provide general GUIDELINES and PATTERNS for creating GitHub Actions workflows.
+
+### 12. [Semantic Release Integration Guide](.claude/references/semantic-release-guide.md)
+**MANDATORY REVIEW** when:
+- Setting up automated versioning and releases
+- Understanding how CHANGELOG is automatically generated
+- Creating release workflow for new modules
+- Troubleshooting release automation issues
+- Learning about conventional commits requirements
+- Adding module-specific release configuration
+
+Contains: Complete guide for semantic-release integration including monorepo configuration, module-specific versioning, CHANGELOG automation, commit message requirements, workflow integration patterns, and troubleshooting guide. This implements the "nothing manual in the repo" philosophy for releases.
