@@ -33,6 +33,20 @@ This example demonstrates how to deploy a highly secure Azure Storage Account su
 - **Access controls**: Azure AD authentication required
 - **Monitoring**: Real-time security alerts
 
+## Prerequisites
+
+- Azure subscription with appropriate permissions
+- Terraform >= 1.3.0
+- AzureRM Provider 4.35.0 (as specified in the module's [versions.tf](../../versions.tf))
+- Network connectivity for private endpoints
+- Permissions to create:
+  - Virtual Networks and Subnets
+  - Private Endpoints and DNS Zones
+  - Key Vault with encryption keys
+  - Log Analytics workspace
+
+**Note**: The module uses a pinned version of the AzureRM provider (4.35.0) to ensure consistent behavior across all deployments.
+
 ## Usage
 
 ```bash

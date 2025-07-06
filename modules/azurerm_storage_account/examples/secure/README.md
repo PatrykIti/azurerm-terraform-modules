@@ -63,12 +63,16 @@ This configuration is suitable for:
 ## Prerequisites
 
 - Azure subscription with appropriate security clearances
+- Terraform >= 1.3.0
+- AzureRM Provider 4.35.0 (as specified in the module's [versions.tf](../../versions.tf))
 - Permissions to create:
   - Premium Key Vault with HSM
   - Private endpoints and DNS zones
   - Log Analytics workspace
   - Monitor alerts
 - Network connectivity to private endpoints
+
+**Note**: The module uses a pinned version of the AzureRM provider (4.35.0) to ensure consistent behavior across all deployments.
 
 ## Deployment Considerations
 

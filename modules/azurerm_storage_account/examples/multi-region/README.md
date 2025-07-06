@@ -154,9 +154,13 @@ terraform apply
 ## Prerequisites
 
 - Azure subscription with multi-region access
+- Terraform >= 1.3.0
+- AzureRM Provider 4.35.0 (as specified in the module's [versions.tf](../../versions.tf))
 - Sufficient storage quota in all regions
 - Network connectivity between regions (for private endpoints)
 - Budget approval for multi-region storage costs
+
+**Note**: The module uses a pinned version of the AzureRM provider (4.35.0) to ensure consistent behavior across all deployments.
 
 ## Customization Options
 

@@ -4,11 +4,11 @@ This directory contains examples showing how to use the Storage Account module i
 
 ## Available Examples
 
-- **[simple](./simple)** - Basic storage account with minimal configuration
-- **[complete](./complete)** - Comprehensive example with all features enabled
-- **[secure](./secure)** - Security-hardened configuration
-- **[secure-private-endpoint](./secure-private-endpoint)** - Private endpoint configuration
-- **[multi-region](./multi-region)** - Multi-region deployment with replication
+- **[simple](./simple/README.md)** - Basic storage account with minimal configuration
+- **[complete](./complete/README.md)** - Comprehensive example with all features enabled
+- **[secure](./secure/README.md)** - Security-hardened configuration
+- **[secure-private-endpoint](./secure-private-endpoint/README.md)** - Private endpoint configuration
+- **[multi-region](./multi-region/README.md)** - Multi-region deployment with replication
 
 ## Important Note on Module Source
 
@@ -31,6 +31,14 @@ module "storage_account" {
 ```
 
 **Note**: After each release, the examples in this repository are automatically updated to show the latest version tag. This ensures that the examples always demonstrate best practices for production usage.
+
+## Provider Version Requirements
+
+**Important**: This module requires specific provider versions as defined in the module's [versions.tf](../versions.tf):
+- **Terraform**: >= 1.3.0
+- **AzureRM Provider**: 4.35.0 (pinned version)
+
+The examples inherit these version constraints from the module. While you can override them in your root configuration, it's recommended to use the same versions for compatibility.
 
 ## Running the Examples
 
@@ -58,3 +66,13 @@ module "storage_account" {
    ```bash
    terraform destroy
    ```
+
+## Authentication
+
+The examples assume you have authenticated to Azure. You can authenticate using:
+
+- Azure CLI: `az login`
+- Service Principal: Set environment variables
+- Managed Identity: When running in Azure
+
+For more details, see the [AzureRM Provider documentation](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#authenticating-to-azure).

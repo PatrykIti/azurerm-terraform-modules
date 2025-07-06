@@ -20,7 +20,9 @@ terraform apply
 
 - Azure subscription
 - Terraform >= 1.3.0
-- AzureRM Provider >= 3.0.0
+- AzureRM Provider 4.35.0 (as specified in the module's [versions.tf](../../versions.tf))
+
+**Note**: The module uses a pinned version of the AzureRM provider (4.35.0) to ensure consistent behavior across all deployments.
 
 ## Outputs
 
