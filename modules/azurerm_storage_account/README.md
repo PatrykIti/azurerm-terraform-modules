@@ -161,4 +161,9 @@ No modules.
 | <a name="output_static_website"></a> [static\_website](#output\_static\_website) | Static website properties |
 | <a name="output_tables"></a> [tables](#output\_tables) | Map of created storage tables |
 
+## Additional Documentation
+
+- [VERSIONING.md](VERSIONING.md) - Module versioning and release process
+- [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
+
 <!-- END_TF_DOCS -->

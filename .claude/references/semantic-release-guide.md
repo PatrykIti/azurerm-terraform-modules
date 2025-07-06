@@ -182,8 +182,38 @@ When creating a new module:
 
 5. Module released with zero manual intervention!
 
+## Terraform-docs Integration
+
+### Automatic README Updates
+
+Each module includes `.terraform-docs.yml` configuration that:
+- Generates consistent README format across all modules
+- Includes current module version
+- Automatically adds links to VERSIONING.md and SECURITY.md
+- Updates via the `module-docs.yml` workflow
+
+### Configuration Template
+
+Location: `scripts/templates/.terraform-docs.yml`
+
+Key features:
+- Injects module version dynamically
+- Includes example code from `examples/simple/main.tf`
+- Adds "Additional Documentation" section with links to:
+  - VERSIONING.md - Module versioning and release process
+  - SECURITY.md - Security features and configuration guidelines
+
+### Workflow Integration
+
+The `module-docs.yml` workflow:
+1. Triggers on changes to Terraform files
+2. Runs terraform-docs for affected modules
+3. Creates PRs with documentation updates
+4. Ensures README always reflects current module structure
+
 ## Related Documentation
 
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [Semantic Release Docs](https://semantic-release.gitbook.io/)
 - [Keep a Changelog](https://keepachangelog.com/)
+- [Terraform-docs](https://terraform-docs.io/)

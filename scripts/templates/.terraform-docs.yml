@@ -18,11 +18,11 @@ content: |-
 
   ## Module Version
 
-  Current version: **SAv1.0.0**
+  Current version: **VERSION_PLACEHOLDER**
 
   ## Description
 
-  This module creates a comprehensive Azure Storage Account with support for all enterprise features including security, monitoring, private endpoints, and lifecycle management.
+  MODULE_DESCRIPTION_PLACEHOLDER
 
   ## Usage
 
@@ -32,10 +32,7 @@ content: |-
 
   ## Examples
 
-  - [Simple](examples/simple) - Basic storage account configuration
-  - [Complete](examples/complete) - Full-featured storage account with all enterprise capabilities  
-  - [Secure](examples/secure) - Maximum security configuration
-  - [Multi-Region](examples/multi-region) - Multi-region setup with disaster recovery
+  EXAMPLES_PLACEHOLDER
 
   ## Requirements
 
