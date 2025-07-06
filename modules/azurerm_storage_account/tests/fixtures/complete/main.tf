@@ -146,5 +146,5 @@ output "primary_blob_endpoint" {
 }
 
 output "container_names" {
-  value = module.storage_account.container_names
+  value = [for k, v in module.storage_account.containers : v.name]
 }

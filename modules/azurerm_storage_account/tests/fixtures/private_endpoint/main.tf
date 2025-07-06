@@ -61,14 +61,14 @@ module "storage_account" {
   }
 
   # Private endpoint configuration
-  private_endpoints = {
-    blob = {
-      name                = "pe-blob-${random_string.suffix.result}"
-      subnet_id           = azurerm_subnet.endpoint.id
-      private_dns_zone_id = azurerm_private_dns_zone.blob.id
-      subresource_names   = ["blob"]
+  private_endpoints = [
+    {
+      name                 = "pe-blob-${random_string.suffix.result}"
+      subnet_id            = azurerm_subnet.endpoint.id
+      private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
+      subresource_names    = ["blob"]
     }
-  }
+  ]
 
   tags = {
     Environment = "Test"
@@ -89,5 +89,5 @@ output "resource_group_name" {
 }
 
 output "private_endpoint_id" {
-  value = module.storage_account.private_endpoint_ids["blob"]
+  value = try(values(module.storage_account.private_endpoints)[0].id, null)
 }
