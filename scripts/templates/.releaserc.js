@@ -84,13 +84,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).`
     }],
     
-    // Update module-config.yml with new version
+    // Update module-config.yml with new version and examples
     ['@semantic-release/exec', {
       prepareCmd: `
+        # Update module-config.yml
         CONFIG_FILE=".github/module-config.yml"
         if [[ -f "$CONFIG_FILE" ]]; then
           sed -i "s/^version: .*/version: \${nextRelease.version}/" "$CONFIG_FILE"
         fi
+        
+        # Update examples to use the new version tag
+        find examples -name "*.tf" -type f -exec sed -i 's|source.*=.*"\.\./../"|source = "github.com/\${context.repo.owner}/\${context.repo.repo}//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"|g' {} +
       `.trim()
     }],
     
@@ -98,7 +102,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     ['@semantic-release/git', {
       assets: [
         'CHANGELOG.md',
-        '.github/module-config.yml'
+        '.github/module-config.yml',
+        'examples/**/*.tf'
       ],
       message: `chore(release): ${TAG_PREFIX}\${nextRelease.version} [skip ci]
 
