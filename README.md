@@ -6,6 +6,14 @@
 
 A comprehensive collection of production-ready Terraform modules for Azure infrastructure, following HashiCorp best practices and enterprise security standards.
 
+## 📚 Quick Navigation
+
+- [**Development Guide**](./CLAUDE.md) - AI-assisted development guidelines and reference documentation
+- [**Terraform Best Practices**](./docs/TERRAFORM_BEST_PRACTISES_GUIDE.md) - Module development standards and conventions
+- [**Testing Guide**](./docs/TERRAFORM_TESTING_GUIDE.md) - Comprehensive testing strategies and examples
+- [**Workflows Documentation**](./docs/WORKFLOWS.md) - GitHub Actions CI/CD implementation details
+- [**Security Policy**](./docs/SECURITY.md) - Security guidelines and vulnerability reporting
+
 ## Repository Structure
 
 This repository follows a **multi-module approach** where each Azure resource type has its own independent module with separate versioning and CI/CD pipelines.
@@ -21,7 +29,7 @@ scripts/                    # Shared automation scripts
 .github/workflows/          # CI/CD workflows
 ```
 
-## =� Quick Start
+## 🚀 Quick Start
 
 ### Using a Module
 
@@ -56,18 +64,18 @@ Each module uses semantic versioning with descriptive prefixes:
 - **Key Vault**: `KVv1.0.0`, `KVv1.1.0`, `KVv2.0.0`
 - **Application Gateway**: `AGv1.0.0`, `AGv1.1.0`, `AGv2.0.0`
 
-## Available Modules
+## 📦 Available Modules
 
 ### In Development
 
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
-| [Storage Account](./modules/azurerm_storage_account/) | 🔧 Development | - | Azure Storage Account with enterprise features |
-| [Virtual Network](./modules/azurerm_virtual_network/) | 📅 Planned | - | Virtual networks with subnets and security |
-| [Key Vault](./modules/azurerm_key_vault/) | 📅 Planned | - | Key management and secrets storage |
-| [Application Gateway](./modules/azurerm_application_gateway/) | 📅 Planned | - | Application-layer load balancing |
+| [Storage Account](./azurerm_storage_account/) | 🔧 Development | - | Azure Storage Account with enterprise features |
+| [Virtual Network](./azurerm_virtual_network/) | 📅 Planned | - | Virtual networks with subnets and security |
+| [Key Vault](./azurerm_key_vault/) | 📅 Planned | - | Key management and secrets storage |
+| [Application Gateway](./azurerm_application_gateway/) | 📅 Planned | - | Application-layer load balancing |
 
-### Roadmap
+### Development Roadmap
 
 - **Phase 1**: Storage Account module with comprehensive features
 - **Phase 2**: Virtual Network module with advanced networking
@@ -118,20 +126,29 @@ Each module uses semantic versioning with descriptive prefixes:
 - Ability to create and manage Azure resources
 - Access to Azure Active Directory (for Key Vault)
 
-## Documentation
+## 📖 Documentation Structure
+
+### Core Documentation
+- [**CLAUDE.md**](./CLAUDE.md) - AI development assistant guidelines and reference index
+- [**Terraform Best Practices Guide**](./docs/TERRAFORM_BEST_PRACTISES_GUIDE.md) - Comprehensive module development standards
+- [**Terraform Testing Guide**](./docs/TERRAFORM_TESTING_GUIDE.md) - Testing strategies, frameworks, and examples
+- [**GitHub Actions Workflows**](./docs/WORKFLOWS.md) - CI/CD pipeline implementation and architecture
+- [**Security Policy**](./docs/SECURITY.md) - Security guidelines and vulnerability reporting
 
 ### Module Documentation
-Each module includes comprehensive documentation:
-- **README.md**: Module overview and usage examples
-- **CHANGELOG.md**: Version history and breaking changes
-- **examples/**: Complete usage examples
-- **tests/**: Automated test suites
+Each module includes:
+- **README.md** - Module overview, requirements, and usage examples
+- **CHANGELOG.md** - Version history and breaking changes
+- **examples/** - Simple and advanced usage examples
+- **tests/** - Unit and integration test suites
+- **docs/** - Additional module-specific documentation
 
-### Shared Documentation
-- [Contributing Guidelines](./docs/CONTRIBUTING.md)
-- [Security Policy](./docs/SECURITY.md)
-- [Module Standards](./docs/module-standards.md)
-- [Best Practices Guide](./docs/terraform-module-best-practices-guide.md)
+### Development References
+Located in `.claude/references/`:
+- MCP tools usage and integration patterns
+- TaskMaster workflow guidelines
+- GitHub Actions architecture patterns
+- Multi-agent development coordination
 
 ## Contributing
 
@@ -145,13 +162,13 @@ We welcome contributions from the community! Please read our [Contributing Guide
 5. Update documentation
 6. Submit a pull request
 
-### Multi-Agent Development
-This project supports parallel development using multiple AI agents:
-- **Module Agent**: Terraform module implementation
-- **Workflow Agent**: CI/CD and automation setup
-- **Documentation Agent**: Examples and guides
-- **Testing Agent**: Test suites and validation
-- **Security Agent**: Security configurations
+### Development Tools
+
+This project is optimized for AI-assisted development:
+- **TaskMaster** integration for task management and workflow coordination
+- **MCP tools** for enhanced development capabilities
+- **Multi-agent support** for parallel development streams
+- See [CLAUDE.md](./CLAUDE.md) for detailed development guidelines
 ## 🔍 Code Quality with TFLint
 
 ### Running TFLint Locally
@@ -195,7 +212,7 @@ rule "azurerm_resource_missing_tags" {
 ### Reporting Security Issues
 Please see our [Security Policy](./docs/SECURITY.md) for information on reporting security vulnerabilities.
 
-## =� CI/CD Pipeline
+## 🔄 CI/CD Pipeline
 
 ### Automated Workflows
 - **Validation**: Terraform format, validate, and TFLint analysis
@@ -213,7 +230,7 @@ All modules must pass:
 - ✅ Documentation completeness
 - ✅ Example functionality
 
-## =� Performance
+## ⚡ Performance
 
 ### Benchmarks
 - Module deployment: < 5 minutes (basic configurations)
@@ -250,4 +267,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Made by the Platform Engineering Team**
+**Built with ❤️ by the Platform Engineering Team**
+
+*This repository follows enterprise-grade standards for infrastructure as code. For development guidelines and AI-assisted workflows, see [CLAUDE.md](./CLAUDE.md).*
