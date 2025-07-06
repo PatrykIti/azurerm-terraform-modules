@@ -69,5 +69,5 @@ output "resource_group_name" {
 }
 
 output "identity_principal_id" {
-  value = module.storage_account.identity_principal_id
+  value = try(module.storage_account.identity.principal_id, null)
 }
