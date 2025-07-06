@@ -1,5 +1,7 @@
 # Module Versioning Guide
 
+This module uses **semantic-release** for fully automated version management based on conventional commits.
+
 ## Version Format
 
 This module follows a custom semantic versioning format:
@@ -11,104 +13,117 @@ SAv{major}.{minor}.{patch}
 Where:
 - `SA` = Storage Account module identifier
 - `v` = version prefix
-- `{major}.{minor}.{patch}` = semantic version numbers
+- `{major}.{minor}.{patch}` = semantic version numbers (automatically determined)
 
 ### Examples:
 - `SAv1.0.0` - First stable release
-- `SAv1.1.0` - Minor feature addition
-- `SAv1.0.1` - Bug fix
-- `SAv2.0.0` - Breaking change
+- `SAv1.1.0` - Minor feature addition (from `feat:` commits)
+- `SAv1.0.1` - Bug fix (from `fix:` commits)
+- `SAv2.0.0` - Breaking change (from `BREAKING CHANGE:` commits)
 
-## Version Number Guidelines
+## Automated Version Determination
+
+Version bumps are **automatically determined** by semantic-release based on commit messages:
 
 ### Major Version (Breaking Changes)
-Increment when:
-- Removing variables or outputs
-- Changing variable types or defaults in incompatible ways
-- Removing resources
-- Changing resource naming conventions
-- Minimum Terraform version increase that drops support
+Triggered by:
+- Commits with `BREAKING CHANGE:` in the footer
+- Commits with `!` after the type (e.g., `feat!:`, `fix!:`)
 
-Examples:
-- Changing `enable_https_traffic_only` default from `true` to `false`
-- Removing support for `account_kind = "Storage"`
-- Renaming core variables without deprecation period
+```bash
+feat(storage-account)!: change default encryption to customer-managed keys
+
+BREAKING CHANGE: The default encryption is now customer-managed instead of Microsoft-managed.
+Users must provide key_vault_key_id or set encryption.enabled = false.
+```
 
 ### Minor Version (New Features)
-Increment when:
-- Adding new variables (with defaults)
-- Adding new outputs
-- Adding new resources (optional)
-- Adding new capabilities
-- Non-breaking improvements
+Triggered by:
+- Commits with type `feat:`
 
-Examples:
-- Adding `enable_nfs_v3` variable
-- Adding support for new Azure features
-- Adding new lifecycle rule options
+```bash
+feat(storage-account): add support for NFS v3 protocol
+feat(storage-account): implement lifecycle management policies
+```
 
 ### Patch Version (Bug Fixes)
-Increment when:
-- Fixing bugs
-- Updating documentation
-- Improving error messages
-- Performance improvements
-- Security patches (non-breaking)
+Triggered by:
+- Commits with types: `fix:`, `perf:`, `revert:`, `refactor:`, `docs:`
 
-Examples:
-- Fixing incorrect validation rules
-- Correcting resource dependencies
-- Documentation typos
-
-## Release Process
-
-### 1. Pre-release Checklist
-- [ ] All tests passing
-- [ ] Documentation updated
-- [ ] Examples tested
-- [ ] CHANGELOG.md updated
-- [ ] Version number decided
-
-### 2. Version Tagging
 ```bash
-# Create annotated tag
-git tag -a SAv1.0.0 -m "Release version SAv1.0.0"
-
-# Push tag
-git push origin SAv1.0.0
+fix(storage-account): correct validation for account name length
+perf(storage-account): optimize tag merging logic
+docs(storage-account): update README with new examples
 ```
 
-### 3. Release Notes Template
+### No Version (Ignored)
+These commits don't trigger releases:
+- `chore:`, `style:`, `test:`, `build:`, `ci:`
+
+```bash
+chore(storage-account): update .gitignore
+test(storage-account): add unit tests for validation
+```
+
+## Automated Release Process
+
+### Prerequisites
+- All commits follow [Conventional Commits](https://www.conventionalcommits.org/) format
+- Commits include module scope: `feat(storage-account): description`
+- PR is merged to main branch
+
+### Release Workflow
+
+1. **Merge PR to main** with conventional commits
+2. **Trigger Release Workflow** (manual via GitHub Actions)
+3. **Semantic-release automatically**:
+   - Analyzes commits since last release
+   - Determines version bump type
+   - Updates CHANGELOG.md
+   - Updates module version in configs
+   - Updates examples to use new version tag
+   - Creates git tag (e.g., `SAv1.2.0`)
+   - Publishes GitHub release
+   - Commits all changes
+
+### What Gets Updated Automatically
+
+#### CHANGELOG.md
 ```markdown
-## SAv1.0.0 - Storage Account Module Release
+## [1.2.0] - 2024-01-15
 
-### Highlights
-- Brief summary of major changes
+### 🚀 Features
+- Add support for NFS v3 protocol (#123)
+- Implement lifecycle management policies (#124)
 
-### New Features
-- Feature 1
-- Feature 2
-
-### Improvements
-- Improvement 1
-- Improvement 2
-
-### Bug Fixes
-- Fix 1
-- Fix 2
-
-### Breaking Changes
-- None (or list them)
-
-### Upgrade Guide
-Instructions for upgrading from previous version
+### 🐛 Bug Fixes
+- Correct validation for account name length (#125)
 ```
+
+#### Examples Source References
+```hcl
+# Before release (development)
+module "storage_account" {
+  source = "../../"
+}
+
+# After release (automatically updated)
+module "storage_account" {
+  source = "github.com/org/repo//modules/azurerm_storage_account?ref=SAv1.2.0"
+}
+```
+
+#### Module Configuration
+- Version in `.github/module-config.yml`
+- Any version references in documentation
 
 ## Version Compatibility Matrix
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| SAv1.0.x       | >= 1.3.0          | >= 3.0.0         | 2021-09-01        |
+| SAv1.0.x       | >= 1.3.0          | 4.35.0 (pinned)  | 2023-01-01        |
+
+**Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments. Updates to the provider version are considered carefully and may result in a minor or major version bump depending on the changes.
 
 ## Deprecation Policy
 
@@ -135,31 +150,61 @@ variable "enable_logs" {
 
 ## Module Versioning in Usage
 
-### Specific Version
+### Direct from GitHub (Recommended)
 ```hcl
-module "storage" {
-  source  = "git::https://github.com/org/terraform-azurerm-storage.git?ref=SAv1.0.0"
-  # ... configuration ...
+module "storage_account" {
+  source = "github.com/yourusername/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  
+  # Module configuration
+  name                = "mystorageaccount"
+  resource_group_name = azurerm_resource_group.main.name
+  location           = "West Europe"
 }
 ```
 
-### Version Constraints (Terraform Registry)
+### Latest Version
 ```hcl
-module "storage" {
-  source  = "org/storage/azurerm"
-  version = "~> 1.0"
-  # ... configuration ...
+# NOT RECOMMENDED - Always pin to a specific version
+module "storage_account" {
+  source = "github.com/yourusername/azurerm-terraform-modules//modules/azurerm_storage_account"
 }
 ```
 
-## Changelog Maintenance
+### Version Selection Strategy
+- **Production**: Always use specific version tags (e.g., `ref=SAv1.2.3`)
+- **Development**: Can use branch references (e.g., `ref=feature/my-feature`)
+- **Testing**: Can use commit SHA (e.g., `ref=a1b2c3d4`)
 
-Every version must have a changelog entry with:
-- Version number and date
-- Categories: Added, Changed, Deprecated, Removed, Fixed, Security
-- Clear description of changes
-- Migration instructions for breaking changes
-- Links to relevant issues/PRs
+## Changelog Management
+
+### Automated by Semantic-release
+
+The CHANGELOG.md is **automatically maintained** by semantic-release:
+
+- Follows [Keep a Changelog](https://keepachangelog.com/) format
+- Groups changes by type with emojis:
+  - 🚀 Features (from `feat:` commits)
+  - 🐛 Bug Fixes (from `fix:` commits)
+  - ⚡ Performance (from `perf:` commits)
+  - 📚 Documentation (from `docs:` commits)
+  - ♻️ Refactoring (from `refactor:` commits)
+- Includes PR/issue numbers when referenced in commits
+- Automatically adds release date
+
+### Manual Entries
+
+The only manual section is `[Unreleased]` during development:
+```markdown
+## [Unreleased]
+
+### Added
+- Work in progress features
+
+### Fixed
+- Known issues being worked on
+```
+
+This section is automatically cleared and moved to the version section during release.
 
 ## Testing Requirements by Version Type
 
@@ -179,16 +224,53 @@ Every version must have a changelog entry with:
 - Smoke tests
 - Example validation
 
-## Communication
+## Best Practices for Commits
 
-### Version Announcements
-- GitHub Release with detailed notes
-- Update README.md badge
-- Notify in team channels
-- Update module registry
+### Always Include Module Scope
+```bash
+# ✅ CORRECT - Will trigger release for this module
+feat(storage-account): add support for immutable blobs
+fix(storage-account): resolve network ACL validation issue
 
-### Breaking Change Communication
-- Announce in advance (when possible)
-- Provide migration guide
-- Offer transition period
-- Support previous version temporarily
+# ❌ WRONG - Will be ignored by this module's release
+feat: add support for immutable blobs
+fix: resolve network ACL validation issue
+```
+
+### Writing Good Commit Messages
+```bash
+# Feature with detailed description
+feat(storage-account): add customer-managed key rotation
+
+Implements automatic key rotation for CMK-encrypted storage accounts.
+Supports both manual and automatic rotation policies.
+
+Closes #156
+
+# Breaking change with migration guide
+feat(storage-account)!: restructure network_rules variable
+
+BREAKING CHANGE: network_rules is now an object instead of a list.
+
+Migration guide:
+Before:
+  network_rules = [{
+    default_action = "Deny"
+    ip_rules = ["10.0.0.0/24"]
+  }]
+
+After:
+  network_rules = {
+    default_action = "Deny"
+    ip_rules = ["10.0.0.0/24"]
+  }
+```
+
+## Release Automation Benefits
+
+1. **Zero Manual Work**: No manual version decisions or tag creation
+2. **Consistent Releases**: Every release follows the same process
+3. **Automatic Documentation**: CHANGELOG always up-to-date
+4. **Clear History**: Commit messages directly map to changelog entries
+5. **Reduced Errors**: No human mistakes in versioning
+6. **Faster Releases**: Release anytime by triggering the workflow
