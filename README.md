@@ -18,39 +18,37 @@ A comprehensive collection of production-ready Terraform modules for Azure infra
 
 ```
 azurerm-terraform-modules/
-├── azurerm_storage_account/     # Storage Account Module (SAv1.x.x)
-├── azurerm_virtual_network/     # Virtual Network Module (VNv1.x.x)
-├── azurerm_key_vault/          # Key Vault Module (KVv1.x.x)
-├── azurerm_application_gateway/ # Application Gateway Module (AGv1.x.x)
-├── docs/                       # Shared documentation and guides
-├── scripts/                    # Shared automation scripts
-├── .github/workflows/          # CI/CD workflows
-└── .claude/references/         # AI development reference docs
+├── modules/                     # Terraform modules
+│   └── azurerm_storage_account/ # Storage Account module
+├── docs/                        # Shared documentation
+├── scripts/                     # Automation scripts
+├── examples/                    # Cross-module examples
+├── tests/                       # Shared test utilities
+├── security-policies/           # Custom security policies
+├── .github/workflows/           # CI/CD workflows
+└── .claude/references/          # AI development guides
 ```
 
 ## 🚀 Quick Start
 
-### Using a Module
+Each module contains comprehensive documentation and examples:
 
+1. **Browse modules** in the [`modules/`](./modules/) directory
+2. **Read module documentation** - Each module has its own README with:
+   - Usage examples
+   - Input/output specifications
+   - Requirements and prerequisites
+3. **Check examples** - Each module includes `examples/` directory with:
+   - Simple usage
+   - Advanced configurations
+   - Security-hardened setups
+   - Multi-region deployments
+
+Example module reference:
 ```hcl
 module "storage_account" {
-  source = "github.com/your-org/azurerm-terraform-modules//azurerm_storage_account?ref=SAv1.0.0"
-
-  name                = "mystorageaccount"
-  resource_group_name = "my-resource-group"
-  location           = "West Europe"
-  
-  account_config = {
-    account_tier             = "Standard"
-    account_replication_type = "LRS"
-    enable_https_traffic     = true
-    min_tls_version         = "TLS1_2"
-  }
-
-  tags = {
-    Environment = "production"
-    Team        = "platform"
-  }
+  source = "github.com/your-org/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  # See module README for configuration details
 }
 ```
 
@@ -61,10 +59,10 @@ module "storage_account" {
 
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
-| [Storage Account](./azurerm_storage_account/) | 🔧 Development | - | Azure Storage Account with enterprise features |
-| [Virtual Network](./azurerm_virtual_network/) | 📅 Planned | - | Virtual networks with subnets and security |
-| [Key Vault](./azurerm_key_vault/) | 📅 Planned | - | Key management and secrets storage |
-| [Application Gateway](./azurerm_application_gateway/) | 📅 Planned | - | Application-layer load balancing |
+| [Storage Account](./modules/azurerm_storage_account/) | 🔧 Development | - | Azure Storage Account with enterprise features |
+| Virtual Network | 📅 Planned | - | Virtual networks with subnets and security |
+| Key Vault | 📅 Planned | - | Key management and secrets storage |
+| Application Gateway | 📅 Planned | - | Application-layer load balancing |
 
 ### Development Roadmap
 
