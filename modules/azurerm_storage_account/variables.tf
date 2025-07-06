@@ -53,13 +53,13 @@ variable "account_kind" {
 }
 
 variable "access_tier" {
-  description = "Defines the access tier for BlobStorage, FileStorage and StorageV2 accounts. Valid options are Hot and Cool."
+  description = "Defines the access tier for BlobStorage, FileStorage and StorageV2 accounts. Valid options are Hot and Cool. Premium is only valid for BlockBlobStorage and FileStorage account kinds."
   type        = string
   default     = "Hot"
 
   validation {
-    condition     = contains(["Hot", "Cool"], var.access_tier)
-    error_message = "Access tier must be either 'Hot' or 'Cool'."
+    condition     = contains(["Hot", "Cool", "Premium"], var.access_tier)
+    error_message = "Access tier must be 'Hot', 'Cool', or 'Premium'."
   }
 }
 
@@ -77,8 +77,8 @@ variable "security_settings" {
   default = {}
 
   validation {
-    condition     = contains(["TLS1_2"], var.security_settings.min_tls_version)
-    error_message = "Valid TLS version is TLS1_2. TLS1_0 and TLS1_1 are no longer supported."
+    condition     = contains(["TLS1_0", "TLS1_1", "TLS1_2"], var.security_settings.min_tls_version)
+    error_message = "Valid TLS versions are TLS1_0, TLS1_1, and TLS1_2."
   }
 }
 
@@ -357,6 +357,161 @@ variable "static_website" {
     error_404_document = optional(string)
   })
   default = {}
+}
+
+# Immutability Policy Configuration
+variable "immutability_policy" {
+  description = "Immutability policy configuration for the storage account."
+  type = object({
+    allow_protected_append_writes = bool
+    state                         = string
+    period_since_creation_in_days = number
+  })
+  default = null
+}
+
+# SAS Policy Configuration
+variable "sas_policy" {
+  description = "SAS policy configuration for the storage account."
+  type = object({
+    expiration_period = string
+    expiration_action = optional(string)
+  })
+  default = null
+}
+
+# Data Lake Gen2 and Protocol Support
+variable "is_hns_enabled" {
+  description = "Is Hierarchical Namespace enabled? This is required for Data Lake Storage Gen 2."
+  type        = bool
+  default     = null
+}
+
+variable "sftp_enabled" {
+  description = "Is SFTP enabled for this storage account?"
+  type        = bool
+  default     = null
+}
+
+variable "nfsv3_enabled" {
+  description = "Is NFSv3 protocol enabled for this storage account?"
+  type        = bool
+  default     = null
+}
+
+variable "local_user_enabled" {
+  description = "Is local user feature enabled for this storage account?"
+  type        = bool
+  default     = null
+}
+
+# Infrastructure Parameters
+variable "large_file_share_enabled" {
+  description = "Is Large File Share Enabled? Defaults to null for backward compatibility."
+  type        = bool
+  default     = null
+}
+
+variable "edge_zone" {
+  description = "Specifies the Edge Zone within the Azure Region where this Storage Account should exist. Defaults to null for backward compatibility."
+  type        = string
+  default     = null
+}
+
+# Routing Configuration
+variable "routing" {
+  description = "Routing configuration for the storage account."
+  type = object({
+    choice                      = optional(string)
+    publish_internet_endpoints  = optional(bool)
+    publish_microsoft_endpoints = optional(bool)
+  })
+  default = null
+}
+
+# Custom Domain Configuration
+variable "custom_domain" {
+  description = "Custom domain configuration for the storage account."
+  type = object({
+    name         = string
+    use_subdomain = optional(bool)
+  })
+  default = null
+}
+
+# Cross-tenant replication
+variable "cross_tenant_replication_enabled" {
+  description = "Should cross Tenant replication be enabled? Defaults to false."
+  type        = bool
+  default     = null
+}
+
+# OAuth authentication
+variable "default_to_oauth_authentication" {
+  description = "Default to Azure Active Directory authorization in the Azure portal when accessing the Storage Account. The default value is false. This will have no effect when the account is not in the same tenant as your Azure subscription."
+  type        = bool
+  default     = null
+}
+
+# Copy scope
+variable "allowed_copy_scope" {
+  description = "Restrict copy to and from Storage Accounts within an AAD tenant or with Private Links to the same VNet. Possible values are AAD and PrivateLink."
+  type        = string
+  default     = null
+
+  validation {
+    condition = var.allowed_copy_scope == null || contains(["AAD", "PrivateLink"], var.allowed_copy_scope)
+    error_message = "Allowed copy scope must be either 'AAD' or 'PrivateLink'."
+  }
+}
+
+# Encryption Key Type for Queue
+variable "queue_encryption_key_type" {
+  description = "The encryption key type to use for the Queue service. Possible values are Service and Account."
+  type        = string
+  default     = null
+
+  validation {
+    condition = var.queue_encryption_key_type == null || contains(["Service", "Account"], var.queue_encryption_key_type)
+    error_message = "Queue encryption key type must be either 'Service', 'Account', or null."
+  }
+}
+
+# Encryption Key Type for Table
+variable "table_encryption_key_type" {
+  description = "The encryption key type to use for the Table service. Possible values are Service and Account."
+  type        = string
+  default     = null
+
+  validation {
+    condition = var.table_encryption_key_type == null || contains(["Service", "Account"], var.table_encryption_key_type)
+    error_message = "Table encryption key type must be either 'Service', 'Account', or null."
+  }
+}
+
+# Share Properties Configuration
+variable "share_properties" {
+  description = "Share service properties including SMB, retention policy, and CORS rules."
+  type = object({
+    cors_rule = optional(list(object({
+      allowed_headers    = list(string)
+      allowed_methods    = list(string)
+      allowed_origins    = list(string)
+      exposed_headers    = list(string)
+      max_age_in_seconds = number
+    })), [])
+    retention_policy = optional(object({
+      days = optional(number, 7)
+    }))
+    smb = optional(object({
+      versions                        = optional(list(string), ["SMB3.0", "SMB3.1.1"])
+      authentication_types            = optional(list(string), ["NTLMv2", "Kerberos"])
+      kerberos_ticket_encryption_type = optional(list(string), ["RC4-HMAC", "AES-256"])
+      channel_encryption_type         = optional(list(string), ["AES-128-CCM", "AES-128-GCM", "AES-256-GCM"])
+      multichannel_enabled            = optional(bool, false)
+    }))
+  })
+  default = null
 }
 
 # Tags

@@ -11,7 +11,7 @@ Create a `test/` directory at the root. Inside, initialize a Go module (`go mod 
 Create a simple placeholder test file (`root_test.go`) that initializes Go modules and can be executed with `go test`. The test should pass, confirming the Go environment is correctly configured.
 
 # Subtasks:
-## 1. Integrate semantic-release for automated CHANGELOG management [pending]
+## 1. Integrate semantic-release for automated CHANGELOG management [done]
 ### Dependencies: None
 ### Description: Replace manual CHANGELOG updates in module-release workflow with semantic-release integration for fully automated versioning and changelog generation
 ### Details:

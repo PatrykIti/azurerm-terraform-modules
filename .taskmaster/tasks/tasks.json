@@ -387,11 +387,97 @@
         ],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 18,
+        "title": "Enhance Storage Account Module with Additional Parameters and Fixes",
+        "description": "Update the `azurerm_storage_account` module to support new features by adding missing parameters (e.g., HNS, SFTP, OAuth) and complex configuration blocks (e.g., SAS policy, immutability). This task also includes fixes for validation rules on existing parameters.",
+        "details": "This task involves a significant feature expansion of the Storage Account module. \n\n**High Priority Parameters:**\nAdd the following optional arguments to the `azurerm_storage_account` resource in `main.tf`, controlled by new variables in `variables.tf` with `null` defaults:\n- `is_hns_enabled` (bool)\n- `cross_tenant_replication_enabled` (bool)\n- `default_to_oauth_authentication` (bool)\n- `sftp_enabled` (bool)\n- `nfsv3_enabled` (bool)\n- `allowed_copy_scope` (string)\n- `queue_encryption_key_type` (string)\n- `table_encryption_key_type` (string)\n- `local_user_enabled` (bool)\n- `edge_zone` (string)\n- `large_file_share_enabled` (bool)\n\n**Medium Priority Blocks:**\nImplement support for the following nested blocks using dynamic blocks and complex object variables:\n- `immutability_policy`: Define a variable `var.immutability_policy` of type object to configure the policy.\n- `sas_policy`: Define `var.sas_policy` to set expiration and type.\n- `routing`: Define `var.routing` to manage routing preferences.\n- `custom_domain`: Define `var.custom_domain` to associate a custom domain.\n- `share_properties`: Define `var.share_properties` to configure SMB settings like `smb_multichannel_enabled`.\n\n**Validation Fixes:**\n1. In `variables.tf`, locate the `min_tls_version` variable and update its `validation` block to include 'TLS1_0', 'TLS1_1', and 'TLS1_2' in the list of allowed values.\n2. Locate the `access_tier` variable and update its `validation` block to add 'Premium' to the allowed values. Note that 'Premium' is only valid for specific `account_kind` values, which should be documented.",
+        "testStrategy": "1. **Validation Fix:** Update an existing example to set `min_tls_version = \"TLS1_1\"` and verify a successful `terraform apply`. Create a new example for a premium block blob storage account (`account_kind = \"BlockBlobStorage\"`, `account_tier = \"Premium\"`) and verify it deploys successfully.\n2. **High-Priority Parameters:** Update the `complete` example to enable SFTP (`sftp_enabled = true`) and Hierarchical Namespace (`is_hns_enabled = true`). Deploy the example and verify in the Azure Portal that the storage account is configured as a Data Lake Gen2 with SFTP enabled.\n3. **Medium-Priority Blocks:** Create a new example (`examples/storage_account/advanced-policies`) that defines variables for `sas_policy` and `share_properties`. Deploy and use Azure CLI or the Portal to confirm that the SAS policy (e.g., expiration period) and the SMB share properties are correctly set on the deployed account.\n4. **Regression:** Execute all existing examples for the storage account module to ensure that these additions do not break existing functionality for users who do not specify the new variables.",
+        "status": "done",
+        "dependencies": [
+          6
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Fix Validation for min_tls_version and access_tier Parameters",
+            "description": "Update the validation rules for `min_tls_version` and `access_tier` variables in `variables.tf` to include newly supported values and improve documentation.",
+            "dependencies": [],
+            "details": "1. Open the `variables.tf` file for the module.\n2. Locate the `min_tls_version` variable definition.\n3. Modify its `validation` block's `condition` to include 'TLS1_0', 'TLS1_1', and 'TLS1_2' in the list of allowed values. The condition should look like: `can(regex(\"^(TLS1_0|TLS1_1|TLS1_2)$\"), var.min_tls_version))`. \n4. Locate the `access_tier` variable definition.\n5. Modify its `validation` block's `condition` to add 'Premium' to the list of allowed values. The condition should look like: `can(regex(\"^(Hot|Cool|Premium)$\"), var.access_tier))`. \n6. Add a comment to the `description` of the `access_tier` variable stating that 'Premium' is only valid for `account_kind` values 'BlockBlobStorage' and 'FileStorage'.\n<info added on 2025-07-06T18:56:01.916Z>\nMANDATORY requirement: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9), and section 9: Terraform Best Practices Guide (lines 112-122) for variable design patterns and validation rules. Key principles: Do what has been asked; nothing more, nothing less. ALWAYS prefer editing existing files. NEVER create new files.\n</info added on 2025-07-06T18:56:01.916Z>",
+            "status": "done",
+            "testStrategy": "Run `terraform validate` after changes. Create a test configuration that sets `min_tls_version = \"TLS1_0\"` and another that sets `access_tier = \"Premium\"` (with a compatible `account_kind`) and run `terraform plan` to ensure validation passes. Test with an invalid value to confirm failure."
+          },
+          {
+            "id": 2,
+            "title": "Add Data Lake Gen2 and Protocol Support Parameters",
+            "description": "Implement support for Data Lake Gen2 (HNS), SFTP, NFSv3, and local user access by adding the corresponding optional boolean parameters to the module.",
+            "dependencies": [],
+            "details": "1. In `variables.tf`, declare the following new variables with `type = bool` and `default = null`:\n   - `is_hns_enabled`\n   - `sftp_enabled`\n   - `nfsv3_enabled`\n   - `local_user_enabled`\n2. In `main.tf`, update the `azurerm_storage_account` resource block to include these new arguments, assigning them their corresponding variable values (e.g., `is_hns_enabled = var.is_hns_enabled`).\n<info added on 2025-07-06T18:56:21.034Z>\nMANDATORY: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) and section 9: Terraform Best Practices Guide (lines 112-122) for variable design patterns. Key principles: Do what has been asked; nothing more, nothing less. ALWAYS prefer editing existing files. NEVER create new files. Follow variable naming conventions and use appropriate defaults (null for optional parameters).\n</info added on 2025-07-06T18:56:21.034Z>",
+            "status": "done",
+            "testStrategy": "For each new parameter, create a test case setting it to `true`. Run `terraform plan` and verify that the plan output shows the corresponding attribute being enabled on the `azurerm_storage_account` resource."
+          },
+          {
+            "id": 3,
+            "title": "Add Security Control Parameters for Replication, Auth, and Copy Scope",
+            "description": "Enhance security options by adding parameters for cross-tenant replication, OAuth authentication default, and allowed copy scope.",
+            "dependencies": [],
+            "details": "1. In `variables.tf`, declare the following new variables with `default = null`:\n   - `cross_tenant_replication_enabled` (type = bool)\n   - `default_to_oauth_authentication` (type = bool)\n   - `allowed_copy_scope` (type = string)\n2. In `main.tf`, update the `azurerm_storage_account` resource block to include these new arguments, assigning them their corresponding variable values (e.g., `cross_tenant_replication_enabled = var.cross_tenant_replication_enabled`).\n<info added on 2025-07-06T18:56:33.465Z>\nMANDATORY: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) and section 9: Terraform Best Practices Guide (lines 112-122), especially the security best practices section. Key principles: Do what has been asked; nothing more, nothing less. ALWAYS prefer editing existing files. NEVER create new files. Follow security best practices when implementing authentication and access control parameters.\n</info added on 2025-07-06T18:56:33.465Z>",
+            "status": "done",
+            "testStrategy": "Create a test configuration that sets non-default values for these parameters (e.g., `default_to_oauth_authentication = true`, `allowed_copy_scope = \"PrivateLink\"`). Run `terraform plan` and confirm the plan reflects these settings."
+          },
+          {
+            "id": 4,
+            "title": "Add Encryption Key Type Parameters for Queues and Tables",
+            "description": "Add optional string parameters to specify the encryption key type ('Service' or 'Account') for queue and table services.",
+            "dependencies": [],
+            "details": "1. In `variables.tf`, declare the following new variables with `type = string` and `default = null`:\n   - `queue_encryption_key_type`\n   - `table_encryption_key_type`\n2. Add a `validation` block to each new variable to ensure the value is one of 'Service' or 'Account'. Example condition: `var.queue_encryption_key_type == null || contains([\"Service\", \"Account\"], var.queue_encryption_key_type)`.\n3. In `main.tf`, update the `azurerm_storage_account` resource block to include the `queue_encryption_key_type` and `table_encryption_key_type` arguments, assigning them their corresponding variable values.\n<info added on 2025-07-06T18:56:52.061Z>\nMANDATORY: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) and section 9: Terraform Best Practices Guide (lines 112-122) for variable design patterns and validation. Key principles: Do what has been asked; nothing more, nothing less. ALWAYS prefer editing existing files. NEVER create new files. Use proper validation blocks to ensure parameters only accept valid values (Service or Account).\n</info added on 2025-07-06T18:56:52.061Z>",
+            "status": "done",
+            "testStrategy": "Create a test case setting `queue_encryption_key_type = \"Account\"` and `table_encryption_key_type = \"Account\"`. Run `terraform plan` and verify the plan shows these values being set on the resource."
+          },
+          {
+            "id": 5,
+            "title": "Add Infrastructure Parameters for Large File Shares and Edge Zone",
+            "description": "Implement support for enabling large file shares and specifying an edge zone for the storage account deployment.",
+            "dependencies": [],
+            "details": "1. In `variables.tf`, declare the following new variables with `default = null`:\n   - `large_file_share_enabled` (type = bool)\n   - `edge_zone` (type = string)\n2. In `main.tf`, update the `azurerm_storage_account` resource block to include the `large_file_share_enabled` and `edge_zone` arguments, assigning them their corresponding variable values.\n<info added on 2025-07-06T18:57:09.355Z>\nBefore starting this subtask, MANDATORY review CLAUDE.md sections: important-instruction-reminders (lines 5-9), section 9: Terraform Best Practices Guide (lines 112-122) for variable design patterns. Key principles: Do what has been asked; nothing more, nothing less. ALWAYS prefer editing existing files. NEVER create new files. Infrastructure parameters should use null defaults to maintain backward compatibility.\n</info added on 2025-07-06T18:57:09.355Z>",
+            "status": "done",
+            "testStrategy": "Create a test case setting `large_file_share_enabled = true` and `edge_zone` to a valid Azure Edge Zone name. Run `terraform plan` and verify the plan output reflects these settings."
+          },
+          {
+            "id": 6,
+            "title": "Implement Immutability Policy and SAS Policy Configuration Blocks",
+            "description": "Add support for configuring container immutability and account-level SAS policies using dynamic blocks based on new object variables.",
+            "dependencies": [],
+            "details": "1. In `variables.tf`, define `var.immutability_policy` with type `object({ allow_protected_append_writes = bool, period_in_days = number })` and `default = null`.\n2. In `variables.tf`, define `var.sas_policy` with type `object({ expiration_period = string, expiration_action = string })` and `default = null`.\n3. In `main.tf`, within the `azurerm_storage_account` resource, add a `dynamic \"immutability_policy\"` block. Use `for_each = var.immutability_policy != null ? [var.immutability_policy] : []`. Inside `content`, map the object attributes to the block arguments.\n4. In `main.tf`, add a `dynamic \"sas_policy\"` block. Use `for_each = var.sas_policy != null ? [var.sas_policy] : []`. Inside `content`, map the object attributes.\n<info added on 2025-07-06T18:57:29.284Z>\nBefore starting this subtask, MANDATORY review CLAUDE.md sections: important-instruction-reminders (lines 5-9), section 9: Terraform Best Practices Guide (lines 112-122) especially variable design patterns for complex objects. Key principles: Do what has been asked; nothing more, nothing less. ALWAYS prefer editing existing files. NEVER create new files. Use object types for grouping related parameters logically as suggested by user.\n</info added on 2025-07-06T18:57:29.284Z>",
+            "status": "done",
+            "testStrategy": "Create a test configuration providing a valid object for `immutability_policy` and `sas_policy`. Run `terraform plan` and inspect the output to ensure the dynamic blocks are generated correctly with the specified values."
+          },
+          {
+            "id": 7,
+            "title": "Implement Routing and Custom Domain Configuration Blocks",
+            "description": "Add support for configuring routing preferences and custom domains using dynamic blocks based on new object variables.",
+            "dependencies": [],
+            "details": "1. In `variables.tf`, define `var.routing` with type `object({ choice = string, publish_internet_endpoints = bool, publish_microsoft_endpoints = bool })` and `default = null`.\n2. In `variables.tf`, define `var.custom_domain` with type `object({ name = string, use_subdomain_name = optional(bool) })` and `default = null`.\n3. In `main.tf`, within the `azurerm_storage_account` resource, add a `dynamic \"routing\"` block. Use `for_each = var.routing != null ? [var.routing] : []`. Map attributes in the `content` block.\n4. In `main.tf`, add a `dynamic \"custom_domain\"` block. Use `for_each = var.custom_domain != null ? [var.custom_domain] : []`. Map attributes in the `content` block.\n<info added on 2025-07-06T18:57:42.746Z>\nMANDATORY: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) and section 9: Terraform Best Practices Guide (lines 112-122), especially regarding variable design patterns for complex objects. Key principles: Do what has been asked; nothing more, nothing less. ALWAYS prefer editing existing files. NEVER create new files. Use object types with optional() for non-required fields within objects.\n</info added on 2025-07-06T18:57:42.746Z>",
+            "status": "done",
+            "testStrategy": "Provide test objects for `routing` and `custom_domain` variables. Run `terraform plan` and verify that the execution plan includes the correctly configured `routing` and `custom_domain` blocks for the storage account."
+          },
+          {
+            "id": 8,
+            "title": "Implement Share Properties Configuration Block",
+            "description": "Add support for configuring file share properties, such as SMB settings and retention policies, using a dynamic block.",
+            "dependencies": [],
+            "details": "1. In `variables.tf`, define a new complex object variable `var.share_properties` with a `default = null`. The object structure should mirror the `share_properties` block in the `azurerm_storage_account` resource, including attributes for `smb`, `cors_rule`, and `retention_policy`.\n2. In `main.tf`, within the `azurerm_storage_account` resource, add a `dynamic \"share_properties\"` block.\n3. Use the pattern `for_each = var.share_properties != null ? [var.share_properties] : []` to conditionally create the block.\n4. Inside the `content` block, map the attributes from the `var.share_properties` object. This will require nested dynamic blocks for list attributes like `cors_rule`.\n<info added on 2025-07-06T18:57:58.447Z>\nMANDATORY: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) and section 9: Terraform Best Practices Guide (lines 112-122), especially regarding variable design patterns for complex nested objects. Key principles to follow: Do what has been asked; nothing more, nothing less. ALWAYS prefer editing existing files. NEVER create new files. Complex objects with nested structures require careful implementation of dynamic blocks.\n</info added on 2025-07-06T18:57:58.447Z>",
+            "status": "done",
+            "testStrategy": "Define a complex `share_properties` object in a test `.tfvars` file, including SMB settings and a CORS rule. Run `terraform plan` and carefully inspect the plan output to ensure all nested properties are correctly configured."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-06T10:38:44.538Z",
+      "updated": "2025-07-06T19:04:39.911Z",
       "description": "Tasks for master context"
     }
   }

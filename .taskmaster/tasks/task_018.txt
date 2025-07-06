@@ -1,0 +1,40 @@
+# Task ID: 18
+# Title: Enhance Storage Account Module with Additional Parameters and Fixes
+# Status: pending
+# Dependencies: 6
+# Priority: high
+# Description: Update the `azurerm_storage_account` module to support new features by adding missing parameters (e.g., HNS, SFTP, OAuth) and complex configuration blocks (e.g., SAS policy, immutability). This task also includes fixes for validation rules on existing parameters.
+# Details:
+This task involves a significant feature expansion of the Storage Account module. 
+
+**High Priority Parameters:**
+Add the following optional arguments to the `azurerm_storage_account` resource in `main.tf`, controlled by new variables in `variables.tf` with `null` defaults:
+- `is_hns_enabled` (bool)
+- `cross_tenant_replication_enabled` (bool)
+- `default_to_oauth_authentication` (bool)
+- `sftp_enabled` (bool)
+- `nfsv3_enabled` (bool)
+- `allowed_copy_scope` (string)
+- `queue_encryption_key_type` (string)
+- `table_encryption_key_type` (string)
+- `local_user_enabled` (bool)
+- `edge_zone` (string)
+- `large_file_share_enabled` (bool)
+
+**Medium Priority Blocks:**
+Implement support for the following nested blocks using dynamic blocks and complex object variables:
+- `immutability_policy`: Define a variable `var.immutability_policy` of type object to configure the policy.
+- `sas_policy`: Define `var.sas_policy` to set expiration and type.
+- `routing`: Define `var.routing` to manage routing preferences.
+- `custom_domain`: Define `var.custom_domain` to associate a custom domain.
+- `share_properties`: Define `var.share_properties` to configure SMB settings like `smb_multichannel_enabled`.
+
+**Validation Fixes:**
+1. In `variables.tf`, locate the `min_tls_version` variable and update its `validation` block to include 'TLS1_0', 'TLS1_1', and 'TLS1_2' in the list of allowed values.
+2. Locate the `access_tier` variable and update its `validation` block to add 'Premium' to the allowed values. Note that 'Premium' is only valid for specific `account_kind` values, which should be documented.
+
+# Test Strategy:
+1. **Validation Fix:** Update an existing example to set `min_tls_version = "TLS1_1"` and verify a successful `terraform apply`. Create a new example for a premium block blob storage account (`account_kind = "BlockBlobStorage"`, `account_tier = "Premium"`) and verify it deploys successfully.
+2. **High-Priority Parameters:** Update the `complete` example to enable SFTP (`sftp_enabled = true`) and Hierarchical Namespace (`is_hns_enabled = true`). Deploy the example and verify in the Azure Portal that the storage account is configured as a Data Lake Gen2 with SFTP enabled.
+3. **Medium-Priority Blocks:** Create a new example (`examples/storage_account/advanced-policies`) that defines variables for `sas_policy` and `share_properties`. Deploy and use Azure CLI or the Portal to confirm that the SAS policy (e.g., expiration period) and the SMB share properties are correctly set on the deployed account.
+4. **Regression:** Execute all existing examples for the storage account module to ensure that these additions do not break existing functionality for users who do not specify the new variables.
