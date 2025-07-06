@@ -17,6 +17,25 @@ resource "azurerm_storage_account" "storage_account" {
   # Infrastructure encryption
   infrastructure_encryption_enabled = var.encryption.infrastructure_encryption_enabled
 
+  # Encryption key types
+  queue_encryption_key_type = var.queue_encryption_key_type
+  table_encryption_key_type = var.table_encryption_key_type
+
+  # Additional security controls
+  cross_tenant_replication_enabled = var.cross_tenant_replication_enabled
+  default_to_oauth_authentication  = var.default_to_oauth_authentication
+  allowed_copy_scope               = var.allowed_copy_scope
+
+  # Infrastructure parameters
+  large_file_share_enabled = var.large_file_share_enabled
+  edge_zone                = var.edge_zone
+
+  # Data Lake Gen2 and Protocol Support
+  is_hns_enabled     = var.is_hns_enabled
+  sftp_enabled       = var.sftp_enabled
+  nfsv3_enabled      = var.nfsv3_enabled
+  local_user_enabled = var.local_user_enabled
+
   # Blob properties
   dynamic "blob_properties" {
     for_each = var.account_kind != "FileStorage" ? [1] : []
@@ -53,6 +72,44 @@ resource "azurerm_storage_account" "storage_account" {
     }
   }
 
+  # Share properties
+  dynamic "share_properties" {
+    for_each = var.share_properties != null ? [var.share_properties] : []
+    content {
+      # CORS rules
+      dynamic "cors_rule" {
+        for_each = share_properties.value.cors_rule
+        content {
+          allowed_headers    = cors_rule.value.allowed_headers
+          allowed_methods    = cors_rule.value.allowed_methods
+          allowed_origins    = cors_rule.value.allowed_origins
+          exposed_headers    = cors_rule.value.exposed_headers
+          max_age_in_seconds = cors_rule.value.max_age_in_seconds
+        }
+      }
+
+      # Retention policy
+      dynamic "retention_policy" {
+        for_each = share_properties.value.retention_policy != null ? [share_properties.value.retention_policy] : []
+        content {
+          days = retention_policy.value.days
+        }
+      }
+
+      # SMB configuration
+      dynamic "smb" {
+        for_each = share_properties.value.smb != null ? [share_properties.value.smb] : []
+        content {
+          versions                        = smb.value.versions
+          authentication_types            = smb.value.authentication_types
+          kerberos_ticket_encryption_type = smb.value.kerberos_ticket_encryption_type
+          channel_encryption_type         = smb.value.channel_encryption_type
+          multichannel_enabled            = smb.value.multichannel_enabled
+        }
+      }
+    }
+  }
+
   # Network rules
   dynamic "network_rules" {
     for_each = var.network_rules.default_action != null ? [1] : []
@@ -79,6 +136,44 @@ resource "azurerm_storage_account" "storage_account" {
     content {
       key_vault_key_id          = var.encryption.key_vault_key_id
       user_assigned_identity_id = var.encryption.user_assigned_identity_id
+    }
+  }
+
+  # Immutability Policy
+  dynamic "immutability_policy" {
+    for_each = var.immutability_policy != null ? [var.immutability_policy] : []
+    content {
+      allow_protected_append_writes = immutability_policy.value.allow_protected_append_writes
+      state                         = immutability_policy.value.state
+      period_since_creation_in_days = immutability_policy.value.period_since_creation_in_days
+    }
+  }
+
+  # SAS Policy
+  dynamic "sas_policy" {
+    for_each = var.sas_policy != null ? [var.sas_policy] : []
+    content {
+      expiration_period = sas_policy.value.expiration_period
+      expiration_action = sas_policy.value.expiration_action
+    }
+  }
+
+  # Routing configuration
+  dynamic "routing" {
+    for_each = var.routing != null ? [var.routing] : []
+    content {
+      choice                      = routing.value.choice
+      publish_internet_endpoints  = routing.value.publish_internet_endpoints
+      publish_microsoft_endpoints = routing.value.publish_microsoft_endpoints
+    }
+  }
+
+  # Custom domain configuration
+  dynamic "custom_domain" {
+    for_each = var.custom_domain != null ? [var.custom_domain] : []
+    content {
+      name         = custom_domain.value.name
+      use_subdomain = custom_domain.value.use_subdomain
     }
   }
 
