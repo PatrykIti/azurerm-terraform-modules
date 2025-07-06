@@ -18,7 +18,7 @@ content: |-
 
   ## Module Version
 
-  Current version: **VERSION_PLACEHOLDER**
+  Current version: **PREFIX_PLACEHOLDERv1.0.0**
 
   ## Description
 
@@ -32,7 +32,9 @@ content: |-
 
   ## Examples
 
-  EXAMPLES_PLACEHOLDER
+  - [Simple](examples/simple) - Basic MODULE_TYPE_PLACEHOLDER configuration
+  - [Complete](examples/complete) - Full-featured MODULE_TYPE_PLACEHOLDER with all capabilities  
+  - [Secure](examples/secure) - Security-hardened configuration
 
   ## Requirements
 

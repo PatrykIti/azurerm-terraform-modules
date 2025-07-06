@@ -126,6 +126,16 @@ cp "$TEMPLATES_DIR/.terraform-docs.yml" "$MODULE_DIR/"
 cp "$TEMPLATES_DIR/.releaserc.js" "$MODULE_DIR/"
 cp "$TEMPLATES_DIR/module-config.yml" "$MODULE_DIR/.github/"
 
+# Composite Actions
+print_info "Creating composite actions..."
+mkdir -p "$MODULE_DIR/.github/actions/validate"
+mkdir -p "$MODULE_DIR/.github/actions/test"
+mkdir -p "$MODULE_DIR/.github/actions/security"
+
+cp "$TEMPLATES_DIR/validate-action.yml" "$MODULE_DIR/.github/actions/validate/action.yml"
+cp "$TEMPLATES_DIR/test-action.yml" "$MODULE_DIR/.github/actions/test/action.yml"
+cp "$TEMPLATES_DIR/security-action.yml" "$MODULE_DIR/.github/actions/security/action.yml"
+
 # Replace placeholders in all copied files
 print_info "Customizing templates..."
 find "$MODULE_DIR" -type f -name "*.tf" -o -name "*.md" -o -name "*.yml" -o -name "*.js" | while read -r file; do
