@@ -60,19 +60,21 @@ module "storage_account" {
       azurerm_subnet.storage.id,
       azurerm_subnet.app.id
     ]
-    bypass = "AzureServices"
+    bypass = ["AzureServices"]
   }
 
-  # CORS rules for blob service
-  cors_rules = [
-    {
-      allowed_origins    = ["https://example.com", "https://test.example.com"]
-      allowed_methods    = ["GET", "POST", "PUT"]
-      allowed_headers    = ["*"]
-      exposed_headers    = ["*"]
-      max_age_in_seconds = 3600
-    }
-  ]
+  # Blob properties with CORS rules
+  blob_properties = {
+    cors_rules = [
+      {
+        allowed_origins    = ["https://example.com", "https://test.example.com"]
+        allowed_methods    = ["GET", "POST", "PUT"]
+        allowed_headers    = ["*"]
+        exposed_headers    = ["*"]
+        max_age_in_seconds = 3600
+      }
+    ]
+  }
 
   tags = {
     Environment = "Test"

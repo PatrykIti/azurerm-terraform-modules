@@ -48,19 +48,39 @@ module "storage_account" {
   account_tier             = "Standard"
   account_replication_type = "ZRS"
 
-  # Advanced features
-  enable_https_traffic_only        = true
-  minimum_tls_version              = "TLS1_2"
-  allow_blob_public_access         = false
-  enable_infrastructure_encryption = true
+  # Security settings
+  security_settings = {
+    https_traffic_only_enabled      = true
+    min_tls_version                 = "TLS1_2"
+    allow_nested_items_to_be_public = false
+    shared_access_key_enabled       = true # Required for Terraform to manage
+  }
+
+  # Encryption configuration
+  encryption = {
+    enabled                           = true
+    infrastructure_encryption_enabled = true
+  }
 
   # Blob properties
   blob_properties = {
-    versioning_enabled              = true
-    change_feed_enabled             = true
-    delete_retention_days           = 7
-    container_delete_retention_days = 7
-    restore_policy_days             = 6
+    versioning_enabled  = true
+    change_feed_enabled = true
+
+    delete_retention_policy = {
+      enabled = true
+      days    = 7
+    }
+
+    container_delete_retention_policy = {
+      enabled = true
+      days    = 7
+    }
+
+    restore_policy = {
+      enabled = true
+      days    = 6
+    }
   }
 
   # Containers
@@ -84,7 +104,7 @@ module "storage_account" {
     default_action = "Deny"
     ip_rules       = ["203.0.113.0/24"]
     subnet_ids     = [azurerm_subnet.test.id]
-    bypass         = "AzureServices"
+    bypass         = ["AzureServices"]
   }
 
   # Diagnostic settings

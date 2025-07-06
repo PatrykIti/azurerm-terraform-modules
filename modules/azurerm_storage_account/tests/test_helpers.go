@@ -288,24 +288,34 @@ func GenerateTestFixtureHCL(config TestFixtureConfig) string {
   account_replication_type = "%s"
 `, config.StorageAccountName, config.AccountTier, config.AccountReplicationType))
 
-	// Optional parameters
+	// Security settings
+	securitySettings := []string{}
 	if !config.EnableHTTPSTrafficOnly {
-		hcl.WriteString(`  enable_https_traffic_only = false
+		securitySettings = append(securitySettings, `    https_traffic_only_enabled = false`)
+	}
+	if config.MinimumTLSVersion != "" && config.MinimumTLSVersion != "TLS1_2" {
+		securitySettings = append(securitySettings, fmt.Sprintf(`    min_tls_version = "%s"`, config.MinimumTLSVersion))
+	}
+	if !config.AllowBlobPublicAccess {
+		securitySettings = append(securitySettings, `    allow_nested_items_to_be_public = false`)
+	}
+	securitySettings = append(securitySettings, `    shared_access_key_enabled = true`)
+	
+	if len(securitySettings) > 0 {
+		hcl.WriteString(`  security_settings = {
+`)
+		hcl.WriteString(strings.Join(securitySettings, "\n"))
+		hcl.WriteString(`
+  }
 `)
 	}
 
-	if config.MinimumTLSVersion != "TLS1_2" {
-		hcl.WriteString(fmt.Sprintf(`  minimum_tls_version = "%s"
-`, config.MinimumTLSVersion))
-	}
-
-	if config.AllowBlobPublicAccess {
-		hcl.WriteString(`  allow_blob_public_access = true
-`)
-	}
-
+	// Encryption settings
 	if config.EnableInfraEncryption {
-		hcl.WriteString(`  enable_infrastructure_encryption = true
+		hcl.WriteString(`  encryption = {
+    enabled                           = true
+    infrastructure_encryption_enabled = true
+  }
 `)
 	}
 
