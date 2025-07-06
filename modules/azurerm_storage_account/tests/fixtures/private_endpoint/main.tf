@@ -27,7 +27,7 @@ resource "azurerm_subnet" "endpoint" {
   virtual_network_name = azurerm_virtual_network.test.name
   address_prefixes     = ["10.0.1.0/24"]
 
-  private_endpoint_network_policies_enabled = false
+  private_endpoint_network_policies = "Disabled"
 }
 
 # Private DNS zone for blob storage
@@ -52,15 +52,12 @@ module "storage_account" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
 
-  # Disable public access
-  public_network_access_enabled = false
-
-  # Network rules (will be ignored when public access is disabled)
+  # Network rules - deny all public access
   network_rules = {
     default_action = "Deny"
     ip_rules       = []
     subnet_ids     = []
-    bypass         = "None"
+    bypass         = [] # No bypass, completely private
   }
 
   # Private endpoint configuration

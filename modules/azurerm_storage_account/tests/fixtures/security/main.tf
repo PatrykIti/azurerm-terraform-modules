@@ -22,37 +22,18 @@ module "storage_account" {
   account_tier             = "Standard"
   account_replication_type = "GRS"
 
-  # Security features
-  enable_https_traffic_only        = true
-  minimum_tls_version              = "TLS1_2"
-  allow_blob_public_access         = false
-  enable_infrastructure_encryption = true
-
-  # Advanced security
-  advanced_threat_protection_enabled = true
+  # Security settings
+  security_settings = {
+    https_traffic_only_enabled      = true
+    min_tls_version                 = "TLS1_2"
+    allow_nested_items_to_be_public = false
+    shared_access_key_enabled       = true # Required for Terraform to manage
+  }
 
   # Encryption configuration
-  encryption_config = {
-    key_source                       = "Microsoft.Storage"
-    enable_infrastructure_encryption = true
-    services = {
-      blob = {
-        enabled  = true
-        key_type = "Account"
-      }
-      file = {
-        enabled  = true
-        key_type = "Account"
-      }
-      table = {
-        enabled  = true
-        key_type = "Account"
-      }
-      queue = {
-        enabled  = true
-        key_type = "Account"
-      }
-    }
+  encryption = {
+    enabled                           = true
+    infrastructure_encryption_enabled = true
   }
 
   # Identity for encryption
@@ -65,7 +46,7 @@ module "storage_account" {
     default_action = "Deny"
     ip_rules       = []
     subnet_ids     = []
-    bypass         = "None"
+    bypass         = []
   }
 
   tags = {
