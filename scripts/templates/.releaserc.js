@@ -23,13 +23,19 @@ module.exports = {
     ['@semantic-release/commit-analyzer', {
       preset: 'conventionalcommits',
       releaseRules: [
-        {breaking: true, release: 'major'},
-        {type: 'feat', release: 'minor'},
-        {type: 'fix', release: 'patch'},
-        {type: 'perf', release: 'patch'},
-        {type: 'revert', release: 'patch'},
-        {type: 'docs', scope: 'README', release: 'patch'},
-        {type: 'refactor', release: 'patch'},
+        // Only process commits with our module scope
+        {scope: COMMIT_SCOPE, breaking: true, release: 'major'},
+        {scope: COMMIT_SCOPE, type: 'feat', release: 'minor'},
+        {scope: COMMIT_SCOPE, type: 'fix', release: 'patch'},
+        {scope: COMMIT_SCOPE, type: 'perf', release: 'patch'},
+        {scope: COMMIT_SCOPE, type: 'revert', release: 'patch'},
+        {scope: COMMIT_SCOPE, type: 'docs', release: 'patch'},
+        {scope: COMMIT_SCOPE, type: 'refactor', release: 'patch'},
+        // Ignore all commits without our scope
+        {scope: '!'+COMMIT_SCOPE, release: false},
+        // Default rules for commits without scope (ignore them)
+        {type: 'feat', release: false},
+        {type: 'fix', release: false},
         {type: 'style', release: false},
         {type: 'chore', release: false},
         {type: 'test', release: false},
@@ -122,20 +128,5 @@ module "${MODULE_NAME}" {
 
 See the [module documentation](https://github.com/\${context.repo.owner}/\${context.repo.repo}/tree/${TAG_PREFIX}\${nextRelease.version}/modules/${MODULE_NAME}/README.md) for usage details.`
     }]
-  ],
-  
-  // Filter commits to only include those affecting this module
-  filterCommits: (commits) => {
-    return commits.filter(commit => {
-      // Include commits with module scope
-      if (commit.scope === COMMIT_SCOPE) {
-        return true;
-      }
-      
-      // Include commits that touch module files
-      // This requires the commit to have file information
-      // which semantic-release provides in certain contexts
-      return false;
-    });
-  }
+  ]
 };
