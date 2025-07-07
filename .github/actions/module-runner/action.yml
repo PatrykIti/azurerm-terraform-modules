@@ -71,28 +71,7 @@ runs:
             ;;
             
           test)
-            # For test action, we should use the module-specific test action if it exists
-            TEST_ACTION_PATH="modules/${{ inputs.module }}/.github/actions/test/action.yml"
-            if [[ -f "$TEST_ACTION_PATH" ]]; then
-              echo "Module has custom test action, it should be called directly"
-              # The test action should be invoked by the workflow, not here
-              echo "Skipping - test action will be invoked separately"
-            else
-              echo "No test action found for ${{ inputs.module }}"
-              # Run basic validation instead
-              cd modules/${{ inputs.module }}
-              if [[ -d "examples" ]]; then
-                for example in examples/*/; do
-                  if [[ -d "$example" && -f "$example/main.tf" ]]; then
-                    echo "Testing example: $example"
-                    cd "$example"
-                    terraform init -backend=false
-                    terraform plan
-                    cd - > /dev/null
-                  fi
-                done
-              fi
-            fi
+            echo "Running tests for ${{ inputs.module }}"
             ;;
             
           security)
@@ -101,6 +80,42 @@ runs:
             ;;
         esac
 
+    - name: Setup Go for tests
+      if: inputs.action == 'test'
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21'
+    
+    - name: Run Terratest
+      if: inputs.action == 'test' 
+      shell: bash
+      working-directory: ./modules/${{ inputs.module }}
+      env:
+        ARM_USE_OIDC: true
+        ARM_CLIENT_ID: ${{ fromJSON(inputs.azure-credentials).clientId }}
+        ARM_TENANT_ID: ${{ fromJSON(inputs.azure-credentials).tenantId }}
+        ARM_SUBSCRIPTION_ID: ${{ fromJSON(inputs.azure-credentials).subscriptionId }}
+      run: |
+        if [[ -d "tests" ]]; then
+          echo "Running Terratest for ${{ inputs.module }}"
+          cd tests
+          go mod download
+          go test -v -timeout 30m
+        else
+          echo "No tests directory found, validating examples instead"
+          if [[ -d "examples" ]]; then
+            for example in examples/*/; do
+              if [[ -d "$example" && -f "$example/main.tf" ]]; then
+                echo "Testing example: $example"
+                cd "$example"
+                terraform init -backend=false
+                terraform plan
+                cd - > /dev/null
+              fi
+            done
+          fi
+        fi
+    
     - name: Run Checkov security scan
       if: inputs.action == 'security'
       uses: bridgecrewio/checkov-action@v12
