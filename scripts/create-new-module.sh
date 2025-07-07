@@ -175,6 +175,14 @@ module "$MODULE_TYPE" {
 }
 EOF
 
+cat > "$MODULE_DIR/examples/simple/variables.tf" << EOF
+variable "location" {
+  description = "Azure region for resources"
+  type        = string
+  default     = "West Europe"
+}
+EOF
+
 cat > "$MODULE_DIR/examples/simple/outputs.tf" << EOF
 output "${MODULE_TYPE}_id" {
   description = "The ID of the created $DISPLAY_NAME"
@@ -205,7 +213,164 @@ terraform apply
 \`\`\`bash
 terraform destroy
 \`\`\`
+
+<!-- BEGIN_TF_DOCS -->
+<!-- END_TF_DOCS -->
 EOF
+
+# Create complete example files
+cat > "$MODULE_DIR/examples/complete/main.tf" << EOF
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "example" {
+  name     = "rg-${MODULE_TYPE}-complete-example"
+  location = "West Europe"
+}
+
+module "$MODULE_TYPE" {
+  source = "../../"
+
+  name                = "${MODULE_TYPE//_/}example002"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+
+  # Add more comprehensive configuration here
+
+  tags = {
+    Environment = "Development"
+    Example     = "Complete"
+  }
+}
+EOF
+
+cat > "$MODULE_DIR/examples/complete/variables.tf" << EOF
+variable "location" {
+  description = "Azure region for resources"
+  type        = string
+  default     = "West Europe"
+}
+EOF
+
+cat > "$MODULE_DIR/examples/complete/outputs.tf" << EOF
+output "${MODULE_TYPE}_id" {
+  description = "The ID of the created $DISPLAY_NAME"
+  value       = module.${MODULE_TYPE}.id
+}
+
+output "${MODULE_TYPE}_name" {
+  description = "The name of the created $DISPLAY_NAME"
+  value       = module.${MODULE_TYPE}.name
+}
+EOF
+
+cat > "$MODULE_DIR/examples/complete/README.md" << EOF
+# Complete $DISPLAY_NAME Example
+
+This example demonstrates all available features and configurations of the $DISPLAY_NAME module.
+
+## Features
+
+- Comprehensive configuration with all available options
+- Advanced features demonstration
+- Best practices implementation
+
+## Usage
+
+\`\`\`bash
+terraform init
+terraform plan
+terraform apply
+\`\`\`
+
+## Cleanup
+
+\`\`\`bash
+terraform destroy
+\`\`\`
+
+<!-- BEGIN_TF_DOCS -->
+<!-- END_TF_DOCS -->
+EOF
+
+# Create secure example files
+cat > "$MODULE_DIR/examples/secure/main.tf" << EOF
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "example" {
+  name     = "rg-${MODULE_TYPE}-secure-example"
+  location = "West Europe"
+}
+
+module "$MODULE_TYPE" {
+  source = "../../"
+
+  name                = "${MODULE_TYPE//_/}example003"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+
+  # Add security-focused configuration here
+
+  tags = {
+    Environment = "Production"
+    Example     = "Secure"
+  }
+}
+EOF
+
+cat > "$MODULE_DIR/examples/secure/variables.tf" << EOF
+variable "location" {
+  description = "Azure region for resources"
+  type        = string
+  default     = "West Europe"
+}
+EOF
+
+cat > "$MODULE_DIR/examples/secure/outputs.tf" << EOF
+output "${MODULE_TYPE}_id" {
+  description = "The ID of the created $DISPLAY_NAME"
+  value       = module.${MODULE_TYPE}.id
+}
+
+output "${MODULE_TYPE}_name" {
+  description = "The name of the created $DISPLAY_NAME"
+  value       = module.${MODULE_TYPE}.name
+}
+EOF
+
+cat > "$MODULE_DIR/examples/secure/README.md" << EOF
+# Secure $DISPLAY_NAME Example
+
+This example demonstrates a security-hardened configuration of the $DISPLAY_NAME module suitable for production environments.
+
+## Security Features
+
+- Maximum security configuration
+- Network isolation
+- Encryption at rest and in transit
+- Compliance-ready settings
+
+## Usage
+
+\`\`\`bash
+terraform init
+terraform plan
+terraform apply
+\`\`\`
+
+## Cleanup
+
+\`\`\`bash
+terraform destroy
+\`\`\`
+
+<!-- BEGIN_TF_DOCS -->
+<!-- END_TF_DOCS -->
+EOF
+
 
 # Create a basic test file
 cat > "$MODULE_DIR/tests/module_test.go" << EOF
@@ -255,7 +420,7 @@ This directory contains additional documentation for the $DISPLAY_NAME module.
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines on adding documentation.
 EOF
 
-# Generate terraform-docs configuration
+# Generate terraform-docs configuration for main module
 print_info "Generating terraform-docs configuration..."
 if [[ -x "$SCRIPT_DIR/generate-terraform-docs-config.sh" ]]; then
     "$SCRIPT_DIR/generate-terraform-docs-config.sh" "$MODULE_DIR"
@@ -263,6 +428,20 @@ else
     print_warning "generate-terraform-docs-config.sh not found - using default template"
     cp "$TEMPLATES_DIR/.terraform-docs.yml.template" "$MODULE_DIR/.terraform-docs.yml"
     replace_placeholders "$MODULE_DIR/.terraform-docs.yml"
+fi
+
+# Generate terraform-docs configuration for all examples
+print_info "Generating terraform-docs configuration for examples..."
+if [[ -f "$TEMPLATES_DIR/example-terraform-docs.yml" ]]; then
+    for example_dir in "$MODULE_DIR/examples"/*; do
+        if [[ -d "$example_dir" ]]; then
+            example_name=$(basename "$example_dir")
+            print_info "  - Creating terraform-docs config for example: $example_name"
+            cp "$TEMPLATES_DIR/example-terraform-docs.yml" "$example_dir/.terraform-docs.yml"
+        fi
+    done
+else
+    print_warning "example-terraform-docs.yml template not found - examples will need manual configuration"
 fi
 
 # Add to workflow choices
