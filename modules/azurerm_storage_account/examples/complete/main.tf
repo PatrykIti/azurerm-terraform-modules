@@ -13,7 +13,6 @@ terraform {
 }
 
 provider "azurerm" {
-  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
   features {
     key_vault {
       purge_soft_delete_on_destroy = true
@@ -202,7 +201,7 @@ module "storage_account" {
 
   # Network security - Allow for initial setup, then restrict
   network_rules = {
-    default_action             = "Allow" # Allow during initial setup
+    default_action             = "Deny" # Secure by default - add your IP ranges below
     bypass                     = ["AzureServices", "Logging", "Metrics"]
     ip_rules                   = [] # Add your IP ranges here
     virtual_network_subnet_ids = []

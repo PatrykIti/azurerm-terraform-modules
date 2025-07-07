@@ -34,10 +34,10 @@ This example demonstrates a maximum-security Azure Storage Account configuration
 - **Versioning**: All changes tracked and retained
 - **Security Alerts**: Automated alerts for authentication failures
 
-### Threat Protection
-- **Advanced Threat Protection**: Enabled for anomaly detection
-- **Security Monitoring**: Real-time alerts to security team
+### Security Monitoring
 - **Authentication Monitoring**: Alerts on failed authentication attempts
+- **Activity Logging**: Comprehensive audit trails in Log Analytics
+- **Real-time Alerts**: Automated notifications to security team
 
 ## Use Cases
 

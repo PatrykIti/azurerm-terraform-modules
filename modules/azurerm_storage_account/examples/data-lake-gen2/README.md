@@ -173,11 +173,51 @@ The example includes lifecycle policies for:
 2. **Cleanup**: Automatically delete temporary data
 3. **Cost Optimization**: Tier data based on access patterns
 
+## Advanced Features
+
+### Change Feed
+- **Enabled**: Tracks all changes to blobs in the storage account
+- **Retention**: 7 days of change history
+- **Use Cases**: Data pipeline triggers, audit trails, incremental processing
+- **Access**: Available through the DFS API or change feed processor
+
+### Query Acceleration
+- Available on-demand for specific queries
+- Not configured via Terraform (runtime feature)
+- Enables SQL-like queries on CSV/JSON files
+- Reduces data transfer and improves query performance
+
+### ACL (Access Control Lists)
+- **POSIX-style permissions**: Fine-grained access control at file/directory level
+- **Inheritance**: Default ACLs apply to new items in directories
+- **Integration**: Works alongside Azure RBAC for defense in depth
+- **Example**: Data Engineers have full access, Data Analysts have read-only to raw data
+
+## Analytics Integration
+
+The example includes commented-out configurations for:
+
+### Azure Databricks
+- Mount Data Lake filesystems in Databricks
+- Use service principal authentication
+- Access data using Spark DataFrames
+
+### Azure Synapse Analytics
+- Native integration with Data Lake Gen2
+- SQL on-demand queries over data lake
+- Spark pools for big data processing
+
+### Azure Data Factory
+- Orchestrate data pipelines
+- Copy data between tiers
+- Transform data using mapping data flows
+
 ## Monitoring and Diagnostics
 
 - Storage metrics tracked in Log Analytics
 - Read/Write/Delete operations logged
 - Transaction and capacity metrics available
+- Change feed provides detailed change tracking
 
 ## Cost Considerations
 

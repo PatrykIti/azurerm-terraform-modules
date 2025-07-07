@@ -1,44 +1,116 @@
-output "storage_account_id" {
-  description = "The ID of the storage account"
-  value       = module.storage_account.id
+# ==============================================================================
+# System-Assigned Identity Storage Account Outputs
+# ==============================================================================
+
+output "system_assigned_storage_account_id" {
+  description = "The ID of the system-assigned identity storage account"
+  value       = module.storage_system_assigned.id
 }
 
-output "storage_account_name" {
-  description = "The name of the storage account"
-  value       = module.storage_account.name
+output "system_assigned_storage_account_name" {
+  description = "The name of the system-assigned identity storage account"
+  value       = module.storage_system_assigned.name
 }
 
-output "identity_principal_id" {
-  description = "The Principal ID of the storage account's system-assigned managed identity"
-  value       = module.storage_account.identity.principal_id
+output "system_assigned_principal_id" {
+  description = "The principal ID of the system-assigned identity"
+  value       = module.storage_system_assigned.identity.principal_id
 }
 
-output "identity_tenant_id" {
-  description = "The Tenant ID of the storage account's system-assigned managed identity"
-  value       = module.storage_account.identity.tenant_id
+output "system_assigned_tenant_id" {
+  description = "The tenant ID of the system-assigned identity"
+  value       = module.storage_system_assigned.identity.tenant_id
 }
 
-output "primary_blob_endpoint" {
-  description = "The primary blob endpoint URL"
-  value       = module.storage_account.primary_blob_endpoint
+# ==============================================================================
+# User-Assigned Identity Storage Account Outputs
+# ==============================================================================
+
+output "user_assigned_storage_account_id" {
+  description = "The ID of the user-assigned identity storage account"
+  value       = module.storage_user_assigned.id
 }
 
-output "test_container_name" {
-  description = "The name of the test container"
-  value       = azurerm_storage_container.test.name
+output "user_assigned_storage_account_name" {
+  description = "The name of the user-assigned identity storage account"
+  value       = module.storage_user_assigned.name
 }
 
-output "current_user_object_id" {
-  description = "The object ID of the current user (has Storage Blob Data Contributor role)"
-  value       = data.azurerm_client_config.current.object_id
+output "user_assigned_identity_id" {
+  description = "The ID of the user-assigned identity"
+  value       = azurerm_user_assigned_identity.storage.id
 }
+
+output "user_assigned_identity_principal_id" {
+  description = "The principal ID of the user-assigned identity"
+  value       = azurerm_user_assigned_identity.storage.principal_id
+}
+
+# ==============================================================================
+# Combined Identities Storage Account Outputs
+# ==============================================================================
+
+output "combined_storage_account_id" {
+  description = "The ID of the combined identities storage account"
+  value       = module.storage_combined.id
+}
+
+output "combined_storage_account_name" {
+  description = "The name of the combined identities storage account"
+  value       = module.storage_combined.name
+}
+
+output "combined_system_principal_id" {
+  description = "The principal ID of the system-assigned identity for the combined account"
+  value       = module.storage_combined.identity.principal_id
+}
+
+# ==============================================================================
+# Key Vault Outputs
+# ==============================================================================
 
 output "key_vault_id" {
-  description = "The ID of the example Key Vault"
+  description = "The ID of the Key Vault used for customer-managed keys"
   value       = azurerm_key_vault.example.id
 }
 
-output "authentication_mode_note" {
-  description = "Important note about authentication"
-  value       = "This storage account has shared keys disabled. Use 'az storage blob list --account-name ${module.storage_account.name} --container-name ${azurerm_storage_container.test.name} --auth-mode login' to access blobs."
+output "key_vault_name" {
+  description = "The name of the Key Vault"
+  value       = azurerm_key_vault.example.name
+}
+
+output "storage_encryption_key_id" {
+  description = "The ID of the storage encryption key"
+  value       = azurerm_key_vault_key.storage.id
+}
+
+# ==============================================================================
+# Testing Instructions
+# ==============================================================================
+
+output "testing_instructions" {
+  description = "Instructions for testing identity-based access"
+  value = <<-EOT
+    To test identity-based access:
+
+    1. System-Assigned Identity:
+       az storage blob list \
+         --account-name ${module.storage_system_assigned.name} \
+         --container-name system-test \
+         --auth-mode login
+
+    2. User-Assigned Identity (with CMK):
+       az storage blob list \
+         --account-name ${module.storage_user_assigned.name} \
+         --container-name user-test \
+         --auth-mode login
+
+    3. Combined Identities (with CMK):
+       az storage blob list \
+         --account-name ${module.storage_combined.name} \
+         --container-name combined-test \
+         --auth-mode login
+
+    Note: The current user has been granted 'Storage Blob Data Contributor' role for testing.
+  EOT
 }

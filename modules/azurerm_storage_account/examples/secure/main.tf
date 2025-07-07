@@ -13,7 +13,6 @@ terraform {
 }
 
 provider "azurerm" {
-  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
   features {
     key_vault {
       purge_soft_delete_on_destroy    = false
@@ -279,6 +278,41 @@ module "storage_account" {
       }
     }
   ]
+
+  # SAS policy configuration for defense in depth
+  # Even though shared access keys are disabled, configure SAS policy
+  sas_policy = {
+    expiration_period = "01.00:00:00" # 1 day maximum SAS token validity
+    expiration_action = "Log"         # Log when SAS tokens expire
+  }
+
+  # Storage containers with immutability policies
+  containers = {
+    "compliance-data" = {
+      public_access = "None"
+      
+      # Immutability policy for regulatory compliance
+      immutability_policy = {
+        immutability_period_in_days           = 365
+        immutability_period_state             = "Unlocked" # Can be changed to "Locked" after testing
+        allow_protected_append_writes_all_enabled = false
+      }
+      
+      metadata = {
+        purpose    = "Compliance data storage"
+        retention  = "7years"
+        compliance = "WORM"
+      }
+    }
+    
+    "audit-logs" = {
+      public_access = "None"
+      metadata = {
+        purpose   = "Security audit logs"
+        retention = "365days"
+      }
+    }
+  }
 
   # Security tags
   tags = {
