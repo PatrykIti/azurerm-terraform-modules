@@ -70,8 +70,9 @@ coverage.html
 
 # Ignore Go test cache and build artifacts (for Terratest)
 vendor/
-go.mod
-go.sum
+# Ignore go.mod/go.sum only in root directory (not in module tests)
+/go.mod
+/go.sum
 
 # Ignore node_modules (if using npm for tooling)
 node_modules/
