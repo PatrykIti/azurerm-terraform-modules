@@ -152,3 +152,4 @@ dev-debug.log
 # Task files
 # tasks.json
 # tasks/ 
+modules/azurerm_storage_account/.terraform-docs.yml
