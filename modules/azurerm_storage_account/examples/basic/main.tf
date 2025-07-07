@@ -23,11 +23,12 @@ module "storage_account" {
   # }
   
   # Create a container for basic storage usage
-  containers = {
-    logs = {
-      public_access = "None"
+  containers = [
+    {
+      name                  = "logs"
+      container_access_type = "private"
     }
-  }
+  ]
 
   tags = {
     Environment = "Development"

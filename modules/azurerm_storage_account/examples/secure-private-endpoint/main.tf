@@ -388,23 +388,26 @@ module "secure_storage" {
   }
 
   # Containers with security configurations
-  containers = {
-    "secure-data" = {
-      public_access = "None"
+  containers = [
+    {
+      name                  = "secure-data"
+      container_access_type = "private"
+    },
+    {
+      name                  = "audit-logs"
+      container_access_type = "private"
     }
-    "audit-logs" = {
-      public_access = "None"
-    }
-  }
+  ]
 
   # File shares with security configurations
-  shares = {
-    "secure-share" = {
+  file_shares = [
+    {
+      name             = "secure-share"
       quota            = 100
       access_tier      = "Hot"
       enabled_protocol = "SMB"
     }
-  }
+  ]
 
   tags = merge(var.tags, {
     Purpose = "Secure data storage with private endpoints"

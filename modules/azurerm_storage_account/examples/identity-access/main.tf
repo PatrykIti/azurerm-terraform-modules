@@ -127,11 +127,12 @@ module "storage_system_assigned" {
     ip_rules       = []
   }
   
-  containers = {
-    "system-test" = {
-      public_access = "None"
+  containers = [
+    {
+      name                  = "system-test"
+      container_access_type = "private"
     }
-  }
+  ]
 
   tags = {
     example       = "system-assigned-identity"
@@ -190,11 +191,12 @@ module "storage_user_assigned" {
     ip_rules       = []
   }
   
-  containers = {
-    "user-test" = {
-      public_access = "None"
+  containers = [
+    {
+      name                  = "user-test"
+      container_access_type = "private"
     }
-  }
+  ]
 
   tags = {
     example       = "user-assigned-identity"
@@ -250,14 +252,16 @@ module "storage_combined" {
     ip_rules       = []
   }
   
-  containers = {
-    "combined-test" = {
-      public_access = "None"
+  containers = [
+    {
+      name                  = "combined-test"
+      container_access_type = "private"
+    },
+    {
+      name                  = "data"
+      container_access_type = "private"
     }
-    "data" = {
-      public_access = "None"
-    }
-  }
+  ]
 
   tags = {
     example       = "combined-identities"
