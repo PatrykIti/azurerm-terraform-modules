@@ -1,0 +1,11 @@
+# Task ID: 19
+# Title: Comprehensive Update of Storage Account Module Outputs
+# Status: pending
+# Dependencies: 6, 18
+# Priority: high
+# Description: Conduct a comprehensive review and update of the `outputs.tf` file for the `azurerm_storage_account` module. This involves adding, correcting, and removing outputs for all associated resources to ensure all useful attributes are exposed.
+# Details:
+The goal is to align all outputs with the latest Terraform AzureRM provider documentation. Review the documentation for each of the following resources within the module: `azurerm_storage_account`, `azurerm_storage_container`, `azurerm_storage_queue`, `azurerm_storage_share`, `azurerm_storage_table`, `azurerm_private_endpoint`, `azurerm_storage_account_queue_properties`, `azurerm_storage_account_static_website`, `azurerm_storage_management_policy`, and `azurerm_monitor_diagnostic_setting`. For each resource, identify all exported attributes that provide value to the end-user. Add new `output` blocks for missing attributes, correct the `value` of any incorrect outputs, and remove any outputs that reference deprecated attributes. Ensure all outputs have a clear and concise `description`. For example, for `azurerm_storage_account`, ensure outputs like `primary_web_endpoint`, `primary_dfs_endpoint`, and the full `identity` block are exposed. For `azurerm_storage_container`, expose `id`, `name`, and `resource_manager_id`.
+
+# Test Strategy:
+1. Update the `complete` example in `examples/storage_account/complete` to include a local `outputs.tf` file that references all the newly added and updated outputs from the module. 2. Run `terraform init` and `terraform apply` on this example to deploy the resources. 3. After a successful deployment, run `terraform output` and inspect the values to ensure they are not null or empty and appear correct. 4. Cross-reference at least five key output values (e.g., `primary_blob_endpoint`, a container ID, a private endpoint ID) with the actual resource properties in the Azure Portal to confirm accuracy. 5. Run `terraform destroy` and verify all resources are cleaned up successfully.

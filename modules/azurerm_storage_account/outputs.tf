@@ -88,6 +88,16 @@ output "secondary_web_endpoint" {
   value       = try(azurerm_storage_account.storage_account.secondary_web_endpoint, null)
 }
 
+output "primary_web_host" {
+  description = "The hostname with port if applicable for web storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_web_host, null)
+}
+
+output "secondary_web_host" {
+  description = "The hostname with port if applicable for web storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_web_host, null)
+}
+
 output "primary_connection_string" {
   description = "The primary connection string for the storage account"
   value       = try(azurerm_storage_account.storage_account.primary_connection_string, null)
@@ -135,15 +145,66 @@ output "identity" {
 }
 
 output "private_endpoints" {
-  description = "Map of private endpoints created for the storage account"
-  value = {
+  description = "Map of private endpoints created for the storage account, keyed by endpoint name"
+  value = length(azurerm_private_endpoint.private_endpoint) > 0 ? {
     for k, v in azurerm_private_endpoint.private_endpoint : k => {
-      id                   = v.id
-      name                 = v.name
-      private_ip_addresses = [v.private_service_connection[0].private_ip_address]
-      fqdn                 = try(v.custom_dns_configs[0].fqdn, null)
+      id                 = v.id
+      name               = v.name
+      private_ip_address = v.private_service_connection[0].private_ip_address
+      subresource_names  = v.private_service_connection[0].subresource_names
+      network_interface = {
+        id   = v.network_interface[0].id
+        name = v.network_interface[0].name
+      }
+      custom_dns_configs = [
+        for config in v.custom_dns_configs : {
+          fqdn         = config.fqdn
+          ip_addresses = config.ip_addresses
+        }
+      ]
+      private_dns_zone_configs = [
+        for config in v.private_dns_zone_configs : {
+          name                = config.name
+          id                  = config.id
+          private_dns_zone_id = config.private_dns_zone_id
+          record_sets = [
+            for rs in config.record_sets : {
+              name         = rs.name
+              type         = rs.type
+              fqdn         = rs.fqdn
+              ttl          = rs.ttl
+              ip_addresses = rs.ip_addresses
+            }
+          ]
+        }
+      ]
+      private_dns_zone_group = length(v.private_dns_zone_group) > 0 ? {
+        id                   = v.private_dns_zone_group[0].id
+        name                 = v.private_dns_zone_group[0].name
+        private_dns_zone_ids = v.private_dns_zone_group[0].private_dns_zone_ids
+      } : null
     }
-  }
+  } : {}
+}
+
+output "private_endpoints_by_subresource" {
+  description = "Private endpoints grouped by subresource type (blob, file, table, queue, web, dfs)"
+  value = length(azurerm_private_endpoint.private_endpoint) > 0 ? {
+    for subresource in distinct(flatten([
+      for pe in azurerm_private_endpoint.private_endpoint : pe.private_service_connection[0].subresource_names
+      ])) : subresource => {
+      for k, v in azurerm_private_endpoint.private_endpoint : k => {
+        id                 = v.id
+        name               = v.name
+        private_ip_address = v.private_service_connection[0].private_ip_address
+        fqdn               = try(v.custom_dns_configs[0].fqdn, null)
+        network_interface = {
+          id   = v.network_interface[0].id
+          name = v.network_interface[0].name
+        }
+      } if contains(v.private_service_connection[0].subresource_names, subresource)
+    }
+  } : {}
 }
 
 output "lifecycle_management_policy_id" {
@@ -152,11 +213,16 @@ output "lifecycle_management_policy_id" {
 }
 
 output "containers" {
-  description = "Map of created storage containers"
+  description = "Map of created storage containers with all available attributes"
   value = {
     for k, v in azurerm_storage_container.storage_container : k => {
-      id   = v.id
-      name = v.name
+      id                       = v.id
+      name                     = v.name
+      resource_manager_id      = v.resource_manager_id
+      has_immutability_policy  = v.has_immutability_policy
+      has_legal_hold           = v.has_legal_hold
+      default_encryption_scope = v.default_encryption_scope
+      metadata                 = v.metadata
     }
   }
 }
@@ -165,8 +231,9 @@ output "queues" {
   description = "Map of created storage queues"
   value = {
     for k, v in azurerm_storage_queue.storage_queue : k => {
-      id   = v.id
-      name = v.name
+      id                  = v.id
+      name                = v.name
+      resource_manager_id = v.resource_manager_id
     }
   }
 }
@@ -175,8 +242,9 @@ output "tables" {
   description = "Map of created storage tables"
   value = {
     for k, v in azurerm_storage_table.storage_table : k => {
-      id   = v.id
-      name = v.name
+      id                  = v.id
+      name                = v.name
+      resource_manager_id = v.resource_manager_id
     }
   }
 }
@@ -185,16 +253,17 @@ output "file_shares" {
   description = "Map of created file shares"
   value = {
     for k, v in azurerm_storage_share.storage_share : k => {
-      id   = v.id
-      name = v.name
-      url  = v.url
+      id                  = v.id
+      name                = v.name
+      resource_manager_id = v.resource_manager_id
+      url                 = v.url
     }
   }
 }
 
 output "queue_properties_id" {
   description = "The ID of the Storage Account Queue Properties"
-  value       = try(azurerm_storage_account_queue_properties.queue_properties[0].id, null)
+  value       = one(azurerm_storage_account_queue_properties.queue_properties[*].id)
 }
 
 output "static_website" {
@@ -205,6 +274,27 @@ output "static_website" {
     error_404_document = azurerm_storage_account_static_website.static_website[0].error_404_document
     primary_endpoint   = try(azurerm_storage_account.storage_account.primary_web_endpoint, null)
     secondary_endpoint = try(azurerm_storage_account.storage_account.secondary_web_endpoint, null)
+    primary_host       = try(azurerm_storage_account.storage_account.primary_web_host, null)
+    secondary_host     = try(azurerm_storage_account.storage_account.secondary_web_host, null)
   } : null
+}
+
+output "static_website_id" {
+  description = "The ID of the Storage Account Static Website configuration"
+  value       = try(azurerm_storage_account_static_website.static_website[0].id, null)
+}
+
+output "diagnostic_settings" {
+  description = "Map of diagnostic settings created for the storage account"
+  value = {
+    storage_account = var.diagnostic_settings.enabled ? {
+      id   = azurerm_monitor_diagnostic_setting.monitor_diagnostic_setting[0].id
+      name = azurerm_monitor_diagnostic_setting.monitor_diagnostic_setting[0].name
+    } : null
+    blob_service = var.diagnostic_settings.enabled && var.account_kind != "FileStorage" ? {
+      id   = azurerm_monitor_diagnostic_setting.blob_diagnostic_setting[0].id
+      name = azurerm_monitor_diagnostic_setting.blob_diagnostic_setting[0].name
+    } : null
+  }
 }
 
