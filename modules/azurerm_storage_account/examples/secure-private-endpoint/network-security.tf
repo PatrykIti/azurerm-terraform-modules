@@ -101,10 +101,10 @@ resource "azurerm_storage_account" "flow_logs" {
 
 # NSG Flow Logs for Private Endpoints NSG
 resource "azurerm_network_watcher_flow_log" "private_endpoints" {
-  count                = var.enable_network_flow_logs ? 1 : 0
-  name                 = "flowlog-nsg-private-endpoints"
-  network_watcher_name = var.enable_network_watcher ? azurerm_network_watcher.example[0].name : "NetworkWatcher_${var.location}"
-  resource_group_name  = var.enable_network_watcher ? azurerm_resource_group.example.name : "NetworkWatcherRG"
+  count                     = var.enable_network_flow_logs ? 1 : 0
+  name                      = "flowlog-nsg-private-endpoints"
+  network_watcher_name      = var.enable_network_watcher ? azurerm_network_watcher.example[0].name : "NetworkWatcher_${var.location}"
+  resource_group_name       = var.enable_network_watcher ? azurerm_resource_group.example.name : "NetworkWatcherRG"
   network_security_group_id = azurerm_network_security_group.private_endpoints.id
   storage_account_id        = azurerm_storage_account.flow_logs[0].id
   enabled                   = true
@@ -128,10 +128,10 @@ resource "azurerm_network_watcher_flow_log" "private_endpoints" {
 
 # NSG Flow Logs for App NSG
 resource "azurerm_network_watcher_flow_log" "app" {
-  count                = var.enable_network_flow_logs ? 1 : 0
-  name                 = "flowlog-nsg-app"
-  network_watcher_name = var.enable_network_watcher ? azurerm_network_watcher.example[0].name : "NetworkWatcher_${var.location}"
-  resource_group_name  = var.enable_network_watcher ? azurerm_resource_group.example.name : "NetworkWatcherRG"
+  count                     = var.enable_network_flow_logs ? 1 : 0
+  name                      = "flowlog-nsg-app"
+  network_watcher_name      = var.enable_network_watcher ? azurerm_network_watcher.example[0].name : "NetworkWatcher_${var.location}"
+  resource_group_name       = var.enable_network_watcher ? azurerm_resource_group.example.name : "NetworkWatcherRG"
   network_security_group_id = azurerm_network_security_group.app.id
   storage_account_id        = azurerm_storage_account.flow_logs[0].id
   enabled                   = true

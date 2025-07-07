@@ -75,10 +75,10 @@ resource "azurerm_monitor_metric_alert" "anomalous_access" {
   window_size         = "PT1H"
 
   dynamic_criteria {
-    metric_namespace = "Microsoft.Storage/storageAccounts"
-    metric_name      = "Egress"
-    aggregation      = "Total"
-    operator         = "GreaterThan"
+    metric_namespace  = "Microsoft.Storage/storageAccounts"
+    metric_name       = "Egress"
+    aggregation       = "Total"
+    operator          = "GreaterThan"
     alert_sensitivity = "High"
 
     dimension {
@@ -163,12 +163,12 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "kv_unknown_access" {
 # ==============================================================================
 
 resource "azurerm_security_center_storage_defender" "example" {
-  count                          = var.enable_advanced_threat_protection ? 1 : 0
-  storage_account_id             = module.secure_storage.id
-  override_subscription_settings_enabled = true
-  malware_scanning_on_upload_enabled    = true
+  count                                       = var.enable_advanced_threat_protection ? 1 : 0
+  storage_account_id                          = module.secure_storage.id
+  override_subscription_settings_enabled      = true
+  malware_scanning_on_upload_enabled          = true
   malware_scanning_on_upload_cap_gb_per_month = 5000
-  sensitive_data_discovery_enabled      = true
+  sensitive_data_discovery_enabled            = true
 
   depends_on = [module.secure_storage]
 }

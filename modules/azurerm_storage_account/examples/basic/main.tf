@@ -21,7 +21,7 @@ module "storage_account" {
   # security_settings = {
   #   shared_access_key_enabled = true
   # }
-  
+
   # Create a container for basic storage usage
   containers = [
     {

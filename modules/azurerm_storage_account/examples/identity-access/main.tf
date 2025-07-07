@@ -126,7 +126,7 @@ module "storage_system_assigned" {
     bypass         = ["AzureServices"]
     ip_rules       = []
   }
-  
+
   containers = [
     {
       name                  = "system-test"
@@ -190,7 +190,7 @@ module "storage_user_assigned" {
     bypass         = ["AzureServices"]
     ip_rules       = []
   }
-  
+
   containers = [
     {
       name                  = "user-test"
@@ -251,7 +251,7 @@ module "storage_combined" {
     bypass         = ["AzureServices"]
     ip_rules       = []
   }
-  
+
   containers = [
     {
       name                  = "combined-test"

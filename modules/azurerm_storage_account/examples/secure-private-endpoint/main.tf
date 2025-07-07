@@ -22,7 +22,7 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
     key_vault {
-      purge_soft_delete_on_destroy = true
+      purge_soft_delete_on_destroy    = true
       recover_soft_deleted_key_vaults = true
     }
   }
@@ -174,8 +174,8 @@ resource "azurerm_key_vault" "example" {
   tenant_id           = data.azurerm_client_config.current.tenant_id
   sku_name            = "premium"
 
-  purge_protection_enabled    = true
-  soft_delete_retention_days  = 90
+  purge_protection_enabled        = true
+  soft_delete_retention_days      = 90
   enabled_for_disk_encryption     = true
   enabled_for_deployment          = false
   enabled_for_template_deployment = false
@@ -297,13 +297,13 @@ module "secure_storage" {
 
   # Maximum security settings
   security_settings = {
-    https_traffic_only_enabled      = true
-    min_tls_version                 = "TLS1_2"
-    shared_access_key_enabled       = true # Required for Terraform to manage the resource
+    https_traffic_only_enabled        = true
+    min_tls_version                   = "TLS1_2"
+    shared_access_key_enabled         = true # Required for Terraform to manage the resource
     infrastructure_encryption_enabled = var.enable_infrastructure_encryption
-    allow_nested_items_to_be_public = false
+    allow_nested_items_to_be_public   = false
   }
-  
+
   # Note: public_network_access_enabled = false would be set here if the module supported it
   # Currently, network isolation is achieved through network_rules with default_action = "Deny"
 

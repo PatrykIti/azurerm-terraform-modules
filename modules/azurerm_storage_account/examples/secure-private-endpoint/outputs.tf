@@ -87,11 +87,11 @@ output "network_security" {
 output "monitoring_configuration" {
   description = "Monitoring and alerting configuration"
   value = {
-    action_group_id          = azurerm_monitor_action_group.security.id
-    log_analytics_id         = azurerm_log_analytics_workspace.example.id
-    application_insights_id  = azurerm_application_insights.security.id
-    defender_enabled         = var.enable_advanced_threat_protection
-    key_rotation_days        = var.key_rotation_reminder_days
+    action_group_id         = azurerm_monitor_action_group.security.id
+    log_analytics_id        = azurerm_log_analytics_workspace.example.id
+    application_insights_id = azurerm_application_insights.security.id
+    defender_enabled        = var.enable_advanced_threat_protection
+    key_rotation_days       = var.key_rotation_reminder_days
   }
 }
 
@@ -112,16 +112,16 @@ output "compliance_status" {
 output "key_vault_configuration" {
   description = "Key Vault configuration for encryption"
   value = {
-    key_vault_id     = azurerm_key_vault.example.id
-    key_vault_name   = azurerm_key_vault.example.name
-    key_id           = azurerm_key_vault_key.storage.id
-    key_rotation     = "Every 90 days with ${var.key_rotation_reminder_days} days reminder"
+    key_vault_id   = azurerm_key_vault.example.id
+    key_vault_name = azurerm_key_vault.example.name
+    key_id         = azurerm_key_vault_key.storage.id
+    key_rotation   = "Every 90 days with ${var.key_rotation_reminder_days} days reminder"
   }
 }
 
 output "deployment_instructions" {
   description = "Post-deployment security recommendations"
-  value = <<-EOT
+  value       = <<-EOT
     Secure Storage Deployment Complete!
     
     Security Checklist:

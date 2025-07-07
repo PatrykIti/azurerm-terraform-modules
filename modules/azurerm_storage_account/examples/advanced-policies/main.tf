@@ -12,20 +12,20 @@ resource "azurerm_resource_group" "example" {
 locals {
   # SAS Policy - Shared Access Signatures expire after 30 days
   sas_policy = {
-    expiration_period = "P30D"  # ISO 8601 duration format - 30 days
-    expiration_action = "Log"   # Log when SAS tokens expire
+    expiration_period = "P30D" # ISO 8601 duration format - 30 days
+    expiration_action = "Log"  # Log when SAS tokens expire
   }
 
   # Immutability Policy - WORM (Write Once Read Many) compliance
   immutability_policy = {
     allow_protected_append_writes = true
-    state                         = "Unlocked"  # Can be "Unlocked", "Locked", or "Disabled"
+    state                         = "Unlocked" # Can be "Unlocked", "Locked", or "Disabled"
     period_since_creation_in_days = 7          # Immutability period
   }
 
   # Routing preferences - Choose between Microsoft network or Internet routing
   routing = {
-    choice                      = "InternetRouting"  # or "MicrosoftRouting"
+    choice                      = "InternetRouting" # or "MicrosoftRouting"
     publish_internet_endpoints  = true
     publish_microsoft_endpoints = false
   }
@@ -35,8 +35,8 @@ locals {
   # The CNAME record must point from your custom domain to the storage account's blob endpoint.
   # Without the DNS record, Terraform apply will fail with a validation error.
   custom_domain = {
-    name          = "storage.example.com"  # Your custom domain
-    use_subdomain = false                  # Set to true for indirect CNAME validation
+    name          = "storage.example.com" # Your custom domain
+    use_subdomain = false                 # Set to true for indirect CNAME validation
   }
 
   # Share properties with SMB settings
@@ -51,19 +51,19 @@ locals {
         max_age_in_seconds = 3600
       }
     ]
-    
+
     # Retention policy for file share snapshots
     retention_policy = {
-      days = 30  # Keep snapshots for 30 days
+      days = 30 # Keep snapshots for 30 days
     }
-    
+
     # SMB protocol settings
     smb = {
       versions                        = ["SMB3.0", "SMB3.1.1"]
       authentication_types            = ["NTLMv2", "Kerberos"]
       kerberos_ticket_encryption_type = ["AES-256"]
       channel_encryption_type         = ["AES-128-GCM", "AES-256-GCM"]
-      multichannel_enabled            = true  # Enable SMB Multichannel for better performance
+      multichannel_enabled            = true # Enable SMB Multichannel for better performance
     }
   }
 }
@@ -88,15 +88,15 @@ module "storage_account" {
   share_properties    = local.share_properties
 
   # Enable features for demonstration
-  is_hns_enabled     = true   # Enable Data Lake Gen2
-  sftp_enabled       = true   # Enable SFTP
-  local_user_enabled = true   # Enable local users for SFTP
+  is_hns_enabled     = true # Enable Data Lake Gen2
+  sftp_enabled       = true # Enable SFTP
+  local_user_enabled = true # Enable local users for SFTP
 
   # Enhanced security settings
   security_settings = {
     https_traffic_only_enabled      = true
     min_tls_version                 = "TLS1_2"
-    shared_access_key_enabled       = true  # Required for SAS policies
+    shared_access_key_enabled       = true # Required for SAS policies
     allow_nested_items_to_be_public = false
   }
 
@@ -106,20 +106,20 @@ module "storage_account" {
     change_feed_enabled      = true
     last_access_time_enabled = true
     default_service_version  = "2023-11-03"
-    
+
     delete_retention_policy = {
       enabled = true
       days    = 30
     }
-    
+
     container_delete_retention_policy = {
       enabled = true
       days    = 30
     }
-    
+
     restore_policy = {
       enabled = true
-      days    = 29  # Must be less than delete_retention_policy.days
+      days    = 29 # Must be less than delete_retention_policy.days
     }
   }
 
@@ -128,19 +128,19 @@ module "storage_account" {
     {
       name    = "archive-old-data"
       enabled = true
-      
+
       filters = {
         blob_types   = ["blockBlob"]
         prefix_match = []
       }
-      
+
       actions = {
         base_blob = {
           tier_to_cool_after_days_since_modification_greater_than    = 30
           tier_to_archive_after_days_since_modification_greater_than = 90
           delete_after_days_since_modification_greater_than          = 365
         }
-        
+
         snapshot = {
           change_tier_to_cool_after_days_since_creation    = 30
           change_tier_to_archive_after_days_since_creation = 90
