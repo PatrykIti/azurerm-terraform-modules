@@ -344,3 +344,119 @@ terraform apply -var="enable_monitoring_alerts=true"
 | `enable_monitoring_alerts` | Enable monitoring alerts | true |
 | `replication_lag_threshold_minutes` | Alert threshold for lag | 30 |
 | `allowed_ip_ranges` | Allowed public IPs | [] |
+<!-- BEGIN_TF_DOCS -->
+
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.35.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.1.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.35.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.7.2 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_dr_storage"></a> [dr\_storage](#module\_dr\_storage) | ../../ | n/a |
+| <a name="module_primary_storage"></a> [primary\_storage](#module\_primary\_storage) | ../../ | n/a |
+| <a name="module_replication_metadata"></a> [replication\_metadata](#module\_replication\_metadata) | ../../ | n/a |
+| <a name="module_secondary_storage"></a> [secondary\_storage](#module\_secondary\_storage) | ../../ | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_application_insights.replication](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/application_insights) | resource |
+| [azurerm_log_analytics_saved_search.replication_lag](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/log_analytics_saved_search) | resource |
+| [azurerm_log_analytics_saved_search.storage_errors](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/log_analytics_saved_search) | resource |
+| [azurerm_log_analytics_workspace.shared](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/log_analytics_workspace) | resource |
+| [azurerm_logic_app_standard.replication](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/logic_app_standard) | resource |
+| [azurerm_monitor_action_group.replication](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/monitor_action_group) | resource |
+| [azurerm_monitor_diagnostic_setting.metadata_enhanced](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/monitor_diagnostic_setting) | resource |
+| [azurerm_monitor_metric_alert.capacity_alert](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/monitor_metric_alert) | resource |
+| [azurerm_monitor_metric_alert.primary_availability](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/monitor_metric_alert) | resource |
+| [azurerm_monitor_metric_alert.primary_errors](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/monitor_metric_alert) | resource |
+| [azurerm_monitor_metric_alert.primary_replication_lag](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/monitor_metric_alert) | resource |
+| [azurerm_monitor_metric_alert.secondary_availability](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/monitor_metric_alert) | resource |
+| [azurerm_private_dns_zone.blob](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone.queue](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone.table](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.blob_dr](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.blob_primary](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.blob_secondary](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.queue_primary](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.table_primary](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_private_endpoint.dr_blob](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_endpoint) | resource |
+| [azurerm_private_endpoint.metadata_blob](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_endpoint) | resource |
+| [azurerm_private_endpoint.metadata_queue](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_endpoint) | resource |
+| [azurerm_private_endpoint.metadata_table](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_endpoint) | resource |
+| [azurerm_private_endpoint.primary_blob](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_endpoint) | resource |
+| [azurerm_private_endpoint.primary_table](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_endpoint) | resource |
+| [azurerm_private_endpoint.secondary_blob](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_endpoint) | resource |
+| [azurerm_resource_group.dr](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/resource_group) | resource |
+| [azurerm_resource_group.primary](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/resource_group) | resource |
+| [azurerm_resource_group.secondary](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/resource_group) | resource |
+| [azurerm_role_assignment.logic_app_dr](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.logic_app_metadata](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.logic_app_primary](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.logic_app_secondary](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/role_assignment) | resource |
+| [azurerm_service_plan.replication](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/service_plan) | resource |
+| [azurerm_storage_account.replication_app](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_account) | resource |
+| [azurerm_subnet.dr_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/subnet) | resource |
+| [azurerm_subnet.primary_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/subnet) | resource |
+| [azurerm_subnet.secondary_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/subnet) | resource |
+| [azurerm_virtual_network.dr](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/virtual_network) | resource |
+| [azurerm_virtual_network.primary](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/virtual_network) | resource |
+| [azurerm_virtual_network.secondary](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/virtual_network) | resource |
+| [azurerm_virtual_network_peering.dr_to_primary](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/virtual_network_peering) | resource |
+| [azurerm_virtual_network_peering.primary_to_dr](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/virtual_network_peering) | resource |
+| [azurerm_virtual_network_peering.primary_to_secondary](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/virtual_network_peering) | resource |
+| [azurerm_virtual_network_peering.secondary_to_primary](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/virtual_network_peering) | resource |
+| [random_string.suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
+| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/data-sources/client_config) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_allowed_ip_ranges"></a> [allowed\_ip\_ranges](#input\_allowed\_ip\_ranges) | List of allowed IP ranges for storage account access | `list(string)` | `[]` | no |
+| <a name="input_dr_location"></a> [dr\_location](#input\_dr\_location) | Disaster recovery region for archive storage | `string` | `"UK South"` | no |
+| <a name="input_enable_monitoring_alerts"></a> [enable\_monitoring\_alerts](#input\_enable\_monitoring\_alerts) | Enable monitoring alerts for replication lag and failures | `bool` | `true` | no |
+| <a name="input_enable_private_endpoints"></a> [enable\_private\_endpoints](#input\_enable\_private\_endpoints) | Enable private endpoints for all storage accounts | `bool` | `false` | no |
+| <a name="input_enable_replication_automation"></a> [enable\_replication\_automation](#input\_enable\_replication\_automation) | Enable automated replication using Azure Function or Logic App | `bool` | `false` | no |
+| <a name="input_primary_location"></a> [primary\_location](#input\_primary\_location) | Primary region for the storage account deployment | `string` | `"West Europe"` | no |
+| <a name="input_replication_lag_threshold_minutes"></a> [replication\_lag\_threshold\_minutes](#input\_replication\_lag\_threshold\_minutes) | Threshold in minutes for replication lag alerts | `number` | `30` | no |
+| <a name="input_replication_schedule"></a> [replication\_schedule](#input\_replication\_schedule) | CRON expression for replication schedule (if automation enabled) | `string` | `"0 */6 * * *"` | no |
+| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix for all resource names | `string` | `"multi-region"` | no |
+| <a name="input_secondary_location"></a> [secondary\_location](#input\_secondary\_location) | Secondary region for backup storage | `string` | `"North Europe"` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Common tags to apply to all resources | `map(string)` | <pre>{<br/>  "CostCenter": "Infrastructure",<br/>  "Example": "Multi-Region",<br/>  "ManagedBy": "Terraform"<br/>}</pre> | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_cross_tenant_replication_status"></a> [cross\_tenant\_replication\_status](#output\_cross\_tenant\_replication\_status) | Cross-tenant replication configuration for all storage accounts |
+| <a name="output_deployment_instructions"></a> [deployment\_instructions](#output\_deployment\_instructions) | Instructions for deploying and configuring the multi-region storage |
+| <a name="output_dr_storage"></a> [dr\_storage](#output\_dr\_storage) | Disaster recovery storage account details |
+| <a name="output_geo_redundancy_configuration"></a> [geo\_redundancy\_configuration](#output\_geo\_redundancy\_configuration) | Comprehensive geo-redundancy configuration across all storage accounts |
+| <a name="output_log_analytics_workspace_id"></a> [log\_analytics\_workspace\_id](#output\_log\_analytics\_workspace\_id) | Shared Log Analytics workspace ID |
+| <a name="output_monitoring_configuration"></a> [monitoring\_configuration](#output\_monitoring\_configuration) | Monitoring and alerting configuration |
+| <a name="output_primary_storage"></a> [primary\_storage](#output\_primary\_storage) | Primary region storage account details with geo-redundant endpoints |
+| <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints) | Private endpoint configuration when enabled |
+| <a name="output_region_mapping"></a> [region\_mapping](#output\_region\_mapping) | Mapping of storage accounts to regions |
+| <a name="output_replication_automation"></a> [replication\_automation](#output\_replication\_automation) | Replication automation configuration when enabled |
+| <a name="output_replication_endpoints"></a> [replication\_endpoints](#output\_replication\_endpoints) | Endpoints for setting up cross-region replication |
+| <a name="output_replication_metadata_storage"></a> [replication\_metadata\_storage](#output\_replication\_metadata\_storage) | Replication metadata storage account details with geo-redundant endpoints |
+| <a name="output_replication_setup"></a> [replication\_setup](#output\_replication\_setup) | Outputs for cross-region replication setup |
+| <a name="output_secondary_storage"></a> [secondary\_storage](#output\_secondary\_storage) | Secondary region storage account details |
+| <a name="output_storage_account_identities"></a> [storage\_account\_identities](#output\_storage\_account\_identities) | Managed identities for all storage accounts |
+<!-- END_TF_DOCS -->

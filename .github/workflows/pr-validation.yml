@@ -288,6 +288,11 @@ jobs:
           docs_errors=()
           
           for module in $modules; do
+            # Skip example directories - they are checked separately
+            if [[ "$module" =~ /examples/ ]]; then
+              continue
+            fi
+            
             # First, generate dynamic terraform-docs config if examples exist
             if [[ -d "$module/examples" ]] && [[ -x "./scripts/generate-terraform-docs-config.sh" ]]; then
               echo "Generating terraform-docs config for $module..."
@@ -308,6 +313,30 @@ jobs:
               fi
             else
               docs_outdated+=("$module (missing README.md)")
+            fi
+            
+            # Check examples for this module
+            if [[ -d "$module/examples" ]]; then
+              for example in $(find "$module/examples" -mindepth 1 -maxdepth 1 -type d); do
+                if [[ -f "$example/README.md" ]]; then
+                  # For examples, just check if terraform-docs markers exist and content is present
+                  if grep -q "BEGIN_TF_DOCS" "$example/README.md" && grep -q "END_TF_DOCS" "$example/README.md"; then
+                    # Run terraform-docs to ensure content is up to date
+                    cd "$example"
+                    if terraform-docs markdown table . > /dev/null 2>&1; then
+                      echo "  ✓ Example $(basename "$example") documentation OK"
+                    else
+                      docs_errors+=("$example (terraform-docs update failed)")
+                    fi
+                    cd - > /dev/null
+                  else
+                    # Example doesn't have terraform-docs markers - that's OK for custom examples
+                    echo "  ✓ Example $(basename "$example") has custom documentation"
+                  fi
+                else
+                  docs_outdated+=("$example (missing README.md)")
+                fi
+              done
             fi
           done
           

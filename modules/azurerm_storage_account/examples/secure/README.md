@@ -185,3 +185,65 @@ This configuration implements a **Defense-in-Depth** strategy with multiple laye
 4. **Network Planning**: Private endpoints require network connectivity
 5. **Monitoring**: Review security alerts and logs regularly
 6. **OAuth Setup**: Applications must be configured for Azure AD authentication (no SAS tokens)
+<!-- BEGIN_TF_DOCS -->
+
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.0.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.1.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.35.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.7.2 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | ../../ | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_key_vault.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) | resource |
+| [azurerm_key_vault_key.storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_key) | resource |
+| [azurerm_log_analytics_workspace.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
+| [azurerm_monitor_action_group.security](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_action_group) | resource |
+| [azurerm_monitor_metric_alert.storage_auth_failures](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
+| [azurerm_private_dns_zone.storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
+| [azurerm_subnet.private_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_user_assigned_identity.storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
+| [azurerm_virtual_network.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
+| [random_string.suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
+| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
+
+## Inputs
+
+No inputs.
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_encryption_key_id"></a> [encryption\_key\_id](#output\_encryption\_key\_id) | The ID of the encryption key |
+| <a name="output_identity_principal_id"></a> [identity\_principal\_id](#output\_identity\_principal\_id) | The principal ID of the storage account's system-assigned identity |
+| <a name="output_key_vault_uri"></a> [key\_vault\_uri](#output\_key\_vault\_uri) | The URI of the Key Vault |
+| <a name="output_log_analytics_workspace_id"></a> [log\_analytics\_workspace\_id](#output\_log\_analytics\_workspace\_id) | The ID of the Log Analytics workspace for security monitoring |
+| <a name="output_network_security_status"></a> [network\_security\_status](#output\_network\_security\_status) | Network security configuration status |
+| <a name="output_primary_blob_endpoint"></a> [primary\_blob\_endpoint](#output\_primary\_blob\_endpoint) | The primary blob endpoint (accessible only via private endpoint) |
+| <a name="output_private_endpoint_ids"></a> [private\_endpoint\_ids](#output\_private\_endpoint\_ids) | Map of private endpoint IDs |
+| <a name="output_security_alert_id"></a> [security\_alert\_id](#output\_security\_alert\_id) | The ID of the authentication failure alert |
+| <a name="output_security_configuration"></a> [security\_configuration](#output\_security\_configuration) | Summary of security settings applied to the storage account |
+| <a name="output_storage_account_id"></a> [storage\_account\_id](#output\_storage\_account\_id) | The ID of the storage account |
+| <a name="output_storage_account_name"></a> [storage\_account\_name](#output\_storage\_account\_name) | The name of the storage account |
+<!-- END_TF_DOCS -->
