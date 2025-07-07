@@ -15,11 +15,13 @@ else
     MODULE_PREFIX="v"
 fi
 
-# Get current version from CHANGELOG or default
+# Get current version from CHANGELOG or use placeholder
 if [[ -f "$MODULE_PATH/CHANGELOG.md" ]]; then
-    CURRENT_VERSION=$(grep -m1 "^## \[" "$MODULE_PATH/CHANGELOG.md" | sed 's/## \[\(.*\)\].*/\1/' || echo "1.0.0")
+    # Look for version in CHANGELOG.md (format: ## [1.0.0] or ## [SAv1.0.0])
+    CURRENT_VERSION=$(grep -m1 "^## \[" "$MODULE_PATH/CHANGELOG.md" | sed 's/## \[\([^]]*\)\].*/\1/' | sed "s/^${MODULE_PREFIX}v//" || echo "0.0.0")
 else
-    CURRENT_VERSION="1.0.0"
+    # No CHANGELOG yet - this will be replaced by semantic-release
+    CURRENT_VERSION="0.0.0"
 fi
 
 # Get module description from README.md or use default
