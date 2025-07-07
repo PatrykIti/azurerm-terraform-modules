@@ -13,6 +13,7 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
   features {
     key_vault {
       purge_soft_delete_on_destroy = true
@@ -181,6 +182,7 @@ module "storage_account" {
     allow_nested_items_to_be_public   = false
     infrastructure_encryption_enabled = true
     enable_advanced_threat_protection = true
+    public_network_access_enabled     = true # Set to false in production
   }
 
   # New security and compliance parameters from task #18
@@ -256,11 +258,27 @@ module "storage_account" {
   }
 
 
+  # Azure Files Authentication - Enable Kerberos authentication
+  azure_files_authentication = {
+    directory_type = "AADKERB"
+    # For on-premises AD, you would use:
+    # directory_type = "AD"
+    # active_directory = {
+    #   domain_name         = "corp.example.com"
+    #   domain_guid         = "12345678-1234-1234-1234-123456789012"
+    #   domain_sid          = "S-1-5-21-1234567890-1234567890-1234567890"
+    #   storage_sid         = "S-1-5-21-0987654321-0987654321-0987654321"
+    #   forest_name         = "corp.example.com"
+    #   netbios_domain_name = "CORP"
+    # }
+  }
+
   # Blob properties
   blob_properties = {
-    versioning_enabled       = true
-    change_feed_enabled      = true
-    last_access_time_enabled = true
+    versioning_enabled            = true
+    change_feed_enabled           = true
+    change_feed_retention_in_days = 365  # Keep change feed for 1 year
+    last_access_time_enabled      = true
 
     delete_retention_policy = {
       enabled = true
@@ -270,6 +288,10 @@ module "storage_account" {
     container_delete_retention_policy = {
       enabled = true
       days    = 30
+    }
+
+    restore_policy = {
+      days = 29  # Must be less than delete_retention_policy.days
     }
 
     cors_rules = [{

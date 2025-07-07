@@ -25,6 +25,7 @@ resource "azurerm_storage_account" "storage_account" {
   cross_tenant_replication_enabled = var.cross_tenant_replication_enabled
   default_to_oauth_authentication  = var.default_to_oauth_authentication
   allowed_copy_scope               = var.allowed_copy_scope
+  public_network_access_enabled    = var.security_settings.public_network_access_enabled
 
   # Infrastructure parameters
   large_file_share_enabled = var.large_file_share_enabled
@@ -40,10 +41,11 @@ resource "azurerm_storage_account" "storage_account" {
   dynamic "blob_properties" {
     for_each = var.account_kind != "FileStorage" ? [1] : []
     content {
-      versioning_enabled       = var.blob_properties.versioning_enabled
-      change_feed_enabled      = var.blob_properties.change_feed_enabled
-      last_access_time_enabled = var.blob_properties.last_access_time_enabled
-      default_service_version  = var.blob_properties.default_service_version
+      versioning_enabled            = var.blob_properties.versioning_enabled
+      change_feed_enabled           = var.blob_properties.change_feed_enabled
+      change_feed_retention_in_days = try(var.blob_properties.change_feed_retention_in_days, null)
+      last_access_time_enabled      = var.blob_properties.last_access_time_enabled
+      default_service_version       = var.blob_properties.default_service_version
 
       dynamic "delete_retention_policy" {
         for_each = var.blob_properties.delete_retention_policy.enabled ? [1] : []
@@ -56,6 +58,13 @@ resource "azurerm_storage_account" "storage_account" {
         for_each = var.blob_properties.container_delete_retention_policy.enabled ? [1] : []
         content {
           days = var.blob_properties.container_delete_retention_policy.days
+        }
+      }
+
+      dynamic "restore_policy" {
+        for_each = try(var.blob_properties.restore_policy, null) != null ? [var.blob_properties.restore_policy] : []
+        content {
+          days = restore_policy.value.days
         }
       }
 
@@ -174,6 +183,26 @@ resource "azurerm_storage_account" "storage_account" {
     content {
       name         = custom_domain.value.name
       use_subdomain = custom_domain.value.use_subdomain
+    }
+  }
+
+  # Azure Files Authentication
+  dynamic "azure_files_authentication" {
+    for_each = var.azure_files_authentication != null ? [var.azure_files_authentication] : []
+    content {
+      directory_type = azure_files_authentication.value.directory_type
+      
+      dynamic "active_directory" {
+        for_each = azure_files_authentication.value.active_directory != null ? [azure_files_authentication.value.active_directory] : []
+        content {
+          domain_name         = active_directory.value.domain_name
+          domain_guid         = active_directory.value.domain_guid
+          domain_sid          = active_directory.value.domain_sid
+          storage_sid         = active_directory.value.storage_sid
+          forest_name         = active_directory.value.forest_name
+          netbios_domain_name = active_directory.value.netbios_domain_name
+        }
+      }
     }
   }
 

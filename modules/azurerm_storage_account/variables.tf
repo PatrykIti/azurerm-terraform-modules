@@ -73,6 +73,7 @@ variable "security_settings" {
     allow_nested_items_to_be_public   = optional(bool, false)
     infrastructure_encryption_enabled = optional(bool, true)
     enable_advanced_threat_protection = optional(bool, true)
+    public_network_access_enabled     = optional(bool, false)
   })
   default = {}
 
@@ -145,10 +146,11 @@ variable "azure_files_authentication" {
 variable "blob_properties" {
   description = "Blob service properties including soft delete and versioning."
   type = object({
-    versioning_enabled       = optional(bool, true)
-    change_feed_enabled      = optional(bool, true)
-    last_access_time_enabled = optional(bool, false)
-    default_service_version  = optional(string)
+    versioning_enabled            = optional(bool, true)
+    change_feed_enabled           = optional(bool, true)
+    change_feed_retention_in_days = optional(number)
+    last_access_time_enabled      = optional(bool, false)
+    default_service_version       = optional(string)
     delete_retention_policy = optional(object({
       enabled = optional(bool, true)
       days    = optional(number, 7)
@@ -157,6 +159,9 @@ variable "blob_properties" {
       enabled = optional(bool, true)
       days    = optional(number, 7)
     }), { enabled = true, days = 7 })
+    restore_policy = optional(object({
+      days = number
+    }))
     cors_rules = optional(list(object({
       allowed_headers    = list(string)
       allowed_methods    = list(string)
