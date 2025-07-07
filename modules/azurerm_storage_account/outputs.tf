@@ -588,3 +588,8 @@ output "tags" {
   value       = try(azurerm_storage_account.storage_account.tags, null)
 }
 
+output "sftp_enabled" {
+  description = "Is SFTP enabled for the storage account"
+  value       = try(azurerm_storage_account.storage_account.sftp_enabled, null)
+}
+
