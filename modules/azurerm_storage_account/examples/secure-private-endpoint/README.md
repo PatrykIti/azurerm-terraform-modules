@@ -8,18 +8,26 @@ This example demonstrates how to deploy a highly secure Azure Storage Account su
 - ✅ **HTTPS-only traffic** - All communication encrypted in transit
 - ✅ **TLS 1.2 minimum** - Modern encryption protocols only
 - ✅ **Public blob access disabled** - No anonymous access to blobs
-- ✅ **Infrastructure encryption** - Double encryption at rest
-- ✅ **Customer-managed keys** - Bring your own encryption keys
+- ✅ **Infrastructure encryption** - Double encryption at rest (configurable)
+- ✅ **Customer-managed keys** - Bring your own encryption keys with rotation
 - ✅ **Network isolation** - Default deny with private endpoints
-- ✅ **Private DNS zones** - Automatic name resolution for private endpoints
+- ✅ **Private DNS zones** - Automatic name resolution for all storage services
 - ✅ **Comprehensive logging** - All operations tracked in Log Analytics
+- ✅ **Microsoft Defender** - Advanced threat protection for storage
+- ✅ **Network Security Groups** - Traffic filtering at subnet level
+- ✅ **Flow Logs** - Network traffic analysis and forensics
+- ✅ **Azure Policy** - Automated compliance enforcement
+- ✅ **Security Alerts** - Real-time threat detection
 
 ### Network Architecture
-- **Virtual Network**: Isolated network for resources
-- **Private Endpoints**: All storage services accessible only via private IPs
-- **Private DNS Zones**: Automatic DNS resolution for private endpoints
+- **Virtual Network**: Isolated network with DDoS protection (optional)
+- **Private Endpoints**: All storage services (blob, file, queue, table, dfs, web)
+- **Private DNS Zones**: Complete DNS setup for all storage services
 - **Service Endpoints**: Additional network-level security
 - **Network ACLs**: Deny all public access by default
+- **Network Security Groups**: Strict inbound/outbound rules
+- **Flow Logs**: Traffic monitoring with analytics
+- **Network Watcher**: Advanced network diagnostics
 
 ### Data Protection
 - **Blob versioning**: Automatic version history
@@ -30,14 +38,18 @@ This example demonstrates how to deploy a highly secure Azure Storage Account su
 ### Compliance Features
 - **Audit logging**: All operations logged to Log Analytics
 - **Encryption at rest**: AES-256 with customer-managed keys
+- **Key rotation**: Automatic reminders and rotation policy
 - **Access controls**: Azure AD authentication required
-- **Monitoring**: Real-time security alerts
+- **Azure Policy**: 6 built-in policies + custom policies
+- **Compliance reporting**: Automated compliance dashboards
+- **Resource locks**: Prevent accidental deletion
+- **Monitoring**: Real-time security alerts with anomaly detection
 
 ## Prerequisites
 
 - Azure subscription with appropriate permissions
 - Terraform >= 1.3.0
-- AzureRM Provider 4.35.0 (as specified in the module's [versions.tf](../../versions.tf))
+- AzureRM Provider 4.35.0 (correctly pinned to match the module version)
 - Network connectivity for private endpoints
 - Permissions to create:
   - Virtual Networks and Subnets
@@ -214,6 +226,84 @@ To adapt this example for your needs:
 - **Dependencies**: Proper dependency management ensures resources are created in order
 - **Security Layers**: Multiple security controls work together for defense in depth
 
+## Security Enhancements in This Example
+
+### 1. Advanced Threat Protection
+- Microsoft Defender for Storage with malware scanning
+- Sensitive data discovery
+- Anomaly detection for data access patterns
+- Real-time security alerts
+
+### 2. Network Security Hardening
+- Network Security Groups with restrictive rules
+- NSG Flow Logs for traffic analysis
+- Traffic Analytics integration
+- Optional DDoS Protection Standard
+
+### 3. Policy Compliance
+- 6 Azure Policy assignments for security compliance
+- Custom policy for TLS version enforcement
+- Automated compliance reporting
+- Policy violation alerts
+
+### 4. Enhanced Monitoring
+- Authentication failure alerts
+- Data exfiltration detection
+- Key Vault access monitoring
+- Security-focused Log Analytics queries
+- Application Insights for security dashboards
+
+### 5. Key Management
+- Automatic key rotation policy (90 days)
+- Key expiration reminders
+- Comprehensive Key Vault access policies
+- Key Vault diagnostic logging
+
+## Configuration Variables
+
+Key variables to customize the deployment:
+
+| Variable | Description | Default |
+|----------|-------------|---------||
+| `enable_advanced_threat_protection` | Enable Microsoft Defender | true |
+| `enable_network_flow_logs` | Enable NSG flow logs | true |
+| `enable_azure_policy_compliance` | Enable policy assignments | true |
+| `enable_infrastructure_encryption` | Double encryption at rest | true |
+| `key_rotation_reminder_days` | Days before key expiry alert | 30 |
+| `log_retention_days` | Log retention period | 90 |
+| `enable_ddos_protection` | DDoS Protection Standard | false |
+
+## Security Operations
+
+### Daily Tasks
+1. Review security alerts in Azure Security Center
+2. Check authentication failure logs
+3. Monitor data access patterns
+
+### Weekly Tasks
+1. Review policy compliance status
+2. Analyze flow logs for anomalies
+3. Check Key Vault access logs
+
+### Monthly Tasks
+1. Review and update network rules
+2. Audit user permissions
+3. Test incident response procedures
+
+### Quarterly Tasks
+1. Rotate encryption keys
+2. Review and update security policies
+3. Conduct security assessment
+
+## Cost Considerations
+
+Premium security features that incur additional costs:
+- Microsoft Defender for Storage (~$0.02/GB scanned)
+- Private Endpoints (~$0.01/hour per endpoint)
+- DDoS Protection Standard (~$2,944/month)
+- Flow Logs and Traffic Analytics
+- Extended log retention
+
 ## Cleanup
 
 To destroy all resources:
@@ -222,4 +312,7 @@ To destroy all resources:
 terraform destroy
 ```
 
-**Note**: Due to Key Vault soft-delete and purge protection, the Key Vault and keys will remain in a soft-deleted state for 90 days.
+**Note**: 
+- Due to Key Vault soft-delete and purge protection, the Key Vault and keys will remain in a soft-deleted state for 90 days
+- Resource locks must be removed before deletion
+- Some policy assignments may need manual cleanup
