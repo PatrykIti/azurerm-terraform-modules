@@ -16,7 +16,7 @@ module "storage_account" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
 
-  # Enable shared access keys for simple example
+  # Enable shared access keys for simple example to allow user access
   security_settings = {
     shared_access_key_enabled = true
   }

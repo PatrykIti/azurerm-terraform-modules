@@ -166,9 +166,16 @@ module "storage_account" {
   security_settings = {
     https_traffic_only_enabled      = true
     min_tls_version                 = "TLS1_2"
-    shared_access_key_enabled       = true # Required for Terraform to manage the resource
+    shared_access_key_enabled       = false # Disabled for OAuth authentication only
     allow_nested_items_to_be_public = false
   }
+  
+  # Additional security parameters for OAuth and copy restrictions
+  default_to_oauth_authentication  = true
+  allowed_copy_scope               = "PrivateLink"
+  cross_tenant_replication_enabled = false
+  queue_encryption_key_type        = "Account"
+  table_encryption_key_type        = "Account"
 
   # Additional encryption settings
   encryption = {
@@ -185,6 +192,9 @@ module "storage_account" {
     ip_rules                   = [] # No public IPs allowed
     virtual_network_subnet_ids = [] # Only private endpoints
   }
+  
+  # Ensure public access is completely disabled
+  public_network_access_enabled = false
 
   # Private endpoints for all services
   private_endpoints = [

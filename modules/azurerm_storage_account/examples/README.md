@@ -5,9 +5,12 @@ This directory contains examples showing how to use the Storage Account module i
 ## Available Examples
 
 - **[simple](./simple/README.md)** - Basic storage account with minimal configuration
-- **[complete](./complete/README.md)** - Comprehensive example with all features enabled
 - **[secure](./secure/README.md)** - Security-hardened configuration
 - **[secure-private-endpoint](./secure-private-endpoint/README.md)** - Private endpoint configuration
+- **[data-lake-gen2](./data-lake-gen2/README.md)** - Data Lake Storage Gen2 with SFTP and NFSv3
+- **[advanced-policies](./advanced-policies/README.md)** - Advanced policies (SAS, immutability, routing)
+- **[identity-access](./identity-access/README.md)** - Microsoft Entra ID authentication and RBAC
+- **[complete](./complete/README.md)** - Comprehensive example with all features enabled
 - **[multi-region](./multi-region/README.md)** - Multi-region deployment with replication
 
 ## Important Note on Module Source

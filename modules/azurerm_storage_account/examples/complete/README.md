@@ -1,36 +1,161 @@
 # Complete Storage Account Example
 
-This example demonstrates a comprehensive enterprise-grade Azure Storage Account deployment with all security and monitoring features enabled.
+This example demonstrates a comprehensive deployment of an Azure Storage Account with all available features and security configurations.
+
+## Overview
+
+This example creates:
+- A highly secure Storage Account with all enterprise features enabled
+- Virtual Network with subnets for private endpoints
+- Private endpoints for all storage services (blob, file, queue, table)
+- Customer Managed Key (CMK) encryption using Azure Key Vault
+- Diagnostic settings with Log Analytics integration
+- Static website hosting
+- Lifecycle management policies
+- All storage services with example resources (containers, queues, tables, file shares)
 
 ## Features Demonstrated
 
-### Security
-- **Encryption**: Customer-managed keys (CMK) with Azure Key Vault
-- **Network Security**: Private endpoints for all storage services (blob, file, queue, table)
-- **Access Control**: Disabled public access, network ACLs with IP and subnet restrictions
-- **Identity**: System and user-assigned managed identities
-- **Advanced Threat Protection**: Enabled for security monitoring
+### Core Configuration
+- **Account Kind**: StorageV2 (most feature-rich option)
+- **Replication**: ZRS (Zone-Redundant Storage)
+- **Access Tier**: Hot (optimized for frequent access)
 
-### High Availability
-- **Zone-Redundant Storage (ZRS)**: Data replicated across availability zones
-- **Versioning**: Blob versioning enabled for data protection
-- **Soft Delete**: 30-day retention for deleted blobs and containers
-
-### Monitoring & Compliance
-- **Diagnostic Settings**: Full metrics and logs to Log Analytics
-- **Change Feed**: Enabled for audit trail
-- **Last Access Time Tracking**: For lifecycle management
-- **CORS Configuration**: For web applications
-
-### Lifecycle Management
-- **Archive Policy**: Automatically tier old logs to cool/archive storage
-- **Cleanup Policy**: Delete temporary data after 7 days
-- **Version Management**: Clean up old versions after 90 days
-
-### Enterprise Features
-- **Static Website**: Configured for hosting static content
-- **SMB Multi-Channel**: Enhanced file share performance
+### Security Features
+- **HTTPS Only**: Enforces encrypted connections
+- **TLS Version**: Minimum TLS 1.2
 - **Infrastructure Encryption**: Double encryption at rest
+- **Advanced Threat Protection**: Enabled for security monitoring
+- **OAuth Authentication**: Default authentication method in Azure portal
+- **Cross-Tenant Replication**: Disabled for security
+- **Copy Scope**: Restricted to Private Link connections only
+
+### Encryption Configuration
+- **Customer Managed Keys**: Using Azure Key Vault
+- **Queue Encryption**: Account-scoped encryption keys
+- **Table Encryption**: Account-scoped encryption keys
+- **Infrastructure Encryption**: Enabled for additional security layer
+
+### Network Security
+- **Private Endpoints**: For all storage services (blob, file, queue, table)
+- **Network Rules**: Configured with secure defaults
+- **Service Endpoints**: Configured on VNet subnets
+
+### Data Protection
+- **Blob Versioning**: Enabled for version history
+- **Change Feed**: Enabled for tracking changes
+- **Soft Delete**: 30-day retention for blobs and containers
+- **Lifecycle Management**: Automated data lifecycle policies
+
+### Compliance and Governance
+- **Immutability Policy**: Configured for WORM (Write Once Read Many) compliance
+- **SAS Policy**: 90-day expiration with logging
+- **Diagnostic Settings**: Full audit logging to Log Analytics
+
+### Advanced Features
+- **Static Website**: Hosting enabled with custom error pages
+- **Large File Shares**: Support for shares >5TB
+- **Share Properties**: SMB multichannel and advanced security settings
+- **Routing**: Microsoft routing with internet endpoints published
+
+### Protocol Support
+- **Hierarchical Namespace**: Configurable for Data Lake Gen2
+- **SFTP**: Configurable for secure file transfer
+- **NFSv3**: Configurable for Linux workloads
+- **Local Users**: Configurable for non-AD authentication
+
+## Parameter Documentation
+
+### Basic Parameters
+- `name`: Globally unique storage account name
+- `resource_group_name`: Resource group for deployment
+- `location`: Azure region
+- `account_kind`: Type of storage account (StorageV2 recommended)
+- `account_tier`: Performance tier (Standard/Premium)
+- `account_replication_type`: Redundancy option (LRS/ZRS/GRS/RAGRS/GZRS/RAGZRS)
+- `access_tier`: Default access tier for blobs (Hot/Cool/Premium)
+
+### Security Settings
+- `security_settings`: Object containing:
+  - `https_traffic_only_enabled`: Enforce HTTPS (default: true)
+  - `min_tls_version`: Minimum TLS version (default: TLS1_2)
+  - `shared_access_key_enabled`: Enable/disable shared key access
+  - `allow_nested_items_to_be_public`: Control public access to blobs
+  - `infrastructure_encryption_enabled`: Enable double encryption
+  - `enable_advanced_threat_protection`: Enable ATP monitoring
+
+### New Security Parameters (Task #18)
+- `default_to_oauth_authentication`: Use OAuth in Azure portal by default
+- `cross_tenant_replication_enabled`: Allow/deny cross-tenant replication
+- `queue_encryption_key_type`: Encryption scope for queues (Service/Account)
+- `table_encryption_key_type`: Encryption scope for tables (Service/Account)
+- `allowed_copy_scope`: Restrict copy operations (AAD/PrivateLink)
+
+### Data Lake and Protocol Support (Task #18)
+- `is_hns_enabled`: Enable Hierarchical Namespace for Data Lake Gen2
+- `sftp_enabled`: Enable SFTP protocol (requires HNS)
+- `nfsv3_enabled`: Enable NFSv3 protocol for Linux workloads
+- `local_user_enabled`: Enable local user authentication
+
+### Infrastructure Parameters (Task #18)
+- `large_file_share_enabled`: Support for file shares larger than 5TB
+- `edge_zone`: Deploy to Azure Edge Zone (optional)
+
+### Compliance Features (Task #18)
+- `immutability_policy`: WORM compliance configuration
+  - `allow_protected_append_writes`: Allow append operations
+  - `state`: Policy state (Locked/Unlocked)
+  - `period_since_creation_in_days`: Retention period
+- `sas_policy`: SAS token governance
+  - `expiration_period`: Maximum SAS token lifetime
+  - `expiration_action`: Action on expiration (Log/Block)
+
+### Advanced Networking (Task #18)
+- `routing`: Traffic routing configuration
+  - `choice`: Routing preference (MicrosoftRouting/InternetRouting)
+  - `publish_internet_endpoints`: Publish internet routing endpoints
+  - `publish_microsoft_endpoints`: Publish Microsoft routing endpoints
+- `custom_domain`: Custom domain configuration
+  - `name`: Custom domain name
+  - `use_subdomain`: Enable indirect CNAME validation
+
+### File Share Properties (Task #18)
+- `share_properties`: Advanced file share configuration
+  - `retention_policy`: Soft delete retention
+  - `smb`: SMB protocol settings
+    - `versions`: Supported SMB versions
+    - `authentication_types`: Authentication methods
+    - `kerberos_ticket_encryption_type`: Kerberos encryption
+    - `channel_encryption_type`: Channel encryption
+    - `multichannel_enabled`: Enable SMB multichannel
+  - `cors_rule`: CORS configuration for file shares
+
+## Outputs
+
+This example exposes ALL available outputs from the storage account module, including:
+
+### Endpoint Outputs
+- All primary and secondary endpoints for each service
+- Internet routing endpoints
+- Microsoft routing endpoints
+- Separate endpoints for blob, file, queue, table, DFS, and web services
+
+### Configuration Outputs
+- Account configuration details
+- Security settings status
+- Feature enablement status
+- Encryption configuration
+
+### Resource Outputs
+- Created containers, queues, tables, and file shares
+- Private endpoint details
+- Identity configuration
+- Diagnostic settings
+
+### Infrastructure Outputs
+- Key Vault ID for CMK
+- Log Analytics Workspace ID
+- Virtual Network and Subnet IDs
 
 ## Prerequisites
 
@@ -39,59 +164,33 @@ This example demonstrates a comprehensive enterprise-grade Azure Storage Account
 - AzureRM Provider 4.35.0 (as specified in the module's [versions.tf](../../versions.tf))
 
 **Note**: The module uses a pinned version of the AzureRM provider (4.35.0) to ensure consistent behavior across all deployments.
-- Sufficient quota for:
-  - Storage accounts
-  - Virtual networks and subnets
-  - Private endpoints
-  - Key Vault
-  - Log Analytics workspace
 
 ## Usage
 
 ```bash
-# Initialize Terraform
 terraform init
-
-# Review the planned changes
 terraform plan
-
-# Apply the configuration
 terraform apply
 ```
 
-## Network Architecture
-
-The example creates a complete network setup:
-- Virtual Network: 10.0.0.0/16
-- Private Endpoints Subnet: 10.0.1.0/24
-- Services Subnet: 10.0.2.0/24 (with service endpoints)
-
 ## Security Considerations
 
-1. **Key Vault Access**: The example grants necessary permissions to the current user and managed identity
-2. **Network Rules**: Default action is "Deny" - adjust IP rules for your environment
-3. **Private DNS**: Automatically configured for private endpoint resolution
-4. **Shared Access Keys**: Disabled in this example - use Azure AD authentication
+1. **Initial Setup**: Network rules are set to "Allow" for initial configuration. After deployment, update to "Deny" with specific allowed IPs/subnets.
+2. **Access Keys**: Although `shared_access_key_enabled` is true (required for Terraform), use Azure AD authentication where possible.
+3. **Private Endpoints**: Ensure DNS resolution is properly configured for private endpoint connectivity.
+4. **CMK Rotation**: Implement key rotation policies in Key Vault for enhanced security.
 
 ## Cost Optimization
 
-This example includes several cost optimization features:
-- Lifecycle policies for automatic blob tiering
-- Metrics retention limited to 30 days
-- Archive tier for old logs
+1. **Lifecycle Policies**: Automatically move or delete old data to reduce costs
+2. **Access Tiers**: Use Cool tier for infrequently accessed data
+3. **Replication**: Choose appropriate replication based on availability requirements
+4. **Monitoring**: Use diagnostic settings to track and optimize usage
 
-## Customization
+## Next Steps
 
-To adapt this example for your environment:
-1. Update the `ip_rules` in network_rules with your allowed IP ranges
-2. Modify the `allowed_origins` in CORS rules for your domains
-3. Adjust lifecycle policies based on your data retention requirements
-4. Configure tags according to your organization's standards
-
-## Outputs
-
-- Storage account details (ID, name, endpoints)
-- Private endpoint IDs for each service
-- Key Vault and Log Analytics workspace IDs
-- Identity configuration
-- Connection strings (marked as sensitive)
+1. Configure network rules to restrict access
+2. Set up Azure AD authentication for applications
+3. Implement backup and disaster recovery procedures
+4. Configure advanced threat protection alerts
+5. Review and adjust lifecycle management policies

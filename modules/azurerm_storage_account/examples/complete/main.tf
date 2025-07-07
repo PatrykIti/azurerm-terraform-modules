@@ -173,13 +173,22 @@ module "storage_account" {
   account_replication_type = "ZRS"
   access_tier              = "Hot"
 
-  # Security settings
+  # Security settings - Demonstrates all available security options
   security_settings = {
-    https_traffic_only_enabled      = true
-    min_tls_version                 = "TLS1_2"
-    shared_access_key_enabled       = true # Required for Terraform to manage the resource
-    allow_nested_items_to_be_public = false
+    https_traffic_only_enabled        = true
+    min_tls_version                   = "TLS1_2"
+    shared_access_key_enabled         = true # Required for Terraform to manage the resource
+    allow_nested_items_to_be_public   = false
+    infrastructure_encryption_enabled = true
+    enable_advanced_threat_protection = true
   }
+
+  # New security and compliance parameters from task #18
+  default_to_oauth_authentication  = true  # Use OAuth by default in Azure portal
+  cross_tenant_replication_enabled = false # Disable cross-tenant replication for security
+  queue_encryption_key_type        = "Account" # Use account-scoped encryption for queues
+  table_encryption_key_type        = "Account" # Use account-scoped encryption for tables
+  allowed_copy_scope               = "PrivateLink" # Restrict copy operations
 
   # Encryption settings
   encryption = {
@@ -333,6 +342,66 @@ module "storage_account" {
     enabled            = true
     index_document     = "index.html"
     error_404_document = "404.html"
+  }
+
+  # Data Lake Gen2 and Protocol Support (new from task #18)
+  is_hns_enabled     = false # Hierarchical namespace for Data Lake Gen2
+  sftp_enabled       = false # SFTP protocol support (requires HNS)
+  nfsv3_enabled      = false # NFSv3 protocol support
+  local_user_enabled = false # Local user feature
+
+  # Infrastructure parameters (new from task #18)
+  large_file_share_enabled = true # Enable large file shares (>5TB)
+  # edge_zone = null # No edge zone deployment for this example
+
+  # Immutability policy configuration (new from task #18)
+  immutability_policy = {
+    allow_protected_append_writes = true
+    state                         = "Unlocked"
+    period_since_creation_in_days = 1
+  }
+
+  # SAS policy configuration (new from task #18)
+  sas_policy = {
+    expiration_period = "90.00:00:00" # 90 days in DD.HH:MM:SS format
+    expiration_action = "Log"         # Log when SAS tokens expire
+  }
+
+  # Routing configuration (new from task #18)
+  routing = {
+    choice                      = "MicrosoftRouting"
+    publish_internet_endpoints  = true
+    publish_microsoft_endpoints = true
+  }
+
+  # Custom domain configuration (new from task #18)
+  # Commented out as it requires a real domain
+  # custom_domain = {
+  #   name          = "storage.example.com"
+  #   use_subdomain = true
+  # }
+
+  # Share properties with SMB configuration (new from task #18)
+  share_properties = {
+    retention_policy = {
+      days = 7
+    }
+    
+    smb = {
+      versions                        = ["SMB3.0", "SMB3.1.1"]
+      authentication_types            = ["NTLMv2", "Kerberos"]
+      kerberos_ticket_encryption_type = ["RC4-HMAC", "AES-256"]
+      channel_encryption_type         = ["AES-128-CCM", "AES-128-GCM", "AES-256-GCM"]
+      multichannel_enabled            = true
+    }
+
+    cors_rule = [{
+      allowed_headers    = ["*"]
+      allowed_methods    = ["GET", "HEAD", "POST", "PUT", "DELETE"]
+      allowed_origins    = ["https://example.com"]
+      exposed_headers    = ["*"]
+      max_age_in_seconds = 3600
+    }]
   }
 
   # Storage containers

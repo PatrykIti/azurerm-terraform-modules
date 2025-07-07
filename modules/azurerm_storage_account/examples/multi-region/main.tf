@@ -60,8 +60,11 @@ module "primary_storage" {
 
   account_kind             = "StorageV2"
   account_tier             = "Standard"
-  account_replication_type = "RAGRS" # Read-access geo-redundant storage
+  account_replication_type = "GZRS" # Geo-zone-redundant storage for maximum availability
   access_tier              = "Hot"
+  
+  # Enable cross-tenant replication for disaster recovery scenarios
+  cross_tenant_replication_enabled = true
 
   # Security settings
   security_settings = {
@@ -120,6 +123,48 @@ module "primary_storage" {
     type = "SystemAssigned"
   }
 
+  # Lifecycle rules for geo-redundancy optimization
+  lifecycle_rules = [
+    {
+      name    = "optimize-geo-redundancy"
+      enabled = true
+
+      filters = {
+        blob_types   = ["blockBlob"]
+        prefix_match = ["logs/", "temp/"]
+      }
+
+      actions = {
+        base_blob = {
+          # Move to cool tier after 30 days for cost optimization
+          tier_to_cool_after_days_since_modification_greater_than = 30
+          # Delete temporary data after 90 days
+          delete_after_days_since_modification_greater_than = 90
+        }
+      }
+    },
+    {
+      name    = "archive-old-data"
+      enabled = true
+
+      filters = {
+        blob_types   = ["blockBlob"]
+        prefix_match = ["archive/", "backup/"]
+      }
+
+      actions = {
+        base_blob = {
+          # Move to cool tier after 7 days
+          tier_to_cool_after_days_since_modification_greater_than = 7
+          # Move to archive tier after 30 days
+          tier_to_archive_after_days_since_modification_greater_than = 30
+          # Keep archived data for 365 days
+          delete_after_days_since_modification_greater_than = 365
+        }
+      }
+    }
+  ]
+
   tags = {
     Environment = "Production"
     Region      = "Primary"
@@ -140,6 +185,9 @@ module "secondary_storage" {
   account_tier             = "Standard"
   account_replication_type = "ZRS"  # Zone-redundant in secondary region
   access_tier              = "Cool" # Cost optimization for secondary
+  
+  # Enable cross-tenant replication for multi-tenant DR scenarios
+  cross_tenant_replication_enabled = true
 
   # Security settings
   security_settings = {
@@ -322,8 +370,11 @@ module "replication_metadata" {
 
   account_kind             = "StorageV2"
   account_tier             = "Standard"
-  account_replication_type = "GRS" # Geo-redundant for metadata
+  account_replication_type = "RAGRS" # Read-access geo-redundant for metadata availability
   access_tier              = "Hot"
+  
+  # Enable cross-tenant replication for metadata sync across tenants
+  cross_tenant_replication_enabled = true
 
   # Tables for replication tracking
   tables = [

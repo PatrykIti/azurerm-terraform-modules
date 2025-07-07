@@ -71,6 +71,21 @@ module "storage_account" {
 - **Phase 3**: Key Vault module with enterprise security
 - **Phase 4**: Application Gateway module with SSL/WAF
 
+### Storage Account Module Examples
+
+The Storage Account module includes comprehensive examples demonstrating various use cases:
+
+| Example | Description |
+|---------|-------------|
+| [simple](./modules/azurerm_storage_account/examples/simple/) | Basic storage account with minimal configuration |
+| [secure](./modules/azurerm_storage_account/examples/secure/) | Security-hardened configuration with maximum protection |
+| [secure-private-endpoint](./modules/azurerm_storage_account/examples/secure-private-endpoint/) | Private endpoint configuration for network isolation |
+| [data-lake-gen2](./modules/azurerm_storage_account/examples/data-lake-gen2/) | Data Lake Storage Gen2 with SFTP and NFSv3 |
+| [advanced-policies](./modules/azurerm_storage_account/examples/advanced-policies/) | Advanced policies (SAS, immutability, routing) |
+| [identity-access](./modules/azurerm_storage_account/examples/identity-access/) | Microsoft Entra ID authentication and RBAC |
+| [complete](./modules/azurerm_storage_account/examples/complete/) | Full-featured storage account with all enterprise capabilities |
+| [multi-region](./modules/azurerm_storage_account/examples/multi-region/) | Multi-region setup with disaster recovery |
+
 
 ## Prerequisites
 
