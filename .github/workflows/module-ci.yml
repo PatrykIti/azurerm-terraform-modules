@@ -52,8 +52,8 @@ jobs:
     if: ${{ needs.detect-changes.outputs.modules != '[]' }}
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
       fail-fast: false
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       
@@ -73,8 +73,8 @@ jobs:
     if: ${{ needs.detect-changes.outputs.modules != '[]' }}
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
       fail-fast: false
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       
@@ -95,8 +95,8 @@ jobs:
     if: ${{ needs.detect-changes.outputs.modules != '[]' }}
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
       fail-fast: false
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       
