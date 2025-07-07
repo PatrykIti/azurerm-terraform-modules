@@ -122,9 +122,14 @@ cp "$TEMPLATES_DIR/VERSIONING.md" "$MODULE_DIR/"
 cp "$TEMPLATES_DIR/SECURITY.md" "$MODULE_DIR/"
 
 # Configuration files
-cp "$TEMPLATES_DIR/.terraform-docs.yml" "$MODULE_DIR/"
+# Don't copy .terraform-docs.yml - we'll generate it dynamically
+# cp "$TEMPLATES_DIR/.terraform-docs.yml" "$MODULE_DIR/"
 cp "$TEMPLATES_DIR/.releaserc.js" "$MODULE_DIR/"
 cp "$TEMPLATES_DIR/module-config.yml" "$MODULE_DIR/.github/"
+
+# Scripts
+cp "$TEMPLATES_DIR/generate-docs.sh" "$MODULE_DIR/"
+chmod +x "$MODULE_DIR/generate-docs.sh"
 
 # Composite Actions
 print_info "Creating composite actions..."
@@ -249,6 +254,16 @@ This directory contains additional documentation for the $DISPLAY_NAME module.
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines on adding documentation.
 EOF
+
+# Generate terraform-docs configuration
+print_info "Generating terraform-docs configuration..."
+if [[ -x "$SCRIPT_DIR/generate-terraform-docs-config.sh" ]]; then
+    "$SCRIPT_DIR/generate-terraform-docs-config.sh" "$MODULE_DIR"
+else
+    print_warning "generate-terraform-docs-config.sh not found - using default template"
+    cp "$TEMPLATES_DIR/.terraform-docs.yml.template" "$MODULE_DIR/.terraform-docs.yml"
+    replace_placeholders "$MODULE_DIR/.terraform-docs.yml"
+fi
 
 # Add to workflow choices
 print_info "Updating workflow configurations..."
