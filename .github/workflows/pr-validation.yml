@@ -285,26 +285,48 @@ jobs:
           modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | xargs -I {} dirname {} | sort -u)
           
           docs_outdated=()
+          docs_errors=()
+          
           for module in $modules; do
             if [[ -f "$module/README.md" ]]; then
               # Generate current documentation
-              terraform-docs markdown table --output-file README.md.tmp "$module"
-              
-              # Compare with existing
-              if ! diff -q "$module/README.md" "$module/README.md.tmp" > /dev/null 2>&1; then
-                docs_outdated+=("$module")
+              if terraform-docs markdown table --output-file README.md.tmp "$module" 2>/dev/null; then
+                # Compare with existing
+                if ! diff -q "$module/README.md" "$module/README.md.tmp" > /dev/null 2>&1; then
+                  docs_outdated+=("$module")
+                fi
+                rm -f "$module/README.md.tmp"
+              else
+                # terraform-docs failed - likely due to configuration error
+                docs_errors+=("$module (terraform-docs error)")
               fi
-              
-              rm -f "$module/README.md.tmp"
             else
               docs_outdated+=("$module (missing README.md)")
             fi
           done
           
+          # Report errors first
+          if [ ${#docs_errors[@]} -gt 0 ]; then
+            echo "❌ Documentation generation errors in:"
+            printf '%s\n' "${docs_errors[@]}"
+          fi
+          
+          # Then report outdated docs
           if [ ${#docs_outdated[@]} -gt 0 ]; then
             echo "❌ Documentation is outdated or missing in:"
             printf '%s\n' "${docs_outdated[@]}"
+          fi
+          
+          # Set output based on both conditions
+          if [ ${#docs_outdated[@]} -gt 0 ] || [ ${#docs_errors[@]} -gt 0 ]; then
             echo "docs_outdated=true" >> $GITHUB_OUTPUT
+            
+            # Store error details for comment
+            if [ ${#docs_errors[@]} -gt 0 ]; then
+              echo "docs_errors<<EOF" >> $GITHUB_OUTPUT
+              printf '%s\n' "${docs_errors[@]}" >> $GITHUB_OUTPUT
+              echo "EOF" >> $GITHUB_OUTPUT
+            fi
           else
             echo "✅ All documentation is up to date"
             echo "docs_outdated=false" >> $GITHUB_OUTPUT
@@ -315,19 +337,25 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const comment = `## 📚 Documentation Update Required
+            const errors = `${{ steps.docs.outputs.docs_errors }}`;
+            let comment = `## 📚 Documentation Update Required\n\n`;
             
-            The documentation for some modules is outdated or missing. Please update it by running:
+            if (errors && errors.trim()) {
+              comment += `### ❌ Documentation Generation Errors\n\n`;
+              comment += `The following modules have terraform-docs configuration errors:\n\n`;
+              comment += errors.split('\n').map(e => `- ${e}`).join('\n');
+              comment += `\n\nPlease check the \`.terraform-docs.yml\` configuration in these modules.\n\n`;
+            }
             
-            \`\`\`bash
-            # For each module that needs updating:
-            terraform-docs markdown table --output-file README.md <module-directory>
-            \`\`\`
-            
-            Or update all modules:
-            \`\`\`bash
-            find modules -name "main.tf" -exec dirname {} \\; | xargs -I {} terraform-docs markdown table --output-file {}/README.md {}
-            \`\`\``;
+            comment += `The documentation for some modules is outdated or missing. Please update it by running:\n\n`;
+            comment += `\`\`\`bash\n`;
+            comment += `# For each module that needs updating:\n`;
+            comment += `terraform-docs markdown table --output-file README.md <module-directory>\n`;
+            comment += `\`\`\`\n\n`;
+            comment += `Or update all modules:\n`;
+            comment += `\`\`\`bash\n`;
+            comment += `find modules -name "main.tf" -exec dirname {} \\; | xargs -I {} terraform-docs markdown table --output-file {}/README.md {}\n`;
+            comment += `\`\`\``;
             
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
