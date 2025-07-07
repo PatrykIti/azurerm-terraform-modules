@@ -97,6 +97,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         if command -v terraform-docs &> /dev/null; then
           terraform-docs markdown table --output-file README.md .
         fi
+        
+        # Update root README.md with module status and version
+        if [[ -x "../../scripts/update-root-readme.sh" ]]; then
+          ../../scripts/update-root-readme.sh "${MODULE_NAME}" "Storage Account" "${TAG_PREFIX}" "\${nextRelease.version}" "\${context.repo.owner}" "\${context.repo.repo}"
+        fi
       `.trim()
     }],
     
@@ -107,7 +112,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         '.github/module-config.yml',
         'examples/**/*.tf',
         'README.md',
-        '.terraform-docs.yml'
+        '.terraform-docs.yml',
+        '../../README.md'
       ],
       message: `chore(release): ${TAG_PREFIX}\${nextRelease.version} [skip ci]
 
