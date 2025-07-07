@@ -127,8 +127,8 @@ jobs:
       
       - name: Validate Terraform configurations
         run: |
-          # Find all modules
-          modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | xargs -I {} dirname {} | sort -u)
+          # Find all modules (excluding tests and fixtures)
+          modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | grep -v "/tests/" | xargs -I {} dirname {} | sort -u)
           
           validation_failed=false
           for module in $modules; do
@@ -281,8 +281,8 @@ jobs:
       - name: Check if documentation is up to date
         id: docs
         run: |
-          # Find all modules
-          modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | xargs -I {} dirname {} | sort -u)
+          # Find all modules (excluding tests and fixtures)
+          modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | grep -v "/tests/" | xargs -I {} dirname {} | sort -u)
           
           docs_outdated=()
           docs_errors=()
