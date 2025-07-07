@@ -46,8 +46,8 @@ external-checks-dir:
 #   - CKV_AZURE_33
 #   - CKV_AZURE_44
 
-# Severity threshold (LOW, MEDIUM, HIGH, CRITICAL)
-check-severity: LOW
+# Severity threshold - not supported in current Checkov version
+# check-severity: LOW
 
 # Enable secrets scanning
 enable-secret-scan-all-files: true
