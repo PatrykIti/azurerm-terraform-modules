@@ -31,7 +31,9 @@ locals {
   }
 
   # Custom domain configuration
-  # IMPORTANT: Requires manual CNAME record creation in DNS before applying
+  # WARNING: Manual DNS CNAME record creation is required for this custom domain to validate.
+  # The CNAME record must point from your custom domain to the storage account's blob endpoint.
+  # Without the DNS record, Terraform apply will fail with a validation error.
   custom_domain = {
     name          = "storage.example.com"  # Your custom domain
     use_subdomain = false                  # Set to true for indirect CNAME validation

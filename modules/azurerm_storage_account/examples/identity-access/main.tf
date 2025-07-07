@@ -9,10 +9,12 @@ terraform {
 }
 
 provider "azurerm" {
-  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
+    }
+    key_vault {
+      purge_soft_delete_on_destroy = true
     }
   }
 }
@@ -26,19 +28,84 @@ resource "azurerm_resource_group" "example" {
   location = "West Europe"
 }
 
-# Create storage account with system-assigned managed identity
-module "storage_account" {
+# ==============================================================================
+# Prerequisites: Key Vault for Customer-Managed Key Encryption
+# ==============================================================================
+
+resource "azurerm_key_vault" "example" {
+  name                = "kv-identity-${substr(md5(timestamp()), 0, 8)}"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  sku_name            = "premium"
+
+  enable_rbac_authorization       = true
+  enabled_for_disk_encryption     = true
+  enabled_for_deployment          = true
+  enabled_for_template_deployment = true
+  soft_delete_retention_days      = 7
+  purge_protection_enabled        = false # Set to true in production
+}
+
+resource "azurerm_key_vault_key" "storage" {
+  name         = "storage-encryption-key"
+  key_vault_id = azurerm_key_vault.example.id
+  key_type     = "RSA"
+  key_size     = 2048
+
+  key_opts = [
+    "decrypt",
+    "encrypt",
+    "sign",
+    "unwrapKey",
+    "verify",
+    "wrapKey",
+  ]
+
+  depends_on = [
+    azurerm_role_assignment.current_user_kv_admin
+  ]
+}
+
+# Grant current user access to Key Vault
+resource "azurerm_role_assignment" "current_user_kv_admin" {
+  scope                = azurerm_key_vault.example.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
+
+# ==============================================================================
+# User-Assigned Identity
+# ==============================================================================
+
+resource "azurerm_user_assigned_identity" "storage" {
+  name                = "uai-storage-identity-example"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+}
+
+# Grant user-assigned identity access to Key Vault
+resource "azurerm_role_assignment" "uai_kv_crypto_user" {
+  scope                = azurerm_key_vault.example.id
+  role_definition_name = "Key Vault Crypto Service Encryption User"
+  principal_id         = azurerm_user_assigned_identity.storage.principal_id
+}
+
+# ==============================================================================
+# Example 1: System-Assigned Identity Only
+# ==============================================================================
+
+module "storage_system_assigned" {
   source = "../.."
 
-  # Basic configuration
-  name                     = "stidentityexample${substr(md5(timestamp()), 0, 8)}"
+  name                     = "stsysidentity${substr(md5(timestamp()), 0, 8)}"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
   account_kind             = "StorageV2"
 
-  # Enable system-assigned managed identity
+  # System-assigned identity only
   identity = {
     type = "SystemAssigned"
   }
@@ -46,73 +113,214 @@ module "storage_account" {
   # Enable OAuth authentication as default and disable shared keys
   default_to_oauth_authentication = true
 
-  # Security settings with disabled shared access keys for true keyless authentication
   security_settings = {
     https_traffic_only_enabled        = true
     min_tls_version                   = "TLS1_2"
-    shared_access_key_enabled         = false # Keyless authentication - no shared keys
+    shared_access_key_enabled         = false # Keyless authentication
     allow_nested_items_to_be_public   = false
     infrastructure_encryption_enabled = true
-    enable_advanced_threat_protection = true
   }
 
-  # Network rules allowing only Azure services by default
   network_rules = {
     default_action = "Deny"
     bypass         = ["AzureServices"]
     ip_rules       = []
   }
+  
+  containers = {
+    "system-test" = {
+      public_access = "None"
+    }
+  }
 
   tags = {
-    example     = "identity-access"
-    environment = "development"
-    purpose     = "keyless-authentication-demo"
+    example       = "system-assigned-identity"
+    identity_type = "SystemAssigned"
   }
 }
 
-# Grant Storage Blob Data Contributor role to the current user
-# This allows testing with Azure CLI using --auth-mode login
-resource "azurerm_role_assignment" "current_user_access" {
-  scope                = module.storage_account.id
+# Grant system-assigned identity access to Key Vault (for potential future CMK use)
+resource "azurerm_role_assignment" "system_identity_kv_access" {
+  scope                = azurerm_key_vault.example.id
+  role_definition_name = "Key Vault Crypto Service Encryption User"
+  principal_id         = module.storage_system_assigned.identity.principal_id
+}
+
+# ==============================================================================
+# Example 2: User-Assigned Identity Only with CMK
+# ==============================================================================
+
+module "storage_user_assigned" {
+  source = "../.."
+
+  name                     = "stuseridentity${substr(md5(timestamp()), 0, 8)}"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  account_kind             = "StorageV2"
+
+  # User-assigned identity only
+  identity = {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.storage.id]
+  }
+
+  # Customer-managed key encryption using user-assigned identity
+  encryption = {
+    enabled                           = true
+    infrastructure_encryption_enabled = true
+    key_vault_key_id                  = azurerm_key_vault_key.storage.id
+    user_assigned_identity_id         = azurerm_user_assigned_identity.storage.id
+  }
+
+  default_to_oauth_authentication = true
+
+  security_settings = {
+    https_traffic_only_enabled        = true
+    min_tls_version                   = "TLS1_2"
+    shared_access_key_enabled         = false
+    allow_nested_items_to_be_public   = false
+    infrastructure_encryption_enabled = true
+  }
+
+  network_rules = {
+    default_action = "Deny"
+    bypass         = ["AzureServices"]
+    ip_rules       = []
+  }
+  
+  containers = {
+    "user-test" = {
+      public_access = "None"
+    }
+  }
+
+  tags = {
+    example       = "user-assigned-identity"
+    identity_type = "UserAssigned"
+  }
+
+  depends_on = [
+    azurerm_role_assignment.uai_kv_crypto_user
+  ]
+}
+
+# ==============================================================================
+# Example 3: Both System and User-Assigned Identities with CMK
+# ==============================================================================
+
+module "storage_combined" {
+  source = "../.."
+
+  name                     = "stcombidentity${substr(md5(timestamp()), 0, 8)}"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  account_kind             = "StorageV2"
+
+  # Both system and user-assigned identities
+  identity = {
+    type         = "SystemAssigned, UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.storage.id]
+  }
+
+  # Customer-managed key encryption using user-assigned identity
+  encryption = {
+    enabled                           = true
+    infrastructure_encryption_enabled = true
+    key_vault_key_id                  = azurerm_key_vault_key.storage.id
+    user_assigned_identity_id         = azurerm_user_assigned_identity.storage.id
+  }
+
+  default_to_oauth_authentication = true
+
+  security_settings = {
+    https_traffic_only_enabled        = true
+    min_tls_version                   = "TLS1_2"
+    shared_access_key_enabled         = false
+    allow_nested_items_to_be_public   = false
+    infrastructure_encryption_enabled = true
+  }
+
+  network_rules = {
+    default_action = "Deny"
+    bypass         = ["AzureServices"]
+    ip_rules       = []
+  }
+  
+  containers = {
+    "combined-test" = {
+      public_access = "None"
+    }
+    "data" = {
+      public_access = "None"
+    }
+  }
+
+  tags = {
+    example       = "combined-identities"
+    identity_type = "SystemAssigned+UserAssigned"
+  }
+
+  depends_on = [
+    azurerm_role_assignment.uai_kv_crypto_user
+  ]
+}
+
+# Grant combined account's system-assigned identity additional permissions
+resource "azurerm_role_assignment" "combined_system_identity_kv_secrets" {
+  scope                = azurerm_key_vault.example.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = module.storage_combined.identity.principal_id
+}
+
+# ==============================================================================
+# RBAC Assignments for Testing
+# ==============================================================================
+
+# Grant current user access to all storage accounts
+resource "azurerm_role_assignment" "current_user_system" {
+  scope                = module.storage_system_assigned.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = data.azurerm_client_config.current.object_id
 }
 
-# Create a container for testing identity-based access
-resource "azurerm_storage_container" "test" {
-  name                  = "test-container"
-  storage_account_name  = module.storage_account.name
-  container_access_type = "private"
-
-  depends_on = [
-    azurerm_role_assignment.current_user_access
-  ]
+resource "azurerm_role_assignment" "current_user_user" {
+  scope                = module.storage_user_assigned.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = data.azurerm_client_config.current.object_id
 }
 
-# Example: Grant the storage account's managed identity access to a Key Vault
-# This demonstrates how the storage account can access other Azure resources
-resource "azurerm_key_vault" "example" {
-  name                = "kv-identity-${substr(md5(timestamp()), 0, 8)}"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-  sku_name            = "standard"
-
-  # Enable RBAC authorization for Key Vault
-  enable_rbac_authorization = true
+resource "azurerm_role_assignment" "current_user_combined" {
+  scope                = module.storage_combined.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = data.azurerm_client_config.current.object_id
 }
 
-# Grant the storage account's managed identity access to Key Vault secrets
-resource "azurerm_role_assignment" "storage_identity_keyvault_access" {
-  scope                = azurerm_key_vault.example.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = module.storage_account.identity.principal_id
+# Example: Container-level RBAC assignment
+resource "azurerm_role_assignment" "container_level_access" {
+  scope                = "${module.storage_combined.id}/blobServices/default/containers/data"
+  role_definition_name = "Storage Blob Data Reader"
+  principal_id         = azurerm_user_assigned_identity.storage.principal_id
 }
 
-# Example of granting a specific Azure AD group access to the storage account
+# ==============================================================================
+# Example Usage Patterns
+# ==============================================================================
+
+# Example of granting a specific Azure AD group access to a storage account
 # Uncomment and update the object_id to use
 # resource "azurerm_role_assignment" "group_access" {
-#   scope                = module.storage_account.id
+#   scope                = module.storage_combined.id
 #   role_definition_name = "Storage Blob Data Reader"
 #   principal_id         = "YOUR-AZURE-AD-GROUP-OBJECT-ID"
+# }
+
+# Example of service principal access for applications
+# resource "azurerm_role_assignment" "app_access" {
+#   scope                = module.storage_user_assigned.id
+#   role_definition_name = "Storage Blob Data Contributor"
+#   principal_id         = "YOUR-APP-SERVICE-PRINCIPAL-OBJECT-ID"
 # }

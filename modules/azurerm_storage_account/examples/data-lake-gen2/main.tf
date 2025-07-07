@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 3.0.0"
     }
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = ">= 2.0.0"
+    }
     random = {
       source  = "hashicorp/random"
       version = ">= 3.1.0"
@@ -13,7 +17,6 @@ terraform {
 }
 
 provider "azurerm" {
-  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
   features {
     key_vault {
       purge_soft_delete_on_destroy = true
@@ -26,6 +29,27 @@ resource "random_string" "suffix" {
   length  = 8
   special = false
   upper   = false
+}
+
+# Current Azure AD configuration
+data "azurerm_client_config" "current" {}
+
+# Service Principal for demonstrating ACLs
+resource "azuread_application" "data_engineer" {
+  display_name = "sp-datalake-data-engineer-${random_string.suffix.result}"
+}
+
+resource "azuread_service_principal" "data_engineer" {
+  client_id = azuread_application.data_engineer.client_id
+}
+
+# Another Service Principal for demonstrating different ACL permissions
+resource "azuread_application" "data_analyst" {
+  display_name = "sp-datalake-data-analyst-${random_string.suffix.result}"
+}
+
+resource "azuread_service_principal" "data_analyst" {
+  client_id = azuread_application.data_analyst.client_id
 }
 
 # Resource Group
@@ -100,6 +124,24 @@ module "data_lake_storage" {
   # Enable system-assigned identity for secure operations
   identity = {
     type = "SystemAssigned"
+  }
+
+  # Blob properties with change feed for tracking changes
+  blob_properties = {
+    versioning_enabled            = true
+    change_feed_enabled           = true
+    change_feed_retention_in_days = 7  # Keep change feed for 7 days
+    last_access_time_enabled      = true  # Track last access time for lifecycle management
+    
+    delete_retention_policy = {
+      enabled = true
+      days    = 30
+    }
+    
+    container_delete_retention_policy = {
+      enabled = true
+      days    = 30
+    }
   }
 
   # Monitoring configuration
@@ -194,12 +236,43 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "gold" {
   }
 }
 
-# Create directory structure within filesystems
+# Create directory structure within filesystems with ACLs
 resource "azurerm_storage_data_lake_gen2_path" "bronze_raw" {
   path               = "raw-data"
   filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.bronze.name
   storage_account_id = module.data_lake_storage.id
   resource           = "directory"
+  
+  # ACL configuration - Data Engineer has full access, Data Analyst has read-only
+  # Access ACL applies to this directory
+  ace {
+    scope       = "access"
+    type        = "user"
+    id          = azuread_service_principal.data_engineer.object_id
+    permissions = "rwx"
+  }
+  
+  # Default ACL applies to new items created within this directory
+  ace {
+    scope       = "default"
+    type        = "user"
+    id          = azuread_service_principal.data_engineer.object_id
+    permissions = "rwx"
+  }
+  
+  ace {
+    scope       = "access"
+    type        = "user"
+    id          = azuread_service_principal.data_analyst.object_id
+    permissions = "r-x"
+  }
+  
+  ace {
+    scope       = "default"
+    type        = "user"
+    id          = azuread_service_principal.data_analyst.object_id
+    permissions = "r-x"
+  }
 }
 
 resource "azurerm_storage_data_lake_gen2_path" "bronze_staging" {
@@ -261,3 +334,119 @@ resource "azurerm_storage_account_local_user" "sftp_user" {
     key         = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC+... example@local"
   }
 }
+
+# RBAC Role Assignments for Data Lake
+# Storage Blob Data Owner for Data Engineer - full access
+resource "azurerm_role_assignment" "data_engineer_owner" {
+  scope                = module.data_lake_storage.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = azuread_service_principal.data_engineer.object_id
+}
+
+# Storage Blob Data Contributor for Data Analyst - read/write but no ACL management
+resource "azurerm_role_assignment" "data_analyst_contributor" {
+  scope                = module.data_lake_storage.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azuread_service_principal.data_analyst.object_id
+}
+
+# Storage Blob Data Reader for a specific container
+resource "azurerm_role_assignment" "data_analyst_reader_gold" {
+  scope                = "${module.data_lake_storage.id}/blobServices/default/containers/${azurerm_storage_data_lake_gen2_filesystem.gold.name}"
+  role_definition_name = "Storage Blob Data Reader"
+  principal_id         = azuread_service_principal.data_analyst.object_id
+}
+
+# Give current user Storage Blob Data Owner for testing
+resource "azurerm_role_assignment" "current_user_owner" {
+  scope                = module.data_lake_storage.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
+
+# Example file with specific ACL permissions
+resource "azurerm_storage_data_lake_gen2_path" "sample_data_file" {
+  path               = "raw-data/sample.csv"
+  filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.bronze.name
+  storage_account_id = module.data_lake_storage.id
+  resource           = "file"
+  
+  # File-level ACL - Data Analyst has read-only access to this specific file
+  ace {
+    scope       = "access"
+    type        = "user"
+    id          = azuread_service_principal.data_analyst.object_id
+    permissions = "r--"
+  }
+  
+  # Data Engineer has write access
+  ace {
+    scope       = "access"
+    type        = "user"
+    id          = azuread_service_principal.data_engineer.object_id
+    permissions = "rw-"
+  }
+}
+
+# ====================================================
+# Analytics Service Integration Examples (Commented Out)
+# ====================================================
+# Uncomment and configure the following resources to integrate with analytics services
+
+# Azure Databricks Integration
+# resource "azurerm_databricks_workspace" "example" {
+#   name                = "databricks-${random_string.suffix.result}"
+#   resource_group_name = azurerm_resource_group.example.name
+#   location            = azurerm_resource_group.example.location
+#   sku                 = "standard"
+#   
+#   # To mount the Data Lake in Databricks:
+#   # 1. Use the service principal credentials created above
+#   # 2. Mount using: dbutils.fs.mount(
+#   #      source = "abfss://bronze@${module.data_lake_storage.name}.dfs.core.windows.net/",
+#   #      mount_point = "/mnt/datalake/bronze",
+#   #      extra_configs = {"fs.azure.account.auth.type": "OAuth",
+#   #                       "fs.azure.account.oauth.provider.type": "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
+#   #                       "fs.azure.account.oauth2.client.id": "<service-principal-client-id>",
+#   #                       "fs.azure.account.oauth2.client.secret": "<service-principal-secret>",
+#   #                       "fs.azure.account.oauth2.client.endpoint": "https://login.microsoftonline.com/<tenant-id>/oauth2/token"})
+# }
+
+# Azure Synapse Analytics Integration
+# resource "azurerm_synapse_workspace" "example" {
+#   name                                 = "synapse${random_string.suffix.result}"
+#   resource_group_name                  = azurerm_resource_group.example.name
+#   location                             = azurerm_resource_group.example.location
+#   storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.bronze.id
+#   sql_administrator_login              = "sqladminuser"
+#   sql_administrator_login_password     = "P@ssw0rd123!"
+#   
+#   identity {
+#     type = "SystemAssigned"
+#   }
+# }
+# 
+# # Grant Synapse access to the Data Lake
+# resource "azurerm_role_assignment" "synapse_storage_access" {
+#   scope                = module.data_lake_storage.id
+#   role_definition_name = "Storage Blob Data Contributor"
+#   principal_id         = azurerm_synapse_workspace.example.identity[0].principal_id
+# }
+
+# Azure Data Factory Integration
+# resource "azurerm_data_factory" "example" {
+#   name                = "adf${random_string.suffix.result}"
+#   location            = azurerm_resource_group.example.location
+#   resource_group_name = azurerm_resource_group.example.name
+#   
+#   identity {
+#     type = "SystemAssigned"
+#   }
+# }
+# 
+# # Grant Data Factory access to the Data Lake
+# resource "azurerm_role_assignment" "adf_storage_access" {
+#   scope                = module.data_lake_storage.id
+#   role_definition_name = "Storage Blob Data Contributor"
+#   principal_id         = azurerm_data_factory.example.identity[0].principal_id
+# }

@@ -785,7 +785,7 @@
         "testStrategy": "Verify the successful removal of state files by running `git status` and ensuring no `.tfstate` files are tracked. Run `terraform validate` in each example directory to check for syntax errors. Manually inspect the codebase for the absence of hardcoded subscription IDs and for compliance with documented best practices.",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -793,7 +793,7 @@
             "description": "Create a comprehensive .gitignore file at the root of the project to prevent committing sensitive or unnecessary files, such as Terraform state files, local variables, and temporary directories.",
             "dependencies": [],
             "details": "Create a new file named `.gitignore` in the project's root directory. Add entries to ignore common Terraform artifacts and local configuration. The file should include at least the following patterns:\n\n# Terraform\n*.tfstate\n*.tfstate.*\n.terraform/\n*.tfvars\ncrash.log\n\n# General\n.DS_Store\n*~",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify that after creating the .gitignore file, running `git status` does not show any `.tfstate` or `.terraform` directories as untracked files if they exist locally. Attempt to add a `test.tfstate` file to staging (`git add test.tfstate`) and confirm that Git ignores it."
           },
           {
@@ -804,7 +804,7 @@
               1
             ],
             "details": "Execute the command `git rm --cached '**/*.tfstate'` from the root of the repository. This will unstage all files matching the pattern `*.tfstate` from the Git index across all directories. Repeat the command for `*.tfstate.*` if any backup files are present: `git rm --cached '**/*.tfstate.*'`. After running the commands, commit the changes with a clear message like 'chore: Remove tracked terraform state files'.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "After committing the changes, run `git ls-files | grep '.tfstate'` to confirm that no state files are being tracked by Git. Clone the repository to a new directory and verify that no `.tfstate` files are present."
           },
           {
@@ -815,7 +815,7 @@
               2
             ],
             "details": "Search across all `*.tf` files in the `examples/` directory for the string `subscription_id`. For each occurrence within a provider block (e.g., `provider \"azurerm\" { ... }`), delete the line containing `subscription_id`. The provider should be configured via environment variables (e.g., `ARM_SUBSCRIPTION_ID`) or other secure means, not hardcoded values.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Perform a global search for `subscription_id` within the project's `.tf` files. The search should return no results within any `provider \"azurerm\"` blocks. Manually inspect the `main.tf` or `provider.tf` file in each example directory to confirm the removal."
           },
           {
@@ -826,7 +826,7 @@
               3
             ],
             "details": "For each example directory, review the Terraform configuration (`.tf` files). Compare the resources being created in the example with the functionality of the module being called. If the module has an input variable like `create_resource_group = true`, the example should leverage that instead of defining a separate `resource \"azurerm_resource_group\" \"example\" { ... }`. Refactor any such examples to use the module's built-in capabilities.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "For each example, run `terraform plan`. The plan should show that the resources being created are appropriate for an example demonstrating the module's usage, and not redundant resources that the module itself manages. The diff for this subtask should only contain removals of redundant resource blocks from the examples."
           },
           {
@@ -837,7 +837,7 @@
               4
             ],
             "details": "Review each example against the checklist in `TERRAFORM_BEST_PRACTISES_GUIDE.md`. Key items to check include:\n1. All variables used in `main.tf` are defined in `variables.tf` with types and descriptions.\n2. Important resource attributes are exposed via `outputs.tf`.\n3. Module source points to the local path (`../../`) for development purposes.\n4. Resource and variable names follow the project's naming conventions. \nRefactor the code in each example to meet these standards.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Manually review the code changes against the `TERRAFORM_BEST_PRACTISES_GUIDE.md` document. Run `terraform validate` in each example directory to catch syntax errors. The code should be clean, well-documented, and consistent across all examples."
           }
         ]
@@ -852,7 +852,7 @@
         "dependencies": [
           23
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -860,7 +860,7 @@
             "description": "Rename the `examples/simple` directory to `examples/basic`. Create a `variables.tf` file within this new directory to define variables for `location` and `resource_group_name`. Update the `main.tf` to use these new variables and provide an example `terraform.tfvars` file.",
             "dependencies": [],
             "details": "1. Rename the directory: `git mv examples/simple examples/basic`. 2. Create `examples/basic/variables.tf` with variables for `location` and `resource_group_name`. 3. In `examples/basic/main.tf`, replace the hardcoded values for these attributes with `var.location` and `var.resource_group_name`. 4. Create an `examples/basic/terraform.tfvars.example` file to demonstrate how to populate these variables.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Navigate to the `examples/basic` directory. Run `terraform init` and `terraform validate` to ensure the configuration is syntactically correct. Run `terraform plan` with appropriate variable values to confirm the changes are correctly interpreted."
           },
           {
@@ -869,7 +869,7 @@
             "description": "In the `examples/basic/main.tf`, remove the `shared_access_key_enabled = true` setting to default to a more secure configuration. Also, demonstrate the module's capability by using the `containers` input to create a private 'logs' container.",
             "dependencies": [],
             "details": "1. Edit `examples/basic/main.tf`. 2. Remove the line `shared_access_key_enabled = true` from the module block. If it doesn't exist, ensure it's not added. 3. Add the input `containers = { \"logs\" = { access_type = \"private\" } }` to the module block to demonstrate container creation.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Navigate to the `examples/basic` directory. Run `terraform plan`. The plan should show the storage account being created with shared access key disabled and one storage container named 'logs' being created."
           },
           {
@@ -878,7 +878,7 @@
             "description": "Create a `variables.tf` file in the `examples/complete` directory. Define variables for `location`, `prefix`, and `network_ranges` to make the example more configurable. Update the `main.tf` to use these new variables and provide an example `terraform.tfvars` file.",
             "dependencies": [],
             "details": "1. Create `examples/complete/variables.tf`. 2. Define variables: `variable \"location\" {}`, `variable \"prefix\" {}`, and `variable \"network_ranges\" { type = list(string) }`. 3. In `examples/complete/main.tf`, replace the corresponding hardcoded values with `var.location`, `var.prefix`, and `var.network_ranges`. 4. Create an `examples/complete/terraform.tfvars.example` file to demonstrate usage.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Navigate to the `examples/complete` directory. Run `terraform init` and `terraform validate`. Run `terraform plan` with appropriate variable values to confirm the configuration is valid and uses the variables correctly."
           },
           {
@@ -887,7 +887,7 @@
             "description": "Update the `examples/complete/main.tf` to set a more secure default network rule by changing the `network_rules_default_action` to \"Deny\". This ensures that traffic is denied by default unless explicitly allowed.",
             "dependencies": [],
             "details": "1. Edit `examples/complete/main.tf`. 2. In the module block for the storage account, add or update the parameter to be `network_rules_default_action = \"Deny\"`.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Navigate to the `examples/complete` directory. Run `terraform plan`. The plan should show the storage account's `network_rules` block being modified to have `default_action = \"Deny\"`."
           }
         ]
@@ -902,7 +902,7 @@
         "dependencies": [
           23
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -910,7 +910,7 @@
             "description": "Update the 'secure' example by removing all comments and documentation that incorrectly reference 'Advanced Threat Protection' (ATP), as this feature is not implemented in the module.",
             "dependencies": [],
             "details": "Navigate to the `examples/secure` directory. Search through all files, particularly `main.tf` and any READMEs, for the phrases 'Advanced Threat Protection' or 'ATP'. Delete these references to clean up the example's documentation.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Manually inspect the files in the `examples/secure` directory to confirm all mentions of ATP have been removed. Run `terraform validate` to ensure no syntax errors were introduced."
           },
           {
@@ -919,7 +919,7 @@
             "description": "Enhance the 'secure' example by adding configuration blocks to demonstrate an immutability policy for a container and a SAS (Shared Access Signature) policy for the storage account.",
             "dependencies": [],
             "details": "In `examples/secure/main.tf`, update the module call. First, add a `sas_policy` argument to the module block, for example: `sas_policy = { expiration_period = \"01.00:00:00\", expiration_action = \"Log\" }`. Second, add a `containers` map to define a container with an immutability policy, for example: `containers = { \"compliance-data\" = { immutability_policy = { days_after_creation = 365, policy_mode = \"Unlocked\" } } }`.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run `terraform plan` within the `examples/secure` directory. Verify that the plan output shows the storage account being configured with the specified SAS policy and a new container being created with the correct immutability policy settings."
           },
           {
@@ -928,7 +928,7 @@
             "description": "Improve the 'advanced-policies' example by adding a `variables.tf` file for consistency and inserting a warning comment in `main.tf` to inform users about the manual DNS CNAME record creation required for custom domains.",
             "dependencies": [],
             "details": "1. In the `examples/advanced-policies` directory, create a new `variables.tf` file. Define variables used in `main.tf` (e.g., for resource group name, location) to align with best practices. 2. In `examples/advanced-policies/main.tf`, find the `custom_domain` block. Add the following comment on the line directly above it: `// WARNING: Manual DNS CNAME record creation is required for this custom domain to validate.`",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run `terraform validate` in the `examples/advanced-policies` directory to confirm the new `variables.tf` is syntactically correct. Manually review `main.tf` to ensure the warning comment is present in the correct location."
           }
         ]
@@ -943,7 +943,7 @@
         "dependencies": [
           23
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -951,7 +951,7 @@
             "description": "Create the necessary Azure AD Service Principal to represent an application or user, and provision the Azure Storage Account with the Hierarchical Namespace (HNS) enabled to function as a Data Lake Gen2. This sets the stage for applying access control.",
             "dependencies": [],
             "details": "1. Use the `azuread_service_principal` and `azuread_application` resources to create a new identity. 2. In the `azurerm_storage_account` resource, ensure the `is_hns_enabled` property is set to `true`. 3. Create an `azurerm_storage_data_lake_gen2_filesystem` resource to act as the container for the data lake paths. 4. Use `output` blocks to expose the service principal's `object_id` and the storage account `id` for use in subsequent subtasks.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run `terraform apply` and verify in the Azure Portal that the storage account is created with 'Hierarchical namespace' enabled and that the service principal exists in Azure AD."
           },
           {
@@ -962,7 +962,7 @@
               1
             ],
             "details": "1. Use the `azurerm_storage_data_lake_gen2_path` resource to create a directory (e.g., `path = \"raw\"`). Set `resource = \"directory\"`. 2. Configure the `ace` block to grant the Service Principal from subtask 1 `rwx` permissions. The `id` in the `ace` block should be the `object_id` of the service principal. 3. Add another `azurerm_storage_data_lake_gen2_path` resource to create a file inside the directory (e.g., `path = \"raw/data.csv\"`, `resource = \"file\"`). Grant this file `rw-` permissions for the same principal to show file-level control.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "After applying, use Azure Storage Explorer or Azure CLI (`az storage fs access show`) to inspect the ACLs on the newly created directory and file. Verify that the service principal's object ID is listed with the correct 'rwx' and 'rw-' permissions respectively."
           },
           {
@@ -973,7 +973,7 @@
               1
             ],
             "details": "1. Create an `azurerm_role_assignment` resource. 2. Set the `scope` to the `id` of the `azurerm_storage_account` created in subtask 1. 3. Set the `role_definition_name` to 'Storage Blob Data Contributor'. This role is commonly used for data plane operations. 4. Set the `principal_id` to the `object_id` of the service principal. 5. Add comments to the Terraform code explaining that Azure first checks RBAC for access, and if granted, then checks ACLs for the specific operation.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "In the Azure Portal, navigate to the Storage Account's 'Access control (IAM)' blade. Verify that the service principal has been assigned the 'Storage Blob Data Contributor' role. Test data access using a tool or script authenticated as the service principal to confirm it can write data as allowed by the combination of its RBAC role and ACLs."
           }
         ]
@@ -989,7 +989,7 @@
           23,
           26
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -997,7 +997,7 @@
             "description": "Modify the Data Lake Gen2 example's Terraform configuration to enable the change feed feature on the storage account and add commented-out resource blocks for Databricks or Synapse Analytics integration.",
             "dependencies": [],
             "details": "In the main Terraform file for the `data-lake-gen2` example, update the module call for the storage account to enable the change feed. Set `change_feed_enabled = true` and `change_feed_retention_in_days = 7`. Following this, add new, commented-out resource blocks for either `azurerm_databricks_workspace` or `azurerm_synapse_workspace`. Include detailed comments above these blocks explaining how a user would uncomment and configure them, and provide guidance or a link on how to mount the Data Lake storage to the chosen analytics service.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run `terraform validate` to check for syntax errors. Run `terraform plan` and inspect the output to confirm that the `change_feed_enabled` property on the storage account's blob service is being set to `true`. Manually review the Terraform file to ensure the commented-out analytics service resources and their accompanying documentation are clear and correct."
           },
           {
@@ -1008,7 +1008,7 @@
               1
             ],
             "details": "Edit the `README.md` file in the `data-lake-gen2` example directory. Create a new section, for example, 'Advanced Features'. Within this section, add subsections to: 1. Explain that the change feed feature is now enabled via the module inputs and briefly describe its use case. 2. Reference the new commented-out blocks for Databricks/Synapse in the Terraform code, explaining how to use them. 3. Add a note explaining what query acceleration is and why it's not configured via Terraform (i.e., it's an on-demand feature applied to specific queries, not the infrastructure).",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Review the modified `README.md` file. Check for clarity, correctness, and formatting. Ensure that all three topics (change feed, analytics integration, and query acceleration) are adequately explained for a user of the example."
           }
         ]
@@ -1159,7 +1159,7 @@
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-07T11:27:29.952Z",
+      "updated": "2025-07-07T12:21:39.062Z",
       "description": "Tasks for master context"
     }
   }

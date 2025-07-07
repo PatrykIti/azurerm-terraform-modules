@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.0.0"
+      version = "4.35.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -13,8 +13,14 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}
-  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+    key_vault {
+      purge_soft_delete_on_destroy = true
+    }
+  }
 }
 
 # Random suffix for unique names
@@ -24,22 +30,25 @@ resource "random_string" "suffix" {
   upper   = false
 }
 
+# Data source for current client configuration
+data "azurerm_client_config" "current" {}
+
 # Primary region resource group
 resource "azurerm_resource_group" "primary" {
-  name     = "rg-storage-multi-primary"
-  location = "West Europe"
+  name     = "rg-${var.resource_prefix}-primary"
+  location = var.primary_location
 }
 
 # Secondary region resource group
 resource "azurerm_resource_group" "secondary" {
-  name     = "rg-storage-multi-secondary"
-  location = "North Europe"
+  name     = "rg-${var.resource_prefix}-secondary"
+  location = var.secondary_location
 }
 
 # Disaster recovery region resource group
 resource "azurerm_resource_group" "dr" {
-  name     = "rg-storage-multi-dr"
-  location = "UK South"
+  name     = "rg-${var.resource_prefix}-dr"
+  location = var.dr_location
 }
 
 # Log Analytics Workspace (shared across regions)
@@ -81,10 +90,11 @@ module "primary_storage" {
     infrastructure_encryption_enabled = true
   }
 
-  # Network rules (adjust for your environment)
+  # Network rules with restrictive defaults
   network_rules = {
-    default_action = "Allow" # Adjust based on security requirements
+    default_action = var.enable_private_endpoints ? "Deny" : "Allow"
     bypass         = ["AzureServices", "Logging", "Metrics"]
+    ip_rules       = var.allowed_ip_ranges
   }
 
   # Monitoring
@@ -204,10 +214,11 @@ module "secondary_storage" {
     infrastructure_encryption_enabled = true
   }
 
-  # Network rules
+  # Network rules with restrictive defaults
   network_rules = {
-    default_action = "Allow"
+    default_action = var.enable_private_endpoints ? "Deny" : "Allow"
     bypass         = ["AzureServices", "Logging", "Metrics"]
+    ip_rules       = var.allowed_ip_ranges
   }
 
   # Monitoring
@@ -296,10 +307,11 @@ module "dr_storage" {
     infrastructure_encryption_enabled = true
   }
 
-  # Network rules
+  # Network rules with restrictive defaults
   network_rules = {
-    default_action = "Allow"
+    default_action = var.enable_private_endpoints ? "Deny" : "Allow"
     bypass         = ["AzureServices", "Logging", "Metrics"]
+    ip_rules       = var.allowed_ip_ranges
   }
 
   # Monitoring
