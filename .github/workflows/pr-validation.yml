@@ -10,6 +10,8 @@ permissions:
   statuses: write
 
 jobs:
+  # Note: We only validate PR titles, not individual commits, because this repository
+  # uses squash merge strategy. The PR title becomes the commit message after merge.
   validate-pr-title:
     name: Validate PR Title
     runs-on: ubuntu-latest
@@ -47,82 +49,6 @@ jobs:
             didn't match the configured pattern. Please ensure that the subject
             doesn't start with an uppercase character.
           validateSingleCommit: false
-
-  validate-commits:
-    name: Validate Commit Messages
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      
-      - name: Check commit messages
-        run: |
-          # Fetch the base branch to ensure we have it
-          git fetch origin ${{ github.base_ref }}
-          
-          # For PRs with many historical commits (like when merging unrelated histories),
-          # we'll be more lenient and only check commits from the last 24 hours or
-          # commits that are likely to be new to this PR
-          
-          # First, let's check if this looks like a merge of unrelated histories
-          total_commits=$(git rev-list --count origin/${{ github.base_ref }}..HEAD)
-          echo "Total commits in PR: $total_commits"
-          
-          if [ "$total_commits" -gt 50 ]; then
-            echo "⚠️ Large number of commits detected ($total_commits). This appears to be a merge of historical branches."
-            echo "Will only validate recent commits (last 7 days) to avoid blocking historical merges."
-            
-            # Get commits from the last 7 days only
-            commits=$(git log --format="%H %s" origin/${{ github.base_ref }}..HEAD --since="7 days ago" --no-merges)
-          else
-            # For normal PRs, check all commits
-            commits=$(git log --format="%H %s" origin/${{ github.base_ref }}..HEAD --no-merges)
-          fi
-          
-          # If no commits to check (all are old), just pass
-          if [ -z "$commits" ]; then
-            echo "✅ No recent commits to validate (historical merge detected)"
-            exit 0
-          fi
-          
-          # Conventional commit pattern
-          pattern="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+"
-          
-          invalid_commits=()
-          while IFS= read -r commit; do
-            [ -z "$commit" ] && continue
-            
-            hash=$(echo "$commit" | cut -d' ' -f1)
-            message=$(echo "$commit" | cut -d' ' -f2-)
-            
-            if ! echo "$message" | grep -qE "$pattern"; then
-              invalid_commits+=("$hash: $message")
-            fi
-          done <<< "$commits"
-          
-          if [ ${#invalid_commits[@]} -gt 0 ]; then
-            echo "❌ The following recent commits do not follow conventional commit format:"
-            printf '%s\n' "${invalid_commits[@]}"
-            echo ""
-            echo "Please use the conventional commit format for new commits:"
-            echo "  <type>(<scope>): <subject>"
-            echo ""
-            echo "Example: feat(storage-account): add support for private endpoints"
-            
-            # Only fail if we're not in a historical merge scenario
-            if [ "$total_commits" -le 50 ]; then
-              exit 1
-            else
-              echo ""
-              echo "⚠️ WARNING: Allowing historical commits to pass validation."
-              echo "Please ensure all NEW commits follow conventional format."
-            fi
-          else
-            echo "✅ All recent commits follow conventional commit format"
-          fi
 
   terraform-fmt:
     name: Terraform Format Check
@@ -449,7 +375,7 @@ jobs:
   quality-gates:
     name: Quality Gates Summary
     runs-on: ubuntu-latest
-    needs: [validate-pr-title, validate-commits, terraform-fmt, terraform-validate, tflint, documentation-check, security-scan]
+    needs: [validate-pr-title, terraform-fmt, terraform-validate, tflint, documentation-check, security-scan]
     if: always()
     
     steps:
@@ -460,7 +386,6 @@ jobs:
             const jobs = ${{ toJSON(needs) }};
             const jobNames = {
               'validate-pr-title': 'PR Title Validation',
-              'validate-commits': 'Commit Message Validation',
               'terraform-fmt': 'Terraform Formatting',
               'terraform-validate': 'Terraform Validation',
               'tflint': 'TFLint Analysis',
