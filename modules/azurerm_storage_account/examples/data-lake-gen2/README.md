@@ -240,3 +240,82 @@ terraform destroy
 - [Multi-protocol access on Data Lake Storage](https://docs.microsoft.com/azure/storage/blobs/data-lake-storage-multi-protocol-access)
 - [SFTP support for Azure Blob Storage](https://docs.microsoft.com/azure/storage/blobs/secure-file-transfer-protocol-support)
 - [Mount Blob Storage by using NFS 3.0](https://docs.microsoft.com/azure/storage/blobs/network-file-system-protocol-support)
+<!-- BEGIN_TF_DOCS -->
+
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
+| <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | >= 2.0.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.0.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.1.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azuread"></a> [azuread](#provider\_azuread) | 3.4.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.35.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.7.2 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_data_lake_storage"></a> [data\_lake\_storage](#module\_data\_lake\_storage) | ../../ | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azuread_application.data_analyst](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/application) | resource |
+| [azuread_application.data_engineer](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/application) | resource |
+| [azuread_service_principal.data_analyst](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/service_principal) | resource |
+| [azuread_service_principal.data_engineer](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/service_principal) | resource |
+| [azurerm_log_analytics_workspace.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
+| [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
+| [azurerm_role_assignment.current_user_owner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.data_analyst_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.data_analyst_reader_gold](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.data_engineer_owner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_storage_account_local_user.sftp_user](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) | resource |
+| [azurerm_storage_data_lake_gen2_filesystem.bronze](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_filesystem) | resource |
+| [azurerm_storage_data_lake_gen2_filesystem.gold](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_filesystem) | resource |
+| [azurerm_storage_data_lake_gen2_filesystem.silver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_filesystem) | resource |
+| [azurerm_storage_data_lake_gen2_path.bronze_raw](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) | resource |
+| [azurerm_storage_data_lake_gen2_path.bronze_staging](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) | resource |
+| [azurerm_storage_data_lake_gen2_path.gold_reports](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) | resource |
+| [azurerm_storage_data_lake_gen2_path.sample_data_dir](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) | resource |
+| [azurerm_storage_data_lake_gen2_path.silver_processed](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) | resource |
+| [azurerm_subnet.nfs_clients](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_virtual_network.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
+| [random_string.suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
+| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
+
+## Inputs
+
+No inputs.
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_bronze_filesystem_id"></a> [bronze\_filesystem\_id](#output\_bronze\_filesystem\_id) | The ID of the bronze data lake filesystem |
+| <a name="output_data_lake_features"></a> [data\_lake\_features](#output\_data\_lake\_features) | Summary of enabled Data Lake Gen2 features |
+| <a name="output_gold_filesystem_id"></a> [gold\_filesystem\_id](#output\_gold\_filesystem\_id) | The ID of the gold data lake filesystem |
+| <a name="output_nfs_mount_point"></a> [nfs\_mount\_point](#output\_nfs\_mount\_point) | The NFSv3 mount point for the storage account |
+| <a name="output_nfs_subnet_id"></a> [nfs\_subnet\_id](#output\_nfs\_subnet\_id) | The ID of the subnet configured for NFSv3 access |
+| <a name="output_primary_blob_endpoint"></a> [primary\_blob\_endpoint](#output\_primary\_blob\_endpoint) | The primary blob endpoint (also supports DFS operations) |
+| <a name="output_primary_dfs_endpoint"></a> [primary\_dfs\_endpoint](#output\_primary\_dfs\_endpoint) | The primary DFS endpoint for Data Lake Storage Gen2 |
+| <a name="output_primary_dfs_host"></a> [primary\_dfs\_host](#output\_primary\_dfs\_host) | The primary DFS host for Data Lake Storage Gen2 |
+| <a name="output_primary_dfs_internet_endpoint"></a> [primary\_dfs\_internet\_endpoint](#output\_primary\_dfs\_internet\_endpoint) | The internet routing DFS endpoint for Data Lake Storage Gen2 |
+| <a name="output_resource_group_name"></a> [resource\_group\_name](#output\_resource\_group\_name) | The name of the resource group |
+| <a name="output_sftp_endpoint"></a> [sftp\_endpoint](#output\_sftp\_endpoint) | The SFTP endpoint for the storage account |
+| <a name="output_sftp_user_name"></a> [sftp\_user\_name](#output\_sftp\_user\_name) | The name of the SFTP user |
+| <a name="output_silver_filesystem_id"></a> [silver\_filesystem\_id](#output\_silver\_filesystem\_id) | The ID of the silver data lake filesystem |
+| <a name="output_storage_account_id"></a> [storage\_account\_id](#output\_storage\_account\_id) | The ID of the Data Lake Storage Gen2 account |
+| <a name="output_storage_account_name"></a> [storage\_account\_name](#output\_storage\_account\_name) | The name of the Data Lake Storage Gen2 account |
+| <a name="output_virtual_network_name"></a> [virtual\_network\_name](#output\_virtual\_network\_name) | The name of the virtual network for NFSv3 access |
+<!-- END_TF_DOCS -->

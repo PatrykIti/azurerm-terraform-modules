@@ -172,3 +172,53 @@ terraform destroy
 ```
 
 **Note**: Immutable blobs cannot be deleted until the retention period expires.
+<!-- BEGIN_TF_DOCS -->
+
+
+## Requirements
+
+No requirements.
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.35.0 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | ../../ | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_custom_domain_name"></a> [custom\_domain\_name](#input\_custom\_domain\_name) | Custom domain name for the storage account (requires DNS CNAME record) | `string` | `""` | no |
+| <a name="input_location"></a> [location](#input\_location) | The Azure region where resources will be created | `string` | `"West Europe"` | no |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group | `string` | `"rg-storage-advanced-policies"` | no |
+| <a name="input_storage_account_name_prefix"></a> [storage\_account\_name\_prefix](#input\_storage\_account\_name\_prefix) | Prefix for the storage account name | `string` | `"stadvpolicies"` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_compliance_features"></a> [compliance\_features](#output\_compliance\_features) | Summary of compliance and security features enabled |
+| <a name="output_custom_domain"></a> [custom\_domain](#output\_custom\_domain) | The custom domain configuration |
+| <a name="output_immutability_policy_state"></a> [immutability\_policy\_state](#output\_immutability\_policy\_state) | The state of the immutability policy |
+| <a name="output_internet_routing_enabled"></a> [internet\_routing\_enabled](#output\_internet\_routing\_enabled) | Whether internet routing is enabled |
+| <a name="output_primary_blob_endpoint"></a> [primary\_blob\_endpoint](#output\_primary\_blob\_endpoint) | The primary blob endpoint |
+| <a name="output_primary_dfs_endpoint"></a> [primary\_dfs\_endpoint](#output\_primary\_dfs\_endpoint) | The primary Data Lake Storage Gen2 endpoint |
+| <a name="output_routing_choice"></a> [routing\_choice](#output\_routing\_choice) | The routing preference choice |
+| <a name="output_sas_expiration_period"></a> [sas\_expiration\_period](#output\_sas\_expiration\_period) | The SAS token expiration period |
+| <a name="output_smb_multichannel_enabled"></a> [smb\_multichannel\_enabled](#output\_smb\_multichannel\_enabled) | Whether SMB Multichannel is enabled |
+| <a name="output_storage_account_id"></a> [storage\_account\_id](#output\_storage\_account\_id) | The ID of the storage account |
+| <a name="output_storage_account_name"></a> [storage\_account\_name](#output\_storage\_account\_name) | The name of the storage account |
+<!-- END_TF_DOCS -->

@@ -240,3 +240,69 @@ The storage account's managed identity can access other services:
 - [Azure Storage RBAC roles](https://learn.microsoft.com/azure/storage/blobs/authorize-access-azure-active-directory)
 - [Managed identities for Azure resources](https://learn.microsoft.com/azure/active-directory/managed-identities-azure-resources/overview)
 - [Azure CLI storage commands](https://learn.microsoft.com/cli/azure/storage)
+<!-- BEGIN_TF_DOCS -->
+
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.35.0 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_storage_combined"></a> [storage\_combined](#module\_storage\_combined) | ../.. | n/a |
+| <a name="module_storage_system_assigned"></a> [storage\_system\_assigned](#module\_storage\_system\_assigned) | ../.. | n/a |
+| <a name="module_storage_user_assigned"></a> [storage\_user\_assigned](#module\_storage\_user\_assigned) | ../.. | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_key_vault.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) | resource |
+| [azurerm_key_vault_key.storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_key) | resource |
+| [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
+| [azurerm_role_assignment.combined_system_identity_kv_secrets](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.container_level_access](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.current_user_combined](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.current_user_kv_admin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.current_user_system](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.current_user_user](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.system_identity_kv_access](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.uai_kv_crypto_user](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_user_assigned_identity.storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
+| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
+
+## Inputs
+
+No inputs.
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_combined_storage_account_id"></a> [combined\_storage\_account\_id](#output\_combined\_storage\_account\_id) | The ID of the combined identities storage account |
+| <a name="output_combined_storage_account_name"></a> [combined\_storage\_account\_name](#output\_combined\_storage\_account\_name) | The name of the combined identities storage account |
+| <a name="output_combined_system_principal_id"></a> [combined\_system\_principal\_id](#output\_combined\_system\_principal\_id) | The principal ID of the system-assigned identity for the combined account |
+| <a name="output_key_vault_id"></a> [key\_vault\_id](#output\_key\_vault\_id) | The ID of the Key Vault used for customer-managed keys |
+| <a name="output_key_vault_name"></a> [key\_vault\_name](#output\_key\_vault\_name) | The name of the Key Vault |
+| <a name="output_storage_encryption_key_id"></a> [storage\_encryption\_key\_id](#output\_storage\_encryption\_key\_id) | The ID of the storage encryption key |
+| <a name="output_system_assigned_principal_id"></a> [system\_assigned\_principal\_id](#output\_system\_assigned\_principal\_id) | The principal ID of the system-assigned identity |
+| <a name="output_system_assigned_storage_account_id"></a> [system\_assigned\_storage\_account\_id](#output\_system\_assigned\_storage\_account\_id) | The ID of the system-assigned identity storage account |
+| <a name="output_system_assigned_storage_account_name"></a> [system\_assigned\_storage\_account\_name](#output\_system\_assigned\_storage\_account\_name) | The name of the system-assigned identity storage account |
+| <a name="output_system_assigned_tenant_id"></a> [system\_assigned\_tenant\_id](#output\_system\_assigned\_tenant\_id) | The tenant ID of the system-assigned identity |
+| <a name="output_testing_instructions"></a> [testing\_instructions](#output\_testing\_instructions) | Instructions for testing identity-based access |
+| <a name="output_user_assigned_identity_id"></a> [user\_assigned\_identity\_id](#output\_user\_assigned\_identity\_id) | The ID of the user-assigned identity |
+| <a name="output_user_assigned_identity_principal_id"></a> [user\_assigned\_identity\_principal\_id](#output\_user\_assigned\_identity\_principal\_id) | The principal ID of the user-assigned identity |
+| <a name="output_user_assigned_storage_account_id"></a> [user\_assigned\_storage\_account\_id](#output\_user\_assigned\_storage\_account\_id) | The ID of the user-assigned identity storage account |
+| <a name="output_user_assigned_storage_account_name"></a> [user\_assigned\_storage\_account\_name](#output\_user\_assigned\_storage\_account\_name) | The name of the user-assigned identity storage account |
+<!-- END_TF_DOCS -->
