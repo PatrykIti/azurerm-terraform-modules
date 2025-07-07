@@ -180,3 +180,73 @@ output "cross_tenant_replication_status" {
     }
   }
 }
+
+output "private_endpoints" {
+  description = "Private endpoint configuration when enabled"
+  value = var.enable_private_endpoints ? {
+    primary_blob_endpoint = {
+      id   = azurerm_private_endpoint.primary_blob[0].id
+      name = azurerm_private_endpoint.primary_blob[0].name
+      ip   = azurerm_private_endpoint.primary_blob[0].private_service_connection[0].private_ip_address
+    }
+    secondary_blob_endpoint = {
+      id   = azurerm_private_endpoint.secondary_blob[0].id
+      name = azurerm_private_endpoint.secondary_blob[0].name
+      ip   = azurerm_private_endpoint.secondary_blob[0].private_service_connection[0].private_ip_address
+    }
+    dr_blob_endpoint = {
+      id   = azurerm_private_endpoint.dr_blob[0].id
+      name = azurerm_private_endpoint.dr_blob[0].name
+      ip   = azurerm_private_endpoint.dr_blob[0].private_service_connection[0].private_ip_address
+    }
+  } : null
+}
+
+output "replication_automation" {
+  description = "Replication automation configuration when enabled"
+  value = var.enable_replication_automation ? {
+    logic_app_name = azurerm_logic_app_standard.replication[0].name
+    logic_app_id   = azurerm_logic_app_standard.replication[0].id
+    schedule       = var.replication_schedule
+  } : null
+}
+
+output "monitoring_configuration" {
+  description = "Monitoring and alerting configuration"
+  value = var.enable_monitoring_alerts ? {
+    action_group_id      = azurerm_monitor_action_group.replication[0].id
+    log_analytics_id     = azurerm_log_analytics_workspace.shared.id
+    application_insights = azurerm_application_insights.replication[0].id
+    alerts = {
+      replication_lag_threshold_minutes = var.replication_lag_threshold_minutes
+      primary_availability_alert        = azurerm_monitor_metric_alert.primary_availability[0].name
+      replication_lag_alert             = azurerm_monitor_metric_alert.primary_replication_lag[0].name
+    }
+  } : {
+    log_analytics_id = azurerm_log_analytics_workspace.shared.id
+  }
+}
+
+output "deployment_instructions" {
+  description = "Instructions for deploying and configuring the multi-region storage"
+  value = <<-EOT
+    Multi-Region Storage Deployment Complete!
+    
+    Next Steps:
+    1. Configure private endpoints: terraform apply -var="enable_private_endpoints=true"
+    2. Enable replication automation: terraform apply -var="enable_replication_automation=true"
+    3. Configure monitoring alerts: terraform apply -var="enable_monitoring_alerts=true"
+    
+    Testing Failover:
+    az storage account failover --name ${module.primary_storage.name} --resource-group ${azurerm_resource_group.primary.name}
+    
+    Monitoring:
+    - Log Analytics Workspace: ${azurerm_log_analytics_workspace.shared.name}
+    - View replication lag metrics in Azure Portal
+    
+    Security Recommendations:
+    - Enable private endpoints for production use
+    - Configure allowed IP ranges for public access
+    - Implement customer-managed keys for encryption
+  EOT
+}

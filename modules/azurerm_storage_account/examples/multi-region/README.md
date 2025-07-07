@@ -76,21 +76,38 @@ This example demonstrates a comprehensive multi-region Azure Storage Account dep
 
 ### Phase 1: Initial Deployment
 ```bash
-# Deploy all storage accounts
+# Deploy all storage accounts with basic configuration
 terraform init
 terraform plan
 terraform apply
 ```
 
-### Phase 2: Configure Replication
-1. Set up cross-region blob copy policies
-2. Configure event-based replication using metadata queues
-3. Implement replication monitoring dashboards
+### Phase 2: Enable Private Endpoints (Recommended for Production)
+```bash
+# Enable private endpoints for network isolation
+terraform apply -var="enable_private_endpoints=true"
+```
 
-### Phase 3: Test Failover
+### Phase 3: Configure Replication Automation
+```bash
+# Enable Logic App for automated replication
+terraform apply -var="enable_replication_automation=true"
+```
+
+### Phase 4: Enable Monitoring and Alerts
+```bash
+# Configure comprehensive monitoring
+terraform apply -var="enable_monitoring_alerts=true"
+```
+
+### Phase 5: Test Failover
 1. Verify read access to secondary endpoints
-2. Test manual failover procedures
+2. Test manual failover procedures:
+   ```bash
+   az storage account failover --name <primary-storage-name> --resource-group <rg-name>
+   ```
 3. Validate data consistency across regions
+4. Monitor replication lag alerts
 
 ## Replication Patterns
 
@@ -158,16 +175,18 @@ terraform apply
 
 ## Security Considerations
 
-- **Encryption**: All storage accounts use Microsoft-managed keys
-- **Network**: Implement private endpoints for production
-- **Access**: Use managed identities for cross-account access
-- **Monitoring**: Enable Advanced Threat Protection
+- **Encryption**: All storage accounts use Microsoft-managed keys with infrastructure encryption
+- **Network**: Private endpoints available with full VNet isolation
+- **Access**: System-assigned managed identities for all storage accounts
+- **Monitoring**: Comprehensive alerts for availability, errors, and replication lag
+- **Network Rules**: Restrictive by default when private endpoints are enabled
+- **IP Whitelisting**: Configure allowed IP ranges via variables
 
 ## Prerequisites
 
 - Azure subscription with multi-region access
 - Terraform >= 1.3.0
-- AzureRM Provider 4.35.0 (as specified in the module's [versions.tf](../../versions.tf))
+- AzureRM Provider 4.35.0 (correctly pinned to match the module version)
 - Sufficient storage quota in all regions
 - Network connectivity between regions (for private endpoints)
 - Budget approval for multi-region storage costs
@@ -277,8 +296,51 @@ terraform apply
 
 1. **Regular Testing**: Test failover procedures quarterly
 2. **Documentation**: Maintain runbooks for DR procedures
-3. **Automation**: Implement automated replication monitoring
+3. **Automation**: Use Logic App or Azure Function for replication orchestration
 4. **Cost Review**: Regular review of storage tiers and lifecycle policies
 5. **Compliance**: Ensure retention meets regulatory requirements
 6. **Cross-Tenant Security**: Implement proper RBAC and network controls
-7. **Monitoring**: Set up alerts for replication lag and failures
+7. **Monitoring**: Configure alerts for:
+   - Replication lag exceeding threshold (default: 30 minutes)
+   - Storage availability dropping below 99.9%
+   - High transaction error rates
+   - Storage capacity exceeding 80%
+
+## Enhanced Features in This Example
+
+### 1. Private Endpoints
+- Complete VNet isolation for all storage accounts
+- Cross-region VNet peering for secure replication
+- Private DNS zones for seamless name resolution
+- Support for blob, table, and queue endpoints
+
+### 2. Replication Automation
+- Logic App-based replication orchestration
+- Configurable replication schedule (CRON expression)
+- System-assigned identity with proper RBAC
+- Alternative Azure Function implementation (commented)
+
+### 3. Advanced Monitoring
+- Comprehensive metric alerts
+- Log Analytics queries for analysis
+- Application Insights integration
+- Saved searches for common scenarios
+
+### 4. Security Hardening
+- Network rules deny by default with private endpoints
+- Infrastructure encryption enabled
+- Managed identities for all operations
+- IP whitelisting support
+
+## Configuration Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------||
+| `primary_location` | Primary region | West Europe |
+| `secondary_location` | Secondary region | North Europe |
+| `dr_location` | DR region | UK South |
+| `enable_private_endpoints` | Enable private endpoints | false |
+| `enable_replication_automation` | Enable Logic App replication | false |
+| `enable_monitoring_alerts` | Enable monitoring alerts | true |
+| `replication_lag_threshold_minutes` | Alert threshold for lag | 30 |
+| `allowed_ip_ranges` | Allowed public IPs | [] |

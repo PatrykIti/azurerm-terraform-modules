@@ -176,12 +176,28 @@ module "primary_storage" {
     }
   ]
 
-  tags = {
+  # Containers for primary storage
+  containers = {
+    "production-data" = {
+      public_access = "None"
+    }
+    "logs" = {
+      public_access = "None"
+    }
+    "temp" = {
+      public_access = "None"
+    }
+    "archive" = {
+      public_access = "None"
+    }
+  }
+
+  tags = merge(var.tags, {
     Environment = "Production"
     Region      = "Primary"
     Role        = "Active"
     DR          = "Enabled"
-  }
+  })
 }
 
 # Secondary Region Storage Account (Zone redundant)
@@ -272,12 +288,22 @@ module "secondary_storage" {
     type = "SystemAssigned"
   }
 
-  tags = {
+  # Containers for secondary storage
+  containers = {
+    "backup-data" = {
+      public_access = "None"
+    }
+    "replicated-logs" = {
+      public_access = "None"
+    }
+  }
+
+  tags = merge(var.tags, {
     Environment = "Production"
     Region      = "Secondary"
     Role        = "Backup"
     DR          = "Target"
-  }
+  })
 }
 
 # Disaster Recovery Storage Account (Archive focused)
@@ -365,12 +391,22 @@ module "dr_storage" {
     type = "SystemAssigned"
   }
 
-  tags = {
+  # Containers for DR storage
+  containers = {
+    "dr-archive" = {
+      public_access = "None"
+    }
+    "compliance-backup" = {
+      public_access = "None"
+    }
+  }
+
+  tags = merge(var.tags, {
     Environment = "Production"
     Region      = "DR"
     Role        = "Archive"
     DR          = "Backup"
-  }
+  })
 }
 
 # Storage account for cross-region replication metadata
@@ -424,11 +460,18 @@ module "replication_metadata" {
     }
   }
 
-  tags = {
+  # Containers for replication tracking
+  containers = {
+    "replication-logs" = {
+      public_access = "None"
+    }
+  }
+
+  tags = merge(var.tags, {
     Environment = "Production"
     Purpose     = "ReplicationMetadata"
     Critical    = "Yes"
-  }
+  })
 }
 
 # Outputs for cross-region replication setup
