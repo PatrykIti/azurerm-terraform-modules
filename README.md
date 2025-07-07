@@ -5,6 +5,9 @@
 [![Azure](https://img.shields.io/badge/Azure-0078D4?logo=microsoft-azure&logoColor=white)](https://azure.microsoft.com/)
 [![AzureRM Provider](https://img.shields.io/badge/AzureRM_Provider-4.35.0-blue?logo=terraform)](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0)
 
+<!-- MODULE BADGES START -->
+<!-- MODULE BADGES END -->
+
 A comprehensive collection of production-ready Terraform modules for Azure infrastructure, following HashiCorp best practices and enterprise security standards.
 
 ## 📚 Quick Navigation
