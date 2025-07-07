@@ -300,7 +300,7 @@ resource "azurerm_storage_data_lake_gen2_path" "gold_reports" {
 resource "azurerm_storage_account_local_user" "sftp_user" {
   name                 = "sftpuser"
   storage_account_id   = module.data_lake_storage.id
-  ssh_key_enabled      = true
+  ssh_key_enabled      = false # Disabled due to SSH key validation issues
   ssh_password_enabled = true
 
   permission_scope {
@@ -329,11 +329,12 @@ resource "azurerm_storage_account_local_user" "sftp_user" {
     resource_name = azurerm_storage_data_lake_gen2_filesystem.silver.name
   }
 
-  ssh_authorized_key {
-    description = "Example SSH key for SFTP access"
-    # Note: Replace with your actual SSH public key
-    key         = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC+nKc5iDGUw5+iNWeNn2e7KyEHgaS3aHmxjJG4kAMLw7M4rXAMPnvHbOLnCgdqDMGdRvM8oT1F8kBNwT7ByBqcXxHEaLNqPFqb8qLXdrkO1YYNDd5XBLgD8C4QfoAvBEp3qQkqdB5D7Vxjok4nTg1M0BmksNLhLjqrr6dmbU8rKZnkNmPyKSjJAwMmFe5m0xvQmSiZkKIWRhYHC+wLdGQPW8qGPmm7Y6fPO1xj2HlhV/uX6BnYJ7xUl6ISUr1PwaH3aXJQ7V1IaJp7bV6HkwJk5BpHtR5YMfJ1gWEJcAJNpRjhTNHQG8H7Ie0xQ3MHqpXtBPNA6fwbMhqNkXxdOy7T/dQ2x5BQGTEmm5wAkCv3qFSQjCJpQjIbG8Me4OzGf8+2Dd7KgYEi0CZ3cRw3mVRdPT7BqI1bHDZHwCrVvD0UvPckmnGLkGE4HeWqCYnVxikYqhZIjJ8J2bPqH7KQhPaRse0j00Tw3RHJGjnHqsDQwJoFMLN5aT4N6J9YNqE= example@local"
-  }
+  # SSH key disabled due to validation issues with AzureRM provider
+  # To enable SSH key authentication, uncomment below and provide a valid SSH public key
+  # ssh_authorized_key {
+  #   description = "Example SSH key for SFTP access"
+  #   key         = "ssh-rsa AAAAB3Nza..."
+  # }
 }
 
 # RBAC Role Assignments for Data Lake
