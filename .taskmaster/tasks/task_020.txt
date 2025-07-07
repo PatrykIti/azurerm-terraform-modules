@@ -1,0 +1,22 @@
+# Task ID: 20
+# Title: Update and Expand Storage Account Module Examples
+# Status: pending
+# Dependencies: 6, 18, 19
+# Priority: high
+# Description: Update the five existing azurerm_storage_account module examples and create two new ones (data-lake-gen2, advanced-policies) to demonstrate the new features, parameters, and outputs introduced in tasks #18 and #19. Ensure all examples have updated READMEs and follow best practices.
+# Details:
+This task involves a comprehensive overhaul of the storage account module's examples. For all 7 examples, ensure prerequisite resources like resource groups are defined within the example's Terraform configuration. Update README.md files to reflect the changes and intended use case. Where applicable, demonstrate access patterns using Microsoft Entra ID roles instead of keys. 
+1. **Update `simple` example**: Keep it minimal but explicitly set `shared_access_key_enabled = true` to showcase this control. 
+2. **Update `complete` example**: Integrate a wide range of new parameters from Task #18, such as `default_to_oauth_authentication`, and reference the new module outputs from Task #19. 
+3. **Update `secure` and `secure-private-endpoint` examples**: Enhance with new security parameters like `allowed_copy_scope` and `min_tls_version`. 
+4. **Update `multi-region` example**: Verify geo-redundancy settings and incorporate `cross_tenant_replication_enabled`. 
+5. **Create new `data-lake-gen2` example**: This example must set `is_hns_enabled = true` and demonstrate the configuration of `sftp_enabled` and `nfsv3_enabled`. 
+6. **Create new `advanced-policies` example**: This example should showcase the new complex object variables for `sas_policy` and `immutability_policy`, and also configure features like `routing_preference` and `custom_domain`.
+
+# Test Strategy:
+For each of the 7 examples (5 updated, 2 new), perform the following steps: 
+1. Navigate to the example's directory (e.g., `examples/storage_account/data-lake-gen2`). 
+2. Run `terraform init` and `terraform apply` to deploy the resources. Verify the deployment completes successfully without errors. 
+3. For each example, perform a spot-check in the Azure Portal to confirm the specific features are configured as expected. For instance, check that SFTP is enabled for the `data-lake-gen2` example and that the SAS policy is applied for the `advanced-policies` example. 
+4. Review the generated `README.md` for each example to ensure it is clear, accurate, and reflects the configuration. 
+5. Run `terraform destroy` for each example and verify that all created resources are removed cleanly.

@@ -45,8 +45,12 @@ module "storage_account" {
 ## Examples
 
 - [Simple](examples/simple) - Basic storage account configuration
-- [Complete](examples/complete) - Full-featured storage account with all enterprise capabilities  
 - [Secure](examples/secure) - Maximum security configuration
+- [Secure Private Endpoint](examples/secure-private-endpoint) - Private endpoint configuration for network isolation
+- [Data Lake Gen2](examples/data-lake-gen2) - Data Lake Storage Gen2 with SFTP and NFSv3
+- [Advanced Policies](examples/advanced-policies) - Advanced policies (SAS, immutability, routing)
+- [Identity Access](examples/identity-access) - Microsoft Entra ID authentication and RBAC
+- [Complete](examples/complete) - Full-featured storage account with all enterprise capabilities  
 - [Multi-Region](examples/multi-region) - Multi-region setup with disaster recovery
 
 ## Requirements

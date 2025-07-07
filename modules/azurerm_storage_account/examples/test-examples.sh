@@ -93,6 +93,9 @@ examples=(
     "simple:$BASE_PATH/simple"
     "secure-private-endpoint:$BASE_PATH/secure-private-endpoint"
     "secure:$BASE_PATH/secure"
+    "data-lake-gen2:$BASE_PATH/data-lake-gen2"
+    "advanced-policies:$BASE_PATH/advanced-policies"
+    "identity-access:$BASE_PATH/identity-access"
     "complete:$BASE_PATH/complete"
     "multi-region:$BASE_PATH/multi-region"
 )

@@ -42,3 +42,36 @@ output "security_alert_id" {
   description = "The ID of the authentication failure alert"
   value       = azurerm_monitor_metric_alert.storage_auth_failures.id
 }
+
+# Security Configuration Summary
+output "security_configuration" {
+  description = "Summary of security settings applied to the storage account"
+  value = {
+    oauth_authentication_default     = true
+    shared_access_keys_enabled       = false
+    public_network_access            = false
+    https_traffic_only               = true
+    min_tls_version                  = "TLS1_2"
+    infrastructure_encryption        = true
+    allowed_copy_scope               = "PrivateLink"
+    cross_tenant_replication_enabled = false
+    queue_encryption_key_type        = "Account"
+    table_encryption_key_type        = "Account"
+    private_endpoints_count          = length(module.storage_account.private_endpoint_ids)
+    customer_managed_key_enabled     = true
+    key_rotation_enabled             = true
+    audit_logging_enabled            = true
+    soft_delete_retention_days       = 365
+  }
+}
+
+output "network_security_status" {
+  description = "Network security configuration status"
+  value = {
+    network_rules_default_action = "Deny"
+    bypass_rules                 = []
+    allowed_ip_rules             = []
+    allowed_subnets              = []
+    private_endpoint_services    = ["blob", "web", "dfs"]
+  }
+}

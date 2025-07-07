@@ -189,6 +189,9 @@ module "secure_storage" {
     shared_access_key_enabled       = true # Required for Terraform to manage the resource
     allow_nested_items_to_be_public = false
   }
+  
+  # Note: public_network_access_enabled = false would be set here if the module supported it
+  # Currently, network isolation is achieved through network_rules with default_action = "Deny"
 
   # Encryption settings
   encryption = {

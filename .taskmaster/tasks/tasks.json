@@ -578,11 +578,108 @@
             "testStrategy": "Deploy an example with one or more diagnostic settings configured. Run `terraform output diagnostic_settings` and validate that the output is a map containing the correct ID and name for each setting."
           }
         ]
+      },
+      {
+        "id": 20,
+        "title": "Update and Expand Storage Account Module Examples",
+        "description": "Update the five existing azurerm_storage_account module examples and create two new ones (data-lake-gen2, advanced-policies) to demonstrate the new features, parameters, and outputs introduced in tasks #18 and #19. Ensure all examples have updated READMEs and follow best practices.",
+        "details": "This task involves a comprehensive overhaul of the storage account module's examples. For all 7 examples, ensure prerequisite resources like resource groups are defined within the example's Terraform configuration. Update README.md files to reflect the changes and intended use case. Where applicable, demonstrate access patterns using Microsoft Entra ID roles instead of keys. \n1. **Update `simple` example**: Keep it minimal but explicitly set `shared_access_key_enabled = true` to showcase this control. \n2. **Update `complete` example**: Integrate a wide range of new parameters from Task #18, such as `default_to_oauth_authentication`, and reference the new module outputs from Task #19. \n3. **Update `secure` and `secure-private-endpoint` examples**: Enhance with new security parameters like `allowed_copy_scope` and `min_tls_version`. \n4. **Update `multi-region` example**: Verify geo-redundancy settings and incorporate `cross_tenant_replication_enabled`. \n5. **Create new `data-lake-gen2` example**: This example must set `is_hns_enabled = true` and demonstrate the configuration of `sftp_enabled` and `nfsv3_enabled`. \n6. **Create new `advanced-policies` example**: This example should showcase the new complex object variables for `sas_policy` and `immutability_policy`, and also configure features like `routing_preference` and `custom_domain`.",
+        "testStrategy": "For each of the 7 examples (5 updated, 2 new), perform the following steps: \n1. Navigate to the example's directory (e.g., `examples/storage_account/data-lake-gen2`). \n2. Run `terraform init` and `terraform apply` to deploy the resources. Verify the deployment completes successfully without errors. \n3. For each example, perform a spot-check in the Azure Portal to confirm the specific features are configured as expected. For instance, check that SFTP is enabled for the `data-lake-gen2` example and that the SAS policy is applied for the `advanced-policies` example. \n4. Review the generated `README.md` for each example to ensure it is clear, accurate, and reflects the configuration. \n5. Run `terraform destroy` for each example and verify that all created resources are removed cleanly.",
+        "status": "pending",
+        "dependencies": [
+          6,
+          18,
+          19
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Update `simple` Storage Account Example",
+            "description": "Update the `simple` example to be a minimal, functional demonstration of the module. It should explicitly set `shared_access_key_enabled = true` and include basic container, queue, table, and share resources to confirm functionality.",
+            "dependencies": [],
+            "details": "In `examples/simple/main.tf`, ensure an `azurerm_resource_group` is defined locally for the example to be self-contained. In the module call, explicitly set `shared_access_key_enabled = true`. Add `azurerm_storage_container`, `azurerm_storage_queue`, `azurerm_storage_table`, and `azurerm_storage_share` resources that use the storage account name from the module's output. Update `outputs.tf` to expose essential resource IDs and endpoints. Refresh the `README.md` to reflect these changes and the example's purpose.\n<info added on 2025-07-07T06:23:09.083Z>\nMANDATORY: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) and section 9: Terraform Best Practices Guide (lines 112-122). Key principles to apply: Keep simple example minimal but functional, ensure shared_access_key_enabled=true for user access, and use resource blocks for prerequisites. Document your observations and what you implemented in the subtask notes.\n</info added on 2025-07-07T06:23:09.083Z>",
+            "status": "done",
+            "testStrategy": "Run `terraform apply` on the example directory. Verify the storage account is created with the shared access key enabled in the Azure Portal. Confirm the container, queue, table, and share are also created."
+          },
+          {
+            "id": 2,
+            "title": "Update `complete` Storage Account Example",
+            "description": "Overhaul the `complete` example to serve as a comprehensive showcase of the module's capabilities, integrating a wide range of new parameters from Task #18 and referencing new outputs from Task #19.",
+            "dependencies": [],
+            "details": "In `examples/complete/main.tf`, expand the module block to include new parameters such as `default_to_oauth_authentication`, advanced blob properties (versioning, change feed, last access time), and detailed network rules. Update the `outputs.tf` file to expose all new module outputs introduced in Task #19. Thoroughly document each configured parameter and its purpose in the `README.md`.\n<info added on 2025-07-07T06:23:38.224Z>\nMANDATORY: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9), and section 9: Terraform Best Practices Guide (lines 112-122). Key principles: Showcase comprehensive features from task #18, use all new outputs from task #19, document each parameter's purpose. Use resource blocks for prerequisites. Document your observations and implementation notes.\n</info added on 2025-07-07T06:23:38.224Z>",
+            "status": "done",
+            "testStrategy": "Run `terraform plan` to verify all new parameters are correctly passed. Run `terraform apply` and inspect the created storage account in the Azure Portal to confirm that all settings (e.g., blob versioning, network rules) have been applied as configured."
+          },
+          {
+            "id": 3,
+            "title": "Update `secure` Storage Account Example",
+            "description": "Enhance the `secure` example with new security-focused parameters. This example should demonstrate a secure-by-default configuration using features like OAuth-only authentication, minimum TLS version, and copy scope restrictions.",
+            "dependencies": [],
+            "details": "Modify `examples/secure/main.tf` to set `default_to_oauth_authentication = true`, `min_tls_version = \"TLS1_2\"`, and `allowed_copy_scope = \"PrivateLink\"`. Ensure `public_network_access_enabled` is explicitly set to `false` or restricted via firewall rules. Update the `README.md` to explain the security posture achieved by these settings.\n<info added on 2025-07-07T06:23:53.222Z>\nMANDATORY: Before starting this subtask, you must review CLAUDE.md, specifically the 'important-instruction-reminders' (lines 5-9) and 'section 9: Terraform Best Practices Guide' (lines 112-122). Key principles to focus on are security parameters, demonstrating OAuth authentication, minimum TLS, and copy scope restrictions. Document the security posture achieved and include any observations and notes.\n</info added on 2025-07-07T06:23:53.222Z>",
+            "status": "done",
+            "testStrategy": "Apply the configuration and verify in the Azure Portal that 'Default to Microsoft Entra authorization' is enabled, the minimum TLS version is 1.2, and public access is disabled. Attempting to generate a SAS key should fail if shared key access is disabled."
+          },
+          {
+            "id": 4,
+            "title": "Update `secure-private-endpoint` Storage Account Example",
+            "description": "Update the `secure-private-endpoint` example to demonstrate secure access over a private network, including the creation of prerequisite networking resources and private DNS integration.",
+            "dependencies": [],
+            "details": "Within the `examples/secure-private-endpoint/` directory, define all necessary prerequisite resources in `main.tf`: `azurerm_resource_group`, `azurerm_virtual_network`, `azurerm_subnet`, and `azurerm_private_dns_zone`. Configure the module to create a private endpoint for the `blob` sub-resource and associate it with the private DNS zone. Ensure `public_network_access_enabled = false`. Update the `README.md` with a clear explanation of the architecture.\n<info added on 2025-07-07T06:24:13.192Z>\nBefore starting this subtask, MANDATORY review CLAUDE.md sections: important-instruction-reminders (lines 5-9), section 9: Terraform Best Practices Guide (lines 112-122). Key principles: Create complete networking prerequisites, demonstrate private endpoint with DNS integration, disable public access. Document architecture clearly. Include observations.\n</info added on 2025-07-07T06:24:13.192Z>",
+            "status": "done",
+            "testStrategy": "Deploy the example. From a VM within the configured VNet, use `nslookup` to verify the storage account's FQDN resolves to a private IP address. Confirm that access from the public internet is blocked."
+          },
+          {
+            "id": 5,
+            "title": "Update `multi-region` Storage Account Example",
+            "description": "Update the `multi-region` example to correctly configure geo-redundant storage (GRS/GZRS) and demonstrate the `cross_tenant_replication_enabled` parameter, showcasing disaster recovery and data residency features.",
+            "dependencies": [],
+            "details": "In `examples/multi-region/main.tf`, set the `account_replication_type` to `GRS` or `GZRS`. Set the `cross_tenant_replication_enabled` parameter to `true`. Update `outputs.tf` to show the primary and secondary location and endpoint URLs from the module's outputs. Update the `README.md` to explain the geo-replication and cross-tenant replication use cases.\n<info added on 2025-07-07T06:24:34.076Z>\nBefore starting this subtask, MANDATORY review CLAUDE.md sections: important-instruction-reminders (lines 5-9), section 9: Terraform Best Practices Guide (lines 112-122). Key principles: Configure geo-redundancy correctly, showcase cross-tenant replication, display primary and secondary endpoints. Document disaster recovery use cases. Include observations.\n</info added on 2025-07-07T06:24:34.076Z>",
+            "status": "done",
+            "testStrategy": "Apply the configuration and verify in the Azure Portal that the storage account's replication is set to GRS/GZRS. Check the 'Geo-replication' blade to confirm the secondary location. The `cross_tenant_replication_enabled` property can be verified using Azure CLI or PowerShell."
+          },
+          {
+            "id": 6,
+            "title": "Create New `data-lake-gen2` Example",
+            "description": "Create a new example for a Data Lake Storage Gen2 account. This example must enable the hierarchical namespace (`is_hns_enabled = true`) and demonstrate the configuration of SFTP and NFSv3.",
+            "dependencies": [],
+            "details": "Create a new directory `examples/data-lake-gen2/`. In a new `main.tf`, call the module with `is_hns_enabled = true`, `sftp_enabled = true`, and `nfsv3_enabled = true`. The configuration should also include creating a container and setting up a local user for SFTP access. Create a `README.md` explaining the setup for a data lake and how to connect via SFTP/NFSv3. Add a corresponding `outputs.tf`.\n<info added on 2025-07-07T06:25:00.185Z>\nBefore starting this subtask, MANDATORY review CLAUDE.md sections: important-instruction-reminders (lines 5-9), section 9: Terraform Best Practices Guide (lines 112-122). Key principles: Create new example directory, enable HNS/SFTP/NFSv3, setup local user for SFTP, document data lake architecture. Create comprehensive README. Include observations and implementation notes.\n</info added on 2025-07-07T06:25:00.185Z>",
+            "status": "done",
+            "testStrategy": "Deploy the example. Verify in the Azure Portal that 'Hierarchical namespace' is enabled. Use an SFTP client to connect to the storage account using the configured local user credentials. Verify NFSv3 mount works from a supported client."
+          },
+          {
+            "id": 7,
+            "title": "Create New `advanced-policies` Example",
+            "description": "Create a new example showcasing advanced policy configurations. This includes setting a `sas_policy`, an `immutability_policy` for a container, and configuring `routing_preference` and a `custom_domain`.",
+            "dependencies": [],
+            "details": "Create a new directory `examples/advanced-policies/`. In `main.tf`, define complex local variables for `sas_policy` (e.g., setting expiration period) and `immutability_policy` (e.g., for a specific container). Pass these to the module. Also configure `routing_preference = \"InternetRouting\"` and set up a `custom_domain`. The `README.md` must document the manual CNAME record prerequisite for the custom domain to work.\n<info added on 2025-07-07T06:25:22.100Z>\nMANDATORY: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) and section 9: Terraform Best Practices Guide (lines 112-122). Include observations and notes.\n</info added on 2025-07-07T06:25:22.100Z>",
+            "status": "done",
+            "testStrategy": "Deploy the example. Verify the SAS policy is applied by trying to create a SAS token that violates the policy. Check the container's immutability policy in the portal. Verify the routing preference is set to 'Internet routing'. Test the custom domain after configuring the CNAME record manually."
+          },
+          {
+            "id": 8,
+            "title": "Create New `identity-access` Example",
+            "description": "Create a new example focused on identity-based access. Demonstrate enabling a system-assigned managed identity and assigning an RBAC role (e.g., 'Storage Blob Data Contributor') to a principal for keyless access.",
+            "dependencies": [],
+            "details": "Create a new directory `examples/identity-access/`. In `main.tf`, configure the module to enable a system-assigned identity. Use a separate `azurerm_role_assignment` resource to grant the 'Storage Blob Data Reader' role to a principal (e.g., using a data source for the current client config) scoped to the storage account. Set `default_to_oauth_authentication = true` and `shared_access_key_enabled = false`. The `README.md` must explain the benefits and process of keyless authentication.\n<info added on 2025-07-07T06:25:38.925Z>\nMANDATORY: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) and section 9: Terraform Best Practices Guide (lines 112-122). Key principles to apply are: create a new example directory, enable system-assigned identity, demonstrate RBAC assignments, disable shared keys, and show Microsoft Entra ID authentication benefits. Include observations.\n</info added on 2025-07-07T06:25:38.925Z>",
+            "status": "done",
+            "testStrategy": "Deploy the example. Using Azure CLI with credentials matching the assigned principal, attempt to read a blob from a container using an `--auth-mode login` command. The command should succeed. Attempting to list keys should fail."
+          },
+          {
+            "id": 9,
+            "title": "Update Test Scripts and Root Documentation",
+            "description": "Integrate the three new examples (`data-lake-gen2`, `advanced-policies`, `identity-access`) into the automated testing script (`test-examples.sh`). Update the root-level README to list and briefly describe all available examples.",
+            "dependencies": [],
+            "details": "Modify the `test-examples.sh` script (or equivalent testing framework) to add `terraform init`, `plan`, `apply`, and `destroy` stages for the `data-lake-gen2`, `advanced-policies`, and `identity-access` example directories. Update the main `README.md` file in the module's root directory, ensuring the table or list of examples includes the new additions with brief descriptions.\n<info added on 2025-07-07T06:25:53.190Z>\nMANDATORY: Before starting, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) and section 9: Terraform Best Practices Guide (lines 112-122). Key principles to follow: Update test scripts to include new examples, update the root README with all examples, and ensure all tests pass. Document the testing approach and include any observations.\n</info added on 2025-07-07T06:25:53.190Z>",
+            "status": "done",
+            "testStrategy": "Run the modified `test-examples.sh` script locally or in a CI environment. Verify that the script executes successfully for all examples, including the newly added ones, without any errors during the plan, apply, or destroy phases."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-07T06:11:07.252Z",
+      "updated": "2025-07-07T06:31:51.771Z",
       "description": "Tasks for master context"
     }
   }

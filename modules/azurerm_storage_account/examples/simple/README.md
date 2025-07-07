@@ -1,12 +1,20 @@
 # Simple Storage Account Example
 
-This example demonstrates the basic usage of the Azure Storage Account module with minimal configuration.
+This example demonstrates the minimal configuration required to create a functional Azure Storage Account with shared key access enabled for user access.
 
 ## Features
 
 - Creates a basic storage account with Standard tier and LRS replication
-- Uses default security settings (HTTPS-only, TLS 1.2)
-- Generates a unique storage account name using random suffix
+- Explicitly enables shared access keys for user authentication
+- Creates a dedicated resource group for the storage account
+- Uses minimal configuration while maintaining functionality
+
+## Key Configuration
+
+This example explicitly sets `shared_access_key_enabled = true` in the security settings to allow traditional authentication methods. This is suitable for:
+- Development environments
+- Applications requiring connection string authentication
+- Scenarios where Azure AD authentication is not yet implemented
 
 ## Usage
 
@@ -30,3 +38,6 @@ terraform apply
 - `storage_account_name` - The name of the created storage account
 - `primary_blob_endpoint` - The primary blob storage endpoint URL
 - `primary_connection_string` - The primary connection string (sensitive)
+- `primary_access_key` - The primary access key (sensitive)
+- `resource_group_name` - The name of the resource group
+- `location` - The Azure location where resources are deployed
