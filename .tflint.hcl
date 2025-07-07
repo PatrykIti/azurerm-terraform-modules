@@ -124,7 +124,4 @@ rule "azurerm_storage_account_public_access_disabled" {
 config {
   # Allow module developers to override certain rules in their module directories
   module = true
-  
-  # Set the minimum version of Terraform
-  minimum_terraform_version = "1.5.0"
 }
