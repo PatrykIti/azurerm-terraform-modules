@@ -438,7 +438,7 @@ variable "routing" {
 variable "custom_domain" {
   description = "Custom domain configuration for the storage account."
   type = object({
-    name         = string
+    name          = string
     use_subdomain = optional(bool)
   })
   default = null
@@ -465,7 +465,7 @@ variable "allowed_copy_scope" {
   default     = null
 
   validation {
-    condition = var.allowed_copy_scope == null || can(regex("^(AAD|PrivateLink)$", var.allowed_copy_scope))
+    condition     = var.allowed_copy_scope == null || can(regex("^(AAD|PrivateLink)$", var.allowed_copy_scope))
     error_message = "Allowed copy scope must be either 'AAD' or 'PrivateLink'."
   }
 }
@@ -477,7 +477,7 @@ variable "queue_encryption_key_type" {
   default     = null
 
   validation {
-    condition = var.queue_encryption_key_type == null || can(regex("^(Service|Account)$", var.queue_encryption_key_type))
+    condition     = var.queue_encryption_key_type == null || can(regex("^(Service|Account)$", var.queue_encryption_key_type))
     error_message = "Queue encryption key type must be either 'Service', 'Account', or null."
   }
 }
@@ -489,7 +489,7 @@ variable "table_encryption_key_type" {
   default     = null
 
   validation {
-    condition = var.table_encryption_key_type == null || can(regex("^(Service|Account)$", var.table_encryption_key_type))
+    condition     = var.table_encryption_key_type == null || can(regex("^(Service|Account)$", var.table_encryption_key_type))
     error_message = "Table encryption key type must be either 'Service', 'Account', or null."
   }
 }

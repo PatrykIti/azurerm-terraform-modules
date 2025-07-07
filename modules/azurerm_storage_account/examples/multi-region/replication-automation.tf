@@ -44,17 +44,17 @@ resource "azurerm_logic_app_standard" "replication" {
   app_settings = {
     "FUNCTIONS_WORKER_RUNTIME"     = "node"
     "WEBSITE_NODE_DEFAULT_VERSION" = "~14"
-    
+
     # Storage account connections
     "PRIMARY_STORAGE_CONNECTION"   = module.primary_storage.primary_connection_string
     "SECONDARY_STORAGE_CONNECTION" = module.secondary_storage.primary_connection_string
     "DR_STORAGE_CONNECTION"        = module.dr_storage.primary_connection_string
     "METADATA_STORAGE_CONNECTION"  = module.replication_metadata.primary_connection_string
-    
+
     # Replication configuration
-    "REPLICATION_SCHEDULE"         = var.replication_schedule
-    "REPLICATION_BATCH_SIZE"       = "100"
-    "REPLICATION_PARALLEL_TASKS"   = "10"
+    "REPLICATION_SCHEDULE"       = var.replication_schedule
+    "REPLICATION_BATCH_SIZE"     = "100"
+    "REPLICATION_PARALLEL_TASKS" = "10"
   }
 
   identity {

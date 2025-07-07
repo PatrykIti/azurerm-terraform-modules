@@ -90,7 +90,7 @@ output "storage_encryption_key_id" {
 
 output "testing_instructions" {
   description = "Instructions for testing identity-based access"
-  value = <<-EOT
+  value       = <<-EOT
     To test identity-based access:
 
     1. System-Assigned Identity:

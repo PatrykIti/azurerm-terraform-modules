@@ -72,7 +72,7 @@ module "primary_storage" {
   account_tier             = "Standard"
   account_replication_type = "GZRS" # Geo-zone-redundant storage for maximum availability
   access_tier              = "Hot"
-  
+
   # Enable cross-tenant replication for disaster recovery scenarios
   cross_tenant_replication_enabled = true
 
@@ -216,7 +216,7 @@ module "secondary_storage" {
   account_tier             = "Standard"
   account_replication_type = "ZRS"  # Zone-redundant in secondary region
   access_tier              = "Cool" # Cost optimization for secondary
-  
+
   # Enable cross-tenant replication for multi-tenant DR scenarios
   cross_tenant_replication_enabled = true
 
@@ -429,7 +429,7 @@ module "replication_metadata" {
   account_tier             = "Standard"
   account_replication_type = "RAGRS" # Read-access geo-redundant for metadata availability
   access_tier              = "Hot"
-  
+
   # Enable cross-tenant replication for metadata sync across tenants
   cross_tenant_replication_enabled = true
 

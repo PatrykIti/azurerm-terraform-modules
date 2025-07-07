@@ -185,10 +185,10 @@ module "storage_account" {
   }
 
   # New security and compliance parameters from task #18
-  default_to_oauth_authentication  = true  # Use OAuth by default in Azure portal
-  cross_tenant_replication_enabled = false # Disable cross-tenant replication for security
-  queue_encryption_key_type        = "Account" # Use account-scoped encryption for queues
-  table_encryption_key_type        = "Account" # Use account-scoped encryption for tables
+  default_to_oauth_authentication  = true          # Use OAuth by default in Azure portal
+  cross_tenant_replication_enabled = false         # Disable cross-tenant replication for security
+  queue_encryption_key_type        = "Account"     # Use account-scoped encryption for queues
+  table_encryption_key_type        = "Account"     # Use account-scoped encryption for tables
   allowed_copy_scope               = "PrivateLink" # Restrict copy operations
 
   # Encryption settings
@@ -276,7 +276,7 @@ module "storage_account" {
   blob_properties = {
     versioning_enabled            = true
     change_feed_enabled           = true
-    change_feed_retention_in_days = 365  # Keep change feed for 1 year
+    change_feed_retention_in_days = 365 # Keep change feed for 1 year
     last_access_time_enabled      = true
 
     delete_retention_policy = {
@@ -290,7 +290,7 @@ module "storage_account" {
     }
 
     restore_policy = {
-      days = 29  # Must be less than delete_retention_policy.days
+      days = 29 # Must be less than delete_retention_policy.days
     }
 
     cors_rules = [{
@@ -407,7 +407,7 @@ module "storage_account" {
     retention_policy = {
       days = 7
     }
-    
+
     smb = {
       versions                        = ["SMB3.0", "SMB3.1.1"]
       authentication_types            = ["NTLMv2", "Kerberos"]

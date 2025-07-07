@@ -181,7 +181,7 @@ resource "azurerm_storage_account" "storage_account" {
   dynamic "custom_domain" {
     for_each = var.custom_domain != null ? [var.custom_domain] : []
     content {
-      name         = custom_domain.value.name
+      name          = custom_domain.value.name
       use_subdomain = custom_domain.value.use_subdomain
     }
   }
@@ -191,7 +191,7 @@ resource "azurerm_storage_account" "storage_account" {
     for_each = var.azure_files_authentication != null ? [var.azure_files_authentication] : []
     content {
       directory_type = azure_files_authentication.value.directory_type
-      
+
       dynamic "active_directory" {
         for_each = azure_files_authentication.value.active_directory != null ? [azure_files_authentication.value.active_directory] : []
         content {

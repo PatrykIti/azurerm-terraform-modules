@@ -69,7 +69,7 @@ output "secondary_blob_internet_host" {
 }
 
 output "secondary_blob_microsoft_endpoint" {
-  description = "The microsoft routing endpoint URL for blob storage in the secondary location"  
+  description = "The microsoft routing endpoint URL for blob storage in the secondary location"
   value       = try(azurerm_storage_account.storage_account.secondary_blob_microsoft_endpoint, null)
 }
 

@@ -170,7 +170,7 @@ module "storage_account" {
     allow_nested_items_to_be_public = false
     public_network_access_enabled   = false # Completely disable public network access
   }
-  
+
   # Additional security parameters for OAuth and copy restrictions
   default_to_oauth_authentication  = true
   allowed_copy_scope               = "PrivateLink"

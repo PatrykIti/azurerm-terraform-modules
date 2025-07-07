@@ -6,7 +6,7 @@ output "primary_storage" {
     location           = module.primary_storage.primary_location
     secondary_location = module.primary_storage.secondary_location
     replication_type   = module.primary_storage.account_replication_type
-    
+
     # Primary endpoints
     primary_endpoints = {
       blob  = module.primary_storage.primary_blob_endpoint
@@ -16,7 +16,7 @@ output "primary_storage" {
       web   = module.primary_storage.primary_web_endpoint
       dfs   = module.primary_storage.primary_dfs_endpoint
     }
-    
+
     # Secondary endpoints (geo-redundant)
     secondary_endpoints = {
       blob  = module.primary_storage.secondary_blob_endpoint
@@ -26,7 +26,7 @@ output "primary_storage" {
       web   = module.primary_storage.secondary_web_endpoint
       dfs   = module.primary_storage.secondary_dfs_endpoint
     }
-    
+
     # Cross-tenant replication status
     cross_tenant_replication_enabled = module.primary_storage.cross_tenant_replication_enabled
   }
@@ -39,7 +39,7 @@ output "secondary_storage" {
     name             = module.secondary_storage.name
     location         = module.secondary_storage.primary_location
     replication_type = module.secondary_storage.account_replication_type
-    
+
     # Endpoints
     endpoints = {
       blob  = module.secondary_storage.primary_blob_endpoint
@@ -47,7 +47,7 @@ output "secondary_storage" {
       table = module.secondary_storage.primary_table_endpoint
       file  = module.secondary_storage.primary_file_endpoint
     }
-    
+
     # Cross-tenant replication status
     cross_tenant_replication_enabled = module.secondary_storage.cross_tenant_replication_enabled
   }
@@ -71,21 +71,21 @@ output "replication_metadata_storage" {
     location           = module.replication_metadata.primary_location
     secondary_location = module.replication_metadata.secondary_location
     replication_type   = module.replication_metadata.account_replication_type
-    
+
     # Primary endpoints
     primary_endpoints = {
       table = module.replication_metadata.primary_table_endpoint
       queue = module.replication_metadata.primary_queue_endpoint
       blob  = module.replication_metadata.primary_blob_endpoint
     }
-    
+
     # Secondary endpoints (geo-redundant)
     secondary_endpoints = {
       table = module.replication_metadata.secondary_table_endpoint
       queue = module.replication_metadata.secondary_queue_endpoint
       blob  = module.replication_metadata.secondary_blob_endpoint
     }
-    
+
     # Cross-tenant replication status
     cross_tenant_replication_enabled = module.replication_metadata.cross_tenant_replication_enabled
   }
@@ -173,10 +173,10 @@ output "cross_tenant_replication_status" {
       ] : storage.name if storage.cross_tenant_replication_enabled == true
     ]
     configuration = {
-      primary_storage    = module.primary_storage.cross_tenant_replication_enabled
-      secondary_storage  = module.secondary_storage.cross_tenant_replication_enabled
-      metadata_storage   = module.replication_metadata.cross_tenant_replication_enabled
-      dr_storage         = false # LRS doesn't support cross-tenant replication
+      primary_storage   = module.primary_storage.cross_tenant_replication_enabled
+      secondary_storage = module.secondary_storage.cross_tenant_replication_enabled
+      metadata_storage  = module.replication_metadata.cross_tenant_replication_enabled
+      dr_storage        = false # LRS doesn't support cross-tenant replication
     }
   }
 }
@@ -222,14 +222,14 @@ output "monitoring_configuration" {
       primary_availability_alert        = azurerm_monitor_metric_alert.primary_availability[0].name
       replication_lag_alert             = azurerm_monitor_metric_alert.primary_replication_lag[0].name
     }
-  } : {
+    } : {
     log_analytics_id = azurerm_log_analytics_workspace.shared.id
   }
 }
 
 output "deployment_instructions" {
   description = "Instructions for deploying and configuring the multi-region storage"
-  value = <<-EOT
+  value       = <<-EOT
     Multi-Region Storage Deployment Complete!
     
     Next Steps:

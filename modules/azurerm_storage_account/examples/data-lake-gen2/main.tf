@@ -130,14 +130,14 @@ module "data_lake_storage" {
   blob_properties = {
     versioning_enabled            = true
     change_feed_enabled           = true
-    change_feed_retention_in_days = 7  # Keep change feed for 7 days
-    last_access_time_enabled      = true  # Track last access time for lifecycle management
-    
+    change_feed_retention_in_days = 7    # Keep change feed for 7 days
+    last_access_time_enabled      = true # Track last access time for lifecycle management
+
     delete_retention_policy = {
       enabled = true
       days    = 30
     }
-    
+
     container_delete_retention_policy = {
       enabled = true
       days    = 30
@@ -242,7 +242,7 @@ resource "azurerm_storage_data_lake_gen2_path" "bronze_raw" {
   filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.bronze.name
   storage_account_id = module.data_lake_storage.id
   resource           = "directory"
-  
+
   # ACL configuration - Data Engineer has full access, Data Analyst has read-only
   # Access ACL applies to this directory
   ace {
@@ -251,7 +251,7 @@ resource "azurerm_storage_data_lake_gen2_path" "bronze_raw" {
     id          = azuread_service_principal.data_engineer.object_id
     permissions = "rwx"
   }
-  
+
   # Default ACL applies to new items created within this directory
   ace {
     scope       = "default"
@@ -259,14 +259,14 @@ resource "azurerm_storage_data_lake_gen2_path" "bronze_raw" {
     id          = azuread_service_principal.data_engineer.object_id
     permissions = "rwx"
   }
-  
+
   ace {
     scope       = "access"
     type        = "user"
     id          = azuread_service_principal.data_analyst.object_id
     permissions = "r-x"
   }
-  
+
   ace {
     scope       = "default"
     type        = "user"
@@ -372,7 +372,7 @@ resource "azurerm_storage_data_lake_gen2_path" "sample_data_dir" {
   filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.bronze.name
   storage_account_id = module.data_lake_storage.id
   resource           = "directory"
-  
+
   # File-level ACL - Data Analyst has read-only access to this specific file
   ace {
     scope       = "access"
@@ -380,7 +380,7 @@ resource "azurerm_storage_data_lake_gen2_path" "sample_data_dir" {
     id          = azuread_service_principal.data_analyst.object_id
     permissions = "r--"
   }
-  
+
   # Data Engineer has write access
   ace {
     scope       = "access"
