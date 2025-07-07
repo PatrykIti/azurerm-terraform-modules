@@ -145,9 +145,9 @@ dev-debug.log
 
 # OS specific
 
-# Task files
-# tasks.json
-# tasks/
-
 # MCP configuration (contains API keys)
 .mcp.json
+
+# Task files
+# tasks.json
+# tasks/ 
