@@ -675,11 +675,112 @@
             "testStrategy": "Run the modified `test-examples.sh` script locally or in a CI environment. Verify that the script executes successfully for all examples, including the newly added ones, without any errors during the plan, apply, or destroy phases."
           }
         ]
+      },
+      {
+        "id": 21,
+        "title": "Parallel Validation of All Storage Account Module Examples",
+        "description": "Create a testing workflow to run `terraform init` and `terraform validate` in parallel across all storage account module examples. This task ensures all examples are syntactically correct and have their provider dependencies properly configured.",
+        "details": "Implement a GitHub Actions workflow that validates all 8 examples for the storage account module. The workflow should use a matrix strategy to run a separate, parallel job for each example directory. Each job must perform the following steps: 1. Check out the repository code. 2. Set up the specified version of Terraform. 3. Configure Azure credentials to allow the provider to initialize correctly. 4. Navigate into the specific example's directory (e.g., `examples/storage_account/simple`). 5. Execute `terraform init -backend=false` to initialize the provider and modules without configuring a state backend. 6. Execute `terraform validate` to check for syntax and configuration errors. Any validation errors discovered during implementation must be fixed. This includes correcting syntax, addressing provider version constraints, or fixing variable definitions within the example configurations. All fixes must adhere to the project's coding standards.",
+        "testStrategy": "1. Trigger the newly created GitHub Actions workflow by pushing a commit or creating a pull request. 2. Navigate to the 'Actions' tab in the GitHub repository and observe the workflow run. 3. Verify that a parallel job is initiated for each of the 8 storage account examples. 4. Confirm that each job successfully completes the `terraform init` and `terraform validate` steps with a green checkmark. 5. To ensure the failure condition works, intentionally introduce a syntax error into one of the example's `main.tf` files, push the change, and verify that the corresponding job in the workflow fails as expected.",
+        "status": "pending",
+        "dependencies": [
+          20
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Validate and Fix the 'simple' Storage Account Example",
+            "description": "Update the Terraform provider block in the `examples/storage_account/simple` directory to include the `subscription_id`. Run `terraform init` and `terraform validate` to ensure the configuration is valid. Fix any syntax or configuration errors that arise.",
+            "dependencies": [],
+            "details": "1. Navigate to the `examples/storage_account/simple` directory.\n2. Open the provider configuration file (e.g., `main.tf` or `provider.tf`).\n3. Add `subscription_id = var.subscription_id` to the `azurerm` provider block. Ensure a corresponding variable is defined in `variables.tf`.\n4. From this directory, execute `terraform init -backend=false`.\n5. Execute `terraform validate`.\n6. If validation fails, analyze the error and correct the Terraform configuration files in this directory. Commit the fixes.",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` locally. The command should exit with code 0 and produce no error output. The changes will also be validated by the parent task's GitHub Actions workflow once implemented."
+          },
+          {
+            "id": 2,
+            "title": "Validate and Fix the 'complete' Storage Account Example",
+            "description": "Update the Terraform provider block in the `examples/storage_account/complete` directory to include the `subscription_id`. Run `terraform init` and `terraform validate` to ensure the configuration is valid. Fix any syntax or configuration errors that arise.",
+            "dependencies": [],
+            "details": "1. Navigate to the `examples/storage_account/complete` directory.\n2. Open the provider configuration file.\n3. Add `subscription_id = var.subscription_id` to the `azurerm` provider block and define the variable if it doesn't exist.\n4. From this directory, execute `terraform init -backend=false`.\n5. Execute `terraform validate`.\n6. If validation fails, correct the Terraform configuration files in this directory. Commit the fixes.",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` locally. The command should exit with code 0 and produce no error output. The changes will also be validated by the parent task's GitHub Actions workflow once implemented."
+          },
+          {
+            "id": 3,
+            "title": "Validate and Fix the 'secure' Storage Account Example",
+            "description": "Update the Terraform provider block in the `examples/storage_account/secure` directory to include the `subscription_id`. Run `terraform init` and `terraform validate` to ensure the configuration is valid. Fix any syntax or configuration errors that arise.",
+            "dependencies": [],
+            "details": "1. Navigate to the `examples/storage_account/secure` directory.\n2. Open the provider configuration file.\n3. Add `subscription_id = var.subscription_id` to the `azurerm` provider block and define the variable if it doesn't exist.\n4. From this directory, execute `terraform init -backend=false`.\n5. Execute `terraform validate`.\n6. If validation fails, correct the Terraform configuration files in this directory. Commit the fixes.",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` locally. The command should exit with code 0 and produce no error output. The changes will also be validated by the parent task's GitHub Actions workflow once implemented."
+          },
+          {
+            "id": 4,
+            "title": "Validate and Fix the 'secure-private-endpoint' Storage Account Example",
+            "description": "Update the Terraform provider block in the `examples/storage_account/secure-private-endpoint` directory to include the `subscription_id`. Run `terraform init` and `terraform validate` to ensure the configuration is valid. Fix any syntax or configuration errors that arise.",
+            "dependencies": [],
+            "details": "1. Navigate to the `examples/storage_account/secure-private-endpoint` directory.\n2. Open the provider configuration file.\n3. Add `subscription_id = var.subscription_id` to the `azurerm` provider block and define the variable if it doesn't exist.\n4. From this directory, execute `terraform init -backend=false`.\n5. Execute `terraform validate`.\n6. If validation fails, correct the Terraform configuration files in this directory. Commit the fixes.",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` locally. The command should exit with code 0 and produce no error output. The changes will also be validated by the parent task's GitHub Actions workflow once implemented."
+          },
+          {
+            "id": 5,
+            "title": "Validate and Fix the 'multi-region' Storage Account Example",
+            "description": "Update the Terraform provider block in the `examples/storage_account/multi-region` directory to include the `subscription_id`. Run `terraform init` and `terraform validate` to ensure the configuration is valid. Fix any syntax or configuration errors that arise.",
+            "dependencies": [],
+            "details": "1. Navigate to the `examples/storage_account/multi-region` directory.\n2. Open the provider configuration file.\n3. Add `subscription_id = var.subscription_id` to the `azurerm` provider block and define the variable if it doesn't exist.\n4. From this directory, execute `terraform init -backend=false`.\n5. Execute `terraform validate`.\n6. If validation fails, correct the Terraform configuration files in this directory. Commit the fixes.",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` locally. The command should exit with code 0 and produce no error output. The changes will also be validated by the parent task's GitHub Actions workflow once implemented."
+          },
+          {
+            "id": 6,
+            "title": "Validate and Fix the 'data-lake-gen2' Storage Account Example",
+            "description": "Update the Terraform provider block in the `examples/storage_account/data-lake-gen2` directory to include the `subscription_id`. Run `terraform init` and `terraform validate` to ensure the configuration is valid. Fix any syntax or configuration errors that arise.",
+            "dependencies": [],
+            "details": "1. Navigate to the `examples/storage_account/data-lake-gen2` directory.\n2. Open the provider configuration file.\n3. Add `subscription_id = var.subscription_id` to the `azurerm` provider block and define the variable if it doesn't exist.\n4. From this directory, execute `terraform init -backend=false`.\n5. Execute `terraform validate`.\n6. If validation fails, correct the Terraform configuration files in this directory. Commit the fixes.",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` locally. The command should exit with code 0 and produce no error output. The changes will also be validated by the parent task's GitHub Actions workflow once implemented."
+          },
+          {
+            "id": 7,
+            "title": "Validate and Fix the 'advanced-policies' Storage Account Example",
+            "description": "Update the Terraform provider block in the `examples/storage_account/advanced-policies` directory to include the `subscription_id`. Run `terraform init` and `terraform validate` to ensure the configuration is valid. Fix any syntax or configuration errors that arise.",
+            "dependencies": [],
+            "details": "1. Navigate to the `examples/storage_account/advanced-policies` directory.\n2. Open the provider configuration file.\n3. Add `subscription_id = var.subscription_id` to the `azurerm` provider block and define the variable if it doesn't exist.\n4. From this directory, execute `terraform init -backend=false`.\n5. Execute `terraform validate`.\n6. If validation fails, correct the Terraform configuration files in this directory. Commit the fixes.",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` locally. The command should exit with code 0 and produce no error output. The changes will also be validated by the parent task's GitHub Actions workflow once implemented."
+          },
+          {
+            "id": 8,
+            "title": "Validate and Fix the 'identity-access' Storage Account Example",
+            "description": "Update the Terraform provider block in the `examples/storage_account/identity-access` directory to include the `subscription_id`. Run `terraform init` and `terraform validate` to ensure the configuration is valid. Fix any syntax or configuration errors that arise.",
+            "dependencies": [],
+            "details": "1. Navigate to the `examples/storage_account/identity-access` directory.\n2. Open the provider configuration file.\n3. Add `subscription_id = var.subscription_id` to the `azurerm` provider block and define the variable if it doesn't exist.\n4. From this directory, execute `terraform init -backend=false`.\n5. Execute `terraform validate`.\n6. If validation fails, correct the Terraform configuration files in this directory. Commit the fixes.",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` locally. The command should exit with code 0 and produce no error output. The changes will also be validated by the parent task's GitHub Actions workflow once implemented."
+          }
+        ]
+      },
+      {
+        "id": 22,
+        "title": "Enhance Storage Account Module with Security and Blob Properties",
+        "description": "This task involves updating the azurerm_storage_account module to add new security and blob storage parameters, fix the azure_files_authentication implementation, and update relevant examples to reflect these changes.",
+        "details": "1. Add `public_network_access_enabled`: In `variables.tf`, add a new boolean variable `public_network_access_enabled` with a default of `false`. In `main.tf`, add the `public_network_access_enabled = var.public_network_access_enabled` argument to the `azurerm_storage_account` resource.\n2. Fix `azure_files_authentication`: In `main.tf`, implement a `dynamic \"azure_files_authentication\"` block for the `azurerm_storage_account` resource. The `for_each` should be `var.azure_files_authentication != null ? [var.azure_files_authentication] : []` to correctly process the existing complex object variable and enable the feature when the variable is not null.\n3. Extend `blob_properties`: In `variables.tf`, update the `blob_properties` variable object to include `change_feed_retention_in_days` (type `number`, default `null`) and an optional `restore_policy` object containing a `days` attribute (type `number`). In `main.tf`, update the `blob_properties` block to pass these new values, using a dynamic block for the `restore_policy` if necessary to handle its optional nature.\n4. Update Examples: Modify `examples/storage_account/secure/main.tf` to explicitly set `public_network_access_enabled = false`. Update `examples/storage_account/complete/main.tf` to demonstrate the usage of `azure_files_authentication`, `change_feed_retention_in_days`, and `restore_policy` with sample values.",
+        "testStrategy": "1. **Public Access Validation**: Run `terraform apply` on the updated `secure` example. Using the Azure Portal or CLI, verify that the deployed storage account has 'Public network access' set to 'Disabled'.\n2. **Azure Files Auth Validation**: Deploy the `complete` example. In the Azure Portal, navigate to the storage account's 'Configuration' settings and confirm that Azure Files identity-based access for the specified directory service is enabled.\n3. **Blob Properties Validation**: After deploying the `complete` example, inspect the storage account's 'Data protection' settings in the Azure Portal. Verify that 'Point-in-time restore for blobs' is enabled with the correct retention period and that 'Blob change feed' retention is configured as specified.\n4. **Syntax Validation**: Run `terraform init` and `terraform validate` on both the `secure` and `complete` example directories to ensure the changes are syntactically correct and pass provider validation. This should be integrated with the workflow from Task #21.",
+        "status": "done",
+        "dependencies": [
+          18,
+          20,
+          21
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-07T06:31:51.771Z",
+      "updated": "2025-07-07T10:43:01.480Z",
       "description": "Tasks for master context"
     }
   }

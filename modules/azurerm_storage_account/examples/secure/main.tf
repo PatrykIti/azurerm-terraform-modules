@@ -13,6 +13,7 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
   features {
     key_vault {
       purge_soft_delete_on_destroy    = false
@@ -168,6 +169,7 @@ module "storage_account" {
     min_tls_version                 = "TLS1_2"
     shared_access_key_enabled       = false # Disabled for OAuth authentication only
     allow_nested_items_to_be_public = false
+    public_network_access_enabled   = false # Completely disable public network access
   }
   
   # Additional security parameters for OAuth and copy restrictions
@@ -192,9 +194,6 @@ module "storage_account" {
     ip_rules                   = [] # No public IPs allowed
     virtual_network_subnet_ids = [] # Only private endpoints
   }
-  
-  # Ensure public access is completely disabled
-  public_network_access_enabled = false
 
   # Private endpoints for all services
   private_endpoints = [
