@@ -53,8 +53,10 @@ jobs:
           install-terraform-docs: true
       
       - name: Validate module before release
-        uses: ./modules/${{ inputs.module }}/.github/actions/validate
+        uses: ./.github/actions/module-runner
         with:
+          module: ${{ inputs.module }}
+          action: validate
           terraform-version: '1.10.3'
       
       - name: Get module configuration

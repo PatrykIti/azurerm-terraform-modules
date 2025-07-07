@@ -123,5 +123,6 @@ rule "azurerm_storage_account_public_access_disabled" {
 # Configuration for module-specific overrides
 config {
   # Allow module developers to override certain rules in their module directories
-  module = true
+  # Changed from "module" to "call_module_type" as required in TFLint v0.54.0+
+  call_module_type = "all"
 }

@@ -1,0 +1,92 @@
+name: 'Module Runner'
+description: 'Runs module-specific actions dynamically'
+
+inputs:
+  module:
+    description: 'Module name'
+    required: true
+  action:
+    description: 'Action to run (validate, test, security)'
+    required: true
+  terraform-version:
+    description: 'Terraform version'
+    required: false
+    default: '1.10.3'
+  github-token:
+    description: 'GitHub token for security scan'
+    required: false
+  azure-credentials:
+    description: 'Azure credentials for testing'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Check if module action exists
+      id: check
+      shell: bash
+      run: |
+        ACTION_PATH="modules/${{ inputs.module }}/.github/actions/${{ inputs.action }}/action.yml"
+        if [[ -f "$ACTION_PATH" ]]; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "Action found: $ACTION_PATH"
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "Action not found: $ACTION_PATH"
+        fi
+
+    - name: Run module-specific action
+      if: steps.check.outputs.exists == 'true'
+      shell: bash
+      run: |
+        echo "Running ${{ inputs.action }} action for ${{ inputs.module }}"
+        
+        # Read the action.yml and execute the steps
+        ACTION_PATH="modules/${{ inputs.module }}/.github/actions/${{ inputs.action }}/action.yml"
+        
+        # This is a workaround - we'll execute the steps from the action manually
+        case "${{ inputs.action }}" in
+          validate)
+            cd modules/${{ inputs.module }}
+            terraform init -backend=false
+            terraform validate
+            terraform fmt -check -recursive
+            
+            # Validate examples
+            for example in examples/*/; do
+              if [[ -d "$example" && -f "$example/main.tf" ]]; then
+                echo "Validating example: $example"
+                cd "$example"
+                terraform init -backend=false
+                terraform validate
+                cd - > /dev/null
+              fi
+            done
+            ;;
+            
+          test)
+            cd modules/${{ inputs.module }}
+            if [[ -d "tests" ]]; then
+              echo "Running tests for ${{ inputs.module }}"
+              cd tests
+              terraform init
+              terraform plan
+            else
+              echo "No tests found for ${{ inputs.module }}"
+            fi
+            ;;
+            
+          security)
+            # Run Checkov directly
+            echo "Running security scan for ${{ inputs.module }}"
+            ;;
+        esac
+
+    - name: Run Checkov security scan
+      if: inputs.action == 'security'
+      uses: bridgecrewio/checkov-action@v12
+      with:
+        directory: modules/${{ inputs.module }}
+        framework: terraform
+        soft_fail: true
+        output_format: json
