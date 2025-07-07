@@ -38,9 +38,54 @@ output "secondary_blob_host" {
   value       = try(azurerm_storage_account.storage_account.secondary_blob_host, null)
 }
 
+output "primary_blob_internet_endpoint" {
+  description = "The internet routing endpoint URL for blob storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_blob_internet_endpoint, null)
+}
+
+output "primary_blob_internet_host" {
+  description = "The internet routing hostname with port if applicable for blob storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_blob_internet_host, null)
+}
+
+output "primary_blob_microsoft_endpoint" {
+  description = "The microsoft routing endpoint URL for blob storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_blob_microsoft_endpoint, null)
+}
+
+output "primary_blob_microsoft_host" {
+  description = "The microsoft routing hostname with port if applicable for blob storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_blob_microsoft_host, null)
+}
+
+output "secondary_blob_internet_endpoint" {
+  description = "The internet routing endpoint URL for blob storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_blob_internet_endpoint, null)
+}
+
+output "secondary_blob_internet_host" {
+  description = "The internet routing hostname with port if applicable for blob storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_blob_internet_host, null)
+}
+
+output "secondary_blob_microsoft_endpoint" {
+  description = "The microsoft routing endpoint URL for blob storage in the secondary location"  
+  value       = try(azurerm_storage_account.storage_account.secondary_blob_microsoft_endpoint, null)
+}
+
+output "secondary_blob_microsoft_host" {
+  description = "The microsoft routing hostname with port if applicable for blob storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_blob_microsoft_host, null)
+}
+
 output "primary_queue_endpoint" {
   description = "The endpoint URL for queue storage in the primary location"
   value       = try(azurerm_storage_account.storage_account.primary_queue_endpoint, null)
+}
+
+output "primary_queue_host" {
+  description = "The hostname with port if applicable for queue storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_queue_host, null)
 }
 
 output "secondary_queue_endpoint" {
@@ -48,9 +93,19 @@ output "secondary_queue_endpoint" {
   value       = try(azurerm_storage_account.storage_account.secondary_queue_endpoint, null)
 }
 
+output "secondary_queue_host" {
+  description = "The hostname with port if applicable for queue storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_queue_host, null)
+}
+
 output "primary_table_endpoint" {
   description = "The endpoint URL for table storage in the primary location"
   value       = try(azurerm_storage_account.storage_account.primary_table_endpoint, null)
+}
+
+output "primary_table_host" {
+  description = "The hostname with port if applicable for table storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_table_host, null)
 }
 
 output "secondary_table_endpoint" {
@@ -58,9 +113,39 @@ output "secondary_table_endpoint" {
   value       = try(azurerm_storage_account.storage_account.secondary_table_endpoint, null)
 }
 
+output "secondary_table_host" {
+  description = "The hostname with port if applicable for table storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_table_host, null)
+}
+
 output "primary_file_endpoint" {
   description = "The endpoint URL for file storage in the primary location"
   value       = try(azurerm_storage_account.storage_account.primary_file_endpoint, null)
+}
+
+output "primary_file_host" {
+  description = "The hostname with port if applicable for file storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_file_host, null)
+}
+
+output "primary_file_internet_endpoint" {
+  description = "The internet routing endpoint URL for file storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_file_internet_endpoint, null)
+}
+
+output "primary_file_internet_host" {
+  description = "The internet routing hostname with port if applicable for file storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_file_internet_host, null)
+}
+
+output "primary_file_microsoft_endpoint" {
+  description = "The microsoft routing endpoint URL for file storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_file_microsoft_endpoint, null)
+}
+
+output "primary_file_microsoft_host" {
+  description = "The microsoft routing hostname with port if applicable for file storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_file_microsoft_host, null)
 }
 
 output "secondary_file_endpoint" {
@@ -68,9 +153,59 @@ output "secondary_file_endpoint" {
   value       = try(azurerm_storage_account.storage_account.secondary_file_endpoint, null)
 }
 
+output "secondary_file_host" {
+  description = "The hostname with port if applicable for file storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_file_host, null)
+}
+
+output "secondary_file_internet_endpoint" {
+  description = "The internet routing endpoint URL for file storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_file_internet_endpoint, null)
+}
+
+output "secondary_file_internet_host" {
+  description = "The internet routing hostname with port if applicable for file storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_file_internet_host, null)
+}
+
+output "secondary_file_microsoft_endpoint" {
+  description = "The microsoft routing endpoint URL for file storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_file_microsoft_endpoint, null)
+}
+
+output "secondary_file_microsoft_host" {
+  description = "The microsoft routing hostname with port if applicable for file storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_file_microsoft_host, null)
+}
+
 output "primary_dfs_endpoint" {
   description = "The endpoint URL for DFS storage in the primary location"
   value       = try(azurerm_storage_account.storage_account.primary_dfs_endpoint, null)
+}
+
+output "primary_dfs_host" {
+  description = "The hostname with port if applicable for DFS storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_dfs_host, null)
+}
+
+output "primary_dfs_internet_endpoint" {
+  description = "The internet routing endpoint URL for DFS storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_dfs_internet_endpoint, null)
+}
+
+output "primary_dfs_internet_host" {
+  description = "The internet routing hostname with port if applicable for DFS storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_dfs_internet_host, null)
+}
+
+output "primary_dfs_microsoft_endpoint" {
+  description = "The microsoft routing endpoint URL for DFS storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_dfs_microsoft_endpoint, null)
+}
+
+output "primary_dfs_microsoft_host" {
+  description = "The microsoft routing hostname with port if applicable for DFS storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_dfs_microsoft_host, null)
 }
 
 output "secondary_dfs_endpoint" {
@@ -78,14 +213,34 @@ output "secondary_dfs_endpoint" {
   value       = try(azurerm_storage_account.storage_account.secondary_dfs_endpoint, null)
 }
 
+output "secondary_dfs_host" {
+  description = "The hostname with port if applicable for DFS storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_dfs_host, null)
+}
+
+output "secondary_dfs_internet_endpoint" {
+  description = "The internet routing endpoint URL for DFS storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_dfs_internet_endpoint, null)
+}
+
+output "secondary_dfs_internet_host" {
+  description = "The internet routing hostname with port if applicable for DFS storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_dfs_internet_host, null)
+}
+
+output "secondary_dfs_microsoft_endpoint" {
+  description = "The microsoft routing endpoint URL for DFS storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_dfs_microsoft_endpoint, null)
+}
+
+output "secondary_dfs_microsoft_host" {
+  description = "The microsoft routing hostname with port if applicable for DFS storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_dfs_microsoft_host, null)
+}
+
 output "primary_web_endpoint" {
   description = "The endpoint URL for web storage in the primary location"
   value       = try(azurerm_storage_account.storage_account.primary_web_endpoint, null)
-}
-
-output "secondary_web_endpoint" {
-  description = "The endpoint URL for web storage in the secondary location"
-  value       = try(azurerm_storage_account.storage_account.secondary_web_endpoint, null)
 }
 
 output "primary_web_host" {
@@ -93,9 +248,54 @@ output "primary_web_host" {
   value       = try(azurerm_storage_account.storage_account.primary_web_host, null)
 }
 
+output "primary_web_internet_endpoint" {
+  description = "The internet routing endpoint URL for web storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_web_internet_endpoint, null)
+}
+
+output "primary_web_internet_host" {
+  description = "The internet routing hostname with port if applicable for web storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_web_internet_host, null)
+}
+
+output "primary_web_microsoft_endpoint" {
+  description = "The microsoft routing endpoint URL for web storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_web_microsoft_endpoint, null)
+}
+
+output "primary_web_microsoft_host" {
+  description = "The microsoft routing hostname with port if applicable for web storage in the primary location"
+  value       = try(azurerm_storage_account.storage_account.primary_web_microsoft_host, null)
+}
+
+output "secondary_web_endpoint" {
+  description = "The endpoint URL for web storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_web_endpoint, null)
+}
+
 output "secondary_web_host" {
   description = "The hostname with port if applicable for web storage in the secondary location"
   value       = try(azurerm_storage_account.storage_account.secondary_web_host, null)
+}
+
+output "secondary_web_internet_endpoint" {
+  description = "The internet routing endpoint URL for web storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_web_internet_endpoint, null)
+}
+
+output "secondary_web_internet_host" {
+  description = "The internet routing hostname with port if applicable for web storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_web_internet_host, null)
+}
+
+output "secondary_web_microsoft_endpoint" {
+  description = "The microsoft routing endpoint URL for web storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_web_microsoft_endpoint, null)
+}
+
+output "secondary_web_microsoft_host" {
+  description = "The microsoft routing hostname with port if applicable for web storage in the secondary location"
+  value       = try(azurerm_storage_account.storage_account.secondary_web_microsoft_host, null)
 }
 
 output "primary_connection_string" {
@@ -296,5 +496,95 @@ output "diagnostic_settings" {
       name = azurerm_monitor_diagnostic_setting.blob_diagnostic_setting[0].name
     } : null
   }
+}
+
+output "account_tier" {
+  description = "The Tier of the storage account"
+  value       = try(azurerm_storage_account.storage_account.account_tier, null)
+}
+
+output "account_replication_type" {
+  description = "The replication type of the storage account"
+  value       = try(azurerm_storage_account.storage_account.account_replication_type, null)
+}
+
+output "account_kind" {
+  description = "The Kind of the storage account"
+  value       = try(azurerm_storage_account.storage_account.account_kind, null)
+}
+
+output "access_tier" {
+  description = "The access tier of the storage account"
+  value       = try(azurerm_storage_account.storage_account.access_tier, null)
+}
+
+output "https_traffic_only_enabled" {
+  description = "Is HTTPS traffic only enabled for the storage account"
+  value       = try(azurerm_storage_account.storage_account.https_traffic_only_enabled, null)
+}
+
+output "min_tls_version" {
+  description = "The minimum TLS version of the storage account"
+  value       = try(azurerm_storage_account.storage_account.min_tls_version, null)
+}
+
+output "is_hns_enabled" {
+  description = "Is Hierarchical Namespace enabled for the storage account"
+  value       = try(azurerm_storage_account.storage_account.is_hns_enabled, null)
+}
+
+output "nfsv3_enabled" {
+  description = "Is NFSv3 protocol enabled for the storage account"
+  value       = try(azurerm_storage_account.storage_account.nfsv3_enabled, null)
+}
+
+output "large_file_share_enabled" {
+  description = "Are Large File Shares enabled for the storage account"
+  value       = try(azurerm_storage_account.storage_account.large_file_share_enabled, null)
+}
+
+output "infrastructure_encryption_enabled" {
+  description = "Is infrastructure encryption enabled for the storage account"
+  value       = try(azurerm_storage_account.storage_account.infrastructure_encryption_enabled, null)
+}
+
+output "allow_nested_items_to_be_public" {
+  description = "Are nested items allowed to be public for the storage account"
+  value       = try(azurerm_storage_account.storage_account.allow_nested_items_to_be_public, null)
+}
+
+output "cross_tenant_replication_enabled" {
+  description = "Is cross tenant replication enabled for the storage account"
+  value       = try(azurerm_storage_account.storage_account.cross_tenant_replication_enabled, null)
+}
+
+output "shared_access_key_enabled" {
+  description = "Are shared access keys enabled for the storage account"
+  value       = try(azurerm_storage_account.storage_account.shared_access_key_enabled, null)
+}
+
+output "queue_encryption_key_type" {
+  description = "The encryption type of the queue service"
+  value       = try(azurerm_storage_account.storage_account.queue_encryption_key_type, null)
+}
+
+output "table_encryption_key_type" {
+  description = "The encryption type of the table service"
+  value       = try(azurerm_storage_account.storage_account.table_encryption_key_type, null)
+}
+
+output "resource_group_name" {
+  description = "The name of the resource group in which the storage account is created"
+  value       = try(azurerm_storage_account.storage_account.resource_group_name, null)
+}
+
+output "location" {
+  description = "The Azure location where the storage account exists"
+  value       = try(azurerm_storage_account.storage_account.location, null)
+}
+
+output "tags" {
+  description = "A map of tags assigned to the storage account"
+  value       = try(azurerm_storage_account.storage_account.tags, null)
 }
 
