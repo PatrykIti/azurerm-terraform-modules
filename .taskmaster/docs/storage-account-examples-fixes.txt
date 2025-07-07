@@ -1,0 +1,76 @@
+# Storage Account Module Examples - Fixes and Improvements
+
+## Overview
+Fix and improve all storage account module examples to ensure they correctly demonstrate module features, follow best practices from CLAUDE.md, and properly utilize module parameters without creating resources that the module already handles.
+
+## Requirements
+
+### General Requirements for All Examples
+1. Remove hardcoded subscription IDs from all examples
+2. Remove committed terraform.tfstate files and add proper .gitignore
+3. Ensure examples use module parameters instead of creating resources the module already provides
+4. Follow Terraform best practices from docs/TERRAFORM_BEST_PRACTISES_GUIDE.md
+5. Verify each example correctly demonstrates its intended scenario
+6. Check module capabilities and use appropriate parameters for each scenario
+
+### Example-Specific Requirements
+
+#### Simple Example
+- Remove explicit `shared_access_key_enabled = true` or add security warning
+- Add at least one container to demonstrate basic storage usage
+- Consider renaming directory from "simple" to "basic" per best practices
+- Add variables.tf for configurable values
+
+#### Complete Example
+- Change network rules default_action to "Deny" with clear documentation
+- Ensure all features are properly documented
+- Add variables.tf for location, prefix, and network ranges
+
+#### Secure Example
+- Remove claims about Advanced Threat Protection (not implemented in module)
+- Add immutability policy example for compliance scenarios
+- Consider adding SAS policy configuration for defense in depth
+
+#### Advanced-Policies Example
+- Add variables.tf file for consistency
+- Add comment warning about custom domain DNS requirements in main.tf
+
+#### Data-Lake-Gen2 Example
+- Add ACL configuration examples using azurerm_storage_data_lake_gen2_path
+- Add Azure AD role assignments (Storage Blob Data Owner/Contributor/Reader)
+- Show integration with at least one analytics service (Databricks/Synapse)
+- Add examples of advanced features (change feed, query acceleration)
+
+#### Identity-Access Example
+- Remove direct azurerm_storage_container resources - use module's containers parameter
+- Add examples for all three identity types: SystemAssigned, UserAssigned, and combined
+- Show complete encryption flow using managed identity with Key Vault
+- Add container-level RBAC assignments examples
+
+#### Multi-Region Example
+- Fix Terraform version requirement to match module (4.35.0)
+- Add practical replication implementation (Azure Functions or Logic Apps)
+- Add monitoring and alerting for replication lag
+- Enhance security with private endpoints and restrictive network rules
+- Add cost estimation documentation
+
+#### Secure-Private-Endpoint Example
+- Add missing DNS zone virtual network links for queue and table services
+- Explicitly set public_network_access_enabled = false in security_settings
+- Add NSG to private endpoints subnet
+- Update module depends_on to include all DNS zone links
+
+## Success Criteria
+- All examples properly demonstrate their intended scenarios
+- No resources are created that the module already handles
+- All examples follow project best practices from CLAUDE.md
+- Each example has appropriate documentation explaining its use case
+- Examples are production-ready and demonstrate real-world scenarios
+- All security anti-patterns are removed or clearly documented with warnings
+
+## Technical Considerations
+- Review module's variables.tf to understand all available parameters
+- Ensure prerequisite resources (VNet, Key Vault, etc.) are properly created
+- Follow the principle "Do what has been asked; nothing more, nothing less"
+- Prefer editing existing files over creating new ones
+- Never create documentation files unless explicitly requested

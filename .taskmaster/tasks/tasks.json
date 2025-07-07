@@ -776,11 +776,390 @@
         ],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 23,
+        "title": "General Project Cleanup and Standardization",
+        "description": "Apply general fixes across all examples, including removing committed terraform.tfstate files, adding a proper .gitignore file, removing hardcoded subscription IDs, and ensuring all examples adhere to the best practices outlined in CLAUDE.md and TERRAFORM_BEST_PRACTISES_GUIDE.md.",
+        "details": "1. Create a root `.gitignore` file containing at least `*.tfstate`, `*.tfstate.*`, `.terraform/`, and `*.tfvars`. 2. Execute `git rm --cached **/*.tfstate` to unstage any committed state files from the repository. 3. Systematically review all `.tf` files within the examples directories and remove any hardcoded `subscription_id` attributes from provider blocks. 4. Perform a comprehensive review of each example against the project's Terraform and general contribution guidelines.",
+        "testStrategy": "Verify the successful removal of state files by running `git status` and ensuring no `.tfstate` files are tracked. Run `terraform validate` in each example directory to check for syntax errors. Manually inspect the codebase for the absence of hardcoded subscription IDs and for compliance with documented best practices.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create and Commit Root .gitignore File",
+            "description": "Create a comprehensive .gitignore file at the root of the project to prevent committing sensitive or unnecessary files, such as Terraform state files, local variables, and temporary directories.",
+            "dependencies": [],
+            "details": "Create a new file named `.gitignore` in the project's root directory. Add entries to ignore common Terraform artifacts and local configuration. The file should include at least the following patterns:\n\n# Terraform\n*.tfstate\n*.tfstate.*\n.terraform/\n*.tfvars\ncrash.log\n\n# General\n.DS_Store\n*~",
+            "status": "pending",
+            "testStrategy": "Verify that after creating the .gitignore file, running `git status` does not show any `.tfstate` or `.terraform` directories as untracked files if they exist locally. Attempt to add a `test.tfstate` file to staging (`git add test.tfstate`) and confirm that Git ignores it."
+          },
+          {
+            "id": 2,
+            "title": "Remove All Committed Terraform State Files from Git History",
+            "description": "Identify and remove any `terraform.tfstate` or `terraform.tfstate.backup` files that have been previously committed to the repository. This ensures that sensitive state information is removed from the Git history.",
+            "dependencies": [
+              1
+            ],
+            "details": "Execute the command `git rm --cached '**/*.tfstate'` from the root of the repository. This will unstage all files matching the pattern `*.tfstate` from the Git index across all directories. Repeat the command for `*.tfstate.*` if any backup files are present: `git rm --cached '**/*.tfstate.*'`. After running the commands, commit the changes with a clear message like 'chore: Remove tracked terraform state files'.",
+            "status": "pending",
+            "testStrategy": "After committing the changes, run `git ls-files | grep '.tfstate'` to confirm that no state files are being tracked by Git. Clone the repository to a new directory and verify that no `.tfstate` files are present."
+          },
+          {
+            "id": 3,
+            "title": "Remove Hardcoded Subscription IDs from Provider Blocks",
+            "description": "Systematically review all `.tf` files within the storage account examples and remove any hardcoded `subscription_id` attributes from the `azurerm` provider blocks. This promotes better configuration management and avoids security risks.",
+            "dependencies": [
+              2
+            ],
+            "details": "Search across all `*.tf` files in the `examples/` directory for the string `subscription_id`. For each occurrence within a provider block (e.g., `provider \"azurerm\" { ... }`), delete the line containing `subscription_id`. The provider should be configured via environment variables (e.g., `ARM_SUBSCRIPTION_ID`) or other secure means, not hardcoded values.",
+            "status": "pending",
+            "testStrategy": "Perform a global search for `subscription_id` within the project's `.tf` files. The search should return no results within any `provider \"azurerm\"` blocks. Manually inspect the `main.tf` or `provider.tf` file in each example directory to confirm the removal."
+          },
+          {
+            "id": 4,
+            "title": "Align Examples with CLAUDE.md Contribution Guidelines",
+            "description": "Review each storage account example to ensure it adheres to the principles outlined in `CLAUDE.md`. Specifically, ensure that examples do not create resources that the module itself is designed to provide (e.g., resource groups, if the module has an option to create one).",
+            "dependencies": [
+              3
+            ],
+            "details": "For each example directory, review the Terraform configuration (`.tf` files). Compare the resources being created in the example with the functionality of the module being called. If the module has an input variable like `create_resource_group = true`, the example should leverage that instead of defining a separate `resource \"azurerm_resource_group\" \"example\" { ... }`. Refactor any such examples to use the module's built-in capabilities.",
+            "status": "pending",
+            "testStrategy": "For each example, run `terraform plan`. The plan should show that the resources being created are appropriate for an example demonstrating the module's usage, and not redundant resources that the module itself manages. The diff for this subtask should only contain removals of redundant resource blocks from the examples."
+          },
+          {
+            "id": 5,
+            "title": "Ensure Adherence to TERRAFORM_BEST_PRACTISES_GUIDE.md",
+            "description": "Perform a final, comprehensive review of all storage account examples to ensure they comply with the project's Terraform best practices guide. This includes checking for proper variable definitions, outputs, naming conventions, and module sourcing.",
+            "dependencies": [
+              4
+            ],
+            "details": "Review each example against the checklist in `TERRAFORM_BEST_PRACTISES_GUIDE.md`. Key items to check include:\n1. All variables used in `main.tf` are defined in `variables.tf` with types and descriptions.\n2. Important resource attributes are exposed via `outputs.tf`.\n3. Module source points to the local path (`../../`) for development purposes.\n4. Resource and variable names follow the project's naming conventions. \nRefactor the code in each example to meet these standards.",
+            "status": "pending",
+            "testStrategy": "Manually review the code changes against the `TERRAFORM_BEST_PRACTISES_GUIDE.md` document. Run `terraform validate` in each example directory to catch syntax errors. The code should be clean, well-documented, and consistent across all examples."
+          }
+        ]
+      },
+      {
+        "id": 24,
+        "title": "Refactor 'Simple' and 'Complete' Examples",
+        "description": "Update the 'simple' and 'complete' examples to align with best practices, including renaming the 'simple' directory to 'basic', adding variables for configuration, improving security defaults, and ensuring the module's capabilities are used correctly.",
+        "details": "For the 'simple' example: 1. Rename the directory from `simple` to `basic`. 2. Remove the `shared_access_key_enabled = true` setting or add a prominent comment warning about the security implications. 3. Introduce a `variables.tf` file for `location` and `resource_group_name`. 4. Use the module's `containers` input to create at least one storage container, e.g., `containers = { \"logs\" = { access_type = \"private\" } }`. For the 'complete' example: 1. Set `network_rules_default_action = \"Deny\"` in the module block. 2. Add a `variables.tf` file for `location`, `prefix`, and `network_ranges`.",
+        "testStrategy": "For each modified example, run `terraform plan` and `terraform apply`. In the Azure Portal, confirm that the 'basic' example's storage account contains the new container. For the 'complete' example, verify that the storage account's networking configuration has its default action set to 'Deny'.",
+        "priority": "medium",
+        "dependencies": [
+          23
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Rename 'simple' example to 'basic' and add variables.tf",
+            "description": "Rename the `examples/simple` directory to `examples/basic`. Create a `variables.tf` file within this new directory to define variables for `location` and `resource_group_name`. Update the `main.tf` to use these new variables and provide an example `terraform.tfvars` file.",
+            "dependencies": [],
+            "details": "1. Rename the directory: `git mv examples/simple examples/basic`. 2. Create `examples/basic/variables.tf` with variables for `location` and `resource_group_name`. 3. In `examples/basic/main.tf`, replace the hardcoded values for these attributes with `var.location` and `var.resource_group_name`. 4. Create an `examples/basic/terraform.tfvars.example` file to demonstrate how to populate these variables.",
+            "status": "pending",
+            "testStrategy": "Navigate to the `examples/basic` directory. Run `terraform init` and `terraform validate` to ensure the configuration is syntactically correct. Run `terraform plan` with appropriate variable values to confirm the changes are correctly interpreted."
+          },
+          {
+            "id": 2,
+            "title": "Improve Security and Add Container Creation to 'basic' Example",
+            "description": "In the `examples/basic/main.tf`, remove the `shared_access_key_enabled = true` setting to default to a more secure configuration. Also, demonstrate the module's capability by using the `containers` input to create a private 'logs' container.",
+            "dependencies": [],
+            "details": "1. Edit `examples/basic/main.tf`. 2. Remove the line `shared_access_key_enabled = true` from the module block. If it doesn't exist, ensure it's not added. 3. Add the input `containers = { \"logs\" = { access_type = \"private\" } }` to the module block to demonstrate container creation.",
+            "status": "pending",
+            "testStrategy": "Navigate to the `examples/basic` directory. Run `terraform plan`. The plan should show the storage account being created with shared access key disabled and one storage container named 'logs' being created."
+          },
+          {
+            "id": 3,
+            "title": "Add variables.tf for the 'complete' Example",
+            "description": "Create a `variables.tf` file in the `examples/complete` directory. Define variables for `location`, `prefix`, and `network_ranges` to make the example more configurable. Update the `main.tf` to use these new variables and provide an example `terraform.tfvars` file.",
+            "dependencies": [],
+            "details": "1. Create `examples/complete/variables.tf`. 2. Define variables: `variable \"location\" {}`, `variable \"prefix\" {}`, and `variable \"network_ranges\" { type = list(string) }`. 3. In `examples/complete/main.tf`, replace the corresponding hardcoded values with `var.location`, `var.prefix`, and `var.network_ranges`. 4. Create an `examples/complete/terraform.tfvars.example` file to demonstrate usage.",
+            "status": "pending",
+            "testStrategy": "Navigate to the `examples/complete` directory. Run `terraform init` and `terraform validate`. Run `terraform plan` with appropriate variable values to confirm the configuration is valid and uses the variables correctly."
+          },
+          {
+            "id": 4,
+            "title": "Harden Network Security in 'complete' Example",
+            "description": "Update the `examples/complete/main.tf` to set a more secure default network rule by changing the `network_rules_default_action` to \"Deny\". This ensures that traffic is denied by default unless explicitly allowed.",
+            "dependencies": [],
+            "details": "1. Edit `examples/complete/main.tf`. 2. In the module block for the storage account, add or update the parameter to be `network_rules_default_action = \"Deny\"`.",
+            "status": "pending",
+            "testStrategy": "Navigate to the `examples/complete` directory. Run `terraform plan`. The plan should show the storage account's `network_rules` block being modified to have `default_action = \"Deny\"`."
+          }
+        ]
+      },
+      {
+        "id": 25,
+        "title": "Enhance 'Secure' and 'Advanced-Policies' Examples",
+        "description": "Improve the 'secure' and 'advanced-policies' examples by removing inaccurate claims about Advanced Threat Protection, adding examples for immutability and SAS policies, and ensuring consistency by adding variables files and necessary warnings.",
+        "details": "For the 'secure' example: 1. Remove any comments or documentation referencing 'Advanced Threat Protection'. 2. Demonstrate an immutability policy by configuring a container via the module, e.g., `containers = { \"compliance-data\" = { immutability_policy = { days_after_creation = 365, policy_mode = \"Unlocked\" } } }`. 3. Add a SAS policy configuration, e.g., `sas_policy = { expiration_period = \"01.00:00:00\", expiration_action = \"Log\" }`. For the 'advanced-policies' example: 1. Add a `variables.tf` file. 2. Add a comment in `main.tf` above the `custom_domain` block: `// WARNING: Manual DNS CNAME record creation is required for this custom domain to validate.`",
+        "testStrategy": "Run `terraform plan` and `apply`. In the Azure Portal, inspect the storage account from the 'secure' example. Verify the immutability policy on the specified container and check the SAS policy settings. For the 'advanced-policies' example, confirm the warning comment is present in the code.",
+        "priority": "high",
+        "dependencies": [
+          23
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Remove Inaccurate ATP Claims from 'secure' Example",
+            "description": "Update the 'secure' example by removing all comments and documentation that incorrectly reference 'Advanced Threat Protection' (ATP), as this feature is not implemented in the module.",
+            "dependencies": [],
+            "details": "Navigate to the `examples/secure` directory. Search through all files, particularly `main.tf` and any READMEs, for the phrases 'Advanced Threat Protection' or 'ATP'. Delete these references to clean up the example's documentation.",
+            "status": "pending",
+            "testStrategy": "Manually inspect the files in the `examples/secure` directory to confirm all mentions of ATP have been removed. Run `terraform validate` to ensure no syntax errors were introduced."
+          },
+          {
+            "id": 2,
+            "title": "Add Immutability and SAS Policy Examples to 'secure' Example",
+            "description": "Enhance the 'secure' example by adding configuration blocks to demonstrate an immutability policy for a container and a SAS (Shared Access Signature) policy for the storage account.",
+            "dependencies": [],
+            "details": "In `examples/secure/main.tf`, update the module call. First, add a `sas_policy` argument to the module block, for example: `sas_policy = { expiration_period = \"01.00:00:00\", expiration_action = \"Log\" }`. Second, add a `containers` map to define a container with an immutability policy, for example: `containers = { \"compliance-data\" = { immutability_policy = { days_after_creation = 365, policy_mode = \"Unlocked\" } } }`.",
+            "status": "pending",
+            "testStrategy": "Run `terraform plan` within the `examples/secure` directory. Verify that the plan output shows the storage account being configured with the specified SAS policy and a new container being created with the correct immutability policy settings."
+          },
+          {
+            "id": 3,
+            "title": "Update 'advanced-policies' Example with Variables and DNS Warning",
+            "description": "Improve the 'advanced-policies' example by adding a `variables.tf` file for consistency and inserting a warning comment in `main.tf` to inform users about the manual DNS CNAME record creation required for custom domains.",
+            "dependencies": [],
+            "details": "1. In the `examples/advanced-policies` directory, create a new `variables.tf` file. Define variables used in `main.tf` (e.g., for resource group name, location) to align with best practices. 2. In `examples/advanced-policies/main.tf`, find the `custom_domain` block. Add the following comment on the line directly above it: `// WARNING: Manual DNS CNAME record creation is required for this custom domain to validate.`",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` in the `examples/advanced-policies` directory to confirm the new `variables.tf` is syntactically correct. Manually review `main.tf` to ensure the warning comment is present in the correct location."
+          }
+        ]
+      },
+      {
+        "id": 26,
+        "title": "Overhaul Data-Lake-Gen2 Example with ACLs and RBAC",
+        "description": "Refactor the Data Lake Gen2 example to demonstrate proper Access Control List (ACL) configuration on directories and files, and to show how to assign Azure AD roles for data plane access.",
+        "details": "1. Ensure the storage account is created with `is_hns_enabled = true`. 2. Use the `azurerm_storage_data_lake_gen2_path` resource to create a directory structure and apply ACLs. Example: `resource \"azurerm_storage_data_lake_gen2_path\" \"example\" { path = \"raw/data\", filesystem_name = module.storage.container_names[\"datalakefs\"], storage_account_id = module.storage.id, resource = \"directory\", ace = [{ type = \"user\", id = var.user_object_id, permissions = \"rwx\" }] }`. 3. Add `azurerm_role_assignment` resources to grant roles like 'Storage Blob Data Owner' to a principal, scoped to the storage account.",
+        "testStrategy": "Apply the configuration. Use Azure CLI (`az storage fs access list`) or Azure Storage Explorer to verify that the directory structure and ACLs are set as defined. In the Azure Portal, check the 'Access control (IAM)' blade of the storage account to confirm the role assignments have been created.",
+        "priority": "high",
+        "dependencies": [
+          23
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Configure Foundational Resources: Azure AD Principal and Data Lake Storage",
+            "description": "Create the necessary Azure AD Service Principal to represent an application or user, and provision the Azure Storage Account with the Hierarchical Namespace (HNS) enabled to function as a Data Lake Gen2. This sets the stage for applying access control.",
+            "dependencies": [],
+            "details": "1. Use the `azuread_service_principal` and `azuread_application` resources to create a new identity. 2. In the `azurerm_storage_account` resource, ensure the `is_hns_enabled` property is set to `true`. 3. Create an `azurerm_storage_data_lake_gen2_filesystem` resource to act as the container for the data lake paths. 4. Use `output` blocks to expose the service principal's `object_id` and the storage account `id` for use in subsequent subtasks.",
+            "status": "pending",
+            "testStrategy": "Run `terraform apply` and verify in the Azure Portal that the storage account is created with 'Hierarchical namespace' enabled and that the service principal exists in Azure AD."
+          },
+          {
+            "id": 2,
+            "title": "Implement Fine-Grained ACLs on Data Lake Paths",
+            "description": "Demonstrate the use of Access Control Lists (ACLs) for POSIX-like permissions on specific directories and files within the data lake. This subtask will create a directory and a file, applying distinct permissions to each for the service principal.",
+            "dependencies": [
+              1
+            ],
+            "details": "1. Use the `azurerm_storage_data_lake_gen2_path` resource to create a directory (e.g., `path = \"raw\"`). Set `resource = \"directory\"`. 2. Configure the `ace` block to grant the Service Principal from subtask 1 `rwx` permissions. The `id` in the `ace` block should be the `object_id` of the service principal. 3. Add another `azurerm_storage_data_lake_gen2_path` resource to create a file inside the directory (e.g., `path = \"raw/data.csv\"`, `resource = \"file\"`). Grant this file `rw-` permissions for the same principal to show file-level control.",
+            "status": "pending",
+            "testStrategy": "After applying, use Azure Storage Explorer or Azure CLI (`az storage fs access show`) to inspect the ACLs on the newly created directory and file. Verify that the service principal's object ID is listed with the correct 'rwx' and 'rw-' permissions respectively."
+          },
+          {
+            "id": 3,
+            "title": "Assign Coarse-Grained RBAC Roles for Data Plane Operations",
+            "description": "Complement the fine-grained ACLs by assigning a broader Azure RBAC role to the service principal. This demonstrates the two-layered security model of Azure Data Lake Storage, where RBAC provides high-level access and ACLs refine it.",
+            "dependencies": [
+              1
+            ],
+            "details": "1. Create an `azurerm_role_assignment` resource. 2. Set the `scope` to the `id` of the `azurerm_storage_account` created in subtask 1. 3. Set the `role_definition_name` to 'Storage Blob Data Contributor'. This role is commonly used for data plane operations. 4. Set the `principal_id` to the `object_id` of the service principal. 5. Add comments to the Terraform code explaining that Azure first checks RBAC for access, and if granted, then checks ACLs for the specific operation.",
+            "status": "pending",
+            "testStrategy": "In the Azure Portal, navigate to the Storage Account's 'Access control (IAM)' blade. Verify that the service principal has been assigned the 'Storage Blob Data Contributor' role. Test data access using a tool or script authenticated as the service principal to confirm it can write data as allowed by the combination of its RBAC role and ACLs."
+          }
+        ]
+      },
+      {
+        "id": 27,
+        "title": "Add Advanced Features to Data-Lake-Gen2 Example",
+        "description": "Extend the Data Lake Gen2 example to showcase integration with analytics services like Databricks or Synapse and to demonstrate advanced features such as change feed.",
+        "details": "1. Add commented-out or placeholder resource blocks for `azurerm_databricks_workspace` or `azurerm_synapse_workspace` with documentation explaining how to mount the Data Lake storage. 2. Enable the change feed feature on the storage account's blob service properties via the module: `change_feed_enabled = true` and `change_feed_retention_in_days = 7`. 3. Add a note in the example's README about query acceleration, explaining it's a feature enabled on-demand and not typically managed via Terraform.",
+        "testStrategy": "Apply the configuration. In the Azure Portal, navigate to the storage account's 'Data protection' settings and verify that the change feed is enabled with the correct retention period. Review the generated documentation for clarity and correctness regarding analytics integration.",
+        "priority": "medium",
+        "dependencies": [
+          23,
+          26
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Enable Change Feed and Add Analytics Service Placeholders in Terraform",
+            "description": "Modify the Data Lake Gen2 example's Terraform configuration to enable the change feed feature on the storage account and add commented-out resource blocks for Databricks or Synapse Analytics integration.",
+            "dependencies": [],
+            "details": "In the main Terraform file for the `data-lake-gen2` example, update the module call for the storage account to enable the change feed. Set `change_feed_enabled = true` and `change_feed_retention_in_days = 7`. Following this, add new, commented-out resource blocks for either `azurerm_databricks_workspace` or `azurerm_synapse_workspace`. Include detailed comments above these blocks explaining how a user would uncomment and configure them, and provide guidance or a link on how to mount the Data Lake storage to the chosen analytics service.",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` to check for syntax errors. Run `terraform plan` and inspect the output to confirm that the `change_feed_enabled` property on the storage account's blob service is being set to `true`. Manually review the Terraform file to ensure the commented-out analytics service resources and their accompanying documentation are clear and correct."
+          },
+          {
+            "id": 2,
+            "title": "Update README with Advanced Feature Documentation",
+            "description": "Update the example's README.md to document the newly added advanced features, including the enabled change feed, the analytics service integration placeholders, and a note on query acceleration.",
+            "dependencies": [
+              1
+            ],
+            "details": "Edit the `README.md` file in the `data-lake-gen2` example directory. Create a new section, for example, 'Advanced Features'. Within this section, add subsections to: 1. Explain that the change feed feature is now enabled via the module inputs and briefly describe its use case. 2. Reference the new commented-out blocks for Databricks/Synapse in the Terraform code, explaining how to use them. 3. Add a note explaining what query acceleration is and why it's not configured via Terraform (i.e., it's an on-demand feature applied to specific queries, not the infrastructure).",
+            "status": "pending",
+            "testStrategy": "Review the modified `README.md` file. Check for clarity, correctness, and formatting. Ensure that all three topics (change feed, analytics integration, and query acceleration) are adequately explained for a user of the example."
+          }
+        ]
+      },
+      {
+        "id": 28,
+        "title": "Refactor 'Identity-Access' Example for Correctness",
+        "description": "Correct the 'identity-access' example by removing direct container resources in favor of the module's parameters. Add distinct demonstrations for SystemAssigned, UserAssigned, and combined identity types, including a complete encryption flow using a managed identity with Azure Key Vault.",
+        "details": "1. Remove all `azurerm_storage_container` resources from the example. 2. Refactor to use the module's `containers` input parameter. 3. Structure the example to clearly demonstrate three identity scenarios: SystemAssigned, UserAssigned, and both. 4. Implement the full customer-managed key encryption flow: create a Key Vault and key, grant the storage account's managed identity access to the vault, and configure the module's `customer_managed_key` block to use the key, e.g., `customer_managed_key = { key_vault_key_id = azurerm_key_vault_key.example.id, user_assigned_identity_id = azurerm_user_assigned_identity.example.id }`.",
+        "testStrategy": "Apply each identity variation separately. For each, verify in the Azure Portal that the storage account has the correct identity type(s) enabled. Check the 'Encryption' settings to confirm it is using the specified customer-managed key from the Key Vault.",
+        "priority": "high",
+        "dependencies": [
+          23
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Refactor Container Management to Use Module Input",
+            "description": "Modify the 'identity-access' example to remove all direct `azurerm_storage_container` resource declarations. The example should instead leverage the module's `containers` input parameter to declare and manage storage containers.",
+            "dependencies": [],
+            "details": "In the `examples/identity-access/main.tf` file, delete all `resource \"azurerm_storage_container\" \"...\"` blocks. In the primary `module \"storage_account\"` call, add the `containers` argument to define the necessary containers. For example: `containers = { \"logs\" = {}, \"data\" = { public_access = \"None\" } }`. This ensures container configuration is handled by the module itself.",
+            "status": "pending",
+            "testStrategy": "Run `terraform plan`. The plan should show the module creating the containers, and there should be no direct `azurerm_storage_container` resources in the plan output."
+          },
+          {
+            "id": 2,
+            "title": "Implement Key Vault and Key for Encryption",
+            "description": "Add the necessary Terraform resources to the example to provision an Azure Key Vault and a cryptographic key. This infrastructure is a prerequisite for demonstrating customer-managed key (CMK) encryption with managed identities.",
+            "dependencies": [],
+            "details": "In `examples/identity-access/main.tf`, add a `resource \"azurerm_key_vault\" \"example\"` and a `resource \"azurerm_key_vault_key\" \"example\"`. Configure the Key Vault with `sku_name = \"premium\"`, `soft_delete_retention_days = 7`, and `purge_protection_enabled = true`. The key should be of type 'RSA'. This creates the components needed for the encryption flow.",
+            "status": "pending",
+            "testStrategy": "Run `terraform apply` and verify in the Azure Portal that the Key Vault and the key within it are created successfully."
+          },
+          {
+            "id": 3,
+            "title": "Structure Identity Scenarios and Grant Key Vault Access",
+            "description": "Restructure the example to clearly demonstrate three distinct identity scenarios: System-Assigned, User-Assigned, and both combined. For each scenario, create a separate module call and grant the relevant managed identity the necessary permissions ('Get', 'Wrap Key', 'Unwrap Key') on the Key Vault key.",
+            "dependencies": [],
+            "details": "Create three separate module calls: `module \"storage_system_assigned\"`, `module \"storage_user_assigned\"`, and `module \"storage_combined\"`. \n1. **SystemAssigned**: Set `identity_type = \"SystemAssigned\"`. Create an `azurerm_key_vault_access_policy` referencing this module's `storage_account_system_assigned_identity[0].principal_id`.\n2. **UserAssigned**: Create an `azurerm_user_assigned_identity`. Set `identity_type = \"UserAssigned\"` and pass the identity's ID to `user_assigned_identity_resource_ids`. Create an access policy for this identity's `principal_id`.\n3. **Combined**: Set `identity_type = \"SystemAssigned, UserAssigned\"`. Create an access policy for its system-assigned identity's principal ID.",
+            "status": "pending",
+            "testStrategy": "Run `terraform plan` to verify that three storage accounts are planned, each with the correct identity configuration, and that three corresponding `azurerm_key_vault_access_policy` resources are created targeting the correct principal IDs."
+          },
+          {
+            "id": 4,
+            "title": "Configure CMK Encryption and Demonstrate Container RBAC",
+            "description": "For each of the three identity scenarios, configure the `customer_managed_key` block to enable encryption using the Key Vault key. Also, add a demonstration of container-level RBAC by assigning a role to one of the managed identities for a specific container.",
+            "dependencies": [],
+            "details": "For each of the three module calls:\n1. Add the `customer_managed_key` block. For System-Assigned, it only needs the `key_vault_key_id`. For User-Assigned and Combined, it also requires the `user_assigned_identity_id`.\n   - Example for User-Assigned: `customer_managed_key = { key_vault_key_id = azurerm_key_vault_key.example.id, user_assigned_identity_id = azurerm_user_assigned_identity.example.id }`\n2. Add an `azurerm_role_assignment` resource. Assign the 'Storage Blob Data Contributor' role to a managed identity (e.g., the user-assigned identity). The scope should be a specific container, which can be retrieved from the module's output, e.g., `module.storage_user_assigned.containers[\"data\"].id`.",
+            "status": "pending",
+            "testStrategy": "Run `terraform apply`. In the Azure Portal, verify that all three storage accounts are created and their 'Encryption' settings are configured for a customer-managed key, pointing to the correct Key Vault key. Verify that the specified role assignment exists on the target container's 'Access control (IAM)' blade."
+          }
+        ]
+      },
+      {
+        "id": 29,
+        "title": "Fix and Enhance Multi-Region Example",
+        "description": "Fix and enhance the 'multi-region' example by correcting the Terraform version requirement, implementing a practical replication mechanism using a Logic App, and adding monitoring and security enhancements.",
+        "details": "1. Update the `required_version` in the `terraform` block to `~> 4.35.0`. 2. Add an `azurerm_logic_app_workflow` resource that triggers on a schedule to copy new blobs from the primary to the secondary storage account. 3. Add an `azurerm_monitor_metric_alert` to monitor replication status (e.g., alert if `UsedCapacity` on the secondary account does not increase over a time period). 4. Secure both storage accounts with private endpoints and restrictive Network Security Groups (NSGs). 5. Add a `README.md` file with cost estimation notes.",
+        "testStrategy": "Apply the configuration. Manually trigger the Logic App and verify that a test blob is copied to the secondary storage account. In Azure Monitor, confirm the alert rule is active. Verify network isolation by checking the private endpoint connections and NSG rules in the Azure Portal.",
+        "priority": "medium",
+        "dependencies": [
+          23
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Update Terraform Version and Secure Storage Accounts",
+            "description": "Update the Terraform provider version and implement foundational security for both storage accounts. This involves configuring private endpoints and network rules to restrict public access, ensuring a secure base for the replication logic.",
+            "dependencies": [],
+            "details": "1. In the main Terraform configuration file (`main.tf`), locate the `terraform` block and update the `required_version` constraint to `~> 4.35.0`.\n2. Define two `azurerm_private_endpoint` resources, one for the primary storage account and one for the secondary.\n3. Associate these private endpoints with the appropriate virtual network and subnet.\n4. Modify the `azurerm_storage_account` resources by setting `public_network_access_enabled` to `false` and configuring the `network_rules` block to default to 'Deny'.",
+            "status": "pending",
+            "testStrategy": "Run `terraform plan` to verify the changes to the provider version and the creation of private endpoints. After applying, use the Azure Portal to confirm that both storage accounts have 'Public network access' disabled and that the private endpoint connections are successfully established."
+          },
+          {
+            "id": 2,
+            "title": "Implement Scheduled Blob Replication with a Logic App",
+            "description": "Create an Azure Logic App workflow that periodically copies new or updated blobs from the primary storage account to the secondary one. This will serve as the practical replication mechanism for the multi-region example.",
+            "dependencies": [],
+            "details": "1. Add an `azurerm_logic_app_workflow` resource to your Terraform configuration.\n2. Configure the workflow with a 'Recurrence' trigger to run on a defined schedule (e.g., every 15 minutes).\n3. Define the workflow steps in the `workflow_schema` or a linked JSON file: \n   a. Use the 'List blobs' action to get files from the primary container.\n   b. Use a 'For each' loop to iterate over the listed blobs.\n   c. Inside the loop, use 'Get blob content' from the primary and 'Create blob' to write it to the secondary.\n4. Grant the Logic App's managed identity the 'Storage Blob Data Contributor' role on both storage accounts to allow it to read and write blobs.",
+            "status": "pending",
+            "testStrategy": "After deployment, manually upload a test file to the primary storage container. Monitor the Logic App's run history in the Azure Portal. Verify that the workflow triggers as scheduled and successfully copies the test file to the secondary storage container without errors."
+          },
+          {
+            "id": 3,
+            "title": "Configure Replication Monitoring and Add Documentation",
+            "description": "Set up a monitoring alert to detect potential replication failures and create a README file to document the example's architecture, usage, and estimated costs.",
+            "dependencies": [],
+            "details": "1. Define an `azurerm_monitor_metric_alert` resource in Terraform.\n2. Target the secondary storage account's `UsedCapacity` metric.\n3. Configure the alert criteria to trigger if the metric's value does not increase over a specific time window (e.g., 1 hour), indicating that replication may have stalled. Set up an action group to send an email notification.\n4. Create a `README.md` file in the root of the example directory.\n5. Document the purpose of the example, the resources it creates, and provide a high-level cost estimation note covering storage, Logic App executions, and data transfer fees.",
+            "status": "pending",
+            "testStrategy": "To test the alert, temporarily disable the Logic App and upload a file to the primary storage. The secondary's capacity will not change, and the alert should trigger after its evaluation period. For the documentation, review the `README.md` file for clarity, completeness, and accuracy."
+          }
+        ]
+      },
+      {
+        "id": 30,
+        "title": "Harden Secure-Private-Endpoint Example",
+        "description": "Harden the 'secure-private-endpoint' example by adding missing DNS zone links for queue and table services, explicitly disabling public network access, associating an NSG with the subnet, and ensuring all dependencies are correctly declared.",
+        "details": "1. Add `azurerm_private_dns_zone_virtual_network_link` resources for `privatelink.queue.core.windows.net` and `privatelink.table.core.windows.net`. 2. In the module call, explicitly set `public_network_access_enabled = false`. 3. Create an `azurerm_network_security_group` with appropriate rules and associate it with the private endpoint's subnet using `azurerm_subnet_network_security_group_association`. 4. Update the `depends_on` block in the module call to include all four private DNS zone link resources (blob, file, queue, table) to ensure correct creation order.",
+        "testStrategy": "Apply the configuration. From a virtual machine within the same VNet, use `nslookup` to resolve the FQDNs for the blob, queue, and table services, and verify they resolve to private IP addresses. In the Azure Portal, confirm that 'Public network access' is disabled on the storage account's networking blade and that the NSG is correctly associated with the subnet.",
+        "priority": "high",
+        "dependencies": [
+          23
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Add Private DNS Zone VNet Links for Queue and Table Services",
+            "description": "Enhance the private endpoint configuration by adding the necessary `azurerm_private_dns_zone_virtual_network_link` resources for the queue and table storage services. This ensures that DNS queries for these services from within the virtual network are resolved to their private IP addresses.",
+            "dependencies": [],
+            "details": "In the main Terraform configuration file for the example (`main.tf`), create two new `azurerm_private_dns_zone_virtual_network_link` resources. One will link the `privatelink.queue.core.windows.net` private DNS zone to the virtual network, and the other will link the `privatelink.table.core.windows.net` private DNS zone. Ensure you reference the existing virtual network and the respective private DNS zones correctly.",
+            "status": "pending",
+            "testStrategy": "Run `terraform plan` to verify the creation of two new `azurerm_private_dns_zone_virtual_network_link` resources. After applying, verify in the Azure Portal that the virtual network is linked to the 'queue' and 'table' private DNS zones."
+          },
+          {
+            "id": 2,
+            "title": "Explicitly Disable Public Network Access on Storage Account",
+            "description": "Harden the storage account by explicitly setting `public_network_access_enabled` to `false`. This enforces that all traffic must route through the private endpoint, aligning with security best practices.",
+            "dependencies": [],
+            "details": "Locate the module call for the storage account within the example's `main.tf`. In the `security_settings` block or as a direct argument, set `public_network_access_enabled = false`.",
+            "status": "pending",
+            "testStrategy": "Run `terraform plan` to confirm the change to the `azurerm_storage_account` resource, showing `public_network_access_enabled` will be updated to `false`. After applying, attempt to access the storage account's public endpoint and verify that the connection is denied."
+          },
+          {
+            "id": 3,
+            "title": "Create and Associate an NSG with the Private Endpoint Subnet",
+            "description": "Implement a Network Security Group (NSG) to control inbound and outbound traffic for the subnet hosting the private endpoints. This adds an essential layer of network-level security.",
+            "dependencies": [],
+            "details": "Define a new `azurerm_network_security_group` resource in `main.tf`. Add appropriate security rules as needed (e.g., a default rule to deny all inbound traffic). Then, create an `azurerm_subnet_network_security_group_association` resource to link the newly created NSG with the private endpoint's subnet.",
+            "status": "pending",
+            "testStrategy": "Run `terraform plan` to verify the creation of the `azurerm_network_security_group` and `azurerm_subnet_network_security_group_association` resources. After applying, check the Azure Portal to confirm the NSG is created and correctly associated with the private endpoint subnet."
+          },
+          {
+            "id": 4,
+            "title": "Update Module `depends_on` to Include All DNS Links",
+            "description": "Update the `depends_on` meta-argument in the main module call to include all four private DNS zone virtual network links (blob, file, queue, and table). This prevents race conditions during deployment by ensuring the network links are fully provisioned before the private endpoints that rely on them are created.",
+            "dependencies": [
+              1
+            ],
+            "details": "In the `main.tf` file, locate the module call that creates the private endpoints. Add or update the `depends_on` block to explicitly list all four `azurerm_private_dns_zone_virtual_network_link` resources, including the two new ones for queue and table created in the first subtask. The list should reference the Terraform resource names, for example: `[azurerm_private_dns_zone_virtual_network_link.blob, azurerm_private_dns_zone_virtual_network_link.file, azurerm_private_dns_zone_virtual_network_link.queue, azurerm_private_dns_zone_virtual_network_link.table]`.",
+            "status": "pending",
+            "testStrategy": "Perform a full `terraform destroy` and `terraform apply` on the example to verify that the entire infrastructure provisions successfully without any dependency-related errors or race conditions."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-07T10:43:01.480Z",
+      "updated": "2025-07-07T11:27:29.952Z",
       "description": "Tasks for master context"
     }
   }
