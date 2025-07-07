@@ -27,12 +27,12 @@ content: |-
   ## Usage
 
   ```hcl
-  {{ include "examples/simple/main.tf" }}
+  {{ include "examples/basic/main.tf" }}
   ```
 
   ## Examples
 
-  - [Simple](examples/simple) - Basic storage account configuration
+  - [Basic](examples/basic) - Basic storage account configuration
   - [Complete](examples/complete) - Full-featured storage account with all enterprise capabilities  
   - [Secure](examples/secure) - Maximum security configuration
   - [Multi-Region](examples/multi-region) - Multi-region setup with disaster recovery
