@@ -288,6 +288,12 @@ jobs:
           docs_errors=()
           
           for module in $modules; do
+            # First, generate dynamic terraform-docs config if examples exist
+            if [[ -d "$module/examples" ]] && [[ -x "./scripts/generate-terraform-docs-config.sh" ]]; then
+              echo "Generating terraform-docs config for $module..."
+              ./scripts/generate-terraform-docs-config.sh "$module"
+            fi
+            
             if [[ -f "$module/README.md" ]]; then
               # Generate current documentation
               if terraform-docs markdown table --output-file README.md.tmp "$module" 2>/dev/null; then

@@ -3,7 +3,7 @@
 
 ## Module Version
 
-Current version: **SAv1.0.0**
+Current version: **vUnreleased**
 
 ## Description
 
@@ -53,10 +53,14 @@ module "storage_account" {
 
 ## Examples
 
-- [Basic](examples/basic) - Basic storage account configuration
-- [Complete](examples/complete) - Full-featured storage account with all enterprise capabilities  
-- [Secure](examples/secure) - Maximum security configuration
-- [Multi-Region](examples/multi-region) - Multi-region setup with disaster recovery
+  - [Advanced Policies](examples/advanced-policies) - This example demonstrates the implementation of advanced storage account policies including SAS policies, immutability policies, routing preferences, custom domains, and SMB configurations.
+  - [Basic](examples/basic) - This example demonstrates a basic Azure Storage Account configuration using secure defaults and minimal setup.
+  - [Complete](examples/complete) - This example demonstrates a comprehensive deployment of an Azure Storage Account with all available features and security configurations.
+  - [Data Lake Gen2](examples/data-lake-gen2) - This example demonstrates how to configure an Azure Storage Account as a Data Lake Storage Gen2 with hierarchical namespace, SFTP, and NFSv3 support.
+  - [Identity Access](examples/identity-access) - This example demonstrates how to configure an Azure Storage Account with **keyless authentication** using managed identities and Microsoft Entra ID (formerly Azure AD) integration. This approach eliminates the need for shared access keys, providing enhanced security through identity-based access control.
+  - [Multi Region](examples/multi-region) - This example demonstrates a comprehensive multi-region Azure Storage Account deployment strategy with enhanced disaster recovery capabilities, cross-tenant replication, and optimized geo-redundancy configurations.
+  - [Secure](examples/secure) - This example demonstrates a maximum-security Azure Storage Account configuration suitable for highly sensitive data and regulated environments.
+  - [Secure Private Endpoint](examples/secure-private-endpoint) - This example demonstrates how to deploy a highly secure Azure Storage Account suitable for production environments handling sensitive data.
 
 ## Requirements
 
