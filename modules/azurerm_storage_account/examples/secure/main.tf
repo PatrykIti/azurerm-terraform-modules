@@ -287,32 +287,25 @@ module "storage_account" {
   }
 
   # Storage containers with immutability policies
-  containers = {
-    "compliance-data" = {
-      public_access = "None"
-      
-      # Immutability policy for regulatory compliance
-      immutability_policy = {
-        immutability_period_in_days           = 365
-        immutability_period_state             = "Unlocked" # Can be changed to "Locked" after testing
-        allow_protected_append_writes_all_enabled = false
-      }
-      
+  containers = [
+    {
+      name                  = "compliance-data"
+      container_access_type = "private"
       metadata = {
         purpose    = "Compliance data storage"
         retention  = "7years"
         compliance = "WORM"
       }
-    }
-    
-    "audit-logs" = {
-      public_access = "None"
+    },
+    {
+      name                  = "audit-logs"
+      container_access_type = "private"
       metadata = {
         purpose   = "Security audit logs"
         retention = "365days"
       }
     }
-  }
+  ]
 
   # Security tags
   tags = {

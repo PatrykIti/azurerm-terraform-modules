@@ -129,16 +129,23 @@ module "storage_account" {
       name    = "archive-old-data"
       enabled = true
       
-      base_blob = {
-        tier_to_cool_after_days_since_modification_greater_than    = 30
-        tier_to_archive_after_days_since_modification_greater_than = 90
-        delete_after_days_since_modification_greater_than          = 365
+      filters = {
+        blob_types   = ["blockBlob"]
+        prefix_match = []
       }
       
-      snapshot = {
-        tier_to_cool_after_days_since_creation_greater_than    = 30
-        tier_to_archive_after_days_since_creation_greater_than = 90
-        delete_after_days_since_creation_greater_than          = 180
+      actions = {
+        base_blob = {
+          tier_to_cool_after_days_since_modification_greater_than    = 30
+          tier_to_archive_after_days_since_modification_greater_than = 90
+          delete_after_days_since_modification_greater_than          = 365
+        }
+        
+        snapshot = {
+          change_tier_to_cool_after_days_since_creation    = 30
+          change_tier_to_archive_after_days_since_creation = 90
+          delete_after_days_since_creation_greater_than    = 180
+        }
       }
     }
   ]

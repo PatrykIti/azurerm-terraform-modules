@@ -177,20 +177,24 @@ module "primary_storage" {
   ]
 
   # Containers for primary storage
-  containers = {
-    "production-data" = {
-      public_access = "None"
+  containers = [
+    {
+      name                  = "production-data"
+      container_access_type = "private"
+    },
+    {
+      name                  = "logs"
+      container_access_type = "private"
+    },
+    {
+      name                  = "temp"
+      container_access_type = "private"
+    },
+    {
+      name                  = "archive"
+      container_access_type = "private"
     }
-    "logs" = {
-      public_access = "None"
-    }
-    "temp" = {
-      public_access = "None"
-    }
-    "archive" = {
-      public_access = "None"
-    }
-  }
+  ]
 
   tags = merge(var.tags, {
     Environment = "Production"
@@ -289,14 +293,16 @@ module "secondary_storage" {
   }
 
   # Containers for secondary storage
-  containers = {
-    "backup-data" = {
-      public_access = "None"
+  containers = [
+    {
+      name                  = "backup-data"
+      container_access_type = "private"
+    },
+    {
+      name                  = "replicated-logs"
+      container_access_type = "private"
     }
-    "replicated-logs" = {
-      public_access = "None"
-    }
-  }
+  ]
 
   tags = merge(var.tags, {
     Environment = "Production"
@@ -392,14 +398,16 @@ module "dr_storage" {
   }
 
   # Containers for DR storage
-  containers = {
-    "dr-archive" = {
-      public_access = "None"
+  containers = [
+    {
+      name                  = "dr-archive"
+      container_access_type = "private"
+    },
+    {
+      name                  = "compliance-backup"
+      container_access_type = "private"
     }
-    "compliance-backup" = {
-      public_access = "None"
-    }
-  }
+  ]
 
   tags = merge(var.tags, {
     Environment = "Production"
@@ -461,11 +469,12 @@ module "replication_metadata" {
   }
 
   # Containers for replication tracking
-  containers = {
-    "replication-logs" = {
-      public_access = "None"
+  containers = [
+    {
+      name                  = "replication-logs"
+      container_access_type = "private"
     }
-  }
+  ]
 
   tags = merge(var.tags, {
     Environment = "Production"
