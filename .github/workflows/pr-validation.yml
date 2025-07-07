@@ -196,7 +196,7 @@ jobs:
             echo "## Running TFLint on: $module"
             
             # Run tflint and capture output
-            if output=$(tflint --format=default --force "$module" 2>&1); then
+            if output=$(tflint --chdir="$module" --format=default --force 2>&1); then
               echo "✅ TFLint passed for: $module"
               echo "$output"
             else
@@ -214,7 +214,7 @@ jobs:
             for example in $examples; do
               echo "## Running TFLint on example: $example"
               
-              if output=$(tflint --format=default --force "$example" 2>&1); then
+              if output=$(tflint --chdir="$example" --format=default --force 2>&1); then
                 echo "✅ TFLint passed for: $example"
                 echo "$output"
               else
@@ -253,7 +253,7 @@ jobs:
             
             \`\`\`bash
             tflint --init
-            tflint --format=default --force <module-directory>
+            tflint --chdir=<module-directory> --format=default --force
             \`\`\``;
             
             await github.rest.issues.createComment({
