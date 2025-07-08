@@ -45,10 +45,8 @@ jobs:
           requireScope: false
           subjectPattern: ^(?![A-Z]).+$
           subjectPatternError: |
-            ❌ Subject validation failed!
-            Subject: "{subject}"
-            Title: "{title}"
-            Please ensure that the subject 
+            The subject "{subject}" found in the pull request title "{title}"
+            didn't match the configured pattern. Please ensure that the subject
             doesn't start with an uppercase character.
           validateSingleCommit: false
 
