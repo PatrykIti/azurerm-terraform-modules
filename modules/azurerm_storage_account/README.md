@@ -246,7 +246,6 @@ No modules.
 | <a name="output_secondary_web_internet_host"></a> [secondary\_web\_internet\_host](#output\_secondary\_web\_internet\_host) | The internet routing hostname with port if applicable for web storage in the secondary location |
 | <a name="output_secondary_web_microsoft_endpoint"></a> [secondary\_web\_microsoft\_endpoint](#output\_secondary\_web\_microsoft\_endpoint) | The microsoft routing endpoint URL for web storage in the secondary location |
 | <a name="output_secondary_web_microsoft_host"></a> [secondary\_web\_microsoft\_host](#output\_secondary\_web\_microsoft\_host) | The microsoft routing hostname with port if applicable for web storage in the secondary location |
-| <a name="output_sftp_enabled"></a> [sftp\_enabled](#output\_sftp\_enabled) | Is SFTP enabled for the storage account |
 | <a name="output_shared_access_key_enabled"></a> [shared\_access\_key\_enabled](#output\_shared\_access\_key\_enabled) | Are shared access keys enabled for the storage account |
 | <a name="output_static_website"></a> [static\_website](#output\_static\_website) | Static website properties |
 | <a name="output_static_website_id"></a> [static\_website\_id](#output\_static\_website\_id) | The ID of the Storage Account Static Website configuration |
