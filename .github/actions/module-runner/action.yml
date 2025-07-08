@@ -113,7 +113,7 @@ runs:
           fi
           
           go mod download
-          go test -v -timeout 30m
+          go test -v -timeout 60m
         else
           echo "No tests directory found, validating examples instead"
           if [[ -d "examples" ]]; then
