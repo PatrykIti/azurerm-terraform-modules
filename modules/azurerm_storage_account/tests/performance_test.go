@@ -147,6 +147,9 @@ func BenchmarkStorageAccountParallelCreation(b *testing.B) {
 
 // TestStorageAccountCreationTime validates creation time is within acceptable limits
 func TestStorageAccountCreationTime(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping performance test in short mode")
+	}
 	t.Parallel()
 	
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/simple")

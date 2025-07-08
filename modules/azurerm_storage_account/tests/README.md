@@ -6,7 +6,9 @@ This directory contains comprehensive Terratest suite for the Azure Storage Acco
 
 ```
 tests/
-├── storage_account_test.go    # Main test file with all test cases
+├── storage_account_test.go    # Basic test cases (run on PRs)
+├── integration_test.go       # Integration tests (run on main branch)
+├── performance_test.go       # Performance tests (run on main branch)
 ├── test_helpers.go           # Helper functions and utilities
 ├── fixtures/                 # Terraform configurations for testing
 │   ├── simple/              # Basic storage account test
@@ -20,6 +22,23 @@ tests/
 ├── go.mod                   # Go module definition
 └── README.md               # This file
 ```
+
+### Test Categories
+
+1. **Short Tests (Run on PRs)** - Basic functionality tests that complete quickly
+   - Marked without `testing.Short()` check
+   - Timeout: 30 minutes
+   - Includes: Basic, Security, Network, Validation tests
+
+2. **Integration Tests (Run on main branch)** - Comprehensive integration tests
+   - Include `if testing.Short() { t.Skip(...) }` check
+   - Timeout: 60 minutes
+   - Includes: Full Integration, Lifecycle, Disaster Recovery, Compliance
+
+3. **Performance Tests (Run on main branch)** - Performance benchmarks
+   - Include `if testing.Short() { t.Skip(...) }` check
+   - Timeout: 60 minutes
+   - Includes: Creation Time, Scaling tests
 
 ## Prerequisites
 
@@ -38,7 +57,19 @@ tests/
 
 ### Run All Tests
 ```bash
-make test
+make test-all
+```
+
+### Run Test Categories
+```bash
+# Run only short tests (basic functionality) - 30min timeout
+make test-short
+
+# Run only integration tests - 60min timeout
+make test-integration
+
+# Run all tests - 60min timeout
+make test-all
 ```
 
 ### Run Specific Test Suite
@@ -72,6 +103,19 @@ make test-coverage
 ### Run Benchmarks
 ```bash
 make benchmark
+```
+
+### Direct Go Test Commands
+```bash
+cd tests
+# Short tests only (excludes integration/performance tests)
+go test -v -short -parallel 8 -timeout 30m
+
+# All tests
+go test -v -parallel 8 -timeout 60m
+
+# Only integration tests
+go test -v -run "Integration|Lifecycle|Disaster|Compliance|Monitoring|Scaling" -parallel 8 -timeout 60m
 ```
 
 ## Test Cases
@@ -163,23 +207,59 @@ steps:
 ```
 
 ### GitHub Actions
+
+The module uses automated CI/CD workflow that runs:
+- **On Pull Requests**: Only short tests (30min timeout)
+- **On Push to main/release**: All tests including integration (60min timeout)
+- **Manual Trigger**: Can be triggered manually with custom options
+
+#### Manual Workflow Dispatch
+
+You can manually trigger tests from GitHub Actions:
+
+1. Go to **Actions** → **Module CI**
+2. Click **"Run workflow"**
+3. Select options:
+   - **Test type**:
+     - `short` - Only basic tests (default for PRs)
+     - `full` - All tests including integration
+     - `integration-only` - Only integration tests
+   - **Module**: Specific module name (e.g., `azurerm_storage_account`) or leave empty for all
+
+Example workflow configuration:
 ```yaml
-name: Test
+name: Module CI
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    paths:
+      - 'modules/**'
+  push:
+    branches: [ main, release/** ]
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of tests to run'
+        required: true
+        default: 'short'
+        type: choice
+        options:
+          - short
+          - full
+          - integration-only
+      module:
+        description: 'Specific module to test'
+        required: false
+        type: string
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: '1.21'
     
@@ -190,13 +270,10 @@ jobs:
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       run: |
-        cd azurerm_storage_account/tests
-        make test-coverage
-    
-    - name: Upload coverage
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./azurerm_storage_account/tests/coverage.out
+        cd modules/azurerm_storage_account/tests
+        # Test type is determined by workflow trigger
+        # PRs run short tests, main branch runs all tests
+        make test
 ```
 
 ## Test Configuration
@@ -252,3 +329,11 @@ When adding new tests:
 3. Update this README with test description
 4. Ensure >80% code coverage is maintained
 5. Add negative test cases for new validations
+6. For integration/performance tests, add `testing.Short()` check:
+   ```go
+   if testing.Short() {
+       t.Skip("Skipping integration test in short mode")
+   }
+   ```
+7. Use `t.Parallel()` for all tests to enable parallel execution
+8. Keep basic functionality tests under 5 minutes execution time

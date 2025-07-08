@@ -14,6 +14,21 @@ on:
     paths:
       - 'modules/**'
       - 'shared/**'
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of tests to run'
+        required: true
+        default: 'short'
+        type: choice
+        options:
+          - short
+          - full
+          - integration-only
+      module:
+        description: 'Specific module to test (leave empty for all)'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -40,7 +55,13 @@ jobs:
       
       - id: set-matrix
         run: |
-          MODULES='${{ steps.filter.outputs.changes }}'
+          # For manual runs with specific module
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.module }}" ]]; then
+            MODULES='["${{ github.event.inputs.module }}"]'
+          else
+            MODULES='${{ steps.filter.outputs.changes }}'
+          fi
+          
           if [ "$MODULES" == "[]" ]; then
             echo "matrix={\"module\":[]}" >> $GITHUB_OUTPUT
           else
