@@ -10,13 +10,13 @@ resource "random_string" "suffix" {
 
 # Primary region
 resource "azurerm_resource_group" "primary" {
-  name     = "rg-test-storage-multi-pri-${var.random_suffix}"
+  name     = "rg-devtmpciti-multi-pri-${var.random_suffix}"
   location = var.primary_location
 }
 
 # Secondary region
 resource "azurerm_resource_group" "secondary" {
-  name     = "rg-test-storage-multi-sec-${var.random_suffix}"
+  name     = "rg-devtmpciti-multi-sec-${var.random_suffix}"
   location = var.secondary_location
 }
 
@@ -24,7 +24,7 @@ resource "azurerm_resource_group" "secondary" {
 module "primary_storage" {
   source = "../../../"
 
-  name                     = "stpri${random_string.suffix.result}"
+  name                     = "devtmpcitipri${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.primary.name
   location                 = azurerm_resource_group.primary.location
   account_kind             = "StorageV2"
@@ -91,7 +91,7 @@ module "primary_storage" {
 module "secondary_storage" {
   source = "../../../"
 
-  name                     = "stsec${random_string.suffix.result}"
+  name                     = "devtmpcitisec${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.secondary.name
   location                 = azurerm_resource_group.secondary.location
   account_kind             = "StorageV2"

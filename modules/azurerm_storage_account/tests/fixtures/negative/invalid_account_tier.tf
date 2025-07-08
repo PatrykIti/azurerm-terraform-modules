@@ -3,14 +3,14 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "test" {
-  name     = "rg-test-invalid"
+  name     = "rg-devtmpciti-invalid"
   location = "northeurope"
 }
 
 module "storage_account" {
   source = "../../../"
 
-  name                = "stginvalidtier123"
+  name                = "devtmpcitiinvtier123"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
   # Invalid: account tier must be Standard or Premium

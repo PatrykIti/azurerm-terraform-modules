@@ -9,7 +9,7 @@ resource "random_string" "suffix" {
 }
 
 resource "azurerm_resource_group" "test" {
-  name     = "rg-test-storage-advpol-${var.random_suffix}"
+  name     = "rg-devtmpciti-advpol-${var.random_suffix}"
   location = var.location
 }
 
@@ -56,7 +56,7 @@ locals {
 module "storage_account" {
   source = "../../../"
 
-  name                     = "stadvpol${random_string.suffix.result}"
+  name                     = "devtmpciti${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"

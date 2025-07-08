@@ -15,13 +15,13 @@ resource "random_string" "suffix" {
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_resource_group" "test" {
-  name     = "rg-test-storage-identity-${var.random_suffix}"
+  name     = "rg-devtmpciti-identity-${var.random_suffix}"
   location = var.location
 }
 
 # Key Vault for CMK
 resource "azurerm_key_vault" "test" {
-  name                       = "kvid${random_string.suffix.result}"
+  name                       = "kvdevtmpciti${random_string.suffix.result}${var.random_suffix}"
   location                   = azurerm_resource_group.test.location
   resource_group_name        = azurerm_resource_group.test.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -60,7 +60,7 @@ resource "azurerm_role_assignment" "current_user_kv" {
 
 # User-assigned identity
 resource "azurerm_user_assigned_identity" "test" {
-  name                = "uai-test-${random_string.suffix.result}"
+  name                = "uai-devtmpciti-${random_string.suffix.result}${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
 }
@@ -75,7 +75,7 @@ resource "azurerm_role_assignment" "uai_kv_access" {
 module "storage_account" {
   source = "../../../"
 
-  name                     = "stident${random_string.suffix.result}"
+  name                     = "devtmpciti${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"

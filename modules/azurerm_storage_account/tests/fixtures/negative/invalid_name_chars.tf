@@ -3,7 +3,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "test" {
-  name     = "rg-test-invalid"
+  name     = "rg-devtmpciti-invalid"
   location = "northeurope"
 }
 
