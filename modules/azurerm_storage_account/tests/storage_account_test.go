@@ -10,7 +10,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2021-09-01/storage"
 	"github.com/gruntwork-io/terratest/modules/azure"
-	"github.com/gruntwork-io/terratest/modules/http"
+	http_helper "github.com/gruntwork-io/terratest/modules/http-helper"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
@@ -107,7 +107,7 @@ func TestCompleteStorageAccount(t *testing.T) {
 
 		// Validate blob endpoint is accessible (should fail due to network rules)
 		tlsConfig := &tls.Config{InsecureSkipVerify: true}
-		_, err := http.HttpGetWithRetryE(t, primaryBlobEndpoint, tlsConfig, 200, 3, 5*time.Second)
+		_, err := http_helper.HttpGetWithRetryE(t, primaryBlobEndpoint, tlsConfig, 200, 3, 5*time.Second, nil)
 		assert.Error(t, err) // Should fail due to network restrictions
 	})
 }

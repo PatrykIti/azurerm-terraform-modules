@@ -8,6 +8,7 @@ require (
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.12
 	github.com/gruntwork-io/terratest v0.46.7
 	github.com/stretchr/testify v1.8.4
+	github.com/gofrs/uuid v4.4.0+incompatible
 )
 
 require (
