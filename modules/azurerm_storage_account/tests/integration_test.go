@@ -2,7 +2,6 @@ package test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -174,7 +173,6 @@ func TestStorageAccountLifecycle(t *testing.T) {
 	terraform.Apply(t, terraformOptions)
 	
 	// Verify update was applied
-	helper := NewStorageAccountHelper(t)
 	helper.ValidateBlobServiceProperties(t, storageAccountName, resourceGroupName)
 	
 	// Test idempotency - apply again without changes
