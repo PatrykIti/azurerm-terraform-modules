@@ -8,9 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2021-09-01/storage"
-	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 	// "github.com/gruntwork-io/terratest/modules/azure" // Commented out due to SQL import issue
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/retry"
@@ -20,16 +21,17 @@ import (
 // StorageAccountHelper provides helper methods for storage account testing
 type StorageAccountHelper struct {
 	subscriptionID string
-	authorizer     autorest.Authorizer
-	client         storage.AccountsClient
+	credential     azcore.TokenCredential
+	client         *armstorage.AccountsClient
+	blobClient     *armstorage.BlobServicesClient
 }
 
 // NewStorageAccountHelper creates a new helper instance
 func NewStorageAccountHelper(t *testing.T) *StorageAccountHelper {
 	subscriptionID := getRequiredEnvVar(t, "AZURE_SUBSCRIPTION_ID")
 	
-	// Create authorizer based on available credentials
-	var authorizer autorest.Authorizer
+	// Create credential based on available credentials
+	var credential azcore.TokenCredential
 	var err error
 	
 	// Check if we have service principal credentials
@@ -39,66 +41,73 @@ func NewStorageAccountHelper(t *testing.T) *StorageAccountHelper {
 	
 	if clientID != "" && clientSecret != "" && tenantID != "" {
 		// Use service principal auth
-		config := auth.NewClientCredentialsConfig(clientID, clientSecret, tenantID)
-		authorizer, err = config.Authorizer()
-		require.NoError(t, err, "Failed to create service principal authorizer")
+		credential, err = azidentity.NewClientSecretCredential(tenantID, clientID, clientSecret, nil)
+		require.NoError(t, err, "Failed to create service principal credential")
 	} else {
-		// Try CLI auth for local development
-		authorizer, err = auth.NewAuthorizerFromCLI()
+		// Try Azure CLI auth for local development
+		credential, err = azidentity.NewAzureCLICredential(nil)
 		if err != nil {
-			// Fall back to environment-based auth
-			authorizer, err = auth.NewAuthorizerFromEnvironment()
-			require.NoError(t, err, "Failed to create authorizer")
+			// Fall back to default Azure credential
+			credential, err = azidentity.NewDefaultAzureCredential(nil)
+			require.NoError(t, err, "Failed to create credential")
 		}
 	}
 
 	// Create storage accounts client
-	client := storage.NewAccountsClient(subscriptionID)
-	client.Authorizer = authorizer
+	client, err := armstorage.NewAccountsClient(subscriptionID, credential, nil)
+	require.NoError(t, err, "Failed to create storage accounts client")
+	
+	// Create blob services client
+	blobClient, err := armstorage.NewBlobServicesClient(subscriptionID, credential, nil)
+	require.NoError(t, err, "Failed to create blob services client")
 
 	return &StorageAccountHelper{
 		subscriptionID: subscriptionID,
-		authorizer:     authorizer,
+		credential:     credential,
 		client:         client,
+		blobClient:     blobClient,
 	}
 }
 
 // GetStorageAccountProperties retrieves detailed storage account properties
-func (h *StorageAccountHelper) GetStorageAccountProperties(t *testing.T, accountName, resourceGroupName string) storage.Account {
+func (h *StorageAccountHelper) GetStorageAccountProperties(t *testing.T, accountName, resourceGroupName string) armstorage.Account {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
-	account, err := h.client.GetProperties(ctx, resourceGroupName, accountName, storage.AccountExpandGeoReplicationStats)
+	resp, err := h.client.GetProperties(ctx, resourceGroupName, accountName, &armstorage.AccountsClientGetPropertiesOptions{
+		Expand: to.Ptr(armstorage.StorageAccountExpandGeoReplicationStats),
+	})
 	require.NoError(t, err, "Failed to get storage account properties")
 
-	return account
+	return resp.Account
 }
 
 // ValidateStorageAccountEncryption validates encryption settings
-func (h *StorageAccountHelper) ValidateStorageAccountEncryption(t *testing.T, account storage.Account) {
-	require.NotNil(t, account.Encryption, "Encryption should be configured")
-	require.Equal(t, storage.KeySource("Microsoft.Storage"), account.Encryption.KeySource, "Should use Microsoft managed keys")
+func (h *StorageAccountHelper) ValidateStorageAccountEncryption(t *testing.T, account armstorage.Account) {
+	require.NotNil(t, account.Properties.Encryption, "Encryption should be configured")
+	require.NotNil(t, account.Properties.Encryption.KeySource, "Key source should be set")
+	require.Equal(t, armstorage.KeySourceMicrosoftStorage, *account.Properties.Encryption.KeySource, "Should use Microsoft managed keys")
 	
 	// Validate blob encryption
-	require.NotNil(t, account.Encryption.Services, "Encryption services should be configured")
-	require.NotNil(t, account.Encryption.Services.Blob, "Blob encryption should be configured")
-	require.True(t, *account.Encryption.Services.Blob.Enabled, "Blob encryption should be enabled")
+	require.NotNil(t, account.Properties.Encryption.Services, "Encryption services should be configured")
+	require.NotNil(t, account.Properties.Encryption.Services.Blob, "Blob encryption should be configured")
+	require.True(t, *account.Properties.Encryption.Services.Blob.Enabled, "Blob encryption should be enabled")
 	
 	// Validate file encryption
-	require.NotNil(t, account.Encryption.Services.File, "File encryption should be configured")
-	require.True(t, *account.Encryption.Services.File.Enabled, "File encryption should be enabled")
+	require.NotNil(t, account.Properties.Encryption.Services.File, "File encryption should be configured")
+	require.True(t, *account.Properties.Encryption.Services.File.Enabled, "File encryption should be enabled")
 }
 
 // ValidateNetworkRules validates network access rules
-func (h *StorageAccountHelper) ValidateNetworkRules(t *testing.T, account storage.Account, expectedIPRules []string, expectedSubnetIDs []string) {
-	require.NotNil(t, account.NetworkRuleSet, "Network rules should be configured")
+func (h *StorageAccountHelper) ValidateNetworkRules(t *testing.T, account armstorage.Account, expectedIPRules []string, expectedSubnetIDs []string) {
+	require.NotNil(t, account.Properties.NetworkRuleSet, "Network rules should be configured")
 	
 	// Validate IP rules
 	if len(expectedIPRules) > 0 {
-		require.Equal(t, len(expectedIPRules), len(*account.NetworkRuleSet.IPRules), "IP rules count mismatch")
+		require.Equal(t, len(expectedIPRules), len(account.Properties.NetworkRuleSet.IPRules), "IP rules count mismatch")
 		
 		actualIPRules := make([]string, 0)
-		for _, rule := range *account.NetworkRuleSet.IPRules {
+		for _, rule := range account.Properties.NetworkRuleSet.IPRules {
 			actualIPRules = append(actualIPRules, *rule.IPAddressOrRange)
 		}
 		
@@ -109,10 +118,10 @@ func (h *StorageAccountHelper) ValidateNetworkRules(t *testing.T, account storag
 	
 	// Validate subnet rules
 	if len(expectedSubnetIDs) > 0 {
-		require.Equal(t, len(expectedSubnetIDs), len(*account.NetworkRuleSet.VirtualNetworkRules), "Subnet rules count mismatch")
+		require.Equal(t, len(expectedSubnetIDs), len(account.Properties.NetworkRuleSet.VirtualNetworkRules), "Subnet rules count mismatch")
 		
 		actualSubnetIDs := make([]string, 0)
-		for _, rule := range *account.NetworkRuleSet.VirtualNetworkRules {
+		for _, rule := range account.Properties.NetworkRuleSet.VirtualNetworkRules {
 			actualSubnetIDs = append(actualSubnetIDs, *rule.VirtualNetworkResourceID)
 		}
 		
@@ -129,11 +138,15 @@ func (h *StorageAccountHelper) WaitForStorageAccountReady(t *testing.T, accountN
 	retry.DoWithRetry(t, description, 30, 10*time.Second, func() (string, error) {
 		account := h.GetStorageAccountProperties(t, accountName, resourceGroupName)
 		
-		if account.ProvisioningState == storage.ProvisioningStateSucceeded {
+		if account.Properties.ProvisioningState != nil && *account.Properties.ProvisioningState == armstorage.ProvisioningStateSucceeded {
 			return "Storage account is ready", nil
 		}
 		
-		return "", fmt.Errorf("storage account provisioning state is %s", account.ProvisioningState)
+		provState := "unknown"
+		if account.Properties.ProvisioningState != nil {
+			provState = string(*account.Properties.ProvisioningState)
+		}
+		return "", fmt.Errorf("storage account provisioning state is %s", provState)
 	})
 }
 
@@ -144,7 +157,7 @@ func (h *StorageAccountHelper) WaitForGRSSecondaryEndpoints(t *testing.T, accoun
 	retry.DoWithRetry(t, description, 60, 10*time.Second, func() (string, error) {
 		account := h.GetStorageAccountProperties(t, accountName, resourceGroupName)
 		
-		if account.SecondaryEndpoints != nil && account.SecondaryEndpoints.Blob != nil && *account.SecondaryEndpoints.Blob != "" {
+		if account.Properties.SecondaryEndpoints != nil && account.Properties.SecondaryEndpoints.Blob != nil && *account.Properties.SecondaryEndpoints.Blob != "" {
 			return "GRS secondary endpoints are available", nil
 		}
 		
@@ -195,28 +208,27 @@ func (h *StorageAccountHelper) ValidateBlobServiceProperties(t *testing.T, accou
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
-	blobClient := storage.NewBlobServicesClient(h.subscriptionID)
-	blobClient.Authorizer = h.authorizer
-
-	properties, err := blobClient.GetServiceProperties(ctx, resourceGroupName, accountName)
+	resp, err := h.blobClient.GetServiceProperties(ctx, resourceGroupName, accountName, nil)
 	require.NoError(t, err, "Failed to get blob service properties")
 
+	properties := resp.BlobServiceProperties
+
 	// Validate soft delete is enabled
-	if properties.DeleteRetentionPolicy != nil && properties.DeleteRetentionPolicy.Enabled != nil {
-		logger.Logf(t, "Blob soft delete enabled: %v", *properties.DeleteRetentionPolicy.Enabled)
-		if *properties.DeleteRetentionPolicy.Enabled && properties.DeleteRetentionPolicy.Days != nil {
-			logger.Logf(t, "Blob soft delete retention days: %d", *properties.DeleteRetentionPolicy.Days)
+	if properties.BlobServicePropertiesProperties != nil && properties.BlobServicePropertiesProperties.DeleteRetentionPolicy != nil && properties.BlobServicePropertiesProperties.DeleteRetentionPolicy.Enabled != nil {
+		logger.Logf(t, "Blob soft delete enabled: %v", *properties.BlobServicePropertiesProperties.DeleteRetentionPolicy.Enabled)
+		if *properties.BlobServicePropertiesProperties.DeleteRetentionPolicy.Enabled && properties.BlobServicePropertiesProperties.DeleteRetentionPolicy.Days != nil {
+			logger.Logf(t, "Blob soft delete retention days: %d", *properties.BlobServicePropertiesProperties.DeleteRetentionPolicy.Days)
 		}
 	}
 
 	// Validate versioning
-	if properties.IsVersioningEnabled != nil {
-		logger.Logf(t, "Blob versioning enabled: %v", *properties.IsVersioningEnabled)
+	if properties.BlobServicePropertiesProperties != nil && properties.BlobServicePropertiesProperties.IsVersioningEnabled != nil {
+		logger.Logf(t, "Blob versioning enabled: %v", *properties.BlobServicePropertiesProperties.IsVersioningEnabled)
 	}
 
 	// Validate change feed
-	if properties.ChangeFeed != nil && properties.ChangeFeed.Enabled != nil {
-		logger.Logf(t, "Change feed enabled: %v", *properties.ChangeFeed.Enabled)
+	if properties.BlobServicePropertiesProperties != nil && properties.BlobServicePropertiesProperties.ChangeFeed != nil && properties.BlobServicePropertiesProperties.ChangeFeed.Enabled != nil {
+		logger.Logf(t, "Change feed enabled: %v", *properties.BlobServicePropertiesProperties.ChangeFeed.Enabled)
 	}
 }
 
@@ -232,7 +244,7 @@ func CreateTestResourceGroup(t *testing.T, subscriptionID, location string) stri
 }
 
 // ValidateStorageAccountTags validates tags on storage account
-func ValidateStorageAccountTags(t *testing.T, account storage.Account, expectedTags map[string]string) {
+func ValidateStorageAccountTags(t *testing.T, account armstorage.Account, expectedTags map[string]string) {
 	require.NotNil(t, account.Tags, "Storage account should have tags")
 	
 	for key, expectedValue := range expectedTags {

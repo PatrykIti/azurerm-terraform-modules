@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2021-09-01/storage"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 	// "github.com/gruntwork-io/terratest/modules/azure" // Commented out due to SQL import issue
 	http_helper "github.com/gruntwork-io/terratest/modules/http-helper"
 	"github.com/gruntwork-io/terratest/modules/random"
@@ -56,13 +56,13 @@ func TestBasicStorageAccount(t *testing.T) {
 		storageAccount := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 		
 		// Validate basic properties
-		assert.Equal(t, storage.SkuName("Standard_LRS"), storageAccount.Sku.Name)
-		assert.Equal(t, storage.Kind("StorageV2"), storageAccount.Kind)
-		assert.Equal(t, storage.ProvisioningStateSucceeded, storageAccount.ProvisioningState)
+		assert.Equal(t, armstorage.SKUNameStandardLRS, *storageAccount.SKU.Name)
+		assert.Equal(t, armstorage.KindStorageV2, *storageAccount.Kind)
+		assert.Equal(t, armstorage.ProvisioningStateSucceeded, *storageAccount.Properties.ProvisioningState)
 		
 		// Validate secure defaults
-		assert.True(t, *storageAccount.EnableHTTPSTrafficOnly)
-		assert.Equal(t, storage.MinimumTLSVersionTLS12, storageAccount.MinimumTLSVersion)
+		assert.True(t, *storageAccount.Properties.EnableHTTPSTrafficOnly)
+		assert.Equal(t, armstorage.MinimumTLSVersionTLS12, *storageAccount.Properties.MinimumTLSVersion)
 	})
 }
 
@@ -95,9 +95,9 @@ func TestCompleteStorageAccount(t *testing.T) {
 		storageAccount := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 		
 		// Validate advanced features
-		assert.Equal(t, storage.SkuName("Standard_ZRS"), storageAccount.Sku.Name)
-		assert.True(t, *storageAccount.EnableHTTPSTrafficOnly)
-		assert.Equal(t, storage.MinimumTLSVersionTLS12, storageAccount.MinimumTLSVersion)
+		assert.Equal(t, armstorage.SKUNameStandardZRS, *storageAccount.SKU.Name)
+		assert.True(t, *storageAccount.Properties.EnableHTTPSTrafficOnly)
+		assert.Equal(t, armstorage.MinimumTLSVersionTLS12, *storageAccount.Properties.MinimumTLSVersion)
 		
 		// Validate containers were created
 		assert.Equal(t, 3, len(containerNames))
@@ -138,22 +138,22 @@ func TestStorageAccountSecurity(t *testing.T) {
 		storageAccount := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 
 		// Validate security settings
-		assert.True(t, *storageAccount.EnableHTTPSTrafficOnly)
-		assert.Equal(t, storage.MinimumTLSVersionTLS12, storageAccount.MinimumTLSVersion)
-		assert.True(t, *storageAccount.AllowBlobPublicAccess == false)
+		assert.True(t, *storageAccount.Properties.EnableHTTPSTrafficOnly)
+		assert.Equal(t, armstorage.MinimumTLSVersionTLS12, *storageAccount.Properties.MinimumTLSVersion)
+		assert.True(t, *storageAccount.Properties.AllowBlobPublicAccess == false)
 		
 		// Validate encryption settings
-		assert.NotNil(t, storageAccount.Encryption)
-		assert.True(t, *storageAccount.Encryption.RequireInfrastructureEncryption)
-		assert.Equal(t, storage.KeySource("Microsoft.Storage"), storageAccount.Encryption.KeySource)
+		assert.NotNil(t, storageAccount.Properties.Encryption)
+		assert.True(t, *storageAccount.Properties.Encryption.RequireInfrastructureEncryption)
+		assert.Equal(t, armstorage.KeySourceMicrosoftStorage, *storageAccount.Properties.Encryption.KeySource)
 		
 		// Validate blob encryption
-		assert.True(t, *storageAccount.Encryption.Services.Blob.Enabled)
-		assert.Equal(t, storage.KeyType("Account"), storageAccount.Encryption.Services.Blob.KeyType)
+		assert.True(t, *storageAccount.Properties.Encryption.Services.Blob.Enabled)
+		assert.Equal(t, armstorage.KeyTypeAccount, *storageAccount.Properties.Encryption.Services.Blob.KeyType)
 		
 		// Validate file encryption
-		assert.True(t, *storageAccount.Encryption.Services.File.Enabled)
-		assert.Equal(t, storage.KeyType("Account"), storageAccount.Encryption.Services.File.KeyType)
+		assert.True(t, *storageAccount.Properties.Encryption.Services.File.Enabled)
+		assert.Equal(t, armstorage.KeyTypeAccount, *storageAccount.Properties.Encryption.Services.File.KeyType)
 	})
 }
 
@@ -183,12 +183,12 @@ func TestStorageAccountNetworkRules(t *testing.T) {
 		storageAccount := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 
 		// Validate network rules
-		assert.NotNil(t, storageAccount.NetworkRuleSet)
-		assert.Equal(t, storage.DefaultActionDeny, storageAccount.NetworkRuleSet.DefaultAction)
+		assert.NotNil(t, storageAccount.Properties.NetworkRuleSet)
+		assert.Equal(t, armstorage.DefaultActionDeny, *storageAccount.Properties.NetworkRuleSet.DefaultAction)
 		
 		// Validate IP rules
-		if storageAccount.NetworkRuleSet.IPRules != nil {
-			ipRules := *storageAccount.NetworkRuleSet.IPRules
+		if storageAccount.Properties.NetworkRuleSet.IPRules != nil {
+			ipRules := storageAccount.Properties.NetworkRuleSet.IPRules
 			assert.NotEmpty(t, ipRules)
 			if len(ipRules) > 0 {
 				assert.Equal(t, "203.0.113.0/24", *ipRules[0].IPAddressOrRange)
@@ -196,10 +196,10 @@ func TestStorageAccountNetworkRules(t *testing.T) {
 		}
 		
 		// Validate virtual network rules
-		assert.NotEmpty(t, storageAccount.NetworkRuleSet.VirtualNetworkRules)
+		assert.NotEmpty(t, storageAccount.Properties.NetworkRuleSet.VirtualNetworkRules)
 		
 		// Validate bypass settings
-		assert.Equal(t, storage.Bypass("AzureServices"), storageAccount.NetworkRuleSet.Bypass)
+		assert.Equal(t, armstorage.BypassAzureServices, *storageAccount.Properties.NetworkRuleSet.Bypass)
 	})
 }
 
@@ -233,10 +233,10 @@ func TestStorageAccountPrivateEndpoint(t *testing.T) {
 		storageAccount := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 
 		// Validate public network access is disabled
-		assert.Equal(t, storage.PublicNetworkAccessDisabled, storageAccount.PublicNetworkAccess)
+		assert.Equal(t, armstorage.PublicNetworkAccessDisabled, *storageAccount.Properties.PublicNetworkAccess)
 		
 		// Validate network rules still apply
-		assert.Equal(t, storage.DefaultActionDeny, storageAccount.NetworkRuleSet.DefaultAction)
+		assert.Equal(t, armstorage.DefaultActionDeny, *storageAccount.Properties.NetworkRuleSet.DefaultAction)
 	})
 }
 

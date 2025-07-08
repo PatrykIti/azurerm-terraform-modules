@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2021-09-01/storage"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 	// "github.com/gruntwork-io/terratest/modules/azure" // Commented out due to SQL import issue
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
@@ -66,12 +66,12 @@ func validateCoreFeatures(t *testing.T, testFolder string) {
 	account := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 
 	// Validate core properties
-	assert.Equal(t, storage.SkuName("Standard_ZRS"), account.Sku.Name)
-	assert.Equal(t, storage.Kind("StorageV2"), account.Kind)
-	assert.Equal(t, storage.ProvisioningStateSucceeded, account.ProvisioningState)
+	assert.Equal(t, armstorage.SKUNameStandardZRS, *account.SKU.Name)
+	assert.Equal(t, armstorage.KindStorageV2, *account.Kind)
+	assert.Equal(t, armstorage.ProvisioningStateSucceeded, *account.Properties.ProvisioningState)
 	
 	// Validate access tier
-	assert.Equal(t, storage.AccessTierHot, account.AccessTier)
+	assert.Equal(t, armstorage.AccessTierHot, *account.Properties.AccessTier)
 	
 	// Validate tags
 	expectedTags := map[string]string{
@@ -94,16 +94,16 @@ func validateSecurityFeatures(t *testing.T, testFolder string) {
 	account := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 
 	// Security validations
-	assert.True(t, *account.EnableHTTPSTrafficOnly, "HTTPS-only should be enabled")
-	assert.Equal(t, storage.MinimumTLSVersionTLS12, account.MinimumTLSVersion, "TLS 1.2 should be minimum")
-	assert.False(t, *account.AllowBlobPublicAccess, "Public blob access should be disabled")
+	assert.True(t, *account.Properties.EnableHTTPSTrafficOnly, "HTTPS-only should be enabled")
+	assert.Equal(t, armstorage.MinimumTLSVersionTLS12, *account.Properties.MinimumTLSVersion, "TLS 1.2 should be minimum")
+	assert.False(t, *account.Properties.AllowBlobPublicAccess, "Public blob access should be disabled")
 	
 	// Validate encryption
 	helper.ValidateStorageAccountEncryption(t, account)
 	
 	// Infrastructure encryption
-	require.NotNil(t, account.Encryption)
-	assert.True(t, *account.Encryption.RequireInfrastructureEncryption, "Infrastructure encryption should be enabled")
+	require.NotNil(t, account.Properties.Encryption)
+	assert.True(t, *account.Properties.Encryption.RequireInfrastructureEncryption, "Infrastructure encryption should be enabled")
 }
 
 // validateNetworkFeatures validates network configurations
@@ -117,8 +117,8 @@ func validateNetworkFeatures(t *testing.T, testFolder string) {
 	account := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 
 	// Network rules validation
-	assert.Equal(t, storage.DefaultActionDeny, account.NetworkRuleSet.DefaultAction)
-	assert.Equal(t, storage.Bypass("AzureServices"), account.NetworkRuleSet.Bypass)
+	assert.Equal(t, armstorage.DefaultActionDeny, *account.Properties.NetworkRuleSet.DefaultAction)
+	assert.Equal(t, armstorage.BypassAzureServices, *account.Properties.NetworkRuleSet.Bypass)
 	
 	// Validate IP rules and subnet rules
 	expectedIPRules := []string{"203.0.113.0/24"}
@@ -213,7 +213,7 @@ func TestStorageAccountDisasterRecovery(t *testing.T) {
 	
 	// Get account properties
 	account := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
-	assert.Equal(t, storage.SkuName("Standard_RAGRS"), account.Sku.Name)
+	assert.Equal(t, armstorage.SKUNameStandardRAGRS, *account.SKU.Name)
 	
 	// Wait for GRS secondary endpoints to be available
 	helper.WaitForGRSSecondaryEndpoints(t, storageAccountName, resourceGroupName)
@@ -222,16 +222,16 @@ func TestStorageAccountDisasterRecovery(t *testing.T) {
 	account = helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 	
 	// Verify secondary endpoints are available for RA-GRS
-	require.NotNil(t, account.SecondaryEndpoints, "Secondary endpoints should be available for RA-GRS")
-	require.NotNil(t, account.SecondaryEndpoints.Blob, "Secondary blob endpoint should not be nil")
-	require.NotEmpty(t, *account.SecondaryEndpoints.Blob, "Secondary blob endpoint should not be empty")
+	require.NotNil(t, account.Properties.SecondaryEndpoints, "Secondary endpoints should be available for RA-GRS")
+	require.NotNil(t, account.Properties.SecondaryEndpoints.Blob, "Secondary blob endpoint should not be nil")
+	require.NotEmpty(t, *account.Properties.SecondaryEndpoints.Blob, "Secondary blob endpoint should not be empty")
 	
 	// Log endpoints for debugging
-	t.Logf("Primary endpoint: %s", *account.PrimaryEndpoints.Blob)
-	t.Logf("Secondary endpoint: %s", *account.SecondaryEndpoints.Blob)
+	t.Logf("Primary endpoint: %s", *account.Properties.PrimaryEndpoints.Blob)
+	t.Logf("Secondary endpoint: %s", *account.Properties.SecondaryEndpoints.Blob)
 	
 	// Verify secondary endpoint format
-	assert.Contains(t, *account.SecondaryEndpoints.Blob, "-secondary.blob.core.", "Secondary endpoint should contain '-secondary' suffix")
+	assert.Contains(t, *account.Properties.SecondaryEndpoints.Blob, "-secondary.blob.core.", "Secondary endpoint should contain '-secondary' suffix")
 }
 
 // TestStorageAccountCompliance tests compliance-related features
@@ -259,27 +259,27 @@ func TestStorageAccountCompliance(t *testing.T) {
 	}{
 		{
 			name:    "HTTPS Only",
-			check:   func() bool { return *account.EnableHTTPSTrafficOnly },
+			check:   func() bool { return *account.Properties.EnableHTTPSTrafficOnly },
 			message: "HTTPS-only traffic must be enforced",
 		},
 		{
 			name:    "TLS Version",
-			check:   func() bool { return account.MinimumTLSVersion == storage.MinimumTLSVersionTLS12 },
+			check:   func() bool { return *account.Properties.MinimumTLSVersion == armstorage.MinimumTLSVersionTLS12 },
 			message: "Minimum TLS version must be 1.2",
 		},
 		{
 			name:    "Public Access",
-			check:   func() bool { return !*account.AllowBlobPublicAccess },
+			check:   func() bool { return !*account.Properties.AllowBlobPublicAccess },
 			message: "Public blob access must be disabled",
 		},
 		{
 			name:    "Network Rules",
-			check:   func() bool { return account.NetworkRuleSet.DefaultAction == storage.DefaultActionDeny },
+			check:   func() bool { return *account.Properties.NetworkRuleSet.DefaultAction == armstorage.DefaultActionDeny },
 			message: "Network default action must be Deny",
 		},
 		{
 			name:    "Encryption",
-			check:   func() bool { return account.Encryption != nil && *account.Encryption.Services.Blob.Enabled },
+			check:   func() bool { return account.Properties.Encryption != nil && *account.Properties.Encryption.Services.Blob.Enabled },
 			message: "Blob encryption must be enabled",
 		},
 	}
