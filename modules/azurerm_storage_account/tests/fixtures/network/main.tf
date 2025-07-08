@@ -42,7 +42,7 @@ resource "azurerm_subnet" "app" {
 module "storage_account" {
   source = "../../../"
 
-  name                     = "stgnetwork${random_string.suffix.result}"
+  name                     = "devtmpciti${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"
