@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2021-09-01/storage"
-	"github.com/gruntwork-io/terratest/modules/azure"
+	// "github.com/gruntwork-io/terratest/modules/azure" // Commented out due to SQL import issue
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
@@ -164,9 +164,10 @@ func TestStorageAccountLifecycle(t *testing.T) {
 	storageAccountName := terraform.Output(t, terraformOptions, "storage_account_name")
 	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 	
-	// Verify initial deployment
-	exists := azure.StorageAccountExists(t, storageAccountName, resourceGroupName, "")
-	assert.True(t, exists)
+	// Verify initial deployment using our helper
+	helper := NewStorageAccountHelper(t)
+	storageAccount := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
+	assert.NotNil(t, storageAccount.ID)
 	
 	// Update configuration (enable blob versioning)
 	terraformOptions.Vars["enable_blob_versioning"] = true
