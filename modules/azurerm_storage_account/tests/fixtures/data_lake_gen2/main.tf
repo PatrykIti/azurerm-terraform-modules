@@ -9,20 +9,20 @@ resource "random_string" "suffix" {
 }
 
 resource "azurerm_resource_group" "test" {
-  name     = "rg-test-storage-dlgen2-${var.random_suffix}"
+  name     = "rg-devtmpciti-dlgen2-${var.random_suffix}"
   location = var.location
 }
 
 # Virtual Network for NFSv3 Support
 resource "azurerm_virtual_network" "test" {
-  name                = "vnet-test-datalake"
+  name                = "vnet-devtmpciti-datalake-${var.random_suffix}"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
 }
 
 resource "azurerm_subnet" "test" {
-  name                 = "snet-test-nfs"
+  name                 = "snet-devtmpciti-nfs"
   resource_group_name  = azurerm_resource_group.test.name
   virtual_network_name = azurerm_virtual_network.test.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -32,7 +32,7 @@ resource "azurerm_subnet" "test" {
 module "storage_account" {
   source = "../../../"
 
-  name                     = "stdlgen2${random_string.suffix.result}"
+  name                     = "devtmpciti${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_kind             = "StorageV2"
