@@ -201,15 +201,30 @@ func TestStorageAccountDisasterRecovery(t *testing.T) {
 	
 	// Verify GRS is configured
 	helper := NewStorageAccountHelper(t)
+	
+	// Wait for storage account to be ready
+	helper.WaitForStorageAccountReady(t, storageAccountName, resourceGroupName)
+	
+	// Get account properties
 	account := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 	assert.Equal(t, storage.SkuName("Standard_GRS"), account.Sku.Name)
 	
-	// Verify secondary endpoints are available
-	assert.NotEmpty(t, account.SecondaryEndpoints)
-	assert.NotEmpty(t, *account.SecondaryEndpoints.Blob)
+	// Wait for GRS secondary endpoints to be available
+	helper.WaitForGRSSecondaryEndpoints(t, storageAccountName, resourceGroupName)
 	
-	t.Logf("Primary endpoint: %s", *account.PrimaryEndpoints.Blob)
-	t.Logf("Secondary endpoint: %s", *account.SecondaryEndpoints.Blob)
+	// Get updated account properties with secondary endpoints
+	account = helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
+	
+	// Verify secondary endpoints are available
+	assert.NotNil(t, account.SecondaryEndpoints, "Secondary endpoints should be available for GRS")
+	if account.SecondaryEndpoints != nil && account.SecondaryEndpoints.Blob != nil {
+		assert.NotEmpty(t, *account.SecondaryEndpoints.Blob, "Secondary blob endpoint should not be empty")
+		t.Logf("Secondary endpoint: %s", *account.SecondaryEndpoints.Blob)
+	}
+	
+	if account.PrimaryEndpoints != nil && account.PrimaryEndpoints.Blob != nil {
+		t.Logf("Primary endpoint: %s", *account.PrimaryEndpoints.Blob)
+	}
 }
 
 // TestStorageAccountCompliance tests compliance-related features

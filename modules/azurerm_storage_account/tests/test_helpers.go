@@ -137,6 +137,21 @@ func (h *StorageAccountHelper) WaitForStorageAccountReady(t *testing.T, accountN
 	})
 }
 
+// WaitForGRSSecondaryEndpoints waits for GRS secondary endpoints to be available
+func (h *StorageAccountHelper) WaitForGRSSecondaryEndpoints(t *testing.T, accountName, resourceGroupName string) {
+	description := fmt.Sprintf("Waiting for GRS secondary endpoints for storage account %s", accountName)
+	
+	retry.DoWithRetry(t, description, 60, 10*time.Second, func() (string, error) {
+		account := h.GetStorageAccountProperties(t, accountName, resourceGroupName)
+		
+		if account.SecondaryEndpoints != nil && account.SecondaryEndpoints.Blob != nil && *account.SecondaryEndpoints.Blob != "" {
+			return "GRS secondary endpoints are available", nil
+		}
+		
+		return "", fmt.Errorf("GRS secondary endpoints are not yet available")
+	})
+}
+
 // ValidateDiagnosticSettings validates diagnostic settings are configured
 func ValidateDiagnosticSettings(t *testing.T, storageAccountID string) {
 	// This would require additional Azure SDK imports for Monitor service
