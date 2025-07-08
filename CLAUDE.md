@@ -415,3 +415,15 @@ These commands make AI calls and may take up to a minute:
 ---
 
 _This guide ensures Claude Code has immediate access to Task Master's essential functionality for agentic development workflows._
+
+## Project Documentation References
+
+### Core Guides
+- [Documentation Guide](.claude/references/documentation-guide.md) - How documentation works in this repo
+- [Semantic Release Guide](.claude/references/semantic-release-guide.md) - Automated versioning and releases
+
+### Important Instructions
+- Do what has been asked; nothing more, nothing less
+- NEVER create files unless they're absolutely necessary for achieving your goal
+- ALWAYS prefer editing an existing file to creating a new one
+- NEVER proactively create documentation files (*.md) or README files unless explicitly requested
