@@ -1,5 +1,4 @@
-<!-- BEGIN_TF_DOCS -->
-
+# Terraform Azure Storage Account Module
 
 ## Module Version
 
@@ -53,16 +52,19 @@ module "storage_account" {
 
 ## Examples
 
-  - [Advanced Policies](examples/advanced-policies) - This example demonstrates the implementation of advanced storage account policies including SAS policies, immutability policies, routing preferences, custom domains, and SMB configurations.
-  - [Basic](examples/basic) - This example demonstrates a basic Azure Storage Account configuration using secure defaults and minimal setup.
-  - [Complete](examples/complete) - This example demonstrates a comprehensive deployment of an Azure Storage Account with all available features and security configurations.
-  - [Data Lake Gen2](examples/data-lake-gen2) - This example demonstrates how to configure an Azure Storage Account as a Data Lake Storage Gen2 with hierarchical namespace, SFTP, and NFSv3 support.
-  - [Identity Access](examples/identity-access) - This example demonstrates how to configure an Azure Storage Account with **keyless authentication** using managed identities and Microsoft Entra ID (formerly Azure AD) integration. This approach eliminates the need for shared access keys, providing enhanced security through identity-based access control.
-  - [Multi Region](examples/multi-region) - This example demonstrates a comprehensive multi-region Azure Storage Account deployment strategy with enhanced disaster recovery capabilities, cross-tenant replication, and optimized geo-redundancy configurations.
-  - [Secure](examples/secure) - This example demonstrates a maximum-security Azure Storage Account configuration suitable for highly sensitive data and regulated environments.
-  - [Secure Private Endpoint](examples/secure-private-endpoint) - This example demonstrates how to deploy a highly secure Azure Storage Account suitable for production environments handling sensitive data.
+<!-- BEGIN_EXAMPLES -->
+- [Advanced Policies](examples/advanced-policies) - This example demonstrates the implementation of advanced storage account policies including SAS policies, immutability policies, routing preferences, custom domains, and SMB configurations.
+- [Basic](examples/basic) - This example demonstrates a basic Azure Storage Account configuration using secure defaults and minimal setup.
+- [Complete](examples/complete) - This example demonstrates a comprehensive deployment of an Azure Storage Account with all available features and security configurations.
+- [Data Lake Gen2](examples/data-lake-gen2) - This example demonstrates how to configure an Azure Storage Account as a Data Lake Storage Gen2 with hierarchical namespace, SFTP, and NFSv3 support.
+- [Identity Access](examples/identity-access) - This example demonstrates how to configure an Azure Storage Account with **keyless authentication** using managed identities and Microsoft Entra ID (formerly Azure AD) integration. This approach eliminates the need for shared access keys, providing enhanced security through identity-based access control.
+- [Multi Region](examples/multi-region) - This example demonstrates a comprehensive multi-region Azure Storage Account deployment strategy with enhanced disaster recovery capabilities, cross-tenant replication, and optimized geo-redundancy configurations.
+- [Secure](examples/secure) - This example demonstrates a maximum-security Azure Storage Account configuration suitable for highly sensitive data and regulated environments.
+- [Secure Private Endpoint](examples/secure-private-endpoint) - This example demonstrates how to deploy a highly secure Azure Storage Account suitable for production environments handling sensitive data.
+<!-- END_EXAMPLES -->
 
-## Requirements
+<!-- BEGIN_TF_DOCS -->
+
 
 ## Requirements
 
@@ -73,19 +75,13 @@ module "storage_account" {
 
 ## Providers
 
-## Providers
-
 | Name | Version |
 |------|---------|
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.35.0 |
 
 ## Modules
 
-## Modules
-
 No modules.
-
-## Resources
 
 ## Resources
 
@@ -102,8 +98,6 @@ No modules.
 | [azurerm_storage_queue.storage_queue](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_queue) | resource |
 | [azurerm_storage_share.storage_share](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_share) | resource |
 | [azurerm_storage_table.storage_table](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_table) | resource |
-
-## Inputs
 
 ## Inputs
 
@@ -149,8 +143,6 @@ No modules.
 | <a name="input_table_encryption_key_type"></a> [table\_encryption\_key\_type](#input\_table\_encryption\_key\_type) | The encryption key type to use for the Table service. Possible values are Service and Account. | `string` | `null` | no |
 | <a name="input_tables"></a> [tables](#input\_tables) | List of storage tables to create. | <pre>list(object({<br/>    name = string<br/>  }))</pre> | `[]` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resource. | `map(string)` | `{}` | no |
-
-## Outputs
 
 ## Outputs
 
@@ -246,16 +238,17 @@ No modules.
 | <a name="output_secondary_web_internet_host"></a> [secondary\_web\_internet\_host](#output\_secondary\_web\_internet\_host) | The internet routing hostname with port if applicable for web storage in the secondary location |
 | <a name="output_secondary_web_microsoft_endpoint"></a> [secondary\_web\_microsoft\_endpoint](#output\_secondary\_web\_microsoft\_endpoint) | The microsoft routing endpoint URL for web storage in the secondary location |
 | <a name="output_secondary_web_microsoft_host"></a> [secondary\_web\_microsoft\_host](#output\_secondary\_web\_microsoft\_host) | The microsoft routing hostname with port if applicable for web storage in the secondary location |
+| <a name="output_sftp_enabled"></a> [sftp\_enabled](#output\_sftp\_enabled) | Is SFTP enabled for the storage account |
 | <a name="output_shared_access_key_enabled"></a> [shared\_access\_key\_enabled](#output\_shared\_access\_key\_enabled) | Are shared access keys enabled for the storage account |
 | <a name="output_static_website"></a> [static\_website](#output\_static\_website) | Static website properties |
 | <a name="output_static_website_id"></a> [static\_website\_id](#output\_static\_website\_id) | The ID of the Storage Account Static Website configuration |
 | <a name="output_table_encryption_key_type"></a> [table\_encryption\_key\_type](#output\_table\_encryption\_key\_type) | The encryption type of the table service |
 | <a name="output_tables"></a> [tables](#output\_tables) | Map of created storage tables |
 | <a name="output_tags"></a> [tags](#output\_tags) | A map of tags assigned to the storage account |
+<!-- END_TF_DOCS -->
 
 ## Additional Documentation
 
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
-
-<!-- END_TF_DOCS -->
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
