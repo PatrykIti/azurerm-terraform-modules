@@ -15,6 +15,9 @@ import (
 
 // TestStorageAccountFullIntegration tests all features working together
 func TestStorageAccountFullIntegration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
 	t.Parallel()
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/complete")
@@ -149,6 +152,9 @@ func validateOperationalFeatures(t *testing.T, testFolder string) {
 
 // TestStorageAccountLifecycle tests the complete lifecycle of storage account
 func TestStorageAccountLifecycle(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
 	t.Parallel()
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/simple")
