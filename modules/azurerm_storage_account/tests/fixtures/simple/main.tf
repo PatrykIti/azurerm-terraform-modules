@@ -16,11 +16,15 @@ resource "azurerm_resource_group" "test" {
 module "storage_account" {
   source = "../../../"
 
-  name                     = "stgsimple${random_string.suffix.result}"
+  name                     = "stgsimple${random_string.suffix.result}${var.storage_account_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"
-  account_replication_type = "LRS"
+  account_replication_type = var.account_replication_type
+
+  blob_properties = {
+    versioning_enabled = var.enable_blob_versioning
+  }
 
   tags = {
     Environment = "Test"
