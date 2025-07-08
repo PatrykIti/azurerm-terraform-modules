@@ -28,9 +28,29 @@ type StorageAccountHelper struct {
 func NewStorageAccountHelper(t *testing.T) *StorageAccountHelper {
 	subscriptionID := getRequiredEnvVar(t, "AZURE_SUBSCRIPTION_ID")
 	
-	// Create authorizer from environment
-	authorizer, err := auth.NewAuthorizerFromEnvironment()
-	require.NoError(t, err, "Failed to create authorizer")
+	// Create authorizer based on available credentials
+	var authorizer autorest.Authorizer
+	var err error
+	
+	// Check if we have service principal credentials
+	clientID := os.Getenv("AZURE_CLIENT_ID")
+	clientSecret := os.Getenv("AZURE_CLIENT_SECRET")
+	tenantID := os.Getenv("AZURE_TENANT_ID")
+	
+	if clientID != "" && clientSecret != "" && tenantID != "" {
+		// Use service principal auth
+		config := auth.NewClientCredentialsConfig(clientID, clientSecret, tenantID)
+		authorizer, err = config.Authorizer()
+		require.NoError(t, err, "Failed to create service principal authorizer")
+	} else {
+		// Try CLI auth for local development
+		authorizer, err = auth.NewAuthorizerFromCLI()
+		if err != nil {
+			// Fall back to environment-based auth
+			authorizer, err = auth.NewAuthorizerFromEnvironment()
+			require.NoError(t, err, "Failed to create authorizer")
+		}
+	}
 
 	// Create storage accounts client
 	client := storage.NewAccountsClient(subscriptionID)
