@@ -22,6 +22,11 @@ module "storage_account" {
   account_tier             = "Standard"
   account_replication_type = var.account_replication_type
 
+  # Enable shared access key for tests
+  security_settings = {
+    shared_access_key_enabled = true
+  }
+
   blob_properties = {
     versioning_enabled = var.enable_blob_versioning
   }
