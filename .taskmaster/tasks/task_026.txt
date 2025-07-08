@@ -1,0 +1,31 @@
+# Task ID: 26
+# Title: Overhaul Data-Lake-Gen2 Example with ACLs and RBAC
+# Status: done
+# Dependencies: 23
+# Priority: high
+# Description: Refactor the Data Lake Gen2 example to demonstrate proper Access Control List (ACL) configuration on directories and files, and to show how to assign Azure AD roles for data plane access.
+# Details:
+1. Ensure the storage account is created with `is_hns_enabled = true`. 2. Use the `azurerm_storage_data_lake_gen2_path` resource to create a directory structure and apply ACLs. Example: `resource "azurerm_storage_data_lake_gen2_path" "example" { path = "raw/data", filesystem_name = module.storage.container_names["datalakefs"], storage_account_id = module.storage.id, resource = "directory", ace = [{ type = "user", id = var.user_object_id, permissions = "rwx" }] }`. 3. Add `azurerm_role_assignment` resources to grant roles like 'Storage Blob Data Owner' to a principal, scoped to the storage account.
+
+# Test Strategy:
+Apply the configuration. Use Azure CLI (`az storage fs access list`) or Azure Storage Explorer to verify that the directory structure and ACLs are set as defined. In the Azure Portal, check the 'Access control (IAM)' blade of the storage account to confirm the role assignments have been created.
+
+# Subtasks:
+## 1. Configure Foundational Resources: Azure AD Principal and Data Lake Storage [done]
+### Dependencies: None
+### Description: Create the necessary Azure AD Service Principal to represent an application or user, and provision the Azure Storage Account with the Hierarchical Namespace (HNS) enabled to function as a Data Lake Gen2. This sets the stage for applying access control.
+### Details:
+1. Use the `azuread_service_principal` and `azuread_application` resources to create a new identity. 2. In the `azurerm_storage_account` resource, ensure the `is_hns_enabled` property is set to `true`. 3. Create an `azurerm_storage_data_lake_gen2_filesystem` resource to act as the container for the data lake paths. 4. Use `output` blocks to expose the service principal's `object_id` and the storage account `id` for use in subsequent subtasks.
+
+## 2. Implement Fine-Grained ACLs on Data Lake Paths [done]
+### Dependencies: 26.1
+### Description: Demonstrate the use of Access Control Lists (ACLs) for POSIX-like permissions on specific directories and files within the data lake. This subtask will create a directory and a file, applying distinct permissions to each for the service principal.
+### Details:
+1. Use the `azurerm_storage_data_lake_gen2_path` resource to create a directory (e.g., `path = "raw"`). Set `resource = "directory"`. 2. Configure the `ace` block to grant the Service Principal from subtask 1 `rwx` permissions. The `id` in the `ace` block should be the `object_id` of the service principal. 3. Add another `azurerm_storage_data_lake_gen2_path` resource to create a file inside the directory (e.g., `path = "raw/data.csv"`, `resource = "file"`). Grant this file `rw-` permissions for the same principal to show file-level control.
+
+## 3. Assign Coarse-Grained RBAC Roles for Data Plane Operations [done]
+### Dependencies: 26.1
+### Description: Complement the fine-grained ACLs by assigning a broader Azure RBAC role to the service principal. This demonstrates the two-layered security model of Azure Data Lake Storage, where RBAC provides high-level access and ACLs refine it.
+### Details:
+1. Create an `azurerm_role_assignment` resource. 2. Set the `scope` to the `id` of the `azurerm_storage_account` created in subtask 1. 3. Set the `role_definition_name` to 'Storage Blob Data Contributor'. This role is commonly used for data plane operations. 4. Set the `principal_id` to the `object_id` of the service principal. 5. Add comments to the Terraform code explaining that Azure first checks RBAC for access, and if granted, then checks ACLs for the specific operation.
+

@@ -1,6 +1,6 @@
 # Task ID: 22
 # Title: Enhance Storage Account Module with Security and Blob Properties
-# Status: pending
+# Status: done
 # Dependencies: 18, 20, 21
 # Priority: medium
 # Description: This task involves updating the azurerm_storage_account module to add new security and blob storage parameters, fix the azure_files_authentication implementation, and update relevant examples to reflect these changes.
