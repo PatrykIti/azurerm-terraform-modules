@@ -1185,8 +1185,8 @@
             "dependencies": [
               1
             ],
-            "details": "In the codebase, open the workflow file identified in the previous step. Locate the step defined with `uses: hashicorp/setup-terraform`. Check its parameters, such as `terraform_version`. Understand how this action is supposed to make the `terraform` executable available to subsequent steps.",
-            "status": "in-progress",
+            "details": "In the codebase, open the workflow file identified in the previous step. Locate the step defined with `uses: hashicorp/setup-terraform`. Check its parameters, such as `terraform_version`. Understand how this action is supposed to make the `terraform` executable available to subsequent steps.\n<info added on 2025-07-08T18:51:58.000Z>\nThe issue is that the terraform binary path is set to a temporary directory that gets cleaned up before Terratest can use it. Although the `hashicorp/setup-terraform` action is correctly configured with `terraform_wrapper: false`, the absolute path from the temporary directory is being passed to Terratest. The solution is to ensure the terraform binary is properly available in the system PATH and not referenced by its absolute temporary path.\n</info added on 2025-07-08T18:51:58.000Z>\n<info added on 2025-07-08T18:53:57.015Z>\nThe initial diagnosis regarding the terraform binary path was incorrect. The true root cause is a `StorageAccountAlreadyTaken` error from Azure, as seen in the `RetryableTerraformErrors` log. The storage account names are generated using the pattern 'stgsimple' + a 6-character random string + a suffix. This naming scheme has insufficient entropy, causing name collisions when many tests run in parallel.\n</info added on 2025-07-08T18:53:57.015Z>",
+            "status": "done",
             "testStrategy": "Confirm that the configuration of the `setup-terraform` action is understood and document any non-standard parameters being used."
           },
           {
@@ -1197,7 +1197,7 @@
               2
             ],
             "details": "In the failing step's `run` block, change the command that calls Terraform. The error suggests an incorrect path is being used. The fix is likely to change a command like `/path/to/terraform fmt` to simply `terraform fmt`, allowing the shell to find the binary in the PATH set by the setup action.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Perform a static analysis or a dry-run of the modified YAML snippet to ensure the syntax is correct before committing."
           },
           {
@@ -1227,7 +1227,7 @@
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-08T18:48:49.208Z",
+      "updated": "2025-07-08T18:55:37.076Z",
       "description": "Tasks for master context"
     }
   }
