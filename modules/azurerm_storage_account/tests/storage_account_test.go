@@ -322,8 +322,8 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	uniqueID := strings.ToLower(random.UniqueId())
 	
 	// Azure subscription ID (will be set from environment)
-	subscriptionID := os.Getenv("ARM_SUBSCRIPTION_ID")
-	require.NotEmpty(t, subscriptionID, "ARM_SUBSCRIPTION_ID is required")
+	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
+	require.NotEmpty(t, subscriptionID, "AZURE_SUBSCRIPTION_ID is required")
 
 	return &terraform.Options{
 		TerraformDir: terraformDir,

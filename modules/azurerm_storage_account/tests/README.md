@@ -25,10 +25,10 @@ tests/
 
 1. **Azure Credentials**: Set the following environment variables:
    ```bash
-   export ARM_SUBSCRIPTION_ID="your-subscription-id"
-   export ARM_TENANT_ID="your-tenant-id"
-   export ARM_CLIENT_ID="your-client-id"
-   export ARM_CLIENT_SECRET="your-client-secret"
+   export AZURE_SUBSCRIPTION_ID="your-subscription-id"
+   export AZURE_TENANT_ID="your-tenant-id"
+   export AZURE_CLIENT_ID="your-client-id"
+   export AZURE_CLIENT_SECRET="your-client-secret"
    ```
 
 2. **Go**: Install Go 1.21 or later

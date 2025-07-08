@@ -9,10 +9,10 @@ AZURE_LOCATION ?= northeurope
 # Environment check
 check-env:
 	@echo "Checking required environment variables..."
-	@test -n "$(ARM_SUBSCRIPTION_ID)" || (echo "ARM_SUBSCRIPTION_ID is not set" && exit 1)
-	@test -n "$(ARM_TENANT_ID)" || (echo "ARM_TENANT_ID is not set" && exit 1)
-	@test -n "$(ARM_CLIENT_ID)" || (echo "ARM_CLIENT_ID is not set" && exit 1)
-	@test -n "$(ARM_CLIENT_SECRET)" || (echo "ARM_CLIENT_SECRET is not set" && exit 1)
+	@test -n "$(AZURE_SUBSCRIPTION_ID)" || (echo "AZURE_SUBSCRIPTION_ID is not set" && exit 1)
+	@test -n "$(AZURE_TENANT_ID)" || (echo "AZURE_TENANT_ID is not set" && exit 1)
+	@test -n "$(AZURE_CLIENT_ID)" || (echo "AZURE_CLIENT_ID is not set" && exit 1)
+	@test -n "$(AZURE_CLIENT_SECRET)" || (echo "AZURE_CLIENT_SECRET is not set" && exit 1)
 	@echo "All required environment variables are set."
 
 # Install dependencies

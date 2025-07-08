@@ -26,7 +26,7 @@ type StorageAccountHelper struct {
 
 // NewStorageAccountHelper creates a new helper instance
 func NewStorageAccountHelper(t *testing.T) *StorageAccountHelper {
-	subscriptionID := getRequiredEnvVar(t, "ARM_SUBSCRIPTION_ID")
+	subscriptionID := getRequiredEnvVar(t, "AZURE_SUBSCRIPTION_ID")
 	
 	// Create authorizer from environment
 	authorizer, err := auth.NewAuthorizerFromEnvironment()
