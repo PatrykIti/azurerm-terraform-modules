@@ -31,10 +31,10 @@ test_suites:
 # Test environment requirements
 environment:
   required_vars:
-    - ARM_SUBSCRIPTION_ID
-    - ARM_TENANT_ID
-    - ARM_CLIENT_ID
-    - ARM_CLIENT_SECRET
+    - AZURE_SUBSCRIPTION_ID
+    - AZURE_TENANT_ID
+    - AZURE_CLIENT_ID
+    - AZURE_CLIENT_SECRET
   
   azure_regions:
     - northeurope
