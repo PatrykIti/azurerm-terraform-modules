@@ -1,0 +1,11 @@
+# Task ID: 31
+# Title: Resolve Failing Tests in GitHub Actions Workflows
+# Status: pending
+# Dependencies: 16, 23
+# Priority: medium
+# Description: Investigate and resolve all failing tests identified in the GitHub Actions CI/CD workflows. This involves analyzing workflow logs, identifying the root causes of failures, and implementing the necessary code or configuration fixes.
+# Details:
+1. Navigate to the project's 'Actions' tab in GitHub to review recent workflow runs. 2. Identify all failed workflows, particularly the 'pr-validation' and any module-specific CI jobs. 3. For each failure, analyze the logs to pinpoint the exact step and command that failed (e.g., `terraform fmt`, `tflint`, `checkov`, `terraform plan`). 4. Address common failure types: fix formatting for `fmt` errors, correct code for `tflint` violations, and remediate security issues or add justified skips for `checkov` findings. 5. For `plan` or `apply` failures, debug the Terraform configuration, checking for issues like incorrect variable inputs, provider errors, or broken resource dependencies. 6. Implement all fixes on a dedicated feature branch.
+
+# Test Strategy:
+1. Before pushing, run the failing commands locally (e.g., `tflint`, `checkov`, `terraform validate`) within the affected directories to confirm the fixes. 2. Push the fix branch and create a pull request. 3. Verify that all GitHub Actions workflows triggered by the pull request complete successfully with green checkmarks. 4. After merging the PR, confirm that the corresponding workflows running against the `main` branch also pass, ensuring the repository is in a healthy state.

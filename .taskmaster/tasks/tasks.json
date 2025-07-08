@@ -1155,11 +1155,79 @@
             "testStrategy": "Perform a full `terraform destroy` and `terraform apply` on the example to verify that the entire infrastructure provisions successfully without any dependency-related errors or race conditions."
           }
         ]
+      },
+      {
+        "id": 31,
+        "title": "Resolve Failing Tests in GitHub Actions Workflows",
+        "description": "Investigate and resolve all failing tests identified in the GitHub Actions CI/CD workflows. This involves analyzing workflow logs, identifying the root causes of failures, and implementing the necessary code or configuration fixes.",
+        "details": "1. Navigate to the project's 'Actions' tab in GitHub to review recent workflow runs. 2. Identify all failed workflows, particularly the 'pr-validation' and any module-specific CI jobs. 3. For each failure, analyze the logs to pinpoint the exact step and command that failed (e.g., `terraform fmt`, `tflint`, `checkov`, `terraform plan`). 4. Address common failure types: fix formatting for `fmt` errors, correct code for `tflint` violations, and remediate security issues or add justified skips for `checkov` findings. 5. For `plan` or `apply` failures, debug the Terraform configuration, checking for issues like incorrect variable inputs, provider errors, or broken resource dependencies. 6. Implement all fixes on a dedicated feature branch.",
+        "testStrategy": "1. Before pushing, run the failing commands locally (e.g., `tflint`, `checkov`, `terraform validate`) within the affected directories to confirm the fixes. 2. Push the fix branch and create a pull request. 3. Verify that all GitHub Actions workflows triggered by the pull request complete successfully with green checkmarks. 4. After merging the PR, confirm that the corresponding workflows running against the `main` branch also pass, ensuring the repository is in a healthy state.",
+        "status": "pending",
+        "dependencies": [
+          16,
+          23
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Isolate the Failing Workflow and Step",
+            "description": "Analyze the GitHub Actions logs to pinpoint the exact workflow file, job, and step that is causing the 'fork/exec ... not a directory' error when attempting to run Terraform.",
+            "dependencies": [],
+            "details": "Navigate to the project's 'Actions' tab in GitHub. Open a recent failed run of the 'pr-validation' workflow. Expand the logs for the failing job and identify the specific step (e.g., 'Run terraform fmt') where the error message 'fork/exec /home/runner/work/_temp/.../terraform: not a directory' is reported.\n<info added on 2025-07-08T18:48:37.765Z>\nThe error was found in the 'Test Module' job. The message 'fork/exec /home/runner/work/_temp/8019fd83-fcc3-43a3-9e3a-5aaed12a66f2/terraform: not a directory' suggests the terraform binary path is being incorrectly set to a temp directory by terratest when it runs terraform commands. This affects multiple test cases, including TestStorageAccountValidationRules and TestStorageAccountCompliance.\n</info added on 2025-07-08T18:48:37.765Z>",
+            "status": "done",
+            "testStrategy": "Review the GitHub Actions logs to confirm the exact location of the failure has been correctly identified."
+          },
+          {
+            "id": 2,
+            "title": "Analyze the 'hashicorp/setup-terraform' Action Configuration",
+            "description": "Inspect the relevant workflow YAML file to review how the `hashicorp/setup-terraform` action is configured and how the Terraform binary is intended to be placed in the system's PATH.",
+            "dependencies": [
+              1
+            ],
+            "details": "In the codebase, open the workflow file identified in the previous step. Locate the step defined with `uses: hashicorp/setup-terraform`. Check its parameters, such as `terraform_version`. Understand how this action is supposed to make the `terraform` executable available to subsequent steps.",
+            "status": "in-progress",
+            "testStrategy": "Confirm that the configuration of the `setup-terraform` action is understood and document any non-standard parameters being used."
+          },
+          {
+            "id": 3,
+            "title": "Correct the Terraform Command Invocation in the Workflow",
+            "description": "Modify the workflow YAML file to ensure that steps calling Terraform use the correct command, relying on the PATH environment variable rather than an incorrect explicit path.",
+            "dependencies": [
+              2
+            ],
+            "details": "In the failing step's `run` block, change the command that calls Terraform. The error suggests an incorrect path is being used. The fix is likely to change a command like `/path/to/terraform fmt` to simply `terraform fmt`, allowing the shell to find the binary in the PATH set by the setup action.",
+            "status": "pending",
+            "testStrategy": "Perform a static analysis or a dry-run of the modified YAML snippet to ensure the syntax is correct before committing."
+          },
+          {
+            "id": 4,
+            "title": "Commit the Workflow Fix to a Dedicated Feature Branch",
+            "description": "Create a new feature branch, apply the corrected YAML configuration, and commit the changes with a clear, descriptive commit message.",
+            "dependencies": [
+              3
+            ],
+            "details": "Execute `git checkout -b fix/ci-terraform-path` to create a new branch. After saving the changes to the workflow file, stage and commit them using a message like 'fix(ci): Correct Terraform binary invocation path in workflow'.",
+            "status": "pending",
+            "testStrategy": "Run `git status` and `git diff --staged` before committing to ensure only the intended changes are included."
+          },
+          {
+            "id": 5,
+            "title": "Validate the Fix via a Pull Request Workflow Run",
+            "description": "Push the feature branch to GitHub and create a pull request to trigger the CI workflow. Monitor the workflow run to confirm that the Terraform execution error is resolved.",
+            "dependencies": [
+              4
+            ],
+            "details": "Push the new branch to the remote repository and open a pull request. Navigate to the 'Checks' tab of the PR to watch the 'pr-validation' workflow in real-time. Verify that the previously failing step now passes and the entire workflow completes successfully.",
+            "status": "pending",
+            "testStrategy": "The GitHub Actions workflow associated with the new pull request must pass all checks, specifically the steps involving Terraform commands."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-07T12:21:39.062Z",
+      "updated": "2025-07-08T18:48:49.208Z",
       "description": "Tasks for master context"
     }
   }
