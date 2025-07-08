@@ -293,10 +293,10 @@ jobs:
               continue
             fi
             
-            # First, generate dynamic terraform-docs config if examples exist
-            if [[ -d "$module/examples" ]] && [[ -x "./scripts/generate-terraform-docs-config.sh" ]]; then
-              echo "Generating terraform-docs config for $module..."
-              ./scripts/generate-terraform-docs-config.sh "$module"
+            # First, update examples list if module has examples
+            if [[ -d "$module/examples" ]] && [[ -x "./scripts/update-examples-list.sh" ]]; then
+              echo "Updating examples list for $module..."
+              ./scripts/update-examples-list.sh "$module"
             fi
             
             if [[ -f "$module/README.md" ]]; then

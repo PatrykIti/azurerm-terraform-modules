@@ -420,14 +420,12 @@ This directory contains additional documentation for the $DISPLAY_NAME module.
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines on adding documentation.
 EOF
 
-# Generate terraform-docs configuration for main module
-print_info "Generating terraform-docs configuration..."
-if [[ -x "$SCRIPT_DIR/generate-terraform-docs-config.sh" ]]; then
-    "$SCRIPT_DIR/generate-terraform-docs-config.sh" "$MODULE_DIR"
+# Copy static terraform-docs configuration for main module
+print_info "Copying terraform-docs configuration..."
+if [[ -f "$TEMPLATES_DIR/module-terraform-docs.yml" ]]; then
+    cp "$TEMPLATES_DIR/module-terraform-docs.yml" "$MODULE_DIR/.terraform-docs.yml"
 else
-    print_warning "generate-terraform-docs-config.sh not found - using default template"
-    cp "$TEMPLATES_DIR/.terraform-docs.yml.template" "$MODULE_DIR/.terraform-docs.yml"
-    replace_placeholders "$MODULE_DIR/.terraform-docs.yml"
+    print_warning "module-terraform-docs.yml template not found - module will need manual configuration"
 fi
 
 # Generate terraform-docs configuration for all examples
@@ -459,8 +457,10 @@ print_info "Next steps:"
 print_info "1. Implement the main resource in main.tf"
 print_info "2. Update variables.tf with module-specific variables"
 print_info "3. Update outputs.tf with actual outputs"
-print_info "4. Run terraform-docs to generate initial README content:"
-print_info "   cd $MODULE_DIR && terraform-docs markdown table --output-file README.md --output-mode inject ."
+print_info "4. Generate documentation:"
+print_info "   cd $MODULE_DIR"
+print_info "   terraform-docs markdown table --output-file README.md --output-mode inject ."
+print_info "   ./scripts/update-examples-list.sh ."
 print_info "5. Create complete and secure examples"
 print_info "6. Write tests for the module"
 print_info "7. Update the module category in .github/module-config.yml"
