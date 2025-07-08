@@ -214,21 +214,21 @@ func (h *StorageAccountHelper) ValidateBlobServiceProperties(t *testing.T, accou
 	properties := resp.BlobServiceProperties
 
 	// Validate soft delete is enabled
-	if properties.BlobServicePropertiesProperties != nil && properties.BlobServicePropertiesProperties.DeleteRetentionPolicy != nil && properties.BlobServicePropertiesProperties.DeleteRetentionPolicy.Enabled != nil {
-		logger.Logf(t, "Blob soft delete enabled: %v", *properties.BlobServicePropertiesProperties.DeleteRetentionPolicy.Enabled)
-		if *properties.BlobServicePropertiesProperties.DeleteRetentionPolicy.Enabled && properties.BlobServicePropertiesProperties.DeleteRetentionPolicy.Days != nil {
-			logger.Logf(t, "Blob soft delete retention days: %d", *properties.BlobServicePropertiesProperties.DeleteRetentionPolicy.Days)
+	if properties.BlobServiceProperties != nil && properties.BlobServiceProperties.DeleteRetentionPolicy != nil && properties.BlobServiceProperties.DeleteRetentionPolicy.Enabled != nil {
+		logger.Logf(t, "Blob soft delete enabled: %v", *properties.BlobServiceProperties.DeleteRetentionPolicy.Enabled)
+		if *properties.BlobServiceProperties.DeleteRetentionPolicy.Enabled && properties.BlobServiceProperties.DeleteRetentionPolicy.Days != nil {
+			logger.Logf(t, "Blob soft delete retention days: %d", *properties.BlobServiceProperties.DeleteRetentionPolicy.Days)
 		}
 	}
 
 	// Validate versioning
-	if properties.BlobServicePropertiesProperties != nil && properties.BlobServicePropertiesProperties.IsVersioningEnabled != nil {
-		logger.Logf(t, "Blob versioning enabled: %v", *properties.BlobServicePropertiesProperties.IsVersioningEnabled)
+	if properties.BlobServiceProperties != nil && properties.BlobServiceProperties.IsVersioningEnabled != nil {
+		logger.Logf(t, "Blob versioning enabled: %v", *properties.BlobServiceProperties.IsVersioningEnabled)
 	}
 
 	// Validate change feed
-	if properties.BlobServicePropertiesProperties != nil && properties.BlobServicePropertiesProperties.ChangeFeed != nil && properties.BlobServicePropertiesProperties.ChangeFeed.Enabled != nil {
-		logger.Logf(t, "Change feed enabled: %v", *properties.BlobServicePropertiesProperties.ChangeFeed.Enabled)
+	if properties.BlobServiceProperties != nil && properties.BlobServiceProperties.ChangeFeed != nil && properties.BlobServiceProperties.ChangeFeed.Enabled != nil {
+		logger.Logf(t, "Change feed enabled: %v", *properties.BlobServiceProperties.ChangeFeed.Enabled)
 	}
 }
 
