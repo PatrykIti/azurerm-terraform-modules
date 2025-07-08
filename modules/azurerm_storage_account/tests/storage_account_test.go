@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2021-09-01/storage"
-	"github.com/gruntwork-io/terratest/modules/azure"
+	// "github.com/gruntwork-io/terratest/modules/azure" // Commented out due to SQL import issue
 	http_helper "github.com/gruntwork-io/terratest/modules/http-helper"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -49,12 +49,11 @@ func TestBasicStorageAccount(t *testing.T) {
 		assert.NotEmpty(t, resourceGroupName)
 		assert.NotEmpty(t, storageAccountID)
 
-		// Validate storage account exists
-		exists := azure.StorageAccountExists(t, storageAccountName, resourceGroupName, "")
-		assert.True(t, exists, "Storage account should exist")
+		// Use our helper instead of azure module due to import issues
+		helper := NewStorageAccountHelper(t)
 
 		// Get storage account properties
-		storageAccount := azure.GetStorageAccount(t, storageAccountName, resourceGroupName, "")
+		storageAccount := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 		
 		// Validate basic properties
 		assert.Equal(t, storage.SkuName("Standard_LRS"), storageAccount.Sku.Name)
@@ -91,8 +90,9 @@ func TestCompleteStorageAccount(t *testing.T) {
 		containerNames := terraform.OutputList(t, terraformOptions, "container_names")
 		primaryBlobEndpoint := terraform.Output(t, terraformOptions, "primary_blob_endpoint")
 
-		// Validate storage account
-		storageAccount := azure.GetStorageAccount(t, storageAccountName, resourceGroupName, "")
+		// Use our helper instead of azure module
+		helper := NewStorageAccountHelper(t)
+		storageAccount := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 		
 		// Validate advanced features
 		assert.Equal(t, storage.SkuName("Standard_ZRS"), storageAccount.Sku.Name)
@@ -133,8 +133,9 @@ func TestStorageAccountSecurity(t *testing.T) {
 		storageAccountName := terraform.Output(t, terraformOptions, "storage_account_name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 
-		// Get storage account
-		storageAccount := azure.GetStorageAccount(t, storageAccountName, resourceGroupName, "")
+		// Use our helper instead of azure module
+		helper := NewStorageAccountHelper(t)
+		storageAccount := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 
 		// Validate security settings
 		assert.True(t, *storageAccount.EnableHTTPSTrafficOnly)
@@ -177,8 +178,9 @@ func TestStorageAccountNetworkRules(t *testing.T) {
 		storageAccountName := terraform.Output(t, terraformOptions, "storage_account_name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 
-		// Get storage account
-		storageAccount := azure.GetStorageAccount(t, storageAccountName, resourceGroupName, "")
+		// Use our helper instead of azure module
+		helper := NewStorageAccountHelper(t)
+		storageAccount := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 
 		// Validate network rules
 		assert.NotNil(t, storageAccount.NetworkRuleSet)
@@ -221,8 +223,9 @@ func TestStorageAccountPrivateEndpoint(t *testing.T) {
 		// Validate private endpoint was created
 		assert.NotEmpty(t, privateEndpointID)
 
-		// Get storage account
-		storageAccount := azure.GetStorageAccount(t, storageAccountName, resourceGroupName, "")
+		// Use our helper instead of azure module
+		helper := NewStorageAccountHelper(t)
+		storageAccount := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 
 		// Validate public network access is disabled
 		assert.Equal(t, storage.PublicNetworkAccessDisabled, storageAccount.PublicNetworkAccess)
