@@ -179,7 +179,7 @@ func TestStorageAccountLifecycle(t *testing.T) {
 	terraform.Apply(t, terraformOptions)
 }
 
-// TestStorageAccountDisasterRecovery tests failover scenarios
+// TestStorageAccountDisasterRecovery tests failover scenarios with RA-GRS for read access to secondary endpoints
 func TestStorageAccountDisasterRecovery(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping disaster recovery test in short mode")
@@ -188,8 +188,8 @@ func TestStorageAccountDisasterRecovery(t *testing.T) {
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/simple")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
-	// Use GRS for failover capability
-	terraformOptions.Vars["account_replication_type"] = "GRS"
+	// Use RA-GRS for read access to secondary region
+	terraformOptions.Vars["account_replication_type"] = "RAGRS"
 	
 	defer terraform.Destroy(t, terraformOptions)
 	
@@ -207,7 +207,7 @@ func TestStorageAccountDisasterRecovery(t *testing.T) {
 	
 	// Get account properties
 	account := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
-	assert.Equal(t, storage.SkuName("Standard_GRS"), account.Sku.Name)
+	assert.Equal(t, storage.SkuName("Standard_RAGRS"), account.Sku.Name)
 	
 	// Wait for GRS secondary endpoints to be available
 	helper.WaitForGRSSecondaryEndpoints(t, storageAccountName, resourceGroupName)
@@ -215,16 +215,17 @@ func TestStorageAccountDisasterRecovery(t *testing.T) {
 	// Get updated account properties with secondary endpoints
 	account = helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 	
-	// Verify secondary endpoints are available
-	assert.NotNil(t, account.SecondaryEndpoints, "Secondary endpoints should be available for GRS")
-	if account.SecondaryEndpoints != nil && account.SecondaryEndpoints.Blob != nil {
-		assert.NotEmpty(t, *account.SecondaryEndpoints.Blob, "Secondary blob endpoint should not be empty")
-		t.Logf("Secondary endpoint: %s", *account.SecondaryEndpoints.Blob)
-	}
+	// Verify secondary endpoints are available for RA-GRS
+	require.NotNil(t, account.SecondaryEndpoints, "Secondary endpoints should be available for RA-GRS")
+	require.NotNil(t, account.SecondaryEndpoints.Blob, "Secondary blob endpoint should not be nil")
+	require.NotEmpty(t, *account.SecondaryEndpoints.Blob, "Secondary blob endpoint should not be empty")
 	
-	if account.PrimaryEndpoints != nil && account.PrimaryEndpoints.Blob != nil {
-		t.Logf("Primary endpoint: %s", *account.PrimaryEndpoints.Blob)
-	}
+	// Log endpoints for debugging
+	t.Logf("Primary endpoint: %s", *account.PrimaryEndpoints.Blob)
+	t.Logf("Secondary endpoint: %s", *account.SecondaryEndpoints.Blob)
+	
+	// Verify secondary endpoint format
+	assert.Contains(t, *account.SecondaryEndpoints.Blob, "-secondary.blob.core.", "Secondary endpoint should contain '-secondary' suffix")
 }
 
 // TestStorageAccountCompliance tests compliance-related features
