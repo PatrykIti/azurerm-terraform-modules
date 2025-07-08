@@ -300,16 +300,21 @@ jobs:
             fi
             
             if [[ -f "$module/README.md" ]]; then
-              # Generate current documentation
-              if terraform-docs markdown table --output-file README.md.tmp "$module" 2>/dev/null; then
-                # Compare with existing
-                if ! diff -q "$module/README.md" "$module/README.md.tmp" > /dev/null 2>&1; then
+              # Check if terraform-docs content is up to date
+              if [[ -x "./scripts/check-terraform-docs.sh" ]]; then
+                if ! ./scripts/check-terraform-docs.sh "$module"; then
                   docs_outdated+=("$module")
                 fi
-                rm -f "$module/README.md.tmp"
               else
-                # terraform-docs failed - likely due to configuration error
-                docs_errors+=("$module (terraform-docs error)")
+                # Fallback to old method if script doesn't exist
+                if terraform-docs markdown table --output-file README.md.tmp "$module" 2>/dev/null; then
+                  if ! diff -q "$module/README.md" "$module/README.md.tmp" > /dev/null 2>&1; then
+                    docs_outdated+=("$module")
+                  fi
+                  rm -f "$module/README.md.tmp"
+                else
+                  docs_errors+=("$module (terraform-docs error)")
+                fi
               fi
             else
               docs_outdated+=("$module (missing README.md)")
