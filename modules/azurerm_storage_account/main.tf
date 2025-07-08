@@ -120,6 +120,7 @@ resource "azurerm_storage_account" "storage_account" {
   }
 
   # Network rules
+  #checkov:skip=CKV_AZURE_36:False positive with dynamic blocks - https://github.com/bridgecrewio/checkov/issues/6724
   dynamic "network_rules" {
     for_each = var.network_rules.default_action != null ? [1] : []
     content {
