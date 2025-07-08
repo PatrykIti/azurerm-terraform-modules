@@ -98,6 +98,7 @@ runs:
         AZURE_CLIENT_ID: ${{ fromJSON(inputs.azure-credentials).clientId }}
         AZURE_TENANT_ID: ${{ fromJSON(inputs.azure-credentials).tenantId }}
         AZURE_SUBSCRIPTION_ID: ${{ fromJSON(inputs.azure-credentials).subscriptionId }}
+        AZURE_CLIENT_SECRET: ${{ fromJSON(inputs.azure-credentials).clientSecret }}
         AZURE_FEDERATED_TOKEN_FILE: /tmp/azure-oidc-token
         AZURE_AUTHORITY_HOST: https://login.microsoftonline.com/
       run: |
