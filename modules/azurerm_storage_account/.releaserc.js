@@ -88,9 +88,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         # Update examples to use the new version tag
         find examples -name "*.tf" -type f -exec sed -i 's|source.*=.*"\.\./../"|source = "github.com/\${context.repo.owner}/\${context.repo.repo}//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"|g' {} +
         
-        # Regenerate terraform-docs config with new version
-        if [[ -x "../../scripts/generate-terraform-docs-config.sh" ]]; then
-          ../../scripts/generate-terraform-docs-config.sh .
+        # Update module version in README
+        if [[ -x "../../scripts/update-module-version.sh" ]]; then
+          ../../scripts/update-module-version.sh . "\${nextRelease.version}"
+        fi
+        
+        # Update examples list in README
+        if [[ -x "../../scripts/update-examples-list.sh" ]]; then
+          ../../scripts/update-examples-list.sh .
         fi
         
         # Update README.md with terraform-docs
@@ -112,7 +117,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         '.github/module-config.yml',
         'examples/**/*.tf',
         'README.md',
-        '.terraform-docs.yml',
         '../../README.md'
       ],
       message: `chore(release): ${TAG_PREFIX}\${nextRelease.version} [skip ci]
