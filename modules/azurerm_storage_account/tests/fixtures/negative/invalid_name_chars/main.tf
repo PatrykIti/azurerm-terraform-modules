@@ -8,7 +8,7 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "storage_account" {
-  source = "../../../"
+  source = "../../../../"
 
   # Invalid: name contains uppercase and special characters
   name                     = "Storage-Account-123"

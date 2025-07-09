@@ -8,7 +8,7 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "storage_account" {
-  source = "../../../"
+  source = "../../../../"
 
   # Invalid: name too short (less than 3 characters)
   name                     = "st"

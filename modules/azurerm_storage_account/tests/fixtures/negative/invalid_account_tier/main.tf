@@ -8,7 +8,7 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "storage_account" {
-  source = "../../../"
+  source = "../../../../"
 
   name                = "devtmpcitiinvtier123"
   resource_group_name = azurerm_resource_group.test.name
