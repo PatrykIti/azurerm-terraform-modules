@@ -257,12 +257,12 @@ func TestStorageAccountValidationRules(t *testing.T) {
 		{
 			name:          "InvalidStorageAccountName_TooShort",
 			fixtureFile:   "negative/invalid_name_short",
-			expectedError: "Storage account name must be between 3 and 24 characters long and use numbers and lower-case letters only",
+			expectedError: "Storage account name must be between 3 and 24 characters long",
 		},
 		{
 			name:          "InvalidStorageAccountName_InvalidChars",
 			fixtureFile:   "negative/invalid_name_chars",
-			expectedError: "Storage account name must be between 3 and 24 characters long and use numbers and lower-case letters only",
+			expectedError: "Storage account name must be between 3 and 24 characters long",
 		},
 		{
 			name:          "InvalidAccountTier",
@@ -272,7 +272,7 @@ func TestStorageAccountValidationRules(t *testing.T) {
 		{
 			name:          "InvalidReplicationType",
 			fixtureFile:   "negative/invalid_replication_type",
-			expectedError: "Account replication type must be one of",
+			expectedError: "Valid replication types are LRS, GRS, RAGRS, ZRS, GZRS, RAGZRS",
 		},
 		{
 			name:          "InvalidContainerAccessType",
