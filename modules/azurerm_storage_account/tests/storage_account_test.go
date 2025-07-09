@@ -319,7 +319,10 @@ func BenchmarkStorageAccountCreation(b *testing.B) {
 // Helper function to get terraform options
 func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	// Generate a unique ID for resources
-	uniqueID := strings.ToLower(random.UniqueId())
+	// Using 8 chars total: 5 random + 3 from timestamp for better uniqueness
+	timestamp := time.Now().UnixNano() % 1000 // Last 3 digits for more variation
+	baseID := strings.ToLower(random.UniqueId())
+	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
 	
 	// Azure subscription ID (will be set from environment)
 	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")

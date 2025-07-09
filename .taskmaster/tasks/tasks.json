@@ -1196,7 +1196,7 @@
             "dependencies": [
               2
             ],
-            "details": "In the failing step's `run` block, change the command that calls Terraform. The error suggests an incorrect path is being used. The fix is likely to change a command like `/path/to/terraform fmt` to simply `terraform fmt`, allowing the shell to find the binary in the PATH set by the setup action.",
+            "details": "In the failing step's `run` block, change the command that calls Terraform. The error suggests an incorrect path is being used. The fix is likely to change a command like `/path/to/terraform fmt` to simply `terraform fmt`, allowing the shell to find the binary in the PATH set by the setup action.\n<info added on 2025-07-09T06:24:24.247Z>\nThe storage account names have been corrected, but the full error context from GitHub Actions is needed to diagnose the real cause. The log only shows the test parameters, not the error itself.\n</info added on 2025-07-09T06:24:24.247Z>",
             "status": "done",
             "testStrategy": "Perform a static analysis or a dry-run of the modified YAML snippet to ensure the syntax is correct before committing."
           },
