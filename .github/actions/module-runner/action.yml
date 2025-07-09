@@ -92,17 +92,22 @@ runs:
       working-directory: ./modules/${{ inputs.module }}
       env:
         ARM_USE_OIDC: true
-        ARM_CLIENT_ID: ${{ fromJSON(inputs.azure-credentials).clientId }}
-        ARM_TENANT_ID: ${{ fromJSON(inputs.azure-credentials).tenantId }}
-        ARM_SUBSCRIPTION_ID: ${{ fromJSON(inputs.azure-credentials).subscriptionId }}
-        ARM_CLIENT_SECRET: ${{ fromJSON(inputs.azure-credentials).clientSecret }}
-        AZURE_CLIENT_ID: ${{ fromJSON(inputs.azure-credentials).clientId }}
-        AZURE_TENANT_ID: ${{ fromJSON(inputs.azure-credentials).tenantId }}
-        AZURE_SUBSCRIPTION_ID: ${{ fromJSON(inputs.azure-credentials).subscriptionId }}
-        AZURE_CLIENT_SECRET: ${{ fromJSON(inputs.azure-credentials).clientSecret }}
         AZURE_FEDERATED_TOKEN_FILE: /tmp/azure-oidc-token
         AZURE_AUTHORITY_HOST: https://login.microsoftonline.com/
       run: |
+        # Set Azure credentials if provided
+        if [[ -n "${{ inputs.azure-credentials }}" ]]; then
+          CREDS='${{ inputs.azure-credentials }}'
+          export ARM_CLIENT_ID=$(echo "$CREDS" | jq -r '.clientId')
+          export ARM_TENANT_ID=$(echo "$CREDS" | jq -r '.tenantId')
+          export ARM_SUBSCRIPTION_ID=$(echo "$CREDS" | jq -r '.subscriptionId')
+          export ARM_CLIENT_SECRET=$(echo "$CREDS" | jq -r '.clientSecret')
+          export AZURE_CLIENT_ID=$ARM_CLIENT_ID
+          export AZURE_TENANT_ID=$ARM_TENANT_ID
+          export AZURE_SUBSCRIPTION_ID=$ARM_SUBSCRIPTION_ID
+          export AZURE_CLIENT_SECRET=$ARM_CLIENT_SECRET
+        fi
+        
         if [[ -d "tests" ]]; then
           echo "Running Terratest for ${{ inputs.module }}"
           cd tests
