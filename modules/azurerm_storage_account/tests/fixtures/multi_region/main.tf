@@ -10,13 +10,13 @@ resource "random_string" "suffix" {
 
 # Primary region
 resource "azurerm_resource_group" "primary" {
-  name     = "rg-devtmpciti-multi-pri-${var.random_suffix}"
+  name     = "rg-devpciti-mpr-${var.random_suffix}"
   location = var.primary_location
 }
 
 # Secondary region
 resource "azurerm_resource_group" "secondary" {
-  name     = "rg-devtmpciti-multi-sec-${var.random_suffix}"
+  name     = "rg-devpciti-msc-${var.random_suffix}"
   location = var.secondary_location
 }
 

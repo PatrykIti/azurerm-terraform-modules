@@ -9,7 +9,7 @@ resource "random_string" "suffix" {
 }
 
 resource "azurerm_resource_group" "test" {
-  name     = "rg-devtmpciti-simple-${var.random_suffix}"
+  name     = "rg-devpciti-smp-${var.random_suffix}"
   location = var.location
 }
 
