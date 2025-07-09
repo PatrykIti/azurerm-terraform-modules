@@ -1,8 +1,8 @@
 package test
 
 import (
-	"crypto/tls"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
@@ -10,7 +10,6 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 	// "github.com/gruntwork-io/terratest/modules/azure" // Commented out due to SQL import issue
-	http_helper "github.com/gruntwork-io/terratest/modules/http-helper"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
