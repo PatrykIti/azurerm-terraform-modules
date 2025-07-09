@@ -75,7 +75,7 @@ resource "azurerm_role_assignment" "uai_kv_access" {
 module "storage_account" {
   source = "../../../"
 
-  name                     = "devtmpciti${random_string.suffix.result}${var.random_suffix}"
+  name                     = "devpcitiida${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"

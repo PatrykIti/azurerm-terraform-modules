@@ -42,7 +42,7 @@ resource "azurerm_log_analytics_workspace" "test" {
 module "storage_account" {
   source = "../../../"
 
-  name                     = "devtmpciti${random_string.suffix.result}${var.random_suffix}"
+  name                     = "devpcticmp${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"
