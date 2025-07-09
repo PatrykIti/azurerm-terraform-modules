@@ -57,8 +57,8 @@ module "storage_account" {
   network_rules = {
     default_action = "Deny"
     ip_rules = [
-      "203.0.113.0/24",  # Test IP range 1
-      "198.51.100.0/24", # Test IP range 2
+      "198.51.100.0/24", # Test IP range 1
+      "203.0.113.0/24",  # Test IP range 2
       "192.0.2.1"        # Single IP
     ]
     virtual_network_subnet_ids = [

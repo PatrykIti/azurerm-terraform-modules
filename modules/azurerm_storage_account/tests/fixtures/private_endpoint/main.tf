@@ -61,14 +61,14 @@ module "storage_account" {
   network_rules = {
     default_action = "Deny"
     ip_rules       = []
-    subnet_ids     = []
+    virtual_network_subnet_ids = []
     bypass         = [] # No bypass, completely private
   }
 
   # Private endpoint configuration
   private_endpoints = [
     {
-      name                 = "pe-dpc-pep-${random_string.suffix.result}${var.random_suffix}"
+      name                 = "blob-endpoint"
       subnet_id            = azurerm_subnet.endpoint.id
       private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
       subresource_names    = ["blob"]
