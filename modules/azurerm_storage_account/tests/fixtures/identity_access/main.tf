@@ -15,13 +15,13 @@ resource "random_string" "suffix" {
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_resource_group" "test" {
-  name     = "rg-devtmpciti-identity-${var.random_suffix}"
+  name     = "rg-devpciti-ida-${var.random_suffix}"
   location = var.location
 }
 
 # Key Vault for CMK
 resource "azurerm_key_vault" "test" {
-  name                       = "kvdevtmpciti${random_string.suffix.result}${var.random_suffix}"
+  name                       = "kvdevpcitiida${random_string.suffix.result}"
   location                   = azurerm_resource_group.test.location
   resource_group_name        = azurerm_resource_group.test.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -60,7 +60,7 @@ resource "azurerm_role_assignment" "current_user_kv" {
 
 # User-assigned identity
 resource "azurerm_user_assigned_identity" "test" {
-  name                = "uai-devtmpciti-${random_string.suffix.result}${var.random_suffix}"
+  name                = "uai-devpciti-ida-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
 }
