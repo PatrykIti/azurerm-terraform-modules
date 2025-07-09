@@ -102,7 +102,7 @@ module "storage_account" {
   # Network rules
   network_rules = {
     default_action = "Deny"
-    ip_rules       = ["203.0.113.0/24"]
+    ip_rules       = ["198.51.100.0/24"]
     virtual_network_subnet_ids = [azurerm_subnet.test.id]
     bypass         = ["AzureServices"]
   }
