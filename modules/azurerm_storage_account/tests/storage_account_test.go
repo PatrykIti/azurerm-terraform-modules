@@ -287,7 +287,12 @@ func TestStorageAccountValidationRules(t *testing.T) {
 			t.Parallel()
 
 			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fmt.Sprintf("azurerm_storage_account/tests/fixtures/%s", tc.fixtureFile))
-			terraformOptions := getTerraformOptions(t, testFolder)
+			
+			// Use minimal terraform options for negative tests (no variables)
+			terraformOptions := &terraform.Options{
+				TerraformDir: testFolder,
+				NoColor:      true,
+			}
 
 			// This should fail during plan/apply
 			_, err := terraform.InitAndPlanE(t, terraformOptions)
