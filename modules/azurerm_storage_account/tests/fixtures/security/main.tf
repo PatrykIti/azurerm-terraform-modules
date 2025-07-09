@@ -16,7 +16,7 @@ resource "azurerm_resource_group" "test" {
 module "storage_account" {
   source = "../../../"
 
-  name                     = "devpcitisec${random_string.suffix.result}${var.random_suffix}"
+  name                     = "dpcsec${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"

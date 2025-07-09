@@ -24,7 +24,7 @@ resource "azurerm_resource_group" "secondary" {
 module "primary_storage" {
   source = "../../../"
 
-  name                     = "devpcitimpr${random_string.suffix.result}${var.random_suffix}"
+  name                     = "dpcmpr${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.primary.name
   location                 = azurerm_resource_group.primary.location
   account_kind             = "StorageV2"
@@ -91,7 +91,7 @@ module "primary_storage" {
 module "secondary_storage" {
   source = "../../../"
 
-  name                     = "devpcitimsc${random_string.suffix.result}${var.random_suffix}"
+  name                     = "dpcmsc${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.secondary.name
   location                 = azurerm_resource_group.secondary.location
   account_kind             = "StorageV2"

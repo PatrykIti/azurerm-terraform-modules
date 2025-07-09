@@ -21,7 +21,7 @@ resource "azurerm_resource_group" "test" {
 
 # Key Vault for CMK
 resource "azurerm_key_vault" "test" {
-  name                       = "kvdevpcitiida${random_string.suffix.result}"
+  name                       = "kvdpcida${random_string.suffix.result}"
   location                   = azurerm_resource_group.test.location
   resource_group_name        = azurerm_resource_group.test.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -75,7 +75,7 @@ resource "azurerm_role_assignment" "uai_kv_access" {
 module "storage_account" {
   source = "../../../"
 
-  name                     = "devpcitiida${random_string.suffix.result}${var.random_suffix}"
+  name                     = "dpcida${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"

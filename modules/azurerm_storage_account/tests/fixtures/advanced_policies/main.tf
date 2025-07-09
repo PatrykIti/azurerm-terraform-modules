@@ -56,7 +56,7 @@ locals {
 module "storage_account" {
   source = "../../../"
 
-  name                     = "devpcitiadv${random_string.suffix.result}${var.random_suffix}"
+  name                     = "dpcadv${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"
