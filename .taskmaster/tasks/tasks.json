@@ -1160,7 +1160,7 @@
         "id": 31,
         "title": "Resolve Failing Tests in GitHub Actions Workflows",
         "description": "Significant progress has been made in resolving failing tests. Multiple code and test fixture issues have been fixed, including storage account name collisions and incorrect test assertions. The primary remaining blocker is an Azure authentication failure in the CI/CD environment, as the configured credentials appear to be invalid or expired.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           16,
           23
@@ -1184,7 +1184,7 @@
             "id": 5,
             "title": "Resolve Azure Authentication Failure in CI",
             "description": "The CI workflow is now failing due to an Azure authentication error: \"Tenant '2bb83c65-43f0-4d43-93fa-69eec5f8c4f5' not found\". The provided Azure credentials in the CI environment are expired or invalid. Work with the appropriate team to obtain and update the `AZURE_CREDENTIALS` secret in the GitHub repository.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               4
             ],
@@ -1195,7 +1195,7 @@
             "id": 6,
             "title": "Validate All Fixes with a Successful CI Workflow Run",
             "description": "With the authentication issue resolved, trigger a new CI run on the pull request. Monitor the workflow to confirm that all tests now pass, validating the cumulative code and fixture fixes.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               5
             ],
@@ -1238,7 +1238,7 @@
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-08T18:55:37.076Z",
+      "updated": "2025-07-09T10:23:03.829Z",
       "description": "Tasks for master context"
     }
   }
