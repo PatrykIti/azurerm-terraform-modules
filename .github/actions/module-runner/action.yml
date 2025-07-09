@@ -95,6 +95,7 @@ runs:
         ARM_CLIENT_ID: ${{ fromJSON(inputs.azure-credentials).clientId }}
         ARM_TENANT_ID: ${{ fromJSON(inputs.azure-credentials).tenantId }}
         ARM_SUBSCRIPTION_ID: ${{ fromJSON(inputs.azure-credentials).subscriptionId }}
+        ARM_CLIENT_SECRET: ${{ fromJSON(inputs.azure-credentials).clientSecret }}
         AZURE_CLIENT_ID: ${{ fromJSON(inputs.azure-credentials).clientId }}
         AZURE_TENANT_ID: ${{ fromJSON(inputs.azure-credentials).tenantId }}
         AZURE_SUBSCRIPTION_ID: ${{ fromJSON(inputs.azure-credentials).subscriptionId }}
