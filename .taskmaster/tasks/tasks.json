@@ -1159,16 +1159,49 @@
       {
         "id": 31,
         "title": "Resolve Failing Tests in GitHub Actions Workflows",
-        "description": "Investigate and resolve all failing tests identified in the GitHub Actions CI/CD workflows. This involves analyzing workflow logs, identifying the root causes of failures, and implementing the necessary code or configuration fixes.",
-        "details": "1. Navigate to the project's 'Actions' tab in GitHub to review recent workflow runs. 2. Identify all failed workflows, particularly the 'pr-validation' and any module-specific CI jobs. 3. For each failure, analyze the logs to pinpoint the exact step and command that failed (e.g., `terraform fmt`, `tflint`, `checkov`, `terraform plan`). 4. Address common failure types: fix formatting for `fmt` errors, correct code for `tflint` violations, and remediate security issues or add justified skips for `checkov` findings. 5. For `plan` or `apply` failures, debug the Terraform configuration, checking for issues like incorrect variable inputs, provider errors, or broken resource dependencies. 6. Implement all fixes on a dedicated feature branch.",
-        "testStrategy": "1. Before pushing, run the failing commands locally (e.g., `tflint`, `checkov`, `terraform validate`) within the affected directories to confirm the fixes. 2. Push the fix branch and create a pull request. 3. Verify that all GitHub Actions workflows triggered by the pull request complete successfully with green checkmarks. 4. After merging the PR, confirm that the corresponding workflows running against the `main` branch also pass, ensuring the repository is in a healthy state.",
+        "description": "Significant progress has been made in resolving failing tests. Multiple code and test fixture issues have been fixed, including storage account name collisions and incorrect test assertions. The primary remaining blocker is an Azure authentication failure in the CI/CD environment, as the configured credentials appear to be invalid or expired.",
         "status": "pending",
         "dependencies": [
           16,
           23
         ],
         "priority": "medium",
+        "details": "The following fixes have been implemented and committed: 1. Resolved storage account name collisions by implementing a 'dpc' prefix and random suffix. 2. Corrected IP address assertions in tests from `203.0.113.0/24` to `198.51.100.0/24`. 3. Updated network test fixtures to use `virtual_network_subnet_ids` instead of `subnet_ids`. 4. Fixed the `bypass` parameter in the private endpoint fixture to be a list instead of a string. 5. Stabilized private endpoint tests by using a static name to avoid 'known after apply' issues. The current failing step is due to an Azure authentication error: \"Tenant '2bb83c65-43f0-4d43-93fa-69eec5f8c4f5' not found\".",
+        "testStrategy": "1. The primary task is to obtain and configure valid Azure credentials in the GitHub Actions environment. 2. Once the credentials are updated, re-run the workflow on the pull request containing the code fixes. 3. Verify that all jobs, particularly the Terratest integration tests, complete successfully. 4. After merging the PR, confirm that the corresponding workflows running against the `main` branch also pass.",
         "subtasks": [
+          {
+            "id": 4,
+            "title": "Commit All Code and Test Fixture Fixes",
+            "description": "Commit all necessary code changes to resolve test failures. This includes fixes for: storage account name collisions, IP address assertions (203.0.113.0/24 to 198.51.100.0/24), network fixture parameters (`subnet_ids` to `virtual_network_subnet_ids`), private endpoint `bypass` parameter type (string to list), and using a static name for private endpoints to prevent 'known after apply' issues.",
+            "status": "done",
+            "dependencies": [
+              3
+            ],
+            "details": "All code fixes identified as necessary to make the tests pass have been committed to the feature branch. This work addresses the root causes of the original test failures.",
+            "testStrategy": "Confirm all code changes are committed to the feature branch via `git log` and code review."
+          },
+          {
+            "id": 5,
+            "title": "Resolve Azure Authentication Failure in CI",
+            "description": "The CI workflow is now failing due to an Azure authentication error: \"Tenant '2bb83c65-43f0-4d43-93fa-69eec5f8c4f5' not found\". The provided Azure credentials in the CI environment are expired or invalid. Work with the appropriate team to obtain and update the `AZURE_CREDENTIALS` secret in the GitHub repository.",
+            "status": "pending",
+            "dependencies": [
+              4
+            ],
+            "details": "The immediate next step is to get new, valid Azure service principal credentials. Once obtained, navigate to the repository's Settings > Secrets and variables > Actions, and update the value of the `AZURE_CREDENTIALS` secret.",
+            "testStrategy": "After updating the secret, re-run a failed workflow job in GitHub Actions to see if the authentication step passes."
+          },
+          {
+            "id": 6,
+            "title": "Validate All Fixes with a Successful CI Workflow Run",
+            "description": "With the authentication issue resolved, trigger a new CI run on the pull request. Monitor the workflow to confirm that all tests now pass, validating the cumulative code and fixture fixes.",
+            "status": "pending",
+            "dependencies": [
+              5
+            ],
+            "details": "Push a small change (e.g., an empty commit) to the feature branch if needed to trigger the workflow again. Navigate to the 'Checks' tab of the PR and ensure the 'pr-validation' workflow completes with a green checkmark.",
+            "testStrategy": "The GitHub Actions workflow associated with the pull request must pass all checks, specifically the Terratest integration tests that were previously failing."
+          },
           {
             "id": 1,
             "title": "Isolate the Failing Workflow and Step",
@@ -1199,28 +1232,6 @@
             "details": "In the failing step's `run` block, change the command that calls Terraform. The error suggests an incorrect path is being used. The fix is likely to change a command like `/path/to/terraform fmt` to simply `terraform fmt`, allowing the shell to find the binary in the PATH set by the setup action.\n<info added on 2025-07-09T06:24:24.247Z>\nThe storage account names have been corrected, but the full error context from GitHub Actions is needed to diagnose the real cause. The log only shows the test parameters, not the error itself.\n</info added on 2025-07-09T06:24:24.247Z>",
             "status": "done",
             "testStrategy": "Perform a static analysis or a dry-run of the modified YAML snippet to ensure the syntax is correct before committing."
-          },
-          {
-            "id": 4,
-            "title": "Commit the Workflow Fix to a Dedicated Feature Branch",
-            "description": "Create a new feature branch, apply the corrected YAML configuration, and commit the changes with a clear, descriptive commit message.",
-            "dependencies": [
-              3
-            ],
-            "details": "Execute `git checkout -b fix/ci-terraform-path` to create a new branch. After saving the changes to the workflow file, stage and commit them using a message like 'fix(ci): Correct Terraform binary invocation path in workflow'.",
-            "status": "pending",
-            "testStrategy": "Run `git status` and `git diff --staged` before committing to ensure only the intended changes are included."
-          },
-          {
-            "id": 5,
-            "title": "Validate the Fix via a Pull Request Workflow Run",
-            "description": "Push the feature branch to GitHub and create a pull request to trigger the CI workflow. Monitor the workflow run to confirm that the Terraform execution error is resolved.",
-            "dependencies": [
-              4
-            ],
-            "details": "Push the new branch to the remote repository and open a pull request. Navigate to the 'Checks' tab of the PR to watch the 'pr-validation' workflow in real-time. Verify that the previously failing step now passes and the entire workflow completes successfully.",
-            "status": "pending",
-            "testStrategy": "The GitHub Actions workflow associated with the new pull request must pass all checks, specifically the steps involving Terraform commands."
           }
         ]
       }
