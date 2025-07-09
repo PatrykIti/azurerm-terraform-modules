@@ -61,7 +61,7 @@ module "storage_account" {
       "198.51.100.0/24", # Test IP range 2
       "192.0.2.1"        # Single IP
     ]
-    subnet_ids = [
+    virtual_network_subnet_ids = [
       azurerm_subnet.storage.id,
       azurerm_subnet.app.id
     ]
