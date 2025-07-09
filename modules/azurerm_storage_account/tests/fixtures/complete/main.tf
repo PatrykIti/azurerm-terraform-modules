@@ -9,13 +9,13 @@ resource "random_string" "suffix" {
 }
 
 resource "azurerm_resource_group" "test" {
-  name     = "rg-devpciti-cmp-${var.random_suffix}"
+  name     = "rg-dpc-cmp-${var.random_suffix}"
   location = var.location
 }
 
 # Virtual network for network rules testing
 resource "azurerm_virtual_network" "test" {
-  name                = "vnet-devpciti-cmp-${var.random_suffix}"
+  name                = "vnet-dpc-cmp-${var.random_suffix}"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
@@ -32,7 +32,7 @@ resource "azurerm_subnet" "test" {
 
 # Log Analytics workspace for diagnostics
 resource "azurerm_log_analytics_workspace" "test" {
-  name                = "law-devpciti-cmp-${var.random_suffix}"
+  name                = "law-dpc-cmp-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
   sku                 = "PerGB2018"

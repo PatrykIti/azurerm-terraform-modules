@@ -9,13 +9,13 @@ resource "random_string" "suffix" {
 }
 
 resource "azurerm_resource_group" "test" {
-  name     = "rg-devpciti-pep-${var.random_suffix}"
+  name     = "rg-dpc-pep-${var.random_suffix}"
   location = var.location
 }
 
 # Virtual network for private endpoint
 resource "azurerm_virtual_network" "test" {
-  name                = "vnet-devpciti-pep-${var.random_suffix}"
+  name                = "vnet-dpc-pep-${var.random_suffix}"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
@@ -68,7 +68,7 @@ module "storage_account" {
   # Private endpoint configuration
   private_endpoints = [
     {
-      name                 = "pe-devpciti-pep-${random_string.suffix.result}${var.random_suffix}"
+      name                 = "pe-dpc-pep-${random_string.suffix.result}${var.random_suffix}"
       subnet_id            = azurerm_subnet.endpoint.id
       private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
       subresource_names    = ["blob"]
