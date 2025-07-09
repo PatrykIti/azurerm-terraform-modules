@@ -62,7 +62,7 @@ module "storage_account" {
     default_action = "Deny"
     ip_rules       = []
     subnet_ids     = []
-    bypass         = "None" # No bypass, completely private
+    bypass         = [] # No bypass, completely private
   }
 
   # Private endpoint configuration
