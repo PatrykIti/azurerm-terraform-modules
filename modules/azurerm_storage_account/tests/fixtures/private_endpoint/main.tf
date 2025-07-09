@@ -46,7 +46,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "blob" {
 module "storage_account" {
   source = "../../../"
 
-  name                     = "devtmpciti${random_string.suffix.result}${var.random_suffix}"
+  name                     = "devpcitipep${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"
