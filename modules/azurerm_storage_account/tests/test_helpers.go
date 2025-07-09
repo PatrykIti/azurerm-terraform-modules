@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 	// "github.com/gruntwork-io/terratest/modules/azure" // Commented out due to SQL import issue
@@ -74,9 +73,7 @@ func (h *StorageAccountHelper) GetStorageAccountProperties(t *testing.T, account
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
-	resp, err := h.client.GetProperties(ctx, resourceGroupName, accountName, &armstorage.AccountsClientGetPropertiesOptions{
-		Expand: to.Ptr(armstorage.StorageAccountExpandGeoReplicationStats),
-	})
+	resp, err := h.client.GetProperties(ctx, resourceGroupName, accountName, &armstorage.AccountsClientGetPropertiesOptions{})
 	require.NoError(t, err, "Failed to get storage account properties")
 
 	return resp.Account
