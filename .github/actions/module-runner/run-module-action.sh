@@ -8,15 +8,6 @@ MODULE="$1"
 ACTION="$2"
 TERRAFORM_VERSION="${3:-1.10.3}"
 
-# Check if module action exists
-ACTION_PATH="modules/${MODULE}/.github/actions/${ACTION}/action.yml"
-if [[ ! -f "$ACTION_PATH" ]]; then
-  echo "::warning::No ${ACTION} action found for module ${MODULE}"
-  echo "Module-specific action not implemented yet. Skipping..."
-  exit 0
-fi
-
-echo "Found action: $ACTION_PATH"
 echo "Executing ${ACTION} action for module ${MODULE}..."
 
 # Change to module directory
