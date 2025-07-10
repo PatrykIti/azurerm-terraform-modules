@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       modules: ${{ steps.changes.outputs.modules }}
-      has_changes: ${{ steps.changes.outputs.has_changes }}
+      matrix: ${{ steps.changes.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,8 +34,6 @@ jobs:
           if [[ -n "${{ inputs.modules }}" ]]; then
             # Manual workflow dispatch with specific modules
             MODULES=$(echo "${{ inputs.modules }}" | tr ',' '\n' | jq -R -s -c 'split("\n")[:-1]')
-            echo "modules=$MODULES" >> $GITHUB_OUTPUT
-            echo "has_changes=true" >> $GITHUB_OUTPUT
           else
             # Automatic detection of changed modules
             CHANGED_MODULES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | 
@@ -44,25 +42,26 @@ jobs:
                             cut -d'/' -f2 | 
                             sort -u | 
                             jq -R -s -c 'split("\n")[:-1] | map(select(length > 0))')
-            
-            if [[ "$CHANGED_MODULES" == "[]" ]]; then
-              echo "has_changes=false" >> $GITHUB_OUTPUT
-              echo "modules=[]" >> $GITHUB_OUTPUT
-            else
-              echo "has_changes=true" >> $GITHUB_OUTPUT
-              echo "modules=$CHANGED_MODULES" >> $GITHUB_OUTPUT
-            fi
+            MODULES=$CHANGED_MODULES
           fi
           
-          echo "🔍 Modules to release: $(cat $GITHUB_OUTPUT | grep "modules=" | cut -d'=' -f2)"
+          # Output both array and matrix format
+          echo "modules=$MODULES" >> $GITHUB_OUTPUT
+          
+          if [ "$MODULES" == "[]" ]; then
+            echo "matrix={\"module\":[]}" >> $GITHUB_OUTPUT
+          else
+            echo "matrix={\"module\":${MODULES}}" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "🔍 Modules to release: $MODULES"
   
   release:
     name: Release Module
     needs: detect-changes
-    if: needs.detect-changes.outputs.has_changes == 'true'
+    if: needs.detect-changes.outputs.modules != '[]'
     strategy:
-      matrix:
-        module: ${{ fromJson(needs.detect-changes.outputs.modules) }}
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
       fail-fast: false
     uses: ./.github/workflows/module-release.yml
     with:
