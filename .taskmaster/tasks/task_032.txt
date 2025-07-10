@@ -1,0 +1,11 @@
+# Task ID: 32
+# Title: Enhance Semantic Release Workflow for Dynamic Module Discovery
+# Status: pending
+# Dependencies: 15
+# Priority: high
+# Description: Fix and enhance the semantic-release workflow to support dynamic module discovery, removing the need for hardcoded module lists and resolving missing package dependencies.
+# Details:
+This task involves several updates to the CI/CD release process. First, add the missing `@semantic-release/exec` package to the `devDependencies` in `package.json` and run `npm install` to update the `package-lock.json` file. Create a new helper script at `scripts/get-module-config.js` designed to safely extract module-specific release configurations, returning an empty object if no configuration is found. Update the `.github/workflows/module-release.yml` workflow to accept the module name as a `string` input rather than a `choice` from a static list. Implement the primary logic in a new workflow file, `.github/workflows/release-changed-modules.yml`, which triggers on pushes to `main`, detects which module directories have changed since the last commit, and then triggers the `module-release.yml` workflow for each identified module. Finally, update the `semantic-release-guide.md` documentation to reflect the new, fully automated release process.
+
+# Test Strategy:
+1. Create a feature branch and make a `feat:` commit to a single module (e.g., the Storage Account module). 2. Merge the pull request into the `main` branch. 3. Verify that the `release-changed-modules.yml` workflow triggers, correctly identifies only the modified module, and successfully creates a new minor version tag and GitHub Release for it. 4. Create another PR with `fix:` commits in two separate modules. 5. After merging, verify that the workflow triggers two distinct release jobs and creates new patch version tags and releases for both modules. 6. Push a commit that only modifies a non-module file (e.g., the root README); verify the workflow runs but does not trigger any module releases.
