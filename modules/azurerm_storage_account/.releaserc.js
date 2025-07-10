@@ -80,6 +80,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         # Update examples to use the new version tag
         find examples -name "*.tf" -type f -exec sed -i 's|source.*=.*"\.\./../"|source = "github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"|g' {} +
         
+        # Update module source in all README files
+        # Handle ../../ pattern (from examples)
+        find . -name "README.md" -type f -exec sed -i 's|source = "../../"|source = "github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"|g' {} +
+        
+        # Handle ../ pattern (from module root)
+        find . -name "README.md" -type f -exec sed -i 's|source = "../"|source = "github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"|g' {} +
+        
+        # Also update in terraform-docs table sections
+        find . -name "README.md" -type f -exec sed -i 's| ../../ | github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version} |g' {} +
+        
         # Update module version in README
         if [[ -x "../../scripts/update-module-version.sh" ]]; then
           ../../scripts/update-module-version.sh . "\${nextRelease.version}"
