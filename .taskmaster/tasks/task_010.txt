@@ -1,0 +1,14 @@
+# Task ID: 10
+# Title: Virtual Network Module: Terratest Suite and Examples
+# Status: pending
+# Dependencies: 5, 9
+# Priority: medium
+# Description: Create a comprehensive test suite for the Virtual Network module using Terratest and develop corresponding usage examples.
+# Details:
+Create `test/virtual_network_test.go`. Write Terratest cases to validate: 
+1. VNet and subnet creation with correct CIDR blocks. 
+2. NSG association. 
+Use `azure.GetVirtualNetwork` and `azure.GetSubnet` to fetch the deployed resources and assert their properties. Create `examples/virtual_network/simple` (VNet with one subnet) and `examples/virtual_network/complete` (VNet with multiple subnets and custom NSG rules).
+
+# Test Strategy:
+Execute the Terratest suite for the VNet module via the CI pipeline. All tests should pass, confirming resource creation and properties, followed by successful cleanup.

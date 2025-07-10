@@ -1,0 +1,37 @@
+# Task ID: 30
+# Title: Harden Secure-Private-Endpoint Example
+# Status: pending
+# Dependencies: 23
+# Priority: high
+# Description: Harden the 'secure-private-endpoint' example by adding missing DNS zone links for queue and table services, explicitly disabling public network access, associating an NSG with the subnet, and ensuring all dependencies are correctly declared.
+# Details:
+1. Add `azurerm_private_dns_zone_virtual_network_link` resources for `privatelink.queue.core.windows.net` and `privatelink.table.core.windows.net`. 2. In the module call, explicitly set `public_network_access_enabled = false`. 3. Create an `azurerm_network_security_group` with appropriate rules and associate it with the private endpoint's subnet using `azurerm_subnet_network_security_group_association`. 4. Update the `depends_on` block in the module call to include all four private DNS zone link resources (blob, file, queue, table) to ensure correct creation order.
+
+# Test Strategy:
+Apply the configuration. From a virtual machine within the same VNet, use `nslookup` to resolve the FQDNs for the blob, queue, and table services, and verify they resolve to private IP addresses. In the Azure Portal, confirm that 'Public network access' is disabled on the storage account's networking blade and that the NSG is correctly associated with the subnet.
+
+# Subtasks:
+## 1. Add Private DNS Zone VNet Links for Queue and Table Services [pending]
+### Dependencies: None
+### Description: Enhance the private endpoint configuration by adding the necessary `azurerm_private_dns_zone_virtual_network_link` resources for the queue and table storage services. This ensures that DNS queries for these services from within the virtual network are resolved to their private IP addresses.
+### Details:
+In the main Terraform configuration file for the example (`main.tf`), create two new `azurerm_private_dns_zone_virtual_network_link` resources. One will link the `privatelink.queue.core.windows.net` private DNS zone to the virtual network, and the other will link the `privatelink.table.core.windows.net` private DNS zone. Ensure you reference the existing virtual network and the respective private DNS zones correctly.
+
+## 2. Explicitly Disable Public Network Access on Storage Account [pending]
+### Dependencies: None
+### Description: Harden the storage account by explicitly setting `public_network_access_enabled` to `false`. This enforces that all traffic must route through the private endpoint, aligning with security best practices.
+### Details:
+Locate the module call for the storage account within the example's `main.tf`. In the `security_settings` block or as a direct argument, set `public_network_access_enabled = false`.
+
+## 3. Create and Associate an NSG with the Private Endpoint Subnet [pending]
+### Dependencies: None
+### Description: Implement a Network Security Group (NSG) to control inbound and outbound traffic for the subnet hosting the private endpoints. This adds an essential layer of network-level security.
+### Details:
+Define a new `azurerm_network_security_group` resource in `main.tf`. Add appropriate security rules as needed (e.g., a default rule to deny all inbound traffic). Then, create an `azurerm_subnet_network_security_group_association` resource to link the newly created NSG with the private endpoint's subnet.
+
+## 4. Update Module `depends_on` to Include All DNS Links [pending]
+### Dependencies: 30.1
+### Description: Update the `depends_on` meta-argument in the main module call to include all four private DNS zone virtual network links (blob, file, queue, and table). This prevents race conditions during deployment by ensuring the network links are fully provisioned before the private endpoints that rely on them are created.
+### Details:
+In the `main.tf` file, locate the module call that creates the private endpoints. Add or update the `depends_on` block to explicitly list all four `azurerm_private_dns_zone_virtual_network_link` resources, including the two new ones for queue and table created in the first subtask. The list should reference the Terraform resource names, for example: `[azurerm_private_dns_zone_virtual_network_link.blob, azurerm_private_dns_zone_virtual_network_link.file, azurerm_private_dns_zone_virtual_network_link.queue, azurerm_private_dns_zone_virtual_network_link.table]`.
+

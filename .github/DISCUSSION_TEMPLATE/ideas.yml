@@ -1,0 +1,52 @@
+title: "[Idea] "
+labels: ["idea", "discussion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 💡 Share Your Ideas
+        
+        Have an idea for improving the project? Share it here!
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: Idea Description
+      description: Describe your idea in detail
+      placeholder: |
+        I think it would be great if...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: What area does this idea relate to?
+      options:
+        - New Features
+        - Performance Improvements
+        - Developer Experience
+        - Documentation
+        - Testing
+        - CI/CD
+        - Community
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: Benefits
+      description: What benefits would this bring?
+      placeholder: |
+        This would help users by...
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Possible Implementation
+      description: Any thoughts on how this could be implemented?
+      placeholder: |
+        One way to do this might be...

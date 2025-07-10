@@ -1,0 +1,71 @@
+name: 'Security Scan MODULE_DISPLAY_NAME_PLACEHOLDER Module'
+description: 'Security scanning for the MODULE_DISPLAY_NAME_PLACEHOLDER Terraform module'
+
+inputs:
+  github-token:
+    description: 'GitHub token for uploading results'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run Checkov
+      id: checkov
+      uses: bridgecrewio/checkov-action@v12
+      with:
+        directory: ./modules/MODULE_NAME_PLACEHOLDER
+        framework: terraform
+        output_format: sarif
+        output_file_path: checkov-results.sarif
+        soft_fail: true
+        skip_check: CKV_AZURE_35  # Skip checks that may not apply to module
+        
+    - name: Upload Checkov Results
+      if: always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: checkov-results.sarif
+        category: checkov-MODULE_TYPE_PLACEHOLDER
+        
+    - name: Run Trivy Security Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'config'
+        scan-ref: './modules/MODULE_NAME_PLACEHOLDER'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        severity: 'CRITICAL,HIGH,MEDIUM'
+        
+    - name: Upload Trivy Results
+      if: always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: trivy-results.sarif
+        category: trivy-MODULE_TYPE_PLACEHOLDER
+        
+    - name: Check Security Best Practices
+      shell: bash
+      working-directory: ./modules/MODULE_NAME_PLACEHOLDER
+      run: |
+        echo "Checking security best practices..."
+        
+        # Check for hardcoded values
+        if grep -r "access_key\|secret\|password" --include="*.tf" .; then
+          echo "WARNING: Potential hardcoded secrets found"
+          exit 1
+        fi
+        
+        # Check for secure defaults
+        echo "Verifying secure defaults in variables.tf..."
+        
+        # Check HTTPS enforcement
+        if ! grep -q "enable_https_traffic_only.*default.*true" variables.tf; then
+          echo "WARNING: HTTPS traffic should be enforced by default"
+        fi
+        
+        # Check minimum TLS version
+        if ! grep -q "min_tls_version.*default.*TLS1_2" variables.tf; then
+          echo "WARNING: Minimum TLS version should be 1.2 by default"
+        fi
+        
+        echo "Security checks completed"

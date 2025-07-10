@@ -1,0 +1,124 @@
+name: 🐛 Bug Report
+description: Report a bug in a Terraform module
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the sections below to help us understand and fix the issue.
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: Affected Module
+      description: Which Terraform module is affected?
+      options:
+        - azurerm_storage_account
+        - azurerm_virtual_network
+        - azurerm_key_vault
+        - azurerm_app_service
+        - azurerm_sql_database
+        - Other (please specify in description)
+    validations:
+      required: true
+
+  - type: input
+    id: terraform-version
+    attributes:
+      label: Terraform Version
+      description: Output of `terraform version`
+      placeholder: "e.g., 1.10.3"
+    validations:
+      required: true
+
+  - type: input
+    id: provider-version
+    attributes:
+      label: AzureRM Provider Version
+      description: Version of the hashicorp/azurerm provider
+      placeholder: "e.g., 4.35.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: |
+        When I try to create a storage account with lifecycle rules enabled, I get an error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Configure module with these variables...
+        2. Run terraform plan
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened
+    validations:
+      required: true
+
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Module Configuration
+      description: Relevant parts of your Terraform configuration
+      render: hcl
+      placeholder: |
+        module "storage_account" {
+          source = "..."
+          
+          # Your configuration here
+        }
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-output
+    attributes:
+      label: Error Output
+      description: Complete error message and Terraform output
+      render: shell
+      placeholder: |
+        $ terraform plan
+        
+        Error: ...
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here (logs, screenshots, etc.)
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have tested with the latest module version
+          required: true
+        - label: I have included all necessary information above
+          required: true

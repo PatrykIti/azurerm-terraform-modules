@@ -1,0 +1,14 @@
+# Task ID: 8
+# Title: Storage Account Module: Terratest Suite and Examples
+# Status: pending
+# Dependencies: 5, 7
+# Priority: high
+# Description: Create a comprehensive test suite for the Storage Account module using Terratest. Develop simple and complete usage examples in the `/examples` directory.
+# Details:
+In the `test/` directory, create `storage_account_test.go`. Write test cases using `t.Run` for different scenarios: 
+1. A minimal deployment. 
+2. A complex deployment with private endpoints and network rules. 
+Use `terraform.InitAndApply` and `defer terraform.Destroy`. Use `azure.GetStorageAccount` from Terratest helpers to assert that the created resource has the correct properties. Create corresponding `examples/storage_account/simple` and `examples/storage_account/complete` directories with `main.tf` files demonstrating usage.
+
+# Test Strategy:
+Run `go test -v -timeout 15m ./...` from the `test/` directory. The GitHub Actions workflow for testing should execute this command against a test Azure subscription. All tests must pass, and resources must be successfully destroyed.

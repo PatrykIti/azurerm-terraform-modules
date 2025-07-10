@@ -1,0 +1,25 @@
+# Task ID: 27
+# Title: Add Advanced Features to Data-Lake-Gen2 Example
+# Status: done
+# Dependencies: 23, 26
+# Priority: medium
+# Description: Extend the Data Lake Gen2 example to showcase integration with analytics services like Databricks or Synapse and to demonstrate advanced features such as change feed.
+# Details:
+1. Add commented-out or placeholder resource blocks for `azurerm_databricks_workspace` or `azurerm_synapse_workspace` with documentation explaining how to mount the Data Lake storage. 2. Enable the change feed feature on the storage account's blob service properties via the module: `change_feed_enabled = true` and `change_feed_retention_in_days = 7`. 3. Add a note in the example's README about query acceleration, explaining it's a feature enabled on-demand and not typically managed via Terraform.
+
+# Test Strategy:
+Apply the configuration. In the Azure Portal, navigate to the storage account's 'Data protection' settings and verify that the change feed is enabled with the correct retention period. Review the generated documentation for clarity and correctness regarding analytics integration.
+
+# Subtasks:
+## 1. Enable Change Feed and Add Analytics Service Placeholders in Terraform [done]
+### Dependencies: None
+### Description: Modify the Data Lake Gen2 example's Terraform configuration to enable the change feed feature on the storage account and add commented-out resource blocks for Databricks or Synapse Analytics integration.
+### Details:
+In the main Terraform file for the `data-lake-gen2` example, update the module call for the storage account to enable the change feed. Set `change_feed_enabled = true` and `change_feed_retention_in_days = 7`. Following this, add new, commented-out resource blocks for either `azurerm_databricks_workspace` or `azurerm_synapse_workspace`. Include detailed comments above these blocks explaining how a user would uncomment and configure them, and provide guidance or a link on how to mount the Data Lake storage to the chosen analytics service.
+
+## 2. Update README with Advanced Feature Documentation [done]
+### Dependencies: 27.1
+### Description: Update the example's README.md to document the newly added advanced features, including the enabled change feed, the analytics service integration placeholders, and a note on query acceleration.
+### Details:
+Edit the `README.md` file in the `data-lake-gen2` example directory. Create a new section, for example, 'Advanced Features'. Within this section, add subsections to: 1. Explain that the change feed feature is now enabled via the module inputs and briefly describe its use case. 2. Reference the new commented-out blocks for Databricks/Synapse in the Terraform code, explaining how to use them. 3. Add a note explaining what query acceleration is and why it's not configured via Terraform (i.e., it's an on-demand feature applied to specific queries, not the infrastructure).
+

@@ -1,0 +1,11 @@
+# Task ID: 13
+# Title: Application Gateway Module: Core Implementation
+# Status: pending
+# Dependencies: 9
+# Priority: low
+# Description: Develop the Application Gateway module (`azurerm_application_gateway`). This complex module will manage the gateway itself, public IP, listeners, backend pools, and routing rules.
+# Details:
+Create `modules/application_gateway`. This module will require a complex variable structure to define the frontend/backend configuration. The `main.tf` will orchestrate `azurerm_public_ip`, `azurerm_application_gateway`, and its sub-resources (`frontend_ip_configuration`, `frontend_port`, `backend_address_pool`, `http_listener`, `request_routing_rule`). The module must depend on a VNet and subnet created by the Virtual Network module.
+
+# Test Strategy:
+Due to its complexity, initial testing will be a manual deployment. Deploy the module into a pre-existing VNet. Verify in the Azure portal that all components (gateway, IP, listener, rules) are configured as specified in the input variables.

@@ -1,0 +1,128 @@
+name: 📦 New Module Request
+description: Request a new Terraform module for an Azure resource
+title: "[Module Request]: azurerm_"
+labels: ["new-module", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for requesting a new module! Please provide details to help us understand the requirements.
+
+  - type: input
+    id: resource-type
+    attributes:
+      label: Azure Resource Type
+      description: What Azure resource should this module manage?
+      placeholder: "e.g., Azure Container Registry, Azure Cosmos DB"
+    validations:
+      required: true
+
+  - type: input
+    id: resource-name
+    attributes:
+      label: Proposed Module Name
+      description: Following the pattern `azurerm_<resource_name>`
+      placeholder: "e.g., azurerm_container_registry"
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Describe your use case for this module
+      placeholder: |
+        We need to deploy Container Registries with...
+        This module would help us...
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Key Requirements
+      description: List the key features/configurations the module should support
+      placeholder: |
+        - Private endpoint support
+        - Geo-replication
+        - Customer-managed keys
+        - Retention policies
+    validations:
+      required: true
+
+  - type: textarea
+    id: example-config
+    attributes:
+      label: Example Configuration
+      description: Show how you envision using this module
+      render: hcl
+      placeholder: |
+        module "container_registry" {
+          source = "..."
+          
+          name                = "myacr"
+          resource_group_name = "rg-example"
+          location           = "westeurope"
+          
+          sku = "Premium"
+          
+          georeplications = [{
+            location = "northeurope"
+            ...
+          }]
+        }
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Expected Complexity
+      description: How complex do you expect this module to be?
+      options:
+        - Simple (basic resource with few options)
+        - Medium (resource with several sub-resources)
+        - Complex (multiple resources with many configurations)
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Reference Documentation
+      description: Links to Azure documentation for this resource
+      placeholder: |
+        - [Azure Container Registry documentation](https://docs.microsoft.com/...)
+        - [Terraform azurerm_container_registry](https://registry.terraform.io/...)
+
+  - type: dropdown
+    id: timeline
+    attributes:
+      label: Timeline
+      description: When do you need this module?
+      options:
+        - No rush
+        - Within a month
+        - Within two weeks
+        - Urgent (please explain why)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to contribute this module
+        - label: I can provide example configurations
+        - label: I can help with testing
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have checked existing modules and this doesn't exist
+          required: true
+        - label: I have reviewed the contribution guidelines
+          required: true
+        - label: This module would benefit the community
+          required: true

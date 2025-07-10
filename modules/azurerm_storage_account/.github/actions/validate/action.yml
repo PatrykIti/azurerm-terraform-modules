@@ -1,0 +1,59 @@
+name: 'Validate Storage Account Module'
+description: 'Validates the Azure Storage Account Terraform module'
+
+inputs:
+  terraform-version:
+    description: 'Terraform version to use'
+    required: true
+    default: '1.10.3'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ inputs.terraform-version }}
+    
+    - name: Terraform Format Check
+      shell: bash
+      working-directory: ./modules/azurerm_storage_account
+      run: |
+        echo "Checking Terraform formatting..."
+        terraform fmt -check -recursive
+        
+    - name: Terraform Init
+      shell: bash
+      working-directory: ./modules/azurerm_storage_account
+      run: |
+        echo "Initializing Terraform..."
+        terraform init -backend=false
+        
+    - name: Terraform Validate
+      shell: bash
+      working-directory: ./modules/azurerm_storage_account
+      run: |
+        echo "Validating Terraform configuration..."
+        terraform validate
+        
+    - name: TFLint
+      shell: bash
+      working-directory: ./modules/azurerm_storage_account
+      run: |
+        echo "Running TFLint..."
+        tflint --init
+        tflint
+        
+    - name: Validate Examples
+      shell: bash
+      run: |
+        echo "Validating examples..."
+        for example in ./modules/azurerm_storage_account/examples/*/; do
+          if [[ -d "$example" && -f "$example/main.tf" ]]; then
+            echo "Validating example: $example"
+            cd "$example"
+            terraform init -backend=false
+            terraform validate
+            cd - > /dev/null
+          fi
+        done

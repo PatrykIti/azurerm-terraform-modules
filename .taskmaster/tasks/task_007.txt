@@ -1,0 +1,16 @@
+# Task ID: 7
+# Title: Storage Account Module: Enterprise and Security Features
+# Status: pending
+# Dependencies: 6
+# Priority: high
+# Description: Enhance the Storage Account module with enterprise-grade security and operational features, including diagnostic settings, private endpoint support, network rules, and customer-managed key integration.
+# Details:
+Add resources and variables to the Storage Account module: 
+- `azurerm_monitor_diagnostic_setting`: To send logs and metrics to a Log Analytics Workspace. 
+- `azurerm_private_endpoint`: Conditionally created based on a variable. 
+- `network_rules` block within `azurerm_storage_account`: To configure firewall settings. 
+- `customer_managed_key` block: To integrate with Azure Key Vault. 
+- Enforce `min_tls_version = "1.2"` and `https_only = true` as secure defaults, which can be overridden if necessary.
+
+# Test Strategy:
+Extend the manual deployment test. Deploy the module with diagnostic settings enabled and verify logs are flowing to Log Analytics. Deploy with a private endpoint and confirm public network access is denied. Check security settings in the Azure portal.
