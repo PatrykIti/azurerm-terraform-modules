@@ -36,19 +36,22 @@ runs:
     
     - name: Configure Azure Credentials
       shell: bash
+      env:
+        ARM_USE_OIDC: true
+        AZURE_FEDERATED_TOKEN_FILE: /tmp/azure-oidc-token
+        AZURE_AUTHORITY_HOST: https://login.microsoftonline.com/
       run: |
         # Set Azure credentials if provided
         if [[ -n "${{ inputs.azure-credentials }}" ]]; then
           CREDS='${{ inputs.azure-credentials }}'
-          echo "ARM_CLIENT_ID=$(echo "$CREDS" | jq -r '.clientId')" >> $GITHUB_ENV
-          echo "ARM_TENANT_ID=$(echo "$CREDS" | jq -r '.tenantId')" >> $GITHUB_ENV
-          echo "ARM_SUBSCRIPTION_ID=$(echo "$CREDS" | jq -r '.subscriptionId')" >> $GITHUB_ENV
-          echo "ARM_CLIENT_SECRET=$(echo "$CREDS" | jq -r '.clientSecret')" >> $GITHUB_ENV
-          echo "AZURE_CLIENT_ID=$(echo "$CREDS" | jq -r '.clientId')" >> $GITHUB_ENV
-          echo "AZURE_TENANT_ID=$(echo "$CREDS" | jq -r '.tenantId')" >> $GITHUB_ENV
-          echo "AZURE_SUBSCRIPTION_ID=$(echo "$CREDS" | jq -r '.subscriptionId')" >> $GITHUB_ENV
-          echo "AZURE_CLIENT_SECRET=$(echo "$CREDS" | jq -r '.clientSecret')" >> $GITHUB_ENV
-          echo "ARM_USE_OIDC=true" >> $GITHUB_ENV
+          export ARM_CLIENT_ID=$(echo "$CREDS" | jq -r '.clientId')
+          export ARM_TENANT_ID=$(echo "$CREDS" | jq -r '.tenantId')
+          export ARM_SUBSCRIPTION_ID=$(echo "$CREDS" | jq -r '.subscriptionId')
+          export ARM_CLIENT_SECRET=$(echo "$CREDS" | jq -r '.clientSecret')
+          export AZURE_CLIENT_ID=$ARM_CLIENT_ID
+          export AZURE_TENANT_ID=$ARM_TENANT_ID
+          export AZURE_SUBSCRIPTION_ID=$ARM_SUBSCRIPTION_ID
+          export AZURE_CLIENT_SECRET=$ARM_CLIENT_SECRET
         fi
 
     - name: Run Tests
