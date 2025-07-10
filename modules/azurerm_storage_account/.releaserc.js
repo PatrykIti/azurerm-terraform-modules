@@ -86,7 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         fi
         
         # Update examples to use the new version tag
-        find examples -name "*.tf" -type f -exec sed -i 's|source.*=.*"\.\./../"|source = "github.com/\${context.repo.owner}/\${context.repo.repo}//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"|g' {} +
+        find examples -name "*.tf" -type f -exec sed -i 's|source.*=.*"\.\./../"|source = "github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"|g' {} +
         
         # Update module version in README
         if [[ -x "../../scripts/update-module-version.sh" ]]; then
@@ -105,7 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         
         # Update root README.md with module status and version
         if [[ -x "../../scripts/update-root-readme.sh" ]]; then
-          ../../scripts/update-root-readme.sh "${MODULE_NAME}" "Storage Account" "${TAG_PREFIX}" "\${nextRelease.version}" "\${context.repo.owner}" "\${context.repo.repo}"
+          ../../scripts/update-root-readme.sh "${MODULE_NAME}" "Storage Account" "${TAG_PREFIX}" "\${nextRelease.version}" "PatrykIti" "azurerm-terraform-modules"
         fi
       `.trim()
     }],
@@ -137,7 +137,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 \`\`\`hcl
 module "storage_account" {
-  source = "github.com/\${context.repo.owner}/\${context.repo.repo}//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"
   
   # See README for configuration options
 }
@@ -145,7 +145,7 @@ module "storage_account" {
 
 ### Documentation
 
-See the [module documentation](https://github.com/\${context.repo.owner}/\${context.repo.repo}/tree/${TAG_PREFIX}\${nextRelease.version}/modules/${MODULE_NAME}/README.md) for usage details.`
+See the [module documentation](https://github.com/PatrykIti/azurerm-terraform-modules/tree/${TAG_PREFIX}\${nextRelease.version}/modules/${MODULE_NAME}/README.md) for usage details.`
     }]
   ]
 };
