@@ -136,7 +136,7 @@ jobs:
         with:
           module: ${{ matrix.module }}
           action: security
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PAT }}
 
   quality-summary:
     name: CI Summary
