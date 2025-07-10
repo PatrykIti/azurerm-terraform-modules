@@ -15,6 +15,11 @@ on:
         description: 'Comma-separated list of modules to release (e.g., azurerm_storage_account,azurerm_virtual_network)'
         required: false
         type: string
+      dry_run:
+        description: 'Perform a dry run without creating release'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   detect-changes:
@@ -66,7 +71,7 @@ jobs:
     uses: ./.github/workflows/module-release.yml
     with:
       module: ${{ matrix.module }}
-      dry_run: false
+      dry_run: ${{ inputs.dry_run || false }}
     permissions:
       contents: write
       pull-requests: write
