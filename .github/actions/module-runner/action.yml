@@ -19,6 +19,14 @@ inputs:
     description: 'Azure credentials for testing'
     required: false
 
+outputs:
+  tfsec-sarif:
+    description: 'Path to tfsec SARIF file'
+    value: ${{ steps.run-action.outputs.tfsec-sarif }}
+  checkov-sarif:
+    description: 'Path to Checkov SARIF file'
+    value: ${{ steps.run-action.outputs.checkov-sarif }}
+
 runs:
   using: 'composite'
   steps:
@@ -28,30 +36,31 @@ runs:
         terraform_version: ${{ inputs.terraform-version }}
         terraform_wrapper: false
     
-    - name: Check if module action exists
-      id: check
+    - name: Make script executable
       shell: bash
+      run: chmod +x .github/actions/module-runner/run-module-action.sh
+    
+    - name: Run module action
+      id: run-action
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        AZURE_CREDENTIALS: ${{ inputs.azure-credentials }}
       run: |
-        ACTION_PATH="modules/${{ inputs.module }}/.github/actions/${{ inputs.action }}/action.yml"
-        if [[ -f "$ACTION_PATH" ]]; then
-          echo "exists=true" >> $GITHUB_OUTPUT
-          echo "Action found: $ACTION_PATH"
-        else
-          echo "exists=false" >> $GITHUB_OUTPUT
-          echo "Action not found: $ACTION_PATH"
-        fi
-
-    - name: Run module-specific action
-      if: steps.check.outputs.exists == 'true'
-      uses: ./modules/${{ inputs.module }}/.github/actions/${{ inputs.action }}
+        .github/actions/module-runner/run-module-action.sh "${{ inputs.module }}" "${{ inputs.action }}" "${{ inputs.terraform-version }}"
+    
+    - name: Upload tfsec SARIF
+      if: ${{ inputs.action == 'security' && steps.run-action.outputs.tfsec-sarif != '' }}
+      uses: github/codeql-action/upload-sarif@v3
       with:
-        terraform-version: ${{ inputs.terraform-version }}
-        github-token: ${{ inputs.github-token }}
-        azure-credentials: ${{ inputs.azure-credentials }}
-
-    - name: Fallback for missing action
-      if: steps.check.outputs.exists == 'false'
-      shell: bash
-      run: |
-        echo "::warning::No ${{ inputs.action }} action found for module ${{ inputs.module }}"
-        echo "Module-specific action not implemented yet. Skipping..."
+        sarif_file: ${{ steps.run-action.outputs.tfsec-sarif }}
+        category: tfsec-${{ inputs.module }}
+      continue-on-error: true
+    
+    - name: Upload Checkov SARIF
+      if: ${{ inputs.action == 'security' && steps.run-action.outputs.checkov-sarif != '' }}
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ steps.run-action.outputs.checkov-sarif }}
+        category: checkov-${{ inputs.module }}
+      continue-on-error: true
