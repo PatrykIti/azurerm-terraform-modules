@@ -32,7 +32,7 @@ updates:
 
   # Enable version updates for Terraform modules
   - package-ecosystem: "terraform"
-    directory: "/azurerm_storage_account"
+    directory: "/modules/azurerm_storage_account"
     schedule:
       interval: "weekly"
       day: "monday"
