@@ -11,8 +11,8 @@ updates:
       - "dependencies"
       - "github-actions"
     commit-message:
-      prefix: "chore"
-      prefix-development: "chore"
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
       include: "scope"
 
   # Enable version updates for npm packages (semantic-release)
@@ -26,8 +26,8 @@ updates:
       - "dependencies"
       - "npm"
     commit-message:
-      prefix: "chore"
-      prefix-development: "chore"
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
       include: "scope"
 
   # Enable version updates for Terraform modules
