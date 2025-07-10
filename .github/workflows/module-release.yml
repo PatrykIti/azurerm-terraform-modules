@@ -34,16 +34,19 @@ jobs:
         with:
           node-version: '20'
       
+      - name: Generate package-lock.json
+        run: npm install --package-lock-only
+      
       - name: Cache node modules
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
       
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       
       - name: Setup Terraform
         uses: ./.github/actions/terraform-setup
