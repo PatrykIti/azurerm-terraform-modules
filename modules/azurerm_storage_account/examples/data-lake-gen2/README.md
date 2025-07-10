@@ -264,7 +264,7 @@ terraform destroy
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_data_lake_storage"></a> [data\_lake\_storage](#module\_data\_lake\_storage) | ../../ | n/a |
+| <a name="module_data_lake_storage"></a> [data\_lake\_storage](#module\_data\_lake\_storage) | github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0 | n/a |
 
 ## Resources
 
