@@ -74,6 +74,20 @@ case "$ACTION" in
     ;;
     
   test)
+    # Export Azure credentials for Terraform provider
+    if [[ -n "${AZURE_CLIENT_ID}" ]]; then
+      echo "::group::Setting up Azure credentials"
+      echo "Configuring Azure authentication"
+      echo "ARM_CLIENT_ID is set"
+      echo "ARM_TENANT_ID is set"
+      echo "ARM_SUBSCRIPTION_ID is set"
+      if [[ -n "${ARM_CLIENT_SECRET}" ]]; then
+        echo "ARM_CLIENT_SECRET is set"
+      fi
+      echo "ARM_USE_OIDC=${ARM_USE_OIDC}"
+      echo "::endgroup::"
+    fi
+    
     # Check for Go tests
     if [[ -d "tests" ]] && ls tests/*.go &> /dev/null 2>&1; then
       echo "::group::Running Go Tests"
@@ -84,7 +98,7 @@ case "$ACTION" in
         go mod download
       fi
       
-      # Run tests
+      # Run tests with Azure credentials
       go test -v -timeout 30m
       echo "::endgroup::"
     else
