@@ -455,14 +455,13 @@ filters: |
     - 'shared/**'
 ```
 
-### Step 4: Update Release Options
+### Step 4: Release Workflow
 
-Edit `.github/workflows/module-release.yml`:
+The module-release workflow accepts any module name as a string input, so no changes are needed to the workflow when adding new modules. Simply use:
 
-```yaml
-options:
-  - azurerm_storage_account
-  - azurerm_virtual_network  # Add new module
+```bash
+# Trigger release via GitHub UI or API
+# Input: module = "azurerm_virtual_network"
 ```
 
 ### Step 5: Module Testing

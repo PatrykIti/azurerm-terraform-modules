@@ -131,15 +131,7 @@ cp "$TEMPLATES_DIR/module-config.yml" "$MODULE_DIR/.github/"
 cp "$TEMPLATES_DIR/generate-docs.sh" "$MODULE_DIR/"
 chmod +x "$MODULE_DIR/generate-docs.sh"
 
-# Composite Actions
-print_info "Creating composite actions..."
-mkdir -p "$MODULE_DIR/.github/actions/validate"
-mkdir -p "$MODULE_DIR/.github/actions/test"
-mkdir -p "$MODULE_DIR/.github/actions/security"
-
-cp "$TEMPLATES_DIR/validate-action.yml" "$MODULE_DIR/.github/actions/validate/action.yml"
-cp "$TEMPLATES_DIR/test-action.yml" "$MODULE_DIR/.github/actions/test/action.yml"
-cp "$TEMPLATES_DIR/security-action.yml" "$MODULE_DIR/.github/actions/security/action.yml"
+# Module-specific actions are no longer needed - using universal module-runner
 
 # Replace placeholders in all copied files
 print_info "Customizing templates..."

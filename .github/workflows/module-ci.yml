@@ -52,6 +52,10 @@ jobs:
             azurerm_storage_account:
               - 'modules/azurerm_storage_account/**'
               - 'shared/**'
+            # Add new modules here following the same pattern:
+            # module_name:
+            #   - 'modules/module_name/**'
+            #   - 'shared/**'
       
       - id: set-matrix
         run: |
