@@ -212,16 +212,6 @@ variable "identity" {
   }
 }
 
-# Customer Managed Key
-variable "customer_managed_key" {
-  description = "Customer managed key configuration for encryption at rest."
-  type = object({
-    key_vault_key_id          = string
-    user_assigned_identity_id = string
-  })
-  default = null
-}
-
 # Diagnostic Settings
 variable "diagnostic_settings" {
   description = "Diagnostic settings configuration for audit logging."
