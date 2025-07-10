@@ -115,11 +115,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     // Commit changes
     ['@semantic-release/git', {
       assets: [
-        'CHANGELOG.md',
-        '.github/module-config.yml',
-        'examples/**/*.tf',
-        'README.md',
-        '../../README.md'
+        'modules/azurerm_storage_account/CHANGELOG.md',
+        'modules/azurerm_storage_account/.github/module-config.yml',
+        'modules/azurerm_storage_account/examples/**/*.tf',
+        'modules/azurerm_storage_account/README.md',
+        'README.md'
       ],
       message: `chore(${COMMIT_SCOPE}): release ${TAG_PREFIX}\${nextRelease.version} [skip ci]`
     }],
