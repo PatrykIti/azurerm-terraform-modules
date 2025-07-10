@@ -150,6 +150,137 @@ done
 # Create example files
 print_info "Creating examples..."
 
+# Create function for generating example READMEs
+generate_example_readme() {
+    local example_type="$1"
+    local example_dir="$2"
+    local module_type="$3"
+    local display_name="$4"
+    
+    case "$example_type" in
+        simple)
+            cat > "$example_dir/README.md" << EOF
+# Simple $display_name Example
+
+This example demonstrates a basic $display_name configuration using secure defaults and minimal setup.
+
+## Features
+
+- Creates a basic $module_type with standard configuration
+- Uses secure defaults following Azure best practices
+- Creates a dedicated resource group
+- Demonstrates basic module usage patterns
+- Uses variables for configuration flexibility
+
+## Key Configuration
+
+This example uses secure defaults and demonstrates:
+- Basic resource creation with minimal configuration
+- Using variables for easy configuration customization
+- Following security best practices by default
+
+## Usage
+
+\`\`\`bash
+terraform init
+terraform plan
+terraform apply
+\`\`\`
+
+## Cleanup
+
+\`\`\`bash
+terraform destroy
+\`\`\`
+
+<!-- BEGIN_TF_DOCS -->
+<!-- END_TF_DOCS -->
+EOF
+            ;;
+        complete)
+            cat > "$example_dir/README.md" << EOF
+# Complete $display_name Example
+
+This example demonstrates a comprehensive deployment of $display_name with all available features and configurations.
+
+## Features
+
+- Full $module_type configuration with all features enabled
+- Advanced networking configuration
+- Diagnostic settings for monitoring and auditing
+- Complete lifecycle management
+- Advanced security settings
+- High availability configuration
+
+## Key Configuration
+
+This comprehensive example showcases all available features of the $module_type module, demonstrating enterprise-grade capabilities suitable for production environments.
+
+## Usage
+
+\`\`\`bash
+terraform init
+terraform plan
+terraform apply
+\`\`\`
+
+## Cleanup
+
+\`\`\`bash
+terraform destroy
+\`\`\`
+
+<!-- BEGIN_TF_DOCS -->
+<!-- END_TF_DOCS -->
+EOF
+            ;;
+        secure)
+            cat > "$example_dir/README.md" << EOF
+# Secure $display_name Example
+
+This example demonstrates a maximum-security $display_name configuration suitable for highly sensitive data and regulated environments.
+
+## Features
+
+- Maximum security configuration with all security features enabled
+- Network isolation and private endpoints
+- Advanced threat protection
+- Comprehensive audit logging and monitoring
+- Encryption at rest and in transit
+- Compliance-ready configuration
+
+## Key Configuration
+
+This example implements defense-in-depth security principles with multiple layers of protection suitable for highly regulated industries and sensitive workloads.
+
+## Security Considerations
+
+- All public access is disabled by default
+- Network access is restricted to specific IP ranges
+- All data is encrypted at rest and in transit
+- Audit logging captures all access and modifications
+
+## Usage
+
+\`\`\`bash
+terraform init
+terraform plan
+terraform apply
+\`\`\`
+
+## Cleanup
+
+\`\`\`bash
+terraform destroy
+\`\`\`
+
+<!-- BEGIN_TF_DOCS -->
+<!-- END_TF_DOCS -->
+EOF
+            ;;
+    esac
+}
+
 # Simple example
 cat > "$MODULE_DIR/examples/simple/main.tf" << EOF
 provider "azurerm" {
@@ -195,28 +326,8 @@ output "${MODULE_TYPE}_name" {
 }
 EOF
 
-cat > "$MODULE_DIR/examples/simple/README.md" << EOF
-# Simple $DISPLAY_NAME Example
-
-This example shows basic usage of the $DISPLAY_NAME module with minimal configuration.
-
-## Usage
-
-\`\`\`bash
-terraform init
-terraform plan
-terraform apply
-\`\`\`
-
-## Cleanup
-
-\`\`\`bash
-terraform destroy
-\`\`\`
-
-<!-- BEGIN_TF_DOCS -->
-<!-- END_TF_DOCS -->
-EOF
+# Generate README for simple example
+generate_example_readme "simple" "$MODULE_DIR/examples/simple" "$MODULE_TYPE" "$DISPLAY_NAME"
 
 # Create complete example files
 cat > "$MODULE_DIR/examples/complete/main.tf" << EOF
@@ -265,34 +376,8 @@ output "${MODULE_TYPE}_name" {
 }
 EOF
 
-cat > "$MODULE_DIR/examples/complete/README.md" << EOF
-# Complete $DISPLAY_NAME Example
-
-This example demonstrates all available features and configurations of the $DISPLAY_NAME module.
-
-## Features
-
-- Comprehensive configuration with all available options
-- Advanced features demonstration
-- Best practices implementation
-
-## Usage
-
-\`\`\`bash
-terraform init
-terraform plan
-terraform apply
-\`\`\`
-
-## Cleanup
-
-\`\`\`bash
-terraform destroy
-\`\`\`
-
-<!-- BEGIN_TF_DOCS -->
-<!-- END_TF_DOCS -->
-EOF
+# Generate README for complete example
+generate_example_readme "complete" "$MODULE_DIR/examples/complete" "$MODULE_TYPE" "$DISPLAY_NAME"
 
 # Create secure example files
 cat > "$MODULE_DIR/examples/secure/main.tf" << EOF
@@ -341,35 +426,8 @@ output "${MODULE_TYPE}_name" {
 }
 EOF
 
-cat > "$MODULE_DIR/examples/secure/README.md" << EOF
-# Secure $DISPLAY_NAME Example
-
-This example demonstrates a security-hardened configuration of the $DISPLAY_NAME module suitable for production environments.
-
-## Security Features
-
-- Maximum security configuration
-- Network isolation
-- Encryption at rest and in transit
-- Compliance-ready settings
-
-## Usage
-
-\`\`\`bash
-terraform init
-terraform plan
-terraform apply
-\`\`\`
-
-## Cleanup
-
-\`\`\`bash
-terraform destroy
-\`\`\`
-
-<!-- BEGIN_TF_DOCS -->
-<!-- END_TF_DOCS -->
-EOF
+# Generate README for secure example
+generate_example_readme "secure" "$MODULE_DIR/examples/secure" "$MODULE_TYPE" "$DISPLAY_NAME"
 
 
 # Create a basic test file
