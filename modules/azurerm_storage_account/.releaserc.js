@@ -111,9 +111,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         'README.md',
         '../../README.md'
       ],
-      message: `chore(release): ${TAG_PREFIX}\${nextRelease.version} [skip ci]
-
-\${nextRelease.notes}`
+      message: `chore(${COMMIT_SCOPE}): release ${TAG_PREFIX}\${nextRelease.version} [skip ci]`
     }],
     
     // Create GitHub release
