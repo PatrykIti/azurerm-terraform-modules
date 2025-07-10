@@ -66,12 +66,16 @@ jobs:
         run: |
           MODULE_DIR="modules/${{ inputs.module }}"
           
-          # Extract module prefix from .releaserc.json
-          if [[ -f "$MODULE_DIR/.releaserc.json" ]]; then
+          # Extract module prefix from .releaserc.js or .releaserc.json
+          if [[ -f "$MODULE_DIR/.releaserc.js" ]]; then
+            # For .releaserc.js, we need to extract TAG_PREFIX from the JS file
+            PREFIX=$(grep "TAG_PREFIX = " "$MODULE_DIR/.releaserc.js" | sed -n "s/.*TAG_PREFIX = '\(.*\)'.*/\1/p")
+            echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
+          elif [[ -f "$MODULE_DIR/.releaserc.json" ]]; then
             PREFIX=$(jq -r '.tagFormat' "$MODULE_DIR/.releaserc.json" | sed 's/\${version}//')
             echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
           else
-            echo "❌ Missing .releaserc.json in $MODULE_DIR"
+            echo "❌ Missing .releaserc.js or .releaserc.json in $MODULE_DIR"
             exit 1
           fi
           
