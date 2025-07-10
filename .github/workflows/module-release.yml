@@ -4,11 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       module:
-        description: 'Module to release'
+        description: 'Module directory name to release (e.g., azurerm_storage_account)'
         required: true
-        type: choice
-        options:
-          - azurerm_storage_account
+        type: string
       dry_run:
         description: 'Perform a dry run without creating release'
         required: false
@@ -61,33 +59,39 @@ jobs:
           action: validate
           terraform-version: '1.10.3'
       
+      - name: Validate module exists
+        run: |
+          MODULE_DIR="modules/${{ inputs.module }}"
+          if [[ ! -d "$MODULE_DIR" ]]; then
+            echo "❌ Module directory '$MODULE_DIR' not found."
+            echo "Available modules:"
+            ls -1 modules/ | grep -v README
+            exit 1
+          fi
+          
+          if [[ ! -f "$MODULE_DIR/.releaserc.js" ]] && [[ ! -f "$MODULE_DIR/.releaserc.json" ]]; then
+            echo "❌ No .releaserc.js or .releaserc.json found in $MODULE_DIR"
+            exit 1
+          fi
+      
       - name: Get module configuration
         id: module-config
         run: |
           MODULE_DIR="modules/${{ inputs.module }}"
           
-          # Extract module prefix from .releaserc.js or .releaserc.json
-          if [[ -f "$MODULE_DIR/.releaserc.js" ]]; then
-            # For .releaserc.js, we need to extract TAG_PREFIX from the JS file
-            PREFIX=$(grep "TAG_PREFIX = " "$MODULE_DIR/.releaserc.js" | sed -n "s/.*TAG_PREFIX = '\(.*\)'.*/\1/p")
-            echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
-          elif [[ -f "$MODULE_DIR/.releaserc.json" ]]; then
-            PREFIX=$(jq -r '.tagFormat' "$MODULE_DIR/.releaserc.json" | sed 's/\${version}//')
-            echo "prefix=$PREFIX" >> $GITHUB_OUTPUT
-          else
-            echo "❌ Missing .releaserc.js or .releaserc.json in $MODULE_DIR"
-            exit 1
-          fi
+          # Use Node.js script to safely extract configuration
+          CONFIG_JSON=$(node scripts/get-module-config.js "$MODULE_DIR")
           
-          # Extract module scope for commit filtering
-          case "${{ inputs.module }}" in
-            azurerm_storage_account) SCOPE="storage-account" ;;
-            azurerm_virtual_network) SCOPE="virtual-network" ;;
-            azurerm_key_vault) SCOPE="key-vault" ;;
-            azurerm_application_gateway) SCOPE="app-gateway" ;;
-            *) SCOPE="${{ inputs.module }}" ;;
-          esac
-          echo "scope=$SCOPE" >> $GITHUB_OUTPUT
+          # Extract values from JSON output
+          TAG_PREFIX=$(echo "$CONFIG_JSON" | jq -r .tag_prefix)
+          COMMIT_SCOPE=$(echo "$CONFIG_JSON" | jq -r .commit_scope)
+          
+          echo "prefix=$TAG_PREFIX" >> $GITHUB_OUTPUT
+          echo "scope=$COMMIT_SCOPE" >> $GITHUB_OUTPUT
+          
+          echo "✅ Module configuration:"
+          echo "   Tag prefix: $TAG_PREFIX"
+          echo "   Commit scope: $COMMIT_SCOPE"
       
       - name: Run semantic-release
         env:

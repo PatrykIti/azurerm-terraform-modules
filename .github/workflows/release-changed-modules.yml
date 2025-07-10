@@ -1,0 +1,74 @@
+name: Release Changed Modules
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'modules/**'
+      - '!modules/**/README.md'
+      - '!modules/**/CHANGELOG.md'
+      - '!modules/**/examples/**'
+      - '!modules/**/tests/**'
+  workflow_dispatch:
+    inputs:
+      modules:
+        description: 'Comma-separated list of modules to release (e.g., azurerm_storage_account,azurerm_virtual_network)'
+        required: false
+        type: string
+
+jobs:
+  detect-changes:
+    name: Detect Changed Modules
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.changes.outputs.modules }}
+      has_changes: ${{ steps.changes.outputs.has_changes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Detect changed modules
+        id: changes
+        run: |
+          if [[ -n "${{ inputs.modules }}" ]]; then
+            # Manual workflow dispatch with specific modules
+            MODULES=$(echo "${{ inputs.modules }}" | tr ',' '\n' | jq -R -s -c 'split("\n")[:-1]')
+            echo "modules=$MODULES" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            # Automatic detection of changed modules
+            CHANGED_MODULES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | 
+                            grep "^modules/" | 
+                            grep -v -E "(README\.md|CHANGELOG\.md|examples/|tests/)" |
+                            cut -d'/' -f2 | 
+                            sort -u | 
+                            jq -R -s -c 'split("\n")[:-1] | map(select(length > 0))')
+            
+            if [[ "$CHANGED_MODULES" == "[]" ]]; then
+              echo "has_changes=false" >> $GITHUB_OUTPUT
+              echo "modules=[]" >> $GITHUB_OUTPUT
+            else
+              echo "has_changes=true" >> $GITHUB_OUTPUT
+              echo "modules=$CHANGED_MODULES" >> $GITHUB_OUTPUT
+            fi
+          fi
+          
+          echo "🔍 Modules to release: $(cat $GITHUB_OUTPUT | grep "modules=" | cut -d'=' -f2)"
+  
+  release:
+    name: Release Module
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
+    strategy:
+      matrix:
+        module: ${{ fromJson(needs.detect-changes.outputs.modules) }}
+      fail-fast: false
+    uses: ./.github/workflows/module-release.yml
+    with:
+      module: ${{ matrix.module }}
+      dry_run: false
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
