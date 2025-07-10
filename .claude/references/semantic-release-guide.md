@@ -117,16 +117,29 @@ fix(storage-account): correct validation logic
 workflow_dispatch:
   inputs:
     module:
-      description: 'Module to release'
-      type: choice
-      options:
-        - azurerm_storage_account
+      description: 'Module directory name to release (e.g., azurerm_storage_account)'
+      type: string  # Changed from choice for dynamic module support
 ```
 
+### Automated Release on Push
+The `release-changed-modules.yml` workflow automatically:
+- Detects which modules changed in the push
+- Runs releases in parallel for all changed modules
+- Filters out non-code changes (README, tests, examples)
+
+### Dynamic Module Support
+Since the refactoring:
+- No hardcoded module lists in workflows
+- Module configuration extracted via `scripts/get-module-config.js`
+- New modules automatically supported without workflow changes
+- Validation ensures module exists before attempting release
+
 ### Automated Process
-1. Workflow changes to module directory
-2. Runs `npx semantic-release`
-3. Semantic-release:
+1. Workflow validates module exists
+2. Extracts configuration using Node.js script
+3. Changes to module directory
+4. Runs `npx semantic-release`
+5. Semantic-release:
    - Analyzes commits for that module
    - Determines next version
    - Updates CHANGELOG.md
@@ -195,7 +208,7 @@ When creating a new module:
    git commit -m "feat(storage-account): add new feature"
    ```
 
-4. Add module to workflow choices in `.github/workflows/module-release.yml`
+4. No workflow changes needed! The module will be automatically detected
 
 ## Troubleshooting
 
@@ -209,9 +222,19 @@ When creating a new module:
 - Verify commit type (feat/fix)
 
 ### CHANGELOG Not Updated
-- Check .releaserc.json exists
+- Check .releaserc.js exists
 - Verify changelog plugin configured
 - Ensure write permissions in workflow
+
+### Missing @semantic-release/exec
+- Error: `Cannot find module '@semantic-release/exec'`
+- Solution: Add to package.json devDependencies
+- This plugin is required for executing scripts during release
+
+### Module Not Found in Workflow
+- Workflow now accepts any module name as string input
+- Use `scripts/get-module-config.js` to verify configuration
+- Run `list-modules.yml` workflow to see all available modules
 
 ## Example Release Flow
 
