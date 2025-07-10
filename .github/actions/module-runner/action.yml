@@ -46,16 +46,16 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         AZURE_CREDENTIALS: ${{ inputs.azure-credentials }}
-        # Parse Azure credentials and set environment variables
-        AZURE_CLIENT_ID: ${{ fromJSON(inputs.azure-credentials).clientId || '' }}
-        AZURE_TENANT_ID: ${{ fromJSON(inputs.azure-credentials).tenantId || '' }}
-        AZURE_SUBSCRIPTION_ID: ${{ fromJSON(inputs.azure-credentials).subscriptionId || '' }}
-        AZURE_CLIENT_SECRET: ${{ fromJSON(inputs.azure-credentials).clientSecret || '' }}
+        # Parse Azure credentials and set environment variables only if provided
+        AZURE_CLIENT_ID: ${{ inputs.azure-credentials && fromJSON(inputs.azure-credentials).clientId || '' }}
+        AZURE_TENANT_ID: ${{ inputs.azure-credentials && fromJSON(inputs.azure-credentials).tenantId || '' }}
+        AZURE_SUBSCRIPTION_ID: ${{ inputs.azure-credentials && fromJSON(inputs.azure-credentials).subscriptionId || '' }}
+        AZURE_CLIENT_SECRET: ${{ inputs.azure-credentials && fromJSON(inputs.azure-credentials).clientSecret || '' }}
         # Also set ARM_ prefixed variables for Terraform
-        ARM_CLIENT_ID: ${{ fromJSON(inputs.azure-credentials).clientId || '' }}
-        ARM_TENANT_ID: ${{ fromJSON(inputs.azure-credentials).tenantId || '' }}
-        ARM_SUBSCRIPTION_ID: ${{ fromJSON(inputs.azure-credentials).subscriptionId || '' }}
-        ARM_CLIENT_SECRET: ${{ fromJSON(inputs.azure-credentials).clientSecret || '' }}
+        ARM_CLIENT_ID: ${{ inputs.azure-credentials && fromJSON(inputs.azure-credentials).clientId || '' }}
+        ARM_TENANT_ID: ${{ inputs.azure-credentials && fromJSON(inputs.azure-credentials).tenantId || '' }}
+        ARM_SUBSCRIPTION_ID: ${{ inputs.azure-credentials && fromJSON(inputs.azure-credentials).subscriptionId || '' }}
+        ARM_CLIENT_SECRET: ${{ inputs.azure-credentials && fromJSON(inputs.azure-credentials).clientSecret || '' }}
         ARM_USE_OIDC: 'true'
       run: |
         .github/actions/module-runner/run-module-action.sh "${{ inputs.module }}" "${{ inputs.action }}" "${{ inputs.terraform-version }}"
