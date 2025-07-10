@@ -1,0 +1,144 @@
+# Task ID: 19
+# Title: Comprehensive Update of Storage Account Module Outputs
+# Status: done
+# Dependencies: 6, 18
+# Priority: high
+# Description: Conduct a comprehensive review and update of the `outputs.tf` file for the `azurerm_storage_account` module. This involves adding, correcting, and removing outputs for all associated resources to ensure all useful attributes are exposed.
+# Details:
+The goal is to align all outputs with the latest Terraform AzureRM provider documentation. Review the documentation for each of the following resources within the module: `azurerm_storage_account`, `azurerm_storage_container`, `azurerm_storage_queue`, `azurerm_storage_share`, `azurerm_storage_table`, `azurerm_private_endpoint`, `azurerm_storage_account_queue_properties`, `azurerm_storage_account_static_website`, `azurerm_storage_management_policy`, and `azurerm_monitor_diagnostic_setting`. For each resource, identify all exported attributes that provide value to the end-user. Add new `output` blocks for missing attributes, correct the `value` of any incorrect outputs, and remove any outputs that reference deprecated attributes. Ensure all outputs have a clear and concise `description`. For example, for `azurerm_storage_account`, ensure outputs like `primary_web_endpoint`, `primary_dfs_endpoint`, and the full `identity` block are exposed. For `azurerm_storage_container`, expose `id`, `name`, and `resource_manager_id`.
+
+# Test Strategy:
+1. Update the `complete` example in `examples/storage_account/complete` to include a local `outputs.tf` file that references all the newly added and updated outputs from the module. 2. Run `terraform init` and `terraform apply` on this example to deploy the resources. 3. After a successful deployment, run `terraform output` and inspect the values to ensure they are not null or empty and appear correct. 4. Cross-reference at least five key output values (e.g., `primary_blob_endpoint`, a container ID, a private endpoint ID) with the actual resource properties in the Azure Portal to confirm accuracy. 5. Run `terraform destroy` and verify all resources are cleaned up successfully.
+
+# Subtasks:
+## 1. Review and Update `azurerm_storage_account` Outputs [done]
+### Dependencies: None
+### Description: Conduct a thorough review of the `azurerm_storage_account` resource attributes against the official Terraform AzureRM provider documentation. Update the `outputs.tf` file to add, correct, or remove outputs to ensure all valuable attributes are exposed.
+### Details:
+1. Access the Terraform Registry page for the `azurerm_storage_account` resource.
+2. Compile a list of all exported attributes.
+3. Compare this list with the existing outputs in the module's `outputs.tf` file.
+4. Add new `output` blocks for high-value missing attributes like `primary_web_endpoint`, `primary_dfs_endpoint`, `secondary_location`, and the `identity` block.
+5. Correct the `value` of any outputs that are misconfigured.
+6. Remove any outputs that reference deprecated attributes.
+7. Ensure every output has a clear and concise `description`.
+<info added on 2025-07-07T05:55:31.685Z>
+MANDATORY requirement: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) - especially "Do what has been asked; nothing more, nothing less" and "ALWAYS prefer editing existing files", and section 9: Terraform Best Practices Guide (lines 112-122) for module documentation standards. Key principles: Edit only outputs.tf file, do not create new files, ensure all outputs have clear descriptions.
+</info added on 2025-07-07T05:55:31.685Z>
+
+## 2. Review and Update `azurerm_storage_container` Outputs [done]
+### Dependencies: None
+### Description: Review the `azurerm_storage_container` resource attributes in the Terraform documentation. Update `outputs.tf` to expose useful attributes for all created containers, likely in a map format.
+### Details:
+1. Consult the `azurerm_storage_container` documentation on the Terraform Registry.
+2. Since containers are created dynamically (likely via `for_each`), structure the output as a map keyed by the container name.
+3. The output map should expose key attributes for each container, such as `id`, `name`, and `resource_manager_id`.
+4. Implement the output like this: `output "containers" { description = "A map of storage containers." value = { for k, v in azurerm_storage_container.this : k => { id = v.id, name = v.name, resource_manager_id = v.resource_manager_id } } }`.
+5. Ensure the output is created conditionally if container creation is optional.
+<info added on 2025-07-07T05:55:52.315Z>
+MANDATORY: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) and section 9: Terraform Best Practices Guide (lines 112-122). When using Context7 or researching documentation, follow section 1: MCP Tools Usage Rules. Key principles to apply: Edit only outputs.tf, use proper map outputs for dynamic resources, and add clear descriptions.
+</info added on 2025-07-07T05:55:52.315Z>
+
+## 3. Review and Update `azurerm_storage_queue` Outputs [done]
+### Dependencies: None
+### Description: Review the `azurerm_storage_queue` resource attributes in the Terraform documentation. Update `outputs.tf` to expose useful attributes for all created queues, likely in a map format.
+### Details:
+1. Check the `azurerm_storage_queue` documentation on the Terraform Registry.
+2. Queues are likely created via `for_each`, so the output should be a map keyed by the queue name.
+3. The output map should expose key attributes for each queue, such as `id`, `name`, and `resource_manager_id`.
+4. Implement the output like this: `output "queues" { description = "A map of storage queues." value = { for k, v in azurerm_storage_queue.this : k => { id = v.id, name = v.name, resource_manager_id = v.resource_manager_id } } }`.
+5. Ensure the output is created conditionally if queue creation is optional.
+<info added on 2025-07-07T05:56:13.198Z>
+MANDATORY: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) and section 9: Terraform Best Practices Guide (lines 112-122). Key principles: Edit only outputs.tf, use map outputs for collections of resources, ensure conditional outputs when resources are optional.
+</info added on 2025-07-07T05:56:13.198Z>
+
+## 4. Review and Update `azurerm_storage_share` Outputs [done]
+### Dependencies: None
+### Description: Review the `azurerm_storage_share` resource attributes in the Terraform documentation. Update `outputs.tf` to expose useful attributes for all created file shares, likely in a map format.
+### Details:
+1. Refer to the `azurerm_storage_share` documentation on the Terraform Registry.
+2. File shares are likely created via `for_each`, so the output should be a map keyed by the share name.
+3. The output map should expose key attributes for each share, such as `id`, `name`, `resource_manager_id`, and `url`.
+4. Implement the output like this: `output "file_shares" { description = "A map of storage file shares." value = { for k, v in azurerm_storage_share.this : k => { id = v.id, name = v.name, url = v.url } } }`.
+5. Ensure the output is created conditionally if file share creation is optional.
+<info added on 2025-07-07T05:56:34.710Z>
+Before starting this subtask, MANDATORY review CLAUDE.md sections: important-instruction-reminders (lines 5-9), section 9: Terraform Best Practices Guide (lines 112-122). Key principles: Edit only outputs.tf, use map outputs for collections, include all relevant attributes like url for file shares.
+</info added on 2025-07-07T05:56:34.710Z>
+
+## 5. Review and Update `azurerm_storage_table` Outputs [done]
+### Dependencies: None
+### Description: Review the `azurerm_storage_table` resource attributes in the Terraform documentation. Update `outputs.tf` to expose useful attributes for all created tables, likely in a map format.
+### Details:
+1. Look up the `azurerm_storage_table` documentation on the Terraform Registry.
+2. Tables are likely created via `for_each`, so the output should be a map keyed by the table name.
+3. The output map should expose key attributes for each table, such as `id`, `name`, and `resource_manager_id`.
+4. Implement the output like this: `output "tables" { description = "A map of storage tables." value = { for k, v in azurerm_storage_table.this : k => { id = v.id, name = v.name, resource_manager_id = v.resource_manager_id } } }`.
+5. Ensure the output is created conditionally if table creation is optional.
+<info added on 2025-07-07T05:56:56.741Z>
+MANDATORY: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) and section 9: Terraform Best Practices Guide (lines 112-122). Key principles to follow: Edit only outputs.tf, follow existing patterns in the module, and ensure conditional outputs for optional resources.
+</info added on 2025-07-07T05:56:56.741Z>
+
+## 6. Review and Update `azurerm_private_endpoint` Outputs [done]
+### Dependencies: None
+### Description: Review the `azurerm_private_endpoint` resource attributes in the Terraform documentation. Update `outputs.tf` to expose connection details for any private endpoints associated with the storage account.
+### Details:
+1. Examine the `azurerm_private_endpoint` documentation on the Terraform Registry.
+2. The module may create multiple private endpoints (for blob, file, etc.), so structure the output as a map keyed by the sub-resource type (e.g., 'blob').
+3. Expose key attributes like `id`, `name`, and `private_ip_address` (found within the `private_service_connection` block).
+4. Implement the output like this: `output "private_endpoints" { description = "A map of private endpoints." value = { for k, v in azurerm_private_endpoint.this : k => { id = v.id, name = v.name, private_ip_address = v.private_service_connection[0].private_ip_address } } }`.
+5. Ensure the output is created conditionally.
+<info added on 2025-07-07T05:57:13.209Z>
+MANDATORY: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) and section 9: Terraform Best Practices Guide (lines 112-122). Key principles to follow: Edit only the outputs.tf file, expose private endpoint connection details including private IP addresses, and use a map structure for multiple endpoints.
+</info added on 2025-07-07T05:57:13.209Z>
+
+## 7. Review and Update `azurerm_storage_account_queue_properties` Outputs [done]
+### Dependencies: None
+### Description: Review the `azurerm_storage_account_queue_properties` resource in the Terraform documentation. Update `outputs.tf` to expose its ID if it provides value.
+### Details:
+1. Check the `azurerm_storage_account_queue_properties` documentation on the Terraform Registry.
+2. This resource primarily configures settings and may only export its `id`.
+3. Determine if outputting the resource ID is useful for consumers of the module.
+4. If so, add a new output: `output "queue_properties_id" { description = "The resource ID of the storage account queue properties." value = one(azurerm_storage_account_queue_properties.this[*].id) }`.
+5. Use a conditional expression to handle cases where the resource is not created.
+<info added on 2025-07-07T05:57:32.863Z>
+Before starting this subtask, MANDATORY review CLAUDE.md sections: important-instruction-reminders (lines 5-9), section 9: Terraform Best Practices Guide (lines 112-122). Key principles: Edit only outputs.tf, use one() function for single optional resources, determine if resource ID output provides value to module consumers.
+</info added on 2025-07-07T05:57:32.863Z>
+
+## 8. Review and Update `azurerm_storage_account_static_website` Outputs [done]
+### Dependencies: None
+### Description: Review the `azurerm_storage_account_static_website` resource in the Terraform documentation. Ensure that related outputs on the main storage account resource are correctly exposed.
+### Details:
+1. Check the `azurerm_storage_account_static_website` documentation.
+2. This resource enables static website hosting, but the primary endpoints (`primary_web_endpoint`, `primary_web_host`) are attributes of the `azurerm_storage_account` resource itself.
+3. This task is to double-check that the outputs for `primary_web_endpoint` and `primary_web_host` are correctly implemented in `outputs.tf` as part of the `azurerm_storage_account` review.
+4. Consider adding an output for the `azurerm_storage_account_static_website` resource `id` for completeness: `output "static_website_id" { ... }`.
+<info added on 2025-07-07T05:57:55.602Z>
+MANDATORY: Before starting this subtask, review CLAUDE.md sections: important-instruction-reminders (lines 5-9) and section 9: Terraform Best Practices Guide (lines 112-122). Key principles to apply: Edit only outputs.tf and verify that the primary_web_endpoint and primary_web_host outputs exist in the azurerm_storage_account outputs section.
+</info added on 2025-07-07T05:57:55.602Z>
+
+## 9. Review and Update `azurerm_storage_management_policy` Outputs [done]
+### Dependencies: None
+### Description: Review the `azurerm_storage_management_policy` resource in the Terraform documentation. Update `outputs.tf` to expose its resource ID.
+### Details:
+1. Consult the `azurerm_storage_management_policy` documentation on the Terraform Registry.
+2. The main exported attribute is the resource `id`.
+3. Add an output to expose this ID, which is useful for auditing or creating dependencies.
+4. Implement the output: `output "storage_management_policy_id" { description = "The resource ID of the storage management policy." value = one(azurerm_storage_management_policy.this[*].id) }`.
+5. Use a conditional expression to handle cases where the resource is not created.
+<info added on 2025-07-07T05:58:14.964Z>
+Before starting this subtask, MANDATORY review CLAUDE.md sections: important-instruction-reminders (lines 5-9), section 9: Terraform Best Practices Guide (lines 112-122). Key principles: Edit only outputs.tf, use one() function for single optional resources, expose resource IDs for auditing purposes.
+</info added on 2025-07-07T05:58:14.964Z>
+
+## 10. Review and Update `azurerm_monitor_diagnostic_setting` Outputs [done]
+### Dependencies: None
+### Description: Review the `azurerm_monitor_diagnostic_setting` resource in the Terraform documentation. Update `outputs.tf` to expose details of the configured diagnostic settings.
+### Details:
+1. Check the `azurerm_monitor_diagnostic_setting` documentation on the Terraform Registry.
+2. The module may create multiple diagnostic settings, so the output should be a map, keyed by the setting's name or a logical key.
+3. The output map should expose the `id` and `name` of each diagnostic setting.
+4. Implement the output: `output "diagnostic_settings" { description = "A map of diagnostic settings applied to the storage account." value = { for k, v in azurerm_monitor_diagnostic_setting.this : k => { id = v.id, name = v.name } } }`.
+5. Ensure the output is created conditionally.
+<info added on 2025-07-07T05:58:34.805Z>
+Before starting this subtask, MANDATORY review CLAUDE.md sections: important-instruction-reminders (lines 5-9), section 9: Terraform Best Practices Guide (lines 112-122). Key principles: Edit only outputs.tf, use map outputs for multiple diagnostic settings, ensure conditional outputs for optional resources.
+</info added on 2025-07-07T05:58:34.805Z>
+

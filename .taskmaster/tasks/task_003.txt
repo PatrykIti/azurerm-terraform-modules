@@ -1,0 +1,53 @@
+# Task ID: 3
+# Title: CI/CD Integration: tflint and Checkov
+# Status: done
+# Dependencies: 2
+# Priority: high
+# Description: Integrate static code analysis tools into the CI/CD pipeline to enforce code quality and security standards. This includes setting up tflint for linting and Checkov for security scanning.
+# Details:
+Add new jobs to the `validation.yml` workflow. 
+- **tflint**: Use `terraform-linters/setup-tflint-action@v4`. Configure `.tflint.hcl` to enable the Azure plugin and recommended rulesets. 
+- **Checkov**: Use `bridgecrewio/checkov-action@v12`. Configure it to scan the `modules` directory and fail the build on medium or higher severity issues. Set a baseline with a `.checkov.yaml` file if needed.
+
+# Test Strategy:
+Submit a PR with a Terraform resource that violates a tflint rule (e.g., non-standard tag). The tflint job should fail. Submit a PR with a security misconfiguration (e.g., a storage account allowing public access). The Checkov job should fail.
+
+# Subtasks:
+## 1. Integrate tflint into CI/CD pipeline [done]
+### Dependencies: 3.2
+### Description: Add tflint configuration and integrate it into GitHub Actions workflows
+### Details:
+Complete tflint integration with the following steps:
+
+1. Create .tflint.hcl configuration file in repository root:
+   - Enable azurerm plugin (latest version)
+   - Configure recommended rules for Terraform best practices
+   - Set up rules for:
+     - terraform_deprecated_interpolation
+     - terraform_documented_outputs
+     - terraform_documented_variables
+     - terraform_naming_convention
+     - terraform_typed_variables
+     - terraform_unused_declarations
+     - terraform_required_version
+     - terraform_required_providers
+     - azurerm_resource_missing_tags
+
+2. Update pr-validation.yml workflow:
+   - Add tflint installation step using GitHub Action
+   - Run tflint on all Terraform modules
+   - Make it a required check for PR approval
+   - Add caching for tflint plugins
+
+3. Create module-specific .tflint.hcl files if needed:
+   - Override rules for specific modules
+   - Add module-specific plugin configurations
+
+4. Update security-scan-all.yml:
+   - Add tflint to the weekly security scan
+   - Generate tflint report for all modules
+
+5. Documentation:
+   - Update README.md with tflint usage instructions
+   - Add tflint badge to repository
+

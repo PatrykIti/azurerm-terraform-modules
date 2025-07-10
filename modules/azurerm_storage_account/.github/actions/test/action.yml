@@ -1,0 +1,71 @@
+name: 'Test Storage Account Module'
+description: 'Tests the Azure Storage Account Terraform module'
+
+inputs:
+  azure-credentials:
+    description: 'Azure credentials for testing'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21'
+        
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: '1.10.3'
+        terraform_wrapper: false
+    
+    - name: Cache Go modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+        key: go-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          go-${{ runner.os }}-
+    
+    - name: Run Unit Tests
+      shell: bash
+      working-directory: ./modules/azurerm_storage_account/tests
+      run: |
+        echo "Running unit tests..."
+        go mod download
+        go test -v -run TestStorageAccount -timeout 10m
+        
+    - name: Run Integration Tests
+      shell: bash
+      working-directory: ./modules/azurerm_storage_account/tests
+      env:
+        ARM_USE_OIDC: true
+        ARM_CLIENT_ID: ${{ fromJSON(inputs.azure-credentials).clientId }}
+        ARM_TENANT_ID: ${{ fromJSON(inputs.azure-credentials).tenantId }}
+        ARM_SUBSCRIPTION_ID: ${{ fromJSON(inputs.azure-credentials).subscriptionId }}
+      run: |
+        echo "Running integration tests..."
+        go test -v -run TestIntegration -timeout 30m
+        
+    - name: Test Examples
+      shell: bash
+      env:
+        ARM_USE_OIDC: true
+        ARM_CLIENT_ID: ${{ fromJSON(inputs.azure-credentials).clientId }}
+        ARM_TENANT_ID: ${{ fromJSON(inputs.azure-credentials).tenantId }}
+        ARM_SUBSCRIPTION_ID: ${{ fromJSON(inputs.azure-credentials).subscriptionId }}
+      run: |
+        echo "Testing examples..."
+        cd ./modules/azurerm_storage_account/examples
+        
+        # Test simple example
+        if [[ -d "simple" ]]; then
+          echo "Testing simple example..."
+          cd simple
+          terraform init
+          terraform plan -out=tfplan
+          cd ..
+        fi

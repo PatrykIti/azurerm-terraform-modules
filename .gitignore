@@ -70,8 +70,9 @@ coverage.html
 
 # Ignore Go test cache and build artifacts (for Terratest)
 vendor/
-go.mod
-go.sum
+# Ignore go.mod/go.sum only in root directory (not in module tests)
+/go.mod
+/go.sum
 
 # Ignore node_modules (if using npm for tooling)
 node_modules/
@@ -124,3 +125,30 @@ Thumbs.db
 
 # Ignore locally generated files
 *.auto.tfvars
+
+# Logs
+logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+
+# Dependency directories
+# Environment variables
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS specific
+
+# MCP configuration (contains API keys)
+.mcp.json
+
+# Task files
+# tasks.json
+# tasks/

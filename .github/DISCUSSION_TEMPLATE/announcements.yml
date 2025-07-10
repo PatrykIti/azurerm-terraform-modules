@@ -1,0 +1,32 @@
+title: "[Announcement] "
+labels: ["announcement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 📢 Announcement Template
+        
+        Use this template for important announcements about the project.
+
+  - type: textarea
+    id: announcement
+    attributes:
+      label: Announcement
+      description: Share your announcement with the community
+      placeholder: |
+        We're excited to announce...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - New Release
+        - Breaking Change
+        - Deprecation Notice
+        - Community Update
+        - Other
+    validations:
+      required: true

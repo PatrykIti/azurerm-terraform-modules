@@ -1,0 +1,134 @@
+# Pre-commit hooks for Terraform security and quality
+# Install: pip install pre-commit
+# Setup: pre-commit install
+
+repos:
+  # Terraform formatting and validation
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.83.5
+    hooks:
+      - id: terraform_fmt
+        name: Terraform fmt
+        description: Rewrites all Terraform configuration files to a canonical format
+        
+      - id: terraform_validate
+        name: Terraform validate
+        description: Validates all Terraform configuration files
+        
+      - id: terraform_docs
+        name: Terraform docs
+        description: Inserts input and output documentation into README.md
+        args:
+          - --hook-config=--path-to-file=README.md
+          - --hook-config=--add-to-existing-file=true
+          - --hook-config=--create-file-if-not-exist=true
+          
+      - id: terraform_tflint
+        name: Terraform TFLint
+        description: Linter for Terraform files
+        args:
+          - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
+
+  # Security scanning with Checkov
+  - repo: https://github.com/bridgecrewio/checkov.git
+    rev: 3.0.36
+    hooks:
+      - id: checkov
+        name: Checkov security scan
+        description: Scans Terraform for security issues
+        args:
+          - --config-file=.checkov.yaml
+          - --framework=terraform
+          - --quiet
+          - --compact
+          
+  # Security scanning with tfsec
+  - repo: https://github.com/aquasecurity/tfsec
+    rev: v1.28.4
+    hooks:
+      - id: tfsec
+        name: tfsec security scan
+        description: Static analysis of Terraform templates to spot potential security issues
+        args:
+          - --config-file=.tfsec.yml
+          - --soft-fail
+          
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-yaml
+        name: Check YAML
+        description: Attempts to load all yaml files to verify syntax
+        
+      - id: check-json
+        name: Check JSON
+        description: Attempts to load all json files to verify syntax
+        
+      - id: check-merge-conflict
+        name: Check merge conflicts
+        description: Check for files that contain merge conflict strings
+        
+      - id: end-of-file-fixer
+        name: Fix end of files
+        description: Makes sure files end in a newline and only a newline
+        
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+        description: Trims trailing whitespace
+        args: [--markdown-linebreak-ext=md]
+        
+      - id: detect-private-key
+        name: Detect private keys
+        description: Checks for the presence of private keys
+        
+      - id: mixed-line-ending
+        name: Mixed line ending
+        description: Checks for mixed line endings
+        args: [--fix=lf]
+
+  # Secrets detection
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        name: Detect secrets
+        description: Detects high entropy strings that are likely to be passwords
+        args:
+          - --baseline
+          - .secrets.baseline
+        exclude: .*\.lock
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.37.0
+    hooks:
+      - id: markdownlint
+        name: Markdown lint
+        description: Checks markdown files and flag style issues
+        args:
+          - --fix
+          - --disable=MD013  # Line length
+          - --disable=MD033  # Allow inline HTML
+
+  # Custom local hooks
+  - repo: local
+    hooks:
+      - id: terraform-security-scan
+        name: Custom Terraform Security Scan
+        entry: scripts/security-scan.sh
+        language: script
+        files: \.tf$
+        pass_filenames: false
+        
+      - id: validate-module-structure
+        name: Validate Module Structure
+        entry: scripts/validate-structure.sh
+        language: script
+        pass_filenames: false
+
+# Configuration
+default_stages: [commit]
+fail_fast: false
+default_language_version:
+  python: python3.11

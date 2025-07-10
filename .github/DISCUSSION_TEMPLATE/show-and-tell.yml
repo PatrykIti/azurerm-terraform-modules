@@ -1,0 +1,70 @@
+title: "[Show & Tell] "
+labels: ["show-and-tell", "community"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🎉 Show & Tell
+        
+        Share what you've built using these Terraform modules!
+
+  - type: textarea
+    id: project
+    attributes:
+      label: Project Description
+      description: Tell us about what you've built
+      placeholder: |
+        I used these modules to build...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: modules-used
+    attributes:
+      label: Modules Used
+      description: Which modules did you use?
+      options:
+        - label: azurerm_storage_account
+        - label: azurerm_virtual_network
+        - label: azurerm_key_vault
+        - label: azurerm_app_service
+        - label: azurerm_sql_database
+
+  - type: textarea
+    id: architecture
+    attributes:
+      label: Architecture Overview
+      description: Describe your architecture or share a diagram
+      placeholder: |
+        Our architecture consists of...
+
+  - type: textarea
+    id: challenges
+    attributes:
+      label: Challenges & Solutions
+      description: What challenges did you face and how did you solve them?
+      placeholder: |
+        We needed to...
+        We solved it by...
+
+  - type: textarea
+    id: code-snippet
+    attributes:
+      label: Code Snippet
+      description: Share an interesting configuration snippet
+      render: hcl
+
+  - type: textarea
+    id: lessons
+    attributes:
+      label: Lessons Learned
+      description: What did you learn from this project?
+      placeholder: |
+        Key takeaways...
+
+  - type: input
+    id: link
+    attributes:
+      label: Project Link
+      description: Link to your project (if public)
+      placeholder: https://...

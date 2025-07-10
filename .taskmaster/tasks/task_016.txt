@@ -1,0 +1,11 @@
+# Task ID: 16
+# Title: Implement GitHub Actions CI/CD Workflows for Modules and Repository
+# Status: pending
+# Dependencies: 1, 2, 5, 8, 10, 12
+# Priority: medium
+# Description: Establish a comprehensive CI/CD pipeline using GitHub Actions, including repository-level workflows for global checks and module-specific workflows for individual module testing and release.
+# Details:
+Implement a multi-faceted GitHub Actions strategy. For repository-level concerns, create a `.github/workflows/pr-validation.yml` that triggers on pull requests to `main`. This workflow will expand on the basic validation by running `terraform fmt`, `tflint`, and `checkov` across all modified modules. For module-specific CI, create workflows like `.github/workflows/azurerm-storage-account-ci.yml`. These will trigger on path-specific changes (e.g., `paths: ['modules/storage_account/**']`) and execute the module's Terratest suite using Azure credentials stored as GitHub secrets. For releases, create corresponding workflows like `azurerm-storage-account-release.yml` that trigger on version tags (e.g., `storage-account/v*.*.*`) to automate the creation of GitHub Releases, ensuring independent module versioning.
+
+# Test Strategy:
+Verify repository-level workflows by creating a PR with a linting error, which should cause the `pr-validation.yml` to fail. A subsequent fix should make it pass. For module-level CI, push a change to the `storage_account` module and confirm that only its specific CI workflow (`azurerm-storage-account-ci.yml`) and the global PR validation workflow are triggered. The CI workflow must successfully execute the Terratest suite. Finally, test the release process by pushing a tag like `storage-account/v1.0.0` and verifying that the release workflow runs and creates a corresponding release on GitHub.

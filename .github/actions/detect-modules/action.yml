@@ -1,0 +1,35 @@
+name: 'Detect Terraform Modules'
+description: 'Automatically detects all Terraform modules in the repository'
+
+outputs:
+  modules:
+    description: 'JSON array of detected module names'
+    value: ${{ steps.detect.outputs.modules }}
+  filters:
+    description: 'Path filters for dorny/paths-filter'
+    value: ${{ steps.detect.outputs.filters }}
+
+runs:
+  using: 'composite'
+  steps:
+    - id: detect
+      shell: bash
+      run: |
+        # Find all directories containing main.tf in modules/
+        MODULES=$(find modules -name "main.tf" -type f | \
+                  sed 's|/main.tf||' | \
+                  sed 's|modules/||' | \
+                  sort)
+        
+        # Create JSON array
+        JSON_ARRAY=$(echo "$MODULES" | jq -R -s -c 'split("\n")[:-1]')
+        echo "modules=$JSON_ARRAY" >> $GITHUB_OUTPUT
+        
+        # Create path filters
+        FILTERS=""
+        for module in $MODULES; do
+          FILTERS="${FILTERS}${module}:\n  - 'modules/${module}/**'\n  - 'shared/**'\n"
+        done
+        echo "filters<<EOF" >> $GITHUB_OUTPUT
+        echo -e "$FILTERS" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT

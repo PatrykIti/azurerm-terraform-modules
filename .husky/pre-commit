@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run terraform fmt check
+echo "Running terraform fmt check..."
+find . -name "*.tf" -not -path "./.terraform/*" -exec dirname {} \; | sort -u | while read dir; do
+  terraform fmt -check "$dir" || {
+    echo "❌ Terraform files in $dir are not formatted."
+    echo "Run 'terraform fmt -recursive' to fix."
+    exit 1
+  }
+done
+
+echo "✅ All Terraform files are properly formatted"

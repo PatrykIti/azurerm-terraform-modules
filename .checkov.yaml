@@ -1,0 +1,58 @@
+# Checkov Configuration for Azure Terraform Modules
+# This configuration enforces security best practices
+
+# Directory to scan
+directory:
+  - .
+
+# Framework to use
+framework:
+  - terraform
+  - terraform_plan
+
+# Output format
+output: cli
+
+# Enable all checks by default
+compact: true
+quiet: false
+
+# Download external modules
+download-external-modules: true
+
+# Specific checks to skip (if needed)
+# skip-check:
+#   - CKV_AZURE_XX
+
+# Ensure these critical Azure Storage security checks are enforced
+# These are automatically checked, but listing for clarity:
+# - CKV_AZURE_33: Ensure Storage Account enables HTTPS traffic only
+# - CKV_AZURE_44: Ensure Storage Account is using the latest version of TLS encryption
+# - CKV_AZURE_35: Ensure Storage Account has public access disabled
+# - CKV_AZURE_43: Ensure Storage Account is configured with Private Endpoint
+# - CKV_AZURE_59: Ensure that Storage Accounts use customer-managed key for encryption
+# - CKV_AZURE_190: Ensure that Storage Account uses infrastructure encryption
+# - CKV_AZURE_206: Ensure that Storage Accounts use replication
+
+# Custom policies directory (if you have custom checks)
+external-checks-dir:
+  - ./security-policies
+
+# Soft fail on specific checks during development (remove in production)
+# soft-fail: true
+
+# Run only specific checks
+# check:
+#   - CKV_AZURE_33
+#   - CKV_AZURE_44
+
+# Soft fail on LOW severity checks
+# This means checks with LOW severity will not cause the scan to fail
+soft-fail-on:
+  - LOW
+
+# Enable secrets scanning
+enable-secret-scan-all-files: true
+
+# Output file (optional)
+# output-file-path: checkov-report.json
