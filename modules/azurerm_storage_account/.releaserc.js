@@ -90,6 +90,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         # Also update in terraform-docs table sections
         find . -name "README.md" -type f -exec sed -i 's| ../../ | github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version} |g' {} +
         
+        # Handle ../.. pattern in terraform-docs tables
+        find . -name "README.md" -type f -exec sed -i 's| ../.. | github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version} |g' {} +
+        
         # Update module version in README
         if [[ -x "../../scripts/update-module-version.sh" ]]; then
           ../../scripts/update-module-version.sh . "\${nextRelease.version}"

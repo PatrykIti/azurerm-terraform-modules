@@ -34,8 +34,12 @@ escape_sed() {
 ESCAPED_MODULE_NAME=$(escape_sed "$MODULE_NAME")
 ESCAPED_TAG_PREFIX=$(escape_sed "$TAG_PREFIX")
 
-# Update module status from Development to Completed with version link
+# Update module status - handle both Development and already Completed status
+# First, try to update from Development status
 sed -i.bak "s|\[${MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) | 🔧 Development | - |\[${MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) | ✅ Completed | [${TAG_PREFIX}${VERSION}](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag/${TAG_PREFIX}${VERSION}) |g" "$TMP_FILE"
+
+# Then, update existing Completed status with new version (handles any previous version)
+sed -i.bak -E "s|\[${MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) \| ✅ Completed \| \[${ESCAPED_TAG_PREFIX}[^]]+\]\([^)]+\)|\[${MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) | ✅ Completed | [${TAG_PREFIX}${VERSION}](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag/${TAG_PREFIX}${VERSION})|g" "$TMP_FILE"
 
 # Add or update module version badge at the top of the file
 echo "Adding/updating version badge for ${MODULE_NAME}"
