@@ -421,6 +421,10 @@ _This guide ensures Claude Code has immediate access to Task Master's essential 
 ### Core Guides
 - [Documentation Guide](.claude/references/documentation-guide.md) - How documentation works in this repo
 - [Semantic Release Guide](.claude/references/semantic-release-guide.md) - Automated versioning and releases
+- [Workflows Guide](./docs/WORKFLOWS.md) - GitHub Actions CI/CD implementation details
+- [Testing Guide](./docs/TERRAFORM_TESTING_GUIDE.md) - Comprehensive testing strategies and examples
+- [Terraform Best Practices](./docs/TERRAFORM_BEST_PRACTISES_GUIDE.md) - Module development standards and conventions
+- [Security Policy](./docs/SECURITY.md) - Security guidelines and vulnerability reporting
 
 ### Important Instructions
 - Do what has been asked; nothing more, nothing less
