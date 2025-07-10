@@ -1,0 +1,74 @@
+name: List Available Modules
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  list:
+    name: List Available Modules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: List all modules
+        run: |
+          echo "📦 Available Terraform modules:"
+          echo "==============================="
+          
+          for module_dir in modules/*/; do
+            if [[ -f "$module_dir/.releaserc.js" ]] || [[ -f "$module_dir/.releaserc.json" ]]; then
+              MODULE_NAME=$(basename "$module_dir")
+              
+              # Try to extract version from CHANGELOG or module-config
+              VERSION="unknown"
+              if [[ -f "$module_dir/CHANGELOG.md" ]]; then
+                VERSION=$(grep -m1 "^## " "$module_dir/CHANGELOG.md" | sed 's/## \[\?\([0-9.]*\)\]\?.*/\1/' || echo "unreleased")
+              fi
+              
+              # Extract configuration using Node.js script
+              CONFIG_JSON=$(node scripts/get-module-config.js "$module_dir" 2>/dev/null || echo '{}')
+              TAG_PREFIX=$(echo "$CONFIG_JSON" | jq -r .tag_prefix // "N/A")
+              COMMIT_SCOPE=$(echo "$CONFIG_JSON" | jq -r .commit_scope // "N/A")
+              
+              echo ""
+              echo "Module: $MODULE_NAME"
+              echo "  Version: $VERSION"
+              echo "  Tag Prefix: $TAG_PREFIX"
+              echo "  Commit Scope: $COMMIT_SCOPE"
+              echo "  Path: $module_dir"
+            fi
+          done
+          
+      - name: Generate module list JSON
+        run: |
+          echo '{"modules":[' > modules.json
+          FIRST=true
+          
+          for module_dir in modules/*/; do
+            if [[ -f "$module_dir/.releaserc.js" ]] || [[ -f "$module_dir/.releaserc.json" ]]; then
+              MODULE_NAME=$(basename "$module_dir")
+              
+              if [[ "$FIRST" != "true" ]]; then
+                echo "," >> modules.json
+              fi
+              FIRST=false
+              
+              CONFIG_JSON=$(node scripts/get-module-config.js "$module_dir" 2>/dev/null || echo '{}')
+              TAG_PREFIX=$(echo "$CONFIG_JSON" | jq -r .tag_prefix // "")
+              COMMIT_SCOPE=$(echo "$CONFIG_JSON" | jq -r .commit_scope // "")
+              
+              echo -n "{\"name\":\"$MODULE_NAME\",\"tag_prefix\":\"$TAG_PREFIX\",\"commit_scope\":\"$COMMIT_SCOPE\"}" >> modules.json
+            fi
+          done
+          
+          echo ']}' >> modules.json
+          
+          echo ""
+          echo "📋 Module list (JSON format):"
+          cat modules.json | jq .
+          
+      - name: Upload module list
+        uses: actions/upload-artifact@v4
+        with:
+          name: module-list
+          path: modules.json
