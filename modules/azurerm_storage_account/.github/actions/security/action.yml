@@ -5,6 +5,13 @@ inputs:
   github-token:
     description: 'GitHub token for uploading results'
     required: true
+  terraform-version:
+    description: 'Terraform version to use'
+    required: false
+    default: '1.10.3'
+  azure-credentials:
+    description: 'Azure credentials (not used in security scan)'
+    required: false
 
 runs:
   using: 'composite'
