@@ -12,6 +12,17 @@ on:
         required: false
         type: boolean
         default: false
+  workflow_call:
+    inputs:
+      module:
+        description: 'Module directory name to release'
+        required: true
+        type: string
+      dry_run:
+        description: 'Perform a dry run without creating release'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
