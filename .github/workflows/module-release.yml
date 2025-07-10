@@ -112,32 +112,32 @@ jobs:
           GIT_COMMITTER_NAME: github-actions[bot]
           GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
         run: |
-          cd modules/${{ inputs.module }}
+          # Run semantic-release from repository root with module-specific config
+          MODULE_CONFIG="./modules/${{ inputs.module }}/.releaserc.js"
           
-          # Run semantic-release with module-specific config
           if [[ "${{ inputs.dry_run }}" == "true" ]]; then
             echo "🔍 Running semantic-release in dry-run mode..."
-            npx semantic-release --dry-run
+            npx semantic-release --extends "$MODULE_CONFIG" --dry-run
           else
             echo "🚀 Running semantic-release for ${{ inputs.module }}..."
-            npx semantic-release
+            npx semantic-release --extends "$MODULE_CONFIG"
           fi
       
       - name: Update module documentation
         if: ${{ inputs.dry_run != 'true' }}
         run: |
-          cd modules/${{ inputs.module }}
+          MODULE_DIR="modules/${{ inputs.module }}"
           
-          # Check if any release was made
-          if git diff --name-only HEAD~1 | grep -q "CHANGELOG.md"; then
+          # Check if any release was made in the module directory
+          if git diff --name-only HEAD~1 | grep -q "$MODULE_DIR/CHANGELOG.md"; then
             echo "📝 Updating module documentation..."
-            terraform-docs markdown table --output-file README.md .
+            terraform-docs markdown table --output-file "$MODULE_DIR/README.md" "$MODULE_DIR"
             
             # Commit documentation updates if changed
-            if git diff --exit-code README.md; then
+            if git diff --exit-code "$MODULE_DIR/README.md"; then
               echo "No documentation changes needed."
             else
-              git add README.md
+              git add "$MODULE_DIR/README.md"
               git commit -m "docs(${{ steps.module-config.outputs.scope }}): update terraform-docs [skip ci]"
               git push origin HEAD
             fi
