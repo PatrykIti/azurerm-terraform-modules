@@ -18,6 +18,8 @@ jobs:
     
     steps:
       - name: Check PR title follows conventional commits
+        # Skip validation for Dependabot PRs
+        if: github.actor != 'dependabot[bot]'
         uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -49,6 +51,10 @@ jobs:
             didn't match the configured pattern. Please ensure that the subject
             doesn't start with an uppercase character.
           validateSingleCommit: false
+      
+      - name: Skip validation message for Dependabot
+        if: github.actor == 'dependabot[bot]'
+        run: echo "Skipping PR title validation for Dependabot"
 
   terraform-fmt:
     name: Terraform Format Check
