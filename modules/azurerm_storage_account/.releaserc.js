@@ -24,15 +24,7 @@ module.exports = {
         {scope: COMMIT_SCOPE, type: 'docs', release: 'patch'},
         {scope: COMMIT_SCOPE, type: 'refactor', release: 'patch'},
         // Ignore all commits without our scope
-        {scope: '!'+COMMIT_SCOPE, release: false},
-        // Default rules for commits without scope (ignore them)
-        {type: 'feat', release: false},
-        {type: 'fix', release: false},
-        {type: 'style', release: false},
-        {type: 'chore', release: false},
-        {type: 'test', release: false},
-        {type: 'ci', release: false},
-        {type: 'build', release: false}
+        {scope: '!'+COMMIT_SCOPE, release: false}
       ],
       parserOpts: {
         noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES']
