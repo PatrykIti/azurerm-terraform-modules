@@ -10,10 +10,11 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: ${{ inputs.terraform-version }}
+    # Terraform setup is already handled by module-runner
+    # - name: Setup Terraform
+    #   uses: hashicorp/setup-terraform@v3
+    #   with:
+    #     terraform_version: ${{ inputs.terraform-version }}
     
     - name: Terraform Format Check
       shell: bash
@@ -35,6 +36,12 @@ runs:
       run: |
         echo "Validating Terraform configuration..."
         terraform validate
+        
+    - name: Install TFLint
+      shell: bash
+      run: |
+        echo "Installing TFLint..."
+        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
         
     - name: TFLint
       shell: bash
