@@ -43,7 +43,12 @@ case "$ACTION" in
     # Install TFLint if needed
     if ! command -v tflint &> /dev/null; then
       echo "::group::Install TFLint"
-      curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+      # Use GitHub token if available to avoid rate limits
+      if [[ -n "${GITHUB_TOKEN}" ]]; then
+        curl -s -H "Authorization: token ${GITHUB_TOKEN}" https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+      else
+        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+      fi
       echo "::endgroup::"
     fi
     
