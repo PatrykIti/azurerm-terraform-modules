@@ -181,3 +181,10 @@ Contains: Comprehensive guide for documentation management including terraform-d
 - Implementing network restrictions and private endpoints
 
 Contains: Comprehensive security policies including security principles (Defense in Depth, Least Privilege, Zero Trust), compliance standards details, security controls by Azure service, security scanning requirements, vulnerability management procedures, best practices for module users, security checklist for new modules, and continuous improvement guidelines.
+
+## GitHub Project Management
+
+**Project**: AzureRM Terraform Modules (Project #2)
+- We are actively working within the GitHub Project "AzureRM Terraform Modules" for task tracking and project management
+- Use `gh project` commands to interact with project items when needed
+- This project tracks the development progress of all Terraform modules in this repository
