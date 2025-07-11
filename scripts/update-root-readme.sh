@@ -19,12 +19,12 @@ elif [[ -f "../../README.md" ]]; then
     ROOT_README="../../README.md"
 else
     echo "Root README.md not found"
-    exit 0
+    exit 1
 fi
 
 if [[ ! -f "$ROOT_README" ]]; then
     echo "Root README.md not found at $ROOT_README"
-    exit 0
+    exit 1
 fi
 
 echo "Updating root README.md for ${MODULE_NAME} release ${TAG_PREFIX}${VERSION}"
