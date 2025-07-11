@@ -38,6 +38,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
           token: ${{ secrets.PAT || github.token }}
+          ref: main
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -113,6 +114,10 @@ jobs:
           GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
           GIT_COMMITTER_NAME: github-actions[bot]
           GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
+          # Clear PR-related environment variables to prevent semantic-release from detecting PR context
+          GITHUB_EVENT_NAME: push
+          GITHUB_HEAD_REF: ''
+          GITHUB_BASE_REF: ''
         run: |
           # Run semantic-release from repository root with module-specific config
           MODULE_CONFIG="./modules/${{ inputs.module }}/.releaserc.js"

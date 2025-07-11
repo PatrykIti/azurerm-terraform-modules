@@ -30,6 +30,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PAT || github.token }}
+          ref: main
       
       - name: Detect changed modules
         id: changes
