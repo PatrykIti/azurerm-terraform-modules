@@ -52,7 +52,7 @@ Each module contains comprehensive documentation and examples:
 Example module reference:
 ```hcl
 module "storage_account" {
-  source = "github.com/your-org/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
   # See module README for configuration details
 }
 ```
@@ -87,7 +87,7 @@ The Storage Account module includes comprehensive examples demonstrating various
 
 | Example | Description |
 |---------|-------------|
-| [simple](./modules/azurerm_storage_account/examples/simple/) | Basic storage account with minimal configuration |
+| [basic](./modules/azurerm_storage_account/examples/basic/) | Basic storage account with minimal configuration |
 | [secure](./modules/azurerm_storage_account/examples/secure/) | Security-hardened configuration with maximum protection |
 | [secure-private-endpoint](./modules/azurerm_storage_account/examples/secure-private-endpoint/) | Private endpoint configuration for network isolation |
 | [data-lake-gen2](./modules/azurerm_storage_account/examples/data-lake-gen2/) | Data Lake Storage Gen2 with SFTP and NFSv3 |

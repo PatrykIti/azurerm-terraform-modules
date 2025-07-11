@@ -61,6 +61,12 @@ sed -i.bak "/\[${MODULE_DISPLAY_NAME}\].*img.shields.io.*${ESCAPED_TAG_PREFIX}/d
 sed -i.bak "/<!-- MODULE BADGES START -->/a\\
 [![${MODULE_DISPLAY_NAME}](https://img.shields.io/github/v/tag/${REPO_OWNER}/${REPO_NAME}?filter=${TAG_PREFIX}*&label=${MODULE_DISPLAY_NAME}&color=success)](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases?q=${TAG_PREFIX})" "$TMP_FILE"
 
+# Update the example module reference with correct source path
+echo "Updating example module reference"
+if grep -q 'source = "github.com/your-org/azurerm-terraform-modules' "$TMP_FILE"; then
+    sed -i.bak "s|github.com/your-org/azurerm-terraform-modules|github.com/${REPO_OWNER}/${REPO_NAME}|g" "$TMP_FILE"
+fi
+
 # Copy back the updated file
 cp "$TMP_FILE" "$ROOT_README"
 rm -f "$TMP_FILE" "${TMP_FILE}.bak"
