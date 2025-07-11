@@ -1,0 +1,119 @@
+name: Release Changed Modules
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      modules:
+        description: 'Comma-separated list of modules to release (e.g., azurerm_storage_account,azurerm_virtual_network)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Perform a dry run without creating release'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  detect-changes:
+    name: Detect Changed Modules
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.changes.outputs.modules }}
+      matrix: ${{ steps.changes.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT || github.token }}
+      
+      - name: Detect changed modules
+        id: changes
+        env:
+          GH_TOKEN: ${{ secrets.PAT || github.token }}
+        run: |
+          if [[ -n "${{ inputs.modules }}" ]]; then
+            # Manual workflow dispatch with specific modules
+            MODULES=$(echo "${{ inputs.modules }}" | tr ',' '\n' | jq -R -s -c 'split("\n")[:-1]')
+          else
+            # Check if last commit is a merge commit and extract PR number
+            COMMIT_MESSAGE=$(git log -1 --pretty=%s)
+            echo "Last commit message: $COMMIT_MESSAGE"
+            
+            PR_TITLE=""
+            # GitHub creates merge commits with format: "Merge pull request #X from ..."
+            if [[ "$COMMIT_MESSAGE" =~ Merge\ pull\ request\ #([0-9]+) ]]; then
+              PR_NUMBER="${BASH_REMATCH[1]}"
+              echo "Detected PR number: $PR_NUMBER"
+              
+              # Get PR title using GitHub API
+              PR_DATA=$(gh api repos/${{ github.repository }}/pulls/${PR_NUMBER} --jq '.title')
+              if [[ -n "$PR_DATA" ]]; then
+                PR_TITLE="$PR_DATA"
+                echo "PR Title from API: $PR_TITLE"
+              fi
+            fi
+            
+            # If we couldn't get PR title, fall back to commit message
+            if [[ -z "$PR_TITLE" ]]; then
+              PR_TITLE="$COMMIT_MESSAGE"
+              echo "Using commit message as fallback: $PR_TITLE"
+            fi
+            
+            # Extract scope from conventional commit format (e.g., "feat(storage-account): ...")
+            if [[ "$PR_TITLE" =~ ^[^(]+\(([^)]+)\) ]]; then
+              SCOPE="${BASH_REMATCH[1]}"
+              echo "Detected scope: $SCOPE"
+              
+              # Check if scope matches a module name (with or without azurerm_ prefix)
+              MODULE_NAME="$SCOPE"
+              
+              # Remove azurerm- prefix if present
+              MODULE_NAME="${MODULE_NAME#azurerm-}"
+              # Replace dashes with underscores
+              MODULE_NAME="${MODULE_NAME//-/_}"
+              # Add azurerm_ prefix
+              MODULE_NAME="azurerm_${MODULE_NAME}"
+              
+              # Check if this module exists
+              if [[ -d "modules/$MODULE_NAME" ]]; then
+                echo "Found module: $MODULE_NAME"
+                MODULES="[\"$MODULE_NAME\"]"
+              else
+                echo "Module $MODULE_NAME not found in modules/ directory"
+                MODULES="[]"
+              fi
+            else
+              echo "PR title doesn't contain a scope in conventional commit format"
+              MODULES="[]"
+            fi
+          fi
+          
+          # Output both array and matrix format
+          echo "modules=$MODULES" >> $GITHUB_OUTPUT
+          
+          if [ "$MODULES" == "[]" ]; then
+            echo "matrix={\"module\":[]}" >> $GITHUB_OUTPUT
+          else
+            echo "matrix={\"module\":${MODULES}}" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "🔍 Modules to release: $MODULES"
+  
+  release:
+    name: Release Module
+    needs: detect-changes
+    if: needs.detect-changes.outputs.modules != '[]'
+    strategy:
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+      fail-fast: false
+    uses: ./.github/workflows/module-release.yml
+    with:
+      module: ${{ matrix.module }}
+      dry_run: ${{ inputs.dry_run || false }}
+    secrets: inherit
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write

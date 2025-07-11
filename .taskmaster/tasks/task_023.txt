@@ -1,0 +1,59 @@
+# Task ID: 23
+# Title: General Project Cleanup and Standardization
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Apply general fixes across all examples, including removing committed terraform.tfstate files, adding a proper .gitignore file, removing hardcoded subscription IDs, and ensuring all examples adhere to the best practices outlined in CLAUDE.md and TERRAFORM_BEST_PRACTISES_GUIDE.md.
+# Details:
+1. Create a root `.gitignore` file containing at least `*.tfstate`, `*.tfstate.*`, `.terraform/`, and `*.tfvars`. 2. Execute `git rm --cached **/*.tfstate` to unstage any committed state files from the repository. 3. Systematically review all `.tf` files within the examples directories and remove any hardcoded `subscription_id` attributes from provider blocks. 4. Perform a comprehensive review of each example against the project's Terraform and general contribution guidelines.
+
+# Test Strategy:
+Verify the successful removal of state files by running `git status` and ensuring no `.tfstate` files are tracked. Run `terraform validate` in each example directory to check for syntax errors. Manually inspect the codebase for the absence of hardcoded subscription IDs and for compliance with documented best practices.
+
+# Subtasks:
+## 1. Create and Commit Root .gitignore File [done]
+### Dependencies: None
+### Description: Create a comprehensive .gitignore file at the root of the project to prevent committing sensitive or unnecessary files, such as Terraform state files, local variables, and temporary directories.
+### Details:
+Create a new file named `.gitignore` in the project's root directory. Add entries to ignore common Terraform artifacts and local configuration. The file should include at least the following patterns:
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+crash.log
+
+# General
+.DS_Store
+*~
+
+## 2. Remove All Committed Terraform State Files from Git History [done]
+### Dependencies: 23.1
+### Description: Identify and remove any `terraform.tfstate` or `terraform.tfstate.backup` files that have been previously committed to the repository. This ensures that sensitive state information is removed from the Git history.
+### Details:
+Execute the command `git rm --cached '**/*.tfstate'` from the root of the repository. This will unstage all files matching the pattern `*.tfstate` from the Git index across all directories. Repeat the command for `*.tfstate.*` if any backup files are present: `git rm --cached '**/*.tfstate.*'`. After running the commands, commit the changes with a clear message like 'chore: Remove tracked terraform state files'.
+
+## 3. Remove Hardcoded Subscription IDs from Provider Blocks [done]
+### Dependencies: 23.2
+### Description: Systematically review all `.tf` files within the storage account examples and remove any hardcoded `subscription_id` attributes from the `azurerm` provider blocks. This promotes better configuration management and avoids security risks.
+### Details:
+Search across all `*.tf` files in the `examples/` directory for the string `subscription_id`. For each occurrence within a provider block (e.g., `provider "azurerm" { ... }`), delete the line containing `subscription_id`. The provider should be configured via environment variables (e.g., `ARM_SUBSCRIPTION_ID`) or other secure means, not hardcoded values.
+
+## 4. Align Examples with CLAUDE.md Contribution Guidelines [done]
+### Dependencies: 23.3
+### Description: Review each storage account example to ensure it adheres to the principles outlined in `CLAUDE.md`. Specifically, ensure that examples do not create resources that the module itself is designed to provide (e.g., resource groups, if the module has an option to create one).
+### Details:
+For each example directory, review the Terraform configuration (`.tf` files). Compare the resources being created in the example with the functionality of the module being called. If the module has an input variable like `create_resource_group = true`, the example should leverage that instead of defining a separate `resource "azurerm_resource_group" "example" { ... }`. Refactor any such examples to use the module's built-in capabilities.
+
+## 5. Ensure Adherence to TERRAFORM_BEST_PRACTISES_GUIDE.md [done]
+### Dependencies: 23.4
+### Description: Perform a final, comprehensive review of all storage account examples to ensure they comply with the project's Terraform best practices guide. This includes checking for proper variable definitions, outputs, naming conventions, and module sourcing.
+### Details:
+Review each example against the checklist in `TERRAFORM_BEST_PRACTISES_GUIDE.md`. Key items to check include:
+1. All variables used in `main.tf` are defined in `variables.tf` with types and descriptions.
+2. Important resource attributes are exposed via `outputs.tf`.
+3. Module source points to the local path (`../../`) for development purposes.
+4. Resource and variable names follow the project's naming conventions. 
+Refactor the code in each example to meet these standards.
+

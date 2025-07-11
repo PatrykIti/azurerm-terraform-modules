@@ -1,0 +1,58 @@
+title: "[Q&A] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## ❓ Questions & Answers
+        
+        Ask questions about using the Terraform modules or get help with issues.
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module
+      description: Which module is your question about?
+      options:
+        - General Question
+        - azurerm_storage_account
+        - azurerm_virtual_network
+        - azurerm_key_vault
+        - azurerm_app_service
+        - azurerm_sql_database
+        - Multiple Modules
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What would you like to know?
+      placeholder: |
+        How do I...
+        Why does...
+        What's the best way to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Provide any relevant context or what you've already tried
+      placeholder: |
+        I'm trying to...
+        I've already attempted...
+
+  - type: textarea
+    id: code
+    attributes:
+      label: Code Sample
+      description: If relevant, share your configuration
+      render: hcl
+      placeholder: |
+        module "example" {
+          source = "..."
+          # Your configuration
+        }

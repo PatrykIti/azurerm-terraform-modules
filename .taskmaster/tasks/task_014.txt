@@ -1,0 +1,11 @@
+# Task ID: 14
+# Title: Application Gateway Module: Terratest Suite and Examples
+# Status: pending
+# Dependencies: 5, 13
+# Priority: low
+# Description: Create a comprehensive test suite for the Application Gateway module using Terratest and develop corresponding usage examples.
+# Details:
+Create `test/application_gateway_test.go`. This test will be more involved. It should deploy a prerequisite VNet and a backend VM (using a simple VM module or local-exec provisioner) to act as a target. The test will then deploy the Application Gateway and make an HTTP request to its public IP to verify a `200 OK` response. Create `examples/application_gateway/simple_gateway` to show a basic setup.
+
+# Test Strategy:
+Execute the Terratest suite for the Application Gateway. This test will take longer but must verify end-to-end functionality by successfully receiving an HTTP response from the backend through the gateway.

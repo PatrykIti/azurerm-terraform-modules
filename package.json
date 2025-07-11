@@ -1,0 +1,66 @@
+{
+  "name": "azurerm-terraform-modules",
+  "version": "1.0.0",
+  "description": "Professional Terraform modules for Azure",
+  "private": true,
+  "scripts": {
+    "semantic-release": "semantic-release",
+    "prepare": "husky install",
+    "commit": "cz"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.3",
+    "@semantic-release/release-notes-generator": "^14.0.3",
+    "commitizen": "^4.3.0",
+    "conventional-changelog-conventionalcommits": "^9.0.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^9.1.7",
+    "semantic-release": "^24.2.6"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "scope-enum": [
+        2,
+        "always",
+        [
+          "storage-account",
+          "virtual-network",
+          "key-vault",
+          "app-service",
+          "sql-database",
+          "core",
+          "deps",
+          "ci",
+          "docs"
+        ]
+      ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PatrykIti/azurerm-terraform-modules.git"
+  },
+  "keywords": [
+    "terraform",
+    "azure",
+    "azurerm",
+    "modules",
+    "infrastructure-as-code"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

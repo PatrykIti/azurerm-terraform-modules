@@ -1,0 +1,538 @@
+name: PR Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+  pull-requests: write
+  statuses: write
+
+jobs:
+  # Note: We only validate PR titles, not individual commits, because this repository
+  # uses squash merge strategy. The PR title becomes the commit message after merge.
+  validate-pr-title:
+    name: Validate PR Title
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check PR title follows conventional commits
+        # Skip validation for Dependabot PRs
+        if: ${{ !startsWith(github.head_ref, 'dependabot/') }}
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+          scopes: |
+            storage-account
+            virtual-network
+            key-vault
+            app-service
+            sql-database
+            core
+            deps
+            deps-dev
+            ci
+            docs
+            tests
+            workflows
+            templates
+            semantic-release
+            security
+            terraform-docs
+            examples
+            modules
+            scripts
+          requireScope: false
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            The subject "{subject}" found in the pull request title "{title}"
+            didn't match the configured pattern. Please ensure that the subject
+            doesn't start with an uppercase character.
+          validateSingleCommit: false
+      
+      - name: Skip validation message for Dependabot
+        if: ${{ startsWith(github.head_ref, 'dependabot/') }}
+        run: echo "Skipping PR title validation for Dependabot PR from branch ${{ github.head_ref }}"
+
+  terraform-fmt:
+    name: Terraform Format Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+      
+      - name: Check Terraform formatting
+        id: fmt
+        run: |
+          # Find all directories with Terraform files
+          tf_dirs=$(find modules -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
+          
+          fmt_issues=()
+          for dir in $tf_dirs; do
+            echo "Checking format in: $dir"
+            if ! terraform fmt -check -recursive "$dir"; then
+              fmt_issues+=("$dir")
+            fi
+          done
+          
+          if [ ${#fmt_issues[@]} -gt 0 ]; then
+            echo "❌ Terraform formatting issues found in:"
+            printf '%s\n' "${fmt_issues[@]}"
+            echo ""
+            echo "Please run 'terraform fmt -recursive' to fix formatting issues."
+            echo "fmt_needed=true" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "✅ All Terraform files are properly formatted"
+            echo "fmt_needed=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Comment formatting instructions
+        if: failure() && steps.fmt.outputs.fmt_needed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = `## ❌ Terraform Formatting Required
+            
+            This PR has Terraform formatting issues. Please run the following command to fix them:
+            
+            \`\`\`bash
+            terraform fmt -recursive
+            \`\`\`
+            
+            Then commit and push the changes.`;
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  terraform-validate:
+    name: Terraform Validation
+    runs-on: ubuntu-latest
+    needs: terraform-fmt
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+      
+      - name: Validate Terraform configurations
+        run: |
+          # Find all modules (excluding tests and fixtures)
+          modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | grep -v "/tests/" | xargs -I {} dirname {} | sort -u)
+          
+          validation_failed=false
+          for module in $modules; do
+            echo "## Validating module: $module"
+            cd "$module"
+            
+            # Initialize without backend
+            if terraform init -backend=false; then
+              if ! terraform validate; then
+                echo "❌ Validation failed for module: $module"
+                validation_failed=true
+              else
+                echo "✅ Module validated successfully: $module"
+              fi
+            else
+              echo "❌ Failed to initialize module: $module"
+              validation_failed=true
+            fi
+            
+            cd - > /dev/null
+          done
+          
+          if [ "$validation_failed" = true ]; then
+            exit 1
+          fi
+
+  tflint:
+    name: TFLint Analysis
+    runs-on: ubuntu-latest
+    needs: terraform-fmt
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Cache tflint plugins
+        uses: actions/cache@v4
+        with:
+          path: ~/.tflint.d/plugins
+          key: ${{ runner.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-tflint-
+      
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+      
+      - name: Initialize TFLint
+        run: |
+          tflint --init
+          echo "TFLint version:"
+          tflint --version
+      
+      - name: Run TFLint on all modules
+        id: tflint
+        run: |
+          # Find all modules
+          modules=$(find modules -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
+          
+          tflint_failed=false
+          tflint_output=""
+          
+          for module in $modules; do
+            echo "## Running TFLint on: $module"
+            
+            # Run tflint and capture output
+            if output=$(tflint --chdir="$module" --format=default --force 2>&1); then
+              echo "✅ TFLint passed for: $module"
+              echo "$output"
+            else
+              echo "❌ TFLint found issues in: $module"
+              echo "$output"
+              tflint_failed=true
+              tflint_output="${tflint_output}\n### Module: $module\n\`\`\`\n${output}\n\`\`\`\n"
+            fi
+            echo ""
+          done
+          
+          # Also run on examples
+          if [[ -d "examples" ]]; then
+            examples=$(find examples -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
+            for example in $examples; do
+              echo "## Running TFLint on example: $example"
+              
+              if output=$(tflint --chdir="$example" --format=default --force 2>&1); then
+                echo "✅ TFLint passed for: $example"
+                echo "$output"
+              else
+                echo "❌ TFLint found issues in: $example"
+                echo "$output"
+                tflint_failed=true
+                tflint_output="${tflint_output}\n### Example: $example\n\`\`\`\n${output}\n\`\`\`\n"
+              fi
+              echo ""
+            done
+          fi
+          
+          if [ "$tflint_failed" = true ]; then
+            echo "tflint_failed=true" >> $GITHUB_OUTPUT
+            echo "tflint_output<<EOF" >> $GITHUB_OUTPUT
+            echo -e "$tflint_output" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "tflint_failed=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Comment TFLint results
+        if: failure() && steps.tflint.outputs.tflint_failed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const output = `${{ steps.tflint.outputs.tflint_output }}`;
+            const comment = `## ⚠️ TFLint Found Issues
+            
+            TFLint has identified code quality issues that need to be addressed:
+            
+            ${output}
+            
+            Please fix these issues before merging. You can run TFLint locally with:
+            
+            \`\`\`bash
+            tflint --init
+            tflint --chdir=<module-directory> --format=default --force
+            \`\`\``;
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  documentation-check:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install terraform-docs
+        run: |
+          # Use a more recent version to match what developers might have
+          TERRAFORM_DOCS_VERSION="v0.20.0"
+          curl -sSLo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/${TERRAFORM_DOCS_VERSION}/terraform-docs-${TERRAFORM_DOCS_VERSION}-linux-amd64.tar.gz
+          tar -xzf terraform-docs.tar.gz
+          chmod +x terraform-docs
+          sudo mv terraform-docs /usr/local/bin/
+          terraform-docs --version
+      
+      - name: Check if documentation is up to date
+        id: docs
+        run: |
+          # Find all modules (excluding tests and fixtures)
+          modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | grep -v "/tests/" | xargs -I {} dirname {} | sort -u)
+          
+          docs_outdated=()
+          docs_errors=()
+          
+          for module in $modules; do
+            # Skip example directories - they are checked separately
+            if [[ "$module" =~ /examples/ ]]; then
+              continue
+            fi
+            
+            # First, update examples list if module has examples
+            if [[ -d "$module/examples" ]] && [[ -x "./scripts/update-examples-list.sh" ]]; then
+              echo "Updating examples list for $module..."
+              ./scripts/update-examples-list.sh "$module"
+            fi
+            
+            if [[ -f "$module/README.md" ]]; then
+              # Check if terraform-docs content is up to date
+              if [[ -x "./scripts/check-terraform-docs.sh" ]]; then
+                if ! ./scripts/check-terraform-docs.sh "$module"; then
+                  docs_outdated+=("$module")
+                fi
+              else
+                # Fallback to old method if script doesn't exist
+                if terraform-docs markdown table --output-file README.md.tmp "$module" 2>/dev/null; then
+                  if ! diff -q "$module/README.md" "$module/README.md.tmp" > /dev/null 2>&1; then
+                    docs_outdated+=("$module")
+                  fi
+                  rm -f "$module/README.md.tmp"
+                else
+                  docs_errors+=("$module (terraform-docs error)")
+                fi
+              fi
+            else
+              docs_outdated+=("$module (missing README.md)")
+            fi
+            
+            # Check examples for this module
+            if [[ -d "$module/examples" ]]; then
+              for example in $(find "$module/examples" -mindepth 1 -maxdepth 1 -type d); do
+                if [[ -f "$example/README.md" ]]; then
+                  # For examples, just check if terraform-docs markers exist and content is present
+                  if grep -q "BEGIN_TF_DOCS" "$example/README.md" && grep -q "END_TF_DOCS" "$example/README.md"; then
+                    # Run terraform-docs to ensure content is up to date
+                    cd "$example"
+                    if terraform-docs markdown table . > /dev/null 2>&1; then
+                      echo "  ✓ Example $(basename "$example") documentation OK"
+                    else
+                      docs_errors+=("$example (terraform-docs update failed)")
+                    fi
+                    cd - > /dev/null
+                  else
+                    # Example doesn't have terraform-docs markers - that's OK for custom examples
+                    echo "  ✓ Example $(basename "$example") has custom documentation"
+                  fi
+                else
+                  docs_outdated+=("$example (missing README.md)")
+                fi
+              done
+            fi
+          done
+          
+          # Report errors first
+          if [ ${#docs_errors[@]} -gt 0 ]; then
+            echo "❌ Documentation generation errors in:"
+            printf '%s\n' "${docs_errors[@]}"
+          fi
+          
+          # Then report outdated docs
+          if [ ${#docs_outdated[@]} -gt 0 ]; then
+            echo "❌ Documentation is outdated or missing in:"
+            printf '%s\n' "${docs_outdated[@]}"
+          fi
+          
+          # Set output based on both conditions
+          if [ ${#docs_outdated[@]} -gt 0 ] || [ ${#docs_errors[@]} -gt 0 ]; then
+            echo "docs_outdated=true" >> $GITHUB_OUTPUT
+            
+            # Store error details for comment
+            if [ ${#docs_errors[@]} -gt 0 ]; then
+              echo "docs_errors<<EOF" >> $GITHUB_OUTPUT
+              printf '%s\n' "${docs_errors[@]}" >> $GITHUB_OUTPUT
+              echo "EOF" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "✅ All documentation is up to date"
+            echo "docs_outdated=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Comment documentation instructions
+        if: steps.docs.outputs.docs_outdated == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const errors = `${{ steps.docs.outputs.docs_errors }}`;
+            let comment = `## 📚 Documentation Update Required\n\n`;
+            
+            if (errors && errors.trim()) {
+              comment += `### ❌ Documentation Generation Errors\n\n`;
+              comment += `The following modules have terraform-docs configuration errors:\n\n`;
+              comment += errors.split('\n').map(e => `- ${e}`).join('\n');
+              comment += `\n\nPlease check the \`.terraform-docs.yml\` configuration in these modules.\n\n`;
+            }
+            
+            comment += `The documentation for some modules is outdated or missing. Please update it by running:\n\n`;
+            comment += `\`\`\`bash\n`;
+            comment += `# For each module that needs updating, run this command in the module directory:\n`;
+            comment += `cd <module-directory> && terraform-docs .\n`;
+            comment += `\`\`\`\n\n`;
+            comment += `Or update all modules:\n`;
+            comment += `\`\`\`bash\n`;
+            comment += `# This script will update terraform-docs for all modules\n`;
+            comment += `for module in $(find modules -name "main.tf" -exec dirname {} \\; | sort -u); do\n`;
+            comment += `  echo "Updating docs for $module"\n`;
+            comment += `  (cd "$module" && terraform-docs .)\n`;
+            comment += `done\n`;
+            comment += `\`\`\`\n\n`;
+            comment += `**Important:** The \`terraform-docs .\` command uses the module's \`.terraform-docs.yml\` configuration file\n`;
+            comment += `which preserves the existing README structure and only updates the documentation sections.`;
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run Checkov scan
+        id: checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: .
+          framework: terraform
+          soft_fail: true
+          output_format: json
+          output_file_path: checkov-results.json
+      
+      - name: Process security results
+        if: always()
+        run: |
+          if [[ -f checkov-results.json ]]; then
+            failed=$(jq '.summary.failed' checkov-results.json)
+            passed=$(jq '.summary.passed' checkov-results.json)
+            
+            echo "## Security Scan Summary"
+            echo "- Passed checks: $passed"
+            echo "- Failed checks: $failed"
+            
+            if [[ $failed -gt 0 ]]; then
+              echo ""
+              echo "### Failed Checks:"
+              jq -r '.results.failed_checks[] | "- [\(.check_id)] \(.check_name) in \(.file_path)"' checkov-results.json
+            fi
+          fi
+
+  quality-gates:
+    name: Quality Gates Summary
+    runs-on: ubuntu-latest
+    needs: [validate-pr-title, terraform-fmt, terraform-validate, tflint, documentation-check, security-scan]
+    if: always()
+    
+    steps:
+      - name: Quality gates summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const jobs = ${{ toJSON(needs) }};
+            const jobNames = {
+              'validate-pr-title': 'PR Title Validation',
+              'terraform-fmt': 'Terraform Formatting',
+              'terraform-validate': 'Terraform Validation',
+              'tflint': 'TFLint Analysis',
+              'documentation-check': 'Documentation Check',
+              'security-scan': 'Security Scan'
+            };
+            
+            let allPassed = true;
+            let summary = '## 🔍 PR Validation Summary\n\n';
+            summary += '| Check | Status |\n';
+            summary += '|-------|--------|\n';
+            
+            for (const [job, result] of Object.entries(jobs)) {
+              const status = result.result === 'success' ? '✅ Passed' : '❌ Failed';
+              if (result.result !== 'success') allPassed = false;
+              summary += `| ${jobNames[job]} | ${status} |\n`;
+            }
+            
+            summary += '\n';
+            
+            if (allPassed) {
+              summary += '### ✅ All quality gates passed!\n\n';
+              summary += 'This PR is ready for review.';
+            } else {
+              summary += '### ❌ Some quality gates failed\n\n';
+              summary += 'Please address the failing checks before this PR can be merged.';
+            }
+            
+            // Find and update existing comment or create new one
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('PR Validation Summary')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: summary
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: summary
+              });
+            }

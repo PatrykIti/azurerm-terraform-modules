@@ -1,0 +1,25 @@
+name: MODULE_NAME_PLACEHOLDER
+display_name: "MODULE_DISPLAY_NAME_PLACEHOLDER"
+description: "MODULE_DESCRIPTION_PLACEHOLDER"
+version: "1.0.0"
+version_prefix: "PREFIX_PLACEHOLDER"
+commit_scope: "SCOPE_PLACEHOLDER"
+category: "CATEGORY_PLACEHOLDER" # compute, storage, networking, security, etc.
+azure_services:
+  - "SERVICE_PLACEHOLDER" # e.g., Storage Account, Virtual Network, etc.
+maintainers:
+  - "MAINTAINER_PLACEHOLDER"
+compliance:
+  - "SOC2"
+  - "ISO27001"
+features:
+  - "Feature 1"
+  - "Feature 2"
+  - "Feature 3"
+documentation:
+  - name: "Versioning"
+    path: "VERSIONING.md"
+  - name: "Security"
+    path: "SECURITY.md"
+  - name: "Contributing"
+    path: "CONTRIBUTING.md"

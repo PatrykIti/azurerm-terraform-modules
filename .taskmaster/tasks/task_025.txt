@@ -1,0 +1,31 @@
+# Task ID: 25
+# Title: Enhance 'Secure' and 'Advanced-Policies' Examples
+# Status: done
+# Dependencies: 23
+# Priority: high
+# Description: Improve the 'secure' and 'advanced-policies' examples by removing inaccurate claims about Advanced Threat Protection, adding examples for immutability and SAS policies, and ensuring consistency by adding variables files and necessary warnings.
+# Details:
+For the 'secure' example: 1. Remove any comments or documentation referencing 'Advanced Threat Protection'. 2. Demonstrate an immutability policy by configuring a container via the module, e.g., `containers = { "compliance-data" = { immutability_policy = { days_after_creation = 365, policy_mode = "Unlocked" } } }`. 3. Add a SAS policy configuration, e.g., `sas_policy = { expiration_period = "01.00:00:00", expiration_action = "Log" }`. For the 'advanced-policies' example: 1. Add a `variables.tf` file. 2. Add a comment in `main.tf` above the `custom_domain` block: `// WARNING: Manual DNS CNAME record creation is required for this custom domain to validate.`
+
+# Test Strategy:
+Run `terraform plan` and `apply`. In the Azure Portal, inspect the storage account from the 'secure' example. Verify the immutability policy on the specified container and check the SAS policy settings. For the 'advanced-policies' example, confirm the warning comment is present in the code.
+
+# Subtasks:
+## 1. Remove Inaccurate ATP Claims from 'secure' Example [done]
+### Dependencies: None
+### Description: Update the 'secure' example by removing all comments and documentation that incorrectly reference 'Advanced Threat Protection' (ATP), as this feature is not implemented in the module.
+### Details:
+Navigate to the `examples/secure` directory. Search through all files, particularly `main.tf` and any READMEs, for the phrases 'Advanced Threat Protection' or 'ATP'. Delete these references to clean up the example's documentation.
+
+## 2. Add Immutability and SAS Policy Examples to 'secure' Example [done]
+### Dependencies: None
+### Description: Enhance the 'secure' example by adding configuration blocks to demonstrate an immutability policy for a container and a SAS (Shared Access Signature) policy for the storage account.
+### Details:
+In `examples/secure/main.tf`, update the module call. First, add a `sas_policy` argument to the module block, for example: `sas_policy = { expiration_period = "01.00:00:00", expiration_action = "Log" }`. Second, add a `containers` map to define a container with an immutability policy, for example: `containers = { "compliance-data" = { immutability_policy = { days_after_creation = 365, policy_mode = "Unlocked" } } }`.
+
+## 3. Update 'advanced-policies' Example with Variables and DNS Warning [done]
+### Dependencies: None
+### Description: Improve the 'advanced-policies' example by adding a `variables.tf` file for consistency and inserting a warning comment in `main.tf` to inform users about the manual DNS CNAME record creation required for custom domains.
+### Details:
+1. In the `examples/advanced-policies` directory, create a new `variables.tf` file. Define variables used in `main.tf` (e.g., for resource group name, location) to align with best practices. 2. In `examples/advanced-policies/main.tf`, find the `custom_domain` block. Add the following comment on the line directly above it: `// WARNING: Manual DNS CNAME record creation is required for this custom domain to validate.`
+

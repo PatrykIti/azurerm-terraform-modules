@@ -1,0 +1,55 @@
+name: 'Setup Terraform'
+description: 'Setup Terraform with caching and common configuration'
+
+inputs:
+  terraform-version:
+    description: 'Terraform version to use'
+    required: false
+    default: '1.10.3'
+  install-tflint:
+    description: 'Whether to install TFLint'
+    required: false
+    default: 'false'
+  install-terraform-docs:
+    description: 'Whether to install terraform-docs'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ inputs.terraform-version }}
+        terraform_wrapper: false
+
+    - name: Cache Terraform plugins
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.terraform.d/plugin-cache
+          **/.terraform/providers
+        key: terraform-${{ runner.os }}-${{ hashFiles('**/.terraform.lock.hcl') }}
+        restore-keys: |
+          terraform-${{ runner.os }}-
+
+    - name: Setup TFLint
+      if: inputs.install-tflint == 'true'
+      shell: bash
+      run: |
+        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+        tflint --version
+
+    - name: Setup terraform-docs
+      if: inputs.install-terraform-docs == 'true'
+      shell: bash
+      run: |
+        # Use consistent version across all workflows
+        TERRAFORM_DOCS_VERSION="v0.20.0"
+        curl -sSLo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/${TERRAFORM_DOCS_VERSION}/terraform-docs-${TERRAFORM_DOCS_VERSION}-linux-amd64.tar.gz
+        tar -xzf terraform-docs.tar.gz
+        chmod +x terraform-docs
+        sudo mv terraform-docs /usr/local/bin/
+        rm -f terraform-docs.tar.gz
+        terraform-docs --version

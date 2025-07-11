@@ -1,0 +1,65 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Global settings for all files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Terraform files
+[*.{tf,tfvars}]
+indent_style = space
+indent_size = 2
+
+# HCL files (including .hcl)
+[*.hcl]
+indent_style = space
+indent_size = 2
+
+# YAML files
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# JSON files
+[*.json]
+indent_style = space
+indent_size = 2
+
+# Markdown files
+[*.md]
+# Preserve trailing spaces for markdown line breaks
+trim_trailing_whitespace = false
+
+# Makefile
+[{Makefile,makefile,GNUmakefile}]
+indent_style = tab
+
+# Go files (for Terratest)
+[*.go]
+indent_style = tab
+indent_size = 4
+
+# Shell scripts
+[*.sh]
+indent_style = space
+indent_size = 2
+
+# PowerShell scripts
+[*.ps1]
+indent_style = space
+indent_size = 4
+
+# Python files (if any automation scripts)
+[*.py]
+indent_style = space
+indent_size = 4
+
+# CHANGELOG files
+[CHANGELOG.md]
+# Ensure proper formatting for changelogs
+trim_trailing_whitespace = true
