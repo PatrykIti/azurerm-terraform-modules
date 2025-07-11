@@ -12,7 +12,15 @@ REPO_OWNER="${5}"
 REPO_NAME="${6}"
 
 # Path to root README
-ROOT_README="../../README.md"
+# When called from semantic-release running at root, adjust path
+if [[ -f "README.md" ]]; then
+    ROOT_README="README.md"
+elif [[ -f "../../README.md" ]]; then
+    ROOT_README="../../README.md"
+else
+    echo "Root README.md not found"
+    exit 0
+fi
 
 if [[ ! -f "$ROOT_README" ]]; then
     echo "Root README.md not found at $ROOT_README"

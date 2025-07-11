@@ -105,7 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         
         # Update README.md with terraform-docs
         if command -v terraform-docs &> /dev/null; then
-          cd "modules/${MODULE_NAME}" && terraform-docs .
+          terraform-docs "modules/${MODULE_NAME}"
         fi
         
         # Update root README.md with module status and version
