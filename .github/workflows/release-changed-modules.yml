@@ -1,14 +1,9 @@
 name: Release Changed Modules
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches: [main]
-    paths:
-      - 'modules/**'
-      - '!modules/**/README.md'
-      - '!modules/**/CHANGELOG.md'
-      - '!modules/**/examples/**'
-      - '!modules/**/tests/**'
   workflow_dispatch:
     inputs:
       modules:
@@ -25,6 +20,8 @@ jobs:
   detect-changes:
     name: Detect Changed Modules
     runs-on: ubuntu-latest
+    # Only run on merged PRs or manual dispatch
+    if: (github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch')
     outputs:
       modules: ${{ steps.changes.outputs.modules }}
       matrix: ${{ steps.changes.outputs.matrix }}
@@ -40,15 +37,41 @@ jobs:
           if [[ -n "${{ inputs.modules }}" ]]; then
             # Manual workflow dispatch with specific modules
             MODULES=$(echo "${{ inputs.modules }}" | tr ',' '\n' | jq -R -s -c 'split("\n")[:-1]')
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # Extract module name from PR title
+            PR_TITLE="${{ github.event.pull_request.title }}"
+            echo "PR Title: $PR_TITLE"
+            
+            # Extract scope from conventional commit format (e.g., "feat(storage-account): ...")
+            if [[ "$PR_TITLE" =~ ^[^(]+\(([^)]+)\) ]]; then
+              SCOPE="${BASH_REMATCH[1]}"
+              echo "Detected scope: $SCOPE"
+              
+              # Check if scope matches a module name (with or without azurerm_ prefix)
+              MODULE_NAME="$SCOPE"
+              
+              # Remove azurerm- prefix if present
+              MODULE_NAME="${MODULE_NAME#azurerm-}"
+              # Replace dashes with underscores
+              MODULE_NAME="${MODULE_NAME//-/_}"
+              # Add azurerm_ prefix
+              MODULE_NAME="azurerm_${MODULE_NAME}"
+              
+              # Check if this module exists
+              if [[ -d "modules/$MODULE_NAME" ]]; then
+                echo "Found module: $MODULE_NAME"
+                MODULES="[\"$MODULE_NAME\"]"
+              else
+                echo "Module $MODULE_NAME not found in modules/ directory"
+                MODULES="[]"
+              fi
+            else
+              echo "PR title doesn't contain a scope in conventional commit format"
+              MODULES="[]"
+            fi
           else
-            # Automatic detection of changed modules
-            CHANGED_MODULES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | 
-                            grep "^modules/" | 
-                            grep -v -E "(README\.md|CHANGELOG\.md|examples/|tests/)" |
-                            cut -d'/' -f2 | 
-                            sort -u | 
-                            jq -R -s -c 'split("\n")[:-1] | map(select(length > 0))')
-            MODULES=$CHANGED_MODULES
+            # This shouldn't happen but handle it gracefully
+            MODULES="[]"
           fi
           
           # Output both array and matrix format
