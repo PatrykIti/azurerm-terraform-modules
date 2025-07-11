@@ -35,7 +35,7 @@ azurerm-terraform-modules/
 │       └── terraform-setup/       # Terraform environment setup
 ├── docs/                          # Global documentation
 │   ├── WORKFLOWS.md              # GitHub Actions documentation
-│   ├── TERRAFORM_BEST_PRACTISES_GUIDE.md
+│   ├── TERRAFORM_BEST_PRACTICES_GUIDE.md
 │   └── TERRAFORM_TESTING_GUIDE.md
 └── .claude/                       # Development guidelines
     └── references/                # Workflow patterns and guidelines
@@ -255,7 +255,7 @@ go test -v -timeout 30m
 ### Documentation
 - [Terraform Best Practices](https://www.terraform-best-practices.com/)
 - [Azure Terraform Documentation](https://docs.microsoft.com/azure/developer/terraform/)
-- [Module Development Guide](docs/TERRAFORM_BEST_PRACTISES_GUIDE.md)
+- [Module Development Guide](docs/TERRAFORM_BEST_PRACTICES_GUIDE.md)
 
 ### Communication
 - **Issues**: For bugs and feature requests

@@ -32,7 +32,7 @@ By participating in this project, you agree to abide by our Code of Conduct, whi
 
 ### Code Standards
 
-1. Follow [Terraform Best Practices](../../docs/TERRAFORM_BEST_PRACTISES_GUIDE.md)
+1. Follow [Terraform Best Practices](../../docs/TERRAFORM_BEST_PRACTICES_GUIDE.md)
 2. Use meaningful variable and resource names
 3. Add descriptions to all variables and outputs
 4. Include validation rules where appropriate
