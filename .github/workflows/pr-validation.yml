@@ -44,6 +44,18 @@ jobs:
             sql-database
             core
             deps
+            deps-dev
+            ci
+            docs
+            tests
+            workflows
+            templates
+            semantic-release
+            security
+            terraform-docs
+            examples
+            modules
+            scripts
           requireScope: false
           subjectPattern: ^(?![A-Z]).+$
           subjectPatternError: |
