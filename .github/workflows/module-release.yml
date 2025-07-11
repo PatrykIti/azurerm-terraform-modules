@@ -36,8 +36,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: true
-          token: ${{ secrets.PAT || github.token }}
+          persist-credentials: false
+      
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.SEMANTIC_RELEASE_APP_ID }}
+          private-key: ${{ secrets.SEMANTIC_RELEASE_APP_PRIVATE_KEY }}
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -107,12 +113,12 @@ jobs:
       
       - name: Run semantic-release
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
-          GH_TOKEN: ${{ secrets.PAT }}
-          GIT_AUTHOR_NAME: github-actions[bot]
-          GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
-          GIT_COMMITTER_NAME: github-actions[bot]
-          GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GIT_AUTHOR_NAME: semantic-terraform-release-bot[bot]
+          GIT_AUTHOR_EMAIL: semantic-terraform-release-bot[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: semantic-terraform-release-bot[bot]
+          GIT_COMMITTER_EMAIL: semantic-terraform-release-bot[bot]@users.noreply.github.com
         run: |
           # Run semantic-release from repository root with module-specific config
           MODULE_CONFIG="./modules/${{ inputs.module }}/.releaserc.js"
@@ -127,8 +133,13 @@ jobs:
       
       - name: Update module documentation
         if: ${{ inputs.dry_run != 'true' }}
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           MODULE_DIR="modules/${{ inputs.module }}"
+          
+          # Configure git to use the GitHub App token
+          git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
           
           # Check if any release was made in the module directory
           if git diff --name-only HEAD~1 | grep -q "$MODULE_DIR/CHANGELOG.md"; then
