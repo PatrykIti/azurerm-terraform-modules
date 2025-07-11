@@ -260,9 +260,9 @@ The storage account's managed identity can access other services:
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_storage_combined"></a> [storage\_combined](#module\_storage\_combined) | ../.. | n/a |
-| <a name="module_storage_system_assigned"></a> [storage\_system\_assigned](#module\_storage\_system\_assigned) | ../.. | n/a |
-| <a name="module_storage_user_assigned"></a> [storage\_user\_assigned](#module\_storage\_user\_assigned) | ../.. | n/a |
+| <a name="module_storage_combined"></a> [storage\_combined](#module\_storage\_combined) | github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0 | n/a |
+| <a name="module_storage_system_assigned"></a> [storage\_system\_assigned](#module\_storage\_system\_assigned) | github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0 | n/a |
+| <a name="module_storage_user_assigned"></a> [storage\_user\_assigned](#module\_storage\_user\_assigned) | github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0 | n/a |
 
 ## Resources
 

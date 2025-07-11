@@ -22,7 +22,7 @@ jobs:
         if: ${{ !startsWith(github.head_ref, 'dependabot/') }}
         uses: amannn/action-semantic-pull-request@v5
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         with:
           types: |
             feat
@@ -279,10 +279,13 @@ jobs:
       
       - name: Install terraform-docs
         run: |
-          curl -sSLo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.17.0/terraform-docs-v0.17.0-linux-amd64.tar.gz
+          # Use a more recent version to match what developers might have
+          TERRAFORM_DOCS_VERSION="v0.20.0"
+          curl -sSLo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/${TERRAFORM_DOCS_VERSION}/terraform-docs-${TERRAFORM_DOCS_VERSION}-linux-amd64.tar.gz
           tar -xzf terraform-docs.tar.gz
           chmod +x terraform-docs
           sudo mv terraform-docs /usr/local/bin/
+          terraform-docs --version
       
       - name: Check if documentation is up to date
         id: docs
@@ -395,13 +398,19 @@ jobs:
             
             comment += `The documentation for some modules is outdated or missing. Please update it by running:\n\n`;
             comment += `\`\`\`bash\n`;
-            comment += `# For each module that needs updating:\n`;
-            comment += `terraform-docs markdown table --output-file README.md <module-directory>\n`;
+            comment += `# For each module that needs updating, run this command in the module directory:\n`;
+            comment += `cd <module-directory> && terraform-docs .\n`;
             comment += `\`\`\`\n\n`;
             comment += `Or update all modules:\n`;
             comment += `\`\`\`bash\n`;
-            comment += `find modules -name "main.tf" -exec dirname {} \\; | xargs -I {} terraform-docs markdown table --output-file {}/README.md {}\n`;
-            comment += `\`\`\``;
+            comment += `# This script will update terraform-docs for all modules\n`;
+            comment += `for module in $(find modules -name "main.tf" -exec dirname {} \\; | sort -u); do\n`;
+            comment += `  echo "Updating docs for $module"\n`;
+            comment += `  (cd "$module" && terraform-docs .)\n`;
+            comment += `done\n`;
+            comment += `\`\`\`\n\n`;
+            comment += `**Important:** The \`terraform-docs .\` command uses the module's \`.terraform-docs.yml\` configuration file\n`;
+            comment += `which preserves the existing README structure and only updates the documentation sections.`;
             
             await github.rest.issues.createComment({
               issue_number: context.issue.number,

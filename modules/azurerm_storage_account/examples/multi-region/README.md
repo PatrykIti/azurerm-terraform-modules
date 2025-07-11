@@ -366,10 +366,10 @@ terraform apply -var="enable_monitoring_alerts=true"
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_dr_storage"></a> [dr\_storage](#module\_dr\_storage) | ../../ | n/a |
-| <a name="module_primary_storage"></a> [primary\_storage](#module\_primary\_storage) | ../../ | n/a |
-| <a name="module_replication_metadata"></a> [replication\_metadata](#module\_replication\_metadata) | ../../ | n/a |
-| <a name="module_secondary_storage"></a> [secondary\_storage](#module\_secondary\_storage) | ../../ | n/a |
+| <a name="module_dr_storage"></a> [dr\_storage](#module\_dr\_storage) | github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0 | n/a |
+| <a name="module_primary_storage"></a> [primary\_storage](#module\_primary\_storage) | github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0 | n/a |
+| <a name="module_replication_metadata"></a> [replication\_metadata](#module\_replication\_metadata) | github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0 | n/a |
+| <a name="module_secondary_storage"></a> [secondary\_storage](#module\_secondary\_storage) | github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0 | n/a |
 
 ## Resources
 

@@ -338,7 +338,7 @@ terraform destroy
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_secure_storage"></a> [secure\_storage](#module\_secure\_storage) | ../../ | n/a |
+| <a name="module_secure_storage"></a> [secure\_storage](#module\_secure\_storage) | github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0 | n/a |
 
 ## Resources
 

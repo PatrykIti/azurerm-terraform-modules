@@ -17,11 +17,6 @@ The Azure Storage Account module manages the lifecycle of Azure Storage Accounts
 ```
 modules/azurerm_storage_account/
 ├── .github/
-│   ├── actions/              # Module-specific composite actions
-│   │   ├── validate/         # Terraform validation and linting
-│   │   ├── test/            # Unit and integration tests
-│   │   ├── security/        # Security scanning (Checkov, Trivy)
-│   │   └── release/         # Release preparation
 │   └── module-config.yml     # Module metadata and CI configuration
 ├── main.tf                   # Core storage account and related resources
 ├── variables.tf              # Input variables with secure defaults

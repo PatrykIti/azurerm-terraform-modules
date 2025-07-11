@@ -72,42 +72,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     ['@semantic-release/exec', {
       prepareCmd: `
         # Update module-config.yml
-        CONFIG_FILE=".github/module-config.yml"
+        CONFIG_FILE="modules/${MODULE_NAME}/.github/module-config.yml"
         if [[ -f "$CONFIG_FILE" ]]; then
           sed -i "s/^version: .*/version: \${nextRelease.version}/" "$CONFIG_FILE"
         fi
         
         # Update examples to use the new version tag
-        find examples -name "*.tf" -type f -exec sed -i 's|source.*=.*"\.\./../"|source = "github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"|g' {} +
+        find "modules/${MODULE_NAME}/examples" -name "*.tf" -type f -exec sed -i 's|source.*=.*"\.\./../"|source = "github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"|g' {} +
         
         # Update module source in all README files
         # Handle ../../ pattern (from examples)
-        find . -name "README.md" -type f -exec sed -i 's|source = "../../"|source = "github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"|g' {} +
+        find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../../"|source = "github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"|g' {} +
         
         # Handle ../ pattern (from module root)
-        find . -name "README.md" -type f -exec sed -i 's|source = "../"|source = "github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"|g' {} +
+        find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../"|source = "github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}"|g' {} +
         
         # Also update in terraform-docs table sections
-        find . -name "README.md" -type f -exec sed -i 's| ../../ | github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version} |g' {} +
+        find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's| ../../ | github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version} |g' {} +
+        
+        # Handle ../.. pattern in terraform-docs tables
+        find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's| ../.. | github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version} |g' {} +
         
         # Update module version in README
-        if [[ -x "../../scripts/update-module-version.sh" ]]; then
-          ../../scripts/update-module-version.sh . "\${nextRelease.version}"
+        if [[ -x "./scripts/update-module-version.sh" ]]; then
+          ./scripts/update-module-version.sh "modules/${MODULE_NAME}" "\${nextRelease.version}"
         fi
         
         # Update examples list in README
-        if [[ -x "../../scripts/update-examples-list.sh" ]]; then
-          ../../scripts/update-examples-list.sh .
+        if [[ -x "./scripts/update-examples-list.sh" ]]; then
+          ./scripts/update-examples-list.sh "modules/${MODULE_NAME}"
         fi
         
         # Update README.md with terraform-docs
         if command -v terraform-docs &> /dev/null; then
-          terraform-docs markdown table --output-file README.md .
+          cd "modules/${MODULE_NAME}" && terraform-docs .
         fi
         
         # Update root README.md with module status and version
-        if [[ -x "../../scripts/update-root-readme.sh" ]]; then
-          ../../scripts/update-root-readme.sh "${MODULE_NAME}" "Storage Account" "${TAG_PREFIX}" "\${nextRelease.version}" "PatrykIti" "azurerm-terraform-modules"
+        if [[ -x "./scripts/update-root-readme.sh" ]]; then
+          ./scripts/update-root-readme.sh "${MODULE_NAME}" "Storage Account" "${TAG_PREFIX}" "\${nextRelease.version}" "PatrykIti" "azurerm-terraform-modules"
         fi
       `.trim()
     }],
@@ -115,11 +118,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     // Commit changes
     ['@semantic-release/git', {
       assets: [
-        'CHANGELOG.md',
-        '.github/module-config.yml',
-        'examples/**/*.tf',
-        'README.md',
-        '../../README.md'
+        'modules/azurerm_storage_account/CHANGELOG.md',
+        'modules/azurerm_storage_account/.github/module-config.yml',
+        'modules/azurerm_storage_account/examples/**/*.tf',
+        'modules/azurerm_storage_account/README.md',
+        'README.md'
       ],
       message: `chore(${COMMIT_SCOPE}): release ${TAG_PREFIX}\${nextRelease.version} [skip ci]`
     }],

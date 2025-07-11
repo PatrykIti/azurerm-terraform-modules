@@ -3,7 +3,7 @@
 ## Module Version
 
 <!-- BEGIN_VERSION -->
-Current version: **vUnreleased**
+Current version: **SAv1.0.0**
 <!-- END_VERSION -->
 
 ## Description
@@ -23,7 +23,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "storage_account" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
   name                     = var.storage_account_name
   resource_group_name      = azurerm_resource_group.example.name
@@ -115,7 +115,6 @@ No modules.
 | <a name="input_containers"></a> [containers](#input\_containers) | List of storage containers to create. | <pre>list(object({<br/>    name                  = string<br/>    container_access_type = optional(string, "private")<br/>    metadata              = optional(map(string), {})<br/>  }))</pre> | `[]` | no |
 | <a name="input_cross_tenant_replication_enabled"></a> [cross\_tenant\_replication\_enabled](#input\_cross\_tenant\_replication\_enabled) | Should cross Tenant replication be enabled? Defaults to false. | `bool` | `null` | no |
 | <a name="input_custom_domain"></a> [custom\_domain](#input\_custom\_domain) | Custom domain configuration for the storage account. | <pre>object({<br/>    name          = string<br/>    use_subdomain = optional(bool)<br/>  })</pre> | `null` | no |
-| <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key) | Customer managed key configuration for encryption at rest. | <pre>object({<br/>    key_vault_key_id          = string<br/>    user_assigned_identity_id = string<br/>  })</pre> | `null` | no |
 | <a name="input_default_to_oauth_authentication"></a> [default\_to\_oauth\_authentication](#input\_default\_to\_oauth\_authentication) | Default to Azure Active Directory authorization in the Azure portal when accessing the Storage Account. The default value is false. This will have no effect when the account is not in the same tenant as your Azure subscription. | `bool` | `null` | no |
 | <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Diagnostic settings configuration for audit logging. | <pre>object({<br/>    enabled                    = optional(bool, true)<br/>    log_analytics_workspace_id = optional(string)<br/>    storage_account_id         = optional(string)<br/>    eventhub_auth_rule_id      = optional(string)<br/>    logs = optional(object({<br/>      storage_read   = optional(bool, true)<br/>      storage_write  = optional(bool, true)<br/>      storage_delete = optional(bool, true)<br/>      retention_days = optional(number, 7)<br/>    }), {})<br/>    metrics = optional(object({<br/>      transaction    = optional(bool, true)<br/>      capacity       = optional(bool, true)<br/>      retention_days = optional(number, 7)<br/>    }), {})<br/>  })</pre> | <pre>{<br/>  "enabled": false<br/>}</pre> | no |
 | <a name="input_edge_zone"></a> [edge\_zone](#input\_edge\_zone) | Specifies the Edge Zone within the Azure Region where this Storage Account should exist. Defaults to null for backward compatibility. | `string` | `null` | no |

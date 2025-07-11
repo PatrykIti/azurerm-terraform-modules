@@ -88,9 +88,9 @@ variable "network_rules" {
   description = "Network rules for the storage account."
   type = object({
     default_action             = string
-    bypass                     = optional(list(string), ["AzureServices"])
-    ip_rules                   = optional(list(string), [])
-    virtual_network_subnet_ids = optional(list(string), [])
+    bypass                     = optional(set(string), ["AzureServices"])
+    ip_rules                   = optional(set(string), [])
+    virtual_network_subnet_ids = optional(set(string), [])
     private_link_access = optional(list(object({
       endpoint_resource_id = string
       endpoint_tenant_id   = optional(string)
@@ -210,16 +210,6 @@ variable "identity" {
     )
     error_message = "Identity type must be 'SystemAssigned', 'UserAssigned', or 'SystemAssigned, UserAssigned'."
   }
-}
-
-# Customer Managed Key
-variable "customer_managed_key" {
-  description = "Customer managed key configuration for encryption at rest."
-  type = object({
-    key_vault_key_id          = string
-    user_assigned_identity_id = string
-  })
-  default = null
 }
 
 # Diagnostic Settings

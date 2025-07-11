@@ -19,7 +19,7 @@ This directory contains examples showing how to use the Storage Account module i
 When testing these examples locally during development, the examples use relative paths:
 ```hcl
 module "storage_account" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
   # ...
 }
 ```
@@ -28,7 +28,7 @@ module "storage_account" {
 In your actual Terraform configurations, you should reference the module using a Git URL with a specific version tag:
 ```hcl
 module "storage_account" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
   # ...
 }
 ```

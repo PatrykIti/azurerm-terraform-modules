@@ -26,7 +26,7 @@ graph TD
     E --> F[Validate]
     E --> G[Test]
     E --> H[Security Scan]
-    F --> I[Module-Specific Actions]
+    F --> I[Module Runner]
     G --> I
     H --> I
     I --> J[Quality Summary]
@@ -36,7 +36,7 @@ graph TD
 
 1. **Dynamic Discovery**: Workflows automatically detect which modules have changed
 2. **Parallel Execution**: Multiple modules are processed concurrently
-3. **Module Isolation**: Each module has its own composite actions
+3. **Universal Actions**: All modules use the same standardized actions via module-runner
 4. **Reusability**: Shared actions for common tasks
 5. **Scalability**: Easy to add new modules without modifying core workflows
 
@@ -52,16 +52,13 @@ azurerm-terraform-modules/
 │   │   ├── pr-validation.yml        # PR quality checks
 │   │   └── repo-maintenance.yml     # Scheduled maintenance
 │   └── actions/                     # Shared composite actions
-│       ├── detect-modules/          # Module detection logic
+│       ├── module-runner/           # Universal module action runner
+│       │   ├── action.yml          # Main composite action
+│       │   └── run-module-action.sh # Script that executes module actions
 │       └── terraform-setup/         # Terraform environment setup
 └── modules/
     └── <module_name>/
         └── .github/
-            ├── actions/             # Module-specific composite actions
-            │   ├── validate/        # Validation logic
-            │   ├── test/           # Testing logic
-            │   ├── security/       # Security scanning
-            │   └── release/        # Release preparation
             └── module-config.yml    # Module metadata
 ```
 
@@ -89,7 +86,7 @@ azurerm-terraform-modules/
 #### `validate`
 ```yaml
 - Runs for each changed module in parallel
-- Executes module-specific validation composite action
+- Executes validation via module-runner action
 - Checks:
   - Terraform formatting (terraform fmt)
   - Terraform initialization (terraform init)
@@ -101,7 +98,7 @@ azurerm-terraform-modules/
 #### `test`
 ```yaml
 - Runs after validation passes
-- Executes module-specific test composite action
+- Executes tests via module-runner action
 - Performs:
   - Unit tests with Go
   - Integration tests with Terratest
@@ -112,7 +109,7 @@ azurerm-terraform-modules/
 #### `security-scan`
 ```yaml
 - Runs in parallel with tests
-- Executes module-specific security composite action
+- Executes security scans via module-runner action
 - Tools:
   - Checkov for Terraform security
   - Trivy for infrastructure scanning
@@ -305,53 +302,72 @@ find modules -name "main.tf" -type f
 - Provider plugin caching
 - Optional tool installation
 
-## Module-Specific Actions
+## Module Runner Action
 
-Each module contains four composite actions in `.github/actions/`:
+The `module-runner` action is a universal composite action that executes standardized workflows for all modules.
 
-### 1. Validate (`validate/action.yml`)
+### Architecture
 
-**Purpose**: Module-specific validation logic.
+```
+.github/actions/module-runner/
+├── action.yml              # Composite action definition
+└── run-module-action.sh    # Bash script with action logic
+```
 
-**Steps**:
-1. Terraform format check
-2. Terraform init (no backend)
-3. Terraform validate
-4. TFLint analysis
-5. Example validation
+### How It Works
 
-### 2. Test (`test/action.yml`)
+1. **Dynamic Execution**: The module-runner receives the module name and action type as inputs
+2. **Script-Based Logic**: Uses a bash script to work around GitHub Actions limitations with dynamic `uses`
+3. **Standardized Workflows**: All modules follow the same validation, test, and security patterns
 
-**Purpose**: Module-specific testing logic.
+### Supported Actions
 
-**Steps**:
-1. Go environment setup
-2. Terraform setup
-3. Go module caching
-4. Unit test execution
-5. Integration test execution
-6. Example testing
+#### 1. Validate
 
-### 3. Security (`security/action.yml`)
-
-**Purpose**: Module-specific security scanning.
+**Purpose**: Standardized validation for all Terraform modules.
 
 **Steps**:
-1. Checkov scanning
-2. Trivy scanning
-3. SARIF result upload
-4. Custom security checks (hardcoded secrets, secure defaults)
+1. Terraform format check (`terraform fmt -check -recursive`)
+2. Terraform init without backend (`terraform init -backend=false`)
+3. Terraform validate (`terraform validate`)
+4. TFLint installation and analysis
+5. Example validation (validates all examples in `examples/*/`)
 
-### 4. Release (`release/action.yml`)
+#### 2. Test
 
-**Purpose**: Module-specific release preparation.
+**Purpose**: Standardized testing for all Terraform modules.
 
 **Steps**:
-1. Pre-release validation
-2. Documentation verification
-3. CHANGELOG check
-4. Release artifact creation
-5. Module registry update
+1. Azure credentials setup (supports both OIDC and client secret)
+2. Go environment detection
+3. Go module download if `go.mod` exists
+4. Test execution with `go test -v -timeout 30m`
+5. Fallback warning if no tests found
+
+#### 3. Security
+
+**Purpose**: Standardized security scanning for all Terraform modules.
+
+**Steps**:
+1. tfsec scanning with SARIF output
+2. Checkov scanning with SARIF output
+3. SARIF file upload to GitHub Security tab
+4. Soft-fail mode to allow reporting without blocking
+
+### Environment Variables
+
+The module-runner handles Azure authentication by setting both `AZURE_*` and `ARM_*` environment variables:
+
+```bash
+# For OIDC authentication
+ARM_USE_OIDC=true
+ARM_CLIENT_ID
+ARM_TENANT_ID
+ARM_SUBSCRIPTION_ID
+
+# For client secret authentication (when needed)
+ARM_CLIENT_SECRET
+```
 
 ## Workflow Interactions
 
@@ -401,8 +417,11 @@ sequenceDiagram
 # Create module directory
 mkdir -p modules/azurerm_virtual_network
 
-# Copy action structure from existing module
-cp -r modules/azurerm_storage_account/.github modules/azurerm_virtual_network/
+# Create .github directory for module configuration
+mkdir -p modules/azurerm_virtual_network/.github
+
+# Copy module configuration from existing module
+cp modules/azurerm_storage_account/.github/module-config.yml modules/azurerm_virtual_network/.github/
 
 # Create Terraform files
 touch modules/azurerm_virtual_network/{main,variables,outputs,versions}.tf
@@ -436,19 +455,23 @@ filters: |
     - 'shared/**'
 ```
 
-### Step 4: Update Release Options
+### Step 4: Release Workflow
 
-Edit `.github/workflows/module-release.yml`:
+The module-release workflow accepts any module name as a string input, so no changes are needed to the workflow when adding new modules. Simply use:
 
-```yaml
-options:
-  - azurerm_storage_account
-  - azurerm_virtual_network  # Add new module
+```bash
+# Trigger release via GitHub UI or API
+# Input: module = "azurerm_virtual_network"
 ```
 
-### Step 5: Customize Module Actions
+### Step 5: Module Testing
 
-Update the composite actions in `modules/azurerm_virtual_network/.github/actions/` to match module-specific requirements.
+The module will automatically use the standardized module-runner action for:
+- Validation (Terraform format, init, validate, TFLint)
+- Testing (Go tests if present in `tests/` directory)
+- Security scanning (tfsec and Checkov)
+
+No additional configuration needed!
 
 ## Troubleshooting
 

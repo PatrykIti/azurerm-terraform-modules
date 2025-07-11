@@ -6,6 +6,7 @@
 [![AzureRM Provider](https://img.shields.io/badge/AzureRM_Provider-4.35.0-blue?logo=terraform)](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0)
 
 <!-- MODULE BADGES START -->
+[![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=SAv)
 <!-- MODULE BADGES END -->
 
 A comprehensive collection of production-ready Terraform modules for Azure infrastructure, following HashiCorp best practices and enterprise security standards.
@@ -51,7 +52,7 @@ Each module contains comprehensive documentation and examples:
 Example module reference:
 ```hcl
 module "storage_account" {
-  source = "github.com/your-org/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
   # See module README for configuration details
 }
 ```
@@ -59,11 +60,16 @@ module "storage_account" {
 
 ## 📦 Available Modules
 
+### Production Ready
+
+| Module | Status | Version | Description |
+|--------|--------|---------|-------------|
+| [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv1.0.0) | Azure Storage Account with enterprise features |
+
 ### In Development
 
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
-| [Storage Account](./modules/azurerm_storage_account/) | 🔧 Development | - | Azure Storage Account with enterprise features |
 | Virtual Network | 📅 Planned | - | Virtual networks with subnets and security |
 | Key Vault | 📅 Planned | - | Key management and secrets storage |
 | Application Gateway | 📅 Planned | - | Application-layer load balancing |
@@ -81,7 +87,7 @@ The Storage Account module includes comprehensive examples demonstrating various
 
 | Example | Description |
 |---------|-------------|
-| [simple](./modules/azurerm_storage_account/examples/simple/) | Basic storage account with minimal configuration |
+| [basic](./modules/azurerm_storage_account/examples/basic/) | Basic storage account with minimal configuration |
 | [secure](./modules/azurerm_storage_account/examples/secure/) | Security-hardened configuration with maximum protection |
 | [secure-private-endpoint](./modules/azurerm_storage_account/examples/secure-private-endpoint/) | Private endpoint configuration for network isolation |
 | [data-lake-gen2](./modules/azurerm_storage_account/examples/data-lake-gen2/) | Data Lake Storage Gen2 with SFTP and NFSv3 |

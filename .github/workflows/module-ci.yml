@@ -52,6 +52,10 @@ jobs:
             azurerm_storage_account:
               - 'modules/azurerm_storage_account/**'
               - 'shared/**'
+            # Add new modules here following the same pattern:
+            # module_name:
+            #   - 'modules/module_name/**'
+            #   - 'shared/**'
       
       - id: set-matrix
         run: |
@@ -90,6 +94,7 @@ jobs:
           module: ${{ matrix.module }}
           action: validate
           terraform-version: ${{ vars.TERRAFORM_VERSION || '1.10.3' }}
+          github-token: ${{ secrets.PAT }}
 
   test:
     needs: [detect-changes, validate]
@@ -136,7 +141,7 @@ jobs:
         with:
           module: ${{ matrix.module }}
           action: security
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PAT }}
 
   quality-summary:
     name: CI Summary

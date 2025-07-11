@@ -1,429 +1,183 @@
-# Task Master AI - Claude Code Integration Guide
-
-## Essential Commands
-
-### Core Workflow Commands
-
-```bash
-# Project Setup
-task-master init                                    # Initialize Task Master in current project
-task-master parse-prd .taskmaster/docs/prd.txt      # Generate tasks from PRD document
-task-master models --setup                        # Configure AI models interactively
-
-# Daily Development Workflow
-task-master list                                   # Show all tasks with status
-task-master next                                   # Get next available task to work on
-task-master show <id>                             # View detailed task information (e.g., task-master show 1.2)
-task-master set-status --id=<id> --status=done    # Mark task complete
-
-# Task Management
-task-master add-task --prompt="description" --research        # Add new task with AI assistance
-task-master expand --id=<id> --research --force              # Break task into subtasks
-task-master update-task --id=<id> --prompt="changes"         # Update specific task
-task-master update --from=<id> --prompt="changes"            # Update multiple tasks from ID onwards
-task-master update-subtask --id=<id> --prompt="notes"        # Add implementation notes to subtask
-
-# Analysis & Planning
-task-master analyze-complexity --research          # Analyze task complexity
-task-master complexity-report                      # View complexity analysis
-task-master expand --all --research               # Expand all eligible tasks
-
-# Dependencies & Organization
-task-master add-dependency --id=<id> --depends-on=<id>       # Add task dependency
-task-master move --from=<id> --to=<id>                       # Reorganize task hierarchy
-task-master validate-dependencies                            # Check for dependency issues
-task-master generate                                         # Update task markdown files (usually auto-called)
-```
-
-## Key Files & Project Structure
-
-### Core Files
-
-- `.taskmaster/tasks/tasks.json` - Main task data file (auto-managed)
-- `.taskmaster/config.json` - AI model configuration (use `task-master models` to modify)
-- `.taskmaster/docs/prd.txt` - Product Requirements Document for parsing
-- `.taskmaster/tasks/*.txt` - Individual task files (auto-generated from tasks.json)
-- `.env` - API keys for CLI usage
-
-### Claude Code Integration Files
-
-- `CLAUDE.md` - Auto-loaded context for Claude Code (this file)
-- `.claude/settings.json` - Claude Code tool allowlist and preferences
-- `.claude/commands/` - Custom slash commands for repeated workflows
-- `.mcp.json` - MCP server configuration (project-specific)
-
-### Directory Structure
-
-```
-project/
-├── .taskmaster/
-│   ├── tasks/              # Task files directory
-│   │   ├── tasks.json      # Main task database
-│   │   ├── task-1.md      # Individual task files
-│   │   └── task-2.md
-│   ├── docs/              # Documentation directory
-│   │   ├── prd.txt        # Product requirements
-│   ├── reports/           # Analysis reports directory
-│   │   └── task-complexity-report.json
-│   ├── templates/         # Template files
-│   │   └── example_prd.txt  # Example PRD template
-│   └── config.json        # AI models & settings
-├── .claude/
-│   ├── settings.json      # Claude Code configuration
-│   └── commands/         # Custom slash commands
-├── .env                  # API keys
-├── .mcp.json            # MCP configuration
-└── CLAUDE.md            # This file - auto-loaded by Claude Code
-```
-
-## MCP Integration
-
-Task Master provides an MCP server that Claude Code can connect to. Configure in `.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "task-master-ai": {
-      "command": "npx",
-      "args": ["-y", "--package=task-master-ai", "task-master-ai"],
-      "env": {
-        "ANTHROPIC_API_KEY": "your_key_here",
-        "PERPLEXITY_API_KEY": "your_key_here",
-        "OPENAI_API_KEY": "OPENAI_API_KEY_HERE",
-        "GOOGLE_API_KEY": "GOOGLE_API_KEY_HERE",
-        "XAI_API_KEY": "XAI_API_KEY_HERE",
-        "OPENROUTER_API_KEY": "OPENROUTER_API_KEY_HERE",
-        "MISTRAL_API_KEY": "MISTRAL_API_KEY_HERE",
-        "AZURE_OPENAI_API_KEY": "AZURE_OPENAI_API_KEY_HERE",
-        "OLLAMA_API_KEY": "OLLAMA_API_KEY_HERE"
-      }
-    }
-  }
-}
-```
-
-### Essential MCP Tools
-
-```javascript
-help; // = shows available taskmaster commands
-// Project setup
-initialize_project; // = task-master init
-parse_prd; // = task-master parse-prd
-
-// Daily workflow
-get_tasks; // = task-master list
-next_task; // = task-master next
-get_task; // = task-master show <id>
-set_task_status; // = task-master set-status
-
-// Task management
-add_task; // = task-master add-task
-expand_task; // = task-master expand
-update_task; // = task-master update-task
-update_subtask; // = task-master update-subtask
-update; // = task-master update
-
-// Analysis
-analyze_project_complexity; // = task-master analyze-complexity
-complexity_report; // = task-master complexity-report
-```
-
-## Claude Code Workflow Integration
-
-### Standard Development Workflow
-
-#### 1. Project Initialization
-
-```bash
-# Initialize Task Master
-task-master init
-
-# Create or obtain PRD, then parse it
-task-master parse-prd .taskmaster/docs/prd.txt
-
-# Analyze complexity and expand tasks
-task-master analyze-complexity --research
-task-master expand --all --research
-```
-
-If tasks already exist, another PRD can be parsed (with new information only!) using parse-prd with --append flag. This will add the generated tasks to the existing list of tasks..
-
-#### 2. Daily Development Loop
-
-```bash
-# Start each session
-task-master next                           # Find next available task
-task-master show <id>                     # Review task details
-
-# During implementation, check in code context into the tasks and subtasks
-task-master update-subtask --id=<id> --prompt="implementation notes..."
-
-# Complete tasks
-task-master set-status --id=<id> --status=done
-```
-
-#### 3. Multi-Claude Workflows
-
-For complex projects, use multiple Claude Code sessions:
-
-```bash
-# Terminal 1: Main implementation
-cd project && claude
-
-# Terminal 2: Testing and validation
-cd project-test-worktree && claude
-
-# Terminal 3: Documentation updates
-cd project-docs-worktree && claude
-```
-
-### Custom Slash Commands
-
-Create `.claude/commands/taskmaster-next.md`:
-
-```markdown
-Find the next available Task Master task and show its details.
-
-Steps:
-
-1. Run `task-master next` to get the next task
-2. If a task is available, run `task-master show <id>` for full details
-3. Provide a summary of what needs to be implemented
-4. Suggest the first implementation step
-```
-
-Create `.claude/commands/taskmaster-complete.md`:
-
-```markdown
-Complete a Task Master task: $ARGUMENTS
-
-Steps:
-
-1. Review the current task with `task-master show $ARGUMENTS`
-2. Verify all implementation is complete
-3. Run any tests related to this task
-4. Mark as complete: `task-master set-status --id=$ARGUMENTS --status=done`
-5. Show the next available task with `task-master next`
-```
-
-## Tool Allowlist Recommendations
-
-Add to `.claude/settings.json`:
-
-```json
-{
-  "allowedTools": [
-    "Edit",
-    "Bash(task-master *)",
-    "Bash(git commit:*)",
-    "Bash(git add:*)",
-    "Bash(npm run *)",
-    "mcp__task_master_ai__*"
-  ]
-}
-```
-
-## Configuration & Setup
-
-### API Keys Required
-
-At least **one** of these API keys must be configured:
-
-- `ANTHROPIC_API_KEY` (Claude models) - **Recommended**
-- `PERPLEXITY_API_KEY` (Research features) - **Highly recommended**
-- `OPENAI_API_KEY` (GPT models)
-- `GOOGLE_API_KEY` (Gemini models)
-- `MISTRAL_API_KEY` (Mistral models)
-- `OPENROUTER_API_KEY` (Multiple models)
-- `XAI_API_KEY` (Grok models)
-
-An API key is required for any provider used across any of the 3 roles defined in the `models` command.
-
-### Model Configuration
-
-```bash
-# Interactive setup (recommended)
-task-master models --setup
-
-# Set specific models
-task-master models --set-main claude-3-5-sonnet-20241022
-task-master models --set-research perplexity-llama-3.1-sonar-large-128k-online
-task-master models --set-fallback gpt-4o-mini
-```
-
-## Task Structure & IDs
-
-### Task ID Format
-
-- Main tasks: `1`, `2`, `3`, etc.
-- Subtasks: `1.1`, `1.2`, `2.1`, etc.
-- Sub-subtasks: `1.1.1`, `1.1.2`, etc.
-
-### Task Status Values
-
-- `pending` - Ready to work on
-- `in-progress` - Currently being worked on
-- `done` - Completed and verified
-- `deferred` - Postponed
-- `cancelled` - No longer needed
-- `blocked` - Waiting on external factors
-
-### Task Fields
-
-```json
-{
-  "id": "1.2",
-  "title": "Implement user authentication",
-  "description": "Set up JWT-based auth system",
-  "status": "pending",
-  "priority": "high",
-  "dependencies": ["1.1"],
-  "details": "Use bcrypt for hashing, JWT for tokens...",
-  "testStrategy": "Unit tests for auth functions, integration tests for login flow",
-  "subtasks": []
-}
-```
-
-## Claude Code Best Practices with Task Master
-
-### Context Management
-
-- Use `/clear` between different tasks to maintain focus
-- This CLAUDE.md file is automatically loaded for context
-- Use `task-master show <id>` to pull specific task context when needed
-
-### Iterative Implementation
-
-1. `task-master show <subtask-id>` - Understand requirements
-2. Explore codebase and plan implementation
-3. `task-master update-subtask --id=<id> --prompt="detailed plan"` - Log plan
-4. `task-master set-status --id=<id> --status=in-progress` - Start work
-5. Implement code following logged plan
-6. `task-master update-subtask --id=<id> --prompt="what worked/didn't work"` - Log progress
-7. `task-master set-status --id=<id> --status=done` - Complete task
-
-### Complex Workflows with Checklists
-
-For large migrations or multi-step processes:
-
-1. Create a markdown PRD file describing the new changes: `touch task-migration-checklist.md` (prds can be .txt or .md)
-2. Use Taskmaster to parse the new prd with `task-master parse-prd --append` (also available in MCP)
-3. Use Taskmaster to expand the newly generated tasks into subtasks. Consdier using `analyze-complexity` with the correct --to and --from IDs (the new ids) to identify the ideal subtask amounts for each task. Then expand them.
-4. Work through items systematically, checking them off as completed
-5. Use `task-master update-subtask` to log progress on each task/subtask and/or updating/researching them before/during implementation if getting stuck
-
-### Git Integration
-
-Task Master works well with `gh` CLI:
-
-```bash
-# Create PR for completed task
-gh pr create --title "Complete task 1.2: User authentication" --body "Implements JWT auth system as specified in task 1.2"
-
-# Reference task in commits
-git commit -m "feat: implement JWT auth (task 1.2)"
-```
-
-### Parallel Development with Git Worktrees
-
-```bash
-# Create worktrees for parallel task development
-git worktree add ../project-auth feature/auth-system
-git worktree add ../project-api feature/api-refactor
-
-# Run Claude Code in each worktree
-cd ../project-auth && claude    # Terminal 1: Auth work
-cd ../project-api && claude     # Terminal 2: API work
-```
-
-## Troubleshooting
-
-### AI Commands Failing
-
-```bash
-# Check API keys are configured
-cat .env                           # For CLI usage
-
-# Verify model configuration
-task-master models
-
-# Test with different model
-task-master models --set-fallback gpt-4o-mini
-```
-
-### MCP Connection Issues
-
-- Check `.mcp.json` configuration
-- Verify Node.js installation
-- Use `--mcp-debug` flag when starting Claude Code
-- Use CLI as fallback if MCP unavailable
-
-### Task File Sync Issues
-
-```bash
-# Regenerate task files from tasks.json
-task-master generate
-
-# Fix dependency issues
-task-master fix-dependencies
-```
-
-DO NOT RE-INITIALIZE. That will not do anything beyond re-adding the same Taskmaster core files.
-
-## Important Notes
-
-### AI-Powered Operations
-
-These commands make AI calls and may take up to a minute:
-
-- `parse_prd` / `task-master parse-prd`
-- `analyze_project_complexity` / `task-master analyze-complexity`
-- `expand_task` / `task-master expand`
-- `expand_all` / `task-master expand --all`
-- `add_task` / `task-master add-task`
-- `update` / `task-master update`
-- `update_task` / `task-master update-task`
-- `update_subtask` / `task-master update-subtask`
-
-### File Management
-
-- Never manually edit `tasks.json` - use commands instead
-- Never manually edit `.taskmaster/config.json` - use `task-master models`
-- Task markdown files in `tasks/` are auto-generated
-- Run `task-master generate` after manual changes to tasks.json
-
-### Claude Code Session Management
-
-- Use `/clear` frequently to maintain focused context
-- Create custom slash commands for repeated Task Master workflows
-- Configure tool allowlist to streamline permissions
-- Use headless mode for automation: `claude -p "task-master next"`
-
-### Multi-Task Updates
-
-- Use `update --from=<id>` to update multiple future tasks
-- Use `update-task --id=<id>` for single task updates
-- Use `update-subtask --id=<id>` for implementation logging
-
-### Research Mode
-
-- Add `--research` flag for research-based AI enhancement
-- Requires a research model API key like Perplexity (`PERPLEXITY_API_KEY`) in environment
-- Provides more informed task creation and updates
-- Recommended for complex technical tasks
-
----
-
-_This guide ensures Claude Code has immediate access to Task Master's essential functionality for agentic development workflows._
-
-## Project Documentation References
-
-### Core Guides
-- [Documentation Guide](.claude/references/documentation-guide.md) - How documentation works in this repo
-- [Semantic Release Guide](.claude/references/semantic-release-guide.md) - Automated versioning and releases
-
-### Important Instructions
-- Do what has been asked; nothing more, nothing less
-- NEVER create files unless they're absolutely necessary for achieving your goal
-- ALWAYS prefer editing an existing file to creating a new one
-- NEVER proactively create documentation files (*.md) or README files unless explicitly requested
+# Terraform Azure Modules - Development Guide
+
+This document contains references to mandatory guidelines for Terraform module development in this project.
+
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+
+## Important Instructions
+
+- **ALWAYS** review the relevant reference files based on your current task
+- **NEVER** skip reading these documents when they apply to your work
+- **CRITICALLY EVALUATE** all suggestions from tools - you are the final decision maker
+- **PRIORITIZE** project-specific needs over generic best practices
+- **MANDATORY**: When Gemini Zen or other tools suggest using web search, ALWAYS use Context7 MCP first if the information is available there. Think independently - do not follow tool suggestions 1:1. You are the orchestrator and must make your own decisions about which tools to use based on what's available to you
+
+# MCP Tools and TaskMaster Usage Rules
+
+This document contains references to mandatory guidelines for using MCP tools and TaskMaster in this project. **REQUIREMENT**: Claude Code MUST review the relevant documentation files based on the current task context.
+
+## Project Documentation
+
+### [PROJECT.md](PROJECT.md)
+**MANDATORY REVIEW** when:
+- Starting work on this project
+- Understanding project architecture and goals
+- Implementing any features or modifications
+- Making technical decisions about implementation
+
+Contains: Complete project specification for BlenderForge MCP including system architecture (Blender addon + MCP server), MVP functionality, development phases, directory structure, implementation principles, and technology stack. This is the primary reference document that defines what we're building and how.
+
+## Reference Documentation
+
+### 1. [MCP Tools Usage Rules](.claude/references/mcp-tools-usage.md)
+**MANDATORY REVIEW** when:
+- Starting any new task or feature implementation
+- Using Context7 MCP, Gemini Zen, or TaskMaster AI tools
+- Making architectural or technical decisions
+- Evaluating tool suggestions or recommendations
+
+Contains: Task triage guidelines, critical thinking principles, context object format, and tool-specific usage instructions for Context7 MCP, Gemini Zen, and TaskMaster AI.
+
+### 2. [TaskMaster Commands Reference](.claude/references/taskmaster-commands.md)
+**MANDATORY REVIEW** when:
+- Working with task management
+- Using TaskMaster commands
+- Following Scrum methodology
+- Managing task statuses and workflows
+- Needing MCP tool to CLI command mapping
+
+Contains: Complete MCP tools to CLI commands mapping, task status values, basic development loop, Scrum methodology rules, and all available TaskMaster commands with their options.
+
+### 3. [Workflow Integration](.claude/references/workflow-integration.md)
+**MANDATORY REVIEW** when:
+- Planning complex features or implementations
+- Coordinating between multiple MCP tools
+- Implementing feedback loops between tools
+- Making final implementation decisions
+
+Contains: Standard workflow steps, feedback loop scenarios, decision authority guidelines, and tool coordination patterns.
+
+### 4. [TaskMaster File Structure](.claude/references/taskmaster-file-structure.md)
+**MANDATORY REVIEW** when:
+- Setting up TaskMaster for a project
+- Creating or managing PRD documents
+- Working with task files
+- Using research mode features
+
+Contains: Core file locations, PRD best practices, multi-Claude workflow patterns, task ID formatting, and research mode usage.
+
+### 5. [Multi-Agent Integration](.claude/references/multi-agent-integration.md)
+**MANDATORY REVIEW** when:
+- Coordinating work between multiple Claude sessions
+- Assigning tasks to different agents
+- Setting up multi-agent workflows
+
+Contains: TaskMaster multi-agent commands and Context7 + Gemini Zen coordination patterns.
+
+### 6. [TaskMaster Workflow Patterns](.claude/references/taskmaster-workflow-patterns.md)
+**MANDATORY REVIEW** when:
+- Starting development with TaskMaster
+- Implementing multi-context workflows with tags
+- Handling team collaboration scenarios
+- Working with experiments or feature branches
+- Following iterative subtask implementation
+- Resolving merge conflicts in tasks
+
+Contains: Standard development workflow, tag introduction patterns, iterative implementation cycle, master list strategy, and research integration patterns.
+
+### 7. [Terraform GitHub Actions Guidelines](.claude/references/terraform-github-actions.md) - **PATTERNS & BEST PRACTICES**
+**MANDATORY REVIEW** when:
+- Learning how to create GitHub Actions workflows for Terraform
+- Understanding best practices for CI/CD pipelines
+- Looking for workflow patterns and examples
+- Needing guidance on security scanning, testing, or deployment workflows
+- Learning about pre-commit hooks integration
+
+Contains: General patterns and best practices for creating GitHub Actions workflows for Terraform projects. Includes example workflows for validation, security scanning, testing, deployment, and various CI/CD patterns. This is a REFERENCE GUIDE for workflow patterns.
+
+### 8. [GitHub Actions Monorepo Guidelines](.claude/references/github-actions-monorepo-guidelines.md) - **ARCHITECTURE PATTERNS**
+**MANDATORY REVIEW** when:
+- Understanding the monorepo pattern for Terraform modules
+- Learning about dynamic module discovery
+- Designing scalable workflow architectures
+- Understanding composite actions pattern
+- Planning migration from flat to modular structure
+
+Contains: Architectural patterns and guidelines for organizing GitHub Actions in a monorepo with multiple Terraform modules. Describes the dynamic discovery pattern, composite actions architecture, and scalability considerations. This is the DESIGN PATTERN that our implementation follows.
+
+### 9. [Terraform Best Practices Guide](docs/TERRAFORM_BEST_PRACTISES_GUIDE.md)
+**MANDATORY REVIEW** when:
+- Creating new Terraform modules
+- Contributing to existing modules
+- Understanding module structure and naming conventions
+- Implementing security best practices
+- Writing module documentation
+- Setting up module testing
+- Following iteration patterns and variable design principles
+
+Contains: Comprehensive guide for Terraform module development including resource naming conventions, module structure, variable design patterns, security best practices, testing requirements, documentation standards, contribution process, and common pitfalls to avoid. This is the primary reference for all Terraform module development standards in this repository.
+
+### 10. [Terraform Testing Guide](docs/TERRAFORM_TESTING_GUIDE.md)
+**MANDATORY REVIEW** when:
+- Setting up testing for new modules
+- Writing unit tests with native Terraform test framework
+- Implementing integration tests with Terratest
+- Creating end-to-end test scenarios
+- Configuring CI/CD testing pipelines
+- Implementing security and compliance testing
+- Optimizing test performance and costs
+- Using mock strategies for expensive resources
+
+Contains: Comprehensive testing strategies including testing pyramid (static analysis, unit, integration, E2E), native Terraform test examples with mock providers, Terratest patterns for Azure resources, security and compliance testing, performance testing, CI/CD integration with GitHub Actions, test organization best practices, and cost optimization strategies for testing infrastructure.
+
+### 11. [GitHub Actions Workflows Documentation](docs/WORKFLOWS.md)
+**MANDATORY REVIEW** when:
+- Understanding the current GitHub Actions workflow architecture
+- Debugging workflow issues or failures
+- Adding new Terraform modules to the repository
+- Modifying existing CI/CD pipelines
+- Understanding how workflows interact with each other
+- Troubleshooting module detection or composite actions
+
+Contains: Comprehensive documentation of the implemented GitHub Actions workflow system including architecture overview with diagrams, detailed description of each workflow (module-ci, module-release, module-docs, pr-validation, repo-maintenance), shared actions documentation, module-specific composite actions, workflow interaction flows, step-by-step guide for adding new modules, and troubleshooting guide.
+
+**Note**: This document describes the ACTUAL IMPLEMENTATION of workflows in this repository, while documents #7 and #8 above provide general GUIDELINES and PATTERNS for creating GitHub Actions workflows.
+
+### 12. [Semantic Release Integration Guide](.claude/references/semantic-release-guide.md)
+**MANDATORY REVIEW** when:
+- Setting up automated versioning and releases
+- Understanding how CHANGELOG is automatically generated
+- Creating release workflow for new modules
+- Troubleshooting release automation issues
+- Learning about conventional commits requirements
+- Adding module-specific release configuration
+
+Contains: Complete guide for semantic-release integration including monorepo configuration, module-specific versioning, CHANGELOG automation, commit message requirements, workflow integration patterns, and troubleshooting guide. This implements the "nothing manual in the repo" philosophy for releases.
+
+### 13. [Documentation Guide](.claude/references/documentation-guide.md)
+**MANDATORY REVIEW** when:
+- Creating or updating module documentation
+- Working with terraform-docs configuration
+- Managing module examples
+- Understanding documentation generation workflows
+- Troubleshooting documentation issues
+- Adding new examples to modules
+- Understanding README structure and markers
+
+Contains: Comprehensive guide for documentation management including terraform-docs configuration, examples list management, version management scripts, documentation validation, workflow integration, templates, and troubleshooting guide. Explains the hybrid approach using terraform-docs for technical docs and custom scripts for dynamic content.
+
+### 14. [Security Policy](docs/SECURITY.md)
+**MANDATORY REVIEW** when:
+- Implementing security features in modules
+- Understanding compliance requirements (SOC 2, ISO 27001, GDPR, PCI DSS)
+- Following security best practices
+- Conducting security reviews
+- Reporting or handling security vulnerabilities
+- Creating new modules with security-by-default approach
+- Implementing network restrictions and private endpoints
+
+Contains: Comprehensive security policies including security principles (Defense in Depth, Least Privilege, Zero Trust), compliance standards details, security controls by Azure service, security scanning requirements, vulnerability management procedures, best practices for module users, security checklist for new modules, and continuous improvement guidelines.
