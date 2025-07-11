@@ -1,8 +1,7 @@
 name: Release Changed Modules
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches: [main]
   workflow_dispatch:
     inputs:
@@ -20,8 +19,6 @@ jobs:
   detect-changes:
     name: Detect Changed Modules
     runs-on: ubuntu-latest
-    # Only run on merged PRs or manual dispatch
-    if: (github.event.pull_request.merged == true) || (github.event_name == 'workflow_dispatch')
     outputs:
       modules: ${{ steps.changes.outputs.modules }}
       matrix: ${{ steps.changes.outputs.matrix }}
@@ -30,18 +27,39 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PAT || github.token }}
-          ref: main
       
       - name: Detect changed modules
         id: changes
+        env:
+          GH_TOKEN: ${{ secrets.PAT || github.token }}
         run: |
           if [[ -n "${{ inputs.modules }}" ]]; then
             # Manual workflow dispatch with specific modules
             MODULES=$(echo "${{ inputs.modules }}" | tr ',' '\n' | jq -R -s -c 'split("\n")[:-1]')
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            # Extract module name from PR title
-            PR_TITLE="${{ github.event.pull_request.title }}"
-            echo "PR Title: $PR_TITLE"
+          else
+            # Check if last commit is a merge commit and extract PR number
+            COMMIT_MESSAGE=$(git log -1 --pretty=%s)
+            echo "Last commit message: $COMMIT_MESSAGE"
+            
+            PR_TITLE=""
+            # GitHub creates merge commits with format: "Merge pull request #X from ..."
+            if [[ "$COMMIT_MESSAGE" =~ Merge\ pull\ request\ #([0-9]+) ]]; then
+              PR_NUMBER="${BASH_REMATCH[1]}"
+              echo "Detected PR number: $PR_NUMBER"
+              
+              # Get PR title using GitHub API
+              PR_DATA=$(gh api repos/${{ github.repository }}/pulls/${PR_NUMBER} --jq '.title')
+              if [[ -n "$PR_DATA" ]]; then
+                PR_TITLE="$PR_DATA"
+                echo "PR Title from API: $PR_TITLE"
+              fi
+            fi
+            
+            # If we couldn't get PR title, fall back to commit message
+            if [[ -z "$PR_TITLE" ]]; then
+              PR_TITLE="$COMMIT_MESSAGE"
+              echo "Using commit message as fallback: $PR_TITLE"
+            fi
             
             # Extract scope from conventional commit format (e.g., "feat(storage-account): ...")
             if [[ "$PR_TITLE" =~ ^[^(]+\(([^)]+)\) ]]; then
@@ -70,9 +88,6 @@ jobs:
               echo "PR title doesn't contain a scope in conventional commit format"
               MODULES="[]"
             fi
-          else
-            # This shouldn't happen but handle it gracefully
-            MODULES="[]"
           fi
           
           # Output both array and matrix format
