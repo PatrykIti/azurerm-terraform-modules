@@ -88,9 +88,9 @@ variable "network_rules" {
   description = "Network rules for the storage account."
   type = object({
     default_action             = string
-    bypass                     = optional(list(string), ["AzureServices"])
-    ip_rules                   = optional(list(string), [])
-    virtual_network_subnet_ids = optional(list(string), [])
+    bypass                     = optional(set(string), ["AzureServices"])
+    ip_rules                   = optional(set(string), [])
+    virtual_network_subnet_ids = optional(set(string), [])
     private_link_access = optional(list(object({
       endpoint_resource_id = string
       endpoint_tenant_id   = optional(string)

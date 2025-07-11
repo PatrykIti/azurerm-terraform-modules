@@ -80,7 +80,7 @@ case "$ACTION" in
     fi
     
     # Check for Go tests
-    if [[ -d "tests" ]] && ls tests/*.go &> /dev/null 2>&1; then
+    if [[ -d "tests" ]] && compgen -G "tests/*.go" > /dev/null; then
       echo "::group::Running Go Tests"
       cd tests
       

@@ -68,9 +68,9 @@ variable "network_rules" {
   description = "Network rules configuration for the MODULE_TYPE_PLACEHOLDER."
   type = object({
     default_action             = string
-    bypass                     = optional(set(string), ["AzureServices"])
-    ip_rules                   = optional(set(string), [])
-    virtual_network_subnet_ids = optional(set(string), [])
+    bypass                     = optional(list(string), ["AzureServices"])
+    ip_rules                   = optional(list(string), [])
+    virtual_network_subnet_ids = optional(list(string), [])
   })
   default = {
     default_action = "Deny"
