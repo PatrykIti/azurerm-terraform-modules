@@ -157,3 +157,27 @@ Contains: Comprehensive documentation of the implemented GitHub Actions workflow
 - Adding module-specific release configuration
 
 Contains: Complete guide for semantic-release integration including monorepo configuration, module-specific versioning, CHANGELOG automation, commit message requirements, workflow integration patterns, and troubleshooting guide. This implements the "nothing manual in the repo" philosophy for releases.
+
+### 13. [Documentation Guide](.claude/references/documentation-guide.md)
+**MANDATORY REVIEW** when:
+- Creating or updating module documentation
+- Working with terraform-docs configuration
+- Managing module examples
+- Understanding documentation generation workflows
+- Troubleshooting documentation issues
+- Adding new examples to modules
+- Understanding README structure and markers
+
+Contains: Comprehensive guide for documentation management including terraform-docs configuration, examples list management, version management scripts, documentation validation, workflow integration, templates, and troubleshooting guide. Explains the hybrid approach using terraform-docs for technical docs and custom scripts for dynamic content.
+
+### 14. [Security Policy](docs/SECURITY.md)
+**MANDATORY REVIEW** when:
+- Implementing security features in modules
+- Understanding compliance requirements (SOC 2, ISO 27001, GDPR, PCI DSS)
+- Following security best practices
+- Conducting security reviews
+- Reporting or handling security vulnerabilities
+- Creating new modules with security-by-default approach
+- Implementing network restrictions and private endpoints
+
+Contains: Comprehensive security policies including security principles (Defense in Depth, Least Privilege, Zero Trust), compliance standards details, security controls by Azure service, security scanning requirements, vulnerability management procedures, best practices for module users, security checklist for new modules, and continuous improvement guidelines.
