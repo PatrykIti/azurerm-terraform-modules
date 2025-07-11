@@ -109,7 +109,7 @@ Contains: General patterns and best practices for creating GitHub Actions workfl
 
 Contains: Architectural patterns and guidelines for organizing GitHub Actions in a monorepo with multiple Terraform modules. Describes the dynamic discovery pattern, composite actions architecture, and scalability considerations. This is the DESIGN PATTERN that our implementation follows.
 
-### 9. [Terraform Best Practices Guide](docs/TERRAFORM_BEST_PRACTISES_GUIDE.md)
+### 9. [Terraform Best Practices Guide](docs/TERRAFORM_BEST_PRACTICES_GUIDE.md)
 **MANDATORY REVIEW** when:
 - Creating new Terraform modules
 - Contributing to existing modules

@@ -14,7 +14,7 @@ A comprehensive collection of production-ready Terraform modules for Azure infra
 ## 📚 Quick Navigation
 
 - [**Development Guide**](./CLAUDE.md) - AI-assisted development guidelines and reference documentation
-- [**Terraform Best Practices**](./docs/TERRAFORM_BEST_PRACTISES_GUIDE.md) - Module development standards and conventions
+- [**Terraform Best Practices**](./docs/TERRAFORM_BEST_PRACTICES_GUIDE.md) - Module development standards and conventions
 - [**Testing Guide**](./docs/TERRAFORM_TESTING_GUIDE.md) - Comprehensive testing strategies and examples
 - [**Workflows Documentation**](./docs/WORKFLOWS.md) - GitHub Actions CI/CD implementation details
 - [**Security Policy**](./docs/SECURITY.md) - Security guidelines and vulnerability reporting
