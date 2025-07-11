@@ -37,7 +37,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: true
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.PAT || github.token }}
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
