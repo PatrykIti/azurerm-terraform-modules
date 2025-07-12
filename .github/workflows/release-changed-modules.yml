@@ -61,29 +61,47 @@ jobs:
               echo "Using commit message as fallback: $PR_TITLE"
             fi
             
-            # Extract scope from conventional commit format (e.g., "feat(storage-account): ...")
+            # Extract scope from conventional commit format (e.g., "feat(storage-account): ..." or "feat(storage-account,virtual-network): ...")
             if [[ "$PR_TITLE" =~ ^[^(]+\(([^)]+)\) ]]; then
               SCOPE="${BASH_REMATCH[1]}"
               echo "Detected scope: $SCOPE"
               
-              # Check if scope matches a module name (with or without azurerm_ prefix)
-              MODULE_NAME="$SCOPE"
+              # Split scope by comma and process each module
+              IFS=',' read -ra SCOPE_ARRAY <<< "$SCOPE"
+              VALID_MODULES=()
               
-              # Remove azurerm- prefix if present
-              MODULE_NAME="${MODULE_NAME#azurerm-}"
-              # Replace dashes with underscores
-              MODULE_NAME="${MODULE_NAME//-/_}"
-              # Add azurerm_ prefix
-              MODULE_NAME="azurerm_${MODULE_NAME}"
+              for scope_item in "${SCOPE_ARRAY[@]}"; do
+                # Trim whitespace
+                scope_item=$(echo "$scope_item" | xargs)
+                echo "Processing scope item: $scope_item"
+                
+                # Check if scope matches a module name (with or without azurerm_ prefix)
+                MODULE_NAME="$scope_item"
+                
+                # Remove azurerm- prefix if present
+                MODULE_NAME="${MODULE_NAME#azurerm-}"
+                # Replace dashes with underscores
+                MODULE_NAME="${MODULE_NAME//-/_}"
+                # Add azurerm_ prefix
+                MODULE_NAME="azurerm_${MODULE_NAME}"
+                
+                # Check if this module exists
+                if [[ -d "modules/$MODULE_NAME" ]]; then
+                  echo "Found module: $MODULE_NAME"
+                  VALID_MODULES+=("$MODULE_NAME")
+                else
+                  echo "Module $MODULE_NAME not found in modules/ directory"
+                fi
+              done
               
-              # Check if this module exists
-              if [[ -d "modules/$MODULE_NAME" ]]; then
-                echo "Found module: $MODULE_NAME"
-                MODULES="[\"$MODULE_NAME\"]"
-              else
-                echo "Module $MODULE_NAME not found in modules/ directory"
+              # Convert array to JSON format
+              if [ ${#VALID_MODULES[@]} -eq 0 ]; then
                 MODULES="[]"
+              else
+                MODULES=$(printf '%s\n' "${VALID_MODULES[@]}" | jq -R -s -c 'split("\n")[:-1]')
               fi
+              
+              echo "Valid modules found: ${VALID_MODULES[*]}"
             else
               echo "PR title doesn't contain a scope in conventional commit format"
               MODULES="[]"
@@ -107,6 +125,7 @@ jobs:
     if: needs.detect-changes.outputs.modules != '[]'
     strategy:
       matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+      max-parallel: 1  # Execute releases sequentially to avoid conflicts in root README.md updates
       fail-fast: false
     uses: ./.github/workflows/module-release.yml
     with:
