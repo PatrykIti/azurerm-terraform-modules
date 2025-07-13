@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.35.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.6"
+    }
   }
 }
 
@@ -15,47 +19,37 @@ provider "azurerm" {
   features {}
 }
 
-# Create a resource group for this example
-resource "azurerm_resource_group" "example" {
-  name     = "rg-vnet-private-endpoint-example"
-  location = "West Europe"
+resource "random_string" "suffix" {
+  length  = 6
+  special = false
+  upper   = false
 }
 
-# Create a storage account to demonstrate private endpoint connectivity
-resource "azurerm_storage_account" "example" {
-  name                     = "stvnetprivateendpoint"
-  resource_group_name      = azurerm_resource_group.example.name
-  location                 = azurerm_resource_group.example.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-
-  # Disable public access to force private endpoint usage
-  public_network_access_enabled = false
-
-  tags = {
-    Environment = "Development"
-    Purpose     = "Private Endpoint Demo"
-  }
+# Create a resource group for this example
+resource "azurerm_resource_group" "test" {
+  name     = "rg-dpc-pep-${var.random_suffix}"
+  location = var.location
 }
 
 # Create Private DNS Zone for storage account
 resource "azurerm_private_dns_zone" "blob" {
   name                = "privatelink.blob.core.windows.net"
-  resource_group_name = azurerm_resource_group.example.name
+  resource_group_name = azurerm_resource_group.test.name
 
   tags = {
-    Environment = "Development"
-    Purpose     = "Private DNS for Storage"
+    Environment = "Test"
+    Module      = "azurerm_virtual_network"
+    Test        = "PrivateEndpoint"
   }
 }
 
 # Virtual Network optimized for private endpoint scenarios
 module "virtual_network" {
-  source = "../../"
+  source = "../../../"
 
-  name                = "vnet-private-endpoint-example"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name                = "vnet-dpc-pep-${var.random_suffix}"
+  resource_group_name = azurerm_resource_group.test.name
+  location            = azurerm_resource_group.test.location
   address_space       = ["10.0.0.0/16"]
 
   # DNS configuration for private endpoint resolution
@@ -68,7 +62,7 @@ module "virtual_network" {
   private_dns_zone_links = [
     {
       name                  = "link-to-blob-storage"
-      resource_group_name   = azurerm_resource_group.example.name
+      resource_group_name   = azurerm_resource_group.test.name
       private_dns_zone_name = azurerm_private_dns_zone.blob.name
       registration_enabled  = false # Auto-registration not needed for private endpoints
       tags = {
@@ -80,17 +74,16 @@ module "virtual_network" {
   # Lifecycle Management
 
   tags = {
-    Environment = "Development"
-    Example     = "Private-Endpoint"
-    Purpose     = "Virtual Network for Private Endpoint Integration"
-    NetworkType = "Private"
+    Environment = "Test"
+    Module      = "azurerm_virtual_network"
+    Test        = "PrivateEndpoint"
   }
 }
 
 # Create subnet for private endpoints
 resource "azurerm_subnet" "private_endpoints" {
   name                 = "subnet-private-endpoints"
-  resource_group_name  = azurerm_resource_group.example.name
+  resource_group_name  = azurerm_resource_group.test.name
   virtual_network_name = module.virtual_network.name
   address_prefixes     = ["10.0.1.0/24"]
 
@@ -103,39 +96,49 @@ resource "azurerm_subnet" "private_endpoints" {
 # Create subnet for application workloads
 resource "azurerm_subnet" "workloads" {
   name                 = "subnet-workloads"
-  resource_group_name  = azurerm_resource_group.example.name
+  resource_group_name  = azurerm_resource_group.test.name
   virtual_network_name = module.virtual_network.name
   address_prefixes     = ["10.0.2.0/24"]
 
   depends_on = [module.virtual_network]
 }
 
-# Create private endpoint for storage account
-resource "azurerm_private_endpoint" "storage" {
-  name                = "pe-storage-blob"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-  subnet_id           = azurerm_subnet.private_endpoints.id
+# Use the Storage Account module to demonstrate private endpoint connectivity
+module "storage_account" {
+  source = "../../../../azurerm_storage_account"
 
-  private_service_connection {
-    name                           = "psc-storage-blob"
-    private_connection_resource_id = azurerm_storage_account.example.id
-    is_manual_connection           = false
-    subresource_names              = ["blob"]
+  name                     = "dpcpep${random_string.suffix.result}${var.random_suffix}"
+  resource_group_name      = azurerm_resource_group.test.name
+  location                 = azurerm_resource_group.test.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+
+  # Enable shared access key for tests
+  security_settings = {
+    shared_access_key_enabled = true
   }
 
-  private_dns_zone_group {
-    name                 = "dns-zone-group-blob"
-    private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
+  # Network rules - deny all public access
+  network_rules = {
+    default_action             = "Deny"
+    ip_rules                   = []
+    virtual_network_subnet_ids = []
+    bypass                     = [] # No bypass, completely private
   }
+
+  # Private endpoint configuration
+  private_endpoints = [
+    {
+      name                 = "blob-endpoint"
+      subnet_id            = azurerm_subnet.private_endpoints.id
+      private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
+      subresource_names    = ["blob"]
+    }
+  ]
 
   tags = {
-    Environment = "Development"
-    Purpose     = "Storage Private Endpoint"
+    Environment = "Test"
+    Module      = "azurerm_virtual_network"
+    Test        = "PrivateEndpoint"
   }
-
-  depends_on = [
-    module.virtual_network,
-    azurerm_subnet.private_endpoints
-  ]
 }

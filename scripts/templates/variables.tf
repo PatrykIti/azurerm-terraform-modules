@@ -48,18 +48,18 @@ variable "location" {
 variable "security_settings" {
   description = "Security configuration for the MODULE_TYPE_PLACEHOLDER."
   type = object({
-    https_traffic_only_enabled        = optional(bool, true)
-    min_tls_version                  = optional(string, "TLS1_2")
-    public_network_access_enabled    = optional(bool, false)
-    shared_access_key_enabled        = optional(bool, false)
-    allow_nested_items_to_be_public  = optional(bool, false)
+    https_traffic_only_enabled      = optional(bool, true)
+    min_tls_version                 = optional(string, "TLS1_2")
+    public_network_access_enabled   = optional(bool, false)
+    shared_access_key_enabled       = optional(bool, false)
+    allow_nested_items_to_be_public = optional(bool, false)
   })
   default = {
-    https_traffic_only_enabled        = true
-    min_tls_version                  = "TLS1_2"
-    public_network_access_enabled    = false
-    shared_access_key_enabled        = false
-    allow_nested_items_to_be_public  = false
+    https_traffic_only_enabled      = true
+    min_tls_version                 = "TLS1_2"
+    public_network_access_enabled   = false
+    shared_access_key_enabled       = false
+    allow_nested_items_to_be_public = false
   }
 
   validation {
@@ -80,7 +80,7 @@ variable "network_rules" {
   default = null
 
   validation {
-    condition = var.network_rules == null || contains(["Allow", "Deny"], var.network_rules.default_action)
+    condition     = var.network_rules == null || contains(["Allow", "Deny"], var.network_rules.default_action)
     error_message = "The default_action must be either 'Allow' or 'Deny'."
   }
 }

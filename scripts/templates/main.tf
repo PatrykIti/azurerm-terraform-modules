@@ -6,11 +6,11 @@ resource "azurerm_MODULE_TYPE_PLACEHOLDER" "main" {
 
   # TODO: Add specific configuration for this resource type
   # Example configuration based on common Azure resource patterns:
-  
+
   # Basic configuration
   # account_tier             = var.account_tier
   # account_replication_type = var.account_replication_type
-  
+
   # Security settings
   # https_traffic_only_enabled = var.security_settings.https_traffic_only_enabled
   # min_tls_version           = var.security_settings.min_tls_version
@@ -25,7 +25,7 @@ resource "azurerm_MODULE_TYPE_PLACEHOLDER_network_rules" "main" {
 
   # TODO: Configure network rules based on resource type
   # storage_account_id = azurerm_MODULE_TYPE_PLACEHOLDER.main.id
-  
+
   default_action             = var.network_rules.default_action
   bypass                     = var.network_rules.bypass
   ip_rules                   = var.network_rules.ip_rules
@@ -64,10 +64,10 @@ resource "azurerm_private_endpoint" "main" {
 resource "azurerm_monitor_diagnostic_setting" "main" {
   count = var.diagnostic_settings.enabled ? 1 : 0
 
-  name                       = "${var.name}-diagnostics"
-  target_resource_id         = azurerm_MODULE_TYPE_PLACEHOLDER.main.id
-  log_analytics_workspace_id = var.diagnostic_settings.log_analytics_workspace_id
-  storage_account_id         = var.diagnostic_settings.storage_account_id
+  name                           = "${var.name}-diagnostics"
+  target_resource_id             = azurerm_MODULE_TYPE_PLACEHOLDER.main.id
+  log_analytics_workspace_id     = var.diagnostic_settings.log_analytics_workspace_id
+  storage_account_id             = var.diagnostic_settings.storage_account_id
   eventhub_authorization_rule_id = var.diagnostic_settings.eventhub_auth_rule_id
 
   # TODO: Configure specific log categories for this resource type

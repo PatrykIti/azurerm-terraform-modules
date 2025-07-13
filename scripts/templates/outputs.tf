@@ -54,10 +54,10 @@ output "private_endpoints" {
   description = "Information about the created private endpoints"
   value = {
     for idx, pe in azurerm_private_endpoint.main : pe.name => {
-      id                = pe.id
-      name              = pe.name
+      id                 = pe.id
+      name               = pe.name
       private_ip_address = pe.private_service_connection[0].private_ip_address
-      fqdn              = try(pe.custom_dns_configs[0].fqdn, null)
+      fqdn               = try(pe.custom_dns_configs[0].fqdn, null)
     }
   }
 }

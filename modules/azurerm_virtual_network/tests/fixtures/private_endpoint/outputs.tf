@@ -30,17 +30,17 @@ output "workload_subnet_id" {
 
 output "storage_account_id" {
   description = "The ID of the storage account"
-  value       = azurerm_storage_account.example.id
+  value       = module.storage_account.id
+}
+
+output "storage_account_name" {
+  description = "The name of the storage account"
+  value       = module.storage_account.name
 }
 
 output "private_endpoint_id" {
   description = "The ID of the private endpoint"
-  value       = azurerm_private_endpoint.storage.id
-}
-
-output "private_endpoint_ip_address" {
-  description = "The private IP address of the private endpoint"
-  value       = azurerm_private_endpoint.storage.private_service_connection[0].private_ip_address
+  value       = try(values(module.storage_account.private_endpoints)[0].id, null)
 }
 
 output "private_dns_zone_id" {
@@ -50,10 +50,10 @@ output "private_dns_zone_id" {
 
 output "resource_group_name" {
   description = "The name of the resource group"
-  value       = azurerm_resource_group.example.name
+  value       = azurerm_resource_group.test.name
 }
 
 output "location" {
   description = "The Azure region where resources were created"
-  value       = azurerm_resource_group.example.location
+  value       = azurerm_resource_group.test.location
 }

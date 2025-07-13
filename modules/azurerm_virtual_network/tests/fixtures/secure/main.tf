@@ -61,7 +61,7 @@ resource "azurerm_storage_account" "security" {
   https_traffic_only_enabled      = true
   min_tls_version                 = "TLS1_2"
   public_network_access_enabled   = false
-  shared_access_key_enabled       = true  # Required for flow logs
+  shared_access_key_enabled       = true # Required for flow logs
   allow_nested_items_to_be_public = false
 
   tags = {
