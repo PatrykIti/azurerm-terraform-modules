@@ -296,18 +296,3 @@ func TestVirtualNetworkNaming(t *testing.T) {
 	}
 }
 
-	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "../examples/secure",
-	})
-
-	defer terraform.Destroy(t, terraformOptions)
-
-	terraform.InitAndApply(t, terraformOptions)
-
-	// Add security-focused assertions here
-	outputID := terraform.Output(t, terraformOptions, "virtual_network_id")
-	assert.NotEmpty(t, outputID)
-
-	// TODO: Add specific security validations
-	// Example: Verify HTTPS is enforced, public access is disabled, etc.
-}

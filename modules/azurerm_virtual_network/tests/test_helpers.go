@@ -52,7 +52,7 @@ func GetTestConfig(t *testing.T) *TestConfig {
 		ClientID:      clientID,
 		ClientSecret:  clientSecret,
 		Location:      location,
-		ResourceGroup: fmt.Sprintf("rg-test-virtual_network-%s", uniqueID),
+		ResourceGroup: fmt.Sprintf("rg-test-vnet-%s", uniqueID),
 		UniqueID:      uniqueID,
 	}
 }
