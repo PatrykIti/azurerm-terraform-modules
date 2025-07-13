@@ -56,7 +56,7 @@ func TestVirtualNetworkBasic(t *testing.T) {
 	virtualNetwork := GetVirtualNetwork(t, virtualNetworkName, resourceGroupName, subscriptionID)
 	assert.Equal(t, virtualNetworkName, *virtualNetwork.Name)
 	assert.Equal(t, location, *virtualNetwork.Location)
-	assert.NotEmpty(t, virtualNetwork.AddressSpace.AddressPrefixes)
+	assert.NotEmpty(t, virtualNetwork.Properties.AddressSpace.AddressPrefixes)
 }
 
 func TestVirtualNetworkComplete(t *testing.T) {
@@ -107,14 +107,14 @@ func TestVirtualNetworkComplete(t *testing.T) {
 	assert.Equal(t, location, *virtualNetwork.Location)
 	
 	// Verify multiple address spaces
-	require.NotNil(t, virtualNetwork.AddressSpace)
-	require.NotNil(t, virtualNetwork.AddressSpace.AddressPrefixes)
-	assert.GreaterOrEqual(t, len(*virtualNetwork.AddressSpace.AddressPrefixes), 2)
+	require.NotNil(t, virtualNetwork.Properties.AddressSpace)
+	require.NotNil(t, virtualNetwork.Properties.AddressSpace.AddressPrefixes)
+	assert.GreaterOrEqual(t, len(virtualNetwork.Properties.AddressSpace.AddressPrefixes), 2)
 	
 	// Verify DNS servers configuration
-	require.NotNil(t, virtualNetwork.DhcpOptions)
-	require.NotNil(t, virtualNetwork.DhcpOptions.DNSServers)
-	assert.GreaterOrEqual(t, len(*virtualNetwork.DhcpOptions.DNSServers), 2)
+	require.NotNil(t, virtualNetwork.Properties.DhcpOptions)
+	require.NotNil(t, virtualNetwork.Properties.DhcpOptions.DNSServers)
+	assert.GreaterOrEqual(t, len(virtualNetwork.Properties.DhcpOptions.DNSServers), 2)
 }
 
 func TestVirtualNetworkSecure(t *testing.T) {
@@ -163,8 +163,8 @@ func TestVirtualNetworkSecure(t *testing.T) {
 	assert.Equal(t, location, *virtualNetwork.Location)
 	
 	// Verify DDoS protection is enabled
-	require.NotNil(t, virtualNetwork.DdosProtectionPlan)
-	assert.True(t, *virtualNetwork.EnableDdosProtection)
+	require.NotNil(t, virtualNetwork.Properties.DdosProtectionPlan)
+	assert.True(t, *virtualNetwork.Properties.EnableDdosProtection)
 }
 
 func TestVirtualNetworkValidation(t *testing.T) {
