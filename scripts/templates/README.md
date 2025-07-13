@@ -1,4 +1,4 @@
-# Terraform Azure MODULE_NAME Module
+# Terraform Azure MODULE_DISPLAY_NAME_PLACEHOLDER Module
 
 ## Module Version
 
@@ -8,16 +8,16 @@ Current version: **vUnreleased**
 
 ## Description
 
-This module creates and manages Azure MODULE_NAME resources with comprehensive configuration options.
+MODULE_DESCRIPTION_PLACEHOLDER
 
 ## Usage
 
 ```hcl
-module "MODULE_NAME" {
-  source = "path/to/MODULE_NAME"
+module "MODULE_NAME_PLACEHOLDER" {
+  source = "path/to/MODULE_NAME_PLACEHOLDER"
 
   # Required variables
-  name                = "example-MODULE_NAME"
+  name                = "example-MODULE_NAME_PLACEHOLDER"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 

@@ -97,19 +97,38 @@ replace_placeholders() {
     local file="$1"
     local date=$(date +%Y-%m-%d)
     
-    sed -i '' \
-        -e "s/MODULE_NAME_PLACEHOLDER/$MODULE_NAME/g" \
-        -e "s/MODULE_DISPLAY_NAME_PLACEHOLDER/$DISPLAY_NAME/g" \
-        -e "s/MODULE_TYPE_PLACEHOLDER/$MODULE_TYPE/g" \
-        -e "s/MODULE_DESCRIPTION_PLACEHOLDER/$DESCRIPTION/g" \
-        -e "s/PREFIX_PLACEHOLDER/$PREFIX/g" \
-        -e "s/SCOPE_PLACEHOLDER/$SCOPE/g" \
-        -e "s/DATE_PLACEHOLDER/$date/g" \
-        -e "s/CATEGORY_PLACEHOLDER/uncategorized/g" \
-        -e "s/SERVICE_PLACEHOLDER/$DISPLAY_NAME/g" \
-        -e "s/MAINTAINER_PLACEHOLDER/Team/g" \
-        -e "s/MODULE_SUBRESOURCE_PLACEHOLDER/${MODULE_TYPE}/g" \
-        "$file"
+    # Detect OS and use appropriate sed syntax
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        sed -i '' \
+            -e "s/MODULE_NAME_PLACEHOLDER/$MODULE_NAME/g" \
+            -e "s/MODULE_DISPLAY_NAME_PLACEHOLDER/$DISPLAY_NAME/g" \
+            -e "s/MODULE_TYPE_PLACEHOLDER/$MODULE_TYPE/g" \
+            -e "s/MODULE_DESCRIPTION_PLACEHOLDER/$DESCRIPTION/g" \
+            -e "s/PREFIX_PLACEHOLDER/$PREFIX/g" \
+            -e "s/SCOPE_PLACEHOLDER/$SCOPE/g" \
+            -e "s/DATE_PLACEHOLDER/$date/g" \
+            -e "s/CATEGORY_PLACEHOLDER/uncategorized/g" \
+            -e "s/SERVICE_PLACEHOLDER/$DISPLAY_NAME/g" \
+            -e "s/MAINTAINER_PLACEHOLDER/Team/g" \
+            -e "s/MODULE_SUBRESOURCE_PLACEHOLDER/${MODULE_TYPE}/g" \
+            "$file"
+    else
+        # Linux and other Unix-like systems
+        sed -i \
+            -e "s/MODULE_NAME_PLACEHOLDER/$MODULE_NAME/g" \
+            -e "s/MODULE_DISPLAY_NAME_PLACEHOLDER/$DISPLAY_NAME/g" \
+            -e "s/MODULE_TYPE_PLACEHOLDER/$MODULE_TYPE/g" \
+            -e "s/MODULE_DESCRIPTION_PLACEHOLDER/$DESCRIPTION/g" \
+            -e "s/PREFIX_PLACEHOLDER/$PREFIX/g" \
+            -e "s/SCOPE_PLACEHOLDER/$SCOPE/g" \
+            -e "s/DATE_PLACEHOLDER/$date/g" \
+            -e "s/CATEGORY_PLACEHOLDER/uncategorized/g" \
+            -e "s/SERVICE_PLACEHOLDER/$DISPLAY_NAME/g" \
+            -e "s/MAINTAINER_PLACEHOLDER/Team/g" \
+            -e "s/MODULE_SUBRESOURCE_PLACEHOLDER/${MODULE_TYPE}/g" \
+            "$file"
+    fi
 }
 
 # Copy and process templates
@@ -148,7 +167,7 @@ cp "$TEMPLATES_DIR/tests_README.md" "$MODULE_DIR/tests/README.md"
 
 # Replace placeholders in all copied files
 print_info "Customizing templates..."
-find "$MODULE_DIR" -type f -name "*.tf" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.js" -o -name "*.go" -o -name "*.mod" | while read -r file; do
+find "$MODULE_DIR" -type f -name "*.tf" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.js" -o -name "*.go" -o -name "*.mod" -o -name "*.sh" | while read -r file; do
     replace_placeholders "$file"
 done
 
