@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gruntwork-io/terratest/modules/azure"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
@@ -54,7 +53,7 @@ func TestVirtualNetworkBasic(t *testing.T) {
 
 	// Verify the Virtual Network exists in Azure
 	subscriptionID := ""
-	virtualNetwork := azure.GetVirtualNetwork(t, virtualNetworkName, resourceGroupName, subscriptionID)
+	virtualNetwork := GetVirtualNetwork(t, virtualNetworkName, resourceGroupName, subscriptionID)
 	assert.Equal(t, virtualNetworkName, *virtualNetwork.Name)
 	assert.Equal(t, location, *virtualNetwork.Location)
 	assert.NotEmpty(t, virtualNetwork.AddressSpace.AddressPrefixes)
@@ -103,7 +102,7 @@ func TestVirtualNetworkComplete(t *testing.T) {
 
 	// Verify the Virtual Network exists in Azure with expected configuration
 	subscriptionID := ""
-	virtualNetwork := azure.GetVirtualNetwork(t, virtualNetworkName, resourceGroupName, subscriptionID)
+	virtualNetwork := GetVirtualNetwork(t, virtualNetworkName, resourceGroupName, subscriptionID)
 	assert.Equal(t, virtualNetworkName, *virtualNetwork.Name)
 	assert.Equal(t, location, *virtualNetwork.Location)
 	
@@ -159,7 +158,7 @@ func TestVirtualNetworkSecure(t *testing.T) {
 
 	// Verify the Virtual Network exists in Azure with security features
 	subscriptionID := ""
-	virtualNetwork := azure.GetVirtualNetwork(t, virtualNetworkName, resourceGroupName, subscriptionID)
+	virtualNetwork := GetVirtualNetwork(t, virtualNetworkName, resourceGroupName, subscriptionID)
 	assert.Equal(t, virtualNetworkName, *virtualNetwork.Name)
 	assert.Equal(t, location, *virtualNetwork.Location)
 	

@@ -10,6 +10,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/stretchr/testify/require"
 )
@@ -148,4 +149,22 @@ func ValidateAddressSpace(addressSpaces []string) error {
 	}
 	
 	return nil
+}
+
+// GetVirtualNetwork retrieves a virtual network from Azure
+func GetVirtualNetwork(t *testing.T, virtualNetworkName, resourceGroupName, subscriptionID string) *armnetwork.VirtualNetwork {
+	if subscriptionID == "" {
+		subscriptionID = os.Getenv("ARM_SUBSCRIPTION_ID")
+		require.NotEmpty(t, subscriptionID, "ARM_SUBSCRIPTION_ID must be set")
+	}
+
+	cred := GetAzureCredential(t)
+	client, err := armnetwork.NewVirtualNetworksClient(subscriptionID, cred, nil)
+	require.NoError(t, err, "Failed to create virtual networks client")
+
+	ctx := context.Background()
+	resp, err := client.Get(ctx, resourceGroupName, virtualNetworkName, nil)
+	require.NoError(t, err, "Failed to get virtual network")
+
+	return &resp.VirtualNetwork
 }
