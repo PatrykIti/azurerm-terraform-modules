@@ -1,74 +1,115 @@
+# Virtual Network Core Outputs
 output "id" {
-  description = "The ID of the Virtual Network"
-  value       = try(azurerm_virtual_network.main.id, null)
+  description = "The ID of the Virtual Network."
+  value       = azurerm_virtual_network.virtual_network.id
 }
 
 output "name" {
-  description = "The name of the Virtual Network"
-  value       = try(azurerm_virtual_network.main.name, null)
+  description = "The name of the Virtual Network."
+  value       = azurerm_virtual_network.virtual_network.name
 }
 
 output "location" {
-  description = "The primary location of the virtual_network"
-  value       = try(azurerm_virtual_network.main.location, null)
+  description = "The Azure Region where the Virtual Network exists."
+  value       = azurerm_virtual_network.virtual_network.location
 }
 
 output "resource_group_name" {
-  description = "The name of the resource group containing the Virtual Network"
-  value       = try(azurerm_virtual_network.main.resource_group_name, null)
+  description = "The name of the resource group containing the Virtual Network."
+  value       = azurerm_virtual_network.virtual_network.resource_group_name
 }
 
-# TODO: Add specific outputs based on the resource type
-# Example outputs for common Azure resources:
+output "address_space" {
+  description = "The address space of the Virtual Network."
+  value       = azurerm_virtual_network.virtual_network.address_space
+}
 
-# output "primary_endpoint" {
-#   description = "The endpoint URL for the primary location"
-#   value       = try(azurerm_virtual_network.main.primary_endpoint, null)
-# }
+output "dns_servers" {
+  description = "The DNS servers configured for the Virtual Network."
+  value       = azurerm_virtual_network.virtual_network.dns_servers
+}
 
-# output "secondary_endpoint" {
-#   description = "The endpoint URL for the secondary location"
-#   value       = try(azurerm_virtual_network.main.secondary_endpoint, null)
-# }
+output "guid" {
+  description = "The GUID of the Virtual Network."
+  value       = azurerm_virtual_network.virtual_network.guid
+}
 
-# output "primary_access_key" {
-#   description = "The primary access key for the virtual_network"
-#   value       = try(azurerm_virtual_network.main.primary_access_key, null)
-#   sensitive   = true
-# }
+# Subnet Information
+output "subnet" {
+  description = "Information about subnets defined within the Virtual Network (if any)."
+  value       = azurerm_virtual_network.virtual_network.subnet
+}
 
-# output "secondary_access_key" {
-#   description = "The secondary access key for the virtual_network"
-#   value       = try(azurerm_virtual_network.main.secondary_access_key, null)
-#   sensitive   = true
-# }
-
-# output "connection_string" {
-#   description = "The connection string for the virtual_network"
-#   value       = try(azurerm_virtual_network.main.primary_connection_string, null)
-#   sensitive   = true
-# }
-
-# Private Endpoint Outputs
-output "private_endpoints" {
-  description = "Information about the created private endpoints"
+# Peering Outputs
+output "peerings" {
+  description = "Information about Virtual Network peerings."
   value = {
-    for idx, pe in azurerm_private_endpoint.main : pe.name => {
-      id                = pe.id
-      name              = pe.name
-      private_ip_address = pe.private_service_connection[0].private_ip_address
-      fqdn              = try(pe.custom_dns_configs[0].fqdn, null)
+    for name, peering in azurerm_virtual_network_peering.peering : name => {
+      id                           = peering.id
+      name                         = peering.name
+      remote_virtual_network_id    = peering.remote_virtual_network_id
+      allow_virtual_network_access = peering.allow_virtual_network_access
+      allow_forwarded_traffic      = peering.allow_forwarded_traffic
+      allow_gateway_transit        = peering.allow_gateway_transit
+      use_remote_gateways          = peering.use_remote_gateways
     }
   }
 }
 
-# Network Rules Output
-output "network_rules" {
-  description = "The network rules configuration applied to the virtual_network"
-  value = var.network_rules != null ? {
-    default_action             = var.network_rules.default_action
-    bypass                     = var.network_rules.bypass
-    ip_rules                   = var.network_rules.ip_rules
-    virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
+# Flow Log Outputs
+output "flow_log" {
+  description = "Information about Network Watcher Flow Log (if configured)."
+  value = var.flow_log != null ? {
+    id                        = try(azurerm_network_watcher_flow_log.flow_log[0].id, null)
+    name                      = try(azurerm_network_watcher_flow_log.flow_log[0].name, null)
+    enabled                   = try(azurerm_network_watcher_flow_log.flow_log[0].enabled, null)
+    version                   = try(azurerm_network_watcher_flow_log.flow_log[0].version, null)
+    storage_account_id        = try(azurerm_network_watcher_flow_log.flow_log[0].storage_account_id, null)
+    network_security_group_id = try(azurerm_network_watcher_flow_log.flow_log[0].network_security_group_id, null)
   } : null
+}
+
+# Private DNS Zone Links Outputs
+output "private_dns_zone_links" {
+  description = "Information about Private DNS Zone Virtual Network Links."
+  value = {
+    for name, link in azurerm_private_dns_zone_virtual_network_link.dns_zone_link : name => {
+      id                    = link.id
+      name                  = link.name
+      private_dns_zone_name = link.private_dns_zone_name
+      virtual_network_id    = link.virtual_network_id
+      registration_enabled  = link.registration_enabled
+    }
+  }
+}
+
+# Diagnostic Settings Output
+output "diagnostic_setting" {
+  description = "Information about diagnostic settings (if configured)."
+  value = var.diagnostic_settings.enabled ? {
+    id                             = try(azurerm_monitor_diagnostic_setting.diagnostic_setting[0].id, null)
+    name                           = try(azurerm_monitor_diagnostic_setting.diagnostic_setting[0].name, null)
+    target_resource_id             = try(azurerm_monitor_diagnostic_setting.diagnostic_setting[0].target_resource_id, null)
+    log_analytics_workspace_id     = try(azurerm_monitor_diagnostic_setting.diagnostic_setting[0].log_analytics_workspace_id, null)
+    storage_account_id             = try(azurerm_monitor_diagnostic_setting.diagnostic_setting[0].storage_account_id, null)
+    eventhub_authorization_rule_id = try(azurerm_monitor_diagnostic_setting.diagnostic_setting[0].eventhub_authorization_rule_id, null)
+  } : null
+}
+
+# Network Configuration Summary
+output "network_configuration" {
+  description = "Summary of Virtual Network configuration."
+  value = {
+    name                    = azurerm_virtual_network.virtual_network.name
+    id                      = azurerm_virtual_network.virtual_network.id
+    address_space           = azurerm_virtual_network.virtual_network.address_space
+    dns_servers             = azurerm_virtual_network.virtual_network.dns_servers
+    flow_timeout_in_minutes = azurerm_virtual_network.virtual_network.flow_timeout_in_minutes
+    bgp_community           = azurerm_virtual_network.virtual_network.bgp_community
+    edge_zone               = azurerm_virtual_network.virtual_network.edge_zone
+    ddos_protection_enabled = var.ddos_protection_plan != null ? var.ddos_protection_plan.enable : false
+    encryption_enabled      = var.encryption != null
+    peerings_count          = length(var.peerings)
+    dns_zone_links_count    = length(var.private_dns_zone_links)
+  }
 }

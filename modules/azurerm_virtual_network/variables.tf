@@ -1,16 +1,16 @@
 # Core Virtual Network Variables
 variable "name" {
-  description = "The name of the virtual_network. Must be globally unique."
+  description = "The name of the Virtual Network. Must be unique within the resource group."
   type        = string
 
   validation {
-    condition     = can(regex("^[a-z0-9]{3,24}$", var.name))
-    error_message = "Virtual Network name must be between 3 and 24 characters long and use numbers and lower-case letters only."
+    condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9-._]{0,78}[a-zA-Z0-9]$", var.name))
+    error_message = "Virtual Network name must be 2-80 characters long, start and end with alphanumeric characters, and can contain hyphens, periods, and underscores."
   }
 }
 
 variable "resource_group_name" {
-  description = "The name of the resource group in which to create the virtual_network."
+  description = "The name of the resource group in which to create the Virtual Network."
   type        = string
 }
 
@@ -19,117 +19,191 @@ variable "location" {
   type        = string
 }
 
-# TODO: Add specific configuration variables for this resource type
-# Example variables based on common Azure resource patterns:
-
-# variable "account_tier" {
-#   description = "Defines the Tier to use for this resource. Valid options are Standard and Premium."
-#   type        = string
-#   default     = "Standard"
-#
-#   validation {
-#     condition     = contains(["Standard", "Premium"], var.account_tier)
-#     error_message = "Account tier must be either 'Standard' or 'Premium'."
-#   }
-# }
-
-# variable "account_replication_type" {
-#   description = "Defines the type of replication to use for this resource."
-#   type        = string
-#   default     = "ZRS"
-#
-#   validation {
-#     condition     = contains(["LRS", "GRS", "RAGRS", "ZRS", "GZRS", "RAGZRS"], var.account_replication_type)
-#     error_message = "Valid replication types are LRS, GRS, RAGRS, ZRS, GZRS, RAGZRS."
-#   }
-# }
-
-# Security Configuration
-variable "security_settings" {
-  description = "Security configuration for the virtual_network."
-  type = object({
-    https_traffic_only_enabled        = optional(bool, true)
-    min_tls_version                  = optional(string, "TLS1_2")
-    public_network_access_enabled    = optional(bool, false)
-    shared_access_key_enabled        = optional(bool, false)
-    allow_nested_items_to_be_public  = optional(bool, false)
-  })
-  default = {
-    https_traffic_only_enabled        = true
-    min_tls_version                  = "TLS1_2"
-    public_network_access_enabled    = false
-    shared_access_key_enabled        = false
-    allow_nested_items_to_be_public  = false
-  }
+variable "address_space" {
+  description = "The address space that is used by the Virtual Network. You can supply more than one address space."
+  type        = list(string)
 
   validation {
-    condition     = contains(["TLS1_0", "TLS1_1", "TLS1_2"], var.security_settings.min_tls_version)
-    error_message = "The min_tls_version must be one of: TLS1_0, TLS1_1, TLS1_2."
+    condition     = length(var.address_space) > 0
+    error_message = "At least one address space must be provided."
   }
 }
 
-# Network Rules
-variable "network_rules" {
-  description = "Network rules configuration for the virtual_network."
+# DNS Configuration
+variable "dns_servers" {
+  description = "List of IP addresses of DNS servers for the Virtual Network. If not specified, Azure-provided DNS is used."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for dns in var.dns_servers : can(regex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$", dns))
+    ])
+    error_message = "All DNS servers must be valid IPv4 addresses."
+  }
+}
+
+# Network Flow Configuration
+variable "flow_timeout_in_minutes" {
+  description = "The flow timeout in minutes for the Virtual Network, which is used to enable connection tracking for intra-VM flows. Possible values are between 4 and 30 minutes."
+  type        = number
+  default     = 4
+
+  validation {
+    condition     = var.flow_timeout_in_minutes >= 4 && var.flow_timeout_in_minutes <= 30
+    error_message = "Flow timeout must be between 4 and 30 minutes."
+  }
+}
+
+# BGP Community
+variable "bgp_community" {
+  description = "The BGP community attribute in format <as-number>:<community-value>. Only applicable if the Virtual Network is connected to ExpressRoute."
+  type        = string
+  default     = null
+
+  validation {
+    condition = var.bgp_community == null || can(regex("^[0-9]+:[0-9]+$", var.bgp_community))
+    error_message = "BGP community must be in format <as-number>:<community-value> (e.g., 12076:20000)."
+  }
+}
+
+# Edge Zone
+variable "edge_zone" {
+  description = "Specifies the Edge Zone within the Azure Region where this Virtual Network should exist."
+  type        = string
+  default     = null
+}
+
+# DDoS Protection Plan
+variable "ddos_protection_plan" {
+  description = "DDoS protection plan configuration for the Virtual Network."
   type = object({
-    default_action             = optional(string, "Deny")
-    bypass                     = optional(list(string), ["AzureServices"])
-    ip_rules                   = optional(list(string), [])
-    virtual_network_subnet_ids = optional(list(string), [])
+    id     = string
+    enable = bool
+  })
+  default = null
+}
+
+# Encryption Configuration
+variable "encryption" {
+  description = "Encryption configuration for the Virtual Network."
+  type = object({
+    enforcement = string
   })
   default = null
 
   validation {
-    condition = var.network_rules == null || contains(["Allow", "Deny"], var.network_rules.default_action)
-    error_message = "The default_action must be either 'Allow' or 'Deny'."
+    condition = var.encryption == null || contains(["AllowUnencrypted", "DropUnencrypted"], var.encryption.enforcement)
+    error_message = "Encryption enforcement must be either 'AllowUnencrypted' or 'DropUnencrypted'."
   }
 }
 
-# Private Endpoints
-variable "private_endpoints" {
-  description = "List of private endpoints to create for the virtual_network."
+# Virtual Network Peerings
+variable "peerings" {
+  description = "List of Virtual Network peerings to create."
   type = list(object({
-    name                            = string
-    subnet_id                       = string
-    subresource_names               = optional(list(string), ["virtual_network"])
-    private_dns_zone_ids            = optional(list(string), [])
-    private_service_connection_name = optional(string)
-    is_manual_connection            = optional(bool, false)
-    request_message                 = optional(string)
-    tags                            = optional(map(string), {})
+    name                         = string
+    remote_virtual_network_id    = string
+    allow_virtual_network_access = optional(bool, true)
+    allow_forwarded_traffic      = optional(bool, false)
+    allow_gateway_transit        = optional(bool, false)
+    use_remote_gateways          = optional(bool, false)
+    triggers                     = optional(map(string), {})
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for peering in var.peerings : !(peering.allow_gateway_transit && peering.use_remote_gateways)
+    ])
+    error_message = "allow_gateway_transit and use_remote_gateways cannot both be true for the same peering."
+  }
+}
+
+# Network Watcher Flow Log
+variable "flow_log" {
+  description = "Network Watcher Flow Log configuration."
+  type = object({
+    network_watcher_name                = string
+    network_watcher_resource_group_name = string
+    network_security_group_id           = string
+    storage_account_id                  = string
+    enabled                             = optional(bool, true)
+    version                             = optional(number, 2)
+    retention_policy = optional(object({
+      enabled = bool
+      days    = number
+    }))
+    traffic_analytics = optional(object({
+      enabled               = bool
+      workspace_id          = string
+      workspace_region      = string
+      workspace_resource_id = string
+      interval_in_minutes   = optional(number, 10)
+    }))
+  })
+  default = null
+
+  validation {
+    condition = var.flow_log == null || contains([1, 2], var.flow_log.version)
+    error_message = "Flow log version must be 1 or 2."
+  }
+
+  validation {
+    condition = var.flow_log == null || var.flow_log.traffic_analytics == null || contains([10, 60], var.flow_log.traffic_analytics.interval_in_minutes)
+    error_message = "Traffic analytics interval must be 10 or 60 minutes."
+  }
+}
+
+# Private DNS Zone Links
+variable "private_dns_zone_links" {
+  description = "List of Private DNS Zone Virtual Network Links to create."
+  type = list(object({
+    name                  = string
+    resource_group_name   = string
+    private_dns_zone_name = string
+    registration_enabled  = optional(bool, false)
+    tags                  = optional(map(string), {})
   }))
   default = []
 }
 
 # Diagnostic Settings
 variable "diagnostic_settings" {
-  description = "Diagnostic settings configuration for audit logging."
+  description = "Diagnostic settings configuration for monitoring and logging."
   type = object({
     enabled                    = optional(bool, false)
     log_analytics_workspace_id = optional(string)
     storage_account_id         = optional(string)
     eventhub_auth_rule_id      = optional(string)
     logs = optional(object({
-      # TODO: Add specific log categories for this resource type
-      # Example log categories (update based on actual resource):
-      # storage_read     = optional(bool, true)
-      # storage_write    = optional(bool, true)
-      # storage_delete   = optional(bool, true)
-      retention_days = optional(number, 7)
+      vm_protection_alerts = optional(bool, true)
     }), {})
     metrics = optional(object({
-      enabled        = optional(bool, true)
-      retention_days = optional(number, 7)
+      all_metrics = optional(bool, true)
     }), {})
   })
   default = {
     enabled = false
+    logs = {
+      vm_protection_alerts = true
+    }
+    metrics = {
+      all_metrics = true
+    }
   }
+}
+
+# Lifecycle Management
+variable "prevent_destroy" {
+  description = "Prevent destruction of the Virtual Network if it contains subnets."
+  type        = bool
+  default     = true
 }
 
 # Tags
 variable "tags" {
-  description = "A mapping of tags to assign to the resource."
+  description = "A mapping of tags to assign to the Virtual Network and associated resources."
   type        = map(string)
   default     = {}
 }

@@ -1,100 +1,153 @@
-# Azure Virtual Network Module - Initial Release
-resource "azurerm_virtual_network" "main" {
+# Terraform Azure Virtual Network Module
+# Manages Azure Virtual Network with comprehensive configuration options
+
+# Main Virtual Network Resource
+resource "azurerm_virtual_network" "virtual_network" {
   name                = var.name
   resource_group_name = var.resource_group_name
   location            = var.location
+  address_space       = var.address_space
 
-  # TODO: Add specific configuration for this resource type
-  # Example configuration based on common Azure resource patterns:
-  
-  # Basic configuration
-  # account_tier             = var.account_tier
-  # account_replication_type = var.account_replication_type
-  
-  # Security settings
-  # https_traffic_only_enabled = var.security_settings.https_traffic_only_enabled
-  # min_tls_version           = var.security_settings.min_tls_version
-  # public_network_access_enabled = var.security_settings.public_network_access_enabled
+  # DNS Configuration
+  dns_servers = var.dns_servers
+
+  # Network Flow Configuration
+  flow_timeout_in_minutes = var.flow_timeout_in_minutes
+
+  # BGP Community (for ExpressRoute)
+  bgp_community = var.bgp_community
+
+  # Edge Zone
+  edge_zone = var.edge_zone
+
+  # DDoS Protection Plan
+  dynamic "ddos_protection_plan" {
+    for_each = var.ddos_protection_plan != null ? [var.ddos_protection_plan] : []
+    content {
+      id     = ddos_protection_plan.value.id
+      enable = ddos_protection_plan.value.enable
+    }
+  }
+
+  # Encryption Configuration
+  dynamic "encryption" {
+    for_each = var.encryption != null ? [var.encryption] : []
+    content {
+      enforcement = encryption.value.enforcement
+    }
+  }
 
   tags = var.tags
-}
 
-# Network Rules (if applicable)
-resource "azurerm_virtual_network_network_rules" "main" {
-  count = var.network_rules != null ? 1 : 0
-
-  # TODO: Configure network rules based on resource type
-  # storage_account_id = azurerm_virtual_network.main.id
-  
-  default_action             = var.network_rules.default_action
-  bypass                     = var.network_rules.bypass
-  ip_rules                   = var.network_rules.ip_rules
-  virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
-}
-
-# Private Endpoints
-resource "azurerm_private_endpoint" "main" {
-  count = length(var.private_endpoints)
-
-  name                = var.private_endpoints[count.index].name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  subnet_id           = var.private_endpoints[count.index].subnet_id
-
-  private_service_connection {
-    name                           = coalesce(var.private_endpoints[count.index].private_service_connection_name, "${var.private_endpoints[count.index].name}-psc")
-    private_connection_resource_id = azurerm_virtual_network.main.id
-    subresource_names              = var.private_endpoints[count.index].subresource_names
-    is_manual_connection           = var.private_endpoints[count.index].is_manual_connection
-    request_message                = var.private_endpoints[count.index].request_message
+  lifecycle {
+    # Prevent destruction of VNet if it contains subnets
+    prevent_destroy = var.prevent_destroy
   }
+}
 
-  dynamic "private_dns_zone_group" {
-    for_each = length(var.private_endpoints[count.index].private_dns_zone_ids) > 0 ? [1] : []
+# Virtual Network Peerings
+resource "azurerm_virtual_network_peering" "peering" {
+  for_each = { for peering in var.peerings : peering.name => peering }
+
+  name                         = each.value.name
+  resource_group_name          = var.resource_group_name
+  virtual_network_name         = azurerm_virtual_network.virtual_network.name
+  remote_virtual_network_id    = each.value.remote_virtual_network_id
+  allow_virtual_network_access = each.value.allow_virtual_network_access
+  allow_forwarded_traffic      = each.value.allow_forwarded_traffic
+  allow_gateway_transit        = each.value.allow_gateway_transit
+  use_remote_gateways          = each.value.use_remote_gateways
+
+  # Triggers for recreation when peering configuration changes
+  triggers = each.value.triggers
+
+  depends_on = [azurerm_virtual_network.virtual_network]
+}
+
+# Network Watcher Flow Logs (if enabled)
+resource "azurerm_network_watcher_flow_log" "flow_log" {
+  count = var.flow_log != null ? 1 : 0
+
+  network_watcher_name      = var.flow_log.network_watcher_name
+  resource_group_name       = var.flow_log.network_watcher_resource_group_name
+  name                      = "${var.name}-flowlog"
+  network_security_group_id = var.flow_log.network_security_group_id
+  storage_account_id        = var.flow_log.storage_account_id
+  enabled                   = var.flow_log.enabled
+  version                   = var.flow_log.version
+
+  dynamic "retention_policy" {
+    for_each = var.flow_log.retention_policy != null ? [var.flow_log.retention_policy] : []
     content {
-      name                 = "${var.private_endpoints[count.index].name}-dns-zone-group"
-      private_dns_zone_ids = var.private_endpoints[count.index].private_dns_zone_ids
+      enabled = retention_policy.value.enabled
+      days    = retention_policy.value.days
     }
   }
 
-  tags = merge(var.tags, var.private_endpoints[count.index].tags)
+  dynamic "traffic_analytics" {
+    for_each = var.flow_log.traffic_analytics != null ? [var.flow_log.traffic_analytics] : []
+    content {
+      enabled               = traffic_analytics.value.enabled
+      workspace_id          = traffic_analytics.value.workspace_id
+      workspace_region      = traffic_analytics.value.workspace_region
+      workspace_resource_id = traffic_analytics.value.workspace_resource_id
+      interval_in_minutes   = traffic_analytics.value.interval_in_minutes
+    }
+  }
+
+  tags = var.tags
+
+  depends_on = [azurerm_virtual_network.virtual_network]
 }
 
-# Diagnostic Settings
-resource "azurerm_monitor_diagnostic_setting" "main" {
+# Private DNS Zone Virtual Network Links
+resource "azurerm_private_dns_zone_virtual_network_link" "dns_zone_link" {
+  for_each = { for link in var.private_dns_zone_links : link.name => link }
+
+  name                  = each.value.name
+  resource_group_name   = each.value.resource_group_name
+  private_dns_zone_name = each.value.private_dns_zone_name
+  virtual_network_id    = azurerm_virtual_network.virtual_network.id
+  registration_enabled  = each.value.registration_enabled
+
+  tags = merge(var.tags, each.value.tags)
+
+  depends_on = [azurerm_virtual_network.virtual_network]
+}
+
+# Diagnostic Settings for Virtual Network
+resource "azurerm_monitor_diagnostic_setting" "diagnostic_setting" {
   count = var.diagnostic_settings.enabled ? 1 : 0
 
-  name                       = "${var.name}-diagnostics"
-  target_resource_id         = azurerm_virtual_network.main.id
-  log_analytics_workspace_id = var.diagnostic_settings.log_analytics_workspace_id
-  storage_account_id         = var.diagnostic_settings.storage_account_id
+  name                           = "${var.name}-diag"
+  target_resource_id             = azurerm_virtual_network.virtual_network.id
+  log_analytics_workspace_id     = var.diagnostic_settings.log_analytics_workspace_id
+  storage_account_id             = var.diagnostic_settings.storage_account_id
   eventhub_authorization_rule_id = var.diagnostic_settings.eventhub_auth_rule_id
 
-  # TODO: Configure specific log categories for this resource type
-  # Example log categories (update based on actual resource):
-  # enabled_log {
-  #   category = "StorageRead"
-  #   retention_policy {
-  #     enabled = true
-  #     days    = var.diagnostic_settings.logs.retention_days
-  #   }
-  # }
-
-  # enabled_log {
-  #   category = "StorageWrite"
-  #   retention_policy {
-  #     enabled = true
-  #     days    = var.diagnostic_settings.logs.retention_days
-  #   }
-  # }
-
-  metric {
-    category = "AllMetrics"
-    enabled  = var.diagnostic_settings.metrics.enabled
-
-    retention_policy {
-      enabled = true
-      days    = var.diagnostic_settings.metrics.retention_days
+  # Virtual Network Logs
+  dynamic "enabled_log" {
+    for_each = {
+      for k, v in {
+        "VMProtectionAlerts" = var.diagnostic_settings.logs.vm_protection_alerts
+      } : k => v if v
+    }
+    content {
+      category = enabled_log.key
     }
   }
+
+  # Virtual Network Metrics
+  dynamic "metric" {
+    for_each = {
+      for k, v in {
+        "AllMetrics" = var.diagnostic_settings.metrics.all_metrics
+      } : k => v if v
+    }
+    content {
+      category = metric.key
+    }
+  }
+
+  depends_on = [azurerm_virtual_network.virtual_network]
 }
