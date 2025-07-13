@@ -154,7 +154,6 @@ module "virtual_network" {
   }
 
   # Lifecycle Management - prevent accidental deletion
-  prevent_destroy = true
 
   tags = {
     Environment   = "Production"

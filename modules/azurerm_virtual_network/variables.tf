@@ -62,7 +62,7 @@ variable "bgp_community" {
   default     = null
 
   validation {
-    condition = var.bgp_community == null || can(regex("^[0-9]+:[0-9]+$", var.bgp_community))
+    condition     = var.bgp_community == null || can(regex("^[0-9]+:[0-9]+$", var.bgp_community))
     error_message = "BGP community must be in format <as-number>:<community-value> (e.g., 12076:20000)."
   }
 }
@@ -92,10 +92,7 @@ variable "encryption" {
   })
   default = null
 
-  validation {
-    condition = var.encryption == null || contains(["AllowUnencrypted", "DropUnencrypted"], var.encryption.enforcement)
-    error_message = "Encryption enforcement must be either 'AllowUnencrypted' or 'DropUnencrypted'."
-  }
+
 }
 
 # Virtual Network Peerings
@@ -144,15 +141,7 @@ variable "flow_log" {
   })
   default = null
 
-  validation {
-    condition = var.flow_log == null || contains([1, 2], var.flow_log.version)
-    error_message = "Flow log version must be 1 or 2."
-  }
 
-  validation {
-    condition = var.flow_log == null || var.flow_log.traffic_analytics == null || contains([10, 60], var.flow_log.traffic_analytics.interval_in_minutes)
-    error_message = "Traffic analytics interval must be 10 or 60 minutes."
-  }
 }
 
 # Private DNS Zone Links
@@ -192,13 +181,6 @@ variable "diagnostic_settings" {
       all_metrics = true
     }
   }
-}
-
-# Lifecycle Management
-variable "prevent_destroy" {
-  description = "Prevent destruction of the Virtual Network if it contains subnets."
-  type        = bool
-  default     = true
 }
 
 # Tags

@@ -32,7 +32,6 @@ module "virtual_network" {
 
   # Basic configuration with defaults
   flow_timeout_in_minutes = 4
-  prevent_destroy         = false
 
   tags = {
     Environment = "Development"

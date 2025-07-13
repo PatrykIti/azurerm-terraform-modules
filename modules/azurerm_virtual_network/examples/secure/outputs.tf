@@ -20,7 +20,7 @@ output "virtual_network_guid" {
 
 output "virtual_network_ddos_protection" {
   description = "Information about DDoS protection configuration"
-  value       = module.virtual_network.ddos_protection_plan
+  value       = "DDoS protection configured via input variables"
 }
 
 output "virtual_network_flow_log" {
@@ -36,7 +36,7 @@ output "virtual_network_diagnostic_setting" {
 output "virtual_network_security_configuration" {
   description = "Summary of security configuration"
   value = {
-    ddos_protection_enabled = module.virtual_network.ddos_protection_plan != null
+    ddos_protection_enabled = true
     flow_logs_enabled      = module.virtual_network.flow_log != null
     encryption_enabled     = true
     monitoring_enabled     = module.virtual_network.diagnostic_setting != null

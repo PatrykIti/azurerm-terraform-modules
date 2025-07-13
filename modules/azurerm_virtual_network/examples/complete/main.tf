@@ -144,7 +144,6 @@ module "virtual_network" {
   }
 
   # Lifecycle Management
-  prevent_destroy = false
 
   tags = {
     Environment = "Development"

@@ -60,12 +60,11 @@ output "peerings" {
 output "flow_log" {
   description = "Information about Network Watcher Flow Log (if configured)."
   value = var.flow_log != null ? {
-    id                        = try(azurerm_network_watcher_flow_log.flow_log[0].id, null)
-    name                      = try(azurerm_network_watcher_flow_log.flow_log[0].name, null)
-    enabled                   = try(azurerm_network_watcher_flow_log.flow_log[0].enabled, null)
-    version                   = try(azurerm_network_watcher_flow_log.flow_log[0].version, null)
-    storage_account_id        = try(azurerm_network_watcher_flow_log.flow_log[0].storage_account_id, null)
-    network_security_group_id = try(azurerm_network_watcher_flow_log.flow_log[0].network_security_group_id, null)
+    id                 = try(azurerm_network_watcher_flow_log.flow_log[0].id, null)
+    name               = try(azurerm_network_watcher_flow_log.flow_log[0].name, null)
+    enabled            = try(azurerm_network_watcher_flow_log.flow_log[0].enabled, null)
+    version            = try(azurerm_network_watcher_flow_log.flow_log[0].version, null)
+    storage_account_id = try(azurerm_network_watcher_flow_log.flow_log[0].storage_account_id, null)
   } : null
 }
 

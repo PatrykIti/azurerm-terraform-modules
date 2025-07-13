@@ -41,7 +41,8 @@ resource "azurerm_virtual_network" "virtual_network" {
 
   lifecycle {
     # Prevent destruction of VNet if it contains subnets
-    prevent_destroy = var.prevent_destroy
+    # Note: prevent_destroy must be a literal value, not a variable
+    prevent_destroy = true
   }
 }
 
