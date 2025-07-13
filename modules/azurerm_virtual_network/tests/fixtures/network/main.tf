@@ -28,9 +28,9 @@ module "virtual_network" {
 
   name                    = "vnet-dpc-net-${var.random_suffix}"
   resource_group_name     = azurerm_resource_group.test.name
-  location               = azurerm_resource_group.test.location
-  address_space          = ["10.0.0.0/16"]
-  dns_servers            = ["10.0.0.4", "10.0.0.5"]
+  location                = azurerm_resource_group.test.location
+  address_space           = ["10.0.0.0/16"]
+  dns_servers             = ["10.0.0.4", "10.0.0.5"]
   flow_timeout_in_minutes = 20
 
   tags = {
@@ -106,12 +106,12 @@ resource "azurerm_route_table" "web" {
   name                          = "rt-web-${var.random_suffix}"
   location                      = azurerm_resource_group.test.location
   resource_group_name           = azurerm_resource_group.test.name
-  disable_bgp_route_propagation = false
+  bgp_route_propagation_enabled = true
 
   route {
-    name                   = "ToInternet"
-    address_prefix         = "0.0.0.0/0"
-    next_hop_type          = "Internet"
+    name           = "ToInternet"
+    address_prefix = "0.0.0.0/0"
+    next_hop_type  = "Internet"
   }
 
   tags = {
@@ -125,7 +125,7 @@ resource "azurerm_route_table" "app" {
   name                          = "rt-app-${var.random_suffix}"
   location                      = azurerm_resource_group.test.location
   resource_group_name           = azurerm_resource_group.test.name
-  disable_bgp_route_propagation = false
+  bgp_route_propagation_enabled = true
 
   route {
     name                   = "ToFirewall"
