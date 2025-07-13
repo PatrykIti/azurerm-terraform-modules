@@ -17,15 +17,15 @@ provider "azurerm" {
 
 # Create a resource group for this example
 resource "azurerm_resource_group" "example" {
-  name     = "rg-vnet-basic-example"
-  location = "West Europe"
+  name     = var.resource_group_name
+  location = var.location
 }
 
 # Basic Virtual Network configuration
 module "virtual_network" {
   source = "../../"
 
-  name                = "vnet-basic-example"
+  name                = var.virtual_network_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   address_space       = ["10.0.0.0/16"]

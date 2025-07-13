@@ -1,21 +1,41 @@
+# Basic Virtual Network Example
+# This example demonstrates the minimal configuration required to create a Virtual Network
+
+terraform {
+  required_version = ">= 1.3.0"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "4.35.0"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-virtual_network-basic-example"
-  location = "West Europe"
+# Create a resource group for this test
+resource "azurerm_resource_group" "test" {
+  name     = "rg-dpc-bas-${var.random_suffix}"
+  location = var.location
 }
 
+# Basic Virtual Network configuration
 module "virtual_network" {
-  source = "../../"
+  source = "../../../"
 
-  name                = "virtualnetworkexample001"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name                = "vnet-dpc-bas-${var.random_suffix}"
+  resource_group_name = azurerm_resource_group.test.name
+  location            = azurerm_resource_group.test.location
+  address_space       = ["10.0.0.0/16"]
+
+  # Basic configuration with defaults
+  flow_timeout_in_minutes = 4
 
   tags = {
-    Environment = "Development"
-    Example     = "Basic"
+    Environment = "Test"
+    Module      = "azurerm_virtual_network"
+    Test        = "Basic"
   }
 }

@@ -3,3 +3,8 @@ variable "location" {
   type        = string
   default     = "West Europe"
 }
+
+variable "random_suffix" {
+  description = "Random suffix for resource naming"
+  type        = string
+}
