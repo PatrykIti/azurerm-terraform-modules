@@ -1,52 +1,300 @@
 package test
 
 import (
+	"fmt"
+	"strings"
 	"testing"
+	"time"
 
+	"github.com/gruntwork-io/terratest/modules/azure"
+	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestModuleBasic(t *testing.T) {
+func TestVirtualNetworkBasic(t *testing.T) {
 	t.Parallel()
+
+	// Generate unique names for resources
+	uniqueID := random.UniqueId()
+	resourceGroupName := fmt.Sprintf("rg-vnet-basic-test-%s", uniqueID)
+	virtualNetworkName := fmt.Sprintf("vnet-basic-test-%s", uniqueID)
+	location := "West Europe"
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: "../examples/basic",
+		Vars: map[string]interface{}{
+			"resource_group_name":    resourceGroupName,
+			"virtual_network_name":   virtualNetworkName,
+			"location":               location,
+		},
+		RetryableTerraformErrors: map[string]string{
+			".*": "Terraform operation failed",
+		},
+		MaxRetries:         3,
+		TimeBetweenRetries: 5 * time.Second,
 	})
 
 	defer terraform.Destroy(t, terraformOptions)
 
 	terraform.InitAndApply(t, terraformOptions)
 
-	// Add assertions here
+	// Test outputs
 	outputID := terraform.Output(t, terraformOptions, "virtual_network_id")
-	assert.NotEmpty(t, outputID)
-
 	outputName := terraform.Output(t, terraformOptions, "virtual_network_name")
-	assert.NotEmpty(t, outputName)
+	outputAddressSpace := terraform.Output(t, terraformOptions, "virtual_network_address_space")
+	outputGUID := terraform.Output(t, terraformOptions, "virtual_network_guid")
+
+	// Assertions
+	assert.NotEmpty(t, outputID)
+	assert.Equal(t, virtualNetworkName, outputName)
+	assert.NotEmpty(t, outputAddressSpace)
+	assert.NotEmpty(t, outputGUID)
+
+	// Verify the Virtual Network exists in Azure
+	subscriptionID := ""
+	virtualNetwork := azure.GetVirtualNetwork(t, virtualNetworkName, resourceGroupName, subscriptionID)
+	assert.Equal(t, virtualNetworkName, *virtualNetwork.Name)
+	assert.Equal(t, location, *virtualNetwork.Location)
+	assert.NotEmpty(t, virtualNetwork.AddressSpace.AddressPrefixes)
 }
 
-func TestModuleComplete(t *testing.T) {
+func TestVirtualNetworkComplete(t *testing.T) {
 	t.Parallel()
+
+	// Generate unique names for resources
+	uniqueID := random.UniqueId()
+	resourceGroupName := fmt.Sprintf("rg-vnet-complete-test-%s", uniqueID)
+	virtualNetworkName := fmt.Sprintf("vnet-complete-test-%s", uniqueID)
+	location := "West Europe"
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: "../examples/complete",
+		Vars: map[string]interface{}{
+			"resource_group_name":    resourceGroupName,
+			"virtual_network_name":   virtualNetworkName,
+			"location":               location,
+		},
+		RetryableTerraformErrors: map[string]string{
+			".*": "Terraform operation failed",
+		},
+		MaxRetries:         3,
+		TimeBetweenRetries: 10 * time.Second,
 	})
 
 	defer terraform.Destroy(t, terraformOptions)
 
 	terraform.InitAndApply(t, terraformOptions)
 
-	// Add comprehensive assertions here
+	// Test outputs
 	outputID := terraform.Output(t, terraformOptions, "virtual_network_id")
-	assert.NotEmpty(t, outputID)
-
 	outputName := terraform.Output(t, terraformOptions, "virtual_network_name")
-	assert.NotEmpty(t, outputName)
+	outputAddressSpace := terraform.Output(t, terraformOptions, "virtual_network_address_space")
+	outputPeerings := terraform.Output(t, terraformOptions, "virtual_network_peerings")
+	outputDNSLinks := terraform.Output(t, terraformOptions, "virtual_network_dns_links")
+
+	// Assertions
+	assert.NotEmpty(t, outputID)
+	assert.Equal(t, virtualNetworkName, outputName)
+	assert.NotEmpty(t, outputAddressSpace)
+	assert.NotEmpty(t, outputPeerings)
+	assert.NotEmpty(t, outputDNSLinks)
+
+	// Verify the Virtual Network exists in Azure with expected configuration
+	subscriptionID := ""
+	virtualNetwork := azure.GetVirtualNetwork(t, virtualNetworkName, resourceGroupName, subscriptionID)
+	assert.Equal(t, virtualNetworkName, *virtualNetwork.Name)
+	assert.Equal(t, location, *virtualNetwork.Location)
+	
+	// Verify multiple address spaces
+	require.NotNil(t, virtualNetwork.AddressSpace)
+	require.NotNil(t, virtualNetwork.AddressSpace.AddressPrefixes)
+	assert.GreaterOrEqual(t, len(*virtualNetwork.AddressSpace.AddressPrefixes), 2)
+	
+	// Verify DNS servers configuration
+	require.NotNil(t, virtualNetwork.DhcpOptions)
+	require.NotNil(t, virtualNetwork.DhcpOptions.DNSServers)
+	assert.GreaterOrEqual(t, len(*virtualNetwork.DhcpOptions.DNSServers), 2)
 }
 
-func TestModuleSecure(t *testing.T) {
+func TestVirtualNetworkSecure(t *testing.T) {
 	t.Parallel()
+
+	// Generate unique names for resources
+	uniqueID := random.UniqueId()
+	resourceGroupName := fmt.Sprintf("rg-vnet-secure-test-%s", uniqueID)
+	virtualNetworkName := fmt.Sprintf("vnet-secure-test-%s", uniqueID)
+	location := "West Europe"
+
+	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
+		TerraformDir: "../examples/secure",
+		Vars: map[string]interface{}{
+			"resource_group_name":    resourceGroupName,
+			"virtual_network_name":   virtualNetworkName,
+			"location":               location,
+		},
+		RetryableTerraformErrors: map[string]string{
+			".*": "Terraform operation failed",
+		},
+		MaxRetries:         3,
+		TimeBetweenRetries: 15 * time.Second,
+	})
+
+	defer terraform.Destroy(t, terraformOptions)
+
+	terraform.InitAndApply(t, terraformOptions)
+
+	// Test outputs
+	outputID := terraform.Output(t, terraformOptions, "virtual_network_id")
+	outputName := terraform.Output(t, terraformOptions, "virtual_network_name")
+	outputDDosProtection := terraform.Output(t, terraformOptions, "virtual_network_ddos_protection")
+	outputFlowLog := terraform.Output(t, terraformOptions, "virtual_network_flow_log")
+
+	// Assertions
+	assert.NotEmpty(t, outputID)
+	assert.Equal(t, virtualNetworkName, outputName)
+	assert.NotEmpty(t, outputDDosProtection)
+	assert.NotEmpty(t, outputFlowLog)
+
+	// Verify the Virtual Network exists in Azure with security features
+	subscriptionID := ""
+	virtualNetwork := azure.GetVirtualNetwork(t, virtualNetworkName, resourceGroupName, subscriptionID)
+	assert.Equal(t, virtualNetworkName, *virtualNetwork.Name)
+	assert.Equal(t, location, *virtualNetwork.Location)
+	
+	// Verify DDoS protection is enabled
+	require.NotNil(t, virtualNetwork.DdosProtectionPlan)
+	assert.True(t, *virtualNetwork.EnableDdosProtection)
+}
+
+func TestVirtualNetworkValidation(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name          string
+		addressSpace  []string
+		expectedError string
+	}{
+		{
+			name:          "Valid single address space",
+			addressSpace:  []string{"10.0.0.0/16"},
+			expectedError: "",
+		},
+		{
+			name:          "Valid multiple address spaces",
+			addressSpace:  []string{"10.0.0.0/16", "10.1.0.0/16"},
+			expectedError: "",
+		},
+		{
+			name:          "Empty address space",
+			addressSpace:  []string{},
+			expectedError: "At least one address space must be provided",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			uniqueID := random.UniqueId()
+			resourceGroupName := fmt.Sprintf("rg-vnet-validation-test-%s", uniqueID)
+			virtualNetworkName := fmt.Sprintf("vnet-validation-test-%s", uniqueID)
+
+			terraformOptions := &terraform.Options{
+				TerraformDir: "../fixtures/basic",
+				Vars: map[string]interface{}{
+					"resource_group_name":  resourceGroupName,
+					"virtual_network_name": virtualNetworkName,
+					"address_space":        tc.addressSpace,
+				},
+			}
+
+			if tc.expectedError != "" {
+				_, err := terraform.InitAndPlanE(t, terraformOptions)
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tc.expectedError)
+			} else {
+				defer terraform.Destroy(t, terraformOptions)
+				terraform.InitAndApply(t, terraformOptions)
+				
+				outputID := terraform.Output(t, terraformOptions, "virtual_network_id")
+				assert.NotEmpty(t, outputID)
+			}
+		})
+	}
+}
+
+func TestVirtualNetworkNaming(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name          string
+		vnetName      string
+		expectedError bool
+	}{
+		{
+			name:          "Valid name with hyphens",
+			vnetName:      "vnet-test-example",
+			expectedError: false,
+		},
+		{
+			name:          "Valid name with underscores",
+			vnetName:      "vnet_test_example",
+			expectedError: false,
+		},
+		{
+			name:          "Valid name with periods",
+			vnetName:      "vnet.test.example",
+			expectedError: false,
+		},
+		{
+			name:          "Invalid name starting with hyphen",
+			vnetName:      "-vnet-test",
+			expectedError: true,
+		},
+		{
+			name:          "Invalid name ending with hyphen",
+			vnetName:      "vnet-test-",
+			expectedError: true,
+		},
+		{
+			name:          "Invalid name too long",
+			vnetName:      strings.Repeat("a", 81),
+			expectedError: true,
+		},
+		{
+			name:          "Invalid name too short",
+			vnetName:      "a",
+			expectedError: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			uniqueID := random.UniqueId()
+			resourceGroupName := fmt.Sprintf("rg-vnet-naming-test-%s", uniqueID)
+
+			terraformOptions := &terraform.Options{
+				TerraformDir: "../fixtures/basic",
+				Vars: map[string]interface{}{
+					"resource_group_name":  resourceGroupName,
+					"virtual_network_name": tc.vnetName,
+					"address_space":        []string{"10.0.0.0/16"},
+				},
+			}
+
+			if tc.expectedError {
+				_, err := terraform.InitAndPlanE(t, terraformOptions)
+				assert.Error(t, err)
+			} else {
+				defer terraform.Destroy(t, terraformOptions)
+				terraform.InitAndApply(t, terraformOptions)
+				
+				outputName := terraform.Output(t, terraformOptions, "virtual_network_name")
+				assert.Equal(t, tc.vnetName, outputName)
+			}
+		})
+	}
+}
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: "../examples/secure",
