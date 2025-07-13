@@ -49,7 +49,7 @@ resource "azurerm_log_analytics_workspace" "security" {
 
 # Create Storage Account for security logs
 resource "azurerm_storage_account" "security" {
-  name                     = "stvnetsecurityexample"
+  name                     = "stvnetsecurityexample2"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -59,7 +59,7 @@ resource "azurerm_storage_account" "security" {
   https_traffic_only_enabled      = true
   min_tls_version                 = "TLS1_2"
   public_network_access_enabled   = false
-  shared_access_key_enabled       = false
+  shared_access_key_enabled       = true  # Required for flow logs
   allow_nested_items_to_be_public = false
 
   tags = {
@@ -114,9 +114,9 @@ module "virtual_network" {
     enable = true
   }
 
-  # Encryption Configuration - enforce encrypted traffic
+  # Encryption Configuration - allow unencrypted (subscription limitation)
   encryption = {
-    enforcement = "DropUnencrypted"
+    enforcement = "AllowUnencrypted"
   }
 
   # Network Watcher Flow Log for security monitoring
