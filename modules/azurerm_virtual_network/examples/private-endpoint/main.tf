@@ -95,7 +95,7 @@ resource "azurerm_subnet" "private_endpoints" {
   address_prefixes     = ["10.0.1.0/24"]
 
   # Disable network policies for private endpoints
-  private_endpoint_network_policies_enabled = false
+  private_endpoint_network_policies = "Disabled"
 
   depends_on = [module.virtual_network]
 }
