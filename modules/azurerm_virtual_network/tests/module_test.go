@@ -12,7 +12,7 @@ import (
 func TestVirtualNetworkBasic(t *testing.T) {
 	t.Parallel()
 
-	terraformOptions := getTerraformOptions(t, "../fixtures/basic")
+	terraformOptions := getTerraformOptions(t, "./fixtures/basic")
 
 	defer terraform.Destroy(t, terraformOptions)
 
@@ -46,7 +46,7 @@ func TestVirtualNetworkBasic(t *testing.T) {
 func TestVirtualNetworkComplete(t *testing.T) {
 	t.Parallel()
 
-	terraformOptions := getTerraformOptions(t, "../fixtures/complete")
+	terraformOptions := getTerraformOptions(t, "./fixtures/complete")
 
 	defer terraform.Destroy(t, terraformOptions)
 
@@ -91,7 +91,7 @@ func TestVirtualNetworkComplete(t *testing.T) {
 func TestVirtualNetworkSecure(t *testing.T) {
 	t.Parallel()
 
-	terraformOptions := getTerraformOptions(t, "../fixtures/secure")
+	terraformOptions := getTerraformOptions(t, "./fixtures/secure")
 
 	defer terraform.Destroy(t, terraformOptions)
 
@@ -152,7 +152,7 @@ func TestVirtualNetworkValidation(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			terraformOptions := getTerraformOptions(t, "../fixtures/basic")
+			terraformOptions := getTerraformOptions(t, "./fixtures/basic")
 			terraformOptions.Vars["address_space"] = tc.addressSpace
 
 			if tc.expectedError != "" {
@@ -218,14 +218,14 @@ func TestVirtualNetworkNaming(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Use appropriate fixture for negative tests
-			fixturePath := "../fixtures/basic"
+			fixturePath := "./fixtures/basic"
 			if tc.expectedError {
 				if tc.name == "Invalid name too short" {
-					fixturePath = "../fixtures/negative/invalid_name_short"
+					fixturePath = "./fixtures/negative/invalid_name_short"
 				} else if tc.name == "Invalid name too long" {
-					fixturePath = "../fixtures/negative/invalid_name_long"
+					fixturePath = "./fixtures/negative/invalid_name_long"
 				} else if strings.Contains(tc.name, "Invalid name") {
-					fixturePath = "../fixtures/negative/invalid_name_chars"
+					fixturePath = "./fixtures/negative/invalid_name_chars"
 				}
 			}
 			
