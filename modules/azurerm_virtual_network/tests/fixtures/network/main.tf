@@ -1,5 +1,6 @@
 # Network Test Fixture
-# This fixture demonstrates network-specific features like subnets, NSGs, and network configurations
+# This fixture demonstrates how virtual network integrates with other network resources
+# using separate resource blocks (NSG, Route Table, Subnets)
 
 terraform {
   required_version = ">= 1.3.0"
@@ -21,9 +22,27 @@ resource "azurerm_resource_group" "test" {
   location = var.location
 }
 
-# Create Network Security Groups for test
+# Virtual Network - Simple module call without subnets
+module "virtual_network" {
+  source = "../../../"
+
+  name                    = "vnet-dpc-net-${var.random_suffix}"
+  resource_group_name     = azurerm_resource_group.test.name
+  location               = azurerm_resource_group.test.location
+  address_space          = ["10.0.0.0/16"]
+  dns_servers            = ["10.0.0.4", "10.0.0.5"]
+  flow_timeout_in_minutes = 20
+
+  tags = {
+    Environment = "Test"
+    Module      = "azurerm_virtual_network"
+    Test        = "Network"
+  }
+}
+
+# Create Network Security Groups
 resource "azurerm_network_security_group" "web" {
-  name                = "nsg-dpc-net-web-${var.random_suffix}"
+  name                = "nsg-web-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
 
@@ -59,12 +78,12 @@ resource "azurerm_network_security_group" "web" {
 }
 
 resource "azurerm_network_security_group" "app" {
-  name                = "nsg-dpc-net-app-${var.random_suffix}"
+  name                = "nsg-app-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
 
   security_rule {
-    name                       = "AllowAppPort"
+    name                       = "AllowWebSubnet"
     priority                   = 100
     direction                  = "Inbound"
     access                     = "Allow"
@@ -82,16 +101,17 @@ resource "azurerm_network_security_group" "app" {
   }
 }
 
-# Create Route Table for test
-resource "azurerm_route_table" "test" {
-  name                = "rt-dpc-net-${var.random_suffix}"
-  location            = azurerm_resource_group.test.location
-  resource_group_name = azurerm_resource_group.test.name
+# Create Route Tables
+resource "azurerm_route_table" "web" {
+  name                          = "rt-web-${var.random_suffix}"
+  location                      = azurerm_resource_group.test.location
+  resource_group_name           = azurerm_resource_group.test.name
+  disable_bgp_route_propagation = false
 
   route {
-    name           = "route-to-internet"
-    address_prefix = "0.0.0.0/0"
-    next_hop_type  = "Internet"
+    name                   = "ToInternet"
+    address_prefix         = "0.0.0.0/0"
+    next_hop_type          = "Internet"
   }
 
   tags = {
@@ -101,53 +121,66 @@ resource "azurerm_route_table" "test" {
   }
 }
 
-# Network configuration with subnets and associated resources
-module "virtual_network" {
-  source = "../../../"
+resource "azurerm_route_table" "app" {
+  name                          = "rt-app-${var.random_suffix}"
+  location                      = azurerm_resource_group.test.location
+  resource_group_name           = azurerm_resource_group.test.name
+  disable_bgp_route_propagation = false
 
-  name                = "vnet-dpc-net-${var.random_suffix}"
-  resource_group_name = azurerm_resource_group.test.name
-  location            = azurerm_resource_group.test.location
-  address_space       = ["10.0.0.0/16"]
-
-  # DNS Configuration
-  dns_servers = ["10.0.0.4", "10.0.0.5"]
-
-  # Subnet Configuration with NSG and Route Table associations
-  subnets = [
-    {
-      name                                  = "WebSubnet"
-      address_prefixes                      = ["10.0.1.0/24"]
-      service_endpoints                     = ["Microsoft.Storage", "Microsoft.Sql"]
-      private_endpoint_network_policies     = "Disabled"
-      private_link_service_network_policies = "Disabled"
-      network_security_group_id             = azurerm_network_security_group.web.id
-      route_table_id                        = azurerm_route_table.test.id
-    },
-    {
-      name                              = "AppSubnet"
-      address_prefixes                  = ["10.0.2.0/24"]
-      service_endpoints                 = ["Microsoft.Storage", "Microsoft.KeyVault"]
-      private_endpoint_network_policies = "Enabled"
-      network_security_group_id         = azurerm_network_security_group.app.id
-    },
-    {
-      name              = "DatabaseSubnet"
-      address_prefixes  = ["10.0.3.0/24"]
-      service_endpoints = ["Microsoft.Sql"]
-      delegation = {
-        name = "postgresql-delegation"
-        service_delegation = {
-          name    = "Microsoft.DBforPostgreSQL/flexibleServers"
-          actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
-        }
-      }
-    }
-  ]
+  route {
+    name                   = "ToFirewall"
+    address_prefix         = "0.0.0.0/0"
+    next_hop_type          = "VirtualAppliance"
+    next_hop_in_ip_address = "10.0.3.4"
+  }
 
   tags = {
     Environment = "Test"
     Module      = "azurerm_virtual_network"
     Test        = "Network"
   }
+}
+
+# Create Subnets as separate resources
+resource "azurerm_subnet" "web" {
+  name                 = "snet-web"
+  resource_group_name  = azurerm_resource_group.test.name
+  virtual_network_name = module.virtual_network.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+resource "azurerm_subnet" "app" {
+  name                 = "snet-app"
+  resource_group_name  = azurerm_resource_group.test.name
+  virtual_network_name = module.virtual_network.name
+  address_prefixes     = ["10.0.2.0/24"]
+}
+
+resource "azurerm_subnet" "firewall" {
+  name                 = "AzureFirewallSubnet"
+  resource_group_name  = azurerm_resource_group.test.name
+  virtual_network_name = module.virtual_network.name
+  address_prefixes     = ["10.0.3.0/24"]
+}
+
+# Associate NSGs with Subnets
+resource "azurerm_subnet_network_security_group_association" "web" {
+  subnet_id                 = azurerm_subnet.web.id
+  network_security_group_id = azurerm_network_security_group.web.id
+}
+
+resource "azurerm_subnet_network_security_group_association" "app" {
+  subnet_id                 = azurerm_subnet.app.id
+  network_security_group_id = azurerm_network_security_group.app.id
+}
+
+# Associate Route Tables with Subnets
+resource "azurerm_subnet_route_table_association" "web" {
+  subnet_id      = azurerm_subnet.web.id
+  route_table_id = azurerm_route_table.web.id
+}
+
+resource "azurerm_subnet_route_table_association" "app" {
+  subnet_id      = azurerm_subnet.app.id
+  route_table_id = azurerm_route_table.app.id
 }

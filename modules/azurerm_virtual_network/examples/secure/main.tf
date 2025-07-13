@@ -23,7 +23,7 @@ resource "azurerm_resource_group" "example" {
 
 # Create DDoS Protection Plan for enhanced security
 resource "azurerm_network_ddos_protection_plan" "example" {
-  name                = "ddos-protection-plan-example"
+  name                = "ddos-vnet-secure-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -35,7 +35,7 @@ resource "azurerm_network_ddos_protection_plan" "example" {
 
 # Create Log Analytics Workspace for security monitoring
 resource "azurerm_log_analytics_workspace" "security" {
-  name                = "law-vnet-security-example"
+  name                = "law-vnet-secure-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
@@ -49,7 +49,7 @@ resource "azurerm_log_analytics_workspace" "security" {
 
 # Create Storage Account for security logs
 resource "azurerm_storage_account" "security" {
-  name                     = "stvnetsecurityexample2"
+  name                     = "stvnetsecureexample"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
