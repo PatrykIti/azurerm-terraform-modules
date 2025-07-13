@@ -90,11 +90,62 @@ func WaitForResourceDeletion(ctx context.Context, checkFunc func() (bool, error)
 // GenerateResourceName generates a unique resource name for testing
 func GenerateResourceName(prefix string, uniqueID string) string {
 	// Ensure the name meets Azure naming requirements
-	name := fmt.Sprintf("%s%s", prefix, uniqueID)
-	// Remove any invalid characters and ensure length limits
-	name = strings.ReplaceAll(name, "-", "")
-	if len(name) > 24 {
-		name = name[:24]
+	name := fmt.Sprintf("%s-%s", prefix, uniqueID)
+	// Ensure length limits for Virtual Network (max 80 characters)
+	if len(name) > 80 {
+		name = name[:80]
 	}
 	return strings.ToLower(name)
+}
+
+// GenerateVirtualNetworkName generates a unique Virtual Network name for testing
+func GenerateVirtualNetworkName(uniqueID string) string {
+	return GenerateResourceName("vnet-test", uniqueID)
+}
+
+// ValidateVirtualNetworkName validates that a Virtual Network name meets Azure requirements
+func ValidateVirtualNetworkName(name string) error {
+	if len(name) < 2 || len(name) > 80 {
+		return fmt.Errorf("Virtual Network name must be between 2 and 80 characters")
+	}
+	
+	// Must start and end with alphanumeric character
+	if !((name[0] >= 'a' && name[0] <= 'z') || (name[0] >= 'A' && name[0] <= 'Z') || (name[0] >= '0' && name[0] <= '9')) {
+		return fmt.Errorf("Virtual Network name must start with alphanumeric character")
+	}
+	
+	lastChar := name[len(name)-1]
+	if !((lastChar >= 'a' && lastChar <= 'z') || (lastChar >= 'A' && lastChar <= 'Z') || (lastChar >= '0' && lastChar <= '9')) {
+		return fmt.Errorf("Virtual Network name must end with alphanumeric character")
+	}
+	
+	// Can contain alphanumeric characters, hyphens, periods, and underscores
+	for _, char := range name {
+		if !((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9') || char == '-' || char == '.' || char == '_') {
+			return fmt.Errorf("Virtual Network name can only contain alphanumeric characters, hyphens, periods, and underscores")
+		}
+	}
+	
+	return nil
+}
+
+// ValidateAddressSpace validates that address spaces are valid CIDR blocks
+func ValidateAddressSpace(addressSpaces []string) error {
+	if len(addressSpaces) == 0 {
+		return fmt.Errorf("at least one address space must be provided")
+	}
+	
+	for _, addressSpace := range addressSpaces {
+		if !strings.Contains(addressSpace, "/") {
+			return fmt.Errorf("address space %s is not a valid CIDR block", addressSpace)
+		}
+		
+		// Basic CIDR validation - could be enhanced with more sophisticated checks
+		parts := strings.Split(addressSpace, "/")
+		if len(parts) != 2 {
+			return fmt.Errorf("address space %s is not a valid CIDR block", addressSpace)
+		}
+	}
+	
+	return nil
 }

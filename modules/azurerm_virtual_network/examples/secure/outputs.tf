@@ -7,3 +7,68 @@ output "virtual_network_name" {
   description = "The name of the created Virtual Network"
   value       = module.virtual_network.name
 }
+
+output "virtual_network_address_space" {
+  description = "The address space of the created Virtual Network"
+  value       = module.virtual_network.address_space
+}
+
+output "virtual_network_guid" {
+  description = "The GUID of the created Virtual Network"
+  value       = module.virtual_network.guid
+}
+
+output "virtual_network_ddos_protection" {
+  description = "Information about DDoS protection configuration"
+  value       = module.virtual_network.ddos_protection_plan
+}
+
+output "virtual_network_flow_log" {
+  description = "Information about network flow log configuration"
+  value       = module.virtual_network.flow_log
+}
+
+output "virtual_network_diagnostic_setting" {
+  description = "Information about diagnostic settings"
+  value       = module.virtual_network.diagnostic_setting
+}
+
+output "virtual_network_security_configuration" {
+  description = "Summary of security configuration"
+  value = {
+    ddos_protection_enabled = module.virtual_network.ddos_protection_plan != null
+    flow_logs_enabled      = module.virtual_network.flow_log != null
+    encryption_enabled     = true
+    monitoring_enabled     = module.virtual_network.diagnostic_setting != null
+  }
+}
+
+output "ddos_protection_plan_id" {
+  description = "The ID of the DDoS protection plan"
+  value       = azurerm_network_ddos_protection_plan.example.id
+}
+
+output "network_watcher_id" {
+  description = "The ID of the Network Watcher"
+  value       = azurerm_network_watcher.example.id
+}
+
+output "log_analytics_workspace_id" {
+  description = "The ID of the Log Analytics workspace"
+  value       = azurerm_log_analytics_workspace.example.id
+}
+
+output "storage_account_id" {
+  description = "The ID of the storage account for flow logs"
+  value       = azurerm_storage_account.example.id
+}
+
+output "resource_group_name" {
+  description = "The name of the resource group"
+  value       = azurerm_resource_group.example.name
+}
+
+output "location" {
+  description = "The Azure region where resources were created"
+  value       = azurerm_resource_group.example.location
+}
