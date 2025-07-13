@@ -1,12 +1,9 @@
 package test
 
 import (
-	"fmt"
 	"strings"
 	"testing"
-	"time"
 
-	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -220,22 +217,27 @@ func TestVirtualNetworkNaming(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			uniqueID := random.UniqueId()
-			resourceGroupName := fmt.Sprintf("rg-vnet-naming-test-%s", uniqueID)
-
-			terraformOptions := &terraform.Options{
-				TerraformDir: "../fixtures/basic",
-				Vars: map[string]interface{}{
-					"resource_group_name":  resourceGroupName,
-					"virtual_network_name": tc.vnetName,
-					"address_space":        []string{"10.0.0.0/16"},
-				},
+			// Use appropriate fixture for negative tests
+			fixturePath := "../fixtures/basic"
+			if tc.expectedError {
+				if tc.name == "Invalid name too short" {
+					fixturePath = "../fixtures/negative/invalid_name_short"
+				} else if tc.name == "Invalid name too long" {
+					fixturePath = "../fixtures/negative/invalid_name_long"
+				} else if strings.Contains(tc.name, "Invalid name") {
+					fixturePath = "../fixtures/negative/invalid_name_chars"
+				}
 			}
+			
+			terraformOptions := getTerraformOptions(t, fixturePath)
 
 			if tc.expectedError {
 				_, err := terraform.InitAndPlanE(t, terraformOptions)
 				assert.Error(t, err)
 			} else {
+				// For valid names, override the generated name
+				terraformOptions.Vars["virtual_network_name"] = tc.vnetName
+				
 				defer terraform.Destroy(t, terraformOptions)
 				terraform.InitAndApply(t, terraformOptions)
 				

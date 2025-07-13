@@ -25,10 +25,10 @@ resource "azurerm_resource_group" "test" {
 module "virtual_network" {
   source = "../../../"
 
-  name                = "vnet-dpc-bas-${var.random_suffix}"
+  name                = var.virtual_network_name != "" ? var.virtual_network_name : "vnet-dpc-bas-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
-  address_space       = ["10.0.0.0/16"]
+  address_space       = var.address_space
 
   # Basic configuration with defaults
   flow_timeout_in_minutes = 4

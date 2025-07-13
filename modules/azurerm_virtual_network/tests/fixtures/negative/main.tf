@@ -10,12 +10,13 @@ resource "azurerm_resource_group" "test" {
 
 # This should fail due to invalid name
 module "virtual_network" {
-  source = "../../../.."
+  source = "../../.."
 
   name                = "INVALID-NAME-WITH-UPPERCASE" # Should fail validation
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
 
+  address_space = []
   tags = {
     Environment = "Test"
     Scenario    = "Negative"
