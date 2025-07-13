@@ -12,6 +12,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5"
 	"github.com/gruntwork-io/terratest/modules/random"
+	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/require"
 )
 
@@ -167,4 +168,36 @@ func GetVirtualNetwork(t *testing.T, virtualNetworkName, resourceGroupName, subs
 	require.NoError(t, err, "Failed to get virtual network")
 
 	return &resp.VirtualNetwork
+}
+
+// getTerraformOptions returns terraform options for test runs
+func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
+	// Generate unique random suffix for resource naming
+	randomSuffix := generateRandomSuffix()
+	
+	return &terraform.Options{
+		TerraformDir: terraformDir,
+		Vars: map[string]interface{}{
+			"random_suffix": randomSuffix,
+		},
+		RetryableTerraformErrors: map[string]string{
+			".*": "Terraform operation failed",
+		},
+		MaxRetries:         3,
+		TimeBetweenRetries: 10 * time.Second,
+	}
+}
+
+// generateRandomSuffix generates a unique suffix for test resources
+func generateRandomSuffix() string {
+	// Use combination of random string and timestamp for uniqueness
+	timestamp := time.Now().Format("0102") // MMDD format
+	randomStr := strings.ToLower(random.UniqueId())
+	
+	// Limit the random string length to ensure total suffix is manageable
+	if len(randomStr) > 5 {
+		randomStr = randomStr[:5]
+	}
+	
+	return fmt.Sprintf("%s%s", randomStr, timestamp)
 }

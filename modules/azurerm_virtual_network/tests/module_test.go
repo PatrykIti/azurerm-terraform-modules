@@ -15,25 +15,7 @@ import (
 func TestVirtualNetworkBasic(t *testing.T) {
 	t.Parallel()
 
-	// Generate unique names for resources
-	uniqueID := random.UniqueId()
-	resourceGroupName := fmt.Sprintf("rg-vnet-basic-test-%s", uniqueID)
-	virtualNetworkName := fmt.Sprintf("vnet-basic-test-%s", uniqueID)
-	location := "West Europe"
-
-	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "../examples/basic",
-		Vars: map[string]interface{}{
-			"resource_group_name":    resourceGroupName,
-			"virtual_network_name":   virtualNetworkName,
-			"location":               location,
-		},
-		RetryableTerraformErrors: map[string]string{
-			".*": "Terraform operation failed",
-		},
-		MaxRetries:         3,
-		TimeBetweenRetries: 5 * time.Second,
-	})
+	terraformOptions := getTerraformOptions(t, "../fixtures/basic")
 
 	defer terraform.Destroy(t, terraformOptions)
 
@@ -47,40 +29,27 @@ func TestVirtualNetworkBasic(t *testing.T) {
 
 	// Assertions
 	assert.NotEmpty(t, outputID)
-	assert.Equal(t, virtualNetworkName, outputName)
+	assert.Contains(t, outputName, "vnet-dpc-bas-")
 	assert.NotEmpty(t, outputAddressSpace)
 	assert.NotEmpty(t, outputGUID)
+
+	// Get actual resource names from outputs
+	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+	virtualNetworkName := terraform.Output(t, terraformOptions, "virtual_network_name")
+	location := terraform.Output(t, terraformOptions, "location")
 
 	// Verify the Virtual Network exists in Azure
 	subscriptionID := ""
 	virtualNetwork := GetVirtualNetwork(t, virtualNetworkName, resourceGroupName, subscriptionID)
 	assert.Equal(t, virtualNetworkName, *virtualNetwork.Name)
-	assert.Equal(t, location, *virtualNetwork.Location)
+	assert.Contains(t, strings.ToLower(*virtualNetwork.Location), strings.ToLower(location))
 	assert.NotEmpty(t, virtualNetwork.Properties.AddressSpace.AddressPrefixes)
 }
 
 func TestVirtualNetworkComplete(t *testing.T) {
 	t.Parallel()
 
-	// Generate unique names for resources
-	uniqueID := random.UniqueId()
-	resourceGroupName := fmt.Sprintf("rg-vnet-complete-test-%s", uniqueID)
-	virtualNetworkName := fmt.Sprintf("vnet-complete-test-%s", uniqueID)
-	location := "West Europe"
-
-	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "../examples/complete",
-		Vars: map[string]interface{}{
-			"resource_group_name":    resourceGroupName,
-			"virtual_network_name":   virtualNetworkName,
-			"location":               location,
-		},
-		RetryableTerraformErrors: map[string]string{
-			".*": "Terraform operation failed",
-		},
-		MaxRetries:         3,
-		TimeBetweenRetries: 10 * time.Second,
-	})
+	terraformOptions := getTerraformOptions(t, "../fixtures/complete")
 
 	defer terraform.Destroy(t, terraformOptions)
 
@@ -95,16 +64,21 @@ func TestVirtualNetworkComplete(t *testing.T) {
 
 	// Assertions
 	assert.NotEmpty(t, outputID)
-	assert.Equal(t, virtualNetworkName, outputName)
+	assert.Contains(t, outputName, "vnet-dpc-cmp-")
 	assert.NotEmpty(t, outputAddressSpace)
 	assert.NotEmpty(t, outputPeerings)
 	assert.NotEmpty(t, outputDNSLinks)
+
+	// Get actual resource names from outputs
+	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+	virtualNetworkName := terraform.Output(t, terraformOptions, "virtual_network_name")
+	location := terraform.Output(t, terraformOptions, "location")
 
 	// Verify the Virtual Network exists in Azure with expected configuration
 	subscriptionID := ""
 	virtualNetwork := GetVirtualNetwork(t, virtualNetworkName, resourceGroupName, subscriptionID)
 	assert.Equal(t, virtualNetworkName, *virtualNetwork.Name)
-	assert.Equal(t, location, *virtualNetwork.Location)
+	assert.Contains(t, strings.ToLower(*virtualNetwork.Location), strings.ToLower(location))
 	
 	// Verify multiple address spaces
 	require.NotNil(t, virtualNetwork.Properties.AddressSpace)
@@ -120,25 +94,7 @@ func TestVirtualNetworkComplete(t *testing.T) {
 func TestVirtualNetworkSecure(t *testing.T) {
 	t.Parallel()
 
-	// Generate unique names for resources
-	uniqueID := random.UniqueId()
-	resourceGroupName := fmt.Sprintf("rg-vnet-secure-test-%s", uniqueID)
-	virtualNetworkName := fmt.Sprintf("vnet-secure-test-%s", uniqueID)
-	location := "West Europe"
-
-	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
-		TerraformDir: "../examples/secure",
-		Vars: map[string]interface{}{
-			"resource_group_name":    resourceGroupName,
-			"virtual_network_name":   virtualNetworkName,
-			"location":               location,
-		},
-		RetryableTerraformErrors: map[string]string{
-			".*": "Terraform operation failed",
-		},
-		MaxRetries:         3,
-		TimeBetweenRetries: 15 * time.Second,
-	})
+	terraformOptions := getTerraformOptions(t, "../fixtures/secure")
 
 	defer terraform.Destroy(t, terraformOptions)
 
@@ -152,15 +108,20 @@ func TestVirtualNetworkSecure(t *testing.T) {
 
 	// Assertions
 	assert.NotEmpty(t, outputID)
-	assert.Equal(t, virtualNetworkName, outputName)
+	assert.Contains(t, outputName, "vnet-dpc-sec-")
 	assert.NotEmpty(t, outputDDosProtection)
 	assert.NotEmpty(t, outputFlowLog)
+
+	// Get actual resource names from outputs
+	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+	virtualNetworkName := terraform.Output(t, terraformOptions, "virtual_network_name")
+	location := terraform.Output(t, terraformOptions, "location")
 
 	// Verify the Virtual Network exists in Azure with security features
 	subscriptionID := ""
 	virtualNetwork := GetVirtualNetwork(t, virtualNetworkName, resourceGroupName, subscriptionID)
 	assert.Equal(t, virtualNetworkName, *virtualNetwork.Name)
-	assert.Equal(t, location, *virtualNetwork.Location)
+	assert.Contains(t, strings.ToLower(*virtualNetwork.Location), strings.ToLower(location))
 	
 	// Verify DDoS protection is enabled
 	require.NotNil(t, virtualNetwork.Properties.DdosProtectionPlan)
@@ -194,18 +155,8 @@ func TestVirtualNetworkValidation(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			uniqueID := random.UniqueId()
-			resourceGroupName := fmt.Sprintf("rg-vnet-validation-test-%s", uniqueID)
-			virtualNetworkName := fmt.Sprintf("vnet-validation-test-%s", uniqueID)
-
-			terraformOptions := &terraform.Options{
-				TerraformDir: "../fixtures/basic",
-				Vars: map[string]interface{}{
-					"resource_group_name":  resourceGroupName,
-					"virtual_network_name": virtualNetworkName,
-					"address_space":        tc.addressSpace,
-				},
-			}
+			terraformOptions := getTerraformOptions(t, "../fixtures/basic")
+			terraformOptions.Vars["address_space"] = tc.addressSpace
 
 			if tc.expectedError != "" {
 				_, err := terraform.InitAndPlanE(t, terraformOptions)
