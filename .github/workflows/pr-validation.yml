@@ -360,21 +360,25 @@ jobs:
           
           # Also run on examples
           if [[ -d "examples" ]]; then
-            examples=$(find examples -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
-            for example in $examples; do
-              echo "## Running TFLint on example: $example"
-              
-              if output=$(tflint --chdir="$example" --format=default --force 2>&1); then
-                echo "✅ TFLint passed for: $example"
-                echo "$output"
-              else
-                echo "❌ TFLint found issues in: $example"
-                echo "$output"
-                tflint_failed=true
-                tflint_output="${tflint_output}\n### Example: $example\n\`\`\`\n${output}\n\`\`\`\n"
-              fi
-              echo ""
-            done
+            examples=$(find examples -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform" || true)
+            if [[ -n "$examples" ]]; then
+              for example in $examples; do
+                echo "## Running TFLint on example: $example"
+                
+                if output=$(tflint --chdir="$example" --format=default --force 2>&1); then
+                  echo "✅ TFLint passed for: $example"
+                  echo "$output"
+                else
+                  echo "❌ TFLint found issues in: $example"
+                  echo "$output"
+                  tflint_failed=true
+                  tflint_output="${tflint_output}\n### Example: $example\n\`\`\`\n${output}\n\`\`\`\n"
+                fi
+                echo ""
+              done
+            else
+              echo "No examples with .tf files found in root examples directory"
+            fi
           fi
           
           if [ "$tflint_failed" = true ]; then
