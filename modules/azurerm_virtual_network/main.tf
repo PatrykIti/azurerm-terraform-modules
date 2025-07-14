@@ -69,13 +69,13 @@ resource "azurerm_virtual_network_peering" "peering" {
 resource "azurerm_network_watcher_flow_log" "flow_log" {
   count = var.flow_log != null ? 1 : 0
 
-  network_watcher_name      = var.flow_log.network_watcher_name
-  resource_group_name       = var.flow_log.network_watcher_resource_group_name
-  name                      = "${var.name}-flowlog"
-  network_security_group_id = var.flow_log.network_security_group_id
-  storage_account_id        = var.flow_log.storage_account_id
-  enabled                   = var.flow_log.enabled
-  version                   = var.flow_log.version
+  network_watcher_name = var.flow_log.network_watcher_name
+  resource_group_name  = var.flow_log.network_watcher_resource_group_name
+  name                 = "${var.name}-flowlog"
+  target_resource_id   = var.flow_log.network_security_group_id
+  storage_account_id   = var.flow_log.storage_account_id
+  enabled              = var.flow_log.enabled
+  version              = var.flow_log.version
 
   dynamic "retention_policy" {
     for_each = var.flow_log.retention_policy != null ? [var.flow_log.retention_policy] : []
