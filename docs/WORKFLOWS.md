@@ -49,8 +49,7 @@ azurerm-terraform-modules/
 │   │   ├── module-ci.yml            # Main CI dispatcher
 │   │   ├── module-release.yml       # Release workflow
 │   │   ├── module-docs.yml          # Documentation automation
-│   │   ├── pr-validation.yml        # PR quality checks
-│   │   └── repo-maintenance.yml     # Scheduled maintenance
+│   │   └── pr-validation.yml        # PR quality checks
 │   └── actions/                     # Shared composite actions
 │       ├── module-runner/           # Universal module action runner
 │       │   ├── action.yml          # Main composite action
@@ -66,7 +65,7 @@ azurerm-terraform-modules/
 
 ### 1. Module CI (`module-ci.yml`)
 
-**Purpose**: Main CI/CD dispatcher that orchestrates validation, testing, and security scanning for changed modules.
+**Purpose**: Main CI/CD dispatcher that orchestrates validation, testing, and security scanning for changed modules with per-module parallel execution.
 
 **Triggers**:
 - Pull requests that modify files in `modules/**` or `shared/**`
@@ -76,16 +75,28 @@ azurerm-terraform-modules/
 
 #### `detect-changes`
 ```yaml
-- Uses: dorny/paths-filter to detect which modules changed
-- Creates a matrix of modules for parallel processing
+- Detects which modules are affected by changes
+- For PRs: 
+  - Parses PR title for module prefix (e.g., "feat(storage-account): ...")
+  - Uses dorny/paths-filter to detect file changes in modules
+  - Merges both detection methods for comprehensive coverage
+- For pushes to main:
+  - Only uses path-based detection
+- Creates matrix strategy for parallel module execution
 - Outputs: 
   - modules: Array of changed module names
   - matrix: JSON matrix for strategy
+  - has_modules: Boolean indicating if any modules changed
 ```
 
-#### `validate`
+#### Per-Module Jobs (Matrix Strategy)
+
+Each of these jobs runs in parallel for each detected module:
+
+#### `validate` - Validate (${{ matrix.module }})
 ```yaml
 - Runs for each changed module in parallel
+- Job name includes module name for clarity
 - Executes validation via module-runner action
 - Checks:
   - Terraform formatting (terraform fmt)
@@ -93,35 +104,43 @@ azurerm-terraform-modules/
   - Terraform validation (terraform validate)
   - TFLint analysis
   - Example validation
+- Module-isolated execution prevents cross-contamination
 ```
 
-#### `test`
+#### `test` - Test (${{ matrix.module }})
 ```yaml
-- Runs after validation passes
+- Runs after validation passes for that specific module
+- Job name includes module name for clarity
 - Executes tests via module-runner action
 - Performs:
-  - Unit tests with Go
+  - Unit tests with Go (if tests/ directory exists)
   - Integration tests with Terratest
   - Example deployment tests
 - Uses OIDC for Azure authentication
+- Module-specific test execution
+- Uploads test results as artifacts
 ```
 
-#### `security-scan`
+#### `security-scan` - Security (${{ matrix.module }})
 ```yaml
-- Runs in parallel with tests
+- Runs in parallel with tests for each module
+- Job name includes module name for clarity
 - Executes security scans via module-runner action
 - Tools:
-  - Checkov for Terraform security
-  - Trivy for infrastructure scanning
+  - tfsec for Terraform-specific security issues
+  - Checkov for general infrastructure security
   - Custom security checks
 - Uploads results to GitHub Security tab
+- Module-specific security context
 ```
 
 #### `quality-summary`
 ```yaml
-- Runs after all checks complete
-- Creates/updates PR comment with results
-- Shows pass/fail status for each check
+- Runs after all module checks complete
+- Creates/updates PR comment with consolidated results
+- Shows pass/fail status for each check per module
+- Provides direct links to failed jobs
+- Summary table format for easy review
 ```
 
 ### 2. Module Release (`module-release.yml`)
@@ -183,12 +202,20 @@ azurerm-terraform-modules/
 
 ### 4. PR Validation (`pr-validation.yml`)
 
-**Purpose**: Enforces code quality standards across all PRs.
+**Purpose**: Enforces code quality standards across all PRs with per-module parallel execution.
 
 **Triggers**:
 - Pull request events (opened, synchronize, reopened, edited)
 
 **Jobs**:
+
+#### `detect-changes`
+```yaml
+- Detects which modules are affected by PR changes
+- Parses PR title for module prefix (e.g., "feat(storage-account): ...")
+- Uses dorny/paths-filter to detect file changes
+- Creates matrix strategy for parallel module execution
+```
 
 #### `validate-pr-title`
 ```yaml
@@ -204,71 +231,52 @@ azurerm-terraform-modules/
 - Provides clear error messages
 ```
 
-#### `terraform-fmt`
+#### Per-Module Jobs (Matrix Strategy)
+
+Each of these jobs runs in parallel for each affected module:
+
+#### `terraform-fmt` - Format Check - ${{ matrix.module }}
 ```yaml
-- Checks Terraform formatting
-- Comments on PR with fix instructions
+- Checks Terraform formatting for specific module
+- Comments on PR with fix instructions if needed
+- Runs only for modules with changes
 ```
 
-#### `terraform-validate`
+#### `terraform-validate` - Validation - ${{ matrix.module }}
 ```yaml
-- Basic validation for all modules
+- Basic validation for specific module
 - Runs terraform init and validate
+- Module-isolated execution
 ```
 
-#### `tflint`
+#### `tflint` - Linting - ${{ matrix.module }}
 ```yaml
-- Runs TFLint on all modules
+- Runs TFLint on specific module
 - Comments detailed issues on PR
+- Module-specific linting rules
 ```
 
-#### `documentation-check`
+#### `documentation-check` - Docs Check - ${{ matrix.module }}
 ```yaml
-- Verifies documentation is up-to-date
+- Verifies documentation is up-to-date for module
 - Comments with update instructions
+- Checks README.md consistency
 ```
 
-#### `security-scan`
+#### `security-scan` - Security - ${{ matrix.module }}
 ```yaml
-- Quick security scan with Checkov
+- Quick security scan with Checkov for module
 - Reports summary of findings
+- Module-specific security checks
 ```
 
-### 5. Repository Maintenance (`repo-maintenance.yml`)
+### 5. Repository Maintenance (Removed)
 
-**Purpose**: Automated maintenance tasks for repository health.
-
-**Triggers**:
-- Weekly schedule (Mondays at 2 AM)
-- Manual workflow dispatch
-
-**Jobs**:
-
-#### `update-dependencies`
-```yaml
-- Checks for Terraform provider updates
-- Integrates with Dependabot
-```
-
-#### `module-inventory`
-```yaml
-- Generates MODULES.md with all modules
-- Includes version, description, test status
-- Creates PR with updates
-```
-
-#### `security-audit`
-```yaml
-- Comprehensive security scan of all modules
-- Generates security report
-```
-
-#### `cleanup`
-```yaml
-- Closes stale issues and PRs
-- Configurable stale periods
-- Exempts security-related items
-```
+The `repo-maintenance.yml` workflow has been removed as its functionality is covered by other tools:
+- **Dependency updates**: Handled by Dependabot
+- **Module inventory**: Can be maintained manually in README
+- **Security audits**: Covered by module-ci security scans
+- **Stale cleanup**: Often considered disruptive to contributors
 
 ## Shared Actions
 
@@ -294,13 +302,14 @@ find modules -name "main.tf" -type f
 
 **Inputs**:
 - `terraform-version`: Version to install (default: 1.10.3)
-- `install-tflint`: Whether to install TFLint
+- `install-tflint`: Whether to install TFLint (uses official terraform-linters/setup-tflint@v4)
 - `install-terraform-docs`: Whether to install terraform-docs
 
 **Features**:
 - Terraform installation via hashicorp/setup-terraform
 - Provider plugin caching
 - Optional tool installation
+- TFLint installation via official GitHub Action (avoids 403 rate limit errors)
 
 ## Module Runner Action
 
@@ -492,6 +501,20 @@ No additional configuration needed!
 4. **Documentation not updating**
    - Ensure terraform-docs is installed
    - Check if README.md has proper injection markers
+
+5. **TFLint installation failing with 403**
+   - Fixed by using official terraform-linters/setup-tflint@v4 action
+   - Avoids GitHub API rate limiting issues
+
+6. **Network Watcher limit reached**
+   - Azure allows only one Network Watcher per region
+   - Tests now detect and reuse existing Network Watcher
+   - Uses external data source for detection
+
+7. **DDoS Protection Plan limit reached**
+   - Azure allows only one DDoS Protection Plan per region
+   - Tests now detect and reuse existing DDoS Protection Plan
+   - Uses external data source for detection
 
 ### Debug Mode
 
