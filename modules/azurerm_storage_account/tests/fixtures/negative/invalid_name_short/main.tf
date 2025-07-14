@@ -8,7 +8,7 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "storage_account" {
-  source = "../../../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
   # Invalid: name too short (less than 3 characters)
   name                     = "st"
