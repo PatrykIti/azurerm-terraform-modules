@@ -40,7 +40,7 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      modules: ${{ steps.filter.outputs.changes || steps.pr-module.outputs.modules }}
+      modules: ${{ steps.set-matrix.outputs.modules }}
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
@@ -128,7 +128,6 @@ jobs:
       
       - uses: dorny/paths-filter@v3
         id: filter
-        if: steps.pr-module.outputs.modules == '[]' || github.event_name != 'pull_request'
         with:
           filters: .github/filters.yml
       
@@ -137,19 +136,51 @@ jobs:
           # For manual runs with specific module
           if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.module }}" ]]; then
             MODULES='["${{ github.event.inputs.module }}"]'
-          # For PRs with module in title
-          elif [[ "${{ github.event_name }}" == "pull_request" && "${{ steps.pr-module.outputs.modules }}" != "[]" ]]; then
-            MODULES='${{ steps.pr-module.outputs.modules }}'
-          # For path-based detection
+            echo "Manual workflow dispatch for module: ${{ github.event.inputs.module }}"
+          # For PRs - merge modules from title and path detection
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "=== Module Detection for PR ==="
+            
+            # Get modules from PR title
+            PR_MODULES='${{ steps.pr-module.outputs.modules }}'
+            echo "Modules from PR title: $PR_MODULES"
+            
+            # Get modules from path changes
+            PATH_MODULES='${{ steps.filter.outputs.changes }}'
+            echo "Modules from path changes: $PATH_MODULES"
+            
+            # Merge both lists
+            if [[ "$PR_MODULES" != "[]" && "$PATH_MODULES" != "[]" ]]; then
+              # Both have modules - merge them
+              ALL_MODULES=$(echo "$PR_MODULES $PATH_MODULES" | jq -s 'add | unique')
+              echo "Merged modules (unique): $ALL_MODULES"
+              MODULES="$ALL_MODULES"
+            elif [[ "$PR_MODULES" != "[]" ]]; then
+              # Only PR title has modules
+              MODULES="$PR_MODULES"
+              echo "Using modules from PR title only"
+            elif [[ "$PATH_MODULES" != "[]" ]]; then
+              # Only path changes have modules
+              MODULES="$PATH_MODULES"
+              echo "Using modules from path changes only"
+            else
+              # No modules detected
+              MODULES="[]"
+              echo "No modules detected from PR title or path changes"
+            fi
+          # For push events - use path-based detection
           else
             MODULES='${{ steps.filter.outputs.changes }}'
+            echo "Push event - using path-based detection: $MODULES"
           fi
           
-          echo "Final modules to test: $MODULES"
+          echo "=== Final modules to test: $MODULES ==="
           
           if [ "$MODULES" == "[]" ]; then
+            echo "modules=[]" >> $GITHUB_OUTPUT
             echo "matrix={\"module\":[]}" >> $GITHUB_OUTPUT
           else
+            echo "modules=$MODULES" >> $GITHUB_OUTPUT
             echo "matrix={\"module\":${MODULES}}" >> $GITHUB_OUTPUT
           fi
 
