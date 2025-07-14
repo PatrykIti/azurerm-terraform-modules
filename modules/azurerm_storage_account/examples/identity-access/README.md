@@ -254,7 +254,7 @@ The storage account's managed identity can access other services:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.35.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.36.0 |
 
 ## Modules
 

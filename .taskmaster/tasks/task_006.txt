@@ -57,7 +57,7 @@ In `modules/storage_account/outputs.tf`, update and add outputs to reflect the n
 <info added on 2025-07-03T15:56:13.278Z>
 Testing of configured Terraform tools is complete:
 - terraform fmt: Passed after fixing formatting in 18 files.
-- terraform validate: Passed after provider upgrade to 4.35.0.
+- terraform validate: Passed after provider upgrade to 4.36.0.
 - tflint: Passed with 2 warnings for deprecated variables (azure_files_authentication, customer_managed_key).
 - terraform-docs: Passed after fixing config template.
 - checkov: Partial pass due to a tool bug with network rule parsing. Scan found 90 passed and 85 failed checks, mostly in examples.
@@ -68,7 +68,7 @@ Completed testing all configured Terraform tools and cleaned up module documenta
 
 Tool Testing Results:
 - terraform fmt - PASSED: Fixed formatting issues in 18 files across module and examples. All files are now properly formatted.
-- terraform validate - PASSED: Module validates successfully with azurerm provider 4.35.0. All syntax and configuration is valid.
+- terraform validate - PASSED: Module validates successfully with azurerm provider 4.36.0. All syntax and configuration is valid.
 - tflint - PASSED (with warnings): Version 0.58.0 installed and configured. Found 2 unused, deprecated variables: azure_files_authentication, customer_managed_key. No critical issues found.
 - terraform-docs - PASSED: Version 0.20.0 installed. Custom .terraform-docs.yml configuration is working after fixing a template issue.
 - checkov - PARTIAL: Version 3.2.447 installed. Security scan has internal errors with network bypass parsing. Found 90 passed checks and 85 failed (mostly in examples due to demo configurations).

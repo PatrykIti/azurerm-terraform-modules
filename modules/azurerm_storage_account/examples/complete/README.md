@@ -161,9 +161,9 @@ This example exposes ALL available outputs from the storage account module, incl
 
 - Azure subscription with appropriate permissions
 - Terraform >= 1.3.0
-- AzureRM Provider 4.35.0 (as specified in the module's [versions.tf](../../versions.tf))
+- AzureRM Provider 4.36.0 (as specified in the module's [versions.tf](../../versions.tf))
 
-**Note**: The module uses a pinned version of the AzureRM provider (4.35.0) to ensure consistent behavior across all deployments.
+**Note**: The module uses a pinned version of the AzureRM provider (4.36.0) to ensure consistent behavior across all deployments.
 
 ## Usage
 
@@ -209,7 +209,7 @@ terraform apply
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.35.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.36.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.7.2 |
 
 ## Modules

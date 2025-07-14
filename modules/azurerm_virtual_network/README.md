@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.3.0-blue.svg)](https://www.terraform.io/)
-[![AzureRM](https://img.shields.io/badge/AzureRM-4.35.0-blue.svg)](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0)
+[![AzureRM](https://img.shields.io/badge/AzureRM-4.36.0-blue.svg)](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0)
 
 ## Module Version
 

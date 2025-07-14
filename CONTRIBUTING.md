@@ -167,7 +167,7 @@ Use conventional commits:
 - `feat(storage-account): add lifecycle management support`
 - `fix(virtual-network): correct subnet CIDR validation`
 - `docs(key-vault): update access policy examples`
-- `chore(deps): update azurerm provider to 4.35.0`
+- `chore(deps): update azurerm provider to 4.36.0`
 - `ci(workflows): update module detection logic`
 - `test(storage-account): add integration tests`
 

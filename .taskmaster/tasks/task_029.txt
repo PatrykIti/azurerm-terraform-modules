@@ -5,7 +5,7 @@
 # Priority: medium
 # Description: Fix and enhance the 'multi-region' example by correcting the Terraform version requirement, implementing a practical replication mechanism using a Logic App, and adding monitoring and security enhancements.
 # Details:
-1. Update the `required_version` in the `terraform` block to `~> 4.35.0`. 2. Add an `azurerm_logic_app_workflow` resource that triggers on a schedule to copy new blobs from the primary to the secondary storage account. 3. Add an `azurerm_monitor_metric_alert` to monitor replication status (e.g., alert if `UsedCapacity` on the secondary account does not increase over a time period). 4. Secure both storage accounts with private endpoints and restrictive Network Security Groups (NSGs). 5. Add a `README.md` file with cost estimation notes.
+1. Update the `required_version` in the `terraform` block to `~> 4.36.0`. 2. Add an `azurerm_logic_app_workflow` resource that triggers on a schedule to copy new blobs from the primary to the secondary storage account. 3. Add an `azurerm_monitor_metric_alert` to monitor replication status (e.g., alert if `UsedCapacity` on the secondary account does not increase over a time period). 4. Secure both storage accounts with private endpoints and restrictive Network Security Groups (NSGs). 5. Add a `README.md` file with cost estimation notes.
 
 # Test Strategy:
 Apply the configuration. Manually trigger the Logic App and verify that a test blob is copied to the secondary storage account. In Azure Monitor, confirm the alert rule is active. Verify network isolation by checking the private endpoint connections and NSG rules in the Azure Portal.
@@ -15,7 +15,7 @@ Apply the configuration. Manually trigger the Logic App and verify that a test b
 ### Dependencies: None
 ### Description: Update the Terraform provider version and implement foundational security for both storage accounts. This involves configuring private endpoints and network rules to restrict public access, ensuring a secure base for the replication logic.
 ### Details:
-1. In the main Terraform configuration file (`main.tf`), locate the `terraform` block and update the `required_version` constraint to `~> 4.35.0`.
+1. In the main Terraform configuration file (`main.tf`), locate the `terraform` block and update the `required_version` constraint to `~> 4.36.0`.
 2. Define two `azurerm_private_endpoint` resources, one for the primary storage account and one for the secondary.
 3. Associate these private endpoints with the appropriate virtual network and subnet.
 4. Modify the `azurerm_storage_account` resources by setting `public_network_access_enabled` to `false` and configuring the `network_rules` block to default to 'Deny'.

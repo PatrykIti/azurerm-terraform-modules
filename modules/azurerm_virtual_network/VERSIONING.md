@@ -117,7 +117,7 @@ module "virtual_network" {
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| VNv1.0.x | >= 1.3.0 | 4.35.0 (pinned) | TBD |
+| VNv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
 
 **Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
 
