@@ -152,7 +152,7 @@ jobs:
             # Merge both lists
             if [[ "$PR_MODULES" != "[]" && "$PATH_MODULES" != "[]" ]]; then
               # Both have modules - merge them
-              ALL_MODULES=$(echo "$PR_MODULES $PATH_MODULES" | jq -s 'add | unique')
+              ALL_MODULES=$(echo "$PR_MODULES $PATH_MODULES" | jq -s -c 'add | unique')
               echo "Merged modules (unique): $ALL_MODULES"
               MODULES="$ALL_MODULES"
             elif [[ "$PR_MODULES" != "[]" ]]; then
