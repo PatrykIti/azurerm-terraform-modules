@@ -68,6 +68,18 @@ resource "azurerm_storage_account" "security" {
   }
 }
 
+# Create Network Watcher for flow logs
+resource "azurerm_network_watcher" "example" {
+  name                = "nw-vnet-secure-example"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+
+  tags = {
+    Environment = "Production"
+    Purpose     = "Network Monitoring"
+  }
+}
+
 # Create Network Security Group for additional security
 resource "azurerm_network_security_group" "example" {
   name                = "nsg-vnet-secure-example"
@@ -121,8 +133,8 @@ module "virtual_network" {
 
   # Network Watcher Flow Log for security monitoring
   flow_log = {
-    network_watcher_name                = "NetworkWatcher_westeurope"
-    network_watcher_resource_group_name = "NetworkWatcherRG"
+    network_watcher_name                = azurerm_network_watcher.example.name
+    network_watcher_resource_group_name = azurerm_resource_group.example.name
     network_security_group_id           = azurerm_network_security_group.example.id
     storage_account_id                  = azurerm_storage_account.security.id
     enabled                             = true
