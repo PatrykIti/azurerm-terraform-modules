@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.35.0"
     }
+    external = {
+      source  = "hashicorp/external"
+      version = "~> 2.3"
+    }
   }
 }
 
@@ -71,30 +75,8 @@ resource "azurerm_storage_account" "security" {
   }
 }
 
-# Create dedicated resource group for Network Watcher to avoid conflicts
-resource "azurerm_resource_group" "network_watcher" {
-  name     = "rg-nw-dpc-sec-${var.random_suffix}"
-  location = var.location
-
-  tags = {
-    Environment = "Test"
-    Module      = "azurerm_virtual_network"
-    Test        = "Secure"
-  }
-}
-
-# Create Network Watcher in dedicated resource group
-resource "azurerm_network_watcher" "test" {
-  name                = "nw-dpc-sec-${var.random_suffix}"
-  location            = azurerm_resource_group.network_watcher.location
-  resource_group_name = azurerm_resource_group.network_watcher.name
-
-  tags = {
-    Environment = "Test"
-    Module      = "azurerm_virtual_network"
-    Test        = "Secure"
-  }
-}
+# Network Watcher configuration is in network_watcher.tf
+# It handles automatic detection of existing default Network Watcher
 
 # Create Network Security Group for additional security
 resource "azurerm_network_security_group" "test" {
@@ -150,8 +132,8 @@ module "virtual_network" {
 
   # Network Watcher Flow Log for security monitoring
   flow_log = {
-    network_watcher_name                = azurerm_network_watcher.test.name
-    network_watcher_resource_group_name = azurerm_resource_group.network_watcher.name
+    network_watcher_name                = local.network_watcher_name
+    network_watcher_resource_group_name = local.network_watcher_rg
     network_security_group_id           = azurerm_network_security_group.test.id
     storage_account_id                  = azurerm_storage_account.security.id
     enabled                             = true
