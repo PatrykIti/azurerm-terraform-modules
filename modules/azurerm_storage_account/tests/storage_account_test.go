@@ -334,16 +334,11 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	baseID := strings.ToLower(random.UniqueId())
 	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
 	
-	// Azure subscription ID (will be set from environment)
-	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
-	require.NotEmpty(t, subscriptionID, "AZURE_SUBSCRIPTION_ID is required")
-
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
-			"random_suffix":   uniqueID,
-			"subscription_id": subscriptionID,
-			"location":        "northeurope",
+			"random_suffix": uniqueID,
+			"location":      "northeurope",
 		},
 		NoColor: true,
 		// Retry configuration

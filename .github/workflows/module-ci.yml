@@ -118,7 +118,8 @@ jobs:
           for module_dir in modules/*/; do
             if [ -d "$module_dir" ]; then
               module_name=$(basename "$module_dir")
-              FILTERS="${FILTERS}${module_name}:\n  - 'modules/${module_name}/**'\n  - 'shared/**'\n"
+              # Include all module files, tests, fixtures, and examples
+              FILTERS="${FILTERS}${module_name}:\n  - 'modules/${module_name}/**'\n  - 'modules/${module_name}/tests/**'\n  - 'modules/${module_name}/examples/**'\n  - 'shared/**'\n"
             fi
           done
           echo -e "$FILTERS" > .github/filters.yml

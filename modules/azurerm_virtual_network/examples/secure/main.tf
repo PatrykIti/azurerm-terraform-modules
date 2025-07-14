@@ -68,16 +68,16 @@ resource "azurerm_storage_account" "security" {
   }
 }
 
-# Create Network Watcher for flow logs
-resource "azurerm_network_watcher" "example" {
-  name                = "nw-vnet-secure-example"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+# Get existing Network Watcher or create if it doesn't exist
+# Azure allows only one Network Watcher per region per subscription
+data "azurerm_network_watcher" "existing" {
+  name                = "NetworkWatcher_${var.location}"
+  resource_group_name = "NetworkWatcherRG"
+}
 
-  tags = {
-    Environment = "Production"
-    Purpose     = "Network Monitoring"
-  }
+# Use the existing Network Watcher
+locals {
+  network_watcher_id = data.azurerm_network_watcher.existing.id
 }
 
 # Create Network Security Group for additional security
@@ -133,8 +133,8 @@ module "virtual_network" {
 
   # Network Watcher Flow Log for security monitoring
   flow_log = {
-    network_watcher_name                = azurerm_network_watcher.example.name
-    network_watcher_resource_group_name = azurerm_resource_group.example.name
+    network_watcher_name                = data.azurerm_network_watcher.existing.name
+    network_watcher_resource_group_name = data.azurerm_network_watcher.existing.resource_group_name
     network_security_group_id           = azurerm_network_security_group.example.id
     storage_account_id                  = azurerm_storage_account.security.id
     enabled                             = true
