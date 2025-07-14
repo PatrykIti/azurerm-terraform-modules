@@ -21,6 +21,8 @@ This Terraform module creates and manages Azure Virtual Networks with comprehens
 - **Monitoring**: Diagnostic settings with Log Analytics and Storage Account integration
 - **BGP Support**: BGP community configuration for ExpressRoute scenarios
 
+**Note**: This module focuses on Virtual Network resources only. For complete enterprise networking scenarios that include subnets, route tables, and network security groups, please refer to the upcoming `azurerm_networking` example in the root `examples/` directory. This comprehensive example will integrate multiple networking modules (`azurerm_virtual_network`, `azurerm_subnet`, `azurerm_route_table`, `azurerm_network_security_group`) to provide flexible configuration patterns for various enterprise scenarios.
+
 ## Features
 
 - ✅ **Comprehensive Configuration**: Support for all Virtual Network features
