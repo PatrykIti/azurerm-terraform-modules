@@ -71,16 +71,29 @@ resource "azurerm_storage_account" "security" {
   }
 }
 
-# Get existing Network Watcher or create if it doesn't exist
-# Azure allows only one Network Watcher per region per subscription
-data "azurerm_network_watcher" "existing" {
-  name                = "NetworkWatcher_${var.location}"
-  resource_group_name = "NetworkWatcherRG"
+# Create dedicated resource group for Network Watcher to avoid conflicts
+resource "azurerm_resource_group" "network_watcher" {
+  name     = "rg-nw-dpc-sec-${var.random_suffix}"
+  location = var.location
+
+  tags = {
+    Environment = "Test"
+    Module      = "azurerm_virtual_network"
+    Test        = "Secure"
+  }
 }
 
-# Use the existing Network Watcher
-locals {
-  network_watcher_id = data.azurerm_network_watcher.existing.id
+# Create Network Watcher in dedicated resource group
+resource "azurerm_network_watcher" "test" {
+  name                = "nw-dpc-sec-${var.random_suffix}"
+  location            = azurerm_resource_group.network_watcher.location
+  resource_group_name = azurerm_resource_group.network_watcher.name
+
+  tags = {
+    Environment = "Test"
+    Module      = "azurerm_virtual_network"
+    Test        = "Secure"
+  }
 }
 
 # Create Network Security Group for additional security
@@ -137,8 +150,8 @@ module "virtual_network" {
 
   # Network Watcher Flow Log for security monitoring
   flow_log = {
-    network_watcher_name                = data.azurerm_network_watcher.existing.name
-    network_watcher_resource_group_name = data.azurerm_network_watcher.existing.resource_group_name
+    network_watcher_name                = azurerm_network_watcher.test.name
+    network_watcher_resource_group_name = azurerm_resource_group.network_watcher.name
     network_security_group_id           = azurerm_network_security_group.test.id
     storage_account_id                  = azurerm_storage_account.security.id
     enabled                             = true
