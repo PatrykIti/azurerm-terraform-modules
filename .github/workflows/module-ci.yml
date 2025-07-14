@@ -57,18 +57,54 @@ jobs:
           # - feat(azurerm_virtual_network): ...
           # - fix(azurerm_storage_account): ...
           # - chore(azurerm_resource_group): ...
-          if [[ "$PR_TITLE" =~ \(([a-zA-Z0-9_]+)\): ]]; then
-            MODULE_NAME="${BASH_REMATCH[1]}"
-            echo "Detected module from PR title: $MODULE_NAME"
+          # - feat(storage-account,virtual-network): ...
+          # - fix(azurerm_storage_account,azurerm_virtual_network): ...
+          if [[ "$PR_TITLE" =~ ^[^(]+\(([^)]+)\) ]]; then
+            SCOPE="${BASH_REMATCH[1]}"
+            echo "Detected scope: $SCOPE"
             
-            # Check if the module directory exists
-            if [ -d "modules/$MODULE_NAME" ]; then
-              echo "modules=[\"$MODULE_NAME\"]" >> $GITHUB_OUTPUT
-              echo "Module directory exists: modules/$MODULE_NAME"
+            # Split scope by comma and process each module
+            IFS=',' read -ra SCOPE_ARRAY <<< "$SCOPE"
+            VALID_MODULES=()
+            
+            for scope_item in "${SCOPE_ARRAY[@]}"; do
+              # Trim whitespace
+              scope_item=$(echo "$scope_item" | xargs)
+              echo "Processing scope item: $scope_item"
+              
+              # Check if scope matches a module name (with or without azurerm_ prefix)
+              MODULE_NAME="$scope_item"
+              
+              # If the scope already contains azurerm_, use it as is
+              if [[ "$MODULE_NAME" =~ ^azurerm_ ]]; then
+                echo "Module name already has azurerm_ prefix: $MODULE_NAME"
+              else
+                # Remove azurerm- prefix if present
+                MODULE_NAME="${MODULE_NAME#azurerm-}"
+                # Replace dashes with underscores
+                MODULE_NAME="${MODULE_NAME//-/_}"
+                # Add azurerm_ prefix
+                MODULE_NAME="azurerm_${MODULE_NAME}"
+              fi
+              
+              # Check if this module exists
+              if [[ -d "modules/$MODULE_NAME" ]]; then
+                echo "Found module: $MODULE_NAME"
+                VALID_MODULES+=("$MODULE_NAME")
+              else
+                echo "Module $MODULE_NAME not found in modules/ directory"
+              fi
+            done
+            
+            # Convert array to JSON format
+            if [ ${#VALID_MODULES[@]} -eq 0 ]; then
+              MODULES="[]"
             else
-              echo "Warning: Module directory modules/$MODULE_NAME does not exist"
-              echo "modules=[]" >> $GITHUB_OUTPUT
+              MODULES=$(printf '%s\n' "${VALID_MODULES[@]}" | jq -R -s -c 'split("\n")[:-1]')
             fi
+            
+            echo "Valid modules found: ${VALID_MODULES[*]}"
+            echo "modules=$MODULES" >> $GITHUB_OUTPUT
           else
             echo "No module detected in PR title, will use path-based detection"
             echo "modules=[]" >> $GITHUB_OUTPUT

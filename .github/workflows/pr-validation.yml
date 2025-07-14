@@ -10,6 +10,89 @@ permissions:
   statuses: write
 
 jobs:
+  # Detect which modules are affected by this PR
+  detect-modules:
+    name: Detect Affected Modules
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.detect.outputs.modules }}
+      modules_json: ${{ steps.detect.outputs.modules_json }}
+      has_modules: ${{ steps.detect.outputs.has_modules }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Detect modules from PR title
+        id: detect
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $PR_TITLE"
+          
+          # Extract scope from conventional commit format (e.g., "feat(storage-account): ..." or "feat(storage-account,virtual-network): ...")
+          if [[ "$PR_TITLE" =~ ^[^(]+\(([^)]+)\) ]]; then
+            SCOPE="${BASH_REMATCH[1]}"
+            echo "Detected scope: $SCOPE"
+            
+            # Split scope by comma and process each module
+            IFS=',' read -ra SCOPE_ARRAY <<< "$SCOPE"
+            VALID_MODULES=()
+            
+            for scope_item in "${SCOPE_ARRAY[@]}"; do
+              # Trim whitespace
+              scope_item=$(echo "$scope_item" | xargs)
+              echo "Processing scope item: $scope_item"
+              
+              # Skip non-module scopes
+              if [[ "$scope_item" =~ ^(core|deps|deps-dev|ci|docs|tests|workflows|templates|semantic-release|security|terraform-docs|examples|modules|scripts)$ ]]; then
+                echo "Skipping non-module scope: $scope_item"
+                continue
+              fi
+              
+              # Check if scope matches a module name (with or without azurerm_ prefix)
+              MODULE_NAME="$scope_item"
+              
+              # If the scope already contains azurerm_, use it as is
+              if [[ "$MODULE_NAME" =~ ^azurerm_ ]]; then
+                echo "Module name already has azurerm_ prefix: $MODULE_NAME"
+              else
+                # Remove azurerm- prefix if present
+                MODULE_NAME="${MODULE_NAME#azurerm-}"
+                # Replace dashes with underscores
+                MODULE_NAME="${MODULE_NAME//-/_}"
+                # Add azurerm_ prefix
+                MODULE_NAME="azurerm_${MODULE_NAME}"
+              fi
+              
+              # Check if this module exists
+              if [[ -d "modules/$MODULE_NAME" ]]; then
+                echo "Found module: $MODULE_NAME"
+                VALID_MODULES+=("$MODULE_NAME")
+              else
+                echo "Module $MODULE_NAME not found in modules/ directory"
+              fi
+            done
+            
+            # Convert array to space-separated string for easier use in shell
+            if [ ${#VALID_MODULES[@]} -eq 0 ]; then
+              echo "modules=" >> $GITHUB_OUTPUT
+              echo "modules_json=[]" >> $GITHUB_OUTPUT
+              echo "has_modules=false" >> $GITHUB_OUTPUT
+            else
+              MODULES_STR="${VALID_MODULES[*]}"
+              MODULES_JSON=$(printf '%s\n' "${VALID_MODULES[@]}" | jq -R -s -c 'split("\n")[:-1]')
+              echo "modules=$MODULES_STR" >> $GITHUB_OUTPUT
+              echo "modules_json=$MODULES_JSON" >> $GITHUB_OUTPUT
+              echo "has_modules=true" >> $GITHUB_OUTPUT
+              echo "Valid modules found: ${VALID_MODULES[*]}"
+            fi
+          else
+            echo "No module scope detected in PR title, will check all modules"
+            echo "modules=" >> $GITHUB_OUTPUT
+            echo "modules_json=[]" >> $GITHUB_OUTPUT
+            echo "has_modules=false" >> $GITHUB_OUTPUT
+          fi
+
   # Note: We only validate PR titles, not individual commits, because this repository
   # uses squash merge strategy. The PR title becomes the commit message after merge.
   validate-pr-title:
@@ -71,6 +154,7 @@ jobs:
   terraform-fmt:
     name: Terraform Format Check
     runs-on: ubuntu-latest
+    needs: detect-modules
     
     steps:
       - name: Checkout repository
@@ -84,8 +168,23 @@ jobs:
       - name: Check Terraform formatting
         id: fmt
         run: |
-          # Find all directories with Terraform files
-          tf_dirs=$(find modules -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
+          # Determine which directories to check
+          if [[ "${{ needs.detect-modules.outputs.has_modules }}" == "true" ]]; then
+            echo "Checking only modules from PR title: ${{ needs.detect-modules.outputs.modules }}"
+            tf_dirs=""
+            for module in ${{ needs.detect-modules.outputs.modules }}; do
+              module_dir="modules/$module"
+              if [[ -d "$module_dir" ]]; then
+                # Find all subdirectories with .tf files in the module
+                module_tf_dirs=$(find "$module_dir" -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
+                tf_dirs="$tf_dirs $module_tf_dirs"
+              fi
+            done
+          else
+            echo "No specific modules detected, checking all modules"
+            # Find all directories with Terraform files
+            tf_dirs=$(find modules -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
+          fi
           
           fmt_issues=()
           for dir in $tf_dirs; do
@@ -132,7 +231,7 @@ jobs:
   terraform-validate:
     name: Terraform Validation
     runs-on: ubuntu-latest
-    needs: terraform-fmt
+    needs: [terraform-fmt, detect-modules]
     
     steps:
       - name: Checkout repository
@@ -145,8 +244,26 @@ jobs:
       
       - name: Validate Terraform configurations
         run: |
-          # Find all modules (excluding tests and fixtures)
-          modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | grep -v "/tests/" | xargs -I {} dirname {} | sort -u)
+          # Determine which modules to validate
+          if [[ "${{ needs.detect-modules.outputs.has_modules }}" == "true" ]]; then
+            echo "Validating only modules from PR title: ${{ needs.detect-modules.outputs.modules }}"
+            modules=""
+            for module in ${{ needs.detect-modules.outputs.modules }}; do
+              module_dir="modules/$module"
+              if [[ -d "$module_dir" ]]; then
+                modules="$modules $module_dir"
+                # Also check examples for this module
+                if [[ -d "$module_dir/examples" ]]; then
+                  example_dirs=$(find "$module_dir/examples" -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | xargs -I {} dirname {} | sort -u)
+                  modules="$modules $example_dirs"
+                fi
+              fi
+            done
+          else
+            echo "No specific modules detected, validating all modules"
+            # Find all modules (excluding tests and fixtures)
+            modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | grep -v "/tests/" | xargs -I {} dirname {} | sort -u)
+          fi
           
           validation_failed=false
           for module in $modules; do
@@ -176,7 +293,7 @@ jobs:
   tflint:
     name: TFLint Analysis
     runs-on: ubuntu-latest
-    needs: terraform-fmt
+    needs: [terraform-fmt, detect-modules]
     
     steps:
       - name: Checkout repository
@@ -201,11 +318,26 @@ jobs:
           echo "TFLint version:"
           tflint --version
       
-      - name: Run TFLint on all modules
+      - name: Run TFLint on detected modules
         id: tflint
         run: |
-          # Find all modules
-          modules=$(find modules -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
+          # Determine which modules to check
+          if [[ "${{ needs.detect-modules.outputs.has_modules }}" == "true" ]]; then
+            echo "Running TFLint only on modules from PR title: ${{ needs.detect-modules.outputs.modules }}"
+            modules=""
+            for module in ${{ needs.detect-modules.outputs.modules }}; do
+              module_dir="modules/$module"
+              if [[ -d "$module_dir" ]]; then
+                # Find all subdirectories with .tf files in the module
+                module_tf_dirs=$(find "$module_dir" -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
+                modules="$modules $module_tf_dirs"
+              fi
+            done
+          else
+            echo "No specific modules detected, running TFLint on all modules"
+            # Find all modules
+            modules=$(find modules -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
+          fi
           
           tflint_failed=false
           tflint_output=""
@@ -284,6 +416,7 @@ jobs:
   documentation-check:
     name: Documentation Check
     runs-on: ubuntu-latest
+    needs: detect-modules
     
     steps:
       - name: Checkout repository
@@ -302,8 +435,21 @@ jobs:
       - name: Check if documentation is up to date
         id: docs
         run: |
-          # Find all modules (excluding tests and fixtures)
-          modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | grep -v "/tests/" | xargs -I {} dirname {} | sort -u)
+          # Determine which modules to check
+          if [[ "${{ needs.detect-modules.outputs.has_modules }}" == "true" ]]; then
+            echo "Checking documentation only for modules from PR title: ${{ needs.detect-modules.outputs.modules }}"
+            modules=""
+            for module in ${{ needs.detect-modules.outputs.modules }}; do
+              module_dir="modules/$module"
+              if [[ -d "$module_dir" ]]; then
+                modules="$modules $module_dir"
+              fi
+            done
+          else
+            echo "No specific modules detected, checking all modules"
+            # Find all modules (excluding tests and fixtures)
+            modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | grep -v "/tests/" | xargs -I {} dirname {} | sort -u)
+          fi
           
           docs_outdated=()
           docs_errors=()
@@ -434,6 +580,7 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
+    needs: detect-modules
     
     steps:
       - name: Checkout repository
@@ -453,24 +600,67 @@ jobs:
         if: always()
         run: |
           if [[ -f checkov-results.json ]]; then
-            failed=$(jq '.summary.failed' checkov-results.json)
-            passed=$(jq '.summary.passed' checkov-results.json)
-            
-            echo "## Security Scan Summary"
-            echo "- Passed checks: $passed"
-            echo "- Failed checks: $failed"
-            
-            if [[ $failed -gt 0 ]]; then
-              echo ""
-              echo "### Failed Checks:"
-              jq -r '.results.failed_checks[] | "- [\(.check_id)] \(.check_name) in \(.file_path)"' checkov-results.json
+            # If specific modules were detected, filter results
+            if [[ "${{ needs.detect-modules.outputs.has_modules }}" == "true" ]]; then
+              echo "Filtering security results for modules: ${{ needs.detect-modules.outputs.modules }}"
+              
+              # Create a temporary filtered results file
+              cp checkov-results.json checkov-results-full.json
+              
+              # Filter results to only show issues in detected modules
+              failed_count=0
+              passed_count=0
+              
+              echo "## Security Scan Summary (Filtered for PR modules)"
+              
+              for module in ${{ needs.detect-modules.outputs.modules }}; do
+                module_path="modules/$module"
+                echo "### Module: $module"
+                
+                # Count passed checks for this module
+                module_passed=$(jq --arg path "$module_path" '.results.passed_checks[] | select(.file_path | startswith($path))' checkov-results-full.json | jq -s 'length')
+                passed_count=$((passed_count + module_passed))
+                
+                # Get failed checks for this module
+                module_failed=$(jq --arg path "$module_path" '.results.failed_checks[] | select(.file_path | startswith($path))' checkov-results-full.json | jq -s '.')
+                module_failed_count=$(echo "$module_failed" | jq 'length')
+                failed_count=$((failed_count + module_failed_count))
+                
+                if [[ $module_failed_count -gt 0 ]]; then
+                  echo "Failed checks:"
+                  echo "$module_failed" | jq -r '.[] | "- [\(.check_id)] \(.check_name) in \(.file_path)"'
+                else
+                  echo "✅ No security issues found"
+                fi
+                echo ""
+              done
+              
+              echo "### Total Summary"
+              echo "- Passed checks: $passed_count"
+              echo "- Failed checks: $failed_count"
+              
+              failed=$failed_count
+            else
+              # No modules detected, show all results
+              failed=$(jq '.summary.failed' checkov-results.json)
+              passed=$(jq '.summary.passed' checkov-results.json)
+              
+              echo "## Security Scan Summary"
+              echo "- Passed checks: $passed"
+              echo "- Failed checks: $failed"
+              
+              if [[ $failed -gt 0 ]]; then
+                echo ""
+                echo "### Failed Checks:"
+                jq -r '.results.failed_checks[] | "- [\(.check_id)] \(.check_name) in \(.file_path)"' checkov-results.json
+              fi
             fi
           fi
 
   quality-gates:
     name: Quality Gates Summary
     runs-on: ubuntu-latest
-    needs: [validate-pr-title, terraform-fmt, terraform-validate, tflint, documentation-check, security-scan]
+    needs: [detect-modules, validate-pr-title, terraform-fmt, terraform-validate, tflint, documentation-check, security-scan]
     if: always()
     
     steps:
