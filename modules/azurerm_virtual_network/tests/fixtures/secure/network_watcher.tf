@@ -5,8 +5,11 @@
 # Use external data source to check for existing Network Watcher
 data "external" "network_watcher_check" {
   program = ["bash", "-c", <<-EOT
+    # Normalize location to match Azure format (lowercase, no spaces)
+    NORMALIZED_LOCATION=$(echo "${var.location}" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
+    
     # Check if Network Watcher exists in the region
-    NW_LIST=$(az network watcher list --query "[?location=='${var.location}']" -o json 2>/dev/null || echo '[]')
+    NW_LIST=$(az network watcher list --query "[?location=='$NORMALIZED_LOCATION']" -o json 2>/dev/null || echo '[]')
     
     # If we found any Network Watchers, return the first one
     if [ "$(echo "$NW_LIST" | jq 'length')" -gt "0" ]; then
