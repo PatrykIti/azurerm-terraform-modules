@@ -9,21 +9,10 @@ variable "location" {
   default     = "northeurope"
 }
 
-variable "subscription_id" {
-  description = "Azure subscription ID"
-  type        = string
-}
-
 variable "account_replication_type" {
   description = "Storage account replication type"
   type        = string
   default     = "LRS"
-}
-
-variable "storage_account_suffix" {
-  description = "Additional suffix for storage account name"
-  type        = string
-  default     = ""
 }
 
 variable "enable_blob_versioning" {

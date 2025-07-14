@@ -40,31 +40,75 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      modules: ${{ steps.filter.outputs.changes }}
+      modules: ${{ steps.filter.outputs.changes || steps.pr-module.outputs.modules }}
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
       
+      # Extract module from PR title if it's a PR
+      - name: Extract module from PR title
+        id: pr-module
+        if: github.event_name == 'pull_request'
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $PR_TITLE"
+          
+          # Extract module name from PR title patterns like:
+          # - feat(azurerm_virtual_network): ...
+          # - fix(azurerm_storage_account): ...
+          # - chore(azurerm_resource_group): ...
+          if [[ "$PR_TITLE" =~ \(([a-zA-Z0-9_]+)\): ]]; then
+            MODULE_NAME="${BASH_REMATCH[1]}"
+            echo "Detected module from PR title: $MODULE_NAME"
+            
+            # Check if the module directory exists
+            if [ -d "modules/$MODULE_NAME" ]; then
+              echo "modules=[\"$MODULE_NAME\"]" >> $GITHUB_OUTPUT
+              echo "Module directory exists: modules/$MODULE_NAME"
+            else
+              echo "Warning: Module directory modules/$MODULE_NAME does not exist"
+              echo "modules=[]" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "No module detected in PR title, will use path-based detection"
+            echo "modules=[]" >> $GITHUB_OUTPUT
+          fi
+      
+      # Dynamically generate filters based on existing modules
+      - name: Generate path filters
+        id: generate-filters
+        run: |
+          FILTERS=""
+          for module_dir in modules/*/; do
+            if [ -d "$module_dir" ]; then
+              module_name=$(basename "$module_dir")
+              FILTERS="${FILTERS}${module_name}:\n  - 'modules/${module_name}/**'\n  - 'shared/**'\n"
+            fi
+          done
+          echo -e "$FILTERS" > .github/filters.yml
+          echo "Generated filters:"
+          cat .github/filters.yml
+      
       - uses: dorny/paths-filter@v3
         id: filter
+        if: steps.pr-module.outputs.modules == '[]' || github.event_name != 'pull_request'
         with:
-          filters: |
-            azurerm_storage_account:
-              - 'modules/azurerm_storage_account/**'
-              - 'shared/**'
-            # Add new modules here following the same pattern:
-            # module_name:
-            #   - 'modules/module_name/**'
-            #   - 'shared/**'
+          filters: .github/filters.yml
       
       - id: set-matrix
         run: |
           # For manual runs with specific module
           if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.module }}" ]]; then
             MODULES='["${{ github.event.inputs.module }}"]'
+          # For PRs with module in title
+          elif [[ "${{ github.event_name }}" == "pull_request" && "${{ steps.pr-module.outputs.modules }}" != "[]" ]]; then
+            MODULES='${{ steps.pr-module.outputs.modules }}'
+          # For path-based detection
           else
             MODULES='${{ steps.filter.outputs.changes }}'
           fi
+          
+          echo "Final modules to test: $MODULES"
           
           if [ "$MODULES" == "[]" ]; then
             echo "matrix={\"module\":[]}" >> $GITHUB_OUTPUT
