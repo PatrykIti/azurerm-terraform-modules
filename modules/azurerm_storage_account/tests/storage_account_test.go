@@ -318,7 +318,8 @@ func BenchmarkStorageAccountCreation(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		// Generate unique name for each iteration
-		terraformOptions.Vars["storage_account_suffix"] = fmt.Sprintf("%d", i)
+		// Override the random_suffix for each iteration
+		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 		
 		terraform.InitAndApply(b, terraformOptions)
 		terraform.Destroy(b, terraformOptions)
