@@ -18,7 +18,7 @@ provider "azurerm" {
 # Create a resource group for this example
 resource "azurerm_resource_group" "example" {
   name     = "rg-vnet-secure-example"
-  location = "West Europe"
+  location = var.location
 }
 
 # Create DDoS Protection Plan for enhanced security

@@ -18,7 +18,7 @@ provider "azurerm" {
 # Create a resource group for this example
 resource "azurerm_resource_group" "example" {
   name     = "rg-vnet-private-endpoint-example"
-  location = "West Europe"
+  location = var.location
 }
 
 # Create a storage account to demonstrate private endpoint connectivity

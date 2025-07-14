@@ -18,13 +18,13 @@ provider "azurerm" {
 # Create a resource group for this example
 resource "azurerm_resource_group" "example" {
   name     = "rg-vnet-complete-example"
-  location = "West Europe"
+  location = var.location
 }
 
 # Create a second resource group for peering example
 resource "azurerm_resource_group" "peer" {
   name     = "rg-vnet-peer-example"
-  location = "West Europe"
+  location = var.location
 }
 
 # Create a peer Virtual Network for peering demonstration
