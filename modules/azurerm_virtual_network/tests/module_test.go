@@ -156,6 +156,10 @@ func TestVirtualNetworkValidation(t *testing.T) {
 			terraformOptions.Vars["address_space"] = tc.addressSpace
 
 			if tc.expectedError != "" {
+				// Disable retries for validation tests to get the actual error message
+				terraformOptions.MaxRetries = 0
+				terraformOptions.RetryableTerraformErrors = map[string]string{}
+				
 				_, err := terraform.InitAndPlanE(t, terraformOptions)
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), tc.expectedError)
