@@ -83,6 +83,8 @@ mkdir -p "$MODULE_DIR/examples/secure"
 mkdir -p "$MODULE_DIR/examples/private-endpoint"
 mkdir -p "$MODULE_DIR/docs"
 mkdir -p "$MODULE_DIR/tests"
+mkdir -p "$MODULE_DIR/tests/test_outputs"
+mkdir -p "$MODULE_DIR/tests/unit"
 mkdir -p "$MODULE_DIR/tests/fixtures/basic"
 mkdir -p "$MODULE_DIR/tests/fixtures/complete"
 mkdir -p "$MODULE_DIR/tests/fixtures/secure"
@@ -160,14 +162,19 @@ cp "$TEMPLATES_DIR/Makefile" "$MODULE_DIR/"
 
 # Test files
 cp "$TEMPLATES_DIR/go.mod" "$MODULE_DIR/tests/"
-cp "$TEMPLATES_DIR/module_test.go" "$MODULE_DIR/tests/"
+# Copy MODULE_TYPE_test.go and rename it to actual module type
+cp "$TEMPLATES_DIR/MODULE_TYPE_test.go" "$MODULE_DIR/tests/${MODULE_TYPE}_test.go"
+cp "$TEMPLATES_DIR/integration_test.go" "$MODULE_DIR/tests/"
+cp "$TEMPLATES_DIR/performance_test.go" "$MODULE_DIR/tests/"
 cp "$TEMPLATES_DIR/test_helpers.go" "$MODULE_DIR/tests/"
-cp "$TEMPLATES_DIR/test_config.yaml" "$MODULE_DIR/tests/"
+cp "$TEMPLATES_DIR/Makefile.tests" "$MODULE_DIR/tests/Makefile"
+cp "$TEMPLATES_DIR/test_config_cicd.yaml" "$MODULE_DIR/tests/test_config.yaml"
+cp "$TEMPLATES_DIR/tests_gitignore" "$MODULE_DIR/tests/.gitignore"
 cp "$TEMPLATES_DIR/tests_README.md" "$MODULE_DIR/tests/README.md"
 
 # Replace placeholders in all copied files
 print_info "Customizing templates..."
-find "$MODULE_DIR" -type f -name "*.tf" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.js" -o -name "*.go" -o -name "*.mod" -o -name "*.sh" | while read -r file; do
+find "$MODULE_DIR" -type f \( -name "*.tf" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.js" -o -name "*.go" -o -name "*.mod" -o -name "*.sh" -o -name "Makefile" -o -name ".gitignore" \) | while read -r file; do
     replace_placeholders "$file"
 done
 
