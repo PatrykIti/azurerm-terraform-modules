@@ -230,7 +230,7 @@ func TestVirtualNetworkFlowLogs(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_virtual_network/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_virtual_network/tests/fixtures/flow_logs")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
