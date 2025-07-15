@@ -188,16 +188,41 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	}
 }
 
-// generateRandomSuffix generates a unique suffix for test resources
-func generateRandomSuffix() string {
-	// Use combination of random string and timestamp for uniqueness
-	timestamp := time.Now().Format("0102") // MMDD format
-	randomStr := strings.ToLower(random.UniqueId())
+// getTerraformOptionsWithVars returns terraform options with custom variables
+func getTerraformOptionsWithVars(t testing.TB, terraformDir string, vars map[string]interface{}) *terraform.Options {
+	// Get base options
+	options := getTerraformOptions(t, terraformDir)
 	
-	// Limit the random string length to ensure total suffix is manageable
-	if len(randomStr) > 5 {
-		randomStr = randomStr[:5]
+	// Merge custom vars with existing ones
+	for k, v := range vars {
+		options.Vars[k] = v
 	}
 	
-	return fmt.Sprintf("%s%s", randomStr, timestamp)
+	return options
+}
+
+// generateRandomSuffix generates a unique suffix for test resources
+func generateRandomSuffix() string {
+	// Generate a random string with only lowercase letters and numbers
+	randomStr := strings.ToLower(random.UniqueId())
+	
+	// Remove any non-alphanumeric characters and ensure only lowercase
+	cleanStr := ""
+	for _, char := range randomStr {
+		if (char >= 'a' && char <= 'z') || (char >= '0' && char <= '9') {
+			cleanStr += string(char)
+		}
+	}
+	
+	// Ensure we have at least 6 characters
+	if len(cleanStr) < 6 {
+		cleanStr = cleanStr + strings.ToLower(random.UniqueId())[:6-len(cleanStr)]
+	}
+	
+	// Limit to 8 characters to leave room for prefixes
+	if len(cleanStr) > 8 {
+		cleanStr = cleanStr[:8]
+	}
+	
+	return cleanStr
 }
