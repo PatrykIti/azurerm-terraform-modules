@@ -1,3 +1,17 @@
+terraform {
+  required_version = ">= 1.5.0"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 4.0.0, < 5.0.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.6"
+    }
+  }
+}
+
 provider "azurerm" {
   features {
     key_vault {
@@ -73,7 +87,7 @@ resource "azurerm_role_assignment" "uai_kv_access" {
 }
 
 module "storage_account" {
-  source = "../../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
   name                     = "dpcida${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
@@ -89,11 +103,11 @@ module "storage_account" {
   }
 
   # Enable CMK encryption
-  customer_managed_key = {
+  encryption = {
     enabled                           = true
+    infrastructure_encryption_enabled = true
     key_vault_key_id                  = azurerm_key_vault_key.test.id
     user_assigned_identity_id         = azurerm_user_assigned_identity.test.id
-    infrastructure_encryption_enabled = true
   }
 
   # Keyless authentication

@@ -40,35 +40,147 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      modules: ${{ steps.filter.outputs.changes }}
+      modules: ${{ steps.set-matrix.outputs.modules }}
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
       
+      # Extract module from PR title if it's a PR
+      - name: Extract module from PR title
+        id: pr-module
+        if: github.event_name == 'pull_request'
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $PR_TITLE"
+          
+          # Extract module name from PR title patterns like:
+          # - feat(azurerm_virtual_network): ...
+          # - fix(azurerm_storage_account): ...
+          # - chore(azurerm_resource_group): ...
+          # - feat(storage-account,virtual-network): ...
+          # - fix(azurerm_storage_account,azurerm_virtual_network): ...
+          if [[ "$PR_TITLE" =~ ^[^(]+\(([^)]+)\) ]]; then
+            SCOPE="${BASH_REMATCH[1]}"
+            echo "Detected scope: $SCOPE"
+            
+            # Split scope by comma and process each module
+            IFS=',' read -ra SCOPE_ARRAY <<< "$SCOPE"
+            VALID_MODULES=()
+            
+            for scope_item in "${SCOPE_ARRAY[@]}"; do
+              # Trim whitespace
+              scope_item=$(echo "$scope_item" | xargs)
+              echo "Processing scope item: $scope_item"
+              
+              # Check if scope matches a module name (with or without azurerm_ prefix)
+              MODULE_NAME="$scope_item"
+              
+              # If the scope already contains azurerm_, use it as is
+              if [[ "$MODULE_NAME" =~ ^azurerm_ ]]; then
+                echo "Module name already has azurerm_ prefix: $MODULE_NAME"
+              else
+                # Remove azurerm- prefix if present
+                MODULE_NAME="${MODULE_NAME#azurerm-}"
+                # Replace dashes with underscores
+                MODULE_NAME="${MODULE_NAME//-/_}"
+                # Add azurerm_ prefix
+                MODULE_NAME="azurerm_${MODULE_NAME}"
+              fi
+              
+              # Check if this module exists
+              if [[ -d "modules/$MODULE_NAME" ]]; then
+                echo "Found module: $MODULE_NAME"
+                VALID_MODULES+=("$MODULE_NAME")
+              else
+                echo "Module $MODULE_NAME not found in modules/ directory"
+              fi
+            done
+            
+            # Convert array to JSON format
+            if [ ${#VALID_MODULES[@]} -eq 0 ]; then
+              MODULES="[]"
+            else
+              MODULES=$(printf '%s\n' "${VALID_MODULES[@]}" | jq -R -s -c 'split("\n")[:-1]')
+            fi
+            
+            echo "Valid modules found: ${VALID_MODULES[*]}"
+            echo "modules=$MODULES" >> $GITHUB_OUTPUT
+          else
+            echo "No module detected in PR title, will use path-based detection"
+            echo "modules=[]" >> $GITHUB_OUTPUT
+          fi
+      
+      # Dynamically generate filters based on existing modules
+      - name: Generate path filters
+        id: generate-filters
+        run: |
+          FILTERS=""
+          for module_dir in modules/*/; do
+            if [ -d "$module_dir" ]; then
+              module_name=$(basename "$module_dir")
+              # Include all module files, tests, fixtures, and examples
+              FILTERS="${FILTERS}${module_name}:\n  - 'modules/${module_name}/**'\n  - 'modules/${module_name}/tests/**'\n  - 'modules/${module_name}/examples/**'\n  - 'shared/**'\n"
+            fi
+          done
+          echo -e "$FILTERS" > .github/filters.yml
+          echo "Generated filters:"
+          cat .github/filters.yml
+      
       - uses: dorny/paths-filter@v3
         id: filter
         with:
-          filters: |
-            azurerm_storage_account:
-              - 'modules/azurerm_storage_account/**'
-              - 'shared/**'
-            # Add new modules here following the same pattern:
-            # module_name:
-            #   - 'modules/module_name/**'
-            #   - 'shared/**'
+          filters: .github/filters.yml
       
       - id: set-matrix
         run: |
           # For manual runs with specific module
           if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.module }}" ]]; then
             MODULES='["${{ github.event.inputs.module }}"]'
+            echo "Manual workflow dispatch for module: ${{ github.event.inputs.module }}"
+          # For PRs - merge modules from title and path detection
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "=== Module Detection for PR ==="
+            
+            # Get modules from PR title
+            PR_MODULES='${{ steps.pr-module.outputs.modules }}'
+            echo "Modules from PR title: $PR_MODULES"
+            
+            # Get modules from path changes
+            PATH_MODULES='${{ steps.filter.outputs.changes }}'
+            echo "Modules from path changes: $PATH_MODULES"
+            
+            # Merge both lists
+            if [[ "$PR_MODULES" != "[]" && "$PATH_MODULES" != "[]" ]]; then
+              # Both have modules - merge them
+              ALL_MODULES=$(echo "$PR_MODULES $PATH_MODULES" | jq -s -c 'add | unique')
+              echo "Merged modules (unique): $ALL_MODULES"
+              MODULES="$ALL_MODULES"
+            elif [[ "$PR_MODULES" != "[]" ]]; then
+              # Only PR title has modules
+              MODULES="$PR_MODULES"
+              echo "Using modules from PR title only"
+            elif [[ "$PATH_MODULES" != "[]" ]]; then
+              # Only path changes have modules
+              MODULES="$PATH_MODULES"
+              echo "Using modules from path changes only"
+            else
+              # No modules detected
+              MODULES="[]"
+              echo "No modules detected from PR title or path changes"
+            fi
+          # For push events - use path-based detection
           else
             MODULES='${{ steps.filter.outputs.changes }}'
+            echo "Push event - using path-based detection: $MODULES"
           fi
           
+          echo "=== Final modules to test: $MODULES ==="
+          
           if [ "$MODULES" == "[]" ]; then
+            echo "modules=[]" >> $GITHUB_OUTPUT
             echo "matrix={\"module\":[]}" >> $GITHUB_OUTPUT
           else
+            echo "modules=$MODULES" >> $GITHUB_OUTPUT
             echo "matrix={\"module\":${MODULES}}" >> $GITHUB_OUTPUT
           fi
 

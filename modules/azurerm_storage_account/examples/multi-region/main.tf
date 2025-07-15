@@ -1,9 +1,9 @@
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.5.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.35.0"
+      version = ">= 4.0.0, < 5.0.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -30,8 +30,6 @@ resource "random_string" "suffix" {
   upper   = false
 }
 
-# Data source for current client configuration
-data "azurerm_client_config" "current" {}
 
 # Primary region resource group
 resource "azurerm_resource_group" "primary" {

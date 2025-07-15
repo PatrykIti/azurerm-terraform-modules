@@ -48,7 +48,7 @@ Fix and improve all storage account module examples to ensure they correctly dem
 - Add container-level RBAC assignments examples
 
 #### Multi-Region Example
-- Fix Terraform version requirement to match module (4.35.0)
+- Fix Terraform version requirement to match module (4.36.0)
 - Add practical replication implementation (Azure Functions or Logic Apps)
 - Add monitoring and alerting for replication lag
 - Enhance security with private endpoints and restrictive network rules

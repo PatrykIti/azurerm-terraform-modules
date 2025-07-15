@@ -1,3 +1,17 @@
+terraform {
+  required_version = ">= 1.5.0"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 4.0.0, < 5.0.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.6"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
 }
@@ -40,7 +54,7 @@ resource "azurerm_log_analytics_workspace" "test" {
 }
 
 module "storage_account" {
-  source = "../../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
   name                     = "dpccmp${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name

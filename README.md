@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.5-623CE4?logo=terraform&logoColor=white)](https://www.terraform.io/)
 [![Azure](https://img.shields.io/badge/Azure-0078D4?logo=microsoft-azure&logoColor=white)](https://azure.microsoft.com/)
-[![AzureRM Provider](https://img.shields.io/badge/AzureRM_Provider-4.35.0-blue?logo=terraform)](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0)
+[![AzureRM Provider](https://img.shields.io/badge/AzureRM_Provider-4.36.0-blue?logo=terraform)](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0)
 
 <!-- MODULE BADGES START -->
 [![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=SAv1.0.0)
@@ -30,6 +30,12 @@ azurerm-terraform-modules/
 ├── examples/                    # Cross-module examples
 ├── tests/                       # Shared test utilities
 ├── security-policies/           # Custom security policies
+├── build-templates/             # Azure Pipelines templates (coming soon)
+│   ├── versioning/              # Versioning pipeline templates
+│   ├── documentation/           # Documentation generation templates
+│   ├── security/                # Security scanning templates
+│   ├── testing/                 # Testing pipeline templates
+│   └── release/                 # Release pipeline templates
 ├── .github/workflows/           # CI/CD workflows
 └── .claude/references/          # AI development guides
 ```
@@ -70,16 +76,20 @@ module "storage_account" {
 
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
-| Virtual Network | 📅 Planned | - | Virtual networks with subnets and security |
-| Key Vault | 📅 Planned | - | Key management and secrets storage |
-| Application Gateway | 📅 Planned | - | Application-layer load balancing |
+| Networking | 🔧 Development | - | Virtual networks with subnets and security |
+| SQL Server | 🔧 Development | - | Azure SQL Server and database management |
+| AKS | 🔧 Development | - | Azure Kubernetes Service cluster |
+| Key Vault | 🔧 Development | - | Key management and secrets storage |
+| App Service | 🔧 Development | - | Web Apps and Function Apps hosting |
 
 ### Development Roadmap
 
-- **Phase 1**: Storage Account module with comprehensive features
-- **Phase 2**: Virtual Network module with advanced networking
+- **Phase 1**: Storage Account module with comprehensive features ✅
+- **Phase 2**: Networking module with virtual networks and security
 - **Phase 3**: Key Vault module with enterprise security
-- **Phase 4**: Application Gateway module with SSL/WAF
+- **Phase 4**: SQL Server module with database management
+- **Phase 5**: AKS module for Kubernetes workloads
+- **Phase 6**: App Service module for web applications
 
 ### Storage Account Module Examples
 
@@ -87,14 +97,14 @@ The Storage Account module includes comprehensive examples demonstrating various
 
 | Example | Description |
 |---------|-------------|
-| [basic](./modules/azurerm_storage_account/examples/basic/) | Basic storage account with minimal configuration |
-| [secure](./modules/azurerm_storage_account/examples/secure/) | Security-hardened configuration with maximum protection |
-| [secure-private-endpoint](./modules/azurerm_storage_account/examples/secure-private-endpoint/) | Private endpoint configuration for network isolation |
-| [data-lake-gen2](./modules/azurerm_storage_account/examples/data-lake-gen2/) | Data Lake Storage Gen2 with SFTP and NFSv3 |
-| [advanced-policies](./modules/azurerm_storage_account/examples/advanced-policies/) | Advanced policies (SAS, immutability, routing) |
-| [identity-access](./modules/azurerm_storage_account/examples/identity-access/) | Microsoft Entra ID authentication and RBAC |
-| [complete](./modules/azurerm_storage_account/examples/complete/) | Full-featured storage account with all enterprise capabilities |
-| [multi-region](./modules/azurerm_storage_account/examples/multi-region/) | Multi-region setup with disaster recovery |
+| [basic](./modules/azurerm_storage_account/examples/basic/README.md) | Basic storage account with minimal configuration |
+| [secure](./modules/azurerm_storage_account/examples/secure/README.md) | Security-hardened configuration with maximum protection |
+| [secure-private-endpoint](./modules/azurerm_storage_account/examples/secure-private-endpoint/README.md) | Private endpoint configuration for network isolation |
+| [data-lake-gen2](./modules/azurerm_storage_account/examples/data-lake-gen2/README.md) | Data Lake Storage Gen2 with SFTP and NFSv3 |
+| [advanced-policies](./modules/azurerm_storage_account/examples/advanced-policies/README.md) | Advanced policies (SAS, immutability, routing) |
+| [identity-access](./modules/azurerm_storage_account/examples/identity-access/README.md) | Microsoft Entra ID authentication and RBAC |
+| [complete](./modules/azurerm_storage_account/examples/complete/README.md) | Full-featured storage account with all enterprise capabilities |
+| [multi-region](./modules/azurerm_storage_account/examples/multi-region/README.md) | Multi-region setup with disaster recovery |
 
 
 ## Prerequisites
@@ -133,6 +143,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ by the Platform Engineering Team**
+**Built with ❤️ by PatrykIti**
 
 *This repository follows enterprise-grade standards for infrastructure as code. For development guidelines and AI-assisted workflows, see [CLAUDE.md](./CLAUDE.md).*

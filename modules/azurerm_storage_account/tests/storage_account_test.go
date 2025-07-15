@@ -3,7 +3,6 @@ package test
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -319,7 +318,8 @@ func BenchmarkStorageAccountCreation(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		// Generate unique name for each iteration
-		terraformOptions.Vars["storage_account_suffix"] = fmt.Sprintf("%d", i)
+		// Override the random_suffix for each iteration
+		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 		
 		terraform.InitAndApply(b, terraformOptions)
 		terraform.Destroy(b, terraformOptions)
@@ -334,16 +334,11 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	baseID := strings.ToLower(random.UniqueId())
 	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
 	
-	// Azure subscription ID (will be set from environment)
-	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
-	require.NotEmpty(t, subscriptionID, "AZURE_SUBSCRIPTION_ID is required")
-
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
-			"random_suffix":   uniqueID,
-			"subscription_id": subscriptionID,
-			"location":        "northeurope",
+			"random_suffix": uniqueID,
+			"location":      "northeurope",
 		},
 		NoColor: true,
 		// Retry configuration

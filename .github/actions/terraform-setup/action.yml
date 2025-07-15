@@ -36,10 +36,9 @@ runs:
 
     - name: Setup TFLint
       if: inputs.install-tflint == 'true'
-      shell: bash
-      run: |
-        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-        tflint --version
+      uses: terraform-linters/setup-tflint@v4
+      with:
+        tflint_version: latest
 
     - name: Setup terraform-docs
       if: inputs.install-terraform-docs == 'true'

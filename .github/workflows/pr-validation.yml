@@ -1,4 +1,4 @@
-name: PR Validation
+name: PR Validation (Improved)
 
 on:
   pull_request:
@@ -8,10 +8,165 @@ permissions:
   contents: read
   pull-requests: write
   statuses: write
+  security-events: write
 
 jobs:
-  # Note: We only validate PR titles, not individual commits, because this repository
-  # uses squash merge strategy. The PR title becomes the commit message after merge.
+  # Detect which modules are affected by this PR
+  detect-changes:
+    name: Detect Affected Modules
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.set-matrix.outputs.modules }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      has_modules: ${{ steps.set-matrix.outputs.has_modules }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      # Extract module from PR title if it's a PR
+      - name: Extract module from PR title
+        id: pr-module
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $PR_TITLE"
+          
+          # Extract module name from PR title patterns
+          if [[ "$PR_TITLE" =~ ^[^(]+\(([^)]+)\) ]]; then
+            SCOPE="${BASH_REMATCH[1]}"
+            echo "Detected scope: $SCOPE"
+            
+            # Split scope by comma and process each module
+            IFS=',' read -ra SCOPE_ARRAY <<< "$SCOPE"
+            VALID_MODULES=()
+            
+            for scope_item in "${SCOPE_ARRAY[@]}"; do
+              # Trim whitespace
+              scope_item=$(echo "$scope_item" | xargs)
+              echo "Processing scope item: $scope_item"
+              
+              # Skip non-module scopes
+              if [[ "$scope_item" =~ ^(core|deps|deps-dev|ci|docs|tests|workflows|templates|semantic-release|security|terraform-docs|examples|modules|scripts)$ ]]; then
+                echo "Skipping non-module scope: $scope_item"
+                continue
+              fi
+              
+              # Check if scope matches a module name
+              MODULE_NAME="$scope_item"
+              
+              # If the scope already contains azurerm_, use it as is
+              if [[ "$MODULE_NAME" =~ ^azurerm_ ]]; then
+                echo "Module name already has azurerm_ prefix: $MODULE_NAME"
+              else
+                # Remove azurerm- prefix if present
+                MODULE_NAME="${MODULE_NAME#azurerm-}"
+                # Replace dashes with underscores
+                MODULE_NAME="${MODULE_NAME//-/_}"
+                # Add azurerm_ prefix
+                MODULE_NAME="azurerm_${MODULE_NAME}"
+              fi
+              
+              # Check if this module exists
+              if [[ -d "modules/$MODULE_NAME" ]]; then
+                echo "Found module: $MODULE_NAME"
+                VALID_MODULES+=("$MODULE_NAME")
+              else
+                echo "Module $MODULE_NAME not found in modules/ directory"
+              fi
+            done
+            
+            # Convert array to JSON format
+            if [ ${#VALID_MODULES[@]} -eq 0 ]; then
+              MODULES="[]"
+            else
+              MODULES=$(printf '%s\n' "${VALID_MODULES[@]}" | jq -R -s -c 'split("\n")[:-1]')
+            fi
+            
+            echo "Valid modules found: ${VALID_MODULES[*]}"
+            echo "modules=$MODULES" >> $GITHUB_OUTPUT
+          else
+            echo "No module detected in PR title, will use path-based detection"
+            echo "modules=[]" >> $GITHUB_OUTPUT
+          fi
+      
+      # Dynamically generate filters based on existing modules
+      - name: Generate path filters
+        id: generate-filters
+        run: |
+          FILTERS=""
+          for module_dir in modules/*/; do
+            if [ -d "$module_dir" ]; then
+              module_name=$(basename "$module_dir")
+              FILTERS="${FILTERS}${module_name}:\n  - 'modules/${module_name}/**'\n  - 'shared/**'\n"
+            fi
+          done
+          echo -e "$FILTERS" > .github/filters.yml
+          echo "Generated filters:"
+          cat .github/filters.yml
+      
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: .github/filters.yml
+      
+      - id: set-matrix
+        run: |
+          # For PRs - merge modules from title and path detection
+          echo "=== Module Detection for PR ==="
+          
+          # Get modules from PR title
+          PR_MODULES='${{ steps.pr-module.outputs.modules }}'
+          echo "Modules from PR title: $PR_MODULES"
+          
+          # Get modules from path changes
+          PATH_MODULES='${{ steps.filter.outputs.changes }}'
+          echo "Modules from path changes: $PATH_MODULES"
+          
+          # Merge both lists
+          if [[ "$PR_MODULES" != "[]" && "$PATH_MODULES" != "[]" ]]; then
+            # Both have modules - merge them
+            ALL_MODULES=$(echo "$PR_MODULES $PATH_MODULES" | jq -s -c 'add | unique')
+            echo "Merged modules (unique): $ALL_MODULES"
+            MODULES="$ALL_MODULES"
+          elif [[ "$PR_MODULES" != "[]" ]]; then
+            # Only PR title has modules
+            MODULES="$PR_MODULES"
+            echo "Using modules from PR title only"
+          elif [[ "$PATH_MODULES" != "[]" ]]; then
+            # Only path changes have modules
+            MODULES="$PATH_MODULES"
+            echo "Using modules from path changes only"
+          else
+            # No modules detected - check all
+            echo "No specific modules detected - will validate all"
+            # Get all modules
+            ALL_MODULES=()
+            for module_dir in modules/*/; do
+              if [ -d "$module_dir" ]; then
+                module_name=$(basename "$module_dir")
+                ALL_MODULES+=("$module_name")
+              fi
+            done
+            if [ ${#ALL_MODULES[@]} -eq 0 ]; then
+              MODULES="[]"
+            else
+              MODULES=$(printf '%s\n' "${ALL_MODULES[@]}" | jq -R -s -c 'split("\n")[:-1]')
+            fi
+          fi
+          
+          echo "=== Final modules to validate: $MODULES ==="
+          
+          if [ "$MODULES" == "[]" ]; then
+            echo "modules=[]" >> $GITHUB_OUTPUT
+            echo "matrix={\"module\":[]}" >> $GITHUB_OUTPUT
+            echo "has_modules=false" >> $GITHUB_OUTPUT
+          else
+            echo "modules=$MODULES" >> $GITHUB_OUTPUT
+            echo "matrix={\"module\":${MODULES}}" >> $GITHUB_OUTPUT
+            echo "has_modules=true" >> $GITHUB_OUTPUT
+          fi
+
+  # PR title validation (not per module)
   validate-pr-title:
     name: Validate PR Title
     runs-on: ubuntu-latest
@@ -63,14 +218,16 @@ jobs:
             didn't match the configured pattern. Please ensure that the subject
             doesn't start with an uppercase character.
           validateSingleCommit: false
-      
-      - name: Skip validation message for Dependabot
-        if: ${{ startsWith(github.head_ref, 'dependabot/') }}
-        run: echo "Skipping PR title validation for Dependabot PR from branch ${{ github.head_ref }}"
 
+  # Per-module terraform formatting check
   terraform-fmt:
-    name: Terraform Format Check
+    name: Format Check - ${{ matrix.module }}
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.has_modules == 'true' }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     
     steps:
       - name: Checkout repository
@@ -81,11 +238,13 @@ jobs:
         with:
           terraform_version: latest
       
-      - name: Check Terraform formatting
+      - name: Check formatting for ${{ matrix.module }}
         id: fmt
         run: |
-          # Find all directories with Terraform files
-          tf_dirs=$(find modules -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
+          module_dir="modules/${{ matrix.module }}"
+          
+          # Find all subdirectories with .tf files in the module
+          tf_dirs=$(find "$module_dir" -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
           
           fmt_issues=()
           for dir in $tf_dirs; do
@@ -103,36 +262,19 @@ jobs:
             echo "fmt_needed=true" >> $GITHUB_OUTPUT
             exit 1
           else
-            echo "✅ All Terraform files are properly formatted"
+            echo "✅ Module ${{ matrix.module }} is properly formatted"
             echo "fmt_needed=false" >> $GITHUB_OUTPUT
           fi
-      
-      - name: Comment formatting instructions
-        if: failure() && steps.fmt.outputs.fmt_needed == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const comment = `## ❌ Terraform Formatting Required
-            
-            This PR has Terraform formatting issues. Please run the following command to fix them:
-            
-            \`\`\`bash
-            terraform fmt -recursive
-            \`\`\`
-            
-            Then commit and push the changes.`;
-            
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
 
+  # Per-module terraform validation
   terraform-validate:
-    name: Terraform Validation
+    name: Validate - ${{ matrix.module }}
+    needs: [detect-changes, terraform-fmt]
+    if: ${{ needs.detect-changes.outputs.has_modules == 'true' }}
     runs-on: ubuntu-latest
-    needs: terraform-fmt
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     
     steps:
       - name: Checkout repository
@@ -143,40 +285,60 @@ jobs:
         with:
           terraform_version: latest
       
-      - name: Validate Terraform configurations
+      - name: Validate ${{ matrix.module }}
         run: |
-          # Find all modules (excluding tests and fixtures)
-          modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | grep -v "/tests/" | xargs -I {} dirname {} | sort -u)
+          module_dir="modules/${{ matrix.module }}"
           
-          validation_failed=false
-          for module in $modules; do
-            echo "## Validating module: $module"
-            cd "$module"
-            
-            # Initialize without backend
-            if terraform init -backend=false; then
-              if ! terraform validate; then
-                echo "❌ Validation failed for module: $module"
-                validation_failed=true
-              else
-                echo "✅ Module validated successfully: $module"
-              fi
+          # Validate main module
+          echo "## Validating module: $module_dir"
+          cd "$module_dir"
+          
+          if terraform init -backend=false; then
+            if ! terraform validate; then
+              echo "❌ Validation failed for module: ${{ matrix.module }}"
+              exit 1
             else
-              echo "❌ Failed to initialize module: $module"
-              validation_failed=true
+              echo "✅ Module validated successfully: ${{ matrix.module }}"
             fi
-            
-            cd - > /dev/null
-          done
-          
-          if [ "$validation_failed" = true ]; then
+          else
+            echo "❌ Failed to initialize module: ${{ matrix.module }}"
             exit 1
           fi
+          
+          cd - > /dev/null
+          
+          # Also validate examples for this module
+          if [[ -d "$module_dir/examples" ]]; then
+            example_dirs=$(find "$module_dir/examples" -mindepth 1 -maxdepth 1 -type d)
+            for example in $example_dirs; do
+              echo "## Validating example: $example"
+              cd "$example"
+              
+              if terraform init -backend=false; then
+                if ! terraform validate; then
+                  echo "❌ Validation failed for example: $(basename $example)"
+                  exit 1
+                else
+                  echo "✅ Example validated successfully: $(basename $example)"
+                fi
+              else
+                echo "❌ Failed to initialize example: $(basename $example)"
+                exit 1
+              fi
+              
+              cd - > /dev/null
+            done
+          fi
 
+  # Per-module TFLint analysis
   tflint:
-    name: TFLint Analysis
+    name: TFLint - ${{ matrix.module }}
+    needs: [detect-changes, terraform-fmt]
+    if: ${{ needs.detect-changes.outputs.has_modules == 'true' }}
     runs-on: ubuntu-latest
-    needs: terraform-fmt
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     
     steps:
       - name: Checkout repository
@@ -201,89 +363,42 @@ jobs:
           echo "TFLint version:"
           tflint --version
       
-      - name: Run TFLint on all modules
+      - name: Run TFLint on ${{ matrix.module }}
         id: tflint
         run: |
-          # Find all modules
-          modules=$(find modules -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
+          module_dir="modules/${{ matrix.module }}"
+          
+          # Find all subdirectories with .tf files in the module
+          tf_dirs=$(find "$module_dir" -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
           
           tflint_failed=false
-          tflint_output=""
-          
-          for module in $modules; do
-            echo "## Running TFLint on: $module"
+          for dir in $tf_dirs; do
+            echo "## Running TFLint on: $dir"
             
-            # Run tflint and capture output
-            if output=$(tflint --chdir="$module" --format=default --force 2>&1); then
-              echo "✅ TFLint passed for: $module"
+            if output=$(tflint --chdir="$dir" --format=default --force 2>&1); then
+              echo "✅ TFLint passed for: $dir"
               echo "$output"
             else
-              echo "❌ TFLint found issues in: $module"
+              echo "❌ TFLint found issues in: $dir"
               echo "$output"
               tflint_failed=true
-              tflint_output="${tflint_output}\n### Module: $module\n\`\`\`\n${output}\n\`\`\`\n"
             fi
             echo ""
           done
           
-          # Also run on examples
-          if [[ -d "examples" ]]; then
-            examples=$(find examples -name "*.tf" -exec dirname {} \; | sort -u | grep -v ".terraform")
-            for example in $examples; do
-              echo "## Running TFLint on example: $example"
-              
-              if output=$(tflint --chdir="$example" --format=default --force 2>&1); then
-                echo "✅ TFLint passed for: $example"
-                echo "$output"
-              else
-                echo "❌ TFLint found issues in: $example"
-                echo "$output"
-                tflint_failed=true
-                tflint_output="${tflint_output}\n### Example: $example\n\`\`\`\n${output}\n\`\`\`\n"
-              fi
-              echo ""
-            done
-          fi
-          
           if [ "$tflint_failed" = true ]; then
-            echo "tflint_failed=true" >> $GITHUB_OUTPUT
-            echo "tflint_output<<EOF" >> $GITHUB_OUTPUT
-            echo -e "$tflint_output" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
             exit 1
-          else
-            echo "tflint_failed=false" >> $GITHUB_OUTPUT
           fi
-      
-      - name: Comment TFLint results
-        if: failure() && steps.tflint.outputs.tflint_failed == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const output = `${{ steps.tflint.outputs.tflint_output }}`;
-            const comment = `## ⚠️ TFLint Found Issues
-            
-            TFLint has identified code quality issues that need to be addressed:
-            
-            ${output}
-            
-            Please fix these issues before merging. You can run TFLint locally with:
-            
-            \`\`\`bash
-            tflint --init
-            tflint --chdir=<module-directory> --format=default --force
-            \`\`\``;
-            
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
 
+  # Per-module documentation check
   documentation-check:
-    name: Documentation Check
+    name: Docs Check - ${{ matrix.module }}
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.has_modules == 'true' }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     
     steps:
       - name: Checkout repository
@@ -291,7 +406,6 @@ jobs:
       
       - name: Install terraform-docs
         run: |
-          # Use a more recent version to match what developers might have
           TERRAFORM_DOCS_VERSION="v0.20.0"
           curl -sSLo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/${TERRAFORM_DOCS_VERSION}/terraform-docs-${TERRAFORM_DOCS_VERSION}-linux-amd64.tar.gz
           tar -xzf terraform-docs.tar.gz
@@ -299,178 +413,102 @@ jobs:
           sudo mv terraform-docs /usr/local/bin/
           terraform-docs --version
       
-      - name: Check if documentation is up to date
+      - name: Check documentation for ${{ matrix.module }}
         id: docs
         run: |
-          # Find all modules (excluding tests and fixtures)
-          modules=$(find modules -name "main.tf" -o -name "versions.tf" | grep -v ".terraform" | grep -v "/tests/" | xargs -I {} dirname {} | sort -u)
+          module_dir="modules/${{ matrix.module }}"
+          docs_outdated=false
           
-          docs_outdated=()
-          docs_errors=()
+          # Update examples list if module has examples
+          if [[ -d "$module_dir/examples" ]] && [[ -x "./scripts/update-examples-list.sh" ]]; then
+            echo "Updating examples list for ${{ matrix.module }}..."
+            ./scripts/update-examples-list.sh "$module_dir"
+          fi
           
-          for module in $modules; do
-            # Skip example directories - they are checked separately
-            if [[ "$module" =~ /examples/ ]]; then
-              continue
-            fi
-            
-            # First, update examples list if module has examples
-            if [[ -d "$module/examples" ]] && [[ -x "./scripts/update-examples-list.sh" ]]; then
-              echo "Updating examples list for $module..."
-              ./scripts/update-examples-list.sh "$module"
-            fi
-            
-            if [[ -f "$module/README.md" ]]; then
-              # Check if terraform-docs content is up to date
-              if [[ -x "./scripts/check-terraform-docs.sh" ]]; then
-                if ! ./scripts/check-terraform-docs.sh "$module"; then
-                  docs_outdated+=("$module")
-                fi
+          if [[ -f "$module_dir/README.md" ]]; then
+            # Check if terraform-docs content is up to date
+            if [[ -x "./scripts/check-terraform-docs.sh" ]]; then
+              if ! ./scripts/check-terraform-docs.sh "$module_dir"; then
+                echo "❌ Documentation is outdated for module: ${{ matrix.module }}"
+                docs_outdated=true
               else
-                # Fallback to old method if script doesn't exist
-                if terraform-docs markdown table --output-file README.md.tmp "$module" 2>/dev/null; then
-                  if ! diff -q "$module/README.md" "$module/README.md.tmp" > /dev/null 2>&1; then
-                    docs_outdated+=("$module")
-                  fi
-                  rm -f "$module/README.md.tmp"
-                else
-                  docs_errors+=("$module (terraform-docs error)")
-                fi
+                echo "✅ Documentation is up to date for module: ${{ matrix.module }}"
               fi
             else
-              docs_outdated+=("$module (missing README.md)")
-            fi
-            
-            # Check examples for this module
-            if [[ -d "$module/examples" ]]; then
-              for example in $(find "$module/examples" -mindepth 1 -maxdepth 1 -type d); do
-                if [[ -f "$example/README.md" ]]; then
-                  # For examples, just check if terraform-docs markers exist and content is present
-                  if grep -q "BEGIN_TF_DOCS" "$example/README.md" && grep -q "END_TF_DOCS" "$example/README.md"; then
-                    # Run terraform-docs to ensure content is up to date
-                    cd "$example"
-                    if terraform-docs markdown table . > /dev/null 2>&1; then
-                      echo "  ✓ Example $(basename "$example") documentation OK"
-                    else
-                      docs_errors+=("$example (terraform-docs update failed)")
-                    fi
-                    cd - > /dev/null
-                  else
-                    # Example doesn't have terraform-docs markers - that's OK for custom examples
-                    echo "  ✓ Example $(basename "$example") has custom documentation"
-                  fi
-                else
-                  docs_outdated+=("$example (missing README.md)")
+              # Fallback to old method
+              if terraform-docs markdown table --output-file README.md.tmp "$module_dir" 2>/dev/null; then
+                if ! diff -q "$module_dir/README.md" "$module_dir/README.md.tmp" > /dev/null 2>&1; then
+                  echo "❌ Documentation is outdated for module: ${{ matrix.module }}"
+                  docs_outdated=true
                 fi
-              done
-            fi
-          done
-          
-          # Report errors first
-          if [ ${#docs_errors[@]} -gt 0 ]; then
-            echo "❌ Documentation generation errors in:"
-            printf '%s\n' "${docs_errors[@]}"
-          fi
-          
-          # Then report outdated docs
-          if [ ${#docs_outdated[@]} -gt 0 ]; then
-            echo "❌ Documentation is outdated or missing in:"
-            printf '%s\n' "${docs_outdated[@]}"
-          fi
-          
-          # Set output based on both conditions
-          if [ ${#docs_outdated[@]} -gt 0 ] || [ ${#docs_errors[@]} -gt 0 ]; then
-            echo "docs_outdated=true" >> $GITHUB_OUTPUT
-            
-            # Store error details for comment
-            if [ ${#docs_errors[@]} -gt 0 ]; then
-              echo "docs_errors<<EOF" >> $GITHUB_OUTPUT
-              printf '%s\n' "${docs_errors[@]}" >> $GITHUB_OUTPUT
-              echo "EOF" >> $GITHUB_OUTPUT
+                rm -f "$module_dir/README.md.tmp"
+              fi
             fi
           else
-            echo "✅ All documentation is up to date"
-            echo "docs_outdated=false" >> $GITHUB_OUTPUT
+            echo "❌ Missing README.md for module: ${{ matrix.module }}"
+            docs_outdated=true
           fi
-      
-      - name: Comment documentation instructions
-        if: steps.docs.outputs.docs_outdated == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const errors = `${{ steps.docs.outputs.docs_errors }}`;
-            let comment = `## 📚 Documentation Update Required\n\n`;
-            
-            if (errors && errors.trim()) {
-              comment += `### ❌ Documentation Generation Errors\n\n`;
-              comment += `The following modules have terraform-docs configuration errors:\n\n`;
-              comment += errors.split('\n').map(e => `- ${e}`).join('\n');
-              comment += `\n\nPlease check the \`.terraform-docs.yml\` configuration in these modules.\n\n`;
-            }
-            
-            comment += `The documentation for some modules is outdated or missing. Please update it by running:\n\n`;
-            comment += `\`\`\`bash\n`;
-            comment += `# For each module that needs updating, run this command in the module directory:\n`;
-            comment += `cd <module-directory> && terraform-docs .\n`;
-            comment += `\`\`\`\n\n`;
-            comment += `Or update all modules:\n`;
-            comment += `\`\`\`bash\n`;
-            comment += `# This script will update terraform-docs for all modules\n`;
-            comment += `for module in $(find modules -name "main.tf" -exec dirname {} \\; | sort -u); do\n`;
-            comment += `  echo "Updating docs for $module"\n`;
-            comment += `  (cd "$module" && terraform-docs .)\n`;
-            comment += `done\n`;
-            comment += `\`\`\`\n\n`;
-            comment += `**Important:** The \`terraform-docs .\` command uses the module's \`.terraform-docs.yml\` configuration file\n`;
-            comment += `which preserves the existing README structure and only updates the documentation sections.`;
-            
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
+          
+          # Check examples documentation
+          if [[ -d "$module_dir/examples" ]]; then
+            for example in $(find "$module_dir/examples" -mindepth 1 -maxdepth 1 -type d); do
+              if [[ -f "$example/README.md" ]]; then
+                if grep -q "BEGIN_TF_DOCS" "$example/README.md" && grep -q "END_TF_DOCS" "$example/README.md"; then
+                  cd "$example"
+                  if terraform-docs markdown table . > /dev/null 2>&1; then
+                    echo "  ✓ Example $(basename "$example") documentation OK"
+                  else
+                    echo "  ❌ Example $(basename "$example") documentation update failed"
+                    docs_outdated=true
+                  fi
+                  cd - > /dev/null
+                fi
+              else
+                echo "  ❌ Example $(basename "$example") missing README.md"
+                docs_outdated=true
+              fi
+            done
+          fi
+          
+          if [ "$docs_outdated" = true ]; then
+            exit 1
+          fi
 
+  # Per-module security scan
   security-scan:
-    name: Security Scan
+    name: Security - ${{ matrix.module }}
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.has_modules == 'true' }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      - name: Run Checkov scan
+      - name: Run Checkov on ${{ matrix.module }}
         id: checkov
         uses: bridgecrewio/checkov-action@v12
         with:
-          directory: .
+          directory: modules/${{ matrix.module }}
           framework: terraform
           soft_fail: true
-          output_format: json
-          output_file_path: checkov-results.json
+          output_format: cli
+          download_external_modules: true
       
-      - name: Process security results
-        if: always()
-        run: |
-          if [[ -f checkov-results.json ]]; then
-            failed=$(jq '.summary.failed' checkov-results.json)
-            passed=$(jq '.summary.passed' checkov-results.json)
-            
-            echo "## Security Scan Summary"
-            echo "- Passed checks: $passed"
-            echo "- Failed checks: $failed"
-            
-            if [[ $failed -gt 0 ]]; then
-              echo ""
-              echo "### Failed Checks:"
-              jq -r '.results.failed_checks[] | "- [\(.check_id)] \(.check_name) in \(.file_path)"' checkov-results.json
-            fi
-          fi
+      - name: Run tfsec on ${{ matrix.module }}
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          working_directory: modules/${{ matrix.module }}
+          soft_fail: true
 
+  # Summary job that collects all results
   quality-gates:
     name: Quality Gates Summary
     runs-on: ubuntu-latest
-    needs: [validate-pr-title, terraform-fmt, terraform-validate, tflint, documentation-check, security-scan]
+    needs: [detect-changes, validate-pr-title, terraform-fmt, terraform-validate, tflint, documentation-check, security-scan]
     if: always()
     
     steps:
@@ -479,27 +517,58 @@ jobs:
         with:
           script: |
             const jobs = ${{ toJSON(needs) }};
-            const jobNames = {
-              'validate-pr-title': 'PR Title Validation',
-              'terraform-fmt': 'Terraform Formatting',
-              'terraform-validate': 'Terraform Validation',
-              'tflint': 'TFLint Analysis',
-              'documentation-check': 'Documentation Check',
-              'security-scan': 'Security Scan'
-            };
+            const modules = jobs['detect-changes'].outputs.modules ? JSON.parse(jobs['detect-changes'].outputs.modules) : [];
             
-            let allPassed = true;
             let summary = '## 🔍 PR Validation Summary\n\n';
+            
+            // Overall status
+            summary += '### Overall Status\n\n';
             summary += '| Check | Status |\n';
             summary += '|-------|--------|\n';
             
-            for (const [job, result] of Object.entries(jobs)) {
-              const status = result.result === 'success' ? '✅ Passed' : '❌ Failed';
-              if (result.result !== 'success') allPassed = false;
-              summary += `| ${jobNames[job]} | ${status} |\n`;
-            }
+            // PR title validation (not module-specific)
+            const prTitleStatus = jobs['validate-pr-title'].result === 'success' ? '✅ Passed' : 
+                                  jobs['validate-pr-title'].result === 'skipped' ? '⏭️ Skipped' : '❌ Failed';
+            summary += `| PR Title Validation | ${prTitleStatus} |\n`;
             
             summary += '\n';
+            
+            // Per-module results if modules were detected
+            if (modules.length > 0) {
+              summary += '### Module-Specific Results\n\n';
+              
+              for (const module of modules) {
+                summary += `#### 📦 ${module}\n\n`;
+                summary += '| Check | Status |\n';
+                summary += '|-------|--------|\n';
+                
+                // Check each job type for this module
+                const checkTypes = ['terraform-fmt', 'terraform-validate', 'tflint', 'documentation-check', 'security-scan'];
+                const checkNames = {
+                  'terraform-fmt': 'Terraform Format',
+                  'terraform-validate': 'Terraform Validate',
+                  'tflint': 'TFLint',
+                  'documentation-check': 'Documentation',
+                  'security-scan': 'Security Scan'
+                };
+                
+                for (const checkType of checkTypes) {
+                  // Jobs are matrix jobs, so we need to check the overall job status
+                  const jobResult = jobs[checkType]?.result;
+                  const status = jobResult === 'success' ? '✅ Passed' : 
+                               jobResult === 'skipped' ? '⏭️ Skipped' : 
+                               jobResult === 'failure' ? '❌ Failed' : '⏱️ Running';
+                  summary += `| ${checkNames[checkType]} | ${status} |\n`;
+                }
+                
+                summary += '\n';
+              }
+            }
+            
+            // Overall conclusion
+            const allPassed = Object.entries(jobs).every(([name, job]) => 
+              name === 'detect-changes' || job.result === 'success' || job.result === 'skipped'
+            );
             
             if (allPassed) {
               summary += '### ✅ All quality gates passed!\n\n';
@@ -508,6 +577,17 @@ jobs:
               summary += '### ❌ Some quality gates failed\n\n';
               summary += 'Please address the failing checks before this PR can be merged.';
             }
+            
+            // Add helpful commands
+            summary += '\n\n### 🛠️ Quick Fix Commands\n\n';
+            summary += '```bash\n';
+            summary += '# Fix formatting issues\n';
+            summary += 'terraform fmt -recursive\n\n';
+            summary += '# Update documentation\n';
+            summary += 'cd <module-directory> && terraform-docs .\n\n';
+            summary += '# Run TFLint\n';
+            summary += 'tflint --init && tflint --chdir=<module-directory>\n';
+            summary += '```';
             
             // Find and update existing comment or create new one
             const { data: comments } = await github.rest.issues.listComments({

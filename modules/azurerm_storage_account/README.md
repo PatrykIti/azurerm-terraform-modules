@@ -73,13 +73,13 @@ module "storage_account" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.35.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.36.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.35.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.36.0 |
 
 ## Modules
 
@@ -89,17 +89,17 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_monitor_diagnostic_setting.blob_diagnostic_setting](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/monitor_diagnostic_setting) | resource |
-| [azurerm_monitor_diagnostic_setting.monitor_diagnostic_setting](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/monitor_diagnostic_setting) | resource |
-| [azurerm_private_endpoint.private_endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/private_endpoint) | resource |
-| [azurerm_storage_account.storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_account) | resource |
-| [azurerm_storage_account_queue_properties.queue_properties](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_account_queue_properties) | resource |
-| [azurerm_storage_account_static_website.static_website](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_account_static_website) | resource |
-| [azurerm_storage_container.storage_container](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_container) | resource |
-| [azurerm_storage_management_policy.storage_management_policy](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_management_policy) | resource |
-| [azurerm_storage_queue.storage_queue](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_queue) | resource |
-| [azurerm_storage_share.storage_share](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_share) | resource |
-| [azurerm_storage_table.storage_table](https://registry.terraform.io/providers/hashicorp/azurerm/4.35.0/docs/resources/storage_table) | resource |
+| [azurerm_monitor_diagnostic_setting.blob_diagnostic_setting](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/monitor_diagnostic_setting) | resource |
+| [azurerm_monitor_diagnostic_setting.monitor_diagnostic_setting](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/monitor_diagnostic_setting) | resource |
+| [azurerm_private_endpoint.private_endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/private_endpoint) | resource |
+| [azurerm_storage_account.storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/storage_account) | resource |
+| [azurerm_storage_account_queue_properties.queue_properties](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/storage_account_queue_properties) | resource |
+| [azurerm_storage_account_static_website.static_website](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/storage_account_static_website) | resource |
+| [azurerm_storage_container.storage_container](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/storage_container) | resource |
+| [azurerm_storage_management_policy.storage_management_policy](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/storage_management_policy) | resource |
+| [azurerm_storage_queue.storage_queue](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/storage_queue) | resource |
+| [azurerm_storage_share.storage_share](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/storage_share) | resource |
+| [azurerm_storage_table.storage_table](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/storage_table) | resource |
 
 ## Inputs
 

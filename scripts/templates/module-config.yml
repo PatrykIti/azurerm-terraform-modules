@@ -1,25 +1,33 @@
 name: MODULE_NAME_PLACEHOLDER
-display_name: "MODULE_DISPLAY_NAME_PLACEHOLDER"
 description: "MODULE_DESCRIPTION_PLACEHOLDER"
-version: "1.0.0"
-version_prefix: "PREFIX_PLACEHOLDER"
-commit_scope: "SCOPE_PLACEHOLDER"
-category: "CATEGORY_PLACEHOLDER" # compute, storage, networking, security, etc.
-azure_services:
-  - "SERVICE_PLACEHOLDER" # e.g., Storage Account, Virtual Network, etc.
-maintainers:
-  - "MAINTAINER_PLACEHOLDER"
-compliance:
-  - "SOC2"
-  - "ISO27001"
-features:
-  - "Feature 1"
-  - "Feature 2"
-  - "Feature 3"
+version: 1.0.0
+terraform:
+  required_version: ">= 1.3.0"
+  required_providers:
+    azurerm: ">= 4.36.0"
+dependencies: []
+ci:
+  test_regions:
+    - westeurope
+    - northeurope
+  test_scenarios:
+    - basic
+    - complete
+    - secure
+  performance_tests:
+    enabled: true
+    timeout: 45m
+  integration_tests:
+    enabled: true
+    cleanup: true
+release:
+  versioning: semver
+  changelog: keep-a-changelog
+  tag_prefix: "PREFIX_PLACEHOLDERv"
+  protected_branches:
+    - main
+    - release/*
 documentation:
-  - name: "Versioning"
-    path: "VERSIONING.md"
-  - name: "Security"
-    path: "SECURITY.md"
-  - name: "Contributing"
-    path: "CONTRIBUTING.md"
+  auto_generate: true
+  include_examples: true
+  include_tests: false

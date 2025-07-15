@@ -117,7 +117,7 @@ module "MODULE_TYPE_PLACEHOLDER" {
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| PREFIX_PLACEHOLDERv1.0.x | >= 1.3.0 | 4.35.0 (pinned) | TBD |
+| PREFIX_PLACEHOLDERv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
 
 **Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
 

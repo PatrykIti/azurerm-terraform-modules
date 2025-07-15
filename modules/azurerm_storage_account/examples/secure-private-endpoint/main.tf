@@ -7,7 +7,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.35.0"
+      version = "4.36.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -284,7 +284,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # Secure Storage Account Module
 module "secure_storage" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  source = "../../"
 
   name                = "stsecure${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.example.name

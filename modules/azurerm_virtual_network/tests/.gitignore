@@ -1,0 +1,23 @@
+# Test outputs
+test_outputs/
+test-results/
+*.tfstate
+*.tfstate.*
+.terraform/
+terraform.tfstate.d/
+
+# Go test files
+coverage.out
+coverage.html
+test-results.xml
+security-report.json
+
+# IDE files
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db

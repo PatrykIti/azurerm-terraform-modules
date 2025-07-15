@@ -1,0 +1,79 @@
+# Test configuration for CI/CD integration
+test_suites:
+  - name: "Basic Tests"
+    tests:
+      - TestVirtualNetworkBasic
+    parallel: true
+    timeout: 15m
+    
+  - name: "Complete Feature Tests"
+    tests:
+      - TestVirtualNetworkComplete
+      - TestVirtualNetworkSecure
+      - TestVirtualNetworkWithPeering
+      - TestVirtualNetworkPrivateEndpoint
+    parallel: true
+    timeout: 30m
+    
+  - name: "Network Tests"
+    tests:
+      - TestVirtualNetworkDNS
+      - TestVirtualNetworkFlowLogs
+    parallel: true
+    timeout: 20m
+    
+  - name: "Validation Tests"
+    tests:
+      - TestVirtualNetworkValidationRules
+    parallel: true
+    timeout: 10m
+    
+  - name: "Performance Tests"
+    tests:
+      - BenchmarkVirtualNetworkCreation
+    parallel: false
+    timeout: 60m
+    benchmark: true
+
+# Test environment requirements
+environment:
+  required_vars:
+    - AZURE_SUBSCRIPTION_ID
+    - AZURE_TENANT_ID
+    - AZURE_CLIENT_ID
+    - AZURE_CLIENT_SECRET
+  
+  azure_regions:
+    - northeurope
+    - westeurope
+  
+  resource_limits:
+    max_virtual_networks: 10
+    max_resource_groups: 5
+    max_network_watchers: 1  # Azure limit per region
+
+# Code coverage settings
+coverage:
+  enabled: true
+  threshold: 80
+  exclude_patterns:
+    - "test_helpers.go"
+    - "*_test.go"
+  
+# Test report settings
+reporting:
+  format: junit
+  output_dir: test-results/
+  include_logs: true
+  
+# Retry configuration
+retry:
+  max_attempts: 3
+  backoff_seconds: 30
+  retryable_errors:
+    - "ResourceGroupNotFound"
+    - "VirtualNetworkNotFound"
+    - "timeout"
+    - "TooManyRequests"
+    - "NetworkWatcherCountLimitReached"
+    - "DdosProtectionPlanCountLimitReached"

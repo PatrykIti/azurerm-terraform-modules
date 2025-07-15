@@ -96,7 +96,7 @@ resource "azurerm_role_assignment" "uai_kv_crypto_user" {
 # ==============================================================================
 
 module "storage_system_assigned" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
   name                     = "stsysidentity${substr(md5(timestamp()), 0, 8)}"
   resource_group_name      = azurerm_resource_group.example.name
@@ -152,7 +152,7 @@ resource "azurerm_role_assignment" "system_identity_kv_access" {
 # ==============================================================================
 
 module "storage_user_assigned" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
   name                     = "stuseridentity${substr(md5(timestamp()), 0, 8)}"
   resource_group_name      = azurerm_resource_group.example.name
@@ -213,7 +213,7 @@ module "storage_user_assigned" {
 # ==============================================================================
 
 module "storage_combined" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
   name                     = "stcombidentity${substr(md5(timestamp()), 0, 8)}"
   resource_group_name      = azurerm_resource_group.example.name
