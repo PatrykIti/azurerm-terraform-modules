@@ -41,15 +41,13 @@ EOF
 
 # List of tests to run
 tests=(
-    "TestVirtualNetworkBasic"
-    "TestVirtualNetworkComplete"
-    "TestVirtualNetworkSecure"
-    "TestVirtualNetworkWithPeering"
-    "TestVirtualNetworkPrivateEndpoint"
-    "TestVirtualNetworkDNS"
-    "TestVirtualNetworkFlowLogs"
-    "TestVirtualNetworkValidationRules"
-    "TestVirtualNetworkFullIntegration"
+    "TestBasicStorageAccount"
+    "TestCompleteStorageAccount"
+    "TestStorageAccountSecurity"
+    "TestStorageAccountNetworkRules"
+    "TestStorageAccountPrivateEndpoint"
+    "TestStorageAccountValidationRules"
+    "BenchmarkStorageAccountCreation"
 )
 
 # Summary tracking
