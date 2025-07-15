@@ -216,7 +216,16 @@ func generateRandomSuffix() string {
 	
 	// Ensure we have at least 6 characters
 	if len(cleanStr) < 6 {
-		cleanStr = cleanStr + strings.ToLower(random.UniqueId())[:6-len(cleanStr)]
+		// Generate another random string and process it the same way
+		additionalStr := strings.ToLower(random.UniqueId())
+		for _, char := range additionalStr {
+			if len(cleanStr) >= 6 {
+				break
+			}
+			if (char >= 'a' && char <= 'z') || (char >= '0' && char <= '9') {
+				cleanStr += string(char)
+			}
+		}
 	}
 	
 	// Limit to 8 characters to leave room for prefixes

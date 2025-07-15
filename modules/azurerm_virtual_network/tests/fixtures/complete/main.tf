@@ -58,7 +58,7 @@ resource "azurerm_log_analytics_workspace" "test" {
 
 # Create Storage Account for diagnostic settings
 resource "azurerm_storage_account" "test" {
-  name                     = "stdpccmp${var.random_suffix}"
+  name                     = "stdpccmp${lower(var.random_suffix)}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"
