@@ -45,7 +45,7 @@ output "virtual_network_security_configuration" {
 
 output "ddos_protection_plan_id" {
   description = "The ID of the DDoS protection plan"
-  value       = local.ddos_protection_plan_id
+  value       = azurerm_network_ddos_protection_plan.test.id
 }
 
 
