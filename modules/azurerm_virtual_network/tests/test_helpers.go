@@ -14,6 +14,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -252,7 +253,7 @@ type VirtualNetworkHelper struct {
 
 // NewVirtualNetworkHelper creates a new VirtualNetworkHelper instance
 func NewVirtualNetworkHelper(t *testing.T) *VirtualNetworkHelper {
-	config := NewTestConfig(t)
+	config := GetTestConfig(t)
 	cred := GetAzureCredential(t)
 	
 	client, err := armnetwork.NewVirtualNetworksClient(config.SubscriptionID, cred, nil)
