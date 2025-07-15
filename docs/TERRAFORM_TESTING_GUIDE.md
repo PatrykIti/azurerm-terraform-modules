@@ -213,6 +213,241 @@ Terratest provides the ability to deploy real infrastructure and validate its co
 ✅ Testing interactions between resources
 ✅ Ensuring Azure Policy compliance
 
+### Test File Organization
+
+Our Terratest implementation follows a specific structure that separates concerns and improves maintainability:
+
+#### 1. Main Test File (`virtual_network_test.go`)
+The main test file contains the primary test orchestration:
+
+```go
+// TestVirtualNetworkModule runs all Virtual Network module tests
+func TestVirtualNetworkModule(t *testing.T) {
+    t.Parallel()
+
+    // Run subtests - each maps to a fixture directory
+    t.Run("Basic", TestVirtualNetworkBasic)
+    t.Run("Complete", TestVirtualNetworkComplete)
+    t.Run("Secure", TestVirtualNetworkSecure)
+    t.Run("Network", TestVirtualNetworkNetwork)
+    t.Run("PrivateEndpoint", TestVirtualNetworkPrivateEndpointBasic)
+}
+```
+
+Key characteristics:
+- Each test function name starts with `Test` for Go test discovery
+- Tests use `t.Parallel()` for concurrent execution
+- Each test maps to a specific fixture in the `fixtures/` directory
+- Tests follow the pattern: Deploy → Validate → Cleanup
+
+#### 2. Integration Test File (`integration_test.go`)
+Contains specialized integration tests for specific features:
+
+```go
+// Example structure:
+TestVirtualNetworkWithPeering()      // Tests VNet peering functionality
+TestVirtualNetworkPrivateEndpoint()  // Tests private endpoint support
+TestVirtualNetworkDNS()              // Tests DNS configuration
+TestVirtualNetworkFlowLogs()         // Tests flow logs functionality
+TestVirtualNetworkValidationRules()  // Tests input validation (negative tests)
+```
+
+These tests:
+- Are independent and can run standalone
+- Focus on specific feature validation
+- Include negative test scenarios
+- Use the common `getTerraformOptions` helper
+
+#### 3. Test Helpers (`test_helpers.go`)
+Provides shared utilities for all tests:
+
+```go
+// Common test configuration
+type TestConfig struct {
+    SubscriptionID string
+    TenantID      string
+    ClientID      string
+    ClientSecret  string
+    Location      string
+    ResourceGroup string
+    UniqueID      string
+}
+
+// Helper functions
+GetTestConfig()         // Retrieves Azure credentials
+GetAzureCredential()    // Creates Azure SDK credential
+getTerraformOptions()   // Creates Terraform options with random suffix
+generateRandomSuffix()  // Generates unique identifiers
+ValidateVirtualNetworkName() // Validates naming conventions
+GetVirtualNetwork()     // Retrieves VNet using Azure SDK
+```
+
+#### 4. Performance Tests (`performance_test.go`)
+Specialized tests for performance validation:
+
+```go
+TestVirtualNetworkScaling()      // Tests concurrent deployments
+TestVirtualNetworkCreationTime() // Measures deployment duration
+TestVirtualNetworkLargeAddressSpace() // Tests with multiple address spaces
+```
+
+### Test Fixtures Organization
+
+Test fixtures are organized by scenario in the `fixtures/` directory:
+
+```
+tests/
+├── fixtures/
+│   ├── basic/              # Minimal viable configuration
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── complete/           # Full feature configuration
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── secure/             # Security-focused configuration
+│   │   ├── main.tf
+│   │   ├── network_watcher.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── network/            # Network peering scenario
+│   ├── private_endpoint/   # Private endpoint configuration
+│   └── negative/           # Invalid configurations for testing
+│       ├── empty_address_space/
+│       ├── invalid_name_chars/
+│       ├── invalid_name_long/
+│       └── invalid_name_short/
+```
+
+### Test Execution Flow
+
+1. **Test Discovery**: Go test runner finds all `Test*` functions
+2. **Parallel Execution**: Tests run concurrently when `t.Parallel()` is used
+3. **Fixture Copy**: Tests copy fixtures to temp directories to avoid conflicts
+4. **Terraform Execution**: 
+   - `terraform init` - Initialize providers
+   - `terraform apply` - Create resources
+   - Output validation - Verify resource properties
+   - `terraform destroy` - Clean up resources
+
+### Running Tests
+
+Using Go directly:
+```bash
+# Run all tests
+go test -v ./...
+
+# Run specific test function
+go test -v -run TestVirtualNetworkBasic
+
+# Run with timeout
+go test -v -timeout 30m
+
+# Run tests matching pattern
+go test -v -run "TestVirtualNetwork.*"
+```
+
+Using Makefile:
+```bash
+# Run all tests
+make test
+
+# Run basic tests only
+make test-basic
+
+# Run specific test
+make test-single TEST_NAME=TestVirtualNetworkBasic
+
+# Run with coverage
+make test-coverage
+```
+
+### Environment Variables
+
+Tests require Azure credentials to be set:
+
+```bash
+# Required for Terraform provider
+export ARM_CLIENT_ID="your-client-id"
+export ARM_CLIENT_SECRET="your-client-secret"
+export ARM_SUBSCRIPTION_ID="your-subscription-id"
+export ARM_TENANT_ID="your-tenant-id"
+
+# Optional - defaults to West Europe
+export ARM_LOCATION="northeurope"
+
+# For GitHub Actions (using OIDC)
+export ARM_USE_OIDC=true
+export ARM_USE_CLI=false
+```
+
+### Test Phases with test-structure
+
+Each test follows a structured approach using Terratest's `test-structure` package:
+
+```go
+func TestVirtualNetworkBasic(t *testing.T) {
+    t.Parallel()
+
+    // 1. Setup Phase - Copy fixtures to temp directory
+    fixtureFolder := "./fixtures/basic"
+    tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
+
+    // 2. Configure Terraform options
+    terraformOptions := &terraform.Options{
+        TerraformDir: tempFolder,
+        Vars: map[string]interface{}{
+            "random_suffix": random.UniqueId(),
+        },
+        NoColor: true,
+    }
+
+    // 3. Save options for later stages
+    test_structure.SaveTerraformOptions(t, tempFolder, terraformOptions)
+
+    // 4. Cleanup Phase (deferred)
+    defer test_structure.RunTestStage(t, "cleanup", func() {
+        terraformOptions := test_structure.LoadTerraformOptions(t, tempFolder)
+        terraform.Destroy(t, terraformOptions)
+    })
+
+    // 5. Deploy Phase
+    test_structure.RunTestStage(t, "deploy", func() {
+        terraform.InitAndApply(t, terraformOptions)
+    })
+
+    // 6. Validate Phase
+    test_structure.RunTestStage(t, "validate", func() {
+        terraformOptions := test_structure.LoadTerraformOptions(t, tempFolder)
+        validateBasicVirtualNetwork(t, terraformOptions)
+    })
+}
+```
+
+### Validation Functions
+
+Validation functions verify that resources were created correctly:
+
+```go
+func validateBasicVirtualNetwork(t *testing.T, terraformOptions *terraform.Options) {
+    // Get outputs
+    vnetID := terraform.Output(t, terraformOptions, "virtual_network_id")
+    vnetName := terraform.Output(t, terraformOptions, "virtual_network_name")
+    addressSpace := terraform.OutputList(t, terraformOptions, "virtual_network_address_space")
+    
+    // Assertions
+    assert.NotEmpty(t, vnetID)
+    assert.Contains(t, vnetName, "vnet-")
+    assert.Len(t, addressSpace, 1)
+    assert.Equal(t, "10.0.0.0/16", addressSpace[0])
+    
+    // Additional SDK validation if needed
+    vnet := GetVirtualNetwork(t, vnetName, resourceGroupName, subscriptionID)
+    assert.Equal(t, "Succeeded", *vnet.Properties.ProvisioningState)
+}
+```
+
 ### Basic Test Structure
 
 ```go

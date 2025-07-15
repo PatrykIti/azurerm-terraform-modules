@@ -132,9 +132,23 @@ Contains: Comprehensive guide for Terraform module development including resourc
 - Optimizing test performance and costs
 - Using mock strategies for expensive resources
 
-Contains: Comprehensive testing strategies including testing pyramid (static analysis, unit, integration, E2E), native Terraform test examples with mock providers, Terratest patterns for Azure resources, security and compliance testing, performance testing, CI/CD integration with GitHub Actions, test organization best practices, and cost optimization strategies for testing infrastructure.
+Contains: Comprehensive testing strategies including testing pyramid (static analysis, unit, integration, E2E), native Terraform test examples with mock providers, Terratest patterns for Azure resources, security and compliance testing, performance testing, CI/CD integration with GitHub Actions, test organization best practices, and cost optimization strategies for testing infrastructure. Includes detailed explanation of test file organization (main test file, integration tests, test helpers, performance tests), test fixtures structure, test execution flow, and running tests with Go and Makefile.
 
-### 11. [GitHub Actions Workflows Documentation](docs/WORKFLOWS.md)
+### 11. [Terraform New Module Guide](docs/TERRAFORM_NEW_MODULE_GUIDE.md)
+**MANDATORY REVIEW** when:
+- Creating a new Terraform module from scratch
+- Planning module architecture and structure
+- Setting up module directory structure
+- Implementing security-first defaults
+- Creating examples for different use cases
+- Setting up comprehensive testing (unit and integration)
+- Configuring CI/CD for new modules
+- Preparing module for release
+- Following the module creation checklist
+
+Contains: Step-by-step guide for creating new Terraform modules including module planning considerations, complete directory structure, core file templates (main.tf, variables.tf, outputs.tf), example implementations (basic, complete, secure), test setup with Terratest and native Terraform tests, Makefile configuration, documentation requirements, CI/CD integration steps, release process, and comprehensive checklist. This is the primary reference for creating production-ready Terraform modules in this repository.
+
+### 12. [GitHub Actions Workflows Documentation](docs/WORKFLOWS.md)
 **MANDATORY REVIEW** when:
 - Understanding the current GitHub Actions workflow architecture
 - Debugging workflow issues or failures
@@ -147,7 +161,7 @@ Contains: Comprehensive documentation of the implemented GitHub Actions workflow
 
 **Note**: This document describes the ACTUAL IMPLEMENTATION of workflows in this repository, while documents #7 and #8 above provide general GUIDELINES and PATTERNS for creating GitHub Actions workflows.
 
-### 12. [Semantic Release Integration Guide](.claude/references/semantic-release-guide.md)
+### 13. [Semantic Release Integration Guide](.claude/references/semantic-release-guide.md)
 **MANDATORY REVIEW** when:
 - Setting up automated versioning and releases
 - Understanding how CHANGELOG is automatically generated
@@ -158,7 +172,7 @@ Contains: Comprehensive documentation of the implemented GitHub Actions workflow
 
 Contains: Complete guide for semantic-release integration including monorepo configuration, module-specific versioning, CHANGELOG automation, commit message requirements, workflow integration patterns, and troubleshooting guide. This implements the "nothing manual in the repo" philosophy for releases.
 
-### 13. [Documentation Guide](.claude/references/documentation-guide.md)
+### 14. [Documentation Guide](.claude/references/documentation-guide.md)
 **MANDATORY REVIEW** when:
 - Creating or updating module documentation
 - Working with terraform-docs configuration
@@ -170,7 +184,7 @@ Contains: Complete guide for semantic-release integration including monorepo con
 
 Contains: Comprehensive guide for documentation management including terraform-docs configuration, examples list management, version management scripts, documentation validation, workflow integration, templates, and troubleshooting guide. Explains the hybrid approach using terraform-docs for technical docs and custom scripts for dynamic content.
 
-### 14. [Security Policy](docs/SECURITY.md)
+### 15. [Security Policy](docs/SECURITY.md)
 **MANDATORY REVIEW** when:
 - Implementing security features in modules
 - Understanding compliance requirements (SOC 2, ISO 27001, GDPR, PCI DSS)
