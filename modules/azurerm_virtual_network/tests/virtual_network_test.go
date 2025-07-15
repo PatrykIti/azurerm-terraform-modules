@@ -1,10 +1,8 @@
 package test
 
 import (
-	"strings"
 	"testing"
 
-	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
@@ -30,7 +28,7 @@ func TestVirtualNetworkBasic(t *testing.T) {
 	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
 
 	// Generate random suffix
-	randomSuffix := strings.ToLower(random.UniqueId())
+	randomSuffix := generateRandomSuffix()
 
 	terraformOptions := &terraform.Options{
 		TerraformDir: tempFolder,
@@ -67,7 +65,7 @@ func TestVirtualNetworkComplete(t *testing.T) {
 	fixtureFolder := "azurerm_virtual_network/tests/fixtures/complete"
 	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
 
-	randomSuffix := strings.ToLower(random.UniqueId())
+	randomSuffix := generateRandomSuffix()
 
 	terraformOptions := &terraform.Options{
 		TerraformDir: tempFolder,
@@ -100,7 +98,7 @@ func TestVirtualNetworkSecure(t *testing.T) {
 	fixtureFolder := "azurerm_virtual_network/tests/fixtures/secure"
 	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
 
-	randomSuffix := strings.ToLower(random.UniqueId())
+	randomSuffix := generateRandomSuffix()
 
 	terraformOptions := &terraform.Options{
 		TerraformDir: tempFolder,
@@ -133,7 +131,7 @@ func TestVirtualNetworkNetwork(t *testing.T) {
 	fixtureFolder := "azurerm_virtual_network/tests/fixtures/network"
 	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
 
-	randomSuffix := strings.ToLower(random.UniqueId())
+	randomSuffix := generateRandomSuffix()
 
 	terraformOptions := &terraform.Options{
 		TerraformDir: tempFolder,
@@ -166,7 +164,7 @@ func TestVirtualNetworkPrivateEndpointBasic(t *testing.T) {
 	fixtureFolder := "azurerm_virtual_network/tests/fixtures/private_endpoint"
 	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
 
-	randomSuffix := strings.ToLower(random.UniqueId())
+	randomSuffix := generateRandomSuffix()
 
 	terraformOptions := &terraform.Options{
 		TerraformDir: tempFolder,
