@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/random"
@@ -268,18 +267,4 @@ func validatePrivateEndpoint(t *testing.T, terraformOptions *terraform.Options) 
 	assert.NotEmpty(t, privateEndpointSubnetID)
 	assert.Contains(t, privateEndpointSubnetID, "/subnets/")
 	assert.Contains(t, privateEndpointSubnetID, vnetID)
-}
-
-// Helper function to get Terraform options with custom variables
-func getTerraformOptionsWithVars(t testing.TB, fixtureFolder string, vars map[string]interface{}) *terraform.Options {
-	// Set default random suffix if not provided
-	if _, ok := vars["random_suffix"]; !ok {
-		vars["random_suffix"] = fmt.Sprintf("%d", random.Random(10000, 99999))
-	}
-
-	return &terraform.Options{
-		TerraformDir: fixtureFolder,
-		Vars:         vars,
-		NoColor:      true,
-	}
 }
