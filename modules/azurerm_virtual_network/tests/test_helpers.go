@@ -186,6 +186,7 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,
+		NoColor:            true,
 	}
 }
 
