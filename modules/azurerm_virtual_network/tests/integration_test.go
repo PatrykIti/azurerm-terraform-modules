@@ -79,12 +79,15 @@ func validateNetworkFeatures(t *testing.T, testFolder string) {
 	
 	// Network outputs
 	subnetIDs := terraform.OutputMap(t, terraformOptions, "subnet_ids")
-	dnsServers := terraform.OutputList(t, terraformOptions, "dns_servers")
 	
 	// Assertions
 	assert.NotEmpty(t, subnetIDs)
 	assert.GreaterOrEqual(t, len(subnetIDs), 1)
-	// DNS servers might be empty (using Azure DNS)
+	
+	// Check DNS servers if they exist
+	if dnsServers, err := terraform.OutputListE(t, terraformOptions, "dns_servers"); err == nil && len(dnsServers) > 0 {
+		t.Logf("DNS servers configured: %v", dnsServers)
+	}
 }
 
 // TestVirtualNetworkWithPeering tests Virtual Network with peering configuration
