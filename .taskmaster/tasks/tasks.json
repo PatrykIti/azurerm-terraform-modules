@@ -70,7 +70,7 @@
         "dependencies": [
           2
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -83,7 +83,7 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -240,7 +240,7 @@
         "dependencies": [
           6
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -254,7 +254,7 @@
           5,
           7
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -267,7 +267,7 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -1251,7 +1251,7 @@
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-10T10:15:57.602Z",
+      "updated": "2025-07-15T06:30:59.593Z",
       "description": "Tasks for master context"
     }
   }

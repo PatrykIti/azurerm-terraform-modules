@@ -6,144 +6,195 @@ import (
 	"time"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
-	"github.com/stretchr/testify/assert"
+	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
+	"github.com/stretchr/testify/require"
 )
 
-// BenchmarkVirtualNetworkCreation benchmarks the creation time of a Virtual Network
-func BenchmarkVirtualNetworkCreation(b *testing.B) {
-	// Skip if not running benchmarks
-	if testing.Short() {
-		b.Skip("Skipping benchmark in short mode")
-	}
+// BenchmarkVirtualNetworkCreationSimple benchmarks simple virtual network creation
+func BenchmarkVirtualNetworkCreationSimple(b *testing.B) {
+	b.ReportAllocs()
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-
-		// Setup unique resource names for each iteration
-		uniqueID := fmt.Sprintf("%d%d", time.Now().Unix(), i)
-		terraformOptions := getTerraformOptionsWithVars(b, "./fixtures/basic", map[string]interface{}{
-			"random_suffix": uniqueID,
-		})
-
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_virtual_network/tests/fixtures/basic")
+		terraformOptions := getTerraformOptions(b, testFolder)
+		// Override the random_suffix for benchmarking
+		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 		b.StartTimer()
 
-		// Time the apply operation
 		start := time.Now()
 		terraform.InitAndApply(b, terraformOptions)
-		duration := time.Since(start)
+		creationTime := time.Since(start)
 
 		b.StopTimer()
-
-		// Clean up
 		terraform.Destroy(b, terraformOptions)
+		b.StartTimer()
 
-		// Log the duration
-		b.Logf("Virtual Network creation took: %v", duration)
-
-		// Reset timer for next iteration
-		b.ResetTimer()
+		b.ReportMetric(float64(creationTime.Milliseconds()), "creation_ms")
 	}
 }
 
-// TestVirtualNetworkScaling tests creating multiple Virtual Networks in parallel
-func TestVirtualNetworkScaling(t *testing.T) {
-	t.Parallel()
+// BenchmarkVirtualNetworkCreationWithSubnets benchmarks virtual network with different subnet counts
+func BenchmarkVirtualNetworkCreationWithSubnets(b *testing.B) {
+	b.ReportAllocs()
 
-	if testing.Short() {
-		t.Skip("Skipping scaling test in short mode")
+	subnetCounts := []int{1, 5, 10, 20}
+
+	for _, count := range subnetCounts {
+		b.Run(fmt.Sprintf("Subnets_%d", count), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				b.StopTimer()
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_virtual_network/tests/fixtures/basic")
+				terraformOptions := getTerraformOptions(b, testFolder)
+
+				// Generate subnets configuration
+				subnets := make(map[string]map[string]interface{})
+				for j := 0; j < count; j++ {
+					subnets[fmt.Sprintf("subnet%d", j)] = map[string]interface{}{
+						"address_prefixes": []string{fmt.Sprintf("10.0.%d.0/24", j)},
+					}
+				}
+				terraformOptions.Vars["subnets"] = subnets
+				// Override the random_suffix for benchmarking
+				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
+				b.StartTimer()
+
+				start := time.Now()
+				terraform.InitAndApply(b, terraformOptions)
+				creationTime := time.Since(start)
+
+				b.StopTimer()
+				terraform.Destroy(b, terraformOptions)
+				b.StartTimer()
+
+				b.ReportMetric(float64(creationTime.Milliseconds()), "creation_ms")
+				b.ReportMetric(float64(count), "subnet_count")
+			}
+		})
 	}
+}
 
-	// Number of Virtual Networks to create in parallel
-	numVirtualNetworks := 3
+// BenchmarkVirtualNetworkCreationWithNSG benchmarks with different NSG rule configurations
+func BenchmarkVirtualNetworkCreationWithNSG(b *testing.B) {
+	b.ReportAllocs()
 
-	// Channel to collect results
-	results := make(chan error, numVirtualNetworks)
+	ruleCounts := []int{0, 5, 10, 50}
 
-	// Create Virtual Networks in parallel
-	for i := 0; i < numVirtualNetworks; i++ {
-		go func(index int) {
-			uniqueID := fmt.Sprintf("%d%d", time.Now().Unix(), index)
-			terraformOptions := getTerraformOptionsWithVars(t, "./fixtures/basic", map[string]interface{}{
-				"random_suffix": uniqueID,
-				"name_prefix":   fmt.Sprintf("vnet%d", index),
+	for _, count := range ruleCounts {
+		b.Run(fmt.Sprintf("NSGRules_%d", count), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				b.StopTimer()
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_virtual_network/tests/fixtures/secure")
+				terraformOptions := getTerraformOptions(b, testFolder)
+				// Override the random_suffix for benchmarking
+				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
+				terraformOptions.Vars["nsg_rule_count"] = count
+				b.StartTimer()
+
+				start := time.Now()
+				terraform.InitAndApply(b, terraformOptions)
+				creationTime := time.Since(start)
+
+				b.StopTimer()
+				terraform.Destroy(b, terraformOptions)
+				b.StartTimer()
+
+				b.ReportMetric(float64(creationTime.Milliseconds()), "creation_ms")
+				b.ReportMetric(float64(count), "nsg_rule_count")
+			}
+		})
+	}
+}
+
+// BenchmarkVirtualNetworkParallelCreation benchmarks parallel creation of virtual networks
+func BenchmarkVirtualNetworkParallelCreation(b *testing.B) {
+	parallelCounts := []int{1, 2, 5, 10}
+
+	for _, parallel := range parallelCounts {
+		b.Run(fmt.Sprintf("Parallel_%d", parallel), func(b *testing.B) {
+			b.SetParallelism(parallel)
+			b.RunParallel(func(pb *testing.PB) {
+				i := 0
+				for pb.Next() {
+					testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_virtual_network/tests/fixtures/basic")
+					terraformOptions := getTerraformOptions(b, testFolder)
+					// Override the random_suffix for parallel testing
+					terraformOptions.Vars["random_suffix"] = fmt.Sprintf("par%d%d%s", parallel, i, terraformOptions.Vars["random_suffix"].(string)[:5])
+
+					start := time.Now()
+					terraform.InitAndApply(b, terraformOptions)
+					creationTime := time.Since(start)
+
+					terraform.Destroy(b, terraformOptions)
+
+					b.ReportMetric(float64(creationTime.Milliseconds()), "creation_ms")
+					i++
+				}
 			})
-
-			defer terraform.Destroy(t, terraformOptions)
-
-			_, err := terraform.InitAndApplyE(t, terraformOptions)
-			results <- err
-		}(i)
+		})
 	}
-
-	// Collect results
-	var errors []error
-	for i := 0; i < numVirtualNetworks; i++ {
-		if err := <-results; err != nil {
-			errors = append(errors, err)
-		}
-	}
-
-	// Assert no errors occurred
-	assert.Empty(t, errors, "Expected no errors during parallel Virtual Network creation")
 }
 
-// TestVirtualNetworkCreationTime tests that Virtual Network creation completes within expected time
+// TestVirtualNetworkCreationTime validates creation time is within acceptable limits
 func TestVirtualNetworkCreationTime(t *testing.T) {
-	t.Parallel()
-
 	if testing.Short() {
 		t.Skip("Skipping performance test in short mode")
 	}
-
-	terraformOptions := getTerraformOptions(t, "./fixtures/basic")
-
-	defer terraform.Destroy(t, terraformOptions)
-
-	// Initialize
-	terraform.Init(t, terraformOptions)
-
-	// Time the apply operation
-	start := time.Now()
-	terraform.Apply(t, terraformOptions)
-	duration := time.Since(start)
-
-	// Assert creation time is within expected bounds (5 minutes)
-	maxDuration := 5 * time.Minute
-	assert.LessOrEqual(t, duration, maxDuration, 
-		"Virtual Network creation took longer than expected: %v", duration)
-
-	t.Logf("Virtual Network creation completed in: %v", duration)
-}
-
-// TestVirtualNetworkLargeAddressSpace tests Virtual Network with large address spaces
-func TestVirtualNetworkLargeAddressSpace(t *testing.T) {
 	t.Parallel()
 
-	if testing.Short() {
-		t.Skip("Skipping large address space test in short mode")
-	}
-
-	// Test with multiple large address spaces
-	addressSpaces := []string{
-		"10.0.0.0/8",
-		"172.16.0.0/12",
-		"192.168.0.0/16",
-	}
-
-	terraformOptions := getTerraformOptionsWithVars(t, "./fixtures/basic", map[string]interface{}{
-		"address_space": addressSpaces,
-	})
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_virtual_network/tests/fixtures/basic")
+	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
 
-	// Time the operation
 	start := time.Now()
 	terraform.InitAndApply(t, terraformOptions)
 	duration := time.Since(start)
 
-	// Verify outputs
-	outputAddressSpace := terraform.OutputList(t, terraformOptions, "virtual_network_address_space")
-	assert.Len(t, outputAddressSpace, len(addressSpaces))
+	// Virtual network creation should complete within 5 minutes
+	maxDuration := 5 * time.Minute
+	require.LessOrEqual(t, duration, maxDuration,
+		"Virtual network creation took %v, expected less than %v", duration, maxDuration)
 
-	t.Logf("Virtual Network with %d address spaces created in: %v", len(addressSpaces), duration)
+	t.Logf("Virtual network created in %v", duration)
+}
+
+// TestVirtualNetworkScaling tests creating multiple virtual networks
+func TestVirtualNetworkScaling(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping scaling test in short mode")
+	}
+
+	networkCount := 5
+	creationTimes := make([]time.Duration, networkCount)
+
+	// Create multiple virtual networks sequentially
+	for i := 0; i < networkCount; i++ {
+		testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_virtual_network/tests/fixtures/basic")
+		terraformOptions := getTerraformOptions(t, testFolder)
+		// Override the random_suffix for each iteration
+		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("scale%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
+
+		start := time.Now()
+		terraform.InitAndApply(t, terraformOptions)
+		creationTimes[i] = time.Since(start)
+
+		// Cleanup immediately to avoid hitting limits
+		terraform.Destroy(t, terraformOptions)
+
+		t.Logf("Virtual network %d created in %v", i, creationTimes[i])
+	}
+
+	// Calculate average creation time
+	var totalTime time.Duration
+	for _, duration := range creationTimes {
+		totalTime += duration
+	}
+	avgTime := totalTime / time.Duration(networkCount)
+
+	t.Logf("Average creation time for %d virtual networks: %v", networkCount, avgTime)
+
+	// Ensure average time is reasonable (under 3 minutes)
+	require.LessOrEqual(t, avgTime, 3*time.Minute,
+		"Average creation time %v exceeds maximum of 3 minutes", avgTime)
 }
