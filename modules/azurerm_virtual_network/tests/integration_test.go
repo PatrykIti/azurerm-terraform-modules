@@ -286,7 +286,7 @@ func TestVirtualNetworkValidationRules(t *testing.T) {
 
 			if tc.expectError {
 				// Use RunCommandAndGetStdOut to capture full output including errors
-				err := terraform.InitE(t, terraformOptions)
+				_, err := terraform.InitE(t, terraformOptions)
 				require.NoError(t, err)
 				
 				// Run plan and expect it to fail
