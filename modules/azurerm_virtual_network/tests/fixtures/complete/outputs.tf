@@ -67,3 +67,13 @@ output "location" {
   description = "The Azure region where resources were created"
   value       = azurerm_resource_group.test.location
 }
+
+output "network_security_group_ids" {
+  description = "IDs of the network security groups (empty - NSGs are managed by separate module)"
+  value       = {}
+}
+
+output "ddos_protection_enabled" {
+  description = "Whether DDoS protection is enabled"
+  value       = module.virtual_network.network_configuration.ddos_protection_enabled
+}

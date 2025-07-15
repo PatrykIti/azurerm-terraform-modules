@@ -82,7 +82,7 @@ module "virtual_network" {
 
 # Create subnet for private endpoints
 resource "azurerm_subnet" "private_endpoints" {
-  name                 = "subnet-private-endpoints"
+  name                 = "snet-private-endpoints"
   resource_group_name  = azurerm_resource_group.test.name
   virtual_network_name = module.virtual_network.name
   address_prefixes     = ["10.0.1.0/24"]

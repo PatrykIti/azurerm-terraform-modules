@@ -201,4 +201,8 @@ module "virtual_network" {
     Module      = "azurerm_virtual_network"
     Test        = "Secure"
   }
+
+  depends_on = [
+    azurerm_network_ddos_protection_plan.test
+  ]
 }

@@ -82,3 +82,28 @@ output "location" {
   description = "The Azure region where resources were created"
   value       = azurerm_resource_group.test.location
 }
+
+output "dns_servers" {
+  description = "DNS servers configured for the Virtual Network"
+  value       = module.virtual_network.dns_servers
+}
+
+output "hub_vnet_id" {
+  description = "The ID of the hub Virtual Network"
+  value       = azurerm_virtual_network.hub.id
+}
+
+output "spoke_vnet_id" {
+  description = "The ID of the spoke Virtual Network"
+  value       = azurerm_virtual_network.spoke.id
+}
+
+output "peering_hub_to_spoke_id" {
+  description = "The ID of the peering from hub to spoke"
+  value       = azurerm_virtual_network_peering.hub_to_spoke.id
+}
+
+output "peering_spoke_to_hub_id" {
+  description = "The ID of the peering from spoke to hub"
+  value       = azurerm_virtual_network_peering.spoke_to_hub.id
+}
