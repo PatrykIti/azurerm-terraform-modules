@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -234,4 +235,79 @@ func generateRandomSuffix() string {
 	}
 	
 	return cleanStr
+}
+
+// stripAnsiCodes removes ANSI color codes from text
+func stripAnsiCodes(text string) string {
+	// Regex pattern to match ANSI escape codes
+	ansiRegex := regexp.MustCompile(`\x1b\[[0-9;]*m`)
+	return ansiRegex.ReplaceAllString(text, "")
+}
+
+// VirtualNetworkHelper provides helper functions for Virtual Network tests
+type VirtualNetworkHelper struct {
+	client         *armnetwork.VirtualNetworksClient
+	subscriptionID string
+}
+
+// NewVirtualNetworkHelper creates a new VirtualNetworkHelper instance
+func NewVirtualNetworkHelper(t *testing.T) *VirtualNetworkHelper {
+	config := NewTestConfig(t)
+	cred := GetAzureCredential(t)
+	
+	client, err := armnetwork.NewVirtualNetworksClient(config.SubscriptionID, cred, nil)
+	require.NoError(t, err, "Failed to create Virtual Networks client")
+	
+	return &VirtualNetworkHelper{
+		client:         client,
+		subscriptionID: config.SubscriptionID,
+	}
+}
+
+// GetVirtualNetworkProperties retrieves detailed virtual network properties
+func (h *VirtualNetworkHelper) GetVirtualNetworkProperties(t *testing.T, vnetName, resourceGroupName string) armnetwork.VirtualNetwork {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	
+	resp, err := h.client.Get(ctx, resourceGroupName, vnetName, &armnetwork.VirtualNetworksClientGetOptions{})
+	require.NoError(t, err, "Failed to get virtual network properties")
+	
+	return resp.VirtualNetwork
+}
+
+// WaitForVirtualNetworkReady waits for virtual network to be in a ready state
+func (h *VirtualNetworkHelper) WaitForVirtualNetworkReady(t *testing.T, vnetName, resourceGroupName string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	defer cancel()
+	
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+	
+	for {
+		select {
+		case <-ctx.Done():
+			t.Fatal("Timeout waiting for virtual network to be ready")
+		case <-ticker.C:
+			vnet, err := h.client.Get(ctx, resourceGroupName, vnetName, &armnetwork.VirtualNetworksClientGetOptions{})
+			if err == nil && vnet.Properties.ProvisioningState != nil && 
+			   *vnet.Properties.ProvisioningState == armnetwork.ProvisioningStateSucceeded {
+				return
+			}
+		}
+	}
+}
+
+// ValidateSubnets validates subnet configuration
+func (h *VirtualNetworkHelper) ValidateSubnets(t *testing.T, vnet armnetwork.VirtualNetwork, expectedSubnetCount int) {
+	require.NotNil(t, vnet.Properties.Subnets, "Subnets should not be nil")
+	assert.GreaterOrEqual(t, len(vnet.Properties.Subnets), expectedSubnetCount, 
+		"VNet should have at least %d subnets", expectedSubnetCount)
+	
+	for _, subnet := range vnet.Properties.Subnets {
+		assert.NotNil(t, subnet.Name, "Subnet name should not be nil")
+		assert.NotNil(t, subnet.Properties, "Subnet properties should not be nil")
+		assert.NotNil(t, subnet.Properties.AddressPrefix, "Subnet address prefix should not be nil")
+		assert.Equal(t, armnetwork.ProvisioningStateSucceeded, *subnet.Properties.ProvisioningState,
+			"Subnet %s should be successfully provisioned", *subnet.Name)
+	}
 }
