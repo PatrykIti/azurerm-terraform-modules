@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -236,13 +235,6 @@ func generateRandomSuffix() string {
 	}
 	
 	return cleanStr
-}
-
-// stripAnsiCodes removes ANSI color codes from text
-func stripAnsiCodes(text string) string {
-	// Regex pattern to match ANSI escape codes
-	ansiRegex := regexp.MustCompile(`\x1b\[[0-9;]*m`)
-	return ansiRegex.ReplaceAllString(text, "")
 }
 
 // VirtualNetworkHelper provides helper functions for Virtual Network tests

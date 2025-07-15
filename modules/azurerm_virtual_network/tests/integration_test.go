@@ -305,23 +305,10 @@ func TestVirtualNetworkValidationRules(t *testing.T) {
 			terraformOptions := getTerraformOptions(t, testFolder)
 
 			if tc.expectError {
-				// Use RunCommandAndGetStdOut to capture full output including errors
-				_, err := terraform.InitE(t, terraformOptions)
-				require.NoError(t, err)
-				
-				// Run plan and expect it to fail
-				output := terraform.RunTerraformCommandAndGetStdOutE(t, terraformOptions, terraform.FormatArgs(terraformOptions, "plan", "-input=false")...)
-				
-				if tc.errorContains != "" {
-					// The output should contain the expected string (handling ANSI codes and Terraform formatting)
-					if !strings.Contains(output, tc.errorContains) {
-						// Also check the stripped version (removing ANSI codes)
-						strippedOutput := stripAnsiCodes(output)
-						if !strings.Contains(strippedOutput, tc.errorContains) {
-							t.Errorf("Expected output to contain '%s', but got: %s", tc.errorContains, strippedOutput)
-						}
-					}
-				}
+				// This should fail during plan/apply
+				_, err := terraform.InitAndPlanE(t, terraformOptions)
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tc.errorContains)
 			} else {
 				defer terraform.Destroy(t, terraformOptions)
 				terraform.InitAndApply(t, terraformOptions)
