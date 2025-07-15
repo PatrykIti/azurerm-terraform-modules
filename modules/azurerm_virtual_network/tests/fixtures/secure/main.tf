@@ -8,10 +8,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.36.0"
     }
-    external = {
-      source  = "hashicorp/external"
-      version = "~> 2.3"
-    }
   }
 }
 
@@ -25,38 +21,8 @@ resource "azurerm_resource_group" "test" {
   location = var.location
 }
 
-# DDoS Protection Plan detection - Azure allows only ONE per region per subscription
-# Check if DDoS Protection Plan exists and use it, or create new if it doesn't
-data "external" "ddos_protection_check" {
-  program = ["bash", "-c", <<-EOT
-    # Normalize location to match Azure format (lowercase, no spaces)
-    NORMALIZED_LOCATION=$(echo "${var.location}" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
-    
-    # Check if DDoS Protection Plan exists in the region
-    DDOS_LIST=$(az network ddos-protection list --query "[?location=='$NORMALIZED_LOCATION']" -o json 2>/dev/null || echo '[]')
-    
-    # If we found any DDoS Protection Plans, return the first one
-    if [ "$(echo "$DDOS_LIST" | jq 'length')" -gt "0" ]; then
-      echo "$DDOS_LIST" | jq '.[0] | {name: .name, resourceGroup: .resourceGroup, id: .id}'
-    else
-      # Return empty values to indicate no DDoS Protection Plan exists
-      echo '{"name": "", "resourceGroup": "", "id": ""}'
-    fi
-  EOT
-  ]
-}
-
-locals {
-  # Check if we found an existing DDoS Protection Plan
-  ddos_protection_exists = data.external.ddos_protection_check.result.name != ""
-
-  # Final values to use
-  ddos_protection_plan_id = local.ddos_protection_exists ? data.external.ddos_protection_check.result.id : azurerm_network_ddos_protection_plan.test[0].id
-}
-
-# Create DDoS Protection Plan only if it doesn't exist in the region
+# Create DDoS Protection Plan - each test gets its own to avoid conflicts
 resource "azurerm_network_ddos_protection_plan" "test" {
-  count               = local.ddos_protection_exists ? 0 : 1
   name                = "ddos-dpc-sec-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
@@ -151,7 +117,7 @@ module "virtual_network" {
 
   # DDoS Protection Plan for enhanced security
   ddos_protection_plan = {
-    id     = local.ddos_protection_plan_id
+    id     = azurerm_network_ddos_protection_plan.test.id
     enable = true
   }
 

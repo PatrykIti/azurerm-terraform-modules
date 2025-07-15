@@ -1,6 +1,7 @@
 package test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -284,10 +285,14 @@ func TestVirtualNetworkValidationRules(t *testing.T) {
 			terraformOptions := getTerraformOptions(t, testFolder)
 
 			if tc.expectError {
-				_, err := terraform.InitAndPlanE(t, terraformOptions)
+				output, err := terraform.InitAndPlanE(t, terraformOptions)
 				require.Error(t, err)
 				if tc.errorContains != "" {
-					assert.Contains(t, err.Error(), tc.errorContains)
+					// Check both error message and output for the expected string
+					errorText := err.Error()
+					if !strings.Contains(errorText, tc.errorContains) && !strings.Contains(output, tc.errorContains) {
+						t.Errorf("Expected error to contain '%s', but got: %s\nOutput: %s", tc.errorContains, errorText, output)
+					}
 				}
 			} else {
 				defer terraform.Destroy(t, terraformOptions)

@@ -77,3 +77,13 @@ output "ddos_protection_enabled" {
   description = "Whether DDoS protection is enabled"
   value       = module.virtual_network.network_configuration.ddos_protection_enabled
 }
+
+output "subnet_ids" {
+  description = "IDs of subnets (empty - subnets are managed separately)"
+  value       = {}
+}
+
+output "dns_servers" {
+  description = "DNS servers configured for the Virtual Network"
+  value       = module.virtual_network.dns_servers
+}
