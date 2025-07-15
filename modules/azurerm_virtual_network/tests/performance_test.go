@@ -70,7 +70,7 @@ func TestVirtualNetworkScaling(t *testing.T) {
 
 			defer terraform.Destroy(t, terraformOptions)
 
-			err := terraform.InitAndApplyE(t, terraformOptions)
+			_, err := terraform.InitAndApplyE(t, terraformOptions)
 			results <- err
 		}(i)
 	}

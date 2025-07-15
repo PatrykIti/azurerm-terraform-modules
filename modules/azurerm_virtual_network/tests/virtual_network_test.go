@@ -15,19 +15,19 @@ func TestVirtualNetworkModule(t *testing.T) {
 	t.Parallel()
 
 	// Run subtests
-	t.Run("Basic", testVirtualNetworkBasic)
-	t.Run("Complete", testVirtualNetworkComplete)
-	t.Run("Secure", testVirtualNetworkSecure)
-	t.Run("Network", testVirtualNetworkWithPeering)
-	t.Run("PrivateEndpoint", testVirtualNetworkPrivateEndpoint)
+	t.Run("Basic", TestVirtualNetworkBasic)
+	t.Run("Complete", TestVirtualNetworkComplete)
+	t.Run("Secure", TestVirtualNetworkSecure)
+	t.Run("Network", TestVirtualNetworkNetwork)
+	t.Run("PrivateEndpoint", TestVirtualNetworkPrivateEndpointBasic)
 }
 
-func testVirtualNetworkBasic(t *testing.T) {
+func TestVirtualNetworkBasic(t *testing.T) {
 	t.Parallel()
 
 	// Copy fixture to temp folder
-	fixtureFolder := "./fixtures/basic"
-	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../", fixtureFolder)
+	fixtureFolder := "azurerm_virtual_network/tests/fixtures/basic"
+	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
 
 	// Generate random suffix
 	randomSuffix := random.UniqueId()
@@ -61,11 +61,11 @@ func testVirtualNetworkBasic(t *testing.T) {
 	})
 }
 
-func testVirtualNetworkComplete(t *testing.T) {
+func TestVirtualNetworkComplete(t *testing.T) {
 	t.Parallel()
 
-	fixtureFolder := "./fixtures/complete"
-	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../", fixtureFolder)
+	fixtureFolder := "azurerm_virtual_network/tests/fixtures/complete"
+	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
 
 	randomSuffix := random.UniqueId()
 
@@ -94,11 +94,11 @@ func testVirtualNetworkComplete(t *testing.T) {
 	})
 }
 
-func testVirtualNetworkSecure(t *testing.T) {
+func TestVirtualNetworkSecure(t *testing.T) {
 	t.Parallel()
 
-	fixtureFolder := "./fixtures/secure"
-	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../", fixtureFolder)
+	fixtureFolder := "azurerm_virtual_network/tests/fixtures/secure"
+	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
 
 	randomSuffix := random.UniqueId()
 
@@ -127,11 +127,11 @@ func testVirtualNetworkSecure(t *testing.T) {
 	})
 }
 
-func testVirtualNetworkWithPeering(t *testing.T) {
+func TestVirtualNetworkNetwork(t *testing.T) {
 	t.Parallel()
 
-	fixtureFolder := "./fixtures/network"
-	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../", fixtureFolder)
+	fixtureFolder := "azurerm_virtual_network/tests/fixtures/network"
+	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
 
 	randomSuffix := random.UniqueId()
 
@@ -160,11 +160,11 @@ func testVirtualNetworkWithPeering(t *testing.T) {
 	})
 }
 
-func testVirtualNetworkPrivateEndpoint(t *testing.T) {
+func TestVirtualNetworkPrivateEndpointBasic(t *testing.T) {
 	t.Parallel()
 
-	fixtureFolder := "./fixtures/private_endpoint"
-	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../", fixtureFolder)
+	fixtureFolder := "azurerm_virtual_network/tests/fixtures/private_endpoint"
+	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
 
 	randomSuffix := random.UniqueId()
 
