@@ -42,7 +42,7 @@ module "virtual_network" {
 
 # Create Network Security Groups
 resource "azurerm_network_security_group" "web" {
-  name                = "nsg-web-${var.random_suffix}"
+  name                = "nsg-dpc-net-web-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
 
@@ -78,7 +78,7 @@ resource "azurerm_network_security_group" "web" {
 }
 
 resource "azurerm_network_security_group" "app" {
-  name                = "nsg-app-${var.random_suffix}"
+  name                = "nsg-dpc-net-app-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
 
@@ -103,7 +103,7 @@ resource "azurerm_network_security_group" "app" {
 
 # Create Route Tables
 resource "azurerm_route_table" "web" {
-  name                          = "rt-web-${var.random_suffix}"
+  name                          = "rt-dpc-net-web-${var.random_suffix}"
   location                      = azurerm_resource_group.test.location
   resource_group_name           = azurerm_resource_group.test.name
   bgp_route_propagation_enabled = true
@@ -122,7 +122,7 @@ resource "azurerm_route_table" "web" {
 }
 
 resource "azurerm_route_table" "app" {
-  name                          = "rt-app-${var.random_suffix}"
+  name                          = "rt-dpc-net-app-${var.random_suffix}"
   location                      = azurerm_resource_group.test.location
   resource_group_name           = azurerm_resource_group.test.name
   bgp_route_propagation_enabled = true
@@ -187,7 +187,7 @@ resource "azurerm_subnet_route_table_association" "app" {
 
 # Create Hub Virtual Network for peering test
 resource "azurerm_virtual_network" "hub" {
-  name                = "vnet-hub-${var.random_suffix}"
+  name                = "vnet-dpc-net-hub-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
   address_space       = ["10.1.0.0/16"]
@@ -202,7 +202,7 @@ resource "azurerm_virtual_network" "hub" {
 
 # Create Spoke Virtual Network for peering test
 resource "azurerm_virtual_network" "spoke" {
-  name                = "vnet-spoke-${var.random_suffix}"
+  name                = "vnet-dpc-net-spk-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
   address_space       = ["10.2.0.0/16"]
