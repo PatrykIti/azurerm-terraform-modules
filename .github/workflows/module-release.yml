@@ -112,6 +112,20 @@ jobs:
           echo "   Tag prefix: $TAG_PREFIX"
           echo "   Commit scope: $COMMIT_SCOPE"
       
+      - name: Sync with remote repository
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          # Configure git to use the GitHub App token
+          git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+          
+          # Pull latest changes from main to ensure we have all previous releases
+          echo "📥 Pulling latest changes from main branch..."
+          git pull origin main --rebase
+          
+          # Show current git status
+          git log --oneline -5
+      
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}

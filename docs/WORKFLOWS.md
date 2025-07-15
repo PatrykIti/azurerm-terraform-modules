@@ -506,7 +506,19 @@ No additional configuration needed!
    - Fixed by using official terraform-linters/setup-tflint@v4 action
    - Avoids GitHub API rate limiting issues
 
-6. **Network Watcher limit reached**
+6. **terraform-docs overwriting root README during release**
+   - **WARNING**: When running terraform-docs from the root directory during semantic-release, it may overwrite the root README.md instead of the module's README.md
+   - **Solution**: Always run terraform-docs from within the module directory:
+     ```bash
+     # ❌ WRONG - runs from root, overwrites root README
+     terraform-docs "modules/${MODULE_NAME}"
+     
+     # ✅ CORRECT - runs from module directory
+     cd "modules/${MODULE_NAME}" && terraform-docs .
+     ```
+   - This happens because `.terraform-docs.yml` specifies `output.file: README.md` which is interpreted relative to the current working directory
+
+7. **Network Watcher limit reached**
    - Azure allows only one Network Watcher per region
    - Tests now detect and reuse existing Network Watcher
    - Uses external data source for detection
