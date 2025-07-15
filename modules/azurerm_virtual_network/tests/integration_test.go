@@ -285,13 +285,19 @@ func TestVirtualNetworkValidationRules(t *testing.T) {
 			terraformOptions := getTerraformOptions(t, testFolder)
 
 			if tc.expectError {
-				output, err := terraform.InitAndPlanE(t, terraformOptions)
+				// Use RunCommandAndGetStdOut to capture full output including errors
+				err := terraform.InitE(t, terraformOptions)
+				require.NoError(t, err)
+				
+				// Run plan and expect it to fail
+				_, err = terraform.PlanE(t, terraformOptions)
 				require.Error(t, err)
+				
 				if tc.errorContains != "" {
-					// Check both error message and output for the expected string
+					// The error message should contain the expected string
 					errorText := err.Error()
-					if !strings.Contains(errorText, tc.errorContains) && !strings.Contains(output, tc.errorContains) {
-						t.Errorf("Expected error to contain '%s', but got: %s\nOutput: %s", tc.errorContains, errorText, output)
+					if !strings.Contains(errorText, tc.errorContains) {
+						t.Errorf("Expected error to contain '%s', but got: %s", tc.errorContains, errorText)
 					}
 				}
 			} else {
