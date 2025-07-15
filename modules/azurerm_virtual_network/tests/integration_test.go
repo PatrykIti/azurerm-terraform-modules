@@ -301,7 +301,12 @@ func TestVirtualNetworkValidationRules(t *testing.T) {
 		tc := tc // capture range variable
 		t.Run(tc.name, func(t *testing.T) {
 			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", tc.fixturePath)
-			terraformOptions := getTerraformOptions(t, testFolder)
+			
+			// Use minimal terraform options for negative tests (no variables)
+			terraformOptions := &terraform.Options{
+				TerraformDir: testFolder,
+				NoColor:      true,
+			}
 
 			if tc.expectError {
 				// This should fail during plan/apply

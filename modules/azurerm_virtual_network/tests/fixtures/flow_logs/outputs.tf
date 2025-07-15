@@ -33,8 +33,8 @@ output "flow_logs_configuration" {
   value = {
     flow_logs_enabled  = module.virtual_network.flow_log != null
     flow_log_version   = module.virtual_network.flow_log != null ? module.virtual_network.flow_log.version : null
-    retention_days     = module.virtual_network.flow_log != null ? module.virtual_network.flow_log.retention_policy.days : null
-    traffic_analytics  = module.virtual_network.flow_log != null ? module.virtual_network.flow_log.traffic_analytics.enabled : null
+    flow_log_id        = module.virtual_network.flow_log != null ? module.virtual_network.flow_log.id : null
+    storage_account_id = module.virtual_network.flow_log != null ? module.virtual_network.flow_log.storage_account_id : null
     monitoring_enabled = module.virtual_network.diagnostic_setting != null
   }
 }
