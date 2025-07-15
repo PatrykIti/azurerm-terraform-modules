@@ -7,7 +7,7 @@
 
 <!-- MODULE BADGES START -->
 [![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=SAv1.0.0)
-[![Virtual Network](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=VNv*&label=Virtual%Network&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=VNv1.0.0)
+[![Virtual Network](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=VNv*&label=Virtual%20Network&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=VNv1.0.0)
 <!-- MODULE BADGES END -->
 
 A comprehensive collection of production-ready Terraform modules for Azure infrastructure, following HashiCorp best practices and enterprise security standards.
@@ -26,6 +26,7 @@ A comprehensive collection of production-ready Terraform modules for Azure infra
 azurerm-terraform-modules/
 ├── modules/                     # Terraform modules
 │   └── azurerm_storage_account/ # Storage Account module
+│   └── azurerm_virtual_network/ # Virtual Network module
 ├── docs/                        # Shared documentation
 ├── scripts/                     # Automation scripts
 ├── examples/                    # Cross-module examples

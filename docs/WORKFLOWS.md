@@ -523,7 +523,7 @@ No additional configuration needed!
    - Tests now detect and reuse existing Network Watcher
    - Uses external data source for detection
 
-7. **DDoS Protection Plan limit reached**
+8. **DDoS Protection Plan limit reached**
    - Azure allows only one DDoS Protection Plan per region
    - Tests now detect and reuse existing DDoS Protection Plan
    - Uses external data source for detection
