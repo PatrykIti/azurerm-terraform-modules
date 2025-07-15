@@ -23,34 +23,54 @@ export ARM_LOCATION="West Europe"  # Optional, defaults to West Europe
 
 ## Running Tests
 
-### Install Dependencies
+### Using Make
 
 ```bash
-go mod download
+# Install dependencies
+make deps
+
+# Run all tests
+make test
+
+# Run specific test
+make test-single TEST_NAME=TestVirtualNetworkBasic
+
+# Run basic tests only
+make test-basic
+
+# Run complete tests
+make test-complete
+
+# Run security tests
+make test-secure
+
+# Run network tests
+make test-network
+
+# Run validation tests
+make test-validation
+
+# Run tests with coverage
+make test-coverage
+
+# Run benchmarks
+make benchmark
+
+# Clean test artifacts
+make clean
 ```
 
-### Run All Tests
+### Direct Go Commands
 
 ```bash
-make test-all
-```
+# Run all tests
+go test -v -timeout 30m ./...
 
-### Run Short Tests Only
+# Run specific test
+go test -v -timeout 30m -run TestVirtualNetworkBasic ./...
 
-```bash
-make test-short
-```
-
-### Run Integration Tests Only
-
-```bash
-make test-integration
-```
-
-### Run Specific Test
-
-```bash
-go test -v -run TestModuleBasic -timeout 30m
+# Run with race detection
+go test -v -race ./...
 ```
 
 ## Test Structure
@@ -58,10 +78,12 @@ go test -v -run TestModuleBasic -timeout 30m
 ### Test Files
 
 - `module_test.go` - Main module functionality tests
-- `integration_test.go` - Integration tests with other Azure services
-- `performance_test.go` - Performance and load tests
-- `test_helpers.go` - Common test utilities and helpers
-- `test_config.yaml` - Test configuration and scenarios
+- `virtual_network_test.go` - Consolidated test suite with staged execution
+- `integration_test.go` - Integration tests (peering, DNS, flow logs)
+- `performance_test.go` - Performance benchmarks and scaling tests
+- `test_helpers.go` - Common test utilities and Azure client helpers
+- `test_config.yaml` - CI/CD test configuration
+- `Makefile` - Test automation and convenience commands
 
 ### Test Fixtures
 
@@ -76,27 +98,47 @@ The `fixtures/` directory contains Terraform configurations for different test s
 
 ## Test Scenarios
 
-### Basic Tests (`-short` flag)
+### Basic Tests (`TestVirtualNetworkBasic`)
 
 - Module deployment and destruction
 - Basic functionality validation
 - Output verification
 - Resource naming validation
 
-### Integration Tests
+### Complete Tests (`TestVirtualNetworkComplete`)
 
-- Integration with other Azure services
-- Network connectivity tests
-- Security compliance validation
-- Disaster recovery scenarios
-- Monitoring and logging validation
+- All module features
+- Virtual Network peering
+- Private DNS zone links
+- Diagnostic settings
+
+### Security Tests (`TestVirtualNetworkSecure`)
+
+- DDoS Protection Plan (with automatic detection)
+- Network Watcher Flow Logs (with automatic detection)
+- Encryption configuration
+- Security monitoring
+
+### Network Tests (`TestVirtualNetworkWithPeering`)
+
+- Hub-spoke network topology
+- Bidirectional peering
+- DNS configuration
+- Network flow logs
+
+### Validation Tests (`TestVirtualNetworkValidationRules`)
+
+- Input validation rules
+- Negative test cases
+- Name length and character validation
+- Address space validation
 
 ### Performance Tests
 
-- Resource creation time
-- Concurrent deployment handling
-- Resource limits testing
-- Cleanup performance
+- Virtual Network creation benchmarks
+- Parallel deployment tests
+- Large address space handling
+- Scaling limits
 
 ## Test Configuration
 
@@ -159,6 +201,8 @@ When adding new tests:
 2. **Resource Conflicts**: Ensure unique resource naming
 3. **Timeout Issues**: Increase test timeouts for complex scenarios
 4. **Quota Limits**: Check Azure subscription quotas
+5. **Network Watcher Limit**: Azure allows only one Network Watcher per region. Tests include automatic detection and reuse.
+6. **DDoS Protection Plan Limit**: Azure allows only one DDoS Protection Plan per region. Tests include automatic detection and reuse.
 
 ### Getting Help
 

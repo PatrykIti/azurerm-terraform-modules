@@ -1,126 +1,79 @@
-# Test Configuration for Virtual Network Module
-test_config:
-  module_name: "azurerm_virtual_network"
-  module_type: "virtual_network"
+# Test configuration for CI/CD integration
+test_suites:
+  - name: "Basic Tests"
+    tests:
+      - TestVirtualNetworkBasic
+    parallel: true
+    timeout: 15m
+    
+  - name: "Complete Feature Tests"
+    tests:
+      - TestVirtualNetworkComplete
+      - TestVirtualNetworkSecure
+      - TestVirtualNetworkWithPeering
+      - TestVirtualNetworkPrivateEndpoint
+    parallel: true
+    timeout: 30m
+    
+  - name: "Network Tests"
+    tests:
+      - TestVirtualNetworkDNS
+      - TestVirtualNetworkFlowLogs
+    parallel: true
+    timeout: 20m
+    
+  - name: "Validation Tests"
+    tests:
+      - TestVirtualNetworkValidationRules
+    parallel: true
+    timeout: 10m
+    
+  - name: "Performance Tests"
+    tests:
+      - BenchmarkVirtualNetworkCreation
+    parallel: false
+    timeout: 60m
+    benchmark: true
+
+# Test environment requirements
+environment:
+  required_vars:
+    - AZURE_SUBSCRIPTION_ID
+    - AZURE_TENANT_ID
+    - AZURE_CLIENT_ID
+    - AZURE_CLIENT_SECRET
   
-  # Test environments
-  environments:
-    - name: "development"
-      location: "West Europe"
-      resource_group_prefix: "rg-vnet-test-dev"
-    - name: "staging"
-      location: "North Europe"
-      resource_group_prefix: "rg-vnet-test-staging"
-    - name: "production"
-      location: "East US 2"
-      resource_group_prefix: "rg-vnet-test-prod"
+  azure_regions:
+    - northeurope
+    - westeurope
   
-  # Test scenarios
-  scenarios:
-    basic:
-      description: "Basic Virtual Network functionality test"
-      terraform_dir: "../examples/basic"
-      timeout: "30m"
-      parallel: true
-      required_outputs:
-        - "virtual_network_id"
-        - "virtual_network_name"
-        - "virtual_network_address_space"
-        - "virtual_network_guid"
-      
-    complete:
-      description: "Complete Virtual Network feature test with peering and DNS"
-      terraform_dir: "../examples/complete"
-      timeout: "60m"
-      parallel: false # Due to peering complexity
-      required_outputs:
-        - "virtual_network_id"
-        - "virtual_network_name"
-        - "virtual_network_peerings"
-        - "virtual_network_dns_links"
-        - "virtual_network_diagnostic_setting"
-      
-    secure:
-      description: "Security-focused Virtual Network test with DDoS protection"
-      terraform_dir: "../examples/secure"
-      timeout: "60m"
-      parallel: false # Due to DDoS protection plan
-      required_outputs:
-        - "virtual_network_id"
-        - "virtual_network_name"
-        - "virtual_network_ddos_protection"
-        - "virtual_network_flow_log"
-      
-    private_endpoint:
-      description: "Private endpoint integration test"
-      terraform_dir: "../examples/private-endpoint"
-      timeout: "45m"
-      parallel: true
-      
-  # Performance test configuration
-  performance:
-    enabled: true
-    timeout: "60m"
-    concurrent_resources: 3 # Reduced due to Azure limits
-    test_scenarios:
-      - "basic"
-      - "complete"
-    
-  # Integration test configuration
-  integration:
-    enabled: true
-    cleanup: true
-    timeout: "90m"
-    test_cross_region: true
-    
-  # Resource naming
-  naming:
-    prefix: "vnettest"
-    max_length: 80 # Virtual Network naming limit
-    allowed_chars: "abcdefghijklmnopqrstuvwxyz0123456789-._"
-    
-  # Test data
-  test_data:
-    locations:
-      - "West Europe"
-      - "North Europe"
-      - "East US 2"
-      - "West US 2"
-    
-    address_spaces:
-      basic:
-        - "10.0.0.0/16"
-      multiple:
-        - "10.0.0.0/16"
-        - "10.1.0.0/16"
-      large:
-        - "10.0.0.0/8"
-    
-    dns_servers:
-      custom:
-        - "10.0.1.4"
-        - "10.0.1.5"
-      azure_default: []
-    
-    tags:
-      Environment: "Test"
-      Module: "azurerm_virtual_network"
-      ManagedBy: "Terraform"
-      TestRun: "{{ .UniqueID }}"
-      Purpose: "Automated Testing"
-      
-  # Validation rules
-  validation:
-    required_tags:
-      - "Environment"
-      - "Module"
-      - "ManagedBy"
-    
-    naming_conventions:
-      virtual_network: "^vnet-.*"
-      resource_group: "^rg-.*"
-    
-    security_requirements:
-      ddos_protection: false # Optional by default
-      encryption: false # Optional by default
-      flow_logs: false # Optional by default
+  resource_limits:
+    max_virtual_networks: 10
+    max_resource_groups: 5
+    max_network_watchers: 1  # Azure limit per region
+
+# Code coverage settings
+coverage:
+  enabled: true
+  threshold: 80
+  exclude_patterns:
+    - "test_helpers.go"
+    - "*_test.go"
+  
+# Test report settings
+reporting:
+  format: junit
+  output_dir: test-results/
+  include_logs: true
+  
+# Retry configuration
+retry:
+  max_attempts: 3
+  backoff_seconds: 30
+  retryable_errors:
+    - "ResourceGroupNotFound"
+    - "VirtualNetworkNotFound"
+    - "timeout"
+    - "TooManyRequests"
+    - "NetworkWatcherCountLimitReached"
+    - "DdosProtectionPlanCountLimitReached"
