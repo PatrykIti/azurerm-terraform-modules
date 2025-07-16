@@ -1247,11 +1247,682 @@
         ],
         "priority": "high",
         "subtasks": []
+      },
+      {
+        "id": 33,
+        "title": "Subnet Module: Core Implementation",
+        "description": "Develop the Subnet module (azurerm_subnet) following AzureRM provider 4.36.0. This module will manage Azure Subnets with comprehensive configuration options including address prefixes, service endpoints, delegations, network policies, and associations with NSG and Route Tables. The module must handle all configuration scenarios and follow security-first principles.",
+        "details": "",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          1
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Scaffold Subnet Module Structure",
+            "description": "Initialize the directory structure for the new `azurerm_subnet` module using the project's standard scaffolding script.",
+            "dependencies": [],
+            "details": "Execute the `create-new-module.sh` script to generate the standard module layout including `main.tf`, `variables.tf`, `outputs.tf`, `versions.tf`, `README.md`, and an `examples` directory. The module will be located at `modules/subnet`.",
+            "status": "pending",
+            "testStrategy": "Verify that the standard module file structure and boilerplate content have been created in the `modules/subnet` directory."
+          },
+          {
+            "id": 2,
+            "title": "Define Core Variables in variables.tf",
+            "description": "Define the essential input variables for creating a subnet, including name, virtual network context, and address prefixes, with appropriate validation.",
+            "dependencies": [
+              1
+            ],
+            "details": "In `variables.tf`, define variables for `name` (string), `resource_group_name` (string), `virtual_network_name` (string), and `address_prefixes` (list(string)). Add `validation` blocks to ensure `name` is not empty and `address_prefixes` contains at least one valid CIDR block.",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` to ensure variable definitions and validations are syntactically correct."
+          },
+          {
+            "id": 3,
+            "title": "Implement Basic azurerm_subnet Resource in main.tf",
+            "description": "Create the core `azurerm_subnet` resource in `main.tf` using the variables defined in the previous step.",
+            "dependencies": [
+              2
+            ],
+            "details": "In `main.tf`, add the `resource \"azurerm_subnet\" \"subnet\"` block. Configure its `name`, `resource_group_name`, `virtual_network_name`, and `address_prefixes` arguments using the corresponding input variables.",
+            "status": "pending",
+            "testStrategy": "Deploy a basic example manually to confirm a subnet can be created with minimal configuration."
+          },
+          {
+            "id": 4,
+            "title": "Define Core Outputs in outputs.tf",
+            "description": "Expose the fundamental attributes of the created subnet as module outputs.",
+            "dependencies": [
+              3
+            ],
+            "details": "In `outputs.tf`, create outputs for `id` (the subnet's Azure Resource ID), `name` (the subnet's name), and `address_prefixes` (the list of assigned address prefixes). The values should be sourced from the `azurerm_subnet.subnet` resource.",
+            "status": "pending",
+            "testStrategy": "After a successful deployment, run `terraform output` and verify the outputs show the correct values for the created subnet."
+          },
+          {
+            "id": 5,
+            "title": "Implement Network Security Group (NSG) Association",
+            "description": "Add functionality to associate a pre-existing Network Security Group with the subnet.",
+            "dependencies": [
+              3
+            ],
+            "details": "Add a new variable `network_security_group_id` of type `string` with a default of `null`. In `main.tf`, set the `network_security_group_id` argument on the `azurerm_subnet` resource to this variable. The association will only occur if a non-null value is provided.",
+            "status": "pending",
+            "testStrategy": "Create an example that passes an NSG ID to the module and verify in the Azure portal that the subnet is correctly associated with the NSG."
+          },
+          {
+            "id": 6,
+            "title": "Implement Route Table Association",
+            "description": "Add functionality to associate a pre-existing Route Table with the subnet.",
+            "dependencies": [
+              3
+            ],
+            "details": "Add a new variable `route_table_id` of type `string` with a default of `null`. In `main.tf`, set the `route_table_id` argument on the `azurerm_subnet` resource to this variable. The association will only occur if a non-null value is provided.",
+            "status": "pending",
+            "testStrategy": "Create an example that passes a Route Table ID to the module and verify in the Azure portal that the subnet is correctly associated with the Route Table."
+          },
+          {
+            "id": 7,
+            "title": "Implement Service Endpoints Configuration",
+            "description": "Enable the configuration of service endpoints for the subnet.",
+            "dependencies": [
+              3
+            ],
+            "details": "Add a new variable `service_endpoints` of type `list(string)` with a default of `[]`. In `main.tf`, set the `service_endpoints` argument on the `azurerm_subnet` resource to this variable. An empty list will result in no service endpoints being configured.",
+            "status": "pending",
+            "testStrategy": "Deploy an example with `service_endpoints = [\"Microsoft.Storage\"]` and verify in the Azure portal that the specified service endpoint is enabled on the subnet."
+          },
+          {
+            "id": 8,
+            "title": "Implement Subnet Delegation Configuration",
+            "description": "Enable the configuration of subnet delegations using a dynamic block.",
+            "dependencies": [
+              3
+            ],
+            "details": "Add a variable `delegations` of type `map(object({ name = string, service_delegation = object({ name = string, actions = optional(list(string)) }) }))` with a default of `{}`. In `main.tf`, use a `dynamic \"delegation\"` block with a `for_each` over the `var.delegations` map to configure one or more delegations.",
+            "status": "pending",
+            "testStrategy": "Deploy an example with a delegation for `Microsoft.ContainerInstance/containerGroups` and verify the delegation is correctly configured in the Azure portal."
+          },
+          {
+            "id": 9,
+            "title": "Implement Private Endpoint Network Policies",
+            "description": "Add a toggle for enabling or disabling network policies for private endpoints on the subnet.",
+            "dependencies": [
+              3
+            ],
+            "details": "Add a variable `private_endpoint_network_policies_enabled` of type `bool` with a default of `true`. In `main.tf`, set the `private_endpoint_network_policies_enabled` argument on the `azurerm_subnet` resource. Note: For subnets hosting private endpoints, this should be set to `false`.",
+            "status": "pending",
+            "testStrategy": "Deploy two instances of the module, one with the default `true` and one with `false`. Verify the setting is applied correctly in the Azure portal for each subnet."
+          },
+          {
+            "id": 10,
+            "title": "Implement Private Link Service Network Policies",
+            "description": "Add a toggle for enabling or disabling network policies for private link services on the subnet.",
+            "dependencies": [
+              3
+            ],
+            "details": "Add a variable `private_link_service_network_policies_enabled` of type `bool` with a default of `true`. In `main.tf`, set the `private_link_service_network_policies_enabled` argument on the `azurerm_subnet` resource.",
+            "status": "pending",
+            "testStrategy": "Deploy an instance of the module with this set to `false` and verify the setting is applied correctly in the Azure portal."
+          },
+          {
+            "id": 11,
+            "title": "Implement Tags Support",
+            "description": "Add support for custom tags to be applied to the subnet resource.",
+            "dependencies": [
+              3
+            ],
+            "details": "Add a `tags` variable of type `map(string)` with a default of `{}`. In the `azurerm_subnet` resource, merge `var.tags` with any project-level default tags using the `merge()` function.",
+            "status": "pending",
+            "testStrategy": "Deploy an example with custom tags and verify that the tags are present on the subnet resource in the Azure portal."
+          },
+          {
+            "id": 12,
+            "title": "Create 'basic' Example",
+            "description": "Create a basic example demonstrating the minimal configuration required to create a subnet.",
+            "dependencies": [
+              4
+            ],
+            "details": "In the `examples/basic` directory, create a `main.tf` that provisions a resource group and a virtual network, then calls the subnet module to create a single subnet inside it with only the required variables.",
+            "status": "pending",
+            "testStrategy": "Run `terraform apply` on the example and confirm successful creation of the resources."
+          },
+          {
+            "id": 13,
+            "title": "Create 'complete' Example",
+            "description": "Create a comprehensive example demonstrating all features of the module.",
+            "dependencies": [
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11
+            ],
+            "details": "In the `examples/complete` directory, create a `main.tf` that provisions all necessary prerequisite resources (VNet, NSG, Route Table) and then calls the subnet module with all arguments populated: `network_security_group_id`, `route_table_id`, `service_endpoints`, `delegations`, and `tags`.",
+            "status": "pending",
+            "testStrategy": "Run `terraform apply` on the example and verify all configurations are correctly applied in the Azure portal."
+          },
+          {
+            "id": 14,
+            "title": "Create 'secure' Example",
+            "description": "Create an example demonstrating a security-focused subnet configuration.",
+            "dependencies": [
+              5,
+              7
+            ],
+            "details": "In the `examples/secure` directory, create a `main.tf` that provisions a subnet with a mandatory NSG association and enables service endpoints for key services like `Microsoft.Storage` and `Microsoft.Sql` to restrict data exfiltration.",
+            "status": "pending",
+            "testStrategy": "Deploy the example and verify that the NSG and service endpoints are correctly configured, enforcing a secure posture."
+          },
+          {
+            "id": 15,
+            "title": "Create 'private-endpoint' Example",
+            "description": "Create an example specifically for a subnet intended to host private endpoints.",
+            "dependencies": [
+              9
+            ],
+            "details": "In the `examples/private-endpoint` directory, create a `main.tf` that calls the subnet module and explicitly sets `private_endpoint_network_policies_enabled = false`. This is a requirement for subnets that contain private endpoints.",
+            "status": "pending",
+            "testStrategy": "Deploy the example and verify that the network policy for private endpoints is disabled on the created subnet."
+          },
+          {
+            "id": 16,
+            "title": "Configure `terraform-docs` for Automated Documentation",
+            "description": "Set up `terraform-docs` to automatically generate documentation for module inputs, outputs, and providers.",
+            "dependencies": [
+              11
+            ],
+            "details": "Create a `.terraform-docs.yml` configuration file in the module's root directory. Add comments to `variables.tf` and `outputs.tf` that will be picked up by the tool. Add markers to `README.md` for auto-injection of the generated content.",
+            "status": "pending",
+            "testStrategy": "Run `terraform-docs` and verify that it correctly updates the `README.md` with a table of variables and outputs."
+          },
+          {
+            "id": 17,
+            "title": "Implement Native Terraform Tests",
+            "description": "Create test files using the native `terraform test` framework to validate module functionality.",
+            "dependencies": [
+              12
+            ],
+            "details": "Create a `tests` directory. Inside, create a `basic.tftest.hcl` file. Define a `run` block that applies the 'basic' example. Add `assert` blocks to verify that the subnet's `name` and `address_prefixes` from the output match the expected values.",
+            "status": "pending",
+            "testStrategy": "Execute `terraform test` from the module's root directory and ensure all tests pass."
+          },
+          {
+            "id": 18,
+            "title": "Implement Terratest Integration Tests",
+            "description": "Set up a Go-based Terratest suite to perform end-to-end testing by deploying an example and validating the resources in Azure.",
+            "dependencies": [
+              12
+            ],
+            "details": "Create a `test` directory with a `go.mod` file and a `subnet_module_test.go` file. Write a test function that uses Terratest to deploy the `examples/basic` configuration. Use the Azure SDK for Go to verify that the `azurerm_subnet` resource exists and has the correct properties.",
+            "status": "pending",
+            "testStrategy": "Run `go test -v` from the `test` directory and ensure the test successfully deploys, validates, and destroys the resources."
+          },
+          {
+            "id": 19,
+            "title": "Write Comprehensive README.md Documentation",
+            "description": "Finalize the README.md file with detailed explanations, usage instructions, and examples.",
+            "dependencies": [
+              16
+            ],
+            "details": "Edit the `README.md` to include a clear description of the module's purpose, its features, and security considerations. Provide copy-paste usage examples for common scenarios (basic, with NSG, for private endpoints). Ensure the `terraform-docs` generated sections are present and correct.",
+            "status": "pending",
+            "testStrategy": "Peer review the documentation for clarity, completeness, and correctness."
+          },
+          {
+            "id": 20,
+            "title": "Configure CI/CD Pipeline Integration",
+            "description": "Integrate the module into the CI/CD pipeline to automate validation, linting, and testing for all future changes.",
+            "dependencies": [
+              17,
+              18
+            ],
+            "details": "Create or update a GitHub Actions workflow file (e.g., `.github/workflows/subnet-module.yml`). The workflow should trigger on pull requests to the module's path. Add steps to run `terraform fmt --check`, `terraform validate`, `tflint`, `terraform test`, and the Terratest suite (`go test`).",
+            "status": "pending",
+            "testStrategy": "Create a test pull request with a minor change to the module and verify that all CI checks are triggered and pass successfully."
+          }
+        ]
+      },
+      {
+        "id": 34,
+        "title": "Network Security Group Module: Core Implementation",
+        "description": "Develop the Network Security Group module (azurerm_network_security_group) following AzureRM provider 4.36.0. This module will manage Azure Network Security Groups with comprehensive security rules configuration, including inbound/outbound rules, service tags, application security groups, and flow logs. The module must provide flexible rule management and follow security-first principles.",
+        "details": "",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          1
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Module Scaffolding: Create Directory and Core Files",
+            "description": "Initialize the directory structure and create the essential Terraform files for the new `network_security_group` module.",
+            "dependencies": [],
+            "details": "Create a new directory `modules/network_security_group`. Inside this directory, create the following empty files: `main.tf`, `variables.tf`, `outputs.tf`, and `versions.tf`. In `versions.tf`, specify the required Terraform version and the AzureRM provider version, pinning it to `~> 4.36.0`.",
+            "status": "pending",
+            "testStrategy": "Verify that the directory and all specified files are created in the correct location within the repository."
+          },
+          {
+            "id": 2,
+            "title": "Core Resource: Implement `azurerm_network_security_group`",
+            "description": "Define the main `azurerm_network_security_group` resource in the module's `main.tf` file.",
+            "dependencies": [],
+            "details": "In `main.tf`, add an `azurerm_network_security_group` resource block. The `name`, `resource_group_name`, and `location` arguments should be sourced from input variables. The `tags` argument should merge module-level tags with any default tags defined.",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` within the module directory after adding basic variables. The validation should pass."
+          },
+          {
+            "id": 3,
+            "title": "Variables: Define Basic NSG Inputs",
+            "description": "Define the fundamental input variables required to create a Network Security Group, such as its name and location.",
+            "dependencies": [],
+            "details": "In `variables.tf`, define variables for `name` (string), `resource_group_name` (string), `location` (string), and `tags` (map(string)). Provide clear descriptions and sensible defaults where applicable (e.g., `tags = {}`).",
+            "status": "pending",
+            "testStrategy": "Review the `variables.tf` file to ensure all required basic variables are defined with correct types and descriptions."
+          },
+          {
+            "id": 4,
+            "title": "Variables: Define Complex Input for Security Rules",
+            "description": "Define a flexible, complex variable to accept a collection of security rule definitions.",
+            "dependencies": [],
+            "details": "In `variables.tf`, create a variable named `security_rules` with type `map(object({...}))` and a default of `{}`. This structure will allow users to define rules using a key-value format, where the key is the rule name.",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` to ensure the complex variable type is syntactically correct."
+          },
+          {
+            "id": 5,
+            "title": "Rule Implementation: Create `azurerm_network_security_rule` Resources",
+            "description": "Implement the creation of `azurerm_network_security_rule` resources dynamically based on the `security_rules` input variable.",
+            "dependencies": [],
+            "details": "In `main.tf`, add an `azurerm_network_security_rule` resource block. Use a `for_each` meta-argument to iterate over `var.security_rules`. The `name` of the rule will be `each.key`, and other properties like `priority`, `direction`, etc., will be sourced from `each.value`.",
+            "status": "pending",
+            "testStrategy": "Create a simple example that passes one rule to the module. Run `terraform plan` to verify that the plan includes the creation of one `azurerm_network_security_rule` resource."
+          },
+          {
+            "id": 6,
+            "title": "Variables: Define Security Rule Object Attributes",
+            "description": "Specify the full attribute set for the security rule object, covering all basic properties of an NSG rule.",
+            "dependencies": [],
+            "details": "Flesh out the `object({...})` definition for the `security_rules` variable in `variables.tf`. Include attributes: `priority` (number), `direction` (string), `access` (string), `protocol` (string), `source_port_range` (string), `destination_port_range` (string), `source_address_prefix` (string), and `destination_address_prefix` (string). Mark non-required fields as `optional(...)`.",
+            "status": "pending",
+            "testStrategy": "Review the `variables.tf` file to ensure the object definition is complete and uses `optional()` correctly to avoid forcing users to specify every attribute."
+          },
+          {
+            "id": 7,
+            "title": "Validation: Add Validation Checks for Security Rules",
+            "description": "Implement validation rules on the `security_rules` variable to enforce constraints and prevent common misconfigurations.",
+            "dependencies": [],
+            "details": "In `variables.tf`, add a `validation` block to the `security_rules` variable. The validation should check that `direction` is either 'Inbound' or 'Outbound', and `access` is either 'Allow' or 'Deny'. You can iterate through the map values in the validation condition.",
+            "status": "pending",
+            "testStrategy": "Create an example with an invalid `direction` value (e.g., 'Incoming'). Run `terraform plan` and verify that it fails with the custom error message from the validation block."
+          },
+          {
+            "id": 8,
+            "title": "Enhancement: Support Multiple Source/Destination Prefixes",
+            "description": "Update the security rule variable to allow specifying a list of source and destination address prefixes.",
+            "dependencies": [],
+            "details": "Modify the `security_rules` object definition in `variables.tf`. Add `source_address_prefixes` and `destination_address_prefixes` as `optional(list(string))`. This allows for more complex rules without creating multiple individual rules.",
+            "status": "pending",
+            "testStrategy": "Update an example to use `source_address_prefixes` instead of `source_address_prefix`. Run `terraform plan` to confirm the plan reflects the use of the list-based attribute."
+          },
+          {
+            "id": 9,
+            "title": "Implementation: Handle Mutually Exclusive Prefix Attributes",
+            "description": "Refactor the `azurerm_network_security_rule` resource to correctly handle the mutually exclusive `_prefix` (singular) and `_prefixes` (plural) arguments.",
+            "dependencies": [],
+            "details": "In the `azurerm_network_security_rule` resource in `main.tf`, use `try()` and conditional logic to set the `source_address_prefix` and `source_address_prefixes` arguments. For example: `source_address_prefix = try(each.value.source_address_prefix, null)` and `source_address_prefixes = try(each.value.source_address_prefixes, null)`. Do the same for destination prefixes.",
+            "status": "pending",
+            "testStrategy": "Create two test cases in the examples: one using the singular prefix and one using the plural prefixes. Run `terraform plan` on both to ensure the correct attribute is being populated in the plan output."
+          },
+          {
+            "id": 10,
+            "title": "Enhancement: Support Application Security Groups (ASGs)",
+            "description": "Extend the security rule variable to support associating rules with Application Security Groups.",
+            "dependencies": [],
+            "details": "Modify the `security_rules` object definition in `variables.tf`. Add `source_application_security_group_ids` and `destination_application_security_group_ids` as `optional(list(string))`. This will allow rules to reference ASGs.",
+            "status": "pending",
+            "testStrategy": "Review `variables.tf` to confirm the new optional attributes for ASG IDs are present in the rule object definition."
+          },
+          {
+            "id": 11,
+            "title": "Implementation: Handle ASG Association in Rules",
+            "description": "Update the `azurerm_network_security_rule` resource to pass ASG IDs and handle the mutual exclusivity between address prefixes and ASGs.",
+            "dependencies": [],
+            "details": "In `main.tf`, update the `azurerm_network_security_rule` resource. Add the `source_application_security_group_ids` and `destination_application_security_group_ids` arguments, sourcing their values from `each.value`. Ensure the `try(..., null)` pattern is used for these new arguments as well.",
+            "status": "pending",
+            "testStrategy": "Create an example that defines a rule using ASG IDs. Run `terraform plan` and verify the plan shows the `_application_security_group_ids` attributes being set."
+          },
+          {
+            "id": 12,
+            "title": "Documentation: Clarify Service Tag Support",
+            "description": "Update the variable descriptions to explicitly state that Service Tags are supported via the address prefixes attributes.",
+            "dependencies": [],
+            "details": "In `variables.tf`, edit the descriptions for `source_address_prefixes` and `destination_address_prefixes`. Add a sentence clarifying that these fields can be used for IP CIDR blocks or for Azure Service Tags (e.g., 'AzureCloud', 'Storage.WestUS').",
+            "status": "pending",
+            "testStrategy": "Manually review the `variables.tf` file to ensure the descriptions have been updated with clear guidance on using Service Tags."
+          },
+          {
+            "id": 13,
+            "title": "Variables: Define Inputs for NSG Flow Logs",
+            "description": "Add input variables to control the creation and configuration of NSG Flow Logs.",
+            "dependencies": [],
+            "details": "In `variables.tf`, add the following variables: `flow_log_enabled` (bool, default false), `flow_log_storage_account_id` (string, default null), and `flow_log_retention_in_days` (number, default 7).",
+            "status": "pending",
+            "testStrategy": "Review `variables.tf` to confirm the new flow log variables are defined with correct types and defaults."
+          },
+          {
+            "id": 14,
+            "title": "Flow Logs: Implement Conditional `azurerm_network_watcher_flow_log`",
+            "description": "Create the `azurerm_network_watcher_flow_log` resource, which should only be provisioned if flow logging is enabled.",
+            "dependencies": [],
+            "details": "In `main.tf`, add an `azurerm_network_watcher_flow_log` resource. Use the `count` meta-argument: `count = var.flow_log_enabled ? 1 : 0`. Associate it with the NSG ID (`azurerm_network_security_group.this.id`) and configure it using the `flow_log_storage_account_id` and `flow_log_retention_in_days` variables.",
+            "status": "pending",
+            "testStrategy": "Run `terraform plan` with `flow_log_enabled = false` (default) and verify the flow log resource is not in the plan. Rerun with `flow_log_enabled = true` and a dummy storage ID to verify it is in the plan."
+          },
+          {
+            "id": 15,
+            "title": "Variables: Define Inputs for Traffic Analytics",
+            "description": "Add input variables to control the Traffic Analytics feature within NSG Flow Logs.",
+            "dependencies": [],
+            "details": "In `variables.tf`, add the following variables for traffic analytics: `traffic_analytics_enabled` (bool, default false), `traffic_analytics_workspace_id` (string, default null), `traffic_analytics_workspace_region` (string, default null), and `traffic_analytics_interval_in_minutes` (number, default 10).",
+            "status": "pending",
+            "testStrategy": "Review `variables.tf` to confirm the new traffic analytics variables are defined with correct types and defaults."
+          },
+          {
+            "id": 16,
+            "title": "Flow Logs: Implement Traffic Analytics Configuration",
+            "description": "Configure the `traffic_analytics` block within the flow log resource based on the corresponding input variables.",
+            "dependencies": [],
+            "details": "In `main.tf`, within the `azurerm_network_watcher_flow_log` resource, add the `traffic_analytics` block. Populate its arguments (`enabled`, `workspace_id`, etc.) from the variables defined in the previous step. The block should be configured conditionally based on `var.traffic_analytics_enabled`.",
+            "status": "pending",
+            "testStrategy": "Run `terraform plan` with `traffic_analytics_enabled = true` and dummy workspace values. Verify the `traffic_analytics` block is present and configured in the plan output."
+          },
+          {
+            "id": 17,
+            "title": "Outputs: Define Module Outputs",
+            "description": "Define outputs for key resource identifiers created by the module, such as the NSG ID and rule IDs.",
+            "dependencies": [],
+            "details": "In `outputs.tf`, define the following outputs: `id` (the ID of the NSG), `name` (the name of the NSG), `security_rule_ids` (a map of security rule names to their IDs), and `flow_log_id` (the ID of the flow log resource, if created).",
+            "status": "pending",
+            "testStrategy": "After applying a test configuration, run `terraform output` and verify that all defined outputs are present and have non-null values."
+          },
+          {
+            "id": 18,
+            "title": "Documentation: Create `terraform-docs` Configuration File",
+            "description": "Create the configuration file needed by the `terraform-docs` CI job to automatically generate module documentation.",
+            "dependencies": [],
+            "details": "Create a file named `.terraform-docs.yml` in the `modules/network_security_group` directory. Configure it to format the inputs, outputs, and resources sections according to the project's standard. This will be picked up by the CI pipeline from Task 4.",
+            "status": "pending",
+            "testStrategy": "Run `terraform-docs` locally on the module directory and verify it generates a `README.md` file with the expected content and formatting."
+          },
+          {
+            "id": 19,
+            "title": "Examples: Create a Basic Usage Example",
+            "description": "Develop a simple example demonstrating the creation of an NSG with a few standard inbound and outbound rules.",
+            "dependencies": [],
+            "details": "Create a directory `examples/network_security_group/simple`. Inside, create a `main.tf` that calls the NSG module. Define a local resource group and provide a static map of 2-3 security rules (e.g., allow SSH inbound, deny all outbound).",
+            "status": "pending",
+            "testStrategy": "Navigate to the example directory, run `terraform init` and `terraform apply`. Verify in the Azure portal that the NSG and its rules are created correctly."
+          },
+          {
+            "id": 20,
+            "title": "Examples: Create a Comprehensive Usage Example",
+            "description": "Develop a complete example showcasing advanced features like Service Tags, ASG association, and enabled Flow Logs with Traffic Analytics.",
+            "dependencies": [],
+            "details": "Create `examples/network_security_group/complete`. The `main.tf` in this directory should call the NSG module and demonstrate its full capabilities. This will require creating mock resources within the example itself, such as a storage account for flow logs, a log analytics workspace for traffic analytics, and an application security group to associate with a rule. Include a rule that uses a Service Tag like 'AzureCloud'.",
+            "status": "pending",
+            "testStrategy": "Run `terraform init` and `terraform apply` on the complete example. Verify all resources, including the NSG, rules with ASG/Service Tags, flow log, and their associations, are correctly created in the Azure portal."
+          }
+        ]
+      },
+      {
+        "id": 35,
+        "title": "Route Table Module: Core Implementation",
+        "description": "Develop the Route Table module (azurerm_route_table) following AzureRM provider 4.36.0. This module will manage Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations. The module must support various next hop types (VirtualAppliance, VirtualNetworkGateway, VnetLocal, Internet, None) and follow security-first principles.",
+        "details": "",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          1
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Module Scaffolding: Create Directory and Files",
+            "description": "Create the directory structure and initial empty files for the `route_table` module.",
+            "dependencies": [],
+            "details": "Create a new directory `modules/route_table`. Inside this directory, create the following empty files: `main.tf`, `variables.tf`, `outputs.tf`, and `README.md`.",
+            "status": "pending",
+            "testStrategy": "Verify that the `modules/route_table` directory and its four initial files exist in the repository."
+          },
+          {
+            "id": 2,
+            "title": "Provider and Version Configuration",
+            "description": "Define the required Terraform and AzureRM provider versions for the module.",
+            "dependencies": [
+              1
+            ],
+            "details": "In `main.tf`, add a `terraform` block specifying `required_version` (e.g., `> 1.0`) and a `required_providers` block for `azurerm`, pinning it to version `~> 4.36.0`.",
+            "status": "pending",
+            "testStrategy": "Run `terraform init` within the module directory to confirm the provider is correctly configured and downloaded."
+          },
+          {
+            "id": 3,
+            "title": "Define Core Input Variables",
+            "description": "Define the essential input variables for creating a route table: name, resource group, and location.",
+            "dependencies": [
+              1
+            ],
+            "details": "In `variables.tf`, define variables for `name` (string), `resource_group_name` (string), and `location` (string). Add descriptions and types for each.",
+            "status": "pending",
+            "testStrategy": "Review `variables.tf` to ensure variables are defined with correct types and descriptions."
+          },
+          {
+            "id": 4,
+            "title": "Define Tagging Variable",
+            "description": "Define a variable to handle resource tagging, providing a default empty map.",
+            "dependencies": [
+              3
+            ],
+            "details": "In `variables.tf`, add a variable named `tags` of type `map(string)` with a default value of `{}`. This will be used to apply tags to the route table resource.",
+            "status": "pending",
+            "testStrategy": "Check that the `tags` variable is defined with the correct type and a default empty map."
+          },
+          {
+            "id": 5,
+            "title": "Implement Core `azurerm_route_table` Resource",
+            "description": "Create the basic `azurerm_route_table` resource in `main.tf` using the core variables.",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "In `main.tf`, add an `azurerm_route_table` resource block. Configure its `name`, `resource_group_name`, `location`, and `tags` arguments using the corresponding input variables.",
+            "status": "pending",
+            "testStrategy": "Deploy a simple example using the module. Verify in the Azure portal that a route table is created with the specified name, location, resource group, and tags."
+          },
+          {
+            "id": 6,
+            "title": "Define BGP Route Propagation Variable",
+            "description": "Define a boolean variable to control BGP route propagation.",
+            "dependencies": [
+              3
+            ],
+            "details": "In `variables.tf`, add a variable `disable_bgp_route_propagation` of type `bool`. Set its default value to `false` to align with Azure defaults and common use cases. Add a clear description explaining its purpose.",
+            "status": "pending",
+            "testStrategy": "Review `variables.tf` to ensure the variable is defined with type `bool` and a default value of `false`."
+          },
+          {
+            "id": 7,
+            "title": "Implement BGP Route Propagation Logic",
+            "description": "Connect the `disable_bgp_route_propagation` variable to the `azurerm_route_table` resource.",
+            "dependencies": [
+              5,
+              6
+            ],
+            "details": "In `main.tf`, update the `azurerm_route_table` resource to include the `disable_bgp_route_propagation` argument, setting its value to `var.disable_bgp_route_propagation`.",
+            "status": "pending",
+            "testStrategy": "Deploy the module with `disable_bgp_route_propagation` set to `true`. Verify in the Azure portal that 'Virtual network gateway route propagation' is disabled for the created route table."
+          },
+          {
+            "id": 8,
+            "title": "Define Complex Variable for Custom Routes",
+            "description": "Define a complex variable to accept a list of custom route configurations.",
+            "dependencies": [
+              3
+            ],
+            "details": "In `variables.tf`, define a variable named `routes` with type `list(object({...}))` and a default value of `[]`. This variable will be used to define custom routes for the table.",
+            "status": "pending",
+            "testStrategy": "Review `variables.tf` to confirm the `routes` variable is defined as a list of objects with an empty list as the default."
+          },
+          {
+            "id": 9,
+            "title": "Specify Object Structure for `routes` Variable",
+            "description": "Detail the specific attributes for the object within the `routes` list variable.",
+            "dependencies": [
+              8
+            ],
+            "details": "Update the `routes` variable definition in `variables.tf` to specify the object attributes: `name` (string), `address_prefix` (string), `next_hop_type` (string), and `next_hop_in_ip_address` (optional string, use `null` as default).",
+            "status": "pending",
+            "testStrategy": "Review the type constraint in `variables.tf` to ensure the object structure is correctly defined."
+          },
+          {
+            "id": 10,
+            "title": "Implement Dynamic Route Block",
+            "description": "Add a dynamic block to the `azurerm_route_table` resource to create routes based on the `routes` variable.",
+            "dependencies": [
+              5,
+              9
+            ],
+            "details": "In `main.tf`, within the `azurerm_route_table` resource, add a `dynamic \"route\"` block. Set its `for_each` argument to `var.routes`.",
+            "status": "pending",
+            "testStrategy": "Deploy the module with a sample route defined in the `routes` variable. Use `terraform plan` to verify that a `route` block is being added to the resource plan."
+          },
+          {
+            "id": 11,
+            "title": "Populate Dynamic Route Block Content",
+            "description": "Map the `routes` variable attributes to the arguments within the dynamic `route` block's content.",
+            "dependencies": [
+              10
+            ],
+            "details": "Inside the `content` of the `dynamic \"route\"` block, map the arguments: `name = route.value.name`, `address_prefix = route.value.address_prefix`, and `next_hop_type = route.value.next_hop_type`.",
+            "status": "pending",
+            "testStrategy": "Deploy the module with a route using `next_hop_type = \"Internet\"`. Verify in the Azure portal that the route is created with the correct name, prefix, and next hop type."
+          },
+          {
+            "id": 12,
+            "title": "Implement Conditional `next_hop_in_ip_address`",
+            "description": "Conditionally set the `next_hop_in_ip_address` argument only when the next hop type is 'VirtualAppliance'.",
+            "dependencies": [
+              11
+            ],
+            "details": "In the `content` of the `dynamic \"route\"` block, set the `next_hop_in_ip_address` argument using a ternary operator: `next_hop_in_ip_address = route.value.next_hop_type == \"VirtualAppliance\" ? route.value.next_hop_in_ip_address : null`. Ensure the variable default for this attribute is `null`.",
+            "status": "pending",
+            "testStrategy": "Deploy two routes: one with `next_hop_type = \"VirtualAppliance\"` and a valid IP, and another with `next_hop_type = \"Internet\"`. Verify the Virtual Appliance route has the IP set, and the Internet route does not."
+          },
+          {
+            "id": 13,
+            "title": "Add Validation for `next_hop_type`",
+            "description": "Add a validation rule to the `routes` variable to ensure `next_hop_type` is one of the allowed values.",
+            "dependencies": [
+              9
+            ],
+            "details": "In `variables.tf`, add a `validation` block to the `routes` variable. The condition should check that for every route in the list, `route.next_hop_type` is in the set of allowed values: `[\"VirtualAppliance\", \"VirtualNetworkGateway\", \"VnetLocal\", \"Internet\", \"None\"]`. Provide a clear error message.",
+            "status": "pending",
+            "testStrategy": "Attempt to deploy the module with an invalid `next_hop_type` (e.g., `\"MyRouter\"`). Verify that Terraform fails during the plan phase with the custom error message."
+          },
+          {
+            "id": 14,
+            "title": "Add Validation for Conditional IP Address",
+            "description": "Add a validation rule to ensure `next_hop_in_ip_address` is provided if and only if `next_hop_type` is 'VirtualAppliance'.",
+            "dependencies": [
+              13
+            ],
+            "details": "In `variables.tf`, add another `validation` block to the `routes` variable. The condition should check that for every route, `(route.next_hop_type == \"VirtualAppliance\" && route.next_hop_in_ip_address != null)` or `(route.next_hop_type != \"VirtualAppliance\" && route.next_hop_in_ip_address == null)`. Provide a clear error message.",
+            "status": "pending",
+            "testStrategy": "Attempt to deploy with `next_hop_type = \"VirtualAppliance\"` and `next_hop_in_ip_address = null`. Verify it fails. Attempt to deploy with `next_hop_type = \"Internet\"` and a non-null IP. Verify it fails."
+          },
+          {
+            "id": 15,
+            "title": "Define Subnet Association Variable",
+            "description": "Define a variable to accept a list of subnet IDs for association.",
+            "dependencies": [
+              3
+            ],
+            "details": "In `variables.tf`, define a variable `subnet_ids_to_associate` of type `set(string)` with a default value of `[]`. Using a set prevents duplicate associations.",
+            "status": "pending",
+            "testStrategy": "Review `variables.tf` to ensure the variable is defined with type `set(string)` and an empty default."
+          },
+          {
+            "id": 16,
+            "title": "Implement `azurerm_subnet_route_table_association` Resource",
+            "description": "Create the association resource to link the route table to specified subnets.",
+            "dependencies": [
+              5,
+              15
+            ],
+            "details": "In `main.tf`, add an `azurerm_subnet_route_table_association` resource. Use `for_each = var.subnet_ids_to_associate` to create multiple associations. In the resource block, set `subnet_id = each.key` and `route_table_id = azurerm_route_table.this.id`.",
+            "status": "pending",
+            "testStrategy": "Deploy the module with a valid subnet ID passed to `subnet_ids_to_associate`. Verify in the Azure portal that the route table is associated with the correct subnet."
+          },
+          {
+            "id": 17,
+            "title": "Define Module Outputs",
+            "description": "Define outputs for the route table's ID, name, and created routes.",
+            "dependencies": [
+              5
+            ],
+            "details": "In `outputs.tf`, define outputs for the route table `id` (`azurerm_route_table.this.id`), `name` (`azurerm_route_table.this.name`), and `routes` (`azurerm_route_table.this.route`).",
+            "status": "pending",
+            "testStrategy": "After a successful deployment, run `terraform output` and verify that the `id`, `name`, and `routes` values are displayed correctly."
+          },
+          {
+            "id": 18,
+            "title": "Create Module README Documentation",
+            "description": "Write comprehensive documentation for the module in its `README.md` file.",
+            "dependencies": [
+              17
+            ],
+            "details": "In `modules/route_table/README.md`, document the module's purpose, all input variables (with types, descriptions, and defaults), and all outputs. Include at least one usage example.",
+            "status": "pending",
+            "testStrategy": "Review the `README.md` file for completeness, clarity, and accuracy. Ensure all variables and outputs are documented."
+          },
+          {
+            "id": 19,
+            "title": "Create Simple Usage Example",
+            "description": "Create a simple example that deploys a route table with no custom routes or associations.",
+            "dependencies": [
+              18
+            ],
+            "details": "Create a directory `examples/route_table/simple`. Add `main.tf` that defines a resource group and then calls the `route_table` module with only the required variables (`name`, `resource_group_name`, `location`).",
+            "status": "pending",
+            "testStrategy": "Navigate to the `examples/route_table/simple` directory and run `terraform init`, `validate`, and `plan` to ensure the example is valid."
+          },
+          {
+            "id": 20,
+            "title": "Create Complete Usage Example",
+            "description": "Create a complete example demonstrating custom routes and subnet association.",
+            "dependencies": [
+              19
+            ],
+            "details": "Create a directory `examples/route_table/complete`. Add `main.tf` that defines a resource group, a virtual network, and a subnet. Then, call the `route_table` module, passing custom `routes` (including one of type 'VirtualAppliance') and the ID of the created subnet to `subnet_ids_to_associate`.",
+            "status": "pending",
+            "testStrategy": "Navigate to the `examples/route_table/complete` directory and run `terraform init`, `validate`, and `plan`. A full `terraform apply` and `destroy` should be run to confirm functionality."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-15T06:30:59.593Z",
+      "updated": "2025-07-16T11:18:08.060Z",
       "description": "Tasks for master context"
     }
   }
