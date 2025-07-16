@@ -1,3 +1,6 @@
+#!/bin/sh
+. "$(dirname "$0")/_/h"
+
 # Run terraform fmt check
 echo "Running terraform fmt check..."
 find . -name "*.tf" -not -path "./.terraform/*" -exec dirname {} \; | sort -u | while read dir; do
