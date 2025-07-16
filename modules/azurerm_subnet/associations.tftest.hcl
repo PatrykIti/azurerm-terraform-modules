@@ -23,7 +23,7 @@ mock_provider "azurerm" {
 
 # Test: NSG Association
 run "test_nsg_association" {
-  command = plan
+  command = apply
 
   variables {
     name                      = "test-subnet"
@@ -56,7 +56,7 @@ run "test_nsg_association" {
 
 # Test: Route Table Association
 run "test_route_table_association" {
-  command = plan
+  command = apply
 
   variables {
     name                 = "test-subnet"
@@ -89,7 +89,7 @@ run "test_route_table_association" {
 
 # Test: Both NSG and Route Table Associations
 run "test_both_associations" {
-  command = plan
+  command = apply
 
   variables {
     name                      = "test-subnet"

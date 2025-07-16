@@ -91,7 +91,7 @@ run "test_no_associations_by_default" {
 
 # Test: Output values
 run "test_subnet_outputs" {
-  command = plan
+  command = apply
 
   assert {
     condition     = output.id != null

@@ -1,19 +1,21 @@
-.PHONY: test test-short test-integration test-all docs clean validate
+.PHONY: test test-unit test-integration test-all docs clean validate
 
-# Run only short tests (basic functionality)
-test-short:
-	cd tests && go test -v -short -parallel 8 -timeout 30m
+# Run native Terraform unit tests
+test-unit:
+	@echo "Running native Terraform tests..."
+	terraform init
+	terraform test
 
-# Run only integration tests
+# Run Terratest integration tests
 test-integration:
-	cd tests && go test -v -run "Integration|Lifecycle|Disaster|Compliance|Monitoring" -parallel 4 -timeout 60m
+	@echo "Running Terratest integration tests..."
+	cd tests/integration && make test
 
 # Run all tests
-test-all:
-	cd tests && go test -v -parallel 8 -timeout 60m
+test-all: test-unit test-integration
 
-# Default test target
-test: test-short
+# Default test target (unit tests only)
+test: test-unit
 
 # Generate documentation
 docs:

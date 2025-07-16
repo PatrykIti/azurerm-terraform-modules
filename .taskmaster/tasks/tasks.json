@@ -1446,7 +1446,7 @@
             "id": 17,
             "title": "Implement Native Terraform Tests",
             "description": "Create test files using the native `terraform test` framework to validate module functionality.",
-            "status": "in-progress",
+            "status": "done",
             "dependencies": [
               12
             ],
@@ -1457,7 +1457,7 @@
             "id": 18,
             "title": "Implement Terratest Integration Tests",
             "description": "Set up a Go-based Terratest suite to perform end-to-end testing by deploying an example and validating the resources in Azure.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               12
             ],
@@ -2060,7 +2060,7 @@
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-16T13:50:46.636Z",
+      "updated": "2025-07-16T14:06:56.009Z",
       "description": "Tasks for master context"
     }
   }
