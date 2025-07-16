@@ -1,0 +1,907 @@
+# Core Kubernetes Cluster Variables
+variable "name" {
+  description = "The name of the Managed Kubernetes Cluster to create. Changing this forces a new resource to be created."
+  type        = string
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9-._]{0,61}[a-zA-Z0-9]$", var.name))
+    error_message = "The name must be between 1 and 63 characters long, start and end with a letter or number, and contain only letters, numbers, hyphens, underscores, and periods."
+  }
+}
+
+variable "resource_group_name" {
+  description = "Specifies the Resource Group where the Managed Kubernetes Cluster should exist. Changing this forces a new resource to be created."
+  type        = string
+}
+
+variable "location" {
+  description = "The location where the Managed Kubernetes Cluster should be created. Changing this forces a new resource to be created."
+  type        = string
+}
+
+# DNS Configuration
+variable "dns_prefix" {
+  description = "DNS prefix specified when creating the managed cluster. Possible values must begin and end with a letter or number, contain only letters, numbers, and hyphens and be between 1 and 54 characters in length. Changing this forces a new resource to be created."
+  type        = string
+  default     = null
+
+  validation {
+    condition = var.dns_prefix == null || (
+      length(var.dns_prefix) >= 1 && length(var.dns_prefix) <= 54 &&
+      can(regex("^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$", var.dns_prefix))
+    )
+    error_message = "DNS prefix must begin and end with a letter or number, contain only letters, numbers, and hyphens and be between 1 and 54 characters in length."
+  }
+}
+
+variable "dns_prefix_private_cluster" {
+  description = "Specifies the DNS prefix to use with private clusters. Changing this forces a new resource to be created. Note: You must define either dns_prefix or dns_prefix_private_cluster."
+  type        = string
+  default     = null
+}
+
+# Kubernetes Version
+variable "kubernetes_version" {
+  description = "Version of Kubernetes specified when creating the AKS managed cluster. If not specified, the latest recommended version will be used at provisioning time (but won't auto-upgrade). AKS does not require an exact patch version to be specified, minor version aliases such as '1.22' are also supported."
+  type        = string
+  default     = null
+}
+
+variable "automatic_upgrade_channel" {
+  description = "The upgrade channel for this Kubernetes Cluster. Possible values are patch, rapid, node-image and stable. Omitting this field sets this value to none."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.automatic_upgrade_channel == null || contains(["patch", "rapid", "node-image", "stable", "none"], var.automatic_upgrade_channel)
+    error_message = "The automatic_upgrade_channel must be one of: patch, rapid, node-image, stable, or none."
+  }
+}
+
+variable "node_os_upgrade_channel" {
+  description = "The upgrade channel for node OS security updates. Possible values are Unmanaged, SecurityPatch, NodeImage and None. Defaults to NodeImage."
+  type        = string
+  default     = "NodeImage"
+
+  validation {
+    condition     = contains(["Unmanaged", "SecurityPatch", "NodeImage", "None"], var.node_os_upgrade_channel)
+    error_message = "The node_os_upgrade_channel must be one of: Unmanaged, SecurityPatch, NodeImage, or None."
+  }
+}
+
+# SKU Configuration
+variable "sku_tier" {
+  description = "The SKU Tier that should be used for this Kubernetes Cluster. Possible values are Free, Standard (which includes the Uptime SLA) and Premium. Defaults to Free."
+  type        = string
+  default     = "Free"
+
+  validation {
+    condition     = contains(["Free", "Standard", "Premium"], var.sku_tier)
+    error_message = "The sku_tier must be one of: Free, Standard, or Premium."
+  }
+}
+
+variable "support_plan" {
+  description = "Specifies the support plan which should be used for this Kubernetes Cluster. Possible values are KubernetesOfficial and AKSLongTermSupport. Defaults to KubernetesOfficial."
+  type        = string
+  default     = "KubernetesOfficial"
+
+  validation {
+    condition     = contains(["KubernetesOfficial", "AKSLongTermSupport"], var.support_plan)
+    error_message = "The support_plan must be either KubernetesOfficial or AKSLongTermSupport."
+  }
+}
+
+# Default Node Pool Configuration
+variable "default_node_pool" {
+  description = <<-EOT
+    Configuration for the default node pool.
+    
+    Required fields:
+    - name: The name which should be used for the default Kubernetes Node Pool.
+    - vm_size: The size of the Virtual Machine, such as Standard_DS2_v2.
+    
+    Optional fields include node count, availability zones, max pods, OS disk configuration, and more.
+  EOT
+  
+  type = object({
+    name                          = string
+    vm_size                       = string
+    capacity_reservation_group_id = optional(string)
+    auto_scaling_enabled          = optional(bool, false)
+    host_encryption_enabled       = optional(bool, false)
+    node_public_ip_enabled        = optional(bool, false)
+    gpu_instance                  = optional(string)
+    host_group_id                 = optional(string)
+    
+    kubelet_config = optional(object({
+      allowed_unsafe_sysctls    = optional(list(string))
+      container_log_max_line    = optional(number)
+      container_log_max_size_mb = optional(number)
+      cpu_cfs_quota_enabled     = optional(bool)
+      cpu_cfs_quota_period      = optional(string)
+      cpu_manager_policy        = optional(string)
+      image_gc_high_threshold   = optional(number)
+      image_gc_low_threshold    = optional(number)
+      pod_max_pid               = optional(number)
+    }))
+    
+    linux_os_config = optional(object({
+      swap_file_size_mb = optional(number)
+      sysctl_config = optional(object({
+        fs_aio_max_nr                      = optional(number)
+        fs_file_max                        = optional(number)
+        fs_inotify_max_user_watches        = optional(number)
+        fs_nr_open                         = optional(number)
+        kernel_threads_max                 = optional(number)
+        net_core_netdev_max_backlog        = optional(number)
+        net_core_optmem_max                = optional(number)
+        net_core_rmem_default              = optional(number)
+        net_core_rmem_max                  = optional(number)
+        net_core_somaxconn                 = optional(number)
+        net_core_wmem_default              = optional(number)
+        net_core_wmem_max                  = optional(number)
+        net_ipv4_ip_local_port_range_max   = optional(number)
+        net_ipv4_ip_local_port_range_min   = optional(number)
+        net_ipv4_neigh_default_gc_thresh1  = optional(number)
+        net_ipv4_neigh_default_gc_thresh2  = optional(number)
+        net_ipv4_neigh_default_gc_thresh3  = optional(number)
+        net_ipv4_tcp_fin_timeout           = optional(number)
+        net_ipv4_tcp_keepalive_intvl       = optional(number)
+        net_ipv4_tcp_keepalive_probes      = optional(number)
+        net_ipv4_tcp_keepalive_time        = optional(number)
+        net_ipv4_tcp_max_syn_backlog       = optional(number)
+        net_ipv4_tcp_max_tw_buckets        = optional(number)
+        net_ipv4_tcp_tw_reuse              = optional(bool)
+        net_netfilter_nf_conntrack_buckets = optional(number)
+        net_netfilter_nf_conntrack_max     = optional(number)
+        vm_max_map_count                   = optional(number)
+        vm_swappiness                      = optional(number)
+        vm_vfs_cache_pressure              = optional(number)
+      }))
+      transparent_huge_page_defrag  = optional(string)
+      transparent_huge_page_enabled = optional(string)
+    }))
+    
+    fips_enabled         = optional(bool, false)
+    kubelet_disk_type    = optional(string)
+    max_pods             = optional(number)
+    node_network_profile = optional(object({
+      allowed_host_ports = optional(list(object({
+        port_start = optional(number)
+        port_end   = optional(number)
+        protocol   = optional(string)
+      })))
+      application_security_group_ids = optional(list(string))
+      node_public_ip_tags            = optional(map(string))
+    }))
+    
+    node_labels                  = optional(map(string))
+    node_public_ip_prefix_id     = optional(string)
+    only_critical_addons_enabled = optional(bool, false)
+    orchestrator_version         = optional(string)
+    os_disk_size_gb              = optional(number)
+    os_disk_type                 = optional(string, "Managed")
+    os_sku                       = optional(string, "Ubuntu")
+    pod_subnet_id                = optional(string)
+    proximity_placement_group_id = optional(string)
+    scale_down_mode              = optional(string, "Delete")
+    
+    snapshot_id = optional(string)
+    
+    temporary_name_for_rotation = optional(string)
+    type                        = optional(string, "VirtualMachineScaleSets")
+    
+    ultra_ssd_enabled = optional(bool, false)
+    
+    upgrade_settings = optional(object({
+      drain_timeout_in_minutes      = optional(number)
+      node_soak_duration_in_minutes = optional(number)
+      max_surge                     = string
+    }))
+    
+    vnet_subnet_id = optional(string)
+    workload_runtime = optional(string)
+    zones          = optional(list(string))
+    
+    max_count  = optional(number)
+    min_count  = optional(number)
+    node_count = optional(number, 1)
+  })
+
+  validation {
+    condition     = var.default_node_pool.os_sku == null || contains(["Ubuntu", "AzureLinux", "CBLMariner", "Mariner", "Windows2019", "Windows2022"], var.default_node_pool.os_sku)
+    error_message = "The os_sku must be one of: Ubuntu, AzureLinux, CBLMariner, Mariner, Windows2019, Windows2022."
+  }
+
+  validation {
+    condition     = var.default_node_pool.workload_runtime == null || contains(["OCIContainer", "WasmWasi", "KataMshvVmIsolation"], var.default_node_pool.workload_runtime)
+    error_message = "The workload_runtime must be one of: OCIContainer, WasmWasi, KataMshvVmIsolation."
+  }
+
+  validation {
+    condition     = var.default_node_pool.scale_down_mode == null || contains(["Delete", "Deallocate"], var.default_node_pool.scale_down_mode)
+    error_message = "The scale_down_mode must be either Delete or Deallocate."
+  }
+
+  validation {
+    condition     = !var.default_node_pool.auto_scaling_enabled || (var.default_node_pool.min_count != null && var.default_node_pool.max_count != null)
+    error_message = "When auto_scaling_enabled is true, both min_count and max_count must be specified."
+  }
+}
+
+# Identity Configuration
+variable "identity" {
+  description = <<-EOT
+    An identity block. One of either identity or service_principal must be specified.
+    
+    type: Specifies the type of Managed Service Identity. Possible values are SystemAssigned or UserAssigned.
+    identity_ids: Specifies a list of User Assigned Managed Identity IDs.
+  EOT
+  
+  type = object({
+    type         = string
+    identity_ids = optional(list(string))
+  })
+  
+  default = {
+    type = "SystemAssigned"
+  }
+
+  validation {
+    condition     = contains(["SystemAssigned", "UserAssigned"], var.identity.type)
+    error_message = "The identity type must be either SystemAssigned or UserAssigned."
+  }
+
+  validation {
+    condition     = var.identity.type != "UserAssigned" || (var.identity.identity_ids != null && length(var.identity.identity_ids) > 0)
+    error_message = "When identity type is UserAssigned, identity_ids must be provided."
+  }
+}
+
+# Service Principal Configuration (Alternative to Identity)
+variable "service_principal" {
+  description = <<-EOT
+    A service_principal block. One of either identity or service_principal must be specified.
+    Note: A migration scenario from service_principal to identity is supported.
+  EOT
+  
+  type = object({
+    client_id     = string
+    client_secret = string
+  })
+  
+  default   = null
+  sensitive = true
+}
+
+# Network Configuration
+variable "network_profile" {
+  description = <<-EOT
+    Network profile configuration for the cluster.
+    
+    network_plugin: Network plugin to use. Possible values are azure, kubenet and none.
+    network_mode: Network mode to be used. Possible values are bridge and transparent.
+    network_policy: Network policy to be used. Possible values are calico, azure and cilium.
+    dns_service_ip: IP address within the Kubernetes service address range for cluster DNS service.
+    service_cidr: The Network Range used by the Kubernetes service. Changing this forces a new resource.
+    load_balancer_sku: Specifies the SKU of the Load Balancer used for this Kubernetes Cluster.
+  EOT
+  
+  type = object({
+    network_plugin             = string
+    network_mode               = optional(string)
+    network_policy             = optional(string)
+    dns_service_ip             = optional(string)
+    network_plugin_mode        = optional(string)
+    outbound_type              = optional(string, "loadBalancer")
+    pod_cidr                   = optional(string)
+    pod_cidrs                  = optional(list(string))
+    service_cidr               = optional(string)
+    service_cidrs              = optional(list(string))
+    ip_versions                = optional(list(string))
+    load_balancer_sku          = optional(string, "standard")
+    
+    load_balancer_profile = optional(object({
+      backend_pool_type              = optional(string, "nodeIPConfiguration")
+      effective_outbound_ips         = optional(list(string))
+      idle_timeout_in_minutes        = optional(number, 30)
+      managed_outbound_ip_count      = optional(number)
+      managed_outbound_ipv6_count    = optional(number)
+      outbound_ip_address_ids        = optional(list(string))
+      outbound_ip_prefix_ids         = optional(list(string))
+      outbound_ports_allocated       = optional(number, 0)
+    }))
+    
+    nat_gateway_profile = optional(object({
+      effective_outbound_ips    = optional(list(string))
+      idle_timeout_in_minutes   = optional(number, 4)
+      managed_outbound_ip_count = optional(number)
+    }))
+  })
+  
+  default = {
+    network_plugin = "azure"
+  }
+
+  validation {
+    condition     = contains(["azure", "kubenet", "none"], var.network_profile.network_plugin)
+    error_message = "The network_plugin must be one of: azure, kubenet, or none."
+  }
+
+  validation {
+    condition     = var.network_profile.network_mode == null || contains(["bridge", "transparent"], var.network_profile.network_mode)
+    error_message = "The network_mode must be either bridge or transparent."
+  }
+
+  validation {
+    condition     = var.network_profile.network_policy == null || contains(["calico", "azure", "cilium"], var.network_profile.network_policy)
+    error_message = "The network_policy must be one of: calico, azure, or cilium."
+  }
+
+  validation {
+    condition     = var.network_profile.outbound_type == null || contains(["loadBalancer", "userDefinedRouting", "managedNATGateway", "userAssignedNATGateway"], var.network_profile.outbound_type)
+    error_message = "The outbound_type must be one of: loadBalancer, userDefinedRouting, managedNATGateway, or userAssignedNATGateway."
+  }
+}
+
+# API Server Access Configuration
+variable "api_server_access_profile" {
+  description = <<-EOT
+    API server access profile configuration.
+    
+    authorized_ip_ranges: Set of authorized IP ranges to allow access to API server.
+    vnet_integration_enabled: Should API Server VNet Integration be enabled?
+    subnet_id: The ID of the Subnet where the API server endpoint is delegated to.
+  EOT
+  
+  type = object({
+    authorized_ip_ranges     = optional(list(string))
+    vnet_integration_enabled = optional(bool, false)
+    subnet_id                = optional(string)
+  })
+  
+  default = null
+}
+
+# Private Cluster Configuration
+variable "private_cluster_enabled" {
+  description = "Should this Kubernetes Cluster have its API server only exposed on internal IP addresses? This provides a Private IP Address for the Kubernetes API on the Virtual Network where the Kubernetes Cluster is located."
+  type        = bool
+  default     = false
+}
+
+variable "private_dns_zone_id" {
+  description = "Either the ID of Private DNS Zone which should be delegated to this Cluster, System to have AKS manage this or None. In case of None you will need to bring your own DNS server and set up resolving, otherwise, the cluster will have issues after provisioning."
+  type        = string
+  default     = null
+}
+
+variable "private_cluster_public_fqdn_enabled" {
+  description = "Specifies whether a Public FQDN for this Private Cluster should be added."
+  type        = bool
+  default     = false
+}
+
+# Azure Active Directory RBAC
+variable "azure_active_directory_role_based_access_control" {
+  description = <<-EOT
+    Azure Active Directory Role Based Access Control configuration.
+    
+    tenant_id: The Tenant ID used for Azure Active Directory Application.
+    admin_group_object_ids: A list of Object IDs of Azure Active Directory Groups which should have Admin Role on the Cluster.
+    azure_rbac_enabled: Is Role Based Access Control based on Azure AD enabled?
+  EOT
+  
+  type = object({
+    tenant_id              = optional(string)
+    admin_group_object_ids = optional(list(string))
+    azure_rbac_enabled     = optional(bool, true)
+  })
+  
+  default = null
+}
+
+# Add-ons Configuration
+variable "azure_policy_enabled" {
+  description = "Should the Azure Policy Add-On be enabled?"
+  type        = bool
+  default     = false
+}
+
+variable "http_application_routing_enabled" {
+  description = "Should HTTP Application Routing be enabled? Note: At this time HTTP Application Routing is not supported in Azure China or Azure US Government."
+  type        = bool
+  default     = false
+}
+
+variable "oms_agent" {
+  description = <<-EOT
+    OMS Agent configuration for Azure Monitor.
+    
+    log_analytics_workspace_id: The ID of the Log Analytics Workspace which the OMS Agent should send data to.
+    msi_auth_for_monitoring_enabled: Is managed identity authentication for monitoring enabled?
+  EOT
+  
+  type = object({
+    log_analytics_workspace_id      = string
+    msi_auth_for_monitoring_enabled = optional(bool, true)
+  })
+  
+  default = null
+}
+
+variable "ingress_application_gateway" {
+  description = <<-EOT
+    Application Gateway Ingress Controller add-on configuration.
+    
+    gateway_id: The ID of the Application Gateway to integrate with.
+    gateway_name: The name of the Application Gateway to be used or created.
+    subnet_cidr: The subnet CIDR to be used to create an Application Gateway.
+    subnet_id: The ID of the subnet on which to create an Application Gateway.
+  EOT
+  
+  type = object({
+    gateway_id   = optional(string)
+    gateway_name = optional(string)
+    subnet_cidr  = optional(string)
+    subnet_id    = optional(string)
+  })
+  
+  default = null
+}
+
+variable "aci_connector_linux" {
+  description = <<-EOT
+    ACI Connector Linux configuration.
+    
+    subnet_name: The subnet name for the virtual nodes to run.
+  EOT
+  
+  type = object({
+    subnet_name = string
+  })
+  
+  default = null
+}
+
+variable "azure_keyvault_secrets_provider" {
+  description = <<-EOT
+    Azure Key Vault Secrets Provider configuration.
+    
+    secret_rotation_enabled: Is secret rotation enabled?
+    secret_rotation_interval: The interval to poll for secret rotation.
+  EOT
+  
+  type = object({
+    secret_rotation_enabled  = optional(bool, true)
+    secret_rotation_interval = optional(string, "2m")
+  })
+  
+  default = null
+}
+
+# Auto Scaler Profile
+variable "auto_scaler_profile" {
+  description = "Auto Scaler Profile configuration."
+  
+  type = object({
+    balance_similar_node_groups                   = optional(bool)
+    daemonset_eviction_for_empty_nodes_enabled    = optional(bool)
+    daemonset_eviction_for_occupied_nodes_enabled = optional(bool)
+    empty_bulk_delete_max                         = optional(string)
+    expander                                      = optional(string)
+    ignore_daemonsets_utilization_enabled         = optional(bool)
+    max_graceful_termination_sec                  = optional(string)
+    max_node_provisioning_time                    = optional(string)
+    max_unready_nodes                             = optional(number)
+    max_unready_percentage                        = optional(number)
+    new_pod_scale_up_delay                        = optional(string)
+    scale_down_delay_after_add                    = optional(string)
+    scale_down_delay_after_delete                 = optional(string)
+    scale_down_delay_after_failure                = optional(string)
+    scale_down_unneeded                           = optional(string)
+    scale_down_unready                            = optional(string)
+    scale_down_utilization_threshold              = optional(string)
+    scan_interval                                 = optional(string)
+    skip_nodes_with_local_storage                 = optional(bool)
+    skip_nodes_with_system_pods                   = optional(bool)
+  })
+  
+  default = null
+}
+
+# Maintenance Windows
+variable "maintenance_window" {
+  description = <<-EOT
+    Maintenance window configuration.
+    
+    allowed: List of allowed maintenance windows.
+    not_allowed: List of not allowed maintenance windows.
+  EOT
+  
+  type = object({
+    allowed = optional(list(object({
+      day   = string
+      hours = list(number)
+    })))
+    not_allowed = optional(list(object({
+      end   = string
+      start = string
+    })))
+  })
+  
+  default = null
+}
+
+variable "maintenance_window_auto_upgrade" {
+  description = "Maintenance window configuration for auto upgrade."
+  
+  type = object({
+    duration     = number
+    frequency    = string
+    interval     = number
+    day_of_month = optional(number)
+    day_of_week  = optional(string)
+    start_date   = optional(string)
+    start_time   = optional(string)
+    utc_offset   = optional(string)
+    week_index   = optional(string)
+    not_allowed = optional(list(object({
+      end   = string
+      start = string
+    })))
+  })
+  
+  default = null
+}
+
+variable "maintenance_window_node_os" {
+  description = "Maintenance window configuration for node OS updates."
+  
+  type = object({
+    duration     = number
+    frequency    = string
+    interval     = number
+    day_of_month = optional(number)
+    day_of_week  = optional(string)
+    start_date   = optional(string)
+    start_time   = optional(string)
+    utc_offset   = optional(string)
+    week_index   = optional(string)
+    not_allowed = optional(list(object({
+      end   = string
+      start = string
+    })))
+  })
+  
+  default = null
+}
+
+# Security Configuration
+variable "microsoft_defender" {
+  description = <<-EOT
+    Microsoft Defender configuration.
+    
+    log_analytics_workspace_id: Specifies the ID of the Log Analytics Workspace where the audit logs should be sent.
+  EOT
+  
+  type = object({
+    log_analytics_workspace_id = string
+  })
+  
+  default = null
+}
+
+variable "workload_identity_enabled" {
+  description = "Specifies whether Azure AD Workload Identity should be enabled for the Cluster."
+  type        = bool
+  default     = false
+}
+
+variable "oidc_issuer_enabled" {
+  description = "Enable or Disable the OIDC issuer URL."
+  type        = bool
+  default     = false
+}
+
+# Monitoring
+variable "monitor_metrics" {
+  description = <<-EOT
+    Monitor metrics configuration.
+    
+    annotations_allowed: Specifies a comma-separated list of Kubernetes annotation keys that will be used in the resource's labels metric.
+    labels_allowed: Specifies a comma-separated list of additional Kubernetes label keys that will be used in the resource's labels metric.
+  EOT
+  
+  type = object({
+    annotations_allowed = optional(string)
+    labels_allowed      = optional(string)
+  })
+  
+  default = null
+}
+
+# Service Mesh
+variable "service_mesh_profile" {
+  description = <<-EOT
+    Service mesh profile configuration.
+    
+    mode: The mode of the service mesh. Possible value is Istio.
+    revisions: Specify 1 or 2 Istio control plane revisions for managing minor upgrades.
+    internal_ingress_gateway_enabled: Is Istio Internal Ingress Gateway enabled?
+    external_ingress_gateway_enabled: Is Istio External Ingress Gateway enabled?
+  EOT
+  
+  type = object({
+    mode                             = string
+    revisions                        = list(string)
+    internal_ingress_gateway_enabled = optional(bool)
+    external_ingress_gateway_enabled = optional(bool)
+  })
+  
+  default = null
+
+  validation {
+    condition     = var.service_mesh_profile == null || var.service_mesh_profile.mode == "Istio"
+    error_message = "The service mesh mode must be Istio."
+  }
+
+  validation {
+    condition     = var.service_mesh_profile == null || (length(var.service_mesh_profile.revisions) >= 1 && length(var.service_mesh_profile.revisions) <= 2)
+    error_message = "Service mesh revisions must contain 1 or 2 items."
+  }
+}
+
+# Workload Autoscaler Profile
+variable "workload_autoscaler_profile" {
+  description = <<-EOT
+    Workload autoscaler profile configuration.
+    
+    keda_enabled: Specifies whether KEDA Autoscaler can be used for workloads.
+    vertical_pod_autoscaler_enabled: Specifies whether Vertical Pod Autoscaler should be enabled.
+  EOT
+  
+  type = object({
+    keda_enabled                    = optional(bool)
+    vertical_pod_autoscaler_enabled = optional(bool)
+  })
+  
+  default = null
+}
+
+# Other Features
+variable "disk_encryption_set_id" {
+  description = "The ID of the Disk Encryption Set which should be used for the Nodes and Volumes. Changing this forces a new resource to be created."
+  type        = string
+  default     = null
+}
+
+variable "edge_zone" {
+  description = "Specifies the Extended Zone (formerly called Edge Zone) within the Azure Region where this Managed Kubernetes Cluster should exist. Changing this forces a new resource to be created."
+  type        = string
+  default     = null
+}
+
+variable "http_proxy_config" {
+  description = <<-EOT
+    HTTP proxy configuration.
+    
+    http_proxy: Proxy server endpoint to use for creating HTTP connections.
+    https_proxy: Proxy server endpoint to use for creating HTTPS connections.
+    no_proxy: Endpoints that should not go through proxy.
+    trusted_ca: Alternative CA bundle base64 string.
+  EOT
+  
+  type = object({
+    http_proxy  = optional(string)
+    https_proxy = optional(string)
+    no_proxy    = optional(list(string))
+    trusted_ca  = optional(string)
+  })
+  
+  default   = null
+  sensitive = true
+}
+
+variable "image_cleaner_enabled" {
+  description = "Specifies whether Image Cleaner is enabled."
+  type        = bool
+  default     = false
+}
+
+variable "image_cleaner_interval_hours" {
+  description = "Specifies the interval in hours when images should be cleaned up. Defaults to 0."
+  type        = number
+  default     = 0
+}
+
+variable "local_account_disabled" {
+  description = "If true local accounts will be disabled. See the documentation for more information."
+  type        = bool
+  default     = false
+}
+
+variable "node_resource_group" {
+  description = "The name of the Resource Group where the Kubernetes Nodes should exist. Azure requires that a new, non-existent Resource Group is used. Changing this forces a new resource to be created."
+  type        = string
+  default     = null
+}
+
+variable "key_management_service" {
+  description = <<-EOT
+    Key Management Service configuration.
+    
+    key_vault_key_id: Identifier of Azure Key Vault key.
+    key_vault_network_access: Network access of the key vault. Possible values are Public and Private.
+  EOT
+  
+  type = object({
+    key_vault_key_id         = string
+    key_vault_network_access = optional(string, "Public")
+  })
+  
+  default = null
+
+  validation {
+    condition     = var.key_management_service == null || contains(["Public", "Private"], var.key_management_service.key_vault_network_access)
+    error_message = "The key_vault_network_access must be either Public or Private."
+  }
+}
+
+variable "key_vault_secrets_provider" {
+  description = <<-EOT
+    Key Vault Secrets Provider configuration.
+    
+    secret_rotation_enabled: Is secret rotation enabled?
+    secret_rotation_interval: The interval to poll for secret rotation.
+  EOT
+  
+  type = object({
+    secret_rotation_enabled  = optional(bool, true)
+    secret_rotation_interval = optional(string, "2m")
+  })
+  
+  default = null
+}
+
+variable "kubelet_identity" {
+  description = <<-EOT
+    Kubelet identity configuration.
+    
+    client_id: The Client ID of the user-defined Managed Identity to be assigned to the Kubelets.
+    object_id: The Object ID of the user-defined Managed Identity assigned to the Kubelets.
+    user_assigned_identity_id: The ID of the User Assigned Identity assigned to the Kubelets.
+  EOT
+  
+  type = object({
+    client_id                 = optional(string)
+    object_id                 = optional(string)
+    user_assigned_identity_id = optional(string)
+  })
+  
+  default = null
+}
+
+variable "linux_profile" {
+  description = <<-EOT
+    Linux profile configuration.
+    
+    admin_username: The Admin Username for the Cluster.
+    ssh_key: An ssh_key block with key_data containing the SSH public key.
+  EOT
+  
+  type = object({
+    admin_username = string
+    ssh_key = object({
+      key_data = string
+    })
+  })
+  
+  default = null
+}
+
+variable "windows_profile" {
+  description = <<-EOT
+    Windows profile configuration.
+    
+    admin_username: The Admin Username for Windows VMs.
+    admin_password: The Admin Password for Windows VMs.
+    license: Specifies the type of on-premise license which should be used for Node Pool Windows VM's.
+    gmsa: GMSA configuration for Windows node pools.
+  EOT
+  
+  type = object({
+    admin_username = string
+    admin_password = optional(string)
+    license        = optional(string)
+    gmsa = optional(object({
+      root_domain = string
+      dns_server  = optional(string)
+    }))
+  })
+  
+  default   = null
+  sensitive = true
+}
+
+variable "web_app_routing" {
+  description = <<-EOT
+    Web App Routing configuration.
+    
+    dns_zone_ids: Specifies the list of the DNS Zone IDs in which DNS entries are created for applications deployed to the cluster.
+    web_app_routing_identity: A web_app_routing_identity block.
+  EOT
+  
+  type = object({
+    dns_zone_ids = list(string)
+    web_app_routing_identity = optional(object({
+      client_id                 = string
+      object_id                 = string
+      user_assigned_identity_id = string
+    }))
+  })
+  
+  default = null
+}
+
+variable "run_command_enabled" {
+  description = "Whether to enable run command for the cluster or not."
+  type        = bool
+  default     = true
+}
+
+variable "open_service_mesh_enabled" {
+  description = "Is Open Service Mesh enabled? For more details, please visit Open Service Mesh for AKS."
+  type        = bool
+  default     = false
+}
+
+variable "confidential_computing" {
+  description = <<-EOT
+    Confidential computing configuration.
+    
+    sgx_quote_helper_enabled: Should the SGX quote helper be enabled?
+  EOT
+  
+  type = object({
+    sgx_quote_helper_enabled = bool
+  })
+  
+  default = null
+}
+
+variable "cost_analysis_enabled" {
+  description = "Should cost analysis be enabled for this Kubernetes Cluster? Defaults to false. The sku_tier must be set to Standard or Premium to enable this feature."
+  type        = bool
+  default     = false
+}
+
+# Storage Profile
+variable "storage_profile" {
+  description = <<-EOT
+    Storage profile configuration.
+    
+    blob_driver_enabled: Is the Blob CSI driver enabled?
+    disk_driver_enabled: Is the Disk CSI driver enabled?
+    disk_driver_version: Disk CSI Driver version to be used.
+    file_driver_enabled: Is the File CSI driver enabled?
+    snapshot_controller_enabled: Is the Snapshot Controller enabled?
+  EOT
+  
+  type = object({
+    blob_driver_enabled         = optional(bool, false)
+    disk_driver_enabled         = optional(bool, true)
+    file_driver_enabled         = optional(bool, true)
+    snapshot_controller_enabled = optional(bool, true)
+  })
+  
+  default = {}
+}
+
+# Tags
+variable "tags" {
+  description = "A mapping of tags to assign to the resource."
+  type        = map(string)
+  default     = {}
+}
