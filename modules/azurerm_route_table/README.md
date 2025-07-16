@@ -32,7 +32,10 @@ module "azurerm_route_table" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-<!-- Examples list will be auto-generated here -->
+- [Basic](examples/basic) - This example demonstrates a basic deployment of an Azure Route Table with simple route configuration.
+- [Complete](examples/complete) - This example demonstrates a comprehensive deployment of Route Tables with all available features and advanced routing scenarios.
+- [Private Endpoint](examples/private-endpoint) - This example demonstrates a Route Table configuration with private endpoint connectivity for enhanced security and network isolation.
+- [Secure](examples/secure) - This example demonstrates a maximum-security Route Table configuration suitable for highly sensitive data and regulated environments.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
