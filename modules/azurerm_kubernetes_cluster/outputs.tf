@@ -267,26 +267,26 @@ output "tags" {
 
 # Additional Node Pools Outputs
 output "node_pools" {
-  description = "Map of created node pools with their IDs and details"
-  value = {
-    for k, v in azurerm_kubernetes_cluster_node_pool.node_pools : k => {
+  description = "List of created node pools with their IDs and details"
+  value = [
+    for k, v in azurerm_kubernetes_cluster_node_pool.node_pools : {
       id   = v.id
       name = v.name
     }
-  }
+  ]
 }
 
 # Extensions Outputs
 output "extensions" {
-  description = "Map of installed extensions with their IDs and details"
-  value = {
-    for k, v in azurerm_kubernetes_cluster_extension.extensions : k => {
+  description = "List of installed extensions with their IDs and details"
+  value = [
+    for k, v in azurerm_kubernetes_cluster_extension.extensions : {
       id                    = v.id
       name                  = v.name
       current_version       = v.current_version
       release_train_applied = v.release_train_applied
     }
-  }
+  ]
 }
 
 # Diagnostic Settings Output

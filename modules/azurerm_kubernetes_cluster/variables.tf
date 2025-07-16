@@ -29,14 +29,14 @@ variable "dns_config" {
     
     Note: You must define either dns_prefix or dns_prefix_private_cluster, but not both.
   EOT
-  
+
   type = object({
     dns_prefix                 = optional(string)
     dns_prefix_private_cluster = optional(string)
   })
-  
+
   default = {}
-  
+
   validation {
     condition = (
       (var.dns_config.dns_prefix != null && var.dns_config.dns_prefix_private_cluster == null) ||
@@ -44,7 +44,7 @@ variable "dns_config" {
     )
     error_message = "You must define either dns_prefix or dns_prefix_private_cluster, but not both."
   }
-  
+
   validation {
     condition = var.dns_config.dns_prefix == null || (
       length(var.dns_config.dns_prefix) >= 1 && length(var.dns_config.dns_prefix) <= 54 &&
@@ -63,22 +63,22 @@ variable "kubernetes_config" {
     automatic_upgrade_channel: The upgrade channel for this Kubernetes Cluster. Possible values are patch, rapid, node-image, stable, or none.
     node_os_upgrade_channel: The upgrade channel for node OS security updates. Possible values are Unmanaged, SecurityPatch, NodeImage, or None.
   EOT
-  
+
   type = object({
     kubernetes_version        = optional(string)
     automatic_upgrade_channel = optional(string)
     node_os_upgrade_channel   = optional(string, "NodeImage")
   })
-  
+
   default = {
     node_os_upgrade_channel = "NodeImage"
   }
-  
+
   validation {
     condition     = var.kubernetes_config.automatic_upgrade_channel == null || contains(["patch", "rapid", "node-image", "stable", "none"], var.kubernetes_config.automatic_upgrade_channel)
     error_message = "The automatic_upgrade_channel must be one of: patch, rapid, node-image, stable, or none."
   }
-  
+
   validation {
     condition     = contains(["Unmanaged", "SecurityPatch", "NodeImage", "None"], var.kubernetes_config.node_os_upgrade_channel)
     error_message = "The node_os_upgrade_channel must be one of: Unmanaged, SecurityPatch, NodeImage, or None."
@@ -93,22 +93,22 @@ variable "sku_config" {
     sku_tier: The SKU Tier that should be used for this Kubernetes Cluster. Possible values are Free, Standard (which includes the Uptime SLA) and Premium.
     support_plan: Specifies the support plan which should be used for this Kubernetes Cluster. Possible values are KubernetesOfficial and AKSLongTermSupport.
   EOT
-  
+
   type = object({
     sku_tier     = optional(string, "Free")
     support_plan = optional(string, "KubernetesOfficial")
   })
-  
+
   default = {
     sku_tier     = "Free"
     support_plan = "KubernetesOfficial"
   }
-  
+
   validation {
     condition     = contains(["Free", "Standard", "Premium"], var.sku_config.sku_tier)
     error_message = "The sku_tier must be one of: Free, Standard, or Premium."
   }
-  
+
   validation {
     condition     = contains(["KubernetesOfficial", "AKSLongTermSupport"], var.sku_config.support_plan)
     error_message = "The support_plan must be either KubernetesOfficial or AKSLongTermSupport."
@@ -392,13 +392,13 @@ variable "private_cluster_config" {
     private_dns_zone_id: Either the ID of Private DNS Zone which should be delegated to this Cluster, System to have AKS manage this or None.
     private_cluster_public_fqdn_enabled: Specifies whether a Public FQDN for this Private Cluster should be added.
   EOT
-  
+
   type = object({
     private_cluster_enabled             = optional(bool, false)
     private_dns_zone_id                 = optional(string)
     private_cluster_public_fqdn_enabled = optional(bool, false)
   })
-  
+
   default = {
     private_cluster_enabled             = false
     private_cluster_public_fqdn_enabled = false
@@ -420,7 +420,7 @@ variable "features" {
     local_account_disabled: If true local accounts will be disabled.
     cost_analysis_enabled: Should cost analysis be enabled for this Kubernetes Cluster?
   EOT
-  
+
   type = object({
     azure_policy_enabled             = optional(bool, false)
     http_application_routing_enabled = optional(bool, false)
@@ -432,7 +432,7 @@ variable "features" {
     local_account_disabled           = optional(bool, false)
     cost_analysis_enabled            = optional(bool, false)
   })
-  
+
   default = {
     azure_policy_enabled             = false
     http_application_routing_enabled = false
@@ -909,14 +909,15 @@ variable "tags" {
 # Additional Node Pools
 variable "node_pools" {
   description = <<-EOT
-    Map of additional node pools to create. The key is the node pool name.
+    List of additional node pools to create.
     
     Each node pool supports the same configuration options as the default node pool,
     plus additional options for spot instances and taints.
   EOT
 
-  type = map(object({
+  type = list(object({
     # Required
+    name    = string
     vm_size = string
 
     # Node Count Configuration
@@ -1041,13 +1042,13 @@ variable "node_pools" {
     tags = optional(map(string), {})
   }))
 
-  default = {}
+  default = []
 }
 
 # Cluster Extensions
 variable "extensions" {
   description = <<-EOT
-    Map of cluster extensions to install. The key is the extension name.
+    List of cluster extensions to install.
     
     Common extension types:
     - microsoft.azuremonitor.containers (Azure Monitor)
@@ -1057,14 +1058,15 @@ variable "extensions" {
     - microsoft.flux (GitOps Flux v2)
   EOT
 
-  type = map(object({
+  type = list(object({
+    name                   = string
     extension_type         = string
     release_train          = optional(string)
     release_namespace      = optional(string)
     target_namespace       = optional(string)
     version                = optional(string)
     configuration_settings = optional(map(string))
-    
+
     plan = optional(object({
       name      = string
       product   = string
@@ -1073,7 +1075,7 @@ variable "extensions" {
     }))
   }))
 
-  default = {}
+  default = []
 }
 
 # Diagnostic Settings
@@ -1095,7 +1097,7 @@ variable "diagnostic_settings" {
     eventhub_authorization_rule_id = optional(string)
     eventhub_name                  = optional(string)
     partner_solution_id            = optional(string)
-    
+
     enabled_log_categories = optional(list(string), [
       "kube-apiserver",
       "kube-audit",
@@ -1109,11 +1111,11 @@ variable "diagnostic_settings" {
       "csi-azurefile-controller",
       "csi-snapshot-controller"
     ])
-    
+
     metrics = optional(list(object({
       category = string
       enabled  = optional(bool, true)
-    })), [
+      })), [
       {
         category = "AllMetrics"
         enabled  = true

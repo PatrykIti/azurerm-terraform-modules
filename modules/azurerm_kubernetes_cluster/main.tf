@@ -565,11 +565,13 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
 
 # Additional Node Pools
 resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
-  for_each = var.node_pools
+  for_each = {
+    for node_pool in var.node_pools : node_pool.name => node_pool
+  }
 
-  name                  = each.key
+  name                  = each.value.name
   kubernetes_cluster_id = azurerm_kubernetes_cluster.kubernetes_cluster.id
-  
+
   # Required fields
   vm_size = each.value.vm_size
 
@@ -723,19 +725,21 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
 
 # Cluster Extensions
 resource "azurerm_kubernetes_cluster_extension" "extensions" {
-  for_each = var.extensions
+  for_each = {
+    for extension in var.extensions : extension.name => extension
+  }
 
-  name              = each.key
-  cluster_id        = azurerm_kubernetes_cluster.kubernetes_cluster.id
-  extension_type    = each.value.extension_type
-  
+  name           = each.value.name
+  cluster_id     = azurerm_kubernetes_cluster.kubernetes_cluster.id
+  extension_type = each.value.extension_type
+
   # Optional fields
-  release_train         = each.value.release_train
-  release_namespace     = each.value.release_namespace
-  target_namespace      = each.value.target_namespace
-  version               = each.value.version
+  release_train          = each.value.release_train
+  release_namespace      = each.value.release_namespace
+  target_namespace       = each.value.target_namespace
+  version                = each.value.version
   configuration_settings = each.value.configuration_settings
-  
+
   dynamic "plan" {
     for_each = each.value.plan != null ? [each.value.plan] : []
     content {
