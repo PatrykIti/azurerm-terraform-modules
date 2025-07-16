@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT || github.token }}
       
       # Extract module from PR title if it's a PR
       - name: Extract module from PR title
@@ -232,6 +234,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT || github.token }}
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -279,6 +283,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT || github.token }}
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -343,6 +349,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT || github.token }}
       
       - name: Cache tflint plugins
         uses: actions/cache@v4
@@ -403,6 +411,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT || github.token }}
       
       - name: Install terraform-docs
         run: |
@@ -487,6 +497,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT || github.token }}
       
       - name: Run Checkov on ${{ matrix.module }}
         id: checkov
@@ -497,6 +509,8 @@ jobs:
           soft_fail: true
           output_format: cli
           download_external_modules: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT || github.token }}
       
       - name: Run tfsec on ${{ matrix.module }}
         uses: aquasecurity/tfsec-action@v1.0.3
@@ -515,6 +529,7 @@ jobs:
       - name: Quality gates summary
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.PAT }}
           script: |
             const jobs = ${{ toJSON(needs) }};
             const modules = jobs['detect-changes'].outputs.modules ? JSON.parse(jobs['detect-changes'].outputs.modules) : [];
