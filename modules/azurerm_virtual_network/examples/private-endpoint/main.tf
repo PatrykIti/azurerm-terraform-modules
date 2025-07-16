@@ -5,7 +5,7 @@ terraform {
   required_version = ">= 1.3.0"
   required_providers {
     azurerm = {
-      source  = "hashicorp/azurerm"
+      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.1"
       version = "4.36.0"
     }
   }
@@ -51,7 +51,7 @@ resource "azurerm_private_dns_zone" "blob" {
 
 # Virtual Network optimized for private endpoint scenarios
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.1"
 
   name                = "vnet-private-endpoint-example"
   resource_group_name = azurerm_resource_group.example.name
@@ -121,7 +121,7 @@ resource "azurerm_private_endpoint" "storage" {
     name                           = "psc-storage-blob"
     private_connection_resource_id = azurerm_storage_account.example.id
     is_manual_connection           = false
-    subresource_names              = ["blob"]
+    subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.1"]
   }
 
   private_dns_zone_group {
