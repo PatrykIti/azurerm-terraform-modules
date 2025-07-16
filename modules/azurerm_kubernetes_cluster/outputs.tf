@@ -269,7 +269,7 @@ output "tags" {
 output "node_pools" {
   description = "List of created node pools with their IDs and details"
   value = [
-    for k, v in azurerm_kubernetes_cluster_node_pool.node_pools : {
+    for k, v in azurerm_kubernetes_cluster_node_pool.kubernetes_cluster_node_pool : {
       id   = v.id
       name = v.name
     }
@@ -280,7 +280,7 @@ output "node_pools" {
 output "extensions" {
   description = "List of installed extensions with their IDs and details"
   value = [
-    for k, v in azurerm_kubernetes_cluster_extension.extensions : {
+    for k, v in azurerm_kubernetes_cluster_extension.kubernetes_cluster_extension : {
       id                    = v.id
       name                  = v.name
       current_version       = v.current_version

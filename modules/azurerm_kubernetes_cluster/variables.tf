@@ -47,8 +47,8 @@ variable "dns_config" {
 
   validation {
     condition = var.dns_config.dns_prefix == null || (
-      length(var.dns_config.dns_prefix) >= 1 && length(var.dns_config.dns_prefix) <= 54 &&
-      can(regex("^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$", var.dns_config.dns_prefix))
+      try(length(var.dns_config.dns_prefix), 0) >= 1 && try(length(var.dns_config.dns_prefix), 0) <= 54 &&
+      can(regex("^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$", try(var.dns_config.dns_prefix, "")))
     )
     error_message = "DNS prefix must begin and end with a letter or number, contain only letters, numbers, and hyphens and be between 1 and 54 characters in length."
   }
@@ -75,7 +75,9 @@ variable "kubernetes_config" {
   }
 
   validation {
-    condition     = var.kubernetes_config.automatic_upgrade_channel == null || contains(["patch", "rapid", "node-image", "stable", "none"], var.kubernetes_config.automatic_upgrade_channel)
+    condition = alltrue([
+      var.kubernetes_config.automatic_upgrade_channel == null ? true : contains(["patch", "rapid", "node-image", "stable", "none"], var.kubernetes_config.automatic_upgrade_channel)
+    ])
     error_message = "The automatic_upgrade_channel must be one of: patch, rapid, node-image, stable, or none."
   }
 
@@ -238,7 +240,9 @@ variable "default_node_pool" {
   }
 
   validation {
-    condition     = var.default_node_pool.workload_runtime == null || contains(["OCIContainer", "WasmWasi", "KataMshvVmIsolation"], var.default_node_pool.workload_runtime)
+    condition = alltrue([
+      var.default_node_pool.workload_runtime == null ? true : contains(["OCIContainer", "WasmWasi", "KataMshvVmIsolation"], var.default_node_pool.workload_runtime)
+    ])
     error_message = "The workload_runtime must be one of: OCIContainer, WasmWasi, KataMshvVmIsolation."
   }
 
@@ -277,7 +281,7 @@ variable "identity" {
   }
 
   validation {
-    condition     = var.identity.type != "UserAssigned" || (var.identity.identity_ids != null && length(var.identity.identity_ids) > 0)
+    condition     = var.identity == null || var.identity.type != "UserAssigned" || (var.identity.identity_ids != null && length(coalesce(var.identity.identity_ids, [])) > 0)
     error_message = "When identity type is UserAssigned, identity_ids must be provided."
   }
 }
@@ -353,7 +357,7 @@ variable "network_profile" {
   }
 
   validation {
-    condition     = var.network_profile.network_mode == null || contains(["bridge", "transparent"], var.network_profile.network_mode)
+    condition     = var.network_profile == null || try(var.network_profile.network_mode, null) == null || try(contains(["bridge", "transparent"], var.network_profile.network_mode), true)
     error_message = "The network_mode must be either bridge or transparent."
   }
 
@@ -684,12 +688,12 @@ variable "service_mesh_profile" {
   default = null
 
   validation {
-    condition     = var.service_mesh_profile == null || var.service_mesh_profile.mode == "Istio"
+    condition     = var.service_mesh_profile == null || try(var.service_mesh_profile.mode, null) == "Istio"
     error_message = "The service mesh mode must be Istio."
   }
 
   validation {
-    condition     = var.service_mesh_profile == null || (length(var.service_mesh_profile.revisions) >= 1 && length(var.service_mesh_profile.revisions) <= 2)
+    condition     = var.service_mesh_profile == null || (try(length(var.service_mesh_profile.revisions), 0) >= 1 && try(length(var.service_mesh_profile.revisions), 0) <= 2)
     error_message = "Service mesh revisions must contain 1 or 2 items."
   }
 }
@@ -775,7 +779,7 @@ variable "key_management_service" {
   default = null
 
   validation {
-    condition     = var.key_management_service == null || contains(["Public", "Private"], var.key_management_service.key_vault_network_access)
+    condition     = var.key_management_service == null || contains(["Public", "Private"], try(var.key_management_service.key_vault_network_access, "Public"))
     error_message = "The key_vault_network_access must be either Public or Private."
   }
 }
