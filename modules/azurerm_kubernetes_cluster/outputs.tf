@@ -264,3 +264,33 @@ output "tags" {
   description = "A mapping of tags assigned to the Kubernetes Cluster."
   value       = try(azurerm_kubernetes_cluster.kubernetes_cluster.tags, null)
 }
+
+# Additional Node Pools Outputs
+output "node_pools" {
+  description = "Map of created node pools with their IDs and details"
+  value = {
+    for k, v in azurerm_kubernetes_cluster_node_pool.node_pools : k => {
+      id   = v.id
+      name = v.name
+    }
+  }
+}
+
+# Extensions Outputs
+output "extensions" {
+  description = "Map of installed extensions with their IDs and details"
+  value = {
+    for k, v in azurerm_kubernetes_cluster_extension.extensions : k => {
+      id                    = v.id
+      name                  = v.name
+      current_version       = v.current_version
+      release_train_applied = v.release_train_applied
+    }
+  }
+}
+
+# Diagnostic Settings Output
+output "diagnostic_settings_id" {
+  description = "The ID of the diagnostic settings"
+  value       = var.diagnostic_settings != null ? azurerm_monitor_diagnostic_setting.aks_diagnostics[0].id : null
+}

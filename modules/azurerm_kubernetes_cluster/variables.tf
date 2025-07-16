@@ -905,3 +905,221 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+# Additional Node Pools
+variable "node_pools" {
+  description = <<-EOT
+    Map of additional node pools to create. The key is the node pool name.
+    
+    Each node pool supports the same configuration options as the default node pool,
+    plus additional options for spot instances and taints.
+  EOT
+
+  type = map(object({
+    # Required
+    vm_size = string
+
+    # Node Count Configuration
+    node_count           = optional(number, 1)
+    auto_scaling_enabled = optional(bool, false)
+    min_count            = optional(number)
+    max_count            = optional(number)
+
+    # VM Configuration
+    capacity_reservation_group_id = optional(string)
+    host_encryption_enabled       = optional(bool, false)
+    node_public_ip_enabled        = optional(bool, false)
+    gpu_instance                  = optional(string)
+    host_group_id                 = optional(string)
+
+    # OS Configuration
+    os_disk_size_gb      = optional(number)
+    os_disk_type         = optional(string, "Managed")
+    os_sku               = optional(string, "Ubuntu")
+    orchestrator_version = optional(string)
+
+    # Network Configuration
+    vnet_subnet_id           = optional(string)
+    pod_subnet_id            = optional(string)
+    node_public_ip_prefix_id = optional(string)
+
+    # Advanced Configuration
+    eviction_policy              = optional(string)
+    fips_enabled                 = optional(bool, false)
+    kubelet_disk_type            = optional(string)
+    max_pods                     = optional(number)
+    mode                         = optional(string, "User")
+    priority                     = optional(string, "Regular")
+    proximity_placement_group_id = optional(string)
+    scale_down_mode              = optional(string, "Delete")
+    snapshot_id                  = optional(string)
+    spot_max_price               = optional(number, -1)
+    ultra_ssd_enabled            = optional(bool, false)
+    workload_runtime             = optional(string)
+    zones                        = optional(list(string))
+
+    # Node Labels and Taints
+    node_labels = optional(map(string))
+    node_taints = optional(list(string))
+
+    # Kubelet Configuration
+    kubelet_config = optional(object({
+      allowed_unsafe_sysctls    = optional(list(string))
+      container_log_max_line    = optional(number)
+      container_log_max_size_mb = optional(number)
+      cpu_cfs_quota_enabled     = optional(bool)
+      cpu_cfs_quota_period      = optional(string)
+      cpu_manager_policy        = optional(string)
+      image_gc_high_threshold   = optional(number)
+      image_gc_low_threshold    = optional(number)
+      pod_max_pid               = optional(number)
+      topology_manager_policy   = optional(string)
+    }))
+
+    # Linux OS Configuration
+    linux_os_config = optional(object({
+      swap_file_size_mb            = optional(number)
+      transparent_huge_page_defrag = optional(string)
+      transparent_huge_page        = optional(string)
+      sysctl_config = optional(object({
+        fs_aio_max_nr                      = optional(number)
+        fs_file_max                        = optional(number)
+        fs_inotify_max_user_watches        = optional(number)
+        fs_nr_open                         = optional(number)
+        kernel_threads_max                 = optional(number)
+        net_core_netdev_max_backlog        = optional(number)
+        net_core_optmem_max                = optional(number)
+        net_core_rmem_default              = optional(number)
+        net_core_rmem_max                  = optional(number)
+        net_core_somaxconn                 = optional(number)
+        net_core_wmem_default              = optional(number)
+        net_core_wmem_max                  = optional(number)
+        net_ipv4_ip_local_port_range_max   = optional(number)
+        net_ipv4_ip_local_port_range_min   = optional(number)
+        net_ipv4_neigh_default_gc_thresh1  = optional(number)
+        net_ipv4_neigh_default_gc_thresh2  = optional(number)
+        net_ipv4_neigh_default_gc_thresh3  = optional(number)
+        net_ipv4_tcp_fin_timeout           = optional(number)
+        net_ipv4_tcp_keepalive_intvl       = optional(number)
+        net_ipv4_tcp_keepalive_probes      = optional(number)
+        net_ipv4_tcp_keepalive_time        = optional(number)
+        net_ipv4_tcp_max_syn_backlog       = optional(number)
+        net_ipv4_tcp_max_tw_buckets        = optional(number)
+        net_ipv4_tcp_tw_reuse              = optional(bool)
+        net_netfilter_nf_conntrack_buckets = optional(number)
+        net_netfilter_nf_conntrack_max     = optional(number)
+        vm_max_map_count                   = optional(number)
+        vm_swappiness                      = optional(number)
+        vm_vfs_cache_pressure              = optional(number)
+      }))
+    }))
+
+    # Node Network Profile
+    node_network_profile = optional(object({
+      application_security_group_ids = optional(list(string))
+      node_public_ip_tags            = optional(map(string))
+      allowed_host_ports = optional(list(object({
+        port_start = optional(number)
+        port_end   = optional(number)
+        protocol   = optional(string)
+      })))
+    }))
+
+    # Windows Profile
+    windows_profile = optional(object({
+      outbound_nat_enabled = optional(bool, true)
+    }))
+
+    # Upgrade Settings
+    upgrade_settings = optional(object({
+      drain_timeout_in_minutes      = optional(number)
+      max_surge                     = string
+      node_soak_duration_in_minutes = optional(number)
+    }))
+
+    # Tags
+    tags = optional(map(string), {})
+  }))
+
+  default = {}
+}
+
+# Cluster Extensions
+variable "extensions" {
+  description = <<-EOT
+    Map of cluster extensions to install. The key is the extension name.
+    
+    Common extension types:
+    - microsoft.azuremonitor.containers (Azure Monitor)
+    - microsoft.azure-policy (Azure Policy)
+    - microsoft.azuredefender.kubernetes (Azure Defender)
+    - microsoft.openservicemesh (Open Service Mesh)
+    - microsoft.flux (GitOps Flux v2)
+  EOT
+
+  type = map(object({
+    extension_type         = string
+    release_train          = optional(string)
+    release_namespace      = optional(string)
+    target_namespace       = optional(string)
+    version                = optional(string)
+    configuration_settings = optional(map(string))
+    
+    plan = optional(object({
+      name      = string
+      product   = string
+      publisher = string
+      version   = optional(string)
+    }))
+  }))
+
+  default = {}
+}
+
+# Diagnostic Settings
+variable "diagnostic_settings" {
+  description = <<-EOT
+    Diagnostic settings for the AKS cluster.
+    
+    Specify destinations for logs and metrics:
+    - Log Analytics workspace
+    - Storage account
+    - Event Hub
+    - Partner solutions
+  EOT
+
+  type = object({
+    name                           = string
+    log_analytics_workspace_id     = optional(string)
+    storage_account_id             = optional(string)
+    eventhub_authorization_rule_id = optional(string)
+    eventhub_name                  = optional(string)
+    partner_solution_id            = optional(string)
+    
+    enabled_log_categories = optional(list(string), [
+      "kube-apiserver",
+      "kube-audit",
+      "kube-audit-admin",
+      "kube-controller-manager",
+      "kube-scheduler",
+      "cluster-autoscaler",
+      "cloud-controller-manager",
+      "guard",
+      "csi-azuredisk-controller",
+      "csi-azurefile-controller",
+      "csi-snapshot-controller"
+    ])
+    
+    metrics = optional(list(object({
+      category = string
+      enabled  = optional(bool, true)
+    })), [
+      {
+        category = "AllMetrics"
+        enabled  = true
+      }
+    ])
+  })
+
+  default = null
+}
