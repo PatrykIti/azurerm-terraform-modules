@@ -6,10 +6,10 @@ set -e
 # Function to extract configuration from existing .releaserc.js
 extract_config() {
     local file=$1
-    local module_name=$(grep -oP "const MODULE_NAME = '\K[^']+" "$file" || echo "")
-    local commit_scope=$(grep -oP "const COMMIT_SCOPE = '\K[^']+" "$file" || echo "")
-    local tag_prefix=$(grep -oP "const TAG_PREFIX = '\K[^']+" "$file" || echo "")
-    local module_title=$(grep -oP "const MODULE_TITLE = '\K[^']+" "$file" || echo "")
+    local module_name=$(sed -n "s/^const MODULE_NAME = '\([^']*\)'.*/\1/p" "$file" | head -1)
+    local commit_scope=$(sed -n "s/^const COMMIT_SCOPE = '\([^']*\)'.*/\1/p" "$file" | head -1)
+    local tag_prefix=$(sed -n "s/^const TAG_PREFIX = '\([^']*\)'.*/\1/p" "$file" | head -1)
+    local module_title=$(sed -n "s/^const MODULE_TITLE = '\([^']*\)'.*/\1/p" "$file" | head -1)
     
     echo "$module_name|$commit_scope|$tag_prefix|$module_title"
 }
