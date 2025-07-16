@@ -34,12 +34,29 @@ case "$ACTION" in
     # Install TFLint if needed
     if ! command -v tflint &> /dev/null; then
       echo "::group::Install TFLint"
+      # Download TFLint directly from GitHub releases to avoid script download issues
+      TFLINT_VERSION="v0.52.0"
+      arch=$(uname -m)
+      case "$arch" in
+        x86_64) arch="amd64" ;;
+        aarch64) arch="arm64" ;;
+      esac
+      
+      download_url="https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/tflint_linux_${arch}.zip"
+      
       # Use GitHub token if available to avoid rate limits
       if [[ -n "${GITHUB_TOKEN}" ]]; then
-        curl -s -H "Authorization: token ${GITHUB_TOKEN}" https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+        curl -L -H "Authorization: token ${GITHUB_TOKEN}" -o /tmp/tflint.zip "$download_url"
       else
-        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+        curl -L -o /tmp/tflint.zip "$download_url"
       fi
+      
+      unzip -o /tmp/tflint.zip -d /tmp/
+      sudo mv /tmp/tflint /usr/local/bin/
+      rm /tmp/tflint.zip
+      
+      # Verify installation
+      tflint --version
       echo "::endgroup::"
     fi
     

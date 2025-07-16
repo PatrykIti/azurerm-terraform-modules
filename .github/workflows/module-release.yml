@@ -96,6 +96,7 @@ jobs:
           module: ${{ inputs.module }}
           action: validate
           terraform-version: '1.10.3'
+          github-token: ${{ steps.app-token.outputs.token }}
       
       - name: Validate module exists
         run: |
@@ -139,6 +140,7 @@ jobs:
           GIT_AUTHOR_EMAIL: semantic-terraform-release-bot[bot]@users.noreply.github.com
           GIT_COMMITTER_NAME: semantic-terraform-release-bot[bot]
           GIT_COMMITTER_EMAIL: semantic-terraform-release-bot[bot]@users.noreply.github.com
+          HUSKY: 0
         run: |
           # Run semantic-release from repository root with module-specific config
           MODULE_CONFIG="./modules/${{ inputs.module }}/.releaserc.js"
@@ -155,6 +157,7 @@ jobs:
         if: ${{ inputs.dry_run != 'true' }}
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          HUSKY: 0
         run: |
           MODULE_DIR="modules/${{ inputs.module }}"
           
