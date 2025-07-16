@@ -1424,7 +1424,7 @@
             "id": 15,
             "title": "Create 'private-endpoint' Example",
             "description": "Create an example specifically for a subnet intended to host private endpoints.",
-            "status": "in-progress",
+            "status": "done",
             "dependencies": [
               9
             ],
@@ -1435,7 +1435,7 @@
             "id": 16,
             "title": "Configure `terraform-docs` for Automated Documentation",
             "description": "Set up `terraform-docs` to automatically generate documentation for module inputs, outputs, and providers.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               11
             ],
@@ -1446,7 +1446,7 @@
             "id": 17,
             "title": "Implement Native Terraform Tests",
             "description": "Create test files using the native `terraform test` framework to validate module functionality.",
-            "status": "pending",
+            "status": "in-progress",
             "dependencies": [
               12
             ],
@@ -1468,7 +1468,7 @@
             "id": 19,
             "title": "Write Comprehensive README.md Documentation",
             "description": "Finalize the README.md file with detailed explanations, usage instructions, and examples.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               16
             ],
@@ -1840,7 +1840,7 @@
             "id": 12,
             "title": "Populate Dynamic Route Block Content",
             "description": "Map the `routes` variable attributes to the arguments within the dynamic `route` block's content.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               11
             ],
@@ -1851,7 +1851,7 @@
             "id": 13,
             "title": "Implement Conditional `next_hop_in_ip_address`",
             "description": "Conditionally set the `next_hop_in_ip_address` argument only when the next hop type is 'VirtualAppliance'.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               12
             ],
@@ -1862,7 +1862,7 @@
             "id": 14,
             "title": "Add Validation for `next_hop_type`",
             "description": "Add a validation rule to the `routes` variable to ensure `next_hop_type` is one of the allowed values.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               10
             ],
@@ -1873,7 +1873,7 @@
             "id": 15,
             "title": "Add Validation for Conditional IP Address",
             "description": "Add a validation rule to ensure `next_hop_in_ip_address` is provided if and only if `next_hop_type` is 'VirtualAppliance'.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               14
             ],
@@ -1884,7 +1884,7 @@
             "id": 16,
             "title": "Define Subnet Association Variable",
             "description": "Define a variable to accept a list of subnet IDs for association.",
-            "status": "pending",
+            "status": "in-progress",
             "dependencies": [
               4
             ],
@@ -1895,7 +1895,7 @@
             "id": 17,
             "title": "Implement `azurerm_subnet_route_table_association` Resource",
             "description": "Create the association resource to link the route table to specified subnets.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               6,
               16
@@ -1907,7 +1907,7 @@
             "id": 18,
             "title": "Define Module Outputs",
             "description": "Define outputs for the route table's ID, name, and created routes.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               6
             ],
@@ -1918,7 +1918,7 @@
             "id": 19,
             "title": "Create Module README Documentation",
             "description": "Write comprehensive documentation for the module in its `README.md` file.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               18
             ],
@@ -1996,7 +1996,7 @@
             "id": 4,
             "title": "Implement Core `azurerm_kubernetes_cluster` Resource",
             "description": "Implement the main `azurerm_kubernetes_cluster` resource in `main.tf`, connecting the variables defined in the previous step to the resource arguments.",
-            "status": "in-progress",
+            "status": "done",
             "dependencies": [],
             "details": "In `modules/kubernetes_cluster/main.tf`, create the `resource \"azurerm_kubernetes_cluster\" \"this\"` block. Map all the variables from `variables.tf` to their corresponding arguments in the resource. For now, focus on the top-level arguments. Complex nested blocks will be handled in the next task.",
             "testStrategy": "Use the `basic` example (to be created later) to run `terraform plan`. The plan should show the creation of one `azurerm_kubernetes_cluster` resource with the correct top-level attributes."
@@ -2005,7 +2005,7 @@
             "id": 5,
             "title": "Implement Complex Nested Blocks in `main.tf`",
             "description": "Flesh out the `azurerm_kubernetes_cluster` resource by implementing the logic for complex nested blocks such as `default_node_pool`, `identity`, `network_profile`, and `addon_profile`.",
-            "status": "pending",
+            "status": "in-progress",
             "dependencies": [],
             "details": "Within the `azurerm_kubernetes_cluster` resource block in `main.tf`, add the configurations for `default_node_pool`, `identity`, `network_profile`, `api_server_access_profile`, `http_proxy_config`, and `addon_profile`. Use dynamic blocks where appropriate to handle optional configurations based on whether the corresponding variable is null.",
             "testStrategy": "Use the `complete` example (to be created later) to run `terraform plan`. The plan should show a detailed configuration for node pools, addons, and network settings."
@@ -2060,7 +2060,7 @@
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-16T13:34:49.080Z",
+      "updated": "2025-07-16T13:44:47.833Z",
       "description": "Tasks for master context"
     }
   }

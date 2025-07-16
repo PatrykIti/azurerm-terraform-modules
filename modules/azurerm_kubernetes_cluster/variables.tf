@@ -351,14 +351,10 @@ variable "api_server_access_profile" {
     API server access profile configuration.
     
     authorized_ip_ranges: Set of authorized IP ranges to allow access to API server.
-    vnet_integration_enabled: Should API Server VNet Integration be enabled?
-    subnet_id: The ID of the Subnet where the API server endpoint is delegated to.
   EOT
   
   type = object({
-    authorized_ip_ranges     = optional(list(string))
-    vnet_integration_enabled = optional(bool, false)
-    subnet_id                = optional(string)
+    authorized_ip_ranges = optional(list(string))
   })
   
   default = null
@@ -465,7 +461,7 @@ variable "aci_connector_linux" {
   default = null
 }
 
-variable "azure_keyvault_secrets_provider" {
+variable "key_vault_secrets_provider" {
   description = <<-EOT
     Azure Key Vault Secrets Provider configuration.
     
@@ -747,22 +743,6 @@ variable "key_management_service" {
     condition     = var.key_management_service == null || contains(["Public", "Private"], var.key_management_service.key_vault_network_access)
     error_message = "The key_vault_network_access must be either Public or Private."
   }
-}
-
-variable "key_vault_secrets_provider" {
-  description = <<-EOT
-    Key Vault Secrets Provider configuration.
-    
-    secret_rotation_enabled: Is secret rotation enabled?
-    secret_rotation_interval: The interval to poll for secret rotation.
-  EOT
-  
-  type = object({
-    secret_rotation_enabled  = optional(bool, true)
-    secret_rotation_interval = optional(string, "2m")
-  })
-  
-  default = null
 }
 
 variable "kubelet_identity" {

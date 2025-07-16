@@ -40,6 +40,30 @@ variable "routes" {
     next_hop_in_ip_address = optional(string, null)
   }))
   default = []
+
+  validation {
+    condition = alltrue([
+      for route in var.routes :
+      contains(["VirtualAppliance", "VirtualNetworkGateway", "VnetLocal", "Internet", "None"], route.next_hop_type)
+    ])
+    error_message = "The next_hop_type must be one of: VirtualAppliance, VirtualNetworkGateway, VnetLocal, Internet, None."
+  }
+
+  validation {
+    condition = alltrue([
+      for route in var.routes :
+      (route.next_hop_type == "VirtualAppliance" && route.next_hop_in_ip_address != null) ||
+      (route.next_hop_type != "VirtualAppliance" && route.next_hop_in_ip_address == null)
+    ])
+    error_message = "The next_hop_in_ip_address must be provided when next_hop_type is 'VirtualAppliance' and must be null otherwise."
+  }
+}
+
+# Subnet Associations
+variable "subnet_ids_to_associate" {
+  description = "Set of subnet IDs to associate with this route table."
+  type        = set(string)
+  default     = []
 }
 
 # Tags
