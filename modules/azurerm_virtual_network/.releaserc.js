@@ -1,7 +1,12 @@
 /**
- * Semantic Release Configuration – Dynamic Template
+ * Semantic Release Configuration Template with Multi-Scope Support
+ * This template supports commits with multiple scopes (e.g., "fix(scope1,scope2): message")
  */
 
+const path = require('path');
+const createMultiScopeFilter = require('../../scripts/semantic-release-multi-scope-filter');
+
+// Module-specific configuration - REPLACE THESE VALUES
 const MODULE_NAME = 'azurerm_virtual_network';
 const COMMIT_SCOPE = 'virtual-network';
 const TAG_PREFIX = 'VNv';
@@ -15,6 +20,9 @@ module.exports = {
   tagFormat: `${TAG_PREFIX}\${version}`,
   
   plugins: [
+    // Custom plugin to filter multi-scope commits
+    createMultiScopeFilter(COMMIT_SCOPE),
+    
     [
       '@semantic-release/commit-analyzer',
       {
@@ -27,21 +35,14 @@ module.exports = {
           { scope: COMMIT_SCOPE, type: 'refactor', release: 'patch' },
           { scope: COMMIT_SCOPE, type: 'perf', release: 'patch' },
           { scope: COMMIT_SCOPE, type: 'revert', release: 'patch' },
-          { scope: `!${COMMIT_SCOPE}`, release: false }
+          { scope: COMMIT_SCOPE, type: 'test', release: false },
+          { scope: COMMIT_SCOPE, type: 'build', release: false },
+          { scope: COMMIT_SCOPE, type: 'ci', release: false },
+          { scope: COMMIT_SCOPE, type: 'chore', release: false },
+          { scope: COMMIT_SCOPE, type: 'style', release: false }
         ],
         parserOpts: {
-          noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES'],
-          transform(commit) {
-            if (!commit.scope) return false;
-
-            const scopes = commit.scope.split(',').map(s => s.trim());
-            if (scopes.includes(COMMIT_SCOPE)) {
-              commit.scope = COMMIT_SCOPE;
-              return commit;
-            }
-
-            return false;
-          }
+          noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES']
         }
       }
     ],

@@ -7,10 +7,10 @@ const path = require('path');
 const createMultiScopeFilter = require('../../scripts/semantic-release-multi-scope-filter');
 
 // Module-specific configuration - REPLACE THESE VALUES
-const MODULE_NAME = 'azurerm_storage_account';
-const COMMIT_SCOPE = 'storage-account';
-const TAG_PREFIX = 'SAv';
-const MODULE_TITLE = 'Storage Account';
+const MODULE_NAME = '{{MODULE_NAME}}';
+const COMMIT_SCOPE = '{{COMMIT_SCOPE}}';
+const TAG_PREFIX = '{{TAG_PREFIX}}';
+const MODULE_TITLE = '{{MODULE_TITLE}}';
 
 const SOURCE_URL = `github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}`;
 const DOC_URL = `https://github.com/PatrykIti/azurerm-terraform-modules/tree/${TAG_PREFIX}\${nextRelease.version}/modules/${MODULE_NAME}`;

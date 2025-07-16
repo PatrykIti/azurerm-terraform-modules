@@ -66,6 +66,10 @@ jobs:
               SCOPE="${BASH_REMATCH[1]}"
               echo "Detected scope: $SCOPE"
               
+              # Debug: Show the exact PR title being processed
+              echo "DEBUG: Full PR title: '$PR_TITLE'"
+              echo "DEBUG: Extracted scope: '$SCOPE'"
+              
               # Split scope by comma and process each module
               IFS=',' read -ra SCOPE_ARRAY <<< "$SCOPE"
               VALID_MODULES=()
