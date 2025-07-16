@@ -42,12 +42,8 @@ update_module() {
     # Create backup
     cp "$releaserc_file" "$releaserc_file.bak"
     
-    # Copy template and replace placeholders
-    cp scripts/templates/.releaserc.template.js "$releaserc_file"
-    sed -i "s/{{MODULE_NAME}}/$module_name/g" "$releaserc_file"
-    sed -i "s/{{COMMIT_SCOPE}}/$commit_scope/g" "$releaserc_file"
-    sed -i "s/{{TAG_PREFIX}}/$tag_prefix/g" "$releaserc_file"
-    sed -i "s/{{MODULE_TITLE}}/$module_title/g" "$releaserc_file"
+    # Copy auto-loading template
+    cp scripts/templates/.releaserc.auto.js "$releaserc_file"
     
     echo "✅ Updated $releaserc_file"
 }

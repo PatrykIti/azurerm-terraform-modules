@@ -1,19 +1,50 @@
 /**
- * Semantic Release Configuration Template with Multi-Scope Support
- * This template supports commits with multiple scopes (e.g., "fix(scope1,scope2): message")
+ * Semantic Release Configuration with Auto-loaded Module Config
+ * This configuration automatically loads module settings from module.json
  */
 
 const path = require('path');
+const fs = require('fs');
 const createMultiScopeFilter = require('../../scripts/semantic-release-multi-scope-filter');
 
-// Module-specific configuration - REPLACE THESE VALUES
-const MODULE_NAME = 'azurerm_virtual_network';
-const COMMIT_SCOPE = 'virtual-network';
-const TAG_PREFIX = 'VNv';
-const MODULE_TITLE = 'Virtual Network';
+// Auto-detect module directory
+const moduleDir = __dirname;
+const moduleName = path.basename(moduleDir);
+
+// Load module configuration
+const configPath = path.join(moduleDir, 'module.json');
+if (!fs.existsSync(configPath)) {
+  throw new Error(`Module configuration not found at ${configPath}. Please create module.json with required fields.`);
+}
+
+const moduleConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
+// Validate required fields
+const requiredFields = ['name', 'title', 'commit_scope', 'tag_prefix'];
+for (const field of requiredFields) {
+  if (!moduleConfig[field]) {
+    throw new Error(`Missing required field '${field}' in module.json`);
+  }
+}
+
+// Extract configuration
+const MODULE_NAME = moduleConfig.name;
+const COMMIT_SCOPE = moduleConfig.commit_scope;
+const TAG_PREFIX = moduleConfig.tag_prefix;
+const MODULE_TITLE = moduleConfig.title;
+
+// Validate that directory name matches module name
+if (moduleName !== MODULE_NAME) {
+  console.warn(`Warning: Directory name '${moduleName}' doesn't match module name '${MODULE_NAME}' in module.json`);
+}
 
 const SOURCE_URL = `github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}`;
 const DOC_URL = `https://github.com/PatrykIti/azurerm-terraform-modules/tree/${TAG_PREFIX}\${nextRelease.version}/modules/${MODULE_NAME}`;
+
+console.log(`📦 Semantic Release Configuration for ${MODULE_TITLE}`);
+console.log(`   Module: ${MODULE_NAME}`);
+console.log(`   Scope: ${COMMIT_SCOPE}`);
+console.log(`   Tag Prefix: ${TAG_PREFIX}`);
 
 module.exports = {
   branches: ['main'],
