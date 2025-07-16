@@ -1973,7 +1973,98 @@
           10
         ],
         "priority": "high",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Setup: Scaffold Module and Create Git Worktree",
+            "description": "Prepare the development environment by creating an isolated Git worktree and using the project script to scaffold the new module's directory structure.",
+            "dependencies": [],
+            "details": "Execute `git worktree add ../azurerm-terraform-modules-aks feature/aks-module` from the repository root to create an isolated workspace. Navigate into the new worktree directory. Run the `./scripts/create-new-module.sh kubernetes_cluster` script to generate the standard module layout including `main.tf`, `variables.tf`, `outputs.tf`, `examples/kubernetes_cluster`, and `test/kubernetes_cluster`.",
+            "status": "pending",
+            "testStrategy": "Verify that the `modules/kubernetes_cluster`, `examples/kubernetes_cluster`, and `test/kubernetes_cluster` directories and their initial files are created successfully."
+          },
+          {
+            "id": 2,
+            "title": "Define Module Interface: Variables",
+            "description": "Research the `azurerm_kubernetes_cluster` resource schema for AzureRM provider v4.36.0 and create a comprehensive `variables.tf` file, exposing all resource arguments as variables with descriptions, types, and sensible defaults.",
+            "dependencies": [],
+            "details": "Consult the Terraform AzureRM provider documentation for `azurerm_kubernetes_cluster` v4.36.0. In `modules/kubernetes_cluster/variables.tf`, define a variable for every argument. Pay close attention to complex types for blocks like `default_node_pool`, `identity`, and `network_profile`. Use `variable \"tags\" { type = map(string) default = {} }` as a standard. For required variables like `location` and `resource_group_name`, omit the `default` value.",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` within the `modules/kubernetes_cluster` directory to ensure syntactical correctness of the variables file."
+          },
+          {
+            "id": 3,
+            "title": "Define Module Interface: Outputs",
+            "description": "Create the `outputs.tf` file, exposing all critical attributes from the `azurerm_kubernetes_cluster` resource. This includes the cluster ID, FQDN, kubeconfig, and identities.",
+            "dependencies": [],
+            "details": "In `modules/kubernetes_cluster/outputs.tf`, define outputs for key resource attributes. Essential outputs include `id`, `name`, `fqdn`, `private_fqdn`, `kube_config_raw` (marked as sensitive), `kube_admin_config_raw` (marked as sensitive), and the principal IDs from the `identity` block. The values will be populated from the resource in a later step (e.g., `value = azurerm_kubernetes_cluster.this.id`).",
+            "status": "pending",
+            "testStrategy": "Run `terraform validate` within the `modules/kubernetes_cluster` directory. The validation will pass even with placeholder values, confirming syntax."
+          },
+          {
+            "id": 4,
+            "title": "Implement Core `azurerm_kubernetes_cluster` Resource",
+            "description": "Implement the main `azurerm_kubernetes_cluster` resource in `main.tf`, connecting the variables defined in the previous step to the resource arguments.",
+            "dependencies": [],
+            "details": "In `modules/kubernetes_cluster/main.tf`, create the `resource \"azurerm_kubernetes_cluster\" \"this\"` block. Map all the variables from `variables.tf` to their corresponding arguments in the resource. For now, focus on the top-level arguments. Complex nested blocks will be handled in the next task.",
+            "status": "pending",
+            "testStrategy": "Use the `basic` example (to be created later) to run `terraform plan`. The plan should show the creation of one `azurerm_kubernetes_cluster` resource with the correct top-level attributes."
+          },
+          {
+            "id": 5,
+            "title": "Implement Complex Nested Blocks in `main.tf`",
+            "description": "Flesh out the `azurerm_kubernetes_cluster` resource by implementing the logic for complex nested blocks such as `default_node_pool`, `identity`, `network_profile`, and `addon_profile`.",
+            "dependencies": [],
+            "details": "Within the `azurerm_kubernetes_cluster` resource block in `main.tf`, add the configurations for `default_node_pool`, `identity`, `network_profile`, `api_server_access_profile`, `http_proxy_config`, and `addon_profile`. Use dynamic blocks where appropriate to handle optional configurations based on whether the corresponding variable is null.",
+            "status": "pending",
+            "testStrategy": "Use the `complete` example (to be created later) to run `terraform plan`. The plan should show a detailed configuration for node pools, addons, and network settings."
+          },
+          {
+            "id": 6,
+            "title": "Create `basic` and `complete` Examples",
+            "description": "Develop two usage examples: a minimal deployment and a feature-rich deployment, to demonstrate module functionality and provide a basis for testing.",
+            "dependencies": [],
+            "details": "1. In `examples/kubernetes_cluster/basic`, create a `main.tf` that calls the module with only the minimum required variables (e.g., `name`, `location`, `resource_group_name`, `dns_prefix`). 2. In `examples/kubernetes_cluster/complete`, create a `main.tf` that showcases multiple features, such as Azure CNI, multiple agent pools (using the separate `azurerm_kubernetes_cluster_node_pool` resource), Azure Monitor addon, and custom tags.",
+            "status": "pending",
+            "testStrategy": "Navigate to each example directory (`basic` and `complete`), run `terraform init` and `terraform apply` to confirm they deploy successfully."
+          },
+          {
+            "id": 7,
+            "title": "Create `secure` and `private-endpoint` Examples",
+            "description": "Develop two advanced usage examples focusing on security: one with Azure AD integration and network policies, and another for a fully private cluster.",
+            "dependencies": [],
+            "details": "1. In `examples/kubernetes_cluster/secure`, configure the module call to enable Azure AD integration and Calico network policy. 2. In `examples/kubernetes_cluster/private-endpoint`, create a prerequisite VNet and Subnet. Call the module with `private_cluster_enabled = true` and provide the subnet ID to the `default_node_pool` block. This example will demonstrate integration with existing network infrastructure.",
+            "status": "pending",
+            "testStrategy": "Navigate to each example directory (`secure` and `private-endpoint`), run `terraform init` and `terraform apply` to confirm they deploy successfully and the specific security features are enabled in the Azure portal."
+          },
+          {
+            "id": 8,
+            "title": "Implement Terratest Suite for Basic and Complete Examples",
+            "description": "Set up the Terratest Go file and implement test cases to validate the deployment of the `basic` and `complete` examples.",
+            "dependencies": [],
+            "details": "Create `test/kubernetes_cluster/kubernetes_cluster_test.go`. Use the standard Terratest boilerplate. Implement two test functions using `t.Run()`: `TestBasicExample` and `TestCompleteExample`. Each function will set `terraform.Options` pointing to the respective example directory. Use `terraform.InitAndApply` to deploy the infrastructure. Add assertions using `terratest-helpers` to check that key outputs (like `cluster_name` and `fqdn`) are not empty.",
+            "status": "pending",
+            "testStrategy": "Run `go test -v -timeout 60m` from the `test/kubernetes_cluster` directory. The tests for the basic and complete examples should pass."
+          },
+          {
+            "id": 9,
+            "title": "Expand Terratest Suite for Advanced Examples",
+            "description": "Extend the Terratest suite to include validation for the `secure` and `private-endpoint` examples, ensuring security-focused features are correctly provisioned.",
+            "dependencies": [],
+            "details": "In `kubernetes_cluster_test.go`, add two more test functions using `t.Run()`: `TestSecureExample` and `TestPrivateEndpointExample`. Point the `terraform.Options` to the correct example directories. For the private cluster test, add an assertion to verify the `private_fqdn` output is populated. For the secure cluster, you can use `azure.GetManagedCluster` to fetch the deployed cluster and assert that `EnableAzureActiveDirectory` is true.",
+            "status": "pending",
+            "testStrategy": "Run `go test -v -timeout 90m` from the `test/kubernetes_cluster` directory. All four tests should now run and pass."
+          },
+          {
+            "id": 10,
+            "title": "Finalize: Documentation, CI, and Review",
+            "description": "Generate the module's documentation, ensure all CI checks pass, and perform a final code review before submitting the pull request.",
+            "dependencies": [],
+            "details": "Navigate to the `modules/kubernetes_cluster` directory and run `terraform-docs markdown table --output-file README.md .` to generate documentation for variables and outputs. Commit all changes to the `feature/aks-module` branch. Push the branch and create a pull request. Verify that the GitHub Actions CI pipeline (fmt, validate, terratest) passes successfully. Address any feedback from the CI or peer reviews.",
+            "status": "pending",
+            "testStrategy": "The pull request's CI checks must all be green. The generated `README.md` should accurately reflect all inputs and outputs."
+          }
+        ]
       }
     ],
     "metadata": {

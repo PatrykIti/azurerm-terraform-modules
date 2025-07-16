@@ -30,6 +30,7 @@ Create a standalone, production-ready Terraform module for `{{ module name}}`, s
 ## 📋 MAIN TASKS
 
 Before start, plan everything and set up proper task in taskmaster (@CLAUDE has proper guidance for this) and create proper subtasks with full description what needs to be done.
+Taskmaster is initialized already and do not do this again!!!
 
 ---
 
