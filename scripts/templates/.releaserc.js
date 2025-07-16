@@ -5,7 +5,6 @@
 
 const path = require('path');
 const fs = require('fs');
-const createMultiScopeFilter = require('../../scripts/semantic-release-multi-scope-filter');
 
 // Auto-detect module directory
 const moduleDir = __dirname;
@@ -52,7 +51,9 @@ module.exports = {
   
   plugins: [
     // Custom plugin to filter multi-scope commits
-    createMultiScopeFilter(COMMIT_SCOPE),
+    ['./../../scripts/semantic-release-multi-scope-plugin.js', {
+      targetScope: COMMIT_SCOPE
+    }],
     
     [
       '@semantic-release/commit-analyzer',
