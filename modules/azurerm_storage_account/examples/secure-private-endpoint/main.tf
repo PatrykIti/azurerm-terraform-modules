@@ -6,11 +6,11 @@ terraform {
   required_version = ">= 1.3.0"
   required_providers {
     azurerm = {
-      source  = "hashicorp/azurerm"
+      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
       version = "4.36.0"
     }
     random = {
-      source  = "hashicorp/random"
+      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
       version = ">= 3.1.0"
     }
   }
@@ -284,7 +284,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # Secure Storage Account Module
 module "secure_storage" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
 
   name                = "stsecure${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.example.name
@@ -327,25 +327,25 @@ module "secure_storage" {
   private_endpoints = [
     {
       name                 = "blob"
-      subresource_names    = ["blob"]
+      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
     },
     {
       name                 = "file"
-      subresource_names    = ["file"]
+      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.file.id]
     },
     {
       name                 = "queue"
-      subresource_names    = ["queue"]
+      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.queue.id]
     },
     {
       name                 = "table"
-      subresource_names    = ["table"]
+      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.table.id]
     }

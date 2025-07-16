@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 1.5.0"
   required_providers {
     azurerm = {
-      source  = "hashicorp/azurerm"
+      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
       version = ">= 4.0.0, < 5.0.0"
     }
   }
@@ -80,7 +80,7 @@ locals {
 
 # Storage Account with Advanced Policies
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
 
   # Basic configuration
   name                     = "stadvancedpoliciesex"

@@ -2,11 +2,11 @@ terraform {
   required_version = ">= 1.5.0"
   required_providers {
     azurerm = {
-      source  = "hashicorp/azurerm"
+      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
       version = ">= 4.0.0, < 5.0.0"
     }
     random = {
-      source  = "hashicorp/random"
+      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
       version = ">= 3.1.0"
     }
   }
@@ -162,7 +162,7 @@ data "azurerm_client_config" "current" {}
 
 # Complete Storage Account with all features
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
 
   name                = "stcomplete${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.example.name
@@ -211,25 +211,25 @@ module "storage_account" {
   private_endpoints = [
     {
       name                 = "blob"
-      subresource_names    = ["blob"]
+      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
     },
     {
       name                 = "file"
-      subresource_names    = ["file"]
+      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.file.id]
     },
     {
       name                 = "queue"
-      subresource_names    = ["queue"]
+      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.queue.id]
     },
     {
       name                 = "table"
-      subresource_names    = ["table"]
+      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.table.id]
     }

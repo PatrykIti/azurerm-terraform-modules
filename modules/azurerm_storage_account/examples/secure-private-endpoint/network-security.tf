@@ -15,9 +15,9 @@ resource "azurerm_network_security_group" "private_endpoints" {
     direction                  = "Inbound"
     access                     = "Deny"
     protocol                   = "*"
-    source_port_range          = "*"
+    source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
     destination_port_range     = "*"
-    source_address_prefix      = "*"
+    source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
     destination_address_prefix = "*"
   }
 
@@ -37,9 +37,9 @@ resource "azurerm_network_security_group" "app" {
     direction                  = "Outbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "*"
+    source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
     destination_port_range     = "443"
-    source_address_prefix      = "VirtualNetwork"
+    source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
     destination_address_prefix = "Storage"
   }
 
@@ -50,9 +50,9 @@ resource "azurerm_network_security_group" "app" {
     direction                  = "Outbound"
     access                     = "Deny"
     protocol                   = "*"
-    source_port_range          = "*"
+    source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
     destination_port_range     = "*"
-    source_address_prefix      = "*"
+    source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
     destination_address_prefix = "*"
   }
 
@@ -104,7 +104,7 @@ resource "azurerm_network_watcher_flow_log" "private_endpoints" {
   count                = var.enable_network_flow_logs ? 1 : 0
   name                 = "flowlog-nsg-private-endpoints"
   network_watcher_name = var.enable_network_watcher ? azurerm_network_watcher.example[0].name : "NetworkWatcher_${var.location}"
-  resource_group_name  = var.enable_network_watcher ? azurerm_resource_group.example.name : "NetworkWatcherRG"
+  resource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
   target_resource_id   = azurerm_network_security_group.private_endpoints.id
   storage_account_id   = azurerm_storage_account.flow_logs[0].id
   enabled              = true
@@ -131,7 +131,7 @@ resource "azurerm_network_watcher_flow_log" "app" {
   count                = var.enable_network_flow_logs ? 1 : 0
   name                 = "flowlog-nsg-app"
   network_watcher_name = var.enable_network_watcher ? azurerm_network_watcher.example[0].name : "NetworkWatcher_${var.location}"
-  resource_group_name  = var.enable_network_watcher ? azurerm_resource_group.example.name : "NetworkWatcherRG"
+  resource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
   target_resource_id   = azurerm_network_security_group.app.id
   storage_account_id   = azurerm_storage_account.flow_logs[0].id
   enabled              = true
