@@ -1493,7 +1493,7 @@
         "id": 34,
         "title": "Network Security Group Module: Core Implementation",
         "description": "CRITICAL: All development MUST follow the mandatory guidelines documented in CLAUDE.md, including reviewing all relevant reference documentation (Terraform Best Practices Guide, Terraform New Module Guide, etc.) before starting implementation. Develop the Network Security Group module (azurerm_network_security_group) following AzureRM provider 4.36.0. This module will manage Azure Network Security Groups with comprehensive security rules configuration, including inbound/outbound rules, service tags, application security groups, and flow logs. The module must provide flexible rule management and follow security-first principles. This module is a key dependency for other modules, such as the Virtual Network module (Task 9), which associates NSGs with subnets.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           1
         ],
@@ -1685,7 +1685,7 @@
             "id": 21,
             "title": "Examples: Create a Comprehensive Usage Example",
             "description": "Develop a complete example showcasing advanced features like Service Tags, ASG association, and enabled Flow Logs with Traffic Analytics.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "Create `examples/network_security_group/complete`. The `main.tf` in this directory should call the NSG module and demonstrate its full capabilities. This will require creating mock resources within the example itself, such as a storage account for flow logs, a log analytics workspace for traffic analytics, and an application security group to associate with a rule. Include a rule that uses a Service Tag like 'AzureCloud'.",
             "testStrategy": "Run `terraform init` and `terraform apply` on the complete example. Verify all resources, including the NSG, rules with ASG/Service Tags, flow log, and their associations, are correctly created in the Azure portal."
@@ -1694,7 +1694,7 @@
             "id": 22,
             "title": "Create Terratest Suite for NSG Module",
             "description": "Develop a comprehensive test suite using Terratest to validate the NSG module's functionality end-to-end.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "Create a new test file `test/network_security_group_test.go` leveraging the existing test framework (Task 5). The test suite should cover:\n1. Basic NSG creation with tags.\n2. Creation of security rules from the `security_rules` variable.\n3. Rules using single prefixes, multiple prefixes, ASGs, and Service Tags.\n4. Conditional creation of Flow Logs and Traffic Analytics.\nThe tests should use the module examples (`simple` and `complete`) as the basis for deployment.",
             "testStrategy": "Execute the test suite via `go test -v ./test/...`. All tests must pass, confirming resource creation and configuration, followed by a successful `terraform destroy` to clean up resources."
@@ -1929,7 +1929,7 @@
             "id": 20,
             "title": "Create Simple Usage Example",
             "description": "Create a simple example that deploys a route table with no custom routes or associations.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               19
             ],
@@ -2060,7 +2060,7 @@
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-16T13:44:47.833Z",
+      "updated": "2025-07-16T13:48:40.381Z",
       "description": "Tasks for master context"
     }
   }

@@ -1,21 +1,12 @@
 # Basic Route Table Example
 
-This example demonstrates a basic Route Table configuration using secure defaults and minimal setup.
+This example demonstrates a basic deployment of an Azure Route Table with simple route configuration.
 
 ## Features
 
-- Creates a basic route_table with standard configuration
-- Uses secure defaults following Azure best practices
-- Creates a dedicated resource group
-- Demonstrates basic module usage patterns
-- Uses variables for configuration flexibility
-
-## Key Configuration
-
-This example uses secure defaults and demonstrates:
-- Basic resource creation with minimal configuration
-- Using variables for easy configuration customization
-- Following security best practices by default
+- Basic route table with essential routes
+- Simple subnet association
+- Minimal configuration for getting started
 
 ## Usage
 
@@ -24,6 +15,14 @@ terraform init
 terraform plan
 terraform apply
 ```
+
+## Key Configuration
+
+- Creates a route table with two basic routes:
+  - Default route to Internet
+  - Local VNet route
+- Associates the route table with a subnet
+- Uses default BGP route propagation settings
 
 ## Cleanup
 
