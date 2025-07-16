@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Extract module configuration from .releaserc.js file
+ * Extract module configuration from module.json or .releaserc.js file
  * Usage: node get-module-config.js <module-directory>
  */
 
@@ -13,9 +13,34 @@ if (!moduleDir) {
   process.exit(1);
 }
 
+// First try to load from module.json
+const moduleJsonPath = path.resolve(process.cwd(), moduleDir, 'module.json');
+if (fs.existsSync(moduleJsonPath)) {
+  try {
+    const moduleConfig = JSON.parse(fs.readFileSync(moduleJsonPath, 'utf8'));
+    
+    // Validate required fields
+    if (!moduleConfig.tag_prefix || !moduleConfig.commit_scope) {
+      console.error('Error: module.json missing required fields (tag_prefix, commit_scope)');
+      process.exit(1);
+    }
+    
+    // Output as JSON for easy parsing in the workflow
+    console.log(JSON.stringify({ 
+      tag_prefix: moduleConfig.tag_prefix, 
+      commit_scope: moduleConfig.commit_scope 
+    }));
+    process.exit(0);
+  } catch (e) {
+    console.error(`Error reading module.json: ${e.message}`);
+    // Fall through to try .releaserc.js
+  }
+}
+
+// Fallback to .releaserc.js
 const configPath = path.resolve(process.cwd(), moduleDir, '.releaserc.js');
 if (!fs.existsSync(configPath)) {
-  console.error(`Error: Config file not found at ${configPath}`);
+  console.error(`Error: Neither module.json nor .releaserc.js found in ${moduleDir}`);
   process.exit(1);
 }
 

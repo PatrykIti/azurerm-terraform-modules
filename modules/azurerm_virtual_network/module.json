@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_virtual_network",
+  "title": "Virtual Network",
+  "commit_scope": "virtual-network",
+  "tag_prefix": "VNv",
+  "description": "Azure Virtual Network Terraform module with advanced networking features"
+}

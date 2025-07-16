@@ -580,6 +580,15 @@ output "private_endpoints" {
   description = "Information about the created private endpoints"
   value       = module.${MODULE_TYPE}.private_endpoints
 }
+
+# Create module.json and .releaserc.js
+print_info "Creating module.json and .releaserc.js..."
+if [[ -x "$SCRIPT_DIR/create-module-json.sh" ]]; then
+    "$SCRIPT_DIR/create-module-json.sh" "$MODULE_DIR" "$DISPLAY_NAME" "$SCOPE" "$PREFIX"
+else
+    print_warning "scripts/create-module-json.sh not found or not executable."
+fi
+
 EOF
 
 # Generate README for private-endpoint example

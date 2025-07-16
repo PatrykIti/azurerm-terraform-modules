@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_storage_account",
+  "title": "Storage Account",
+  "commit_scope": "storage-account",
+  "tag_prefix": "SAv",
+  "description": "Azure Storage Account Terraform module with enterprise-grade security features"
+}

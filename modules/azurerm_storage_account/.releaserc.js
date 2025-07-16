@@ -1,20 +1,59 @@
 /**
- * Semantic Release Configuration – Dynamic Template
+ * Semantic Release Configuration with Auto-loaded Module Config
+ * This configuration automatically loads module settings from module.json
  */
 
-const MODULE_NAME = 'azurerm_storage_account';
-const COMMIT_SCOPE = 'storage-account';
-const TAG_PREFIX = 'SAv';
-const MODULE_TITLE = 'Storage Account';
+const path = require('path');
+const fs = require('fs');
+const createMultiScopeFilter = require('../../scripts/semantic-release-multi-scope-filter');
+
+// Auto-detect module directory
+const moduleDir = __dirname;
+const moduleName = path.basename(moduleDir);
+
+// Load module configuration
+const configPath = path.join(moduleDir, 'module.json');
+if (!fs.existsSync(configPath)) {
+  throw new Error(`Module configuration not found at ${configPath}. Please create module.json with required fields.`);
+}
+
+const moduleConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
+// Validate required fields
+const requiredFields = ['name', 'title', 'commit_scope', 'tag_prefix'];
+for (const field of requiredFields) {
+  if (!moduleConfig[field]) {
+    throw new Error(`Missing required field '${field}' in module.json`);
+  }
+}
+
+// Extract configuration
+const MODULE_NAME = moduleConfig.name;
+const COMMIT_SCOPE = moduleConfig.commit_scope;
+const TAG_PREFIX = moduleConfig.tag_prefix;
+const MODULE_TITLE = moduleConfig.title;
+
+// Validate that directory name matches module name
+if (moduleName !== MODULE_NAME) {
+  console.warn(`Warning: Directory name '${moduleName}' doesn't match module name '${MODULE_NAME}' in module.json`);
+}
 
 const SOURCE_URL = `github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}`;
 const DOC_URL = `https://github.com/PatrykIti/azurerm-terraform-modules/tree/${TAG_PREFIX}\${nextRelease.version}/modules/${MODULE_NAME}`;
+
+console.log(`📦 Semantic Release Configuration for ${MODULE_TITLE}`);
+console.log(`   Module: ${MODULE_NAME}`);
+console.log(`   Scope: ${COMMIT_SCOPE}`);
+console.log(`   Tag Prefix: ${TAG_PREFIX}`);
 
 module.exports = {
   branches: ['main'],
   tagFormat: `${TAG_PREFIX}\${version}`,
   
   plugins: [
+    // Custom plugin to filter multi-scope commits
+    createMultiScopeFilter(COMMIT_SCOPE),
+    
     [
       '@semantic-release/commit-analyzer',
       {
@@ -27,21 +66,14 @@ module.exports = {
           { scope: COMMIT_SCOPE, type: 'refactor', release: 'patch' },
           { scope: COMMIT_SCOPE, type: 'perf', release: 'patch' },
           { scope: COMMIT_SCOPE, type: 'revert', release: 'patch' },
-          { scope: `!${COMMIT_SCOPE}`, release: false }
+          { scope: COMMIT_SCOPE, type: 'test', release: false },
+          { scope: COMMIT_SCOPE, type: 'build', release: false },
+          { scope: COMMIT_SCOPE, type: 'ci', release: false },
+          { scope: COMMIT_SCOPE, type: 'chore', release: false },
+          { scope: COMMIT_SCOPE, type: 'style', release: false }
         ],
         parserOpts: {
-          noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES'],
-          transform(commit) {
-            if (!commit.scope) return false;
-
-            const scopes = commit.scope.split(',').map(s => s.trim());
-            if (scopes.includes(COMMIT_SCOPE)) {
-              commit.scope = COMMIT_SCOPE;
-              return commit;
-            }
-
-            return false;
-          }
+          noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES']
         }
       }
     ],
@@ -112,7 +144,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
           fi
 
           if command -v terraform-docs &> /dev/null; then
-            terraform-docs "modules/${MODULE_NAME}"
+            cd "modules/${MODULE_NAME}" && terraform-docs .
           fi
 
           if [[ -x "./scripts/update-root-readme.sh" ]]; then
