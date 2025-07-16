@@ -5,39 +5,39 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
   location            = var.location
 
   # DNS Configuration - One of dns_prefix or dns_prefix_private_cluster is required
-  dns_prefix                 = var.dns_prefix
-  dns_prefix_private_cluster = var.dns_prefix_private_cluster
+  dns_prefix                 = var.dns_config.dns_prefix
+  dns_prefix_private_cluster = var.dns_config.dns_prefix_private_cluster
 
   # Kubernetes Version and Upgrade Configuration
-  kubernetes_version        = var.kubernetes_version
-  automatic_upgrade_channel = var.automatic_upgrade_channel
-  node_os_upgrade_channel   = var.node_os_upgrade_channel
+  kubernetes_version        = var.kubernetes_config.kubernetes_version
+  automatic_upgrade_channel = var.kubernetes_config.automatic_upgrade_channel
+  node_os_upgrade_channel   = var.kubernetes_config.node_os_upgrade_channel
 
   # SKU Configuration
-  sku_tier     = var.sku_tier
-  support_plan = var.support_plan
+  sku_tier     = var.sku_config.sku_tier
+  support_plan = var.sku_config.support_plan
 
   # Node Resource Group
   node_resource_group = var.node_resource_group
 
   # Private Cluster Configuration
-  private_cluster_enabled             = var.private_cluster_enabled
-  private_dns_zone_id                 = var.private_dns_zone_id
-  private_cluster_public_fqdn_enabled = var.private_cluster_public_fqdn_enabled
+  private_cluster_enabled             = var.private_cluster_config.private_cluster_enabled
+  private_dns_zone_id                 = var.private_cluster_config.private_dns_zone_id
+  private_cluster_public_fqdn_enabled = var.private_cluster_config.private_cluster_public_fqdn_enabled
 
   # Feature Flags
-  azure_policy_enabled             = var.azure_policy_enabled
-  http_application_routing_enabled = var.http_application_routing_enabled
-  workload_identity_enabled        = var.workload_identity_enabled
-  oidc_issuer_enabled              = var.oidc_issuer_enabled
-  open_service_mesh_enabled        = var.open_service_mesh_enabled
-  image_cleaner_enabled            = var.image_cleaner_enabled
-  run_command_enabled              = var.run_command_enabled
-  local_account_disabled           = var.local_account_disabled
-  cost_analysis_enabled            = var.cost_analysis_enabled
+  azure_policy_enabled             = var.features.azure_policy_enabled
+  http_application_routing_enabled = var.features.http_application_routing_enabled
+  workload_identity_enabled        = var.features.workload_identity_enabled
+  oidc_issuer_enabled              = var.features.oidc_issuer_enabled
+  open_service_mesh_enabled        = var.features.open_service_mesh_enabled
+  image_cleaner_enabled            = var.features.image_cleaner_enabled
+  run_command_enabled              = var.features.run_command_enabled
+  local_account_disabled           = var.features.local_account_disabled
+  cost_analysis_enabled            = var.features.cost_analysis_enabled
 
   # Image Cleaner Configuration
-  image_cleaner_interval_hours = var.image_cleaner_enabled ? var.image_cleaner_interval_hours : 0
+  image_cleaner_interval_hours = var.features.image_cleaner_enabled ? var.image_cleaner_interval_hours : 0
 
   # Encryption Configuration
   disk_encryption_set_id = var.disk_encryption_set_id
@@ -537,8 +537,8 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
   lifecycle {
     precondition {
       condition = (
-        (var.dns_prefix != null && var.dns_prefix_private_cluster == null) ||
-        (var.dns_prefix == null && var.dns_prefix_private_cluster != null)
+        (var.dns_config.dns_prefix != null && var.dns_config.dns_prefix_private_cluster == null) ||
+        (var.dns_config.dns_prefix == null && var.dns_config.dns_prefix_private_cluster != null)
       )
       error_message = "You must define either dns_prefix or dns_prefix_private_cluster, but not both."
     }
@@ -552,12 +552,12 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
     }
 
     precondition {
-      condition     = var.cost_analysis_enabled == false || contains(["Standard", "Premium"], var.sku_tier)
+      condition     = var.features.cost_analysis_enabled == false || contains(["Standard", "Premium"], var.sku_config.sku_tier)
       error_message = "Cost analysis can only be enabled when sku_tier is set to Standard or Premium."
     }
 
     precondition {
-      condition     = var.private_cluster_enabled == false || var.dns_prefix_private_cluster != null
+      condition     = var.private_cluster_config.private_cluster_enabled == false || var.dns_config.dns_prefix_private_cluster != null
       error_message = "When private_cluster_enabled is true, dns_prefix_private_cluster must be specified."
     }
   }

@@ -20,74 +20,97 @@ variable "location" {
 }
 
 # DNS Configuration
-variable "dns_prefix" {
-  description = "DNS prefix specified when creating the managed cluster. Possible values must begin and end with a letter or number, contain only letters, numbers, and hyphens and be between 1 and 54 characters in length. Changing this forces a new resource to be created."
-  type        = string
-  default     = null
-
+variable "dns_config" {
+  description = <<-EOT
+    DNS configuration for the Kubernetes cluster.
+    
+    dns_prefix: DNS prefix specified when creating the managed cluster. Required for public clusters.
+    dns_prefix_private_cluster: DNS prefix to use with private clusters. Required for private clusters.
+    
+    Note: You must define either dns_prefix or dns_prefix_private_cluster, but not both.
+  EOT
+  
+  type = object({
+    dns_prefix                 = optional(string)
+    dns_prefix_private_cluster = optional(string)
+  })
+  
+  default = {}
+  
   validation {
-    condition = var.dns_prefix == null || (
-      length(var.dns_prefix) >= 1 && length(var.dns_prefix) <= 54 &&
-      can(regex("^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$", var.dns_prefix))
+    condition = (
+      (var.dns_config.dns_prefix != null && var.dns_config.dns_prefix_private_cluster == null) ||
+      (var.dns_config.dns_prefix == null && var.dns_config.dns_prefix_private_cluster != null)
+    )
+    error_message = "You must define either dns_prefix or dns_prefix_private_cluster, but not both."
+  }
+  
+  validation {
+    condition = var.dns_config.dns_prefix == null || (
+      length(var.dns_config.dns_prefix) >= 1 && length(var.dns_config.dns_prefix) <= 54 &&
+      can(regex("^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$", var.dns_config.dns_prefix))
     )
     error_message = "DNS prefix must begin and end with a letter or number, contain only letters, numbers, and hyphens and be between 1 and 54 characters in length."
   }
 }
 
-variable "dns_prefix_private_cluster" {
-  description = "Specifies the DNS prefix to use with private clusters. Changing this forces a new resource to be created. Note: You must define either dns_prefix or dns_prefix_private_cluster."
-  type        = string
-  default     = null
-}
-
-# Kubernetes Version
-variable "kubernetes_version" {
-  description = "Version of Kubernetes specified when creating the AKS managed cluster. If not specified, the latest recommended version will be used at provisioning time (but won't auto-upgrade). AKS does not require an exact patch version to be specified, minor version aliases such as '1.22' are also supported."
-  type        = string
-  default     = null
-}
-
-variable "automatic_upgrade_channel" {
-  description = "The upgrade channel for this Kubernetes Cluster. Possible values are patch, rapid, node-image and stable. Omitting this field sets this value to none."
-  type        = string
-  default     = null
-
+# Kubernetes Version and Upgrade Configuration
+variable "kubernetes_config" {
+  description = <<-EOT
+    Kubernetes version and upgrade configuration.
+    
+    kubernetes_version: Version of Kubernetes specified when creating the AKS managed cluster.
+    automatic_upgrade_channel: The upgrade channel for this Kubernetes Cluster. Possible values are patch, rapid, node-image, stable, or none.
+    node_os_upgrade_channel: The upgrade channel for node OS security updates. Possible values are Unmanaged, SecurityPatch, NodeImage, or None.
+  EOT
+  
+  type = object({
+    kubernetes_version        = optional(string)
+    automatic_upgrade_channel = optional(string)
+    node_os_upgrade_channel   = optional(string, "NodeImage")
+  })
+  
+  default = {
+    node_os_upgrade_channel = "NodeImage"
+  }
+  
   validation {
-    condition     = var.automatic_upgrade_channel == null || contains(["patch", "rapid", "node-image", "stable", "none"], var.automatic_upgrade_channel)
+    condition     = var.kubernetes_config.automatic_upgrade_channel == null || contains(["patch", "rapid", "node-image", "stable", "none"], var.kubernetes_config.automatic_upgrade_channel)
     error_message = "The automatic_upgrade_channel must be one of: patch, rapid, node-image, stable, or none."
   }
-}
-
-variable "node_os_upgrade_channel" {
-  description = "The upgrade channel for node OS security updates. Possible values are Unmanaged, SecurityPatch, NodeImage and None. Defaults to NodeImage."
-  type        = string
-  default     = "NodeImage"
-
+  
   validation {
-    condition     = contains(["Unmanaged", "SecurityPatch", "NodeImage", "None"], var.node_os_upgrade_channel)
+    condition     = contains(["Unmanaged", "SecurityPatch", "NodeImage", "None"], var.kubernetes_config.node_os_upgrade_channel)
     error_message = "The node_os_upgrade_channel must be one of: Unmanaged, SecurityPatch, NodeImage, or None."
   }
 }
 
 # SKU Configuration
-variable "sku_tier" {
-  description = "The SKU Tier that should be used for this Kubernetes Cluster. Possible values are Free, Standard (which includes the Uptime SLA) and Premium. Defaults to Free."
-  type        = string
-  default     = "Free"
-
+variable "sku_config" {
+  description = <<-EOT
+    SKU configuration for the Kubernetes cluster.
+    
+    sku_tier: The SKU Tier that should be used for this Kubernetes Cluster. Possible values are Free, Standard (which includes the Uptime SLA) and Premium.
+    support_plan: Specifies the support plan which should be used for this Kubernetes Cluster. Possible values are KubernetesOfficial and AKSLongTermSupport.
+  EOT
+  
+  type = object({
+    sku_tier     = optional(string, "Free")
+    support_plan = optional(string, "KubernetesOfficial")
+  })
+  
+  default = {
+    sku_tier     = "Free"
+    support_plan = "KubernetesOfficial"
+  }
+  
   validation {
-    condition     = contains(["Free", "Standard", "Premium"], var.sku_tier)
+    condition     = contains(["Free", "Standard", "Premium"], var.sku_config.sku_tier)
     error_message = "The sku_tier must be one of: Free, Standard, or Premium."
   }
-}
-
-variable "support_plan" {
-  description = "Specifies the support plan which should be used for this Kubernetes Cluster. Possible values are KubernetesOfficial and AKSLongTermSupport. Defaults to KubernetesOfficial."
-  type        = string
-  default     = "KubernetesOfficial"
-
+  
   validation {
-    condition     = contains(["KubernetesOfficial", "AKSLongTermSupport"], var.support_plan)
+    condition     = contains(["KubernetesOfficial", "AKSLongTermSupport"], var.sku_config.support_plan)
     error_message = "The support_plan must be either KubernetesOfficial or AKSLongTermSupport."
   }
 }
@@ -361,22 +384,66 @@ variable "api_server_access_profile" {
 }
 
 # Private Cluster Configuration
-variable "private_cluster_enabled" {
-  description = "Should this Kubernetes Cluster have its API server only exposed on internal IP addresses? This provides a Private IP Address for the Kubernetes API on the Virtual Network where the Kubernetes Cluster is located."
-  type        = bool
-  default     = false
+variable "private_cluster_config" {
+  description = <<-EOT
+    Private cluster configuration.
+    
+    private_cluster_enabled: Should this Kubernetes Cluster have its API server only exposed on internal IP addresses?
+    private_dns_zone_id: Either the ID of Private DNS Zone which should be delegated to this Cluster, System to have AKS manage this or None.
+    private_cluster_public_fqdn_enabled: Specifies whether a Public FQDN for this Private Cluster should be added.
+  EOT
+  
+  type = object({
+    private_cluster_enabled             = optional(bool, false)
+    private_dns_zone_id                 = optional(string)
+    private_cluster_public_fqdn_enabled = optional(bool, false)
+  })
+  
+  default = {
+    private_cluster_enabled             = false
+    private_cluster_public_fqdn_enabled = false
+  }
 }
 
-variable "private_dns_zone_id" {
-  description = "Either the ID of Private DNS Zone which should be delegated to this Cluster, System to have AKS manage this or None. In case of None you will need to bring your own DNS server and set up resolving, otherwise, the cluster will have issues after provisioning."
-  type        = string
-  default     = null
-}
-
-variable "private_cluster_public_fqdn_enabled" {
-  description = "Specifies whether a Public FQDN for this Private Cluster should be added."
-  type        = bool
-  default     = false
+# Feature Flags
+variable "features" {
+  description = <<-EOT
+    Feature flags for enabling/disabling various Kubernetes cluster features.
+    
+    azure_policy_enabled: Should the Azure Policy Add-On be enabled?
+    http_application_routing_enabled: Should HTTP Application Routing be enabled?
+    workload_identity_enabled: Specifies whether Azure AD Workload Identity should be enabled for the Cluster.
+    oidc_issuer_enabled: Enable or Disable the OIDC issuer URL.
+    open_service_mesh_enabled: Is Open Service Mesh enabled?
+    image_cleaner_enabled: Specifies whether Image Cleaner is enabled.
+    run_command_enabled: Whether to enable run command for the cluster or not.
+    local_account_disabled: If true local accounts will be disabled.
+    cost_analysis_enabled: Should cost analysis be enabled for this Kubernetes Cluster?
+  EOT
+  
+  type = object({
+    azure_policy_enabled             = optional(bool, false)
+    http_application_routing_enabled = optional(bool, false)
+    workload_identity_enabled        = optional(bool, false)
+    oidc_issuer_enabled              = optional(bool, false)
+    open_service_mesh_enabled        = optional(bool, false)
+    image_cleaner_enabled            = optional(bool, false)
+    run_command_enabled              = optional(bool, true)
+    local_account_disabled           = optional(bool, false)
+    cost_analysis_enabled            = optional(bool, false)
+  })
+  
+  default = {
+    azure_policy_enabled             = false
+    http_application_routing_enabled = false
+    workload_identity_enabled        = false
+    oidc_issuer_enabled              = false
+    open_service_mesh_enabled        = false
+    image_cleaner_enabled            = false
+    run_command_enabled              = true
+    local_account_disabled           = false
+    cost_analysis_enabled            = false
+  }
 }
 
 # Azure Active Directory RBAC
@@ -399,17 +466,6 @@ variable "azure_active_directory_role_based_access_control" {
 }
 
 # Add-ons Configuration
-variable "azure_policy_enabled" {
-  description = "Should the Azure Policy Add-On be enabled?"
-  type        = bool
-  default     = false
-}
-
-variable "http_application_routing_enabled" {
-  description = "Should HTTP Application Routing be enabled? Note: At this time HTTP Application Routing is not supported in Azure China or Azure US Government."
-  type        = bool
-  default     = false
-}
 
 variable "oms_agent" {
   description = <<-EOT
@@ -589,17 +645,6 @@ variable "microsoft_defender" {
   default = null
 }
 
-variable "workload_identity_enabled" {
-  description = "Specifies whether Azure AD Workload Identity should be enabled for the Cluster."
-  type        = bool
-  default     = false
-}
-
-variable "oidc_issuer_enabled" {
-  description = "Enable or Disable the OIDC issuer URL."
-  type        = bool
-  default     = false
-}
 
 # Monitoring
 variable "monitor_metrics" {
@@ -700,11 +745,6 @@ variable "http_proxy_config" {
   sensitive = true
 }
 
-variable "image_cleaner_enabled" {
-  description = "Specifies whether Image Cleaner is enabled."
-  type        = bool
-  default     = false
-}
 
 variable "image_cleaner_interval_hours" {
   description = "Specifies the interval in hours when images should be cleaned up. Defaults to 0."
@@ -712,11 +752,6 @@ variable "image_cleaner_interval_hours" {
   default     = 0
 }
 
-variable "local_account_disabled" {
-  description = "If true local accounts will be disabled. See the documentation for more information."
-  type        = bool
-  default     = false
-}
 
 variable "node_resource_group" {
   description = "The name of the Resource Group where the Kubernetes Nodes should exist. Azure requires that a new, non-existent Resource Group is used. Changing this forces a new resource to be created."
@@ -825,17 +860,7 @@ variable "web_app_routing" {
   default = null
 }
 
-variable "run_command_enabled" {
-  description = "Whether to enable run command for the cluster or not."
-  type        = bool
-  default     = true
-}
 
-variable "open_service_mesh_enabled" {
-  description = "Is Open Service Mesh enabled? For more details, please visit Open Service Mesh for AKS."
-  type        = bool
-  default     = false
-}
 
 variable "confidential_computing" {
   description = <<-EOT
@@ -851,11 +876,6 @@ variable "confidential_computing" {
   default = null
 }
 
-variable "cost_analysis_enabled" {
-  description = "Should cost analysis be enabled for this Kubernetes Cluster? Defaults to false. The sku_tier must be set to Standard or Premium to enable this feature."
-  type        = bool
-  default     = false
-}
 
 # Storage Profile
 variable "storage_profile" {
