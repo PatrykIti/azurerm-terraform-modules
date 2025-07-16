@@ -38,6 +38,11 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           fetch-tags: true
+      - name: Clean git state (before anything!)
+        run: |
+          echo "🧹 Cleaning git state..."
+          git reset --hard
+          git clean -fd
       
       - name: Generate GitHub App Token
         id: app-token
@@ -45,6 +50,20 @@ jobs:
         with:
           app-id: ${{ vars.SEMANTIC_RELEASE_APP_ID }}
           private-key: ${{ secrets.SEMANTIC_RELEASE_APP_PRIVATE_KEY }}
+
+      - name: Sync with remote repository
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          # Configure git to use the GitHub App token
+          git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+          
+          # Pull latest changes from main to ensure we have all previous releases
+          echo "📥 Pulling latest changes from main branch..."
+          git pull origin main --rebase
+          
+          # Show current git status
+          git log --oneline -5
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -111,20 +130,6 @@ jobs:
           echo "✅ Module configuration:"
           echo "   Tag prefix: $TAG_PREFIX"
           echo "   Commit scope: $COMMIT_SCOPE"
-      
-      - name: Sync with remote repository
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: |
-          # Configure git to use the GitHub App token
-          git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
-          
-          # Pull latest changes from main to ensure we have all previous releases
-          echo "📥 Pulling latest changes from main branch..."
-          git pull origin main --rebase
-          
-          # Show current git status
-          git log --oneline -5
       
       - name: Run semantic-release
         env:
