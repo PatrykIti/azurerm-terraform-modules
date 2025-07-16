@@ -26,7 +26,7 @@ module "network_security_group" {
       destination_address_prefix = "*"
       description                = "Allow RDP from internal network"
     }
-    
+
     allow_http = {
       priority                   = 110
       direction                  = "Inbound"
@@ -38,7 +38,7 @@ module "network_security_group" {
       destination_address_prefix = "*"
       description                = "Allow HTTP from anywhere"
     }
-    
+
     allow_https = {
       priority                   = 120
       direction                  = "Inbound"
@@ -50,7 +50,7 @@ module "network_security_group" {
       destination_address_prefix = "*"
       description                = "Allow HTTPS from anywhere"
     }
-    
+
     deny_all_outbound = {
       priority                   = 4096
       direction                  = "Outbound"

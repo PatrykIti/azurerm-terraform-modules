@@ -59,10 +59,10 @@ run "test_private_link_service_policies_enabled" {
   command = plan
 
   variables {
-    name                                           = "test-subnet"
-    resource_group_name                            = "test-rg"
-    virtual_network_name                           = "test-vnet"
-    address_prefixes                               = ["10.0.1.0/24"]
+    name                                          = "test-subnet"
+    resource_group_name                           = "test-rg"
+    virtual_network_name                          = "test-vnet"
+    address_prefixes                              = ["10.0.1.0/24"]
     private_link_service_network_policies_enabled = true
   }
 
@@ -81,10 +81,10 @@ run "test_private_link_service_policies_disabled" {
   command = plan
 
   variables {
-    name                                           = "test-subnet"
-    resource_group_name                            = "test-rg"
-    virtual_network_name                           = "test-vnet"
-    address_prefixes                               = ["10.0.1.0/24"]
+    name                                          = "test-subnet"
+    resource_group_name                           = "test-rg"
+    virtual_network_name                          = "test-vnet"
+    address_prefixes                              = ["10.0.1.0/24"]
     private_link_service_network_policies_enabled = false
   }
 
@@ -104,11 +104,11 @@ run "test_private_endpoint_subnet_configuration" {
   command = plan
 
   variables {
-    name                                           = "test-pe-subnet"
-    resource_group_name                            = "test-rg"
-    virtual_network_name                           = "test-vnet"
-    address_prefixes                               = ["10.0.1.0/24"]
-    private_endpoint_network_policies_enabled      = false
+    name                                          = "test-pe-subnet"
+    resource_group_name                           = "test-rg"
+    virtual_network_name                          = "test-vnet"
+    address_prefixes                              = ["10.0.1.0/24"]
+    private_endpoint_network_policies_enabled     = false
     private_link_service_network_policies_enabled = false
   }
 

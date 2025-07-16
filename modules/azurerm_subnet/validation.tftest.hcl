@@ -29,7 +29,7 @@ run "test_valid_subnet_name" {
 # Test: Empty subnet name validation
 run "test_empty_subnet_name_validation" {
   command = plan
-  
+
   variables {
     name                 = ""
     resource_group_name  = "test-rg"
@@ -79,7 +79,7 @@ run "test_valid_ipv6_address_prefix" {
 # Test: Invalid address prefix validation
 run "test_invalid_address_prefix_validation" {
   command = plan
-  
+
   variables {
     name                 = "test-subnet"
     resource_group_name  = "test-rg"
@@ -95,7 +95,7 @@ run "test_invalid_address_prefix_validation" {
 # Test: Empty address prefixes validation
 run "test_empty_address_prefixes_validation" {
   command = plan
-  
+
   variables {
     name                 = "test-subnet"
     resource_group_name  = "test-rg"
@@ -129,7 +129,7 @@ run "test_valid_service_endpoint" {
 # Test: Invalid service endpoint validation
 run "test_invalid_service_endpoint_validation" {
   command = plan
-  
+
   variables {
     name                 = "test-subnet"
     resource_group_name  = "test-rg"
@@ -156,7 +156,7 @@ run "test_valid_delegation" {
       aci = {
         name = "Microsoft.ContainerInstance/containerGroups"
         service_delegation = {
-          name = "Microsoft.ContainerInstance/containerGroups"
+          name    = "Microsoft.ContainerInstance/containerGroups"
           actions = []
         }
       }
@@ -172,7 +172,7 @@ run "test_valid_delegation" {
 # Test: Invalid delegation validation
 run "test_invalid_delegation_validation" {
   command = plan
-  
+
   variables {
     name                 = "test-subnet"
     resource_group_name  = "test-rg"
@@ -182,7 +182,7 @@ run "test_invalid_delegation_validation" {
       invalid = {
         name = "Invalid.Service/type"
         service_delegation = {
-          name = "Invalid.Service/type"
+          name    = "Invalid.Service/type"
           actions = []
         }
       }

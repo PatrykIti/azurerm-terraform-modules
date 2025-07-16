@@ -61,7 +61,7 @@ variable "security_rules" {
     }
     ```
   EOT
-  
+
   type = map(object({
     priority                                   = number
     direction                                  = string
@@ -79,37 +79,37 @@ variable "security_rules" {
     destination_application_security_group_ids = optional(list(string))
     description                                = optional(string)
   }))
-  
+
   default = {}
 
   validation {
     condition = alltrue([
-      for rule_name, rule in var.security_rules : 
-        contains(["Inbound", "Outbound"], rule.direction)
+      for rule_name, rule in var.security_rules :
+      contains(["Inbound", "Outbound"], rule.direction)
     ])
     error_message = "Security rule direction must be either 'Inbound' or 'Outbound'."
   }
 
   validation {
     condition = alltrue([
-      for rule_name, rule in var.security_rules : 
-        contains(["Allow", "Deny"], rule.access)
+      for rule_name, rule in var.security_rules :
+      contains(["Allow", "Deny"], rule.access)
     ])
     error_message = "Security rule access must be either 'Allow' or 'Deny'."
   }
 
   validation {
     condition = alltrue([
-      for rule_name, rule in var.security_rules : 
-        contains(["Tcp", "Udp", "Icmp", "Esp", "Ah", "*"], rule.protocol)
+      for rule_name, rule in var.security_rules :
+      contains(["Tcp", "Udp", "Icmp", "Esp", "Ah", "*"], rule.protocol)
     ])
     error_message = "Security rule protocol must be one of: 'Tcp', 'Udp', 'Icmp', 'Esp', 'Ah', or '*'."
   }
 
   validation {
     condition = alltrue([
-      for rule_name, rule in var.security_rules : 
-        rule.priority >= 100 && rule.priority <= 4096
+      for rule_name, rule in var.security_rules :
+      rule.priority >= 100 && rule.priority <= 4096
     ])
     error_message = "Security rule priority must be between 100 and 4096."
   }

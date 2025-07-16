@@ -62,9 +62,9 @@ resource "azurerm_route_table" "example" {
   resource_group_name = azurerm_resource_group.example.name
 
   route {
-    name                   = "DefaultRoute"
-    address_prefix         = "0.0.0.0/0"
-    next_hop_type          = "VirtualNetworkGateway"
+    name           = "DefaultRoute"
+    address_prefix = "0.0.0.0/0"
+    next_hop_type  = "VirtualNetworkGateway"
   }
 
   tags = var.tags

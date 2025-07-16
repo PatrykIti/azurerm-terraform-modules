@@ -144,7 +144,7 @@ output "ingress_application_gateway" {
     gateway_name         = azurerm_kubernetes_cluster.kubernetes_cluster.ingress_application_gateway[0].gateway_name
     subnet_cidr          = azurerm_kubernetes_cluster.kubernetes_cluster.ingress_application_gateway[0].subnet_cidr
     subnet_id            = azurerm_kubernetes_cluster.kubernetes_cluster.ingress_application_gateway[0].subnet_id
-    
+
     ingress_application_gateway_identity = try({
       client_id                 = azurerm_kubernetes_cluster.kubernetes_cluster.ingress_application_gateway[0].ingress_application_gateway_identity[0].client_id
       object_id                 = azurerm_kubernetes_cluster.kubernetes_cluster.ingress_application_gateway[0].ingress_application_gateway_identity[0].object_id
@@ -201,17 +201,17 @@ output "network_profile" {
     service_cidrs       = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].service_cidrs
     ip_versions         = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].ip_versions
     load_balancer_sku   = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_sku
-    
+
     load_balancer_profile = try({
-      effective_outbound_ips         = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_profile[0].effective_outbound_ips
-      idle_timeout_in_minutes        = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_profile[0].idle_timeout_in_minutes
-      managed_outbound_ip_count      = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_profile[0].managed_outbound_ip_count
-      managed_outbound_ipv6_count    = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_profile[0].managed_outbound_ipv6_count
-      outbound_ip_address_ids        = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_profile[0].outbound_ip_address_ids
-      outbound_ip_prefix_ids         = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_profile[0].outbound_ip_prefix_ids
-      outbound_ports_allocated       = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_profile[0].outbound_ports_allocated
+      effective_outbound_ips      = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_profile[0].effective_outbound_ips
+      idle_timeout_in_minutes     = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_profile[0].idle_timeout_in_minutes
+      managed_outbound_ip_count   = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_profile[0].managed_outbound_ip_count
+      managed_outbound_ipv6_count = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_profile[0].managed_outbound_ipv6_count
+      outbound_ip_address_ids     = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_profile[0].outbound_ip_address_ids
+      outbound_ip_prefix_ids      = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_profile[0].outbound_ip_prefix_ids
+      outbound_ports_allocated    = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_profile[0].outbound_ports_allocated
     }, null)
-    
+
     nat_gateway_profile = try({
       effective_outbound_ips    = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].nat_gateway_profile[0].effective_outbound_ips
       idle_timeout_in_minutes   = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].nat_gateway_profile[0].idle_timeout_in_minutes

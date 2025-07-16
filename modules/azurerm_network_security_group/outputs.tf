@@ -27,31 +27,31 @@ output "tags" {
 output "security_rule_ids" {
   description = "Map of security rule names to their resource IDs"
   value = {
-    for rule_name, rule in azurerm_network_security_rule.security_rules : 
-      rule_name => rule.id
+    for rule_name, rule in azurerm_network_security_rule.security_rules :
+    rule_name => rule.id
   }
 }
 
 output "security_rules" {
   description = "Map of security rule names to their full configuration"
   value = {
-    for rule_name, rule in azurerm_network_security_rule.security_rules : 
-      rule_name => {
-        id                         = rule.id
-        priority                   = rule.priority
-        direction                  = rule.direction
-        access                     = rule.access
-        protocol                   = rule.protocol
-        source_port_range          = rule.source_port_range
-        source_port_ranges         = rule.source_port_ranges
-        destination_port_range     = rule.destination_port_range
-        destination_port_ranges    = rule.destination_port_ranges
-        source_address_prefix      = rule.source_address_prefix
-        source_address_prefixes    = rule.source_address_prefixes
-        destination_address_prefix = rule.destination_address_prefix
-        destination_address_prefixes = rule.destination_address_prefixes
-        description                = rule.description
-      }
+    for rule_name, rule in azurerm_network_security_rule.security_rules :
+    rule_name => {
+      id                           = rule.id
+      priority                     = rule.priority
+      direction                    = rule.direction
+      access                       = rule.access
+      protocol                     = rule.protocol
+      source_port_range            = rule.source_port_range
+      source_port_ranges           = rule.source_port_ranges
+      destination_port_range       = rule.destination_port_range
+      destination_port_ranges      = rule.destination_port_ranges
+      source_address_prefix        = rule.source_address_prefix
+      source_address_prefixes      = rule.source_address_prefixes
+      destination_address_prefix   = rule.destination_address_prefix
+      destination_address_prefixes = rule.destination_address_prefixes
+      description                  = rule.description
+    }
   }
 }
 

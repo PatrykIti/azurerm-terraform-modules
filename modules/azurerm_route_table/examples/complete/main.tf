@@ -30,7 +30,7 @@ resource "azurerm_subnet" "data" {
 }
 
 resource "azurerm_subnet" "firewall" {
-  name                 = "AzureFirewallSubnet"  # Special name for Azure Firewall
+  name                 = "AzureFirewallSubnet" # Special name for Azure Firewall
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.0.0/24"]
@@ -53,12 +53,12 @@ module "route_table_complete" {
       name                   = "to-firewall-default"
       address_prefix         = "0.0.0.0/0"
       next_hop_type          = "VirtualAppliance"
-      next_hop_in_ip_address = "10.0.0.4"  # Firewall internal IP
+      next_hop_in_ip_address = "10.0.0.4" # Firewall internal IP
     },
     {
-      name                   = "to-on-premises"
-      address_prefix         = "192.168.0.0/16"
-      next_hop_type          = "VirtualNetworkGateway"
+      name           = "to-on-premises"
+      address_prefix = "192.168.0.0/16"
+      next_hop_type  = "VirtualNetworkGateway"
     },
     {
       name                   = "to-spoke1"
@@ -73,14 +73,14 @@ module "route_table_complete" {
       next_hop_in_ip_address = "10.0.0.4"
     },
     {
-      name                   = "local-vnet"
-      address_prefix         = "10.0.0.0/16"
-      next_hop_type          = "VnetLocal"
+      name           = "local-vnet"
+      address_prefix = "10.0.0.0/16"
+      next_hop_type  = "VnetLocal"
     },
     {
-      name                   = "blackhole-bad-traffic"
-      address_prefix         = "1.2.3.4/32"
-      next_hop_type          = "None"  # Drop traffic to this IP
+      name           = "blackhole-bad-traffic"
+      address_prefix = "1.2.3.4/32"
+      next_hop_type  = "None" # Drop traffic to this IP
     }
   ]
 

@@ -37,13 +37,13 @@ output "cluster_identity" {
 
 output "kubelet_identity" {
   description = "The kubelet identity of the cluster"
-  value = module.kubernetes_cluster.kubelet_identity
+  value       = module.kubernetes_cluster.kubelet_identity
 }
 
 # Network outputs
 output "network_profile" {
   description = "The network profile of the cluster"
-  value = module.kubernetes_cluster.network_profile
+  value       = module.kubernetes_cluster.network_profile
 }
 
 # OIDC outputs

@@ -90,10 +90,10 @@ module "network_security_group" {
   flow_log_version            = 2
 
   # Traffic Analytics Configuration
-  traffic_analytics_enabled              = true
-  traffic_analytics_workspace_id         = azurerm_log_analytics_workspace.example.id
-  traffic_analytics_workspace_region     = azurerm_log_analytics_workspace.example.location
-  traffic_analytics_interval_in_minutes  = 10
+  traffic_analytics_enabled             = true
+  traffic_analytics_workspace_id        = azurerm_log_analytics_workspace.example.id
+  traffic_analytics_workspace_region    = azurerm_log_analytics_workspace.example.location
+  traffic_analytics_interval_in_minutes = 10
 
   # Comprehensive Security Rules
   security_rules = {
@@ -125,15 +125,15 @@ module "network_security_group" {
 
     # Multiple Address Prefixes Example
     allow_management_subnets = {
-      priority                     = 120
-      direction                    = "Inbound"
-      access                       = "Allow"
-      protocol                     = "Tcp"
-      source_port_range            = "*"
-      destination_port_ranges      = ["22", "3389"]
-      source_address_prefixes      = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-      destination_address_prefix   = "VirtualNetwork"
-      description                  = "Allow SSH/RDP from management subnets"
+      priority                   = 120
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_ranges    = ["22", "3389"]
+      source_address_prefixes    = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+      destination_address_prefix = "VirtualNetwork"
+      description                = "Allow SSH/RDP from management subnets"
     }
 
     # Application Security Group Example

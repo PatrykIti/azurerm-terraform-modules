@@ -5,13 +5,13 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
   location            = var.location
 
   # DNS Configuration - One of dns_prefix or dns_prefix_private_cluster is required
-  dns_prefix                  = var.dns_prefix
-  dns_prefix_private_cluster  = var.dns_prefix_private_cluster
+  dns_prefix                 = var.dns_prefix
+  dns_prefix_private_cluster = var.dns_prefix_private_cluster
 
   # Kubernetes Version and Upgrade Configuration
-  kubernetes_version          = var.kubernetes_version
-  automatic_upgrade_channel   = var.automatic_upgrade_channel
-  node_os_upgrade_channel     = var.node_os_upgrade_channel
+  kubernetes_version        = var.kubernetes_version
+  automatic_upgrade_channel = var.automatic_upgrade_channel
+  node_os_upgrade_channel   = var.node_os_upgrade_channel
 
   # SKU Configuration
   sku_tier     = var.sku_tier
@@ -26,9 +26,9 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
   private_cluster_public_fqdn_enabled = var.private_cluster_public_fqdn_enabled
 
   # Feature Flags
-  azure_policy_enabled              = var.azure_policy_enabled
-  http_application_routing_enabled  = var.http_application_routing_enabled
-  workload_identity_enabled         = var.workload_identity_enabled
+  azure_policy_enabled             = var.azure_policy_enabled
+  http_application_routing_enabled = var.http_application_routing_enabled
+  workload_identity_enabled        = var.workload_identity_enabled
   oidc_issuer_enabled              = var.oidc_issuer_enabled
   open_service_mesh_enabled        = var.open_service_mesh_enabled
   image_cleaner_enabled            = var.image_cleaner_enabled
@@ -47,33 +47,33 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
 
   # Default Node Pool - Required
   default_node_pool {
-    name                          = var.default_node_pool.name
-    vm_size                       = var.default_node_pool.vm_size
-    
+    name    = var.default_node_pool.name
+    vm_size = var.default_node_pool.vm_size
+
     # Node Count Configuration
-    node_count                    = var.default_node_pool.node_count
-    auto_scaling_enabled          = var.default_node_pool.auto_scaling_enabled
-    min_count                     = var.default_node_pool.auto_scaling_enabled ? var.default_node_pool.min_count : null
-    max_count                     = var.default_node_pool.auto_scaling_enabled ? var.default_node_pool.max_count : null
-    
+    node_count           = var.default_node_pool.node_count
+    auto_scaling_enabled = var.default_node_pool.auto_scaling_enabled
+    min_count            = var.default_node_pool.auto_scaling_enabled ? var.default_node_pool.min_count : null
+    max_count            = var.default_node_pool.auto_scaling_enabled ? var.default_node_pool.max_count : null
+
     # VM Configuration
     capacity_reservation_group_id = var.default_node_pool.capacity_reservation_group_id
     host_encryption_enabled       = var.default_node_pool.host_encryption_enabled
     node_public_ip_enabled        = var.default_node_pool.node_public_ip_enabled
     gpu_instance                  = var.default_node_pool.gpu_instance
-    host_group_id                = var.default_node_pool.host_group_id
-    
+    host_group_id                 = var.default_node_pool.host_group_id
+
     # OS Configuration
-    os_disk_size_gb              = var.default_node_pool.os_disk_size_gb
-    os_disk_type                 = var.default_node_pool.os_disk_type
-    os_sku                       = var.default_node_pool.os_sku
-    orchestrator_version         = var.default_node_pool.orchestrator_version
-    
+    os_disk_size_gb      = var.default_node_pool.os_disk_size_gb
+    os_disk_type         = var.default_node_pool.os_disk_type
+    os_sku               = var.default_node_pool.os_sku
+    orchestrator_version = var.default_node_pool.orchestrator_version
+
     # Network Configuration
-    vnet_subnet_id               = var.default_node_pool.vnet_subnet_id
-    pod_subnet_id                = var.default_node_pool.pod_subnet_id
-    node_public_ip_prefix_id     = var.default_node_pool.node_public_ip_prefix_id
-    
+    vnet_subnet_id           = var.default_node_pool.vnet_subnet_id
+    pod_subnet_id            = var.default_node_pool.pod_subnet_id
+    node_public_ip_prefix_id = var.default_node_pool.node_public_ip_prefix_id
+
     # Advanced Configuration
     fips_enabled                 = var.default_node_pool.fips_enabled
     kubelet_disk_type            = var.default_node_pool.kubelet_disk_type
@@ -87,10 +87,10 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
     ultra_ssd_enabled            = var.default_node_pool.ultra_ssd_enabled
     workload_runtime             = var.default_node_pool.workload_runtime
     zones                        = var.default_node_pool.zones
-    
+
     # Node Labels
-    node_labels                  = var.default_node_pool.node_labels
-    
+    node_labels = var.default_node_pool.node_labels
+
     # Kubelet Configuration
     dynamic "kubelet_config" {
       for_each = var.default_node_pool.kubelet_config != null ? [var.default_node_pool.kubelet_config] : []
@@ -107,15 +107,15 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
         topology_manager_policy   = kubelet_config.value.topology_manager_policy
       }
     }
-    
+
     # Linux OS Configuration
     dynamic "linux_os_config" {
       for_each = var.default_node_pool.linux_os_config != null ? [var.default_node_pool.linux_os_config] : []
       content {
-        swap_file_size_mb             = linux_os_config.value.swap_file_size_mb
-        transparent_huge_page_defrag  = linux_os_config.value.transparent_huge_page_defrag
-        transparent_huge_page_enabled = linux_os_config.value.transparent_huge_page_enabled
-        
+        swap_file_size_mb            = linux_os_config.value.swap_file_size_mb
+        transparent_huge_page_defrag = linux_os_config.value.transparent_huge_page_defrag
+        transparent_huge_page        = linux_os_config.value.transparent_huge_page
+
         dynamic "sysctl_config" {
           for_each = linux_os_config.value.sysctl_config != null ? [linux_os_config.value.sysctl_config] : []
           content {
@@ -152,14 +152,14 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
         }
       }
     }
-    
+
     # Node Network Profile
     dynamic "node_network_profile" {
       for_each = var.default_node_pool.node_network_profile != null ? [var.default_node_pool.node_network_profile] : []
       content {
         application_security_group_ids = node_network_profile.value.application_security_group_ids
-        node_public_ip_tags           = node_network_profile.value.node_public_ip_tags
-        
+        node_public_ip_tags            = node_network_profile.value.node_public_ip_tags
+
         dynamic "allowed_host_ports" {
           for_each = node_network_profile.value.allowed_host_ports != null ? node_network_profile.value.allowed_host_ports : []
           content {
@@ -170,7 +170,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
         }
       }
     }
-    
+
     # Upgrade Settings
     dynamic "upgrade_settings" {
       for_each = var.default_node_pool.upgrade_settings != null ? [var.default_node_pool.upgrade_settings] : []
@@ -355,7 +355,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
     for_each = var.linux_profile != null ? [var.linux_profile] : []
     content {
       admin_username = linux_profile.value.admin_username
-      
+
       ssh_key {
         key_data = linux_profile.value.ssh_key.key_data
       }
@@ -369,7 +369,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
       admin_username = windows_profile.value.admin_username
       admin_password = windows_profile.value.admin_password
       license        = windows_profile.value.license
-      
+
       dynamic "gmsa" {
         for_each = windows_profile.value.gmsa != null ? [windows_profile.value.gmsa] : []
         content {
@@ -391,7 +391,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
           hours = allowed.value.hours
         }
       }
-      
+
       dynamic "not_allowed" {
         for_each = maintenance_window.value.not_allowed != null ? maintenance_window.value.not_allowed : []
         content {
@@ -415,7 +415,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
       start_time   = maintenance_window_auto_upgrade.value.start_time
       utc_offset   = maintenance_window_auto_upgrade.value.utc_offset
       week_index   = maintenance_window_auto_upgrade.value.week_index
-      
+
       dynamic "not_allowed" {
         for_each = maintenance_window_auto_upgrade.value.not_allowed != null ? maintenance_window_auto_upgrade.value.not_allowed : []
         content {
@@ -439,7 +439,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
       start_time   = maintenance_window_node_os.value.start_time
       utc_offset   = maintenance_window_node_os.value.utc_offset
       week_index   = maintenance_window_node_os.value.week_index
-      
+
       dynamic "not_allowed" {
         for_each = maintenance_window_node_os.value.not_allowed != null ? maintenance_window_node_os.value.not_allowed : []
         content {
@@ -518,7 +518,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
     for_each = var.web_app_routing != null ? [var.web_app_routing] : []
     content {
       dns_zone_ids = web_app_routing.value.dns_zone_ids
-      
+
       dynamic "web_app_routing_identity" {
         for_each = web_app_routing.value.web_app_routing_identity != null ? [web_app_routing.value.web_app_routing_identity] : []
         content {
@@ -552,12 +552,12 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
     }
 
     precondition {
-      condition = var.cost_analysis_enabled == false || contains(["Standard", "Premium"], var.sku_tier)
+      condition     = var.cost_analysis_enabled == false || contains(["Standard", "Premium"], var.sku_tier)
       error_message = "Cost analysis can only be enabled when sku_tier is set to Standard or Premium."
     }
 
     precondition {
-      condition = var.private_cluster_enabled == false || var.dns_prefix_private_cluster != null
+      condition     = var.private_cluster_enabled == false || var.dns_prefix_private_cluster != null
       error_message = "When private_cluster_enabled is true, dns_prefix_private_cluster must be specified."
     }
   }

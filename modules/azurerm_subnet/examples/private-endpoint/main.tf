@@ -123,7 +123,7 @@ resource "azurerm_storage_account" "example" {
 
   account_tier             = "Standard"
   account_replication_type = "LRS"
-  
+
   # Disable public access - only accessible via private endpoint
   public_network_access_enabled = false
 

@@ -103,7 +103,7 @@ variable "default_node_pool" {
     
     Optional fields include node count, availability zones, max pods, OS disk configuration, and more.
   EOT
-  
+
   type = object({
     name                          = string
     vm_size                       = string
@@ -113,7 +113,7 @@ variable "default_node_pool" {
     node_public_ip_enabled        = optional(bool, false)
     gpu_instance                  = optional(string)
     host_group_id                 = optional(string)
-    
+
     kubelet_config = optional(object({
       allowed_unsafe_sysctls    = optional(list(string))
       container_log_max_line    = optional(number)
@@ -125,7 +125,7 @@ variable "default_node_pool" {
       image_gc_low_threshold    = optional(number)
       pod_max_pid               = optional(number)
     }))
-    
+
     linux_os_config = optional(object({
       swap_file_size_mb = optional(number)
       sysctl_config = optional(object({
@@ -159,13 +159,13 @@ variable "default_node_pool" {
         vm_swappiness                      = optional(number)
         vm_vfs_cache_pressure              = optional(number)
       }))
-      transparent_huge_page_defrag  = optional(string)
-      transparent_huge_page_enabled = optional(string)
+      transparent_huge_page_defrag = optional(string)
+      transparent_huge_page        = optional(string)
     }))
-    
-    fips_enabled         = optional(bool, false)
-    kubelet_disk_type    = optional(string)
-    max_pods             = optional(number)
+
+    fips_enabled      = optional(bool, false)
+    kubelet_disk_type = optional(string)
+    max_pods          = optional(number)
     node_network_profile = optional(object({
       allowed_host_ports = optional(list(object({
         port_start = optional(number)
@@ -175,7 +175,7 @@ variable "default_node_pool" {
       application_security_group_ids = optional(list(string))
       node_public_ip_tags            = optional(map(string))
     }))
-    
+
     node_labels                  = optional(map(string))
     node_public_ip_prefix_id     = optional(string)
     only_critical_addons_enabled = optional(bool, false)
@@ -186,24 +186,24 @@ variable "default_node_pool" {
     pod_subnet_id                = optional(string)
     proximity_placement_group_id = optional(string)
     scale_down_mode              = optional(string, "Delete")
-    
+
     snapshot_id = optional(string)
-    
+
     temporary_name_for_rotation = optional(string)
     type                        = optional(string, "VirtualMachineScaleSets")
-    
+
     ultra_ssd_enabled = optional(bool, false)
-    
+
     upgrade_settings = optional(object({
       drain_timeout_in_minutes      = optional(number)
       node_soak_duration_in_minutes = optional(number)
       max_surge                     = string
     }))
-    
-    vnet_subnet_id = optional(string)
+
+    vnet_subnet_id   = optional(string)
     workload_runtime = optional(string)
-    zones          = optional(list(string))
-    
+    zones            = optional(list(string))
+
     max_count  = optional(number)
     min_count  = optional(number)
     node_count = optional(number, 1)
@@ -238,12 +238,12 @@ variable "identity" {
     type: Specifies the type of Managed Service Identity. Possible values are SystemAssigned or UserAssigned.
     identity_ids: Specifies a list of User Assigned Managed Identity IDs.
   EOT
-  
+
   type = object({
     type         = string
     identity_ids = optional(list(string))
   })
-  
+
   default = {
     type = "SystemAssigned"
   }
@@ -265,12 +265,12 @@ variable "service_principal" {
     A service_principal block. One of either identity or service_principal must be specified.
     Note: A migration scenario from service_principal to identity is supported.
   EOT
-  
+
   type = object({
     client_id     = string
     client_secret = string
   })
-  
+
   default   = null
   sensitive = true
 }
@@ -287,39 +287,39 @@ variable "network_profile" {
     service_cidr: The Network Range used by the Kubernetes service. Changing this forces a new resource.
     load_balancer_sku: Specifies the SKU of the Load Balancer used for this Kubernetes Cluster.
   EOT
-  
+
   type = object({
-    network_plugin             = string
-    network_mode               = optional(string)
-    network_policy             = optional(string)
-    dns_service_ip             = optional(string)
-    network_plugin_mode        = optional(string)
-    outbound_type              = optional(string, "loadBalancer")
-    pod_cidr                   = optional(string)
-    pod_cidrs                  = optional(list(string))
-    service_cidr               = optional(string)
-    service_cidrs              = optional(list(string))
-    ip_versions                = optional(list(string))
-    load_balancer_sku          = optional(string, "standard")
-    
+    network_plugin      = string
+    network_mode        = optional(string)
+    network_policy      = optional(string)
+    dns_service_ip      = optional(string)
+    network_plugin_mode = optional(string)
+    outbound_type       = optional(string, "loadBalancer")
+    pod_cidr            = optional(string)
+    pod_cidrs           = optional(list(string))
+    service_cidr        = optional(string)
+    service_cidrs       = optional(list(string))
+    ip_versions         = optional(list(string))
+    load_balancer_sku   = optional(string, "standard")
+
     load_balancer_profile = optional(object({
-      backend_pool_type              = optional(string, "nodeIPConfiguration")
-      effective_outbound_ips         = optional(list(string))
-      idle_timeout_in_minutes        = optional(number, 30)
-      managed_outbound_ip_count      = optional(number)
-      managed_outbound_ipv6_count    = optional(number)
-      outbound_ip_address_ids        = optional(list(string))
-      outbound_ip_prefix_ids         = optional(list(string))
-      outbound_ports_allocated       = optional(number, 0)
+      backend_pool_type           = optional(string, "nodeIPConfiguration")
+      effective_outbound_ips      = optional(list(string))
+      idle_timeout_in_minutes     = optional(number, 30)
+      managed_outbound_ip_count   = optional(number)
+      managed_outbound_ipv6_count = optional(number)
+      outbound_ip_address_ids     = optional(list(string))
+      outbound_ip_prefix_ids      = optional(list(string))
+      outbound_ports_allocated    = optional(number, 0)
     }))
-    
+
     nat_gateway_profile = optional(object({
       effective_outbound_ips    = optional(list(string))
       idle_timeout_in_minutes   = optional(number, 4)
       managed_outbound_ip_count = optional(number)
     }))
   })
-  
+
   default = {
     network_plugin = "azure"
   }
@@ -352,11 +352,11 @@ variable "api_server_access_profile" {
     
     authorized_ip_ranges: Set of authorized IP ranges to allow access to API server.
   EOT
-  
+
   type = object({
     authorized_ip_ranges = optional(list(string))
   })
-  
+
   default = null
 }
 
@@ -388,13 +388,13 @@ variable "azure_active_directory_role_based_access_control" {
     admin_group_object_ids: A list of Object IDs of Azure Active Directory Groups which should have Admin Role on the Cluster.
     azure_rbac_enabled: Is Role Based Access Control based on Azure AD enabled?
   EOT
-  
+
   type = object({
     tenant_id              = optional(string)
     admin_group_object_ids = optional(list(string))
     azure_rbac_enabled     = optional(bool, true)
   })
-  
+
   default = null
 }
 
@@ -418,12 +418,12 @@ variable "oms_agent" {
     log_analytics_workspace_id: The ID of the Log Analytics Workspace which the OMS Agent should send data to.
     msi_auth_for_monitoring_enabled: Is managed identity authentication for monitoring enabled?
   EOT
-  
+
   type = object({
     log_analytics_workspace_id      = string
     msi_auth_for_monitoring_enabled = optional(bool, true)
   })
-  
+
   default = null
 }
 
@@ -436,14 +436,14 @@ variable "ingress_application_gateway" {
     subnet_cidr: The subnet CIDR to be used to create an Application Gateway.
     subnet_id: The ID of the subnet on which to create an Application Gateway.
   EOT
-  
+
   type = object({
     gateway_id   = optional(string)
     gateway_name = optional(string)
     subnet_cidr  = optional(string)
     subnet_id    = optional(string)
   })
-  
+
   default = null
 }
 
@@ -453,11 +453,11 @@ variable "aci_connector_linux" {
     
     subnet_name: The subnet name for the virtual nodes to run.
   EOT
-  
+
   type = object({
     subnet_name = string
   })
-  
+
   default = null
 }
 
@@ -468,19 +468,19 @@ variable "key_vault_secrets_provider" {
     secret_rotation_enabled: Is secret rotation enabled?
     secret_rotation_interval: The interval to poll for secret rotation.
   EOT
-  
+
   type = object({
     secret_rotation_enabled  = optional(bool, true)
     secret_rotation_interval = optional(string, "2m")
   })
-  
+
   default = null
 }
 
 # Auto Scaler Profile
 variable "auto_scaler_profile" {
   description = "Auto Scaler Profile configuration."
-  
+
   type = object({
     balance_similar_node_groups                   = optional(bool)
     daemonset_eviction_for_empty_nodes_enabled    = optional(bool)
@@ -503,7 +503,7 @@ variable "auto_scaler_profile" {
     skip_nodes_with_local_storage                 = optional(bool)
     skip_nodes_with_system_pods                   = optional(bool)
   })
-  
+
   default = null
 }
 
@@ -515,7 +515,7 @@ variable "maintenance_window" {
     allowed: List of allowed maintenance windows.
     not_allowed: List of not allowed maintenance windows.
   EOT
-  
+
   type = object({
     allowed = optional(list(object({
       day   = string
@@ -526,13 +526,13 @@ variable "maintenance_window" {
       start = string
     })))
   })
-  
+
   default = null
 }
 
 variable "maintenance_window_auto_upgrade" {
   description = "Maintenance window configuration for auto upgrade."
-  
+
   type = object({
     duration     = number
     frequency    = string
@@ -548,13 +548,13 @@ variable "maintenance_window_auto_upgrade" {
       start = string
     })))
   })
-  
+
   default = null
 }
 
 variable "maintenance_window_node_os" {
   description = "Maintenance window configuration for node OS updates."
-  
+
   type = object({
     duration     = number
     frequency    = string
@@ -570,7 +570,7 @@ variable "maintenance_window_node_os" {
       start = string
     })))
   })
-  
+
   default = null
 }
 
@@ -581,11 +581,11 @@ variable "microsoft_defender" {
     
     log_analytics_workspace_id: Specifies the ID of the Log Analytics Workspace where the audit logs should be sent.
   EOT
-  
+
   type = object({
     log_analytics_workspace_id = string
   })
-  
+
   default = null
 }
 
@@ -609,12 +609,12 @@ variable "monitor_metrics" {
     annotations_allowed: Specifies a comma-separated list of Kubernetes annotation keys that will be used in the resource's labels metric.
     labels_allowed: Specifies a comma-separated list of additional Kubernetes label keys that will be used in the resource's labels metric.
   EOT
-  
+
   type = object({
     annotations_allowed = optional(string)
     labels_allowed      = optional(string)
   })
-  
+
   default = null
 }
 
@@ -628,14 +628,14 @@ variable "service_mesh_profile" {
     internal_ingress_gateway_enabled: Is Istio Internal Ingress Gateway enabled?
     external_ingress_gateway_enabled: Is Istio External Ingress Gateway enabled?
   EOT
-  
+
   type = object({
     mode                             = string
     revisions                        = list(string)
     internal_ingress_gateway_enabled = optional(bool)
     external_ingress_gateway_enabled = optional(bool)
   })
-  
+
   default = null
 
   validation {
@@ -657,12 +657,12 @@ variable "workload_autoscaler_profile" {
     keda_enabled: Specifies whether KEDA Autoscaler can be used for workloads.
     vertical_pod_autoscaler_enabled: Specifies whether Vertical Pod Autoscaler should be enabled.
   EOT
-  
+
   type = object({
     keda_enabled                    = optional(bool)
     vertical_pod_autoscaler_enabled = optional(bool)
   })
-  
+
   default = null
 }
 
@@ -688,14 +688,14 @@ variable "http_proxy_config" {
     no_proxy: Endpoints that should not go through proxy.
     trusted_ca: Alternative CA bundle base64 string.
   EOT
-  
+
   type = object({
     http_proxy  = optional(string)
     https_proxy = optional(string)
     no_proxy    = optional(list(string))
     trusted_ca  = optional(string)
   })
-  
+
   default   = null
   sensitive = true
 }
@@ -731,12 +731,12 @@ variable "key_management_service" {
     key_vault_key_id: Identifier of Azure Key Vault key.
     key_vault_network_access: Network access of the key vault. Possible values are Public and Private.
   EOT
-  
+
   type = object({
     key_vault_key_id         = string
     key_vault_network_access = optional(string, "Public")
   })
-  
+
   default = null
 
   validation {
@@ -753,13 +753,13 @@ variable "kubelet_identity" {
     object_id: The Object ID of the user-defined Managed Identity assigned to the Kubelets.
     user_assigned_identity_id: The ID of the User Assigned Identity assigned to the Kubelets.
   EOT
-  
+
   type = object({
     client_id                 = optional(string)
     object_id                 = optional(string)
     user_assigned_identity_id = optional(string)
   })
-  
+
   default = null
 }
 
@@ -770,14 +770,14 @@ variable "linux_profile" {
     admin_username: The Admin Username for the Cluster.
     ssh_key: An ssh_key block with key_data containing the SSH public key.
   EOT
-  
+
   type = object({
     admin_username = string
     ssh_key = object({
       key_data = string
     })
   })
-  
+
   default = null
 }
 
@@ -790,7 +790,7 @@ variable "windows_profile" {
     license: Specifies the type of on-premise license which should be used for Node Pool Windows VM's.
     gmsa: GMSA configuration for Windows node pools.
   EOT
-  
+
   type = object({
     admin_username = string
     admin_password = optional(string)
@@ -800,7 +800,7 @@ variable "windows_profile" {
       dns_server  = optional(string)
     }))
   })
-  
+
   default   = null
   sensitive = true
 }
@@ -812,7 +812,7 @@ variable "web_app_routing" {
     dns_zone_ids: Specifies the list of the DNS Zone IDs in which DNS entries are created for applications deployed to the cluster.
     web_app_routing_identity: A web_app_routing_identity block.
   EOT
-  
+
   type = object({
     dns_zone_ids = list(string)
     web_app_routing_identity = optional(object({
@@ -821,7 +821,7 @@ variable "web_app_routing" {
       user_assigned_identity_id = string
     }))
   })
-  
+
   default = null
 }
 
@@ -843,11 +843,11 @@ variable "confidential_computing" {
     
     sgx_quote_helper_enabled: Should the SGX quote helper be enabled?
   EOT
-  
+
   type = object({
     sgx_quote_helper_enabled = bool
   })
-  
+
   default = null
 }
 
@@ -868,14 +868,14 @@ variable "storage_profile" {
     file_driver_enabled: Is the File CSI driver enabled?
     snapshot_controller_enabled: Is the Snapshot Controller enabled?
   EOT
-  
+
   type = object({
     blob_driver_enabled         = optional(bool, false)
     disk_driver_enabled         = optional(bool, true)
     file_driver_enabled         = optional(bool, true)
     snapshot_controller_enabled = optional(bool, true)
   })
-  
+
   default = {}
 }
 

@@ -50,37 +50,37 @@ module "kubernetes_cluster" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   dns_prefix          = "aks-basic-example"
-  
+
   # Use system-assigned managed identity (secure default)
   identity = {
     type         = "SystemAssigned"
     identity_ids = null
   }
-  
+
   # Default node pool with minimal configuration
   default_node_pool = {
-    name                   = "default"
-    vm_size                = "Standard_D2s_v3"
-    node_count             = 2
-    auto_scaling_enabled   = false
-    vnet_subnet_id         = azurerm_subnet.example.id
-    
+    name                 = "default"
+    vm_size              = "Standard_D2s_v3"
+    node_count           = 2
+    auto_scaling_enabled = false
+    vnet_subnet_id       = azurerm_subnet.example.id
+
     # Secure defaults
-    os_disk_type           = "Managed"
-    os_sku                 = "Ubuntu"
-    host_encryption_enabled = false
-    node_public_ip_enabled = false
+    os_disk_type                 = "Managed"
+    os_sku                       = "Ubuntu"
+    host_encryption_enabled      = false
+    node_public_ip_enabled       = false
     only_critical_addons_enabled = false
-    
+
     # Not setting optional fields to use module defaults
   }
-  
+
   # Basic network profile
   network_profile = {
     network_plugin = "azure"
     network_policy = "azure"
   }
-  
+
   # Basic storage profile with secure defaults
   storage_profile = {
     blob_driver_enabled         = true

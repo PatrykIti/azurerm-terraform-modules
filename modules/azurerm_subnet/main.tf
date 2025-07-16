@@ -5,7 +5,7 @@
 locals {
   # Resource naming convention  
   resource_name = var.name
-  
+
   # Merge default tags with user-provided tags
   tags = merge(
     {
@@ -52,7 +52,7 @@ resource "azurerm_subnet" "subnet" {
   }
 
   # Network Policies
-  private_endpoint_network_policies = var.private_endpoint_network_policies_enabled ? "Enabled" : "Disabled"
+  private_endpoint_network_policies             = var.private_endpoint_network_policies_enabled ? "Enabled" : "Disabled"
   private_link_service_network_policies_enabled = var.private_link_service_network_policies_enabled
 }
 

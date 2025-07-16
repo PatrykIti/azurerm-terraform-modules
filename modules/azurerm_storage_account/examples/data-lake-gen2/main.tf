@@ -2,15 +2,15 @@ terraform {
   required_version = ">= 1.3.0"
   required_providers {
     azurerm = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+      source  = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
       version = ">= 3.0.0"
     }
     azuread = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+      source  = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
       version = ">= 2.0.0"
     }
     random = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+      source  = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
       version = ">= 3.1.0"
     }
   }
@@ -241,7 +241,7 @@ resource "azurerm_storage_data_lake_gen2_path" "bronze_raw" {
   path               = "raw-data"
   filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.bronze.name
   storage_account_id = module.data_lake_storage.id
-  resource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  resource           = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
 
   # ACL configuration - Data Engineer has full access, Data Analyst has read-only
   # Access ACL applies to this directory
@@ -279,21 +279,21 @@ resource "azurerm_storage_data_lake_gen2_path" "bronze_staging" {
   path               = "staging"
   filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.bronze.name
   storage_account_id = module.data_lake_storage.id
-  resource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  resource           = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
 }
 
 resource "azurerm_storage_data_lake_gen2_path" "silver_processed" {
   path               = "processed"
   filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.silver.name
   storage_account_id = module.data_lake_storage.id
-  resource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  resource           = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
 }
 
 resource "azurerm_storage_data_lake_gen2_path" "gold_reports" {
   path               = "reports"
   filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.gold.name
   storage_account_id = module.data_lake_storage.id
-  resource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  resource           = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
 }
 
 # Local user for SFTP access
@@ -371,7 +371,7 @@ resource "azurerm_storage_data_lake_gen2_path" "sample_data_dir" {
   path               = "raw-data/samples"
   filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.bronze.name
   storage_account_id = module.data_lake_storage.id
-  resource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  resource           = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
 
   # File-level ACL - Data Analyst has read-only access to this specific file
   ace {

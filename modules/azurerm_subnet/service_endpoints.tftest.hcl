@@ -52,11 +52,11 @@ run "test_service_endpoint_policies" {
   command = plan
 
   variables {
-    name                        = "test-subnet"
-    resource_group_name         = "test-rg"
-    virtual_network_name        = "test-vnet"
-    address_prefixes            = ["10.0.1.0/24"]
-    service_endpoints           = ["Microsoft.Storage"]
+    name                 = "test-subnet"
+    resource_group_name  = "test-rg"
+    virtual_network_name = "test-vnet"
+    address_prefixes     = ["10.0.1.0/24"]
+    service_endpoints    = ["Microsoft.Storage"]
     service_endpoint_policy_ids = [
       "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/serviceEndpointPolicies/test-policy1",
       "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/serviceEndpointPolicies/test-policy2"

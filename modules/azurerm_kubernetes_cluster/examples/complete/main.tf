@@ -67,7 +67,7 @@ resource "azurerm_subnet" "pods" {
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.2.0/22"]
-  
+
   delegation {
     name = "aks-delegation"
     service_delegation {
@@ -106,105 +106,105 @@ module "kubernetes_cluster" {
   location            = azurerm_resource_group.example.location
   dns_prefix          = "aks-complete-${random_string.suffix.result}"
   kubernetes_version  = var.kubernetes_version
-  
+
   # SKU and support
   sku_tier                  = "Standard"
   automatic_upgrade_channel = "stable"
   node_os_upgrade_channel   = "NodeImage"
-  
+
   # Node resource group
   node_resource_group = "rg-aks-nodes-${random_string.suffix.result}"
-  
+
   # Identity configuration
   identity = {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.example.id]
   }
-  
+
   # Comprehensive default node pool configuration
   default_node_pool = {
-    name                   = "system"
-    vm_size                = "Standard_D4s_v3"
-    node_count             = null
-    auto_scaling_enabled   = true
-    min_count              = 2
-    max_count              = 5
-    vnet_subnet_id         = azurerm_subnet.nodes.id
-    pod_subnet_id          = azurerm_subnet.pods.id
-    
+    name                 = "system"
+    vm_size              = "Standard_D4s_v3"
+    node_count           = null
+    auto_scaling_enabled = true
+    min_count            = 2
+    max_count            = 5
+    vnet_subnet_id       = azurerm_subnet.nodes.id
+    pod_subnet_id        = azurerm_subnet.pods.id
+
     # VM configuration
-    os_disk_size_gb        = 100
-    os_disk_type           = "Managed"
-    os_sku                 = "Ubuntu"
-    orchestrator_version   = var.kubernetes_version
-    
+    os_disk_size_gb      = 100
+    os_disk_type         = "Managed"
+    os_sku               = "Ubuntu"
+    orchestrator_version = var.kubernetes_version
+
     # Security and features
-    host_encryption_enabled     = false
-    node_public_ip_enabled      = false
+    host_encryption_enabled      = false
+    node_public_ip_enabled       = false
     only_critical_addons_enabled = true
-    fips_enabled                = false
-    
+    fips_enabled                 = false
+
     # Advanced configuration
-    max_pods               = 110
-    scale_down_mode        = "Delete"
-    ultra_ssd_enabled      = false
-    zones                  = ["1", "2", "3"]
-    
+    max_pods          = 110
+    scale_down_mode   = "Delete"
+    ultra_ssd_enabled = false
+    zones             = ["1", "2", "3"]
+
     # Node labels
     node_labels = {
-      "nodepool-type"    = "system"
-      "environment"      = "production"
-      "nodepoolos"       = "linux"
+      "nodepool-type" = "system"
+      "environment"   = "production"
+      "nodepoolos"    = "linux"
     }
-    
+
     # Kubelet configuration
     kubelet_config = {
-      cpu_manager_policy    = "static"
-      cpu_cfs_quota_enabled = true
-      cpu_cfs_quota_period  = "100ms"
+      cpu_manager_policy      = "static"
+      cpu_cfs_quota_enabled   = true
+      cpu_cfs_quota_period    = "100ms"
       image_gc_high_threshold = 85
       image_gc_low_threshold  = 80
       topology_manager_policy = "best-effort"
-      pod_max_pid            = -1
+      pod_max_pid             = -1
     }
-    
+
     # Linux OS configuration
     linux_os_config = {
       transparent_huge_page_enabled = "always"
       transparent_huge_page_defrag  = "madvise"
-      swap_file_size_mb            = 0
-      
+      swap_file_size_mb             = 0
+
       sysctl_config = {
         kernel_threads_max                 = 200000
-        net_core_netdev_max_backlog       = 5000
-        net_core_rmem_max                 = 134217728
-        net_core_wmem_max                 = 134217728
-        net_core_rmem_default             = 262144
-        net_core_wmem_default             = 262144
-        net_ipv4_tcp_max_syn_backlog      = 4096
-        net_ipv4_tcp_keepalive_time       = 7200
-        net_ipv4_tcp_keepalive_probes     = 9
-        net_ipv4_tcp_keepalive_intvl      = 75
-        net_ipv4_tcp_tw_reuse             = false
-        net_netfilter_nf_conntrack_max    = 1000000
+        net_core_netdev_max_backlog        = 5000
+        net_core_rmem_max                  = 134217728
+        net_core_wmem_max                  = 134217728
+        net_core_rmem_default              = 262144
+        net_core_wmem_default              = 262144
+        net_ipv4_tcp_max_syn_backlog       = 4096
+        net_ipv4_tcp_keepalive_time        = 7200
+        net_ipv4_tcp_keepalive_probes      = 9
+        net_ipv4_tcp_keepalive_intvl       = 75
+        net_ipv4_tcp_tw_reuse              = false
+        net_netfilter_nf_conntrack_max     = 1000000
         net_netfilter_nf_conntrack_buckets = 262144
-        fs_file_max                       = 2097152
-        fs_inotify_max_user_watches       = 1048576
-        fs_nr_open                        = 1048576
-        vm_max_map_count                  = 262144
-        vm_swappiness                     = 10
-        vm_vfs_cache_pressure             = 100
+        fs_file_max                        = 2097152
+        fs_inotify_max_user_watches        = 1048576
+        fs_nr_open                         = 1048576
+        vm_max_map_count                   = 262144
+        vm_swappiness                      = 10
+        vm_vfs_cache_pressure              = 100
       }
     }
-    
+
     # Upgrade settings
     upgrade_settings = {
-      max_surge = "33%"
-      drain_timeout_in_minutes = 30
+      max_surge                     = "33%"
+      drain_timeout_in_minutes      = 30
       node_soak_duration_in_minutes = 0
     }
   }
-  
+
   # Advanced network profile
   network_profile = {
     network_plugin      = "azure"
@@ -213,11 +213,11 @@ module "kubernetes_cluster" {
     network_plugin_mode = "overlay"
     outbound_type       = "loadBalancer"
     load_balancer_sku   = "standard"
-    
+
     # Service and pod CIDRs
-    service_cidr        = "172.16.0.0/16"
-    dns_service_ip      = "172.16.0.10"
-    
+    service_cidr   = "172.16.0.0/16"
+    dns_service_ip = "172.16.0.10"
+
     # Load balancer configuration
     load_balancer_profile = {
       managed_outbound_ip_count = 2
@@ -225,7 +225,7 @@ module "kubernetes_cluster" {
       outbound_ports_allocated  = 0
     }
   }
-  
+
   # Storage profile
   storage_profile = {
     blob_driver_enabled         = true
@@ -233,11 +233,11 @@ module "kubernetes_cluster" {
     file_driver_enabled         = true
     snapshot_controller_enabled = true
   }
-  
+
   # Feature flags
-  azure_policy_enabled              = true
-  http_application_routing_enabled  = false
-  workload_identity_enabled         = true
+  azure_policy_enabled             = true
+  http_application_routing_enabled = false
+  workload_identity_enabled        = true
   oidc_issuer_enabled              = true
   open_service_mesh_enabled        = false
   image_cleaner_enabled            = true
@@ -245,25 +245,25 @@ module "kubernetes_cluster" {
   run_command_enabled              = false
   local_account_disabled           = false
   cost_analysis_enabled            = true
-  
+
   # API Server Access Profile (for public clusters)
   api_server_access_profile = {
     authorized_ip_ranges = var.authorized_ip_ranges
   }
-  
+
   # Azure AD RBAC configuration
   azure_active_directory_role_based_access_control = {
     tenant_id              = var.tenant_id
     admin_group_object_ids = var.admin_group_object_ids
     azure_rbac_enabled     = true
   }
-  
+
   # OMS Agent (Container Insights)
   oms_agent = {
     log_analytics_workspace_id      = azurerm_log_analytics_workspace.example.id
     msi_auth_for_monitoring_enabled = true
   }
-  
+
   # Auto scaler profile
   auto_scaler_profile = {
     balance_similar_node_groups      = true
@@ -282,22 +282,22 @@ module "kubernetes_cluster" {
     skip_nodes_with_local_storage    = true
     skip_nodes_with_system_pods      = true
   }
-  
+
   # Key Vault Secrets Provider
   key_vault_secrets_provider = {
     secret_rotation_enabled  = true
     secret_rotation_interval = "2m"
   }
-  
+
   # Maintenance windows
   maintenance_window_auto_upgrade = {
-    frequency    = "Weekly"
-    interval     = 1
-    duration     = 4
-    day_of_week  = "Sunday"
-    start_time   = "00:00"
-    utc_offset   = "+00:00"
-    
+    frequency   = "Weekly"
+    interval    = 1
+    duration    = 4
+    day_of_week = "Sunday"
+    start_time  = "00:00"
+    utc_offset  = "+00:00"
+
     not_allowed = [
       {
         start = "2024-12-24T00:00:00Z"
@@ -305,16 +305,16 @@ module "kubernetes_cluster" {
       }
     ]
   }
-  
+
   maintenance_window_node_os = {
-    frequency    = "Weekly"
-    interval     = 1
-    duration     = 4
-    day_of_week  = "Sunday"
-    start_time   = "04:00"
-    utc_offset   = "+00:00"
+    frequency   = "Weekly"
+    interval    = 1
+    duration    = 4
+    day_of_week = "Sunday"
+    start_time  = "04:00"
+    utc_offset  = "+00:00"
   }
-  
+
   # Workload autoscaler profile
   workload_autoscaler_profile = {
     keda_enabled                    = true
