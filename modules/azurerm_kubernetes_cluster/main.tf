@@ -765,7 +765,7 @@ resource "azurerm_private_endpoint" "private_endpoint" {
   subnet_id           = each.value.subnet_id
 
   private_service_connection {
-    name                           = "${each.value.name}-psc${each.value.key}"
+    name                           = "${each.value.name}-connection"
     private_connection_resource_id = azurerm_kubernetes_cluster.kubernetes_cluster.id
     is_manual_connection           = false
     subresource_names              = ["management"]
