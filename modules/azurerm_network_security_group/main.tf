@@ -76,6 +76,7 @@ resource "azurerm_network_watcher_flow_log" "flow_log" {
       enabled               = true
       workspace_id          = var.traffic_analytics_workspace_id
       workspace_region      = var.traffic_analytics_workspace_region
+      workspace_resource_id = var.traffic_analytics_workspace_id
       interval_in_minutes   = var.traffic_analytics_interval_in_minutes
     }
   }

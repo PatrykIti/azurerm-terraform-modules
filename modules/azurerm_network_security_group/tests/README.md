@@ -1,167 +1,181 @@
 # Network Security Group Module Tests
 
-This directory contains automated tests for the Network Security Group Terraform module using [Terratest](https://terratest.gruntwork.io/).
+This directory contains automated tests for the Azure Network Security Group Terraform module.
 
-## Prerequisites
+## Test Structure
 
-1. **Go**: Version 1.21 or later
-2. **Terraform**: Version 1.3.0 or later
-3. **Azure CLI**: Authenticated with appropriate permissions
-4. **Azure Service Principal**: With Contributor access to the test subscription
-
-## Environment Variables
-
-Set the following environment variables before running tests:
-
-```bash
-export ARM_SUBSCRIPTION_ID="your-subscription-id"
-export ARM_TENANT_ID="your-tenant-id"
-export ARM_CLIENT_ID="your-client-id"
-export ARM_CLIENT_SECRET="your-client-secret"
-export ARM_LOCATION="West Europe"  # Optional, defaults to West Europe
+```
+tests/
+├── unit/                      # Native Terraform test framework tests
+│   ├── basic.tftest.hcl      # Basic functionality tests
+│   ├── security_rules.tftest.hcl # Security rules tests
+│   └── validation.tftest.hcl # Input validation tests
+├── integration/              # Terratest integration tests (Go)
+│   ├── network_security_group_test.go      # Main integration tests
+│   ├── network_security_group_perf_test.go # Performance tests
+│   └── test_helpers.go      # Test utility functions
+├── fixtures/                # Test fixtures
+│   └── basic-nsg.tf        # Basic NSG test fixture
+├── go.mod                  # Go module dependencies
+└── README.md              # This file
 ```
 
 ## Running Tests
 
-### Install Dependencies
+### Unit Tests (Native Terraform Tests)
 
+Run all unit tests:
 ```bash
+terraform test
+```
+
+Run specific test file:
+```bash
+terraform test -filter=tests/unit/basic.tftest.hcl
+```
+
+### Integration Tests (Terratest)
+
+Prerequisites:
+- Go 1.20 or later
+- Azure credentials configured
+- Terraform installed
+
+Set up environment:
+```bash
+export ARM_SUBSCRIPTION_ID="your-subscription-id"
+export ARM_CLIENT_ID="your-client-id"
+export ARM_CLIENT_SECRET="your-client-secret"
+export ARM_TENANT_ID="your-tenant-id"
+```
+
+Run all integration tests:
+```bash
+cd tests
 go mod download
+go test -v ./integration/...
 ```
 
-### Run All Tests
-
+Run specific test:
 ```bash
-make test-all
+go test -v -run TestNetworkSecurityGroupBasic ./integration/
 ```
 
-### Run Short Tests Only
-
+Run tests with timeout:
 ```bash
-make test-short
+go test -v -timeout 30m ./integration/...
 ```
-
-### Run Integration Tests Only
-
-```bash
-make test-integration
-```
-
-### Run Specific Test
-
-```bash
-go test -v -run TestModuleBasic -timeout 30m
-```
-
-## Test Structure
-
-### Test Files
-
-- `module_test.go` - Main module functionality tests
-- `integration_test.go` - Integration tests with other Azure services
-- `performance_test.go` - Performance and load tests
-- `test_helpers.go` - Common test utilities and helpers
-- `test_config.yaml` - Test configuration and scenarios
-
-### Test Fixtures
-
-The `fixtures/` directory contains Terraform configurations for different test scenarios:
-
-- `fixtures/basic/` - Basic module configuration
-- `fixtures/complete/` - Complete feature demonstration
-- `fixtures/secure/` - Security-focused configuration
-- `fixtures/private_endpoint/` - Private endpoint configuration
-- `fixtures/network/` - Network integration tests
-- `fixtures/negative/` - Negative test cases
-
-## Test Scenarios
-
-### Basic Tests (`-short` flag)
-
-- Module deployment and destruction
-- Basic functionality validation
-- Output verification
-- Resource naming validation
-
-### Integration Tests
-
-- Integration with other Azure services
-- Network connectivity tests
-- Security compliance validation
-- Disaster recovery scenarios
-- Monitoring and logging validation
 
 ### Performance Tests
 
-- Resource creation time
-- Concurrent deployment handling
-- Resource limits testing
-- Cleanup performance
-
-## Test Configuration
-
-Tests are configured via `test_config.yaml`. Key configuration options:
-
-- **Environments**: Different Azure regions and configurations
-- **Scenarios**: Test case definitions and timeouts
-- **Performance**: Load testing parameters
-- **Integration**: Cross-service testing settings
-
-## Debugging Tests
-
-### Verbose Output
-
+Performance tests are skipped by default. To run them:
 ```bash
-go test -v -run TestModuleBasic
+go test -v -run TestNetworkSecurityGroupPerformance ./integration/
 ```
 
-### Keep Resources After Test Failure
+## Test Coverage
 
-Set the `SKIP_TEARDOWN` environment variable:
+### Unit Tests
+- Basic NSG creation
+- Default values validation
+- Output verification
+- Security rule validation
+- Network policy defaults
 
-```bash
-export SKIP_TEARDOWN=true
-go test -v -run TestModuleBasic
+### Integration Tests
+- **Basic NSG**: Simple NSG with basic rules
+- **Complete NSG**: All features including flow logs and traffic analytics
+- **Security Rules**: Various rule configurations and patterns
+- **Input Validation**: Invalid input handling
+- **Performance**: Large number of rules and concurrent deployments
+
+## Writing New Tests
+
+### Unit Tests
+1. Create a new `.tftest.hcl` file in `tests/unit/`
+2. Use mock providers to avoid real resource creation
+3. Focus on module logic and validation
+
+Example:
+```hcl
+run "test_new_feature" {
+  command = plan
+  
+  variables = {
+    # Test inputs
+  }
+  
+  assert {
+    condition     = # Your condition
+    error_message = "Descriptive error message"
+  }
+}
 ```
 
-### Debug Terraform
+### Integration Tests
+1. Add test functions to existing test files or create new ones
+2. Use unique resource names with `random.UniqueId()`
+3. Always clean up resources with `defer terraform.Destroy()`
+4. Use parallel testing where possible
 
-Enable Terraform debug logging:
-
-```bash
-export TF_LOG=DEBUG
-go test -v -run TestModuleBasic
+Example:
+```go
+func TestNewFeature(t *testing.T) {
+    t.Parallel()
+    
+    uniqueID := random.UniqueId()
+    // ... test implementation
+    
+    defer terraform.Destroy(t, terraformOptions)
+    // ... assertions
+}
 ```
 
-## Continuous Integration
+## CI/CD Integration
 
-Tests are automatically run in CI/CD pipelines:
-
-- **Pull Requests**: Short tests only
-- **Main Branch**: All tests including integration
-- **Releases**: Full test suite including performance tests
-
-## Contributing
-
-When adding new tests:
-
-1. Follow the existing test structure and naming conventions
-2. Add appropriate fixtures in the `fixtures/` directory
-3. Update `test_config.yaml` if adding new scenarios
-4. Ensure tests are idempotent and clean up resources
-5. Add documentation for any new test scenarios
+### GitHub Actions Example
+```yaml
+- name: Run Terraform Unit Tests
+  run: terraform test
+  
+- name: Run Terratest Integration Tests
+  env:
+    ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+    ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+    ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+    ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  run: |
+    cd modules/azurerm_network_security_group/tests
+    go test -v -short -timeout 30m ./integration/...
+```
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Authentication Errors**: Verify Azure credentials and permissions
-2. **Resource Conflicts**: Ensure unique resource naming
-3. **Timeout Issues**: Increase test timeouts for complex scenarios
-4. **Quota Limits**: Check Azure subscription quotas
+1. **Authentication Errors**
+   - Ensure Azure credentials are properly set
+   - Check subscription permissions
 
-### Getting Help
+2. **Resource Already Exists**
+   - Previous test may have failed to clean up
+   - Manually delete orphaned resources
+   - Use unique naming with timestamps
 
-- Check the [Terratest documentation](https://terratest.gruntwork.io/)
-- Review Azure provider documentation
-- Check module-specific troubleshooting in the main README
+3. **Timeout Errors**
+   - Increase test timeout: `-timeout 60m`
+   - Check Azure service health
+   - Reduce test scope for debugging
+
+4. **Module Not Found**
+   - Run `go mod download` to fetch dependencies
+   - Ensure correct module path in go.mod
+
+## Best Practices
+
+1. **Resource Naming**: Always use unique names with `random.UniqueId()`
+2. **Cleanup**: Always use `defer` for resource cleanup
+3. **Parallel Testing**: Use `t.Parallel()` for faster execution
+4. **Error Handling**: Check for both Terraform and Azure errors
+5. **Assertions**: Use meaningful assertion messages
+6. **Tags**: Tag all test resources for easy identification
