@@ -1,0 +1,169 @@
+formatter: "markdown table"
+
+version: ""
+
+header-from: main.tf
+footer-from: ""
+
+recursive:
+  enabled: false
+  path: modules
+
+sections:
+  hide: []
+  show: []
+
+content: |-
+  {{ .Header }}
+
+  ## Overview
+
+  This Terraform module creates and manages an Azure Network Security Group (NSG) with comprehensive security rules configuration. It supports inbound and outbound rules, service tags, application security groups, and flow logs with traffic analytics.
+
+  ## Features
+
+  - ✅ Flexible security rule management with support for:
+    - Single or multiple source/destination ports
+    - Single or multiple source/destination address prefixes
+    - Service tags (Internet, VirtualNetwork, AzureLoadBalancer, etc.)
+    - Application Security Groups (ASGs)
+  - ✅ NSG Flow Logs with configurable retention
+  - ✅ Traffic Analytics integration for network monitoring
+  - ✅ Comprehensive validation for all rule parameters
+  - ✅ Security-first approach with secure defaults
+
+  ## Usage
+
+  ### Basic Example
+
+  ```hcl
+  module "network_security_group" {
+    source = "../../"
+
+    name                = "nsg-app-prod-001"
+    resource_group_name = azurerm_resource_group.example.name
+    location            = azurerm_resource_group.example.location
+
+    security_rules = {
+      allow_ssh = {
+        priority                   = 100
+        direction                  = "Inbound"
+        access                     = "Allow"
+        protocol                   = "Tcp"
+        source_port_range          = "*"
+        destination_port_range     = "22"
+        source_address_prefix      = "10.0.0.0/8"
+        destination_address_prefix = "*"
+        description                = "Allow SSH from internal network"
+      }
+      
+      allow_https = {
+        priority                   = 110
+        direction                  = "Inbound"
+        access                     = "Allow"
+        protocol                   = "Tcp"
+        source_port_range          = "*"
+        destination_port_range     = "443"
+        source_address_prefix      = "Internet"
+        destination_address_prefix = "VirtualNetwork"
+        description                = "Allow HTTPS from Internet"
+      }
+    }
+
+    tags = {
+      Environment = "Production"
+      ManagedBy   = "Terraform"
+    }
+  }
+  ```
+
+  ### Example with Flow Logs and Traffic Analytics
+
+  ```hcl
+  module "network_security_group" {
+    source = "../../"
+
+    name                = "nsg-app-prod-001"
+    resource_group_name = azurerm_resource_group.example.name
+    location            = azurerm_resource_group.example.location
+
+    # Enable Flow Logs
+    flow_log_enabled            = true
+    network_watcher_name        = azurerm_network_watcher.example.name
+    flow_log_storage_account_id = azurerm_storage_account.logs.id
+    flow_log_retention_in_days  = 30
+    flow_log_version            = 2
+
+    # Enable Traffic Analytics
+    traffic_analytics_enabled              = true
+    traffic_analytics_workspace_id         = azurerm_log_analytics_workspace.example.id
+    traffic_analytics_workspace_region     = azurerm_log_analytics_workspace.example.location
+    traffic_analytics_interval_in_minutes  = 10
+
+    security_rules = {
+      # ... rules configuration ...
+    }
+  }
+  ```
+
+  ## Examples
+
+  - [Basic](examples/basic) - Simple NSG with basic security rules
+  - [Complete](examples/complete) - Full configuration with all features
+  - [Secure](examples/secure) - Security-hardened configuration
+  - [Private Endpoint](examples/private-endpoint) - NSG for private endpoint scenarios
+
+  {{ .Requirements }}
+
+  {{ .Providers }}
+
+  {{ .Modules }}
+
+  {{ .Resources }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
+
+  ## Security Considerations
+
+  - Always follow the principle of least privilege when defining security rules
+  - Use specific source and destination addresses instead of wildcards when possible
+  - Enable Flow Logs and Traffic Analytics for security monitoring
+  - Regularly review and audit security rules
+  - Consider using Application Security Groups for complex scenarios
+
+  ## License
+
+  MIT
+
+output:
+  file: README.md
+  mode: inject
+  template: |-
+    <!-- BEGIN_TF_DOCS -->
+    {{ .Content }}
+    <!-- END_TF_DOCS -->
+
+output-values:
+  enabled: false
+  from: ""
+
+sort:
+  enabled: true
+  by: name
+
+settings:
+  anchor: true
+  color: true
+  default: true
+  description: false
+  escape: true
+  hide-empty: false
+  html: true
+  indent: 2
+  lockfile: true
+  read-comments: true
+  required: true
+  sensitive: true
+  type: true
