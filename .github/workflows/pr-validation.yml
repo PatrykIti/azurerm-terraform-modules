@@ -517,6 +517,8 @@ jobs:
         with:
           working_directory: modules/${{ matrix.module }}
           soft_fail: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT || github.token }}
 
   # Summary job that collects all results
   quality-gates:
