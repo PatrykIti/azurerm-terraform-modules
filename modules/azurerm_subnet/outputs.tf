@@ -38,7 +38,7 @@ output "service_endpoint_policy_ids" {
 # Network Policies
 output "private_endpoint_network_policies_enabled" {
   description = "Whether network policies are enabled for private endpoints on this subnet"
-  value       = azurerm_subnet.subnet.private_endpoint_network_policies_enabled
+  value       = azurerm_subnet.subnet.private_endpoint_network_policies == "Enabled"
 }
 
 output "private_link_service_network_policies_enabled" {
