@@ -1078,6 +1078,28 @@ variable "extensions" {
   default = []
 }
 
+# Private Endpoints Configuration
+variable "private_endpoints" {
+  description = <<-EOT
+    List of private endpoints to create for the AKS cluster.
+    
+    Private endpoints allow secure access to the AKS API server from other VNets.
+    Requires private_cluster_enabled = true.
+  EOT
+
+  type = list(object({
+    name      = string
+    subnet_id = string
+    private_dns_zone_group = optional(object({
+      name                 = string
+      private_dns_zone_ids = list(string)
+    }))
+    tags = optional(map(string), {})
+  }))
+
+  default = []
+}
+
 # Diagnostic Settings
 variable "diagnostic_settings" {
   description = <<-EOT

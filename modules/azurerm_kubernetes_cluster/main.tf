@@ -753,6 +753,45 @@ resource "azurerm_kubernetes_cluster_extension" "kubernetes_cluster_extension" {
   depends_on = [azurerm_kubernetes_cluster.kubernetes_cluster]
 }
 
+# Private Endpoints for AKS API Server
+resource "azurerm_private_endpoint" "private_endpoint" {
+  for_each = {
+    for pe in var.private_endpoints : pe.name => pe
+  }
+
+  name                = each.value.name
+  location            = azurerm_kubernetes_cluster.kubernetes_cluster.location
+  resource_group_name = azurerm_kubernetes_cluster.kubernetes_cluster.resource_group_name
+  subnet_id           = each.value.subnet_id
+
+  private_service_connection {
+    name                           = "${each.value.name}-connection"
+    private_connection_resource_id = azurerm_kubernetes_cluster.kubernetes_cluster.id
+    is_manual_connection           = false
+    subresource_names              = ["management"]
+  }
+
+  # Optional DNS zone group integration
+  dynamic "private_dns_zone_group" {
+    for_each = each.value.private_dns_zone_group != null ? [each.value.private_dns_zone_group] : []
+    content {
+      name                 = private_dns_zone_group.value.name
+      private_dns_zone_ids = private_dns_zone_group.value.private_dns_zone_ids
+    }
+  }
+
+  tags = merge(var.tags, each.value.tags)
+
+  depends_on = [azurerm_kubernetes_cluster.kubernetes_cluster]
+
+  lifecycle {
+    precondition {
+      condition     = var.private_cluster_config.private_cluster_enabled == true
+      error_message = "Private endpoints can only be created when private_cluster_enabled is true."
+    }
+  }
+}
+
 # Diagnostic Settings
 resource "azurerm_monitor_diagnostic_setting" "aks_diagnostics" {
   count = var.diagnostic_settings != null ? 1 : 0

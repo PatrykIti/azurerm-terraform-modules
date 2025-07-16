@@ -289,6 +289,18 @@ output "extensions" {
   ]
 }
 
+# Private Endpoints Outputs
+output "private_endpoints" {
+  description = "List of created private endpoints with their details"
+  value = [
+    for k, v in azurerm_private_endpoint.private_endpoint : {
+      id                 = v.id
+      name               = v.name
+      private_ip_address = v.private_service_connection[0].private_ip_address
+    }
+  ]
+}
+
 # Diagnostic Settings Output
 output "diagnostic_settings_id" {
   description = "The ID of the diagnostic settings"
