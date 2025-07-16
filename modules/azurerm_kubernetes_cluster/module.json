@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_kubernetes_cluster",
+  "title": "Kubernetes Cluster",
+  "commit_scope": "kubernetes-cluster",
+  "tag_prefix": "AKSv",
+  "description": "Azure Kubernetes Terraform module with enterprise-grade security features"
+}

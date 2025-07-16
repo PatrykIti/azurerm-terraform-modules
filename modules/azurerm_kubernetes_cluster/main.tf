@@ -564,7 +564,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
 }
 
 # Additional Node Pools
-resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
+resource "azurerm_kubernetes_cluster_node_pool" "kubernetes_cluster_node_pool" {
   for_each = {
     for node_pool in var.node_pools : node_pool.name => node_pool
   }
@@ -724,7 +724,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
 }
 
 # Cluster Extensions
-resource "azurerm_kubernetes_cluster_extension" "extensions" {
+resource "azurerm_kubernetes_cluster_extension" "kubernetes_cluster_extension" {
   for_each = {
     for extension in var.extensions : extension.name => extension
   }
