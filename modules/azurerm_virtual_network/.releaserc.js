@@ -144,7 +144,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
           fi
 
           if command -v terraform-docs &> /dev/null; then
-            terraform-docs "modules/${MODULE_NAME}"
+            cd "modules/${MODULE_NAME}" && terraform-docs .
           fi
 
           if [[ -x "./scripts/update-root-readme.sh" ]]; then
