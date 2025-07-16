@@ -104,13 +104,24 @@ module "kubernetes_cluster" {
   name                = "aks-complete-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  dns_prefix          = "aks-complete-${random_string.suffix.result}"
-  kubernetes_version  = var.kubernetes_version
+  
+  # DNS configuration
+  dns_config = {
+    dns_prefix = "aks-complete-${random_string.suffix.result}"
+  }
 
-  # SKU and support
-  sku_tier                  = "Standard"
-  automatic_upgrade_channel = "stable"
-  node_os_upgrade_channel   = "NodeImage"
+  # Kubernetes configuration
+  kubernetes_config = {
+    kubernetes_version        = var.kubernetes_version
+    automatic_upgrade_channel = "stable"
+    node_os_upgrade_channel   = "NodeImage"
+  }
+
+  # SKU configuration
+  sku_config = {
+    sku_tier     = "Standard"
+    support_plan = "KubernetesOfficial"
+  }
 
   # Node resource group
   node_resource_group = "rg-aks-nodes-${random_string.suffix.result}"
@@ -170,9 +181,9 @@ module "kubernetes_cluster" {
 
     # Linux OS configuration
     linux_os_config = {
-      transparent_huge_page_enabled = "always"
-      transparent_huge_page_defrag  = "madvise"
-      swap_file_size_mb             = 0
+      transparent_huge_page        = "always"
+      transparent_huge_page_defrag = "madvise"
+      swap_file_size_mb            = 0
 
       sysctl_config = {
         kernel_threads_max                 = 200000
@@ -226,25 +237,20 @@ module "kubernetes_cluster" {
     }
   }
 
-  # Storage profile
-  storage_profile = {
-    blob_driver_enabled         = true
-    disk_driver_enabled         = true
-    file_driver_enabled         = true
-    snapshot_controller_enabled = true
+  # Feature flags
+  features = {
+    azure_policy_enabled             = true
+    http_application_routing_enabled = false
+    workload_identity_enabled        = true
+    oidc_issuer_enabled              = true
+    open_service_mesh_enabled        = false
+    image_cleaner_enabled            = true
+    run_command_enabled              = false
+    local_account_disabled           = false
+    cost_analysis_enabled            = true
   }
 
-  # Feature flags
-  azure_policy_enabled             = true
-  http_application_routing_enabled = false
-  workload_identity_enabled        = true
-  oidc_issuer_enabled              = true
-  open_service_mesh_enabled        = false
-  image_cleaner_enabled            = true
-  image_cleaner_interval_hours     = 48
-  run_command_enabled              = false
-  local_account_disabled           = false
-  cost_analysis_enabled            = true
+  image_cleaner_interval_hours = 48
 
   # API Server Access Profile (for public clusters)
   api_server_access_profile = {
