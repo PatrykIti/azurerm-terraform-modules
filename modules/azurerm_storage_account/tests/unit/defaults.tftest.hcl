@@ -124,11 +124,10 @@ run "verify_blob_properties_defaults" {
     }
   }
 
-  # Since blob_properties is a dynamic block, we can only verify that the plan succeeds
-  # The actual values would be set in the Azure API
+  # Since blob_properties is a dynamic block, we verify the configuration is accepted
   assert {
-    condition     = true
-    error_message = "Blob properties configuration should be valid"
+    condition     = var.blob_properties.versioning_enabled == true
+    error_message = "Blob properties versioning should be enabled by default"
   }
 }
 
@@ -149,7 +148,7 @@ run "verify_network_rules_defaults" {
   # Network rules are applied via a separate resource in the actual implementation
   # Here we verify the plan succeeds with default deny configuration
   assert {
-    condition     = true
+    condition     = can(azurerm_storage_account.storage_account.id)
     error_message = "Network rules with default deny should be valid"
   }
 }
