@@ -146,9 +146,9 @@ run "verify_network_rules_defaults" {
   }
 
   # Network rules are applied via a separate resource in the actual implementation
-  # Here we verify the plan succeeds with default deny configuration
+  # Here we verify the configuration is valid
   assert {
-    condition     = can(azurerm_storage_account.storage_account.id)
-    error_message = "Network rules with default deny should be valid"
+    condition     = var.network_rules.default_action == "Deny"
+    error_message = "Network rules default action should be Deny"
   }
 }

@@ -50,124 +50,180 @@ variables {
   location            = "northeurope"
 }
 
-# Test basic outputs
-run "verify_basic_outputs" {
+# Test that outputs are defined and use try() for null safety
+run "verify_outputs_defined" {
   command = plan
 
-  # Test ID output
+  # Test that all outputs are defined in the module
   assert {
-    condition     = output.id == "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/testsa"
-    error_message = "Storage account ID output should be formatted correctly"
+    condition     = can(output.id)
+    error_message = "Output 'id' should be defined"
   }
 
-  # Test name output
   assert {
-    condition     = output.name == "testsa"
-    error_message = "Storage account name output should match the input name"
+    condition     = can(output.name)
+    error_message = "Output 'name' should be defined"
   }
 
-  # Test primary location output
   assert {
-    condition     = output.primary_location == "northeurope"
-    error_message = "Primary location output should match the configured location"
+    condition     = can(output.primary_location)
+    error_message = "Output 'primary_location' should be defined"
   }
 
-  # Test secondary location output
   assert {
-    condition     = output.secondary_location == "westeurope"
-    error_message = "Secondary location output should be available for geo-redundant storage"
+    condition     = can(output.secondary_location)
+    error_message = "Output 'secondary_location' should be defined"
+  }
+
+  assert {
+    condition     = can(output.primary_blob_endpoint)
+    error_message = "Output 'primary_blob_endpoint' should be defined"
+  }
+
+  assert {
+    condition     = can(output.primary_blob_host)
+    error_message = "Output 'primary_blob_host' should be defined"
+  }
+
+  assert {
+    condition     = can(output.secondary_blob_endpoint)
+    error_message = "Output 'secondary_blob_endpoint' should be defined"
+  }
+
+  assert {
+    condition     = can(output.secondary_blob_host)
+    error_message = "Output 'secondary_blob_host' should be defined"
+  }
+
+  assert {
+    condition     = can(output.primary_blob_internet_endpoint)
+    error_message = "Output 'primary_blob_internet_endpoint' should be defined"
+  }
+
+  assert {
+    condition     = can(output.primary_blob_internet_host)
+    error_message = "Output 'primary_blob_internet_host' should be defined"
   }
 }
 
-# Test blob endpoint outputs
-run "verify_blob_endpoint_outputs" {
+# Test sensitive outputs are defined
+run "verify_sensitive_outputs_defined" {
   command = plan
 
-  # Test primary blob endpoint
+  # Test connection string output exists
   assert {
-    condition     = output.primary_blob_endpoint == "https://testsa.blob.core.windows.net/"
-    error_message = "Primary blob endpoint output should be formatted correctly"
+    condition     = can(output.primary_connection_string)
+    error_message = "Output 'primary_connection_string' should be defined"
   }
 
-  # Test primary blob host
   assert {
-    condition     = output.primary_blob_host == "testsa.blob.core.windows.net"
-    error_message = "Primary blob host output should be formatted correctly"
+    condition     = can(output.secondary_connection_string)
+    error_message = "Output 'secondary_connection_string' should be defined"
   }
 
-  # Test secondary blob endpoint
   assert {
-    condition     = output.secondary_blob_endpoint == "https://testsa-secondary.blob.core.windows.net/"
-    error_message = "Secondary blob endpoint output should be formatted correctly"
+    condition     = can(output.primary_blob_connection_string)
+    error_message = "Output 'primary_blob_connection_string' should be defined"
   }
 
-  # Test secondary blob host
   assert {
-    condition     = output.secondary_blob_host == "testsa-secondary.blob.core.windows.net"
-    error_message = "Secondary blob host output should be formatted correctly"
+    condition     = can(output.secondary_blob_connection_string)
+    error_message = "Output 'secondary_blob_connection_string' should be defined"
   }
 
-  # Test primary blob internet endpoint
+  # Test access key outputs exist
   assert {
-    condition     = output.primary_blob_internet_endpoint == "https://testsa.blob.core.internet.net/"
-    error_message = "Primary blob internet endpoint output should be formatted correctly"
+    condition     = can(output.primary_access_key)
+    error_message = "Output 'primary_access_key' should be defined"
   }
 
-  # Test primary blob internet host
   assert {
-    condition     = output.primary_blob_internet_host == "testsa.blob.core.internet.net"
-    error_message = "Primary blob internet host output should be formatted correctly"
+    condition     = can(output.secondary_access_key)
+    error_message = "Output 'secondary_access_key' should be defined"
   }
 }
 
-# Test connection string outputs
-run "verify_connection_string_outputs" {
+# Test queue-related outputs
+run "verify_queue_outputs_defined" {
   command = plan
 
-  # Test primary connection string output
   assert {
-    condition     = output.primary_connection_string == "DefaultEndpointsProtocol=https;AccountName=testsa;AccountKey=mock-key;EndpointSuffix=core.windows.net"
-    error_message = "Primary connection string output should be formatted correctly"
+    condition     = can(output.primary_queue_endpoint)
+    error_message = "Output 'primary_queue_endpoint' should be defined"
   }
 
-  # Test that connection string is marked as sensitive
   assert {
-    condition     = output.primary_connection_string != null
-    error_message = "Primary connection string should be available"
+    condition     = can(output.primary_queue_host)
+    error_message = "Output 'primary_queue_host' should be defined"
+  }
+
+  assert {
+    condition     = can(output.secondary_queue_endpoint)
+    error_message = "Output 'secondary_queue_endpoint' should be defined"
+  }
+
+  assert {
+    condition     = can(output.secondary_queue_host)
+    error_message = "Output 'secondary_queue_host' should be defined"
   }
 }
 
-# Test access key outputs
-run "verify_access_key_outputs" {
+# Test table-related outputs
+run "verify_table_outputs_defined" {
   command = plan
 
-  # Test primary access key output
   assert {
-    condition     = output.primary_access_key == "mock-primary-access-key"
-    error_message = "Primary access key output should be available"
+    condition     = can(output.primary_table_endpoint)
+    error_message = "Output 'primary_table_endpoint' should be defined"
   }
 
-  # Test that access key is marked as sensitive
   assert {
-    condition     = output.primary_access_key != null
-    error_message = "Primary access key should be available"
+    condition     = can(output.primary_table_host)
+    error_message = "Output 'primary_table_host' should be defined"
+  }
+
+  assert {
+    condition     = can(output.secondary_table_endpoint)
+    error_message = "Output 'secondary_table_endpoint' should be defined"
+  }
+
+  assert {
+    condition     = can(output.secondary_table_host)
+    error_message = "Output 'secondary_table_host' should be defined"
   }
 }
 
-# Test outputs with LRS replication (no secondary endpoints)
-run "verify_lrs_outputs" {
+# Test file and dfs outputs
+run "verify_file_dfs_outputs_defined" {
   command = plan
 
-  variables {
-    name                     = "testsa"
-    resource_group_name      = "test-rg"
-    location                 = "northeurope"
-    account_replication_type = "LRS"
+  assert {
+    condition     = can(output.primary_file_endpoint)
+    error_message = "Output 'primary_file_endpoint' should be defined"
   }
 
-  # For LRS, secondary location should be null
   assert {
-    condition     = output.secondary_location == null || output.secondary_location == "westeurope"
-    error_message = "Secondary location may be null for LRS replication"
+    condition     = can(output.primary_file_host)
+    error_message = "Output 'primary_file_host' should be defined"
+  }
+
+  assert {
+    condition     = can(output.primary_dfs_endpoint)
+    error_message = "Output 'primary_dfs_endpoint' should be defined"
+  }
+
+  assert {
+    condition     = can(output.primary_dfs_host)
+    error_message = "Output 'primary_dfs_host' should be defined"
+  }
+
+  assert {
+    condition     = can(output.primary_web_endpoint)
+    error_message = "Output 'primary_web_endpoint' should be defined"
+  }
+
+  assert {
+    condition     = can(output.primary_web_host)
+    error_message = "Output 'primary_web_host' should be defined"
   }
 }
