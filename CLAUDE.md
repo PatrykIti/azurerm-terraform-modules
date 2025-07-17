@@ -8,6 +8,21 @@ NEVER create files unless they're absolutely necessary for achieving your goal.
 ALWAYS prefer editing an existing file to creating a new one.
 NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
 
+## Multi-Agent Execution Guidelines
+
+**MANDATORY**: When working with TaskMaster tasks that have subtasks, you MUST:
+- Always use multiple agents (subagents) for parallel execution wherever possible
+- Assign each independent subtask to a different agent for maximum efficiency
+- Provide each agent with:
+  - This CLAUDE.md file for project context
+  - Specific, detailed instructions for their subtask
+  - All necessary reference files and paths
+  - Clear success criteria
+- Use `mcp__taskmaster-ai__set_task_status` to mark subtasks as "in-progress" when assigning to agents
+- Monitor progress and coordinate results between agents
+
+This approach is REQUIRED to maximize development speed and efficiency. Sequential execution of independent tasks is NOT acceptable when parallel execution is possible.
+
 ## Important Instructions
 
 - **ALWAYS** review the relevant reference files based on your current task
