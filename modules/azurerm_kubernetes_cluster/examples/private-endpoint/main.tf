@@ -125,6 +125,20 @@ resource "azurerm_private_dns_zone_virtual_network_link" "jumpbox" {
   virtual_network_id    = azurerm_virtual_network.jumpbox.id
 }
 
+# User-assigned identity for AKS (required for custom private DNS zone)
+resource "azurerm_user_assigned_identity" "aks" {
+  name                = "uai-aks-private-endpoint-${random_string.suffix.result}"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+
+# Grant the user-assigned identity permissions to the private DNS zone
+resource "azurerm_role_assignment" "aks_dns_contributor" {
+  scope                = azurerm_private_dns_zone.aks.id
+  role_definition_name = "Private DNS Zone Contributor"
+  principal_id         = azurerm_user_assigned_identity.aks.principal_id
+}
+
 module "kubernetes_cluster" {
   source = "../../"
 
@@ -139,7 +153,7 @@ module "kubernetes_cluster" {
 
   # Kubernetes configuration
   kubernetes_config = {
-    kubernetes_version        = "1.27.9"
+    kubernetes_version        = "1.30"
     automatic_upgrade_channel = "stable"
   }
 
@@ -162,9 +176,10 @@ module "kubernetes_cluster" {
     }
   }
 
-  # Identity configuration
+  # Identity configuration (user-assigned required for custom private DNS zone)
   identity = {
-    type = "SystemAssigned"
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.aks.id]
   }
 
   # Network configuration
@@ -186,7 +201,7 @@ module "kubernetes_cluster" {
   # Private endpoints configuration
   private_endpoints = [
     {
-      name      = "pe-aks-prod-devops-${random_string.suffix.result}"
+      name      = "pe-aks-prod-devops"
       subnet_id = azurerm_subnet.devops_endpoint.id
       private_dns_zone_group = {
         name                 = "default"
@@ -194,7 +209,7 @@ module "kubernetes_cluster" {
       }
     },
     {
-      name      = "pe-aks-prod-jumpbox-${random_string.suffix.result}"
+      name      = "pe-aks-prod-jumpbox"
       subnet_id = azurerm_subnet.jumpbox_endpoint.id
       # No DNS group - can be managed externally
     }

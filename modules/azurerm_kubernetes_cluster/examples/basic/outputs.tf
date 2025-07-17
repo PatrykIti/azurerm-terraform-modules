@@ -15,13 +15,13 @@ output "kubernetes_cluster_fqdn" {
 
 output "kubernetes_cluster_endpoint" {
   description = "The endpoint for the Kubernetes API server"
-  value       = module.kubernetes_cluster.kube_config[0].host
+  value       = module.kubernetes_cluster.kube_config != null ? module.kubernetes_cluster.kube_config.host : null
   sensitive   = true
 }
 
 output "client_certificate" {
   description = "Base64 encoded public certificate used by clients to authenticate to the Kubernetes cluster"
-  value       = module.kubernetes_cluster.kube_config[0].client_certificate
+  value       = module.kubernetes_cluster.kube_config != null ? module.kubernetes_cluster.kube_config.client_certificate : null
   sensitive   = true
 }
 

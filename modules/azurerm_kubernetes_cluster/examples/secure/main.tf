@@ -97,7 +97,7 @@ module "kubernetes_cluster" {
 
   # Kubernetes configuration
   kubernetes_config = {
-    kubernetes_version        = "1.27.9"
+    kubernetes_version        = "1.30.12"  # Updated to a supported version
     automatic_upgrade_channel = "stable"
     node_os_upgrade_channel   = "NodeImage"
   }
@@ -128,7 +128,7 @@ module "kubernetes_cluster" {
     vnet_subnet_id       = azurerm_subnet.nodes.id
     
     # Security hardening
-    os_disk_type                 = "Ephemeral"
+    os_disk_type                 = "Managed"  # Changed from Ephemeral due to VM size constraints
     os_sku                       = "AzureLinux"
     host_encryption_enabled      = false  # Enable if supported by subscription
     node_public_ip_enabled       = false
@@ -136,7 +136,7 @@ module "kubernetes_cluster" {
     fips_enabled                 = false  # Enable for FIPS compliance
     
     # Availability zones for resilience
-    zones = ["1", "2", "3"]
+    zones = ["1"]  # Only zone 1 is supported in West Europe for this configuration
     
     node_labels = {
       "nodepool-type" = "system"
