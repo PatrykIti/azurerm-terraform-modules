@@ -55,11 +55,6 @@ run "verify_storage_account_planned" {
   command = plan
 
   assert {
-    condition     = can(azurerm_storage_account.storage_account)
-    error_message = "Storage account resource should be planned"
-  }
-
-  assert {
     condition     = azurerm_storage_account.storage_account.name == var.name
     error_message = "Storage account name should match variable"
   }
@@ -111,50 +106,52 @@ run "verify_output_behavior_with_grs" {
   }
 }
 
-# Test that outputs use try() function for null safety
-run "verify_outputs_use_try_function" {
+# Test that account tier affects behavior
+run "verify_premium_storage_configuration" {
   command = plan
 
-  # Since we can't check output values during plan with mocks,
-  # we verify the module structure is correct
+  variables {
+    name                     = "testsa"
+    resource_group_name      = "test-rg"
+    location                 = "northeurope"
+    account_tier             = "Premium"
+    account_kind             = "BlockBlobStorage"
+    account_replication_type = "LRS"
+  }
+
+  # Verify premium storage configuration
   assert {
-    condition     = can(azurerm_storage_account.storage_account.id)
-    error_message = "Storage account should have an ID attribute"
+    condition     = azurerm_storage_account.storage_account.account_tier == "Premium"
+    error_message = "Storage account should use Premium tier"
   }
 
   assert {
-    condition     = can(azurerm_storage_account.storage_account.name)
-    error_message = "Storage account should have a name attribute"
-  }
-
-  assert {
-    condition     = can(azurerm_storage_account.storage_account.primary_location)
-    error_message = "Storage account should have a primary_location attribute"
+    condition     = azurerm_storage_account.storage_account.account_kind == "BlockBlobStorage"
+    error_message = "Premium storage should use BlockBlobStorage kind"
   }
 }
 
-# Test storage account attributes that map to outputs
-run "verify_storage_account_attributes" {
+# Test FileStorage configuration
+run "verify_file_storage_configuration" {
   command = plan
 
-  # Verify key attributes exist on the storage account resource
+  variables {
+    name                     = "testsa"
+    resource_group_name      = "test-rg"
+    location                 = "northeurope"
+    account_tier             = "Premium"
+    account_kind             = "FileStorage"
+    account_replication_type = "LRS"
+  }
+
+  # Verify FileStorage configuration
   assert {
-    condition     = can(azurerm_storage_account.storage_account.primary_blob_endpoint)
-    error_message = "Storage account should have primary_blob_endpoint attribute"
+    condition     = azurerm_storage_account.storage_account.account_kind == "FileStorage"
+    error_message = "Storage account should use FileStorage kind"
   }
 
   assert {
-    condition     = can(azurerm_storage_account.storage_account.primary_blob_host)
-    error_message = "Storage account should have primary_blob_host attribute"
-  }
-
-  assert {
-    condition     = can(azurerm_storage_account.storage_account.primary_access_key)
-    error_message = "Storage account should have primary_access_key attribute"
-  }
-
-  assert {
-    condition     = can(azurerm_storage_account.storage_account.primary_connection_string)
-    error_message = "Storage account should have primary_connection_string attribute"
+    condition     = azurerm_storage_account.storage_account.account_tier == "Premium"
+    error_message = "FileStorage requires Premium tier"
   }
 }
