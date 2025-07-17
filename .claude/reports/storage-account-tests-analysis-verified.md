@@ -188,6 +188,82 @@ The Makefile provides comprehensive targets:
 - ✅ JUnit output for CI/CD (`test-junit`)
 - ✅ Parallel and sequential execution scripts
 
+### 5a. Test Execution Scripts
+
+The module includes three essential scripts for test execution:
+
+#### `test_env.sh`
+Environment configuration script that sets Azure credentials:
+```bash
+#!/bin/bash
+# Azure credentials for testing
+export AZURE_CLIENT_ID="YOUR_AZURE_CLIENT_ID_HERE"
+export AZURE_CLIENT_SECRET="YOUR_AZURE_CLIENT_SECRET_HERE"
+export AZURE_SUBSCRIPTION_ID="YOUR_AZURE_SUBSCRIPTION_ID_HERE"
+export AZURE_TENANT_ID="YOUR_AZURE_TENANT_ID_HERE"
+
+# ARM_ prefixed variables for Terraform provider
+export ARM_CLIENT_ID="${AZURE_CLIENT_ID}"
+export ARM_CLIENT_SECRET="${AZURE_CLIENT_SECRET}"
+export ARM_SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID}"
+export ARM_TENANT_ID="${AZURE_TENANT_ID}"
+```
+
+**IMPORTANT**: This file should never contain real credentials in version control. Use environment variables or CI/CD secrets.
+
+#### `run_tests_parallel.sh`
+Advanced parallel test execution with comprehensive features:
+- Sources credentials from `test_env.sh`
+- Creates structured output directory for test results
+- Runs all tests in parallel using background processes
+- Captures individual test logs and timing metrics
+- Generates JSON output for each test with:
+  - Test name, timestamp, duration
+  - Pass/fail/skip status
+  - Error messages for failed tests
+- Creates summary JSON with aggregate statistics
+- Non-blocking execution (always exits with 0 to see all results)
+
+**Key Features**:
+```bash
+# Runs tests in parallel
+for test in "${tests[@]}"; do
+    run_test "$test" &
+    pids+=($!)
+done
+
+# Creates JSON output per test
+{
+  "test_name": "TestBasicStorageAccount",
+  "timestamp": "2025-01-17T19:30:00Z",
+  "status": "passed",
+  "duration_seconds": 180,
+  "success": true
+}
+```
+
+#### `run_tests_sequential.sh`
+Sequential test execution for debugging:
+- Sources credentials from `test_env.sh`
+- Creates timestamped output directory
+- Runs tests one by one (useful for debugging)
+- Uses `tee` to show live output while saving logs
+- Generates JSON results for each test
+- Creates summary JSON with test statistics
+- Better for troubleshooting as tests don't interfere with each other
+
+**Usage Examples**:
+```bash
+# Run all tests in parallel
+./run_tests_parallel.sh
+
+# Run tests sequentially for debugging
+./run_tests_sequential.sh
+
+# View results
+cat test_outputs/summary.json
+```
+
 ### 6. Fixture Organization
 
 Excellent scenario coverage with well-organized fixtures:

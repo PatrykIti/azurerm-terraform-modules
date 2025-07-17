@@ -330,7 +330,7 @@ func BenchmarkStorageAccountCreation(b *testing.B) {
 func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	// Generate a unique random suffix for resource naming
 	// The suffix will be used in Terraform templates to create unique names
-	randomSuffix := strings.ToLower(random.UniqueId()[:8])
+	randomSuffix := strings.ToLower(random.UniqueId())
 	
 	return &terraform.Options{
 		TerraformDir: terraformDir,
