@@ -63,6 +63,10 @@ test_results/
 test-results/
 *.xml
 
+# Ignore storage account module test outputs
+modules/azurerm_storage_account/tests/test_outputs/*
+!modules/azurerm_storage_account/tests/test_outputs/.gitkeep
+
 # Ignore coverage reports
 coverage/
 coverage.html
