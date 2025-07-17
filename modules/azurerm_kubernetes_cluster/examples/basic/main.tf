@@ -79,6 +79,8 @@ module "kubernetes_cluster" {
   network_profile = {
     network_plugin = "azure"
     network_policy = "azure"
+    service_cidr   = "172.16.0.0/16"  # Non-overlapping with VNet CIDR
+    dns_service_ip = "172.16.0.10"    # Must be within service_cidr
   }
 
 
