@@ -1,5 +1,11 @@
 package test
 
+// NOTE: This file uses both the new Azure SDK (github.com/Azure/azure-sdk-for-go/sdk/...)
+// and Terratest's azure module which uses the old Azure SDK (github.com/Azure/azure-sdk-for-go v51).
+// The two SDKs have incompatible types, so we cannot directly use Terratest's GetStorageAccountE
+// with our armstorage types. Instead, we use Terratest functions where possible (like
+// StorageBlobContainerExists) and implement our own using the new SDK where needed.
+
 import (
 	"context"
 	"fmt"
@@ -11,7 +17,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
-	"github.com/gruntwork-io/terratest/modules/azure" // Testing SQL import issue
+	"github.com/gruntwork-io/terratest/modules/azure"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/retry"
 	"github.com/stretchr/testify/require"
@@ -195,9 +201,9 @@ func GenerateValidStorageAccountName(prefix string) string {
 
 // ValidateContainerExists checks if a container exists in the storage account
 func ValidateContainerExists(t *testing.T, accountName, resourceGroupName, containerName string) {
-	// TODO: Implement container existence check without azure module
-	// For now, we'll skip this validation due to Terratest import issues
-	logger.Logf(t, "Skipping container existence check for %s due to Terratest import issues", containerName)
+	subscriptionID := getRequiredEnvVar(t, "AZURE_SUBSCRIPTION_ID")
+	exists := azure.StorageBlobContainerExists(t, containerName, accountName, resourceGroupName, subscriptionID)
+	require.True(t, exists, fmt.Sprintf("Container %s should exist in storage account %s", containerName, accountName))
 }
 
 // ValidateBlobServiceProperties validates blob service properties like versioning, soft delete, etc.
@@ -233,8 +239,8 @@ func (h *StorageAccountHelper) ValidateBlobServiceProperties(t *testing.T, accou
 func CreateTestResourceGroup(t *testing.T, subscriptionID, location string) string {
 	resourceGroupName := fmt.Sprintf("rg-terratest-%d", time.Now().Unix())
 	
-	// TODO: Implement resource group creation without azure module
-	// For now, we'll expect the resource group to be created by Terraform
+	// Note: Terratest's azure module has functions for resource groups, but they use the old SDK.
+	// Since we're using Terraform to manage resources, we'll let Terraform create the resource group.
 	logger.Logf(t, "Resource group %s should be created by Terraform", resourceGroupName)
 	
 	return resourceGroupName
