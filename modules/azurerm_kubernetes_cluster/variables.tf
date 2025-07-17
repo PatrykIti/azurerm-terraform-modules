@@ -149,6 +149,7 @@ variable "default_node_pool" {
       image_gc_high_threshold   = optional(number)
       image_gc_low_threshold    = optional(number)
       pod_max_pid               = optional(number)
+      topology_manager_policy   = optional(string)
     }))
 
     linux_os_config = optional(object({
