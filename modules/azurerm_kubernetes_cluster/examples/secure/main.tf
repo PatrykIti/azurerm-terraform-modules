@@ -47,7 +47,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # Create virtual network
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-aks-secure"
+  name                = "vnet-aks-secure--${random_string.suffix.result}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   address_space       = ["10.0.0.0/16"]
@@ -55,10 +55,23 @@ resource "azurerm_virtual_network" "example" {
 
 # Create subnet for AKS nodes
 resource "azurerm_subnet" "nodes" {
-  name                 = "snet-aks-nodes"
+  name                 = "snet-aks-nodes-${random_string.suffix.result}"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
+}
+
+# Create Network Security Group for nodes
+resource "azurerm_network_security_group" "example" {
+  name                = "nsg-aks-nodes-${random_string.suffix.result}"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+
+# Associate NSG with node subnet
+resource "azurerm_subnet_network_security_group_association" "nodes" {
+  subnet_id                 = azurerm_subnet.nodes.id
+  network_security_group_id = azurerm_network_security_group.example.id
 }
 
 # Create User Assigned Identity for the cluster
@@ -94,6 +107,9 @@ module "kubernetes_cluster" {
     sku_tier     = "Standard"
     support_plan = "KubernetesOfficial"
   }
+
+  # Node resource group
+  node_resource_group = "rg-aks-nodes-${random_string.suffix.result}"
 
   # Identity configuration - User Assigned for better control
   identity = {
@@ -219,7 +235,7 @@ module "kubernetes_cluster" {
 
   # Diagnostic settings
   diagnostic_settings = {
-    name                       = "diag-aks-secure"
+    name                       = "diag-aks-secure-${random_string.suffix.result}"
     log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
     
     enabled_log_categories = [

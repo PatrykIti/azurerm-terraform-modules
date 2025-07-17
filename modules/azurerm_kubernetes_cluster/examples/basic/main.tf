@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.36.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.0"
+    }
   }
 }
 
@@ -19,15 +23,22 @@ provider "azurerm" {
   }
 }
 
+# Generate random suffix for unique naming
+resource "random_string" "suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
 # Create a resource group
 resource "azurerm_resource_group" "example" {
-  name     = "rg-aks-basic-example"
+  name     = "rg-aks-basic-${random_string.suffix.result}"
   location = "West Europe"
 }
 
 # Create a virtual network for the cluster
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-aks-basic"
+  name                = "vnet-aks-basic-${random_string.suffix.result}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   address_space       = ["10.0.0.0/16"]
@@ -35,7 +46,7 @@ resource "azurerm_virtual_network" "example" {
 
 # Create a subnet for the AKS nodes
 resource "azurerm_subnet" "example" {
-  name                 = "snet-aks-nodes"
+  name                 = "snet-aks-nodes-${random_string.suffix.result}"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -46,13 +57,13 @@ module "kubernetes_cluster" {
   source = "../../"
 
   # Basic cluster configuration
-  name                = "aks-basic-example"
+  name                = "aks-basic-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   
   # DNS configuration
   dns_config = {
-    dns_prefix = "aks-basic-example"
+    dns_prefix = "aks-basic-${random_string.suffix.result}"
   }
 
   # Use system-assigned managed identity (secure default)
