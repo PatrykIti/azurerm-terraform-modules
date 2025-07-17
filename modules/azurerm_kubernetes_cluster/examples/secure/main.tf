@@ -160,6 +160,9 @@ module "kubernetes_cluster" {
     cost_analysis_enabled            = true
   }
 
+  # Image cleaner configuration
+  image_cleaner_interval_hours = 48
+
   # Private cluster configuration
   private_cluster_config = {
     private_cluster_enabled             = false  # Set to true for private cluster
@@ -174,7 +177,7 @@ module "kubernetes_cluster" {
   # Azure AD RBAC configuration
   azure_active_directory_role_based_access_control = {
     azure_rbac_enabled = true
-    # tenant_id and admin_group_object_ids should be set from variables
+    tenant_id = "b8e7b798-6929-432e-b94b-8a117708f2c5"  # Using the provided tenant ID
   }
 
   # Enable monitoring

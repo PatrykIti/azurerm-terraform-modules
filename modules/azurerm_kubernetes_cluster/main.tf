@@ -37,7 +37,7 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
   cost_analysis_enabled            = var.features.cost_analysis_enabled
 
   # Image Cleaner Configuration
-  image_cleaner_interval_hours = var.features.image_cleaner_enabled ? var.image_cleaner_interval_hours : 0
+  image_cleaner_interval_hours = var.features.image_cleaner_enabled ? var.image_cleaner_interval_hours : null
 
   # Encryption Configuration
   disk_encryption_set_id = var.disk_encryption_set_id
@@ -493,15 +493,6 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
     content {
       key_vault_key_id         = key_management_service.value.key_vault_key_id
       key_vault_network_access = key_management_service.value.key_vault_network_access
-    }
-  }
-
-  # Key Vault Secrets Provider
-  dynamic "key_vault_secrets_provider" {
-    for_each = var.key_vault_secrets_provider != null ? [var.key_vault_secrets_provider] : []
-    content {
-      secret_rotation_enabled  = key_vault_secrets_provider.value.secret_rotation_enabled
-      secret_rotation_interval = key_vault_secrets_provider.value.secret_rotation_interval
     }
   }
 

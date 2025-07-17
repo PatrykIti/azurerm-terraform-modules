@@ -330,7 +330,7 @@ variable "network_profile" {
     load_balancer_sku   = optional(string, "standard")
 
     load_balancer_profile = optional(object({
-      backend_pool_type           = optional(string, "nodeIPConfiguration")
+      backend_pool_type           = optional(string, "NodeIPConfiguration")
       effective_outbound_ips      = optional(list(string))
       idle_timeout_in_minutes     = optional(number, 30)
       managed_outbound_ip_count   = optional(number)
@@ -751,9 +751,9 @@ variable "http_proxy_config" {
 
 
 variable "image_cleaner_interval_hours" {
-  description = "Specifies the interval in hours when images should be cleaned up. Defaults to 0."
+  description = "Specifies the interval in hours when images should be cleaned up. Valid values are between 24 and 2160 (90 days). Defaults to 48."
   type        = number
-  default     = 0
+  default     = 48
 }
 
 
