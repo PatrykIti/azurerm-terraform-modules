@@ -5,10 +5,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 4.0.0, < 5.0.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.6"
-    }
   }
 }
 
@@ -16,11 +12,6 @@ provider "azurerm" {
   features {}
 }
 
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
 
 # Primary region
 resource "azurerm_resource_group" "primary" {
@@ -38,7 +29,7 @@ resource "azurerm_resource_group" "secondary" {
 module "primary_storage" {
   source = "../../../"
 
-  name                     = "dpcmpr${random_string.suffix.result}${var.random_suffix}"
+  name                     = "dpcmpr${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.primary.name
   location                 = azurerm_resource_group.primary.location
   account_kind             = "StorageV2"
@@ -105,7 +96,7 @@ module "primary_storage" {
 module "secondary_storage" {
   source = "../../../"
 
-  name                     = "dpcmsc${random_string.suffix.result}${var.random_suffix}"
+  name                     = "dpcmsc${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.secondary.name
   location                 = azurerm_resource_group.secondary.location
   account_kind             = "StorageV2"

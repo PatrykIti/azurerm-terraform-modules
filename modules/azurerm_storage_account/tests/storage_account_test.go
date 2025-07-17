@@ -328,16 +328,14 @@ func BenchmarkStorageAccountCreation(b *testing.B) {
 
 // Helper function to get terraform options
 func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
-	// Generate a unique ID for resources
-	// Using 8 chars total: 5 random + 3 from timestamp for better uniqueness
-	timestamp := time.Now().UnixNano() % 1000 // Last 3 digits for more variation
-	baseID := strings.ToLower(random.UniqueId())
-	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
+	// Generate a unique random suffix for resource naming
+	// The suffix will be used in Terraform templates to create unique names
+	randomSuffix := strings.ToLower(random.UniqueId()[:8])
 	
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
-			"random_suffix": uniqueID,
+			"random_suffix": randomSuffix,
 			"location":      "northeurope",
 		},
 		NoColor: true,

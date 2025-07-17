@@ -206,6 +206,13 @@ func ValidateContainerExists(t *testing.T, accountName, resourceGroupName, conta
 	require.True(t, exists, fmt.Sprintf("Container %s should exist in storage account %s", containerName, accountName))
 }
 
+// ValidateStorageAccountExists checks if a storage account exists using Terratest
+func ValidateStorageAccountExists(t *testing.T, accountName, resourceGroupName string) {
+	subscriptionID := getRequiredEnvVar(t, "AZURE_SUBSCRIPTION_ID")
+	exists := azure.StorageAccountExists(t, accountName, resourceGroupName, subscriptionID)
+	require.True(t, exists, fmt.Sprintf("Storage account %s should exist in resource group %s", accountName, resourceGroupName))
+}
+
 // ValidateBlobServiceProperties validates blob service properties like versioning, soft delete, etc.
 func (h *StorageAccountHelper) ValidateBlobServiceProperties(t *testing.T, accountName, resourceGroupName string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
