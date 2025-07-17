@@ -18,7 +18,7 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  source = "../../../.."
 
   name                = "devtmpcitiinvtier123"
   resource_group_name = azurerm_resource_group.test.name

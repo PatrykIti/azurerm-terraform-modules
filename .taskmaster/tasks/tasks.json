@@ -2073,7 +2073,7 @@
             "description": "Implement native Terraform unit tests (.tftest.hcl) for the storage account module to cover basic configurations, outputs, and validation rules. This addresses the 0% compliance gap for native tests as per the testing guide.",
             "dependencies": [],
             "details": "In the storage account module directory, create a `tests/unit` subdirectory. Inside this directory, add the following five files:\n1. `defaults.tftest.hcl`: A test run block that invokes the module with no variables set to test default behavior.\n2. `naming.tftest.hcl`: A test run block that provides a name and suffix to verify naming conventions.\n3. `outputs.tftest.hcl`: A test run block that checks the structure and expected values of the module's outputs for a simple configuration.\n4. `validation.tftest.hcl`: At least two test run blocks with `error_expected` set. One should test an invalid name, and another should test an invalid combination of account tier/kind.\n5. `containers.tftest.hcl`: A test run block to verify the creation of blob containers when the corresponding variable is set.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Run `terraform test` from the root of the storage account module. Verify that all tests pass, including the expected failures defined in `validation.tftest.hcl`."
           },
           {
@@ -2082,7 +2082,7 @@
             "description": "Modify the source path for the primary set of Terratest fixtures (simple, complete, security, network, private_endpoint) to use a local relative path instead of a GitHub reference. This is a critical step to enable testing of local module changes.",
             "dependencies": [],
             "details": "Navigate to the `test/fixtures/` directory. For each of the following fixture subdirectories: `simple`, `complete`, `security`, `network`, and `private_endpoint`, open the main `.tf` file. Locate the `module \"storage_account\"` block and change the `source` attribute from its current Git URL to `source = \"../../../\"`. This relative path points from the fixture directory to the module root.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "After modifying the paths, run the Terratest suite for one of the updated fixtures, for example, `go test -v -run TestStorageAccountComplete`. Confirm that the test initializes and applies successfully using the local module source."
           },
           {
@@ -2091,7 +2091,7 @@
             "description": "Modify the source path for the remaining set of Terratest fixtures (negative/*, advanced_policies, data_lake_gen2, identity_access) to use a local relative path. This completes the effort to make all fixtures test local changes.",
             "dependencies": [],
             "details": "Navigate to the `test/fixtures/` directory. For each of the following fixture subdirectories: `negative/invalid_name`, `negative/invalid_tier`, `advanced_policies`, `data_lake_gen2`, and `identity_access`, open the main `.tf` file. Locate the `module \"storage_account\"` block and change the `source` attribute from its current Git URL to `source = \"../../../\"`.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "After modifying the paths, run the Terratest suite for one of the updated fixtures, for example, `go test -v -run TestStorageAccountDataLakeGen2`. Confirm that the test initializes and applies successfully using the local module source."
           },
           {
@@ -2100,7 +2100,7 @@
             "description": "Refactor all Terratest fixtures to use a consistent `random_suffix` variable for resource naming, removing any local `random_string` resources. This simplifies fixture configuration and aligns with the testing guide's best practices.",
             "dependencies": [],
             "details": "1. In each fixture's `main.tf` under `test/fixtures/`, remove any `resource \"random_string\"` declarations.\n2. In each fixture's `variables.tf`, add a new variable: `variable \"random_suffix\" { type = string }`.\n3. Update resource names within each fixture's `main.tf` to use this variable (e.g., for the resource group name).\n4. In the corresponding Go test files (`*_test.go`), ensure a random suffix is generated (e.g., using `random.UniqueId()`) and passed as a Terraform variable in `terraform.Options`. Example: `Vars: map[string]interface{}{\"random_suffix\": randomSuffix}`.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Execute the full Terratest suite via `make test-all`. Verify that all tests pass and that created resources in Azure are named with the randomly generated suffix passed from the Go test code."
           },
           {
@@ -2109,7 +2109,7 @@
             "description": "Investigate and resolve the Go module dependency conflict involving an SQL package that currently prevents the use of the standard Terratest Azure module. The goal is to re-enable the module and leverage its standard helper functions.",
             "dependencies": [],
             "details": "1. Examine the `go.mod` file to identify the conflicting packages related to `github.com/gruntwork-io/terratest/modules/azure`.\n2. Attempt to resolve the conflict using `go mod` tooling. This may involve `go get -u` to update dependencies or adding a `replace` directive in `go.mod` to force a specific version of the conflicting package.\n3. Once the dependency conflict is resolved, uncomment the `import` statement for the Terratest Azure module in the `storage_account_test.go` file.\n4. Replace any custom helper functions (e.g., for getting storage account properties) with the standard functions from the re-enabled module, such as `azure.GetStorageAccount`.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "After applying the fix, run `go mod tidy` and `go build ./...` from the `test` directory to ensure the project compiles without errors. Then, execute the full Terratest suite to confirm that tests using the re-enabled module functions pass successfully."
           }
         ]
@@ -2117,7 +2117,7 @@
     ],
     "metadata": {
       "created": "2025-06-30T11:02:09.199Z",
-      "updated": "2025-07-17T18:51:43.860Z",
+      "updated": "2025-07-17T19:08:22.036Z",
       "description": "Tasks for master context"
     }
   }
