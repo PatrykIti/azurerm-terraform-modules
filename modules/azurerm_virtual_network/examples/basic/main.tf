@@ -5,7 +5,7 @@ terraform {
   required_version = ">= 1.3.0"
   required_providers {
     azurerm = {
-      source  = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.1"
+      source  = "hashicorp/azurerm"
       version = "4.36.0"
     }
   }
@@ -23,7 +23,7 @@ resource "azurerm_resource_group" "example" {
 
 # Basic Virtual Network configuration
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.0"
 
   name                = var.virtual_network_name
   resource_group_name = azurerm_resource_group.example.name

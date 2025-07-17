@@ -7,7 +7,7 @@ variable "location" {
 variable "kubernetes_version" {
   description = "Kubernetes version to use for the cluster"
   type        = string
-  default     = "1.29.2"
+  default     = "1.30.12"
 }
 
 variable "authorized_ip_ranges" {

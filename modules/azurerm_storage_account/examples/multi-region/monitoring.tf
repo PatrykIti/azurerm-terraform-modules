@@ -221,7 +221,7 @@ resource "azurerm_log_analytics_saved_search" "replication_lag" {
   display_name               = "Storage Replication Lag Analysis"
   query                      = <<-QUERY
     AzureMetrics
-    | where Resource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+    | where ResourceProvider == "MICROSOFT.STORAGE"
     | where MetricName == "GeoReplicationLatency"
     | summarize AvgLag = avg(Average), MaxLag = max(Maximum) by bin(TimeGenerated, 5m), Resource
     | where MaxLag > ${var.replication_lag_threshold_minutes * 60000}

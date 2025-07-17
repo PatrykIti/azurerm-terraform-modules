@@ -129,7 +129,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
             sed -i "s/^version: .*/version: \${nextRelease.version}/" "$CONFIG_FILE"
           fi
 
-          find "modules/${MODULE_NAME}/examples" -name "*.tf" -type f -exec sed -i 's|source.*=.*"|source = "${SOURCE_URL}"|g' {} +
+          # Update only module source references in examples (not provider sources or other fields)
+          find "modules/${MODULE_NAME}/examples" -name "*.tf" -type f -exec sed -i '/^module /,/^}/ s|source[[:space:]]*=[[:space:]]*"\.\./.*"|source = "${SOURCE_URL}"|g' {} +
 
           find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../../"|source = "${SOURCE_URL}"|g' {} +
           find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../"|source = "${SOURCE_URL}"|g' {} +

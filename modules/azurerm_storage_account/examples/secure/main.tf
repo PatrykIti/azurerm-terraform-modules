@@ -2,11 +2,11 @@ terraform {
   required_version = ">= 1.3.0"
   required_providers {
     azurerm = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+      source  = "hashicorp/azurerm"
       version = ">= 3.0.0"
     }
     random = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+      source  = "hashicorp/random"
       version = ">= 3.1.0"
     }
   }
@@ -152,7 +152,7 @@ data "azurerm_client_config" "current" {}
 
 # Highly secure Storage Account
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
   name                = "stsecure${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.example.name
@@ -198,19 +198,19 @@ module "storage_account" {
   private_endpoints = [
     {
       name                 = "blob"
-      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
+      subresource_names    = ["blob"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.storage["blob"].id]
     },
     {
       name                 = "web"
-      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
+      subresource_names    = ["web"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.storage["web"].id]
     },
     {
       name                 = "dfs"
-      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
+      subresource_names    = ["dfs"]
       subnet_id            = azurerm_subnet.private_endpoints.id
       private_dns_zone_ids = [azurerm_private_dns_zone.storage["dfs"].id]
     }

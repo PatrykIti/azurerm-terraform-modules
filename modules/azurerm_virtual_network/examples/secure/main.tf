@@ -5,7 +5,7 @@ terraform {
   required_version = ">= 1.3.0"
   required_providers {
     azurerm = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.1"
+      source  = "hashicorp/azurerm"
       version = "4.36.0"
     }
   }
@@ -93,9 +93,9 @@ resource "azurerm_network_security_group" "example" {
     direction                  = "Inbound"
     access                     = "Deny"
     protocol                   = "*"
-    source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.1"
+    source_port_range          = "*"
     destination_port_range     = "*"
-    source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.1"
+    source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
 
@@ -107,7 +107,7 @@ resource "azurerm_network_security_group" "example" {
 
 # Secure Virtual Network configuration with enhanced security features
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.0"
 
   name                = "vnet-secure-example"
   resource_group_name = azurerm_resource_group.example.name

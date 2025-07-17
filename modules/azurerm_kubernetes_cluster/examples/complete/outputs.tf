@@ -28,10 +28,11 @@ output "node_resource_group" {
 # Identity outputs
 output "cluster_identity" {
   description = "The managed identity of the cluster"
+  sensitive   = true
   value = {
-    type         = module.kubernetes_cluster.identity[0].type
-    principal_id = module.kubernetes_cluster.identity[0].principal_id
-    tenant_id    = module.kubernetes_cluster.identity[0].tenant_id
+    type         = module.kubernetes_cluster.identity.type
+    principal_id = module.kubernetes_cluster.identity.principal_id
+    tenant_id    = module.kubernetes_cluster.identity.tenant_id
   }
 }
 

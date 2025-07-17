@@ -13,7 +13,7 @@ resource "azurerm_private_endpoint" "primary_blob" {
   private_service_connection {
     name                           = "psc-${module.primary_storage.name}-blob"
     private_connection_resource_id = module.primary_storage.id
-    subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
+    subresource_names              = ["blob"]
     is_manual_connection           = false
   }
 
@@ -39,7 +39,7 @@ resource "azurerm_private_endpoint" "primary_table" {
   private_service_connection {
     name                           = "psc-${module.primary_storage.name}-table"
     private_connection_resource_id = module.primary_storage.id
-    subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
+    subresource_names              = ["table"]
     is_manual_connection           = false
   }
 
@@ -65,7 +65,7 @@ resource "azurerm_private_endpoint" "secondary_blob" {
   private_service_connection {
     name                           = "psc-${module.secondary_storage.name}-blob"
     private_connection_resource_id = module.secondary_storage.id
-    subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
+    subresource_names              = ["blob"]
     is_manual_connection           = false
   }
 
@@ -91,7 +91,7 @@ resource "azurerm_private_endpoint" "dr_blob" {
   private_service_connection {
     name                           = "psc-${module.dr_storage.name}-blob"
     private_connection_resource_id = module.dr_storage.id
-    subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
+    subresource_names              = ["blob"]
     is_manual_connection           = false
   }
 
@@ -117,7 +117,7 @@ resource "azurerm_private_endpoint" "metadata_blob" {
   private_service_connection {
     name                           = "psc-${module.replication_metadata.name}-blob"
     private_connection_resource_id = module.replication_metadata.id
-    subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
+    subresource_names              = ["blob"]
     is_manual_connection           = false
   }
 
@@ -142,7 +142,7 @@ resource "azurerm_private_endpoint" "metadata_table" {
   private_service_connection {
     name                           = "psc-${module.replication_metadata.name}-table"
     private_connection_resource_id = module.replication_metadata.id
-    subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
+    subresource_names              = ["table"]
     is_manual_connection           = false
   }
 
@@ -167,7 +167,7 @@ resource "azurerm_private_endpoint" "metadata_queue" {
   private_service_connection {
     name                           = "psc-${module.replication_metadata.name}-queue"
     private_connection_resource_id = module.replication_metadata.id
-    subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
+    subresource_names              = ["queue"]
     is_manual_connection           = false
   }
 

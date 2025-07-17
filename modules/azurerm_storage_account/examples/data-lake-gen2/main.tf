@@ -2,15 +2,15 @@ terraform {
   required_version = ">= 1.3.0"
   required_providers {
     azurerm = {
-      source  = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+      source  = "hashicorp/azurerm"
       version = ">= 3.0.0"
     }
     azuread = {
-      source  = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+      source  = "hashicorp/azuread"
       version = ">= 2.0.0"
     }
     random = {
-      source  = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+      source  = "hashicorp/random"
       version = ">= 3.1.0"
     }
   }
@@ -87,7 +87,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # Data Lake Storage Gen2 Account
 module "data_lake_storage" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
   name                = "datalake${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.example.name
@@ -241,7 +241,7 @@ resource "azurerm_storage_data_lake_gen2_path" "bronze_raw" {
   path               = "raw-data"
   filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.bronze.name
   storage_account_id = module.data_lake_storage.id
-  resource           = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  resource           = "directory"
 
   # ACL configuration - Data Engineer has full access, Data Analyst has read-only
   # Access ACL applies to this directory
@@ -279,21 +279,21 @@ resource "azurerm_storage_data_lake_gen2_path" "bronze_staging" {
   path               = "staging"
   filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.bronze.name
   storage_account_id = module.data_lake_storage.id
-  resource           = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  resource           = "directory"
 }
 
 resource "azurerm_storage_data_lake_gen2_path" "silver_processed" {
   path               = "processed"
   filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.silver.name
   storage_account_id = module.data_lake_storage.id
-  resource           = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  resource           = "directory"
 }
 
 resource "azurerm_storage_data_lake_gen2_path" "gold_reports" {
   path               = "reports"
   filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.gold.name
   storage_account_id = module.data_lake_storage.id
-  resource           = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  resource           = "directory"
 }
 
 # Local user for SFTP access
@@ -371,7 +371,7 @@ resource "azurerm_storage_data_lake_gen2_path" "sample_data_dir" {
   path               = "raw-data/samples"
   filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.bronze.name
   storage_account_id = module.data_lake_storage.id
-  resource           = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  resource           = "directory"
 
   # File-level ACL - Data Analyst has read-only access to this specific file
   ace {
@@ -405,7 +405,7 @@ resource "azurerm_storage_data_lake_gen2_path" "sample_data_dir" {
 #   # To mount the Data Lake in Databricks:
 #   # 1. Use the service principal credentials created above
 #   # 2. Mount using: dbutils.fs.mount(
-#   #      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0",
+#   #      source = "abfss://bronze@${module.data_lake_storage.name}.dfs.core.windows.net/",
 #   #      mount_point = "/mnt/datalake/bronze",
 #   #      extra_configs = {"fs.azure.account.auth.type": "OAuth",
 #   #                       "fs.azure.account.oauth.provider.type": "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",

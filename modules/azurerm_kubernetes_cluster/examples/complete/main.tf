@@ -136,12 +136,11 @@ module "kubernetes_cluster" {
   default_node_pool = {
     name                 = "system"
     vm_size              = "Standard_D4s_v3"
-    node_count           = null
+    node_count           = 2
     auto_scaling_enabled = true
     min_count            = 2
     max_count            = 5
     vnet_subnet_id       = azurerm_subnet.nodes.id
-    pod_subnet_id        = azurerm_subnet.pods.id
 
     # VM configuration
     os_disk_size_gb      = 100
@@ -159,7 +158,7 @@ module "kubernetes_cluster" {
     max_pods          = 110
     scale_down_mode   = "Delete"
     ultra_ssd_enabled = false
-    zones             = ["1", "2", "3"]
+    zones             = ["1"]
 
     # Node labels
     node_labels = {
