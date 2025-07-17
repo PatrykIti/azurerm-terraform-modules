@@ -12,6 +12,8 @@ This report provides a comprehensive analysis of the `azurerm_storage_account` m
 | Terratest Integration Tests | ✅ Excellent | 95% |
 | Test Organization | ✅ Very Good | 90% |
 | Helper Functions | ✅ Excellent | 100% |
+| Fixture Coverage | ✅ Comprehensive | 90% |
+| Fixture Implementation | ⚠️ Issues | 60% |
 | Makefile & CI/CD | ✅ Comprehensive | 100% |
 | Performance Tests | ✅ Implemented | 100% |
 | Security Testing | ✅ Good | 85% |
@@ -234,25 +236,64 @@ Complete private connectivity setup:
 
 ##### Negative Fixtures (`fixtures/negative/`)
 Systematic validation testing with 5 scenarios:
-1. **Invalid Name** - Tests uppercase character rejection
-2. **Invalid Tier** - Tests Premium tier with LRS replication
-3. **Invalid Replication** - Tests Standard tier with ZRS
-4. **Invalid Access Tier** - Tests Cool tier with Premium
-5. **Invalid Public Access** - Tests conflicting settings
+1. **Invalid Name Characters** (`invalid_name_chars/`) - Tests uppercase character rejection
+2. **Invalid Name Short** (`invalid_name_short/`) - Tests name length validation
+3. **Invalid Account Tier** (`invalid_account_tier/`) - Tests Premium tier with invalid replication
+4. **Invalid Replication Type** (`invalid_replication_type/`) - Tests invalid tier/replication combinations
+5. **Invalid Container Access** (`invalid_container_access/`) - Tests conflicting access settings
+
+##### Advanced Policies Fixture (`fixtures/advanced_policies/`)
+**NOT MENTIONED in initial analysis** - Tests advanced storage features:
+- SAS (Shared Access Signature) policy configuration
+- Routing preferences (InternetRouting vs MicrosoftRouting)
+- Share properties with SMB multichannel settings
+- CORS rules configuration
+- Kerberos ticket encryption types
+- SFTP and hierarchical namespace (HNS) enabled
+- Complex lifecycle rules with multiple conditions
+
+##### Data Lake Gen2 Fixture (`fixtures/data_lake_gen2/`)
+**Initially mentioned as missing, but actually EXISTS** - Comprehensive Data Lake testing:
+- Hierarchical namespace (HNS) enabled
+- SFTP enabled for secure file transfers
+- NFSv3 protocol support with dedicated subnet
+- Local user authentication enabled
+- DFS (Data Lake File System) endpoint validation
+- Network configuration for NFSv3 compatibility
+
+##### Identity & Access Fixture (`fixtures/identity_access/`)
+**NOT MENTIONED in initial analysis** - Advanced identity and encryption:
+- Customer-managed keys (CMK) with Key Vault integration
+- Both system-assigned and user-assigned identities
+- Keyless authentication (OAuth) enabled
+- Infrastructure encryption with CMK
+- Shared access keys disabled for enhanced security
+- Complex RBAC assignments for Key Vault access
+
+##### Multi-Region Fixture (`fixtures/multi_region/`)
+**Initially mentioned as missing, but actually EXISTS** - Geo-redundancy testing:
+- Primary storage with GRS (Geo-Redundant Storage)
+- Secondary storage in different region with LRS
+- Cross-tenant replication enabled
+- Different access tiers (Hot vs Cool)
+- Multi-region deployment validation
+- **NOTE**: Uses relative path `source = "../../../"` (CORRECT!)
 
 #### Fixture Issues
 
 ##### Hardcoded Source References
-**Critical Issue**: All fixtures use GitHub references instead of local paths:
+**Critical Issue**: Most fixtures use GitHub references instead of local paths:
 ```hcl
-# Current (incorrect):
+# Current (incorrect) - used in most fixtures:
 source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
-# Should be:
+# Correct (only in multi_region fixture):
 source = "../../../"
 ```
 
 This prevents testing of local changes and creates dependency on published versions.
+
+**EXCEPTION**: The `multi_region` fixture correctly uses relative path `source = "../../../"`, showing proper implementation pattern that should be applied to all other fixtures.
 
 ##### Variable Pattern Inconsistency
 Different fixtures use varying patterns:
@@ -299,13 +340,19 @@ Consider resolving this to use Terratest's built-in Azure functions.
 
 While integration tests are comprehensive, adding E2E tests that combine storage account with other modules (VNet, Key Vault) would complete Level 4 of the testing pyramid.
 
-### 4. **Missing Test Scenarios**
+### 4. **Updated Fixture Coverage Assessment**
 
-Based on comprehensive analysis, consider adding:
-- **Data Lake Gen2 fixture** - For hierarchical namespace testing
-- **Multi-region fixture** - For geo-redundancy validation
-- **Customer-managed keys fixture** - For advanced encryption scenarios
-- **Lifecycle management fixture** - For blob lifecycle policies
+After thorough review, all initially "missing" fixtures actually exist:
+- ✅ **Data Lake Gen2 fixture** - EXISTS at `fixtures/data_lake_gen2/`
+- ✅ **Multi-region fixture** - EXISTS at `fixtures/multi_region/` 
+- ✅ **Customer-managed keys** - Covered in `fixtures/identity_access/`
+- ✅ **Advanced policies** - EXISTS at `fixtures/advanced_policies/`
+
+**Still Missing Test Scenarios**:
+- **Lifecycle management dedicated fixture** - Currently only tested as part of other fixtures
+- **Static website hosting fixture** - Not covered in any fixture
+- **File share specific fixture** - Storage account file shares not tested
+- **Queue and Table service fixture** - Only blob service is thoroughly tested
 
 ### 5. **Test Execution Improvements**
 
@@ -351,9 +398,10 @@ The storage account module demonstrates **exceptional Terratest implementation**
 **Key Technical Strengths:**
 - Sophisticated helper class design with proper authentication handling
 - Comprehensive validation methods covering all storage aspects
-- Well-structured fixtures for every use case
+- Well-structured fixtures for every use case (11 fixtures covering diverse scenarios)
 - Excellent retry logic and error handling
 - Performance benchmarking included
+- Advanced scenarios covered (CMK, Data Lake Gen2, multi-region, identity)
 
 **Critical Compliance Gap:**
 Complete absence of native Terraform unit tests, which are explicitly required by the testing guide.
