@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.0.0, < 5.0.0"
+      version = "4.36.0"
     }
   }
 }
@@ -27,7 +27,7 @@ resource "azurerm_resource_group" "secondary" {
 
 # Primary storage account with GRS replication
 module "primary_storage" {
-  source = "../../../"
+  source = "../../.."
 
   name                     = "dpcmpr${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.primary.name
