@@ -182,10 +182,16 @@ run "container_depends_on_storage_account" {
     ]
   }
 
-  # Verify container is created and linked to storage account
+  # Verify container is created
   assert {
-    condition     = can(azurerm_storage_container.storage_container["testcontainer"])
+    condition     = length(azurerm_storage_container.storage_container) == 1
     error_message = "Container should be created successfully"
+  }
+  
+  # Verify container has correct name
+  assert {
+    condition     = azurerm_storage_container.storage_container["testcontainer"].name == "testcontainer"
+    error_message = "Container name should be correct"
   }
 }
 
