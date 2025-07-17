@@ -139,6 +139,14 @@ resource "azurerm_role_assignment" "aks_dns_contributor" {
   principal_id         = azurerm_user_assigned_identity.aks.principal_id
 }
 
+# Grant the user-assigned identity Network Contributor role on the AKS VNet
+# This is required for AKS to manage DNS zone links
+resource "azurerm_role_assignment" "aks_network_contributor" {
+  scope                = azurerm_virtual_network.aks.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_user_assigned_identity.aks.principal_id
+}
+
 module "kubernetes_cluster" {
   source = "../../"
 
@@ -219,4 +227,10 @@ module "kubernetes_cluster" {
     Environment = "Development"
     Example     = "Private-Endpoint"
   }
+
+  # Ensure role assignments are completed before creating AKS
+  depends_on = [
+    azurerm_role_assignment.aks_dns_contributor,
+    azurerm_role_assignment.aks_network_contributor
+  ]
 }
