@@ -50,6 +50,7 @@ func TestKubernetesClusterLifecycle(t *testing.T) {
 		assert.Equal(t, int32(2), *(*clusterAfterUpdate.Properties.AgentPoolProfiles[0]).Count)
 
 		// Run apply again to check for idempotency
-		terraform.Apply(t, terraformOptions)
+		exitCode := terraform.ApplyExitCode(t, terraformOptions)
+		assert.Equal(t, 0, exitCode)
 	})
 }

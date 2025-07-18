@@ -2,20 +2,26 @@ provider "azurerm" {
   features {}
 }
 
+resource "random_string" "suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
 resource "azurerm_resource_group" "test" {
-  name     = "rg-aks-smp-${var.random_suffix}"
+  name     = "rg-aks-basic-${random_string.suffix.result}"
   location = var.location
 }
 
 resource "azurerm_virtual_network" "test" {
-  name                = "vnet-aks-smp-${var.random_suffix}"
-  address_space       = ["10.0.0.0/16"]
+  name                = "vnet-aks-basic-${random_string.suffix.result}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
+  address_space       = ["10.0.0.0/16"]
 }
 
 resource "azurerm_subnet" "test" {
-  name                 = "snet-aks-smp"
+  name                 = "snet-aks-nodes-${random_string.suffix.result}"
   resource_group_name  = azurerm_resource_group.test.name
   virtual_network_name = azurerm_virtual_network.test.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -24,20 +30,29 @@ resource "azurerm_subnet" "test" {
 module "kubernetes_cluster" {
   source = "../../.."
 
-  name                = "aks-smp-${var.random_suffix}"
+  name                = "aks-basic-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
-  dns_prefix          = "akssmp${var.random_suffix}"
-
-  default_node_pool = {
-    name           = "default"
-    node_count     = var.node_count
-    vm_size        = "Standard_D2_v2"
-    vnet_subnet_id = azurerm_subnet.test.id
+  
+  dns_config = {
+    dns_prefix = "aks-basic-${random_string.suffix.result}"
   }
 
   identity = {
     type = "SystemAssigned"
+  }
+
+  default_node_pool = {
+    name           = "default"
+    vm_size        = "Standard_D2s_v3"
+    node_count     = var.node_count
+    vnet_subnet_id = azurerm_subnet.test.id
+  }
+
+  network_profile = {
+    network_plugin = "azure"
+    service_cidr   = "172.16.0.0/16"
+    dns_service_ip = "172.16.0.10"
   }
 
   tags = {

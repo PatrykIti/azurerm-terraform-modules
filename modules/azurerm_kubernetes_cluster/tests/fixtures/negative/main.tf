@@ -1,23 +1,27 @@
-# Negative test cases - should fail validation
 provider "azurerm" {
   features {}
 }
 
 resource "azurerm_resource_group" "test" {
-  name     = "rg-kubernetes_cluster-negative-test"
-  location = "West Europe"
+  name     = "rg-aks-negative-${var.random_suffix}"
+  location = var.location
 }
 
-# This should fail due to invalid name
 module "kubernetes_cluster" {
-  source = "../../../"
+  source = "../../.."
 
-  name                = "INVALID-NAME-WITH-UPPERCASE" # Should fail validation
+  name                = "AKS-Invalid-Name" # Invalid name with uppercase letters and hyphens
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
+  dns_prefix          = "aksinvalid"
 
-  tags = {
-    Environment = "Test"
-    Scenario    = "Negative"
+  default_node_pool = {
+    name       = "default"
+    node_count = 1
+    vm_size    = "Standard_D2_v2"
+  }
+
+  identity = {
+    type = "SystemAssigned"
   }
 }
