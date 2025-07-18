@@ -1,174 +1,138 @@
 # Fixtures and Test Execution
 
-Effective management of test configurations (`fixtures`) and automated test execution are key to an efficient CI/CD process. This section describes the standards for organizing `fixtures` and using `Makefile` and `bash` scripts to orchestrate tests.
+This guide covers the standards for creating test configurations (`fixtures`) and the tools used to execute the tests, including `Makefile` and supplementary shell scripts.
 
-## Fixture Organization
+## Test Fixtures
 
-The `tests/fixtures` directory contains subdirectories, each representing a separate, isolated test scenario in the form of a complete Terraform configuration.
+Test fixtures are small, self-contained Terraform configurations located in the `tests/fixtures` directory. Each subdirectory represents a specific scenario to be tested.
 
-### `fixtures` Directory Structure
+### Fixture Organization
 
+A well-organized `fixtures` directory is crucial for covering a wide range of scenarios.
+
+**Standard Structure:**
 ```
 tests/
 └── fixtures/
-    ├── simple/           # A minimal, working configuration of the module.
-    │   ├── main.tf
-    │   ├── variables.tf
-    │   └── outputs.tf
-    ├── complete/         # A configuration testing all or most of the module's features.
-    ├── security/         # A configuration with the most restrictive security settings.
-    ├── network/          # A scenario testing advanced network rules.
-    ├── private_endpoint/ # A scenario using a Private Endpoint.
-    └── negative/         # A collection of intentionally incorrect configurations.
+    ├── simple/           # Minimal, valid configuration to test basic resource creation.
+    ├── complete/         # A complex configuration that enables most of the module's features.
+    ├── security/         # A configuration focused on security-hardened settings.
+    ├── network/          # Scenarios for advanced networking (e.g., VNet integration, IP rules).
+    ├── private_endpoint/ # A specific scenario for private endpoint integration.
+    └── negative/         # Subdirectories for configurations that are expected to fail validation.
         ├── invalid_name_short/
         └── invalid_replication_type/
 ```
 
 ### Best Practices for Fixtures
 
-1.  **Local Module Source**: Each `fixture` must reference the module being tested using a relative path to test local changes.
+1.  **Use a Local Module Source**: Fixtures must always test the local version of the module using a relative path.
     ```hcl
-    # fixtures/simple/main.tf
+    # in fixtures/simple/main.tf
     module "storage_account" {
-      source = "../../../" # Reference to the module's root directory
+      # This path points to the module's root directory
+      source = "../../../" 
 
-      # ... variables
+      name                = "stsimple${var.random_suffix}"
+      resource_group_name = azurerm_resource_group.test.name
+      # ... other variables
     }
     ```
 
-2.  **Unique Resource Names**: Use the `random_suffix` variable, passed from the Go test, to create unique resource names.
+2.  **Ensure Unique Resource Names**: To enable parallel testing, all resources must have unique names. This is achieved by accepting a `random_suffix` variable from the Go test code.
     ```hcl
-    # fixtures/simple/variables.tf
+    # in fixtures/simple/variables.tf
     variable "random_suffix" {
       type        = string
-      description = "A random suffix to ensure unique resource names."
+      description = "A random suffix passed from the test to ensure unique resource names."
     }
 
-    # fixtures/simple/main.tf
+    # in fixtures/simple/main.tf
     resource "azurerm_resource_group" "test" {
       name     = "rg-test-${var.random_suffix}"
       location = var.location
     }
     ```
 
-3.  **Minimalism**: A `fixture` should only contain the configuration necessary to test a given scenario. Avoid adding unrelated resources.
-
-4.  **Outputs**: Each `fixture` must define an `outputs.tf` file that exposes key attributes of the deployed resources. These values are then read and validated in the Go tests.
+3.  **Define Outputs for Validation**: Each fixture must expose the key attributes of the created resources as outputs. The Go tests will read these outputs to get the names and IDs needed for validation with the Azure SDK.
     ```hcl
-    # fixtures/simple/outputs.tf
+    # in fixtures/simple/outputs.tf
     output "storage_account_id" {
-      value = module.storage_account.id
+      description = "The ID of the created storage account."
+      value       = module.storage_account.id
     }
 
     output "storage_account_name" {
-      value = module.storage_account.name
+      description = "The name of the created storage account."
+      value       = module.storage_account.name
     }
     ```
 
-## Running Tests
+## Test Execution
 
-We use `Makefile` as the main interface for running tests, which simplifies and standardizes the process both locally and in CI/CD.
+A `Makefile` in the `tests` directory serves as the standardized interface for running all test-related commands.
 
-### `Makefile`
+### Using the `Makefile`
 
-The `Makefile` defines a set of commands (targets) to manage the test lifecycle.
+The `Makefile` provides convenient targets for common operations, ensuring that tests are run the same way by every developer and in the CI/CD pipeline.
 
-**Key Targets (`modules/azurerm_storage_account/tests/Makefile`):**
-```makefile
-# Configuration variables
-TIMEOUT ?= 30m
-PARALLEL ?= 8
+**Key `Makefile` Targets:**
 
-# Check environment variables
-check-env:
-	@test -n "$(AZURE_SUBSCRIPTION_ID)" || (echo "AZURE_SUBSCRIPTION_ID is not set" && exit 1)
-    # ... (other variables)
+| Target | Description |
+|---|---|
+| `make test` | Runs all Go tests in parallel. The default command for a full test run. |
+| `make test-single TEST_NAME=<TestFunctionName>` | Runs a single, specific test function. Useful for debugging. |
+| `make test-basic` | Runs only the `TestBasicStorageAccount` test. |
+| `make test-security` | Runs only the `TestStorageAccountSecurity` test. |
+| `make benchmark` | Runs all performance benchmarks. |
+| `make test-coverage` | Runs tests and generates an HTML code coverage report (`coverage.html`). |
+| `make test-junit` | Runs tests and generates a JUnit XML report (`test-results.xml`) for CI/CD integration. |
+| `make lint` | Runs the `golangci-lint` linter to check for code style issues. |
+| `make fmt` | Formats all Go code using `gofmt`. |
+| `make clean` | Deletes all test artifacts, including temporary folders and state files. |
+| `make ci` | A comprehensive target that simulates the CI/CD pipeline by running `fmt`, `lint`, `test-coverage`, and `test-junit`. |
 
-# Install dependencies
-deps:
-	go mod download
-	go mod tidy
-
-# Run all tests
-test: check-env deps
-	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...
-
-# Run a specific test
-test-single: check-env deps
-	go test -v -timeout $(TIMEOUT) -run $(TEST_NAME) ./...
-
-# Run tests with a coverage report
-test-coverage: check-env deps
-	go test -v -coverprofile=coverage.out ./...
-	go tool cover -html=coverage.out
-
-# Generate a JUnit report for CI/CD
-test-junit: check-env deps
-	go install github.com/jstemmer/go-junit-report/v2@latest
-	go test -v ./... 2>&1 | go-junit-report -set-exit-code > test-results.xml
-
-# Clean up artifacts
-clean:
-	rm -f coverage.out test-results.xml
-	find . -name "*.tfstate*" -type f -delete
-```
-
-**Usage:**
+**Example Usage:**
 ```bash
-# Run all tests
-make test
+# Run all tests with a 45-minute timeout
+make test TIMEOUT=45m
 
-# Run only basic tests
-make test-basic
+# Run only the private endpoint test
+make test-single TEST_NAME=TestStorageAccountPrivateEndpoint
 
-# Run a specific test
-make test-single TEST_NAME=TestStorageAccountSecurity
-
-# Generate a code coverage report
-make test-coverage
+# Check for linting errors
+make lint
 ```
 
-### Execution Scripts (`run_tests_*.sh`)
+### Advanced Execution Scripts
 
-For more advanced orchestration, especially for generating detailed reports, we use `bash` scripts.
+For more complex orchestration, such as generating custom reports, the following scripts are provided:
 
-#### `run_tests_parallel.sh`
-
--   **Purpose**: Runs all defined tests in parallel, each in a separate process.
--   **Key Features**:
-    -   Runs tests in the background (`&`).
-    -   Collects process PIDs and waits for them to complete (`wait`).
-    -   Generates a separate `.log` and `.json` file with metadata (status, duration, error) for each test.
-    -   Finally, creates a `summary.json` file with the results of all tests.
-    -   **Always exits with code 0** so that the full report can be analyzed in CI/CD, even if some tests failed.
-
-#### `run_tests_sequential.sh`
-
--   **Purpose**: Runs tests one after another. Ideal for debugging.
--   **Key Features**:
-    -   Runs tests in a `for` loop.
-    -   Displays live logs in the console (`tee`).
-    -   Similar to the parallel version, generates individual JSON reports and a summary.
+-   `run_tests_parallel.sh`: Executes all test functions in parallel as separate processes and generates a detailed JSON report for each. It creates a final `summary.json` with the results of the entire run.
+-   `run_tests_sequential.sh`: Executes tests one by one. This is useful for debugging, as it makes logs easier to follow.
 
 ### Test Configuration (`test_config.yaml`)
 
-This file allows you to define test suites and other parameters that can be used by execution scripts or CI/CD tools to dynamically build test matrices.
+This file provides a way to configure test execution behavior without modifying code or scripts. It can be used by CI/CD pipelines to define different test suites.
 
+**Example Structure:**
 ```yaml
 # test_config.yaml
 test_suites:
-  - name: "Basic Tests"
+  - name: "Pull Request Quick Checks"
     tests:
       - TestBasicStorageAccount
+      - TestStorageAccountValidationRules
     parallel: true
     timeout: 15m
     
-  - name: "Complete Feature Tests"
+  - name: "Nightly Full Run"
     tests:
       - TestCompleteStorageAccount
       - TestStorageAccountSecurity
+      - TestStorageAccountLifecycle
     parallel: true
-    timeout: 30m
+    timeout: 45m
 
 coverage:
   enabled: true
@@ -178,4 +142,3 @@ reporting:
   format: junit
   output_dir: test-results/
 ```
-This file makes it easy to manage which tests belong to which category (e.g., "quick", "full") without modifying the scripts.
