@@ -10,24 +10,11 @@ Once a module is developed, it must be integrated into the repository's CI/CD wo
 
 ## Steps for Integration
 
-### Step 1: Add Module to the Test Matrix
+The `module-ci.yml` workflow is fully dynamic and automatically discovers all modules within the `modules/` directory using a dedicated `detect-modules` action. This means **you no longer need to manually add your new module to a list or matrix in the workflow file.**
 
-The `module-ci.yml` workflow uses a matrix strategy to test each module. You must add your new module's directory name to this matrix.
+The primary integration steps are now focused on configuring the release process and providing optional CI overrides.
 
-**File to Edit**: `.github/workflows/module-ci.yml`
-
-**Example Change**:
-```yaml
-strategy:
-  fail-fast: false
-  matrix:
-    module:
-      - azurerm_storage_account
-      - azurerm_virtual_network
-      - azurerm_kubernetes_cluster # <-- Add your new module here
-```
-
-### Step 2: Configure Release Process
+### Step 1: Configure Release Process
 
 The release process is handled by `semantic-release`. The configuration is managed by two key files within your module's directory:
 
@@ -46,7 +33,7 @@ The release process is handled by `semantic-release`. The configuration is manag
 
 2.  **`.releaserc.js`**: This file should be copied from a reference module like `azurerm_kubernetes_cluster`. It is designed to be dynamic and reads its configuration from `module.json`, so you typically don't need to modify it.
 
-### Step 3: (Optional) Create Module-Specific CI Configuration
+### Step 2: (Optional) Create Module-Specific CI Configuration
 
 In some cases, a module may have unique testing requirements (e.g., requires specific regions, has longer timeouts). You can create a `.github/module-config.yml` file inside your module directory to override the default CI settings.
 

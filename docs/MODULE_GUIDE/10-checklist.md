@@ -58,5 +58,5 @@ Before submitting a pull request for a new module, please review this checklist 
 
 ## CI/CD Integration
 
-- [ ] The new module has been added to the test matrix in `.github/workflows/module-ci.yml`.
+- [ ] `module.json` and `.releaserc.js` are configured for release automation.
 - [ ] (If needed) A `module-config.yml` has been added to `.github/` for custom CI settings.
