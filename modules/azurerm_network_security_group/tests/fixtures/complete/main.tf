@@ -30,7 +30,7 @@ resource "azurerm_network_watcher" "test" {
 }
 
 module "network_security_group" {
-  source = "../../"
+  source = "../../.."
 
   name                = "nsg-cmp-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
