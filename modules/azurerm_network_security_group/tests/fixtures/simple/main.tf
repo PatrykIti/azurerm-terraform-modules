@@ -2,20 +2,44 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-network_security_group-basic-example"
-  location = "West Europe"
+variable "random_suffix" {
+  type        = string
+  description = "A random suffix passed from the test to ensure unique resource names."
+}
+
+variable "location" {
+  type        = string
+  description = "The Azure region for the resources."
+}
+
+resource "azurerm_resource_group" "test" {
+  name     = "rg-nsg-smp-${var.random_suffix}"
+  location = var.location
 }
 
 module "network_security_group" {
-  source = "../../"
+  source = "../../.."
 
-  name                = "networksecuritygroupexample001"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-
+  name                = "nsg-smp-${var.random_suffix}"
+  resource_group_name = azurerm_resource_group.test.name
+  location            = azurerm_resource_group.test.location
   tags = {
-    Environment = "Development"
-    Example     = "Basic"
+    Environment = "Test"
+    Scenario    = "Simple"
   }
+}
+
+output "id" {
+  description = "The ID of the created Network Security Group."
+  value       = module.network_security_group.id
+}
+
+output "name" {
+  description = "The name of the created Network Security Group."
+  value       = module.network_security_group.name
+}
+
+output "resource_group_name" {
+  description = "The name of the resource group."
+  value       = azurerm_resource_group.test.name
 }

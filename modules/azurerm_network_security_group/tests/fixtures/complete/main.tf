@@ -2,22 +2,106 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-network_security_group-complete-example"
-  location = "West Europe"
+variable "random_suffix" {
+  type        = string
+  description = "A random suffix passed from the test to ensure unique resource names."
+}
+
+variable "location" {
+  type        = string
+  description = "The Azure region for the resources."
+}
+
+resource "azurerm_resource_group" "test" {
+  name     = "rg-nsg-cmp-${var.random_suffix}"
+  location = var.location
+}
+
+resource "azurerm_storage_account" "test" {
+  name                     = "stnsgcmp${var.random_suffix}"
+  resource_group_name      = azurerm_resource_group.test.name
+  location                 = azurerm_resource_group.test.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_log_analytics_workspace" "test" {
+  name                = "log-nsg-cmp-${var.random_suffix}"
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
+
+resource "azurerm_network_watcher" "test" {
+  name                = "nw-nsg-cmp-${var.random_suffix}"
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
 }
 
 module "network_security_group" {
   source = "../../"
 
-  name                = "networksecuritygroupexample002"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name                = "nsg-cmp-${var.random_suffix}"
+  resource_group_name = azurerm_resource_group.test.name
+  location            = azurerm_resource_group.test.location
 
-  # Add more comprehensive configuration here
+  security_rules = {
+    allow_ssh_inbound = {
+      priority                   = 100
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_range     = "22"
+      source_address_prefix      = "10.0.0.0/16"
+      destination_address_prefix = "*"
+      description                = "Allow SSH from internal network"
+    }
+    deny_rdp_outbound = {
+      priority                   = 110
+      direction                  = "Outbound"
+      access                     = "Deny"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_range     = "3389"
+      source_address_prefix      = "*"
+      destination_address_prefix = "Internet"
+      description                = "Deny RDP to the Internet"
+    }
+  }
+
+  flow_log_enabled          = true
+  network_watcher_name      = azurerm_network_watcher.test.name
+  flow_log_storage_account_id = azurerm_storage_account.test.id
+
+  traffic_analytics_enabled            = true
+  traffic_analytics_workspace_id       = azurerm_log_analytics_workspace.test.workspace_id
+  traffic_analytics_workspace_region   = azurerm_log_analytics_workspace.test.location
+  traffic_analytics_interval_in_minutes = 10
 
   tags = {
-    Environment = "Development"
-    Example     = "Complete"
+    Environment = "Test"
+    Scenario    = "Complete"
   }
+}
+
+output "id" {
+  description = "The ID of the created Network Security Group."
+  value       = module.network_security_group.id
+}
+
+output "name" {
+  description = "The name of the created Network Security Group."
+  value       = module.network_security_group.name
+}
+
+output "resource_group_name" {
+  description = "The name of the resource group."
+  value       = azurerm_resource_group.test.name
+}
+
+output "flow_log_id" {
+  description = "The ID of the NSG Flow Log."
+  value       = module.network_security_group.flow_log_id
 }
