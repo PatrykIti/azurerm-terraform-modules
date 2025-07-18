@@ -1,14 +1,20 @@
 # Complete Route Table Example
 
 # Resource Group
+resource "random_string" "suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
 resource "azurerm_resource_group" "example" {
-  name     = "rg-route-table-complete-example"
-  location = "East US"
+  name     = "rg-rt-complete-${random_string.suffix.result}"
+  location = var.location
 }
 
 # Virtual Network
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-hub-example"
+  name                = "vnet-hub-complete-${random_string.suffix.result}"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
@@ -16,14 +22,14 @@ resource "azurerm_virtual_network" "example" {
 
 # Multiple Subnets for demonstration
 resource "azurerm_subnet" "app" {
-  name                 = "subnet-app"
+  name                 = "snet-app-${random_string.suffix.result}"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
 resource "azurerm_subnet" "data" {
-  name                 = "subnet-data"
+  name                 = "snet-data-${random_string.suffix.result}"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.2.0/24"]
@@ -40,12 +46,12 @@ resource "azurerm_subnet" "firewall" {
 module "route_table_complete" {
   source = "../../"
 
-  name                = "rt-hub-complete-example"
+  name                = "rt-hub-complete-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
   # Disable BGP route propagation for full control
-  disable_bgp_route_propagation = true
+  bgp_route_propagation_enabled = false
 
   # Comprehensive routes configuration
   routes = [
@@ -61,18 +67,6 @@ module "route_table_complete" {
       next_hop_type  = "VirtualNetworkGateway"
     },
     {
-      name                   = "to-spoke1"
-      address_prefix         = "10.1.0.0/16"
-      next_hop_type          = "VirtualAppliance"
-      next_hop_in_ip_address = "10.0.0.4"
-    },
-    {
-      name                   = "to-spoke2"
-      address_prefix         = "10.2.0.0/16"
-      next_hop_type          = "VirtualAppliance"
-      next_hop_in_ip_address = "10.0.0.4"
-    },
-    {
       name           = "local-vnet"
       address_prefix = "10.0.0.0/16"
       next_hop_type  = "VnetLocal"
@@ -85,10 +79,10 @@ module "route_table_complete" {
   ]
 
   # Associate with multiple subnets
-  subnet_ids_to_associate = {
-    (azurerm_subnet.app.id)  = azurerm_subnet.app.id,
-    (azurerm_subnet.data.id) = azurerm_subnet.data.id
-  }
+  subnet_ids_to_associate = [
+    azurerm_subnet.app.id,
+    azurerm_subnet.data.id
+  ]
 
   tags = {
     Environment = "Production"
@@ -102,12 +96,12 @@ module "route_table_complete" {
 module "route_table_dmz" {
   source = "../../"
 
-  name                = "rt-dmz-example"
+  name                = "rt-dmz-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
   # Keep BGP propagation enabled for this table
-  disable_bgp_route_propagation = false
+  bgp_route_propagation_enabled = true
 
   routes = [
     {
