@@ -61,7 +61,7 @@ variable "routes" {
 
 # Subnet Associations
 variable "subnet_ids_to_associate" {
-  description = "Set of subnet IDs to associate with this route table."
+  description = "A list of subnet IDs to associate with this route table."
   type        = list(string)
   default     = []
 }
