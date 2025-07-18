@@ -51,11 +51,21 @@ func (h *NetworkSecurityGroupHelper) GetNsgProperties(t *testing.T, resourceGrou
 	return &resp.SecurityGroup
 }
 
-// ValidateNsgSecurityRules validates the security rules of a Network Security Group
-func (h *NetworkSecurityGroupHelper) ValidateNsgSecurityRules(t *testing.T, nsg *armnetwork.SecurityGroup, expectedRuleCount int) {
+// ValidateNsgSecurityRules validates the custom security rules of a Network Security Group, ignoring default rules.
+func (h *NetworkSecurityGroupHelper) ValidateNsgSecurityRules(t *testing.T, nsg *armnetwork.SecurityGroup, expectedCustomRuleCount int) {
 	require.NotNil(t, nsg.Properties, "NSG properties should not be nil")
-	require.NotNil(t, nsg.Properties.SecurityRules, "Security rules should not be nil")
-	require.Len(t, nsg.Properties.SecurityRules, expectedRuleCount, "Incorrect number of security rules")
+
+	var customRules []*armnetwork.SecurityRule
+	if nsg.Properties.SecurityRules != nil {
+		for _, rule := range nsg.Properties.SecurityRules {
+			// Custom rules have priority <= 4096. Default rules are >= 65000.
+			if rule.Properties.Priority != nil && *rule.Properties.Priority <= 4096 {
+				customRules = append(customRules, rule)
+			}
+		}
+	}
+
+	require.Len(t, customRules, expectedCustomRuleCount, "Incorrect number of custom security rules")
 }
 
 // getTerraformOptions creates a standard terraform.Options object

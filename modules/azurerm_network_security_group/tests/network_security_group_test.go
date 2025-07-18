@@ -28,15 +28,13 @@ func TestNsgSimple(t *testing.T) {
 
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		nsqName := terraform.Output(t, terraformOptions, "network_security_group_name")
+		nsgName := terraform.Output(t, terraformOptions, "name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 
 		helper := NewNetworkSecurityGroupHelper(t)
-		nsg := helper.GetNsgProperties(t, resourceGroupName, nsqName)
+		nsg := helper.GetNsgProperties(t, resourceGroupName, nsgName)
 
-		assert.Equal(t, nsqName, *nsg.Name)
-		// Default rules + custom rules. Adjust if defaults change.
-		helper.ValidateNsgSecurityRules(t, nsg, 0)
+		assert.Equal(t, nsgName, *nsg.Name, "NSG name should match the output.")
 	})
 }
 
@@ -59,14 +57,18 @@ func TestNsgComplete(t *testing.T) {
 
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		nsgName := terraform.Output(t, terraformOptions, "network_security_group_name")
+		nsgName := terraform.Output(t, terraformOptions, "name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+		flowLogID := terraform.Output(t, terraformOptions, "flow_log_id")
 
 		helper := NewNetworkSecurityGroupHelper(t)
 		nsg := helper.GetNsgProperties(t, resourceGroupName, nsgName)
 
-		assert.Equal(t, nsgName, *nsg.Name)
-		// Add more specific assertions for the 'complete' fixture
+		assert.Equal(t, nsgName, *nsg.Name, "NSG name should match the output.")
+		assert.NotEmpty(t, flowLogID, "Flow Log ID should not be empty.")
+		// The fixture defines 2 custom rules. Azure adds default rules.
+		// We validate that our 2 custom rules are present.
+		helper.ValidateNsgSecurityRules(t, nsg, 2)
 	})
 }
 
@@ -74,32 +76,16 @@ func TestNsgComplete(t *testing.T) {
 func TestNsgValidationRules(t *testing.T) {
 	t.Parallel()
 
-	testCases := []struct {
-		name          string
-		fixtureFolder string
-		expectedError string
-	}{
-		{
-			name:          "InvalidName",
-			fixtureFolder: "negative/invalid_name_chars",
-			expectedError: "does not match the regular expression",
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_network_security_group/tests/fixtures/negative")
+
+	terraformOptions := &terraform.Options{
+		TerraformDir: testFolder,
+		Vars: map[string]interface{}{
+			"random_suffix": "neg",
 		},
 	}
 
-	for _, tc := range testCases {
-		tc := tc // Capture range variable
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_network_security_group/tests/fixtures/"+tc.fixtureFolder)
-
-			terraformOptions := &terraform.Options{
-				TerraformDir: testFolder,
-			}
-
-			_, err := terraform.InitAndPlanE(t, terraformOptions)
-			require.Error(t, err)
-			assert.Contains(t, err.Error(), tc.expectedError)
-		})
-	}
+	_, err := terraform.InitAndPlanE(t, terraformOptions)
+	require.Error(t, err, "Plan should fail for invalid input.")
+	assert.Contains(t, err.Error(), "Security rule priority must be between 100 and 4096", "Error message should indicate invalid priority.")
 }

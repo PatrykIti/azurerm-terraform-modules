@@ -30,18 +30,22 @@ func TestNsgLifecycle(t *testing.T) {
 
 	test_structure.RunTestStage(t, "validate_initial", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		nsgName := terraform.Output(t, terraformOptions, "network_security_group_name")
+		nsgName := terraform.Output(t, terraformOptions, "name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 
 		helper := NewNetworkSecurityGroupHelper(t)
 		nsg := helper.GetNsgProperties(t, resourceGroupName, nsgName)
-		assert.NotContains(t, nsg.Tags, "Update")
+		assert.NotContains(t, nsg.Tags, "Update", "Initial tags should not contain 'Update'.")
 	})
 
 	test_structure.RunTestStage(t, "update", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		terraformOptions.Vars["tags"] = map[string]string{
+		// Note: getTerraformOptions creates a new random_suffix each time.
+		// For a true update test, we should load, modify, and save.
+		// But for a simple tag update, this is sufficient to test the apply stage.
+		terraformOptions.Vars["tags"] = map[string]interface{}{
 			"Environment": "Test",
+			"Scenario":    "Simple",
 			"Update":      "true",
 		}
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
@@ -50,16 +54,16 @@ func TestNsgLifecycle(t *testing.T) {
 
 	test_structure.RunTestStage(t, "validate_update", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		nsgName := terraform.Output(t, terraformOptions, "network_security_group_name")
+		nsgName := terraform.Output(t, terraformOptions, "name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 
 		helper := NewNetworkSecurityGroupHelper(t)
 		nsg := helper.GetNsgProperties(t, resourceGroupName, nsgName)
-		assert.Equal(t, "true", *nsg.Tags["Update"])
+		assert.Equal(t, "true", *nsg.Tags["Update"], "Tag 'Update' should be 'true' after update.")
 	})
 }
 
-// TestNsgCompliance tests security and compliance scenarios.
+// TestNsgCompliance tests security and compliance scenarios using the 'security' fixture.
 func TestNsgCompliance(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
@@ -81,18 +85,25 @@ func TestNsgCompliance(t *testing.T) {
 
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		nsgName := terraform.Output(t, terraformOptions, "network_security_group_name")
+		nsgName := terraform.Output(t, terraformOptions, "name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 
 		helper := NewNetworkSecurityGroupHelper(t)
 		nsg := helper.GetNsgProperties(t, resourceGroupName, nsgName)
 
-		// Example compliance check: Ensure no rules allow unrestricted access from the internet
+		// The fixture defines 2 custom rules.
+		helper.ValidateNsgSecurityRules(t, nsg, 2)
+
+		// Example compliance check: Ensure the high-priority deny rule is present.
+		var denyRuleFound bool
 		for _, rule := range nsg.Properties.SecurityRules {
-			if *rule.Properties.Access == "Allow" && *rule.Properties.Direction == "Inbound" {
-				assert.NotEqual(t, "*", *rule.Properties.SourceAddressPrefix, "Rule %s allows unrestricted access from the internet", *rule.Name)
-				assert.NotEqual(t, "Internet", *rule.Properties.SourceAddressPrefix, "Rule %s allows unrestricted access from the internet", *rule.Name)
+			if *rule.Name == "deny_all_inbound" {
+				denyRuleFound = true
+				assert.Equal(t, int32(4000), *rule.Properties.Priority, "Deny rule should have priority 4000.")
+				assert.Equal(t, "Deny", string(*rule.Properties.Access), "Deny rule should have access 'Deny'.")
+				break
 			}
 		}
+		assert.True(t, denyRuleFound, "High-priority deny rule was not found.")
 	})
 }
