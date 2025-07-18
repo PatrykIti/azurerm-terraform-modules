@@ -3,3 +3,14 @@ variable "location" {
   type        = string
   default     = "West Europe"
 }
+
+variable "random_suffix" {
+  description = "A random suffix to ensure unique resource names."
+  type        = string
+}
+
+variable "node_count" {
+  description = "The initial number of nodes for the default node pool."
+  type        = number
+  default     = 1
+}

@@ -10,91 +10,69 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice"
 	"github.com/gruntwork-io/terratest/modules/random"
+	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/require"
 )
 
-// TestConfig holds common test configuration
-type TestConfig struct {
-	SubscriptionID    string
-	TenantID         string
-	ClientID         string
-	ClientSecret     string
-	Location         string
-	ResourceGroup    string
-	UniqueID         string
+// KubernetesClusterHelper provides helper methods for AKS testing
+type KubernetesClusterHelper struct {
+	subscriptionID string
+	credential     azcore.TokenCredential
+	client         *armcontainerservice.ManagedClustersClient
 }
 
-// GetTestConfig returns a test configuration with required Azure credentials
-func GetTestConfig(t *testing.T) *TestConfig {
-	subscriptionID := os.Getenv("ARM_SUBSCRIPTION_ID")
-	require.NotEmpty(t, subscriptionID, "ARM_SUBSCRIPTION_ID environment variable must be set")
+// NewKubernetesClusterHelper creates a new helper instance for AKS
+func NewKubernetesClusterHelper(t *testing.T) *KubernetesClusterHelper {
+	subscriptionID := getRequiredEnvVar(t, "AZURE_SUBSCRIPTION_ID")
 
-	tenantID := os.Getenv("ARM_TENANT_ID")
-	require.NotEmpty(t, tenantID, "ARM_TENANT_ID environment variable must be set")
+	credential, err := azidentity.NewDefaultAzureCredential(nil)
+	require.NoError(t, err, "Failed to create default Azure credential")
 
-	clientID := os.Getenv("ARM_CLIENT_ID")
-	require.NotEmpty(t, clientID, "ARM_CLIENT_ID environment variable must be set")
+	client, err := armcontainerservice.NewManagedClustersClient(subscriptionID, credential, nil)
+	require.NoError(t, err, "Failed to create AKS client")
 
-	clientSecret := os.Getenv("ARM_CLIENT_SECRET")
-	require.NotEmpty(t, clientSecret, "ARM_CLIENT_SECRET environment variable must be set")
-
-	location := os.Getenv("ARM_LOCATION")
-	if location == "" {
-		location = "West Europe"
-	}
-
-	uniqueID := strings.ToLower(random.UniqueId())
-
-	return &TestConfig{
-		SubscriptionID: subscriptionID,
-		TenantID:      tenantID,
-		ClientID:      clientID,
-		ClientSecret:  clientSecret,
-		Location:      location,
-		ResourceGroup: fmt.Sprintf("rg-test-kubernetes_cluster-%s", uniqueID),
-		UniqueID:      uniqueID,
+	return &KubernetesClusterHelper{
+		subscriptionID: subscriptionID,
+		credential:     credential,
+		client:         client,
 	}
 }
 
-// GetAzureCredential returns Azure credentials for SDK calls
-func GetAzureCredential(t *testing.T) azcore.TokenCredential {
-	cred, err := azidentity.NewDefaultAzureCredential(nil)
-	require.NoError(t, err, "Failed to create Azure credential")
-	return cred
+// GetKubernetesClusterProperties retrieves the properties of an AKS cluster
+func (h *KubernetesClusterHelper) GetKubernetesClusterProperties(t *testing.T, resourceGroupName, clusterName string) *armcontainerservice.ManagedCluster {
+	resp, err := h.client.Get(context.Background(), resourceGroupName, clusterName, nil)
+	require.NoError(t, err, "Failed to get AKS cluster properties")
+	return &resp.ManagedCluster
 }
 
-// WaitForResourceDeletion waits for a resource to be deleted
-func WaitForResourceDeletion(ctx context.Context, checkFunc func() (bool, error), timeout time.Duration) error {
-	ticker := time.NewTicker(30 * time.Second)
-	defer ticker.Stop()
+// Shared test helper functions
 
-	timeoutCh := time.After(timeout)
+// getTerraformOptions creates a standard terraform.Options object for tests
+func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
+	randomSuffix := strings.ToLower(random.UniqueId())
 
-	for {
-		select {
-		case <-timeoutCh:
-			return fmt.Errorf("timeout waiting for resource deletion")
-		case <-ticker.C:
-			exists, err := checkFunc()
-			if err != nil {
-				return fmt.Errorf("error checking resource existence: %w", err)
-			}
-			if !exists {
-				return nil
-			}
-		}
+	return &terraform.Options{
+		TerraformDir: terraformDir,
+		Vars: map[string]interface{}{
+			"random_suffix": randomSuffix,
+			"location":      "northeurope", // Standard test location
+		},
+		NoColor: true,
+		RetryableTerraformErrors: map[string]string{
+			".*timeout.*":               "Timeout error, retrying.",
+			".*ResourceGroupNotFound.*": "Resource group not found, retrying.",
+			".*Another operation is in progress.*": "Another operation is in progress, retrying.",
+		},
+		MaxRetries:         3,
+		TimeBetweenRetries: 10 * time.Second,
 	}
 }
 
-// GenerateResourceName generates a unique resource name for testing
-func GenerateResourceName(prefix string, uniqueID string) string {
-	// Ensure the name meets Azure naming requirements
-	name := fmt.Sprintf("%s%s", prefix, uniqueID)
-	// Remove any invalid characters and ensure length limits
-	name = strings.ReplaceAll(name, "-", "")
-	if len(name) > 24 {
-		name = name[:24]
-	}
-	return strings.ToLower(name)
+// getRequiredEnvVar gets a required environment variable or fails the test
+func getRequiredEnvVar(t *testing.T, envVarName string) string {
+	value := os.Getenv(envVarName)
+	require.NotEmpty(t, value, fmt.Sprintf("Required environment variable '%s' is not set.", envVarName))
+	return value
 }
