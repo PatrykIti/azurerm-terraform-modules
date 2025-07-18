@@ -1,10 +1,10 @@
-# Integracja z CI/CD
+# CI/CD Integration
 
-Automatyzacja testów w ramach pipeline'u CI/CD jest kluczowa dla zapewnienia jakości i bezpieczeństwa modułów. Używamy GitHub Actions do orkiestracji całego procesu.
+Automating tests within a CI/CD pipeline is crucial for ensuring the quality and security of modules. We use GitHub Actions to orchestrate the entire process.
 
-## Struktura Workflow
+## Workflow Structure
 
-Główny workflow (`.github/workflows/module-ci.yml`) jest zaprojektowany tak, aby dynamicznie wykrywać zmiany w modułach i uruchamiać dla nich odpowiednie zestawy testów równolegle.
+The main workflow (`.github/workflows/module-ci.yml`) is designed to dynamically detect changes in modules and run the appropriate test suites for them in parallel.
 
 ```yaml
 # .github/workflows/module-ci.yml
@@ -29,7 +29,7 @@ jobs:
         with:
           filters: |
             storage_account: modules/azurerm_storage_account/**
-            # ... inne moduły
+            # ... other modules
 
   unit-test:
     needs: detect-changes
@@ -57,19 +57,19 @@ jobs:
           make test-junit
 ```
 
-### Kluczowe Elementy Workflow
+### Key Workflow Elements
 
-1.  **`detect-changes`**: Ten job używa akcji `dorny/paths-filter`, aby zidentyfikować, które katalogi modułów zostały zmodyfikowane w danym commicie lub pull requeście. Wynik jest przekazywany do kolejnych jobów jako macierz (`matrix`).
-2.  **`strategy: matrix`**: Pozwala na dynamiczne tworzenie jobów dla każdego zmienionego modułu. Jeśli zmieniono 3 moduły, GitHub Actions uruchomi 3 równoległe joby `unit-test` i 3 `integration-test`.
-3.  **Równoległość**: Dzięki macierzy, testy dla różnych modułów nie blokują się nawzajem, co drastycznie skraca czas oczekiwania na wyniki.
-4.  **Zależności (`needs`)**: Job `integration-test` zależy od `unit-test`, co zapewnia, że kosztowne testy integracyjne są uruchamiane tylko wtedy, gdy szybkie testy jednostkowe zakończą się sukcesem.
+1.  **`detect-changes`**: This job uses the `dorny/paths-filter` action to identify which module directories have been modified in a given commit or pull request. The result is passed to subsequent jobs as a matrix.
+2.  **`strategy: matrix`**: Allows for the dynamic creation of jobs for each changed module. If 3 modules are changed, GitHub Actions will run 3 parallel `unit-test` jobs and 3 `integration-test` jobs.
+3.  **Parallelism**: Thanks to the matrix, tests for different modules do not block each other, which drastically reduces the waiting time for results.
+4.  **Dependencies (`needs`)**: The `integration-test` job depends on `unit-test`, ensuring that expensive integration tests are only run if the fast unit tests succeed.
 
-## Uwierzytelnianie w Azure
+## Authentication in Azure
 
-W CI/CD używamy **OpenID Connect (OIDC)** do bezpiecznego uwierzytelniania w Azure bez przechowywania statycznych sekretów.
+In CI/CD, we use **OpenID Connect (OIDC)** for secure authentication in Azure without storing static secrets.
 
 ```yaml
-# Krok w jobie integration-test
+# Step in the integration-test job
 - name: Azure Login
   uses: azure/login@v1
   with:
@@ -77,26 +77,26 @@ W CI/CD używamy **OpenID Connect (OIDC)** do bezpiecznego uwierzytelniania w Az
     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-# Zmienne środowiskowe przekazywane do testów Go
+# Environment variables passed to Go tests
 env:
   ARM_USE_OIDC: true
   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 ```
--   Akcja `azure/login@v1` uzyskuje tymczasowy token dostępu.
--   Zmienna `ARM_USE_OIDC: true` informuje providera Terraform oraz nasze helpery w Go, aby używały uwierzytelniania OIDC.
+-   The `azure/login@v1` action obtains a temporary access token.
+-   The `ARM_USE_OIDC: true` variable informs the Terraform provider and our Go helpers to use OIDC authentication.
 
-## Raportowanie Wyników Testów
+## Reporting Test Results
 
-Aby uzyskać czytelne wyniki testów, zwłaszcza w przypadku błędów, generujemy raporty w formacie JUnit XML.
+To get clear test results, especially in case of failures, we generate reports in JUnit XML format.
 
-### Generowanie Raportu
+### Generating the Report
 
-W `Makefile` znajduje się target `test-junit`, który:
-1.  Instaluje narzędzie `go-junit-report`.
-2.  Uruchamia `go test`.
-3.  Przekierowuje standardowe wyjście i błędy do `go-junit-report`, które konwertuje je na format XML.
+The `Makefile` contains a `test-junit` target that:
+1.  Installs the `go-junit-report` tool.
+2.  Runs `go test`.
+3.  Redirects standard output and errors to `go-junit-report`, which converts them to XML format.
 
 ```makefile
 # Makefile
@@ -106,18 +106,18 @@ test-junit: check-env deps
 	go test -v -timeout $(TIMEOUT) ./... 2>&1 | go-junit-report -set-exit-code > test-results.xml
 ```
 
-### Publikowanie Raportu w GitHub Actions
+### Publishing the Report in GitHub Actions
 
-Następnie, w workflow CI/CD, używamy akcji do publikowania tych wyników.
+Then, in the CI/CD workflow, we use an action to publish these results.
 
 ```yaml
-# Krok w jobie integration-test
+# Step in the integration-test job
 - name: Publish Test Results
   uses: EnricoMi/publish-unit-test-result-action@v2
-  if: always() # Uruchamiaj ten krok zawsze, nawet jeśli testy zawiodły
+  if: always() # Always run this step, even if tests failed
   with:
     files: |
       **/test-results.xml
 ```
--   `if: always()`: Gwarantuje, że raport zostanie opublikowany, co jest kluczowe do analizy błędów.
--   Akcja automatycznie parsuje pliki XML i wyświetla podsumowanie bezpośrednio w interfejsie GitHub Actions, a także w pull requeście.
+-   `if: always()`: Guarantees that the report will be published, which is crucial for analyzing failures.
+-   The action automatically parses the XML files and displays a summary directly in the GitHub Actions interface, as well as in the pull request.

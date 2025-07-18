@@ -1,29 +1,29 @@
-# Integracja z Terratest (Testy Integracyjne)
+# Terratest Integration (Integration Tests)
 
-Testy integracyjne stanowią trzeci poziom piramidy testów i są kluczowe dla weryfikacji, czy moduły Terraform poprawnie tworzą i konfigurują rzeczywistą infrastrukturę w Azure. W tym celu wykorzystujemy framework **Terratest** napisany w języku Go.
+Integration tests are the third level of the testing pyramid and are crucial for verifying that Terraform modules correctly create and configure real infrastructure in Azure. For this purpose, we use the **Terratest** framework, written in Go.
 
-## Kiedy używać Terratest?
+## When to Use Terratest?
 
-Terratest jest idealnym narzędziem do scenariuszy, których nie da się sprawdzić za pomocą statycznej analizy lub testów jednostkowych. Główne zastosowania to:
+Terratest is the ideal tool for scenarios that cannot be verified with static analysis or unit tests. Key use cases include:
 
-- ✅ **Weryfikacja poprawności wdrożenia**: Sprawdzanie, czy zasoby zostały utworzone z prawidłowymi właściwościami (SKU, lokalizacja, nazwa).
-- ✅ **Testowanie reguł sieciowych**: Weryfikacja, czy reguły NSG, firewalla, czy private endpoints działają zgodnie z oczekiwaniami.
-- ✅ **Walidacja uprawnień IAM**: Sprawdzanie, czy przypisane role i uprawnienia (RBAC) pozwalają na zamierzone akcje.
-- ✅ **Testowanie interakcji między zasobami**: Weryfikacja, czy np. maszyna wirtualna może połączyć się z bazą danych przez prywatny link.
-- ✅ **Sprawdzanie zgodności z Azure Policy**: Weryfikacja, czy wdrożona infrastruktura jest zgodna z przypisanymi politykami.
+- ✅ **Deployment Verification**: Checking if resources were created with the correct properties (SKU, location, name).
+- ✅ **Network Rule Testing**: Verifying that NSG rules, firewalls, or private endpoints work as expected.
+- ✅ **IAM Permission Validation**: Checking if assigned roles and permissions (RBAC) allow for the intended actions.
+- ✅ **Resource Interaction Testing**: Verifying if, for example, a virtual machine can connect to a database via a private link.
+- ✅ **Azure Policy Compliance Checking**: Verifying that the deployed infrastructure complies with assigned policies.
 
-## Wymagane narzędzia i zależności
+## Required Tools and Dependencies
 
-Aby uruchomić testy integracyjne, środowisko deweloperskie musi być wyposażone w:
+To run integration tests, the development environment must be equipped with:
 
-1.  **Go**: Wersja 1.21 lub nowsza.
-2.  **Terraform**: Wersja 1.5.0 lub nowsza.
-3.  **Azure CLI**: Do uwierzytelniania i interakcji z Azure.
-4.  **Kluczowe pakiety Go**: Zależności są zarządzane przez `go.mod`.
+1.  **Go**: Version 1.21 or newer.
+2.  **Terraform**: Version 1.5.0 or newer.
+3.  **Azure CLI**: For authentication and interaction with Azure.
+4.  **Key Go Packages**: Dependencies are managed by `go.mod`.
 
-### Główne zależności w `go.mod`
+### Main Dependencies in `go.mod`
 
-Plik `go.mod` w katalogu `tests` definiuje kluczowe biblioteki. Najważniejsze z nich to:
+The `go.mod` file in the `tests` directory defines key libraries. The most important ones are:
 
 ```go
 module github.com/example/azurerm-storage-account/tests
@@ -39,23 +39,23 @@ require (
 )
 ```
 
--   **`github.com/gruntwork-io/terratest`**: Główny framework do testowania infrastruktury. Dostarcza funkcje do uruchamiania poleceń Terraform (`terraform init`, `apply`, `destroy`) i walidacji wyników.
--   **`github.com/stretchr/testify`**: Popularny pakiet do asercji w Go. Używamy go do sprawdzania warunków (np. `assert.Equal`, `require.NoError`).
--   **`github.com/Azure/azure-sdk-for-go/sdk/*`**: Nowy Azure SDK dla Go. Używamy go do bezpośredniej interakcji z API Azure w celu weryfikacji stanu zasobów po ich utworzeniu przez Terraform.
+-   **`github.com/gruntwork-io/terratest`**: The main framework for infrastructure testing. It provides functions to run Terraform commands (`terraform init`, `apply`, `destroy`) and validate the results.
+-   **`github.com/stretchr/testify`**: A popular assertion package in Go. We use it to check conditions (e.g., `assert.Equal`, `require.NoError`).
+-   **`github.com/Azure/azure-sdk-for-go/sdk/*`**: The new Azure SDK for Go. We use it for direct interaction with the Azure API to verify the state of resources after they are created by Terraform.
 
-## Uwierzytelnianie
+## Authentication
 
-Testy Terratest wymagają uwierzytelnienia w Azure. Nasze skrypty i helpery wspierają kilka metod, z których korzystają w następującej kolejności:
+Terratest tests require authentication with Azure. Our scripts and helpers support several methods, which are used in the following order:
 
-1.  **Service Principal (Zmienne środowiskowe)**: Preferowana metoda w CI/CD.
+1.  **Service Principal (Environment Variables)**: The preferred method in CI/CD.
     - `AZURE_CLIENT_ID`
     - `AZURE_CLIENT_SECRET`
     - `AZURE_TENANT_ID`
     - `AZURE_SUBSCRIPTION_ID`
-2.  **Azure CLI**: Domyślna metoda dla lokalnego developmentu, jeśli powyższe zmienne nie są ustawione. Wystarczy być zalogowanym przez `az login`.
-3.  **Default Azure Credential**: Ostateczna metoda, która próbuje różnych mechanizmów (Managed Identity, itp.).
+2.  **Azure CLI**: The default method for local development if the above variables are not set. You just need to be logged in via `az login`.
+3.  **Default Azure Credential**: The final method, which tries various mechanisms (Managed Identity, etc.).
 
-Plik `test_env.sh` służy do lokalnego ustawiania tych zmiennych. **Nigdy nie należy umieszczać w nim prawdziwych danych uwierzytelniających w systemie kontroli wersji.**
+The `test_env.sh` file is used to set these variables locally. **You should never commit real credentials to the version control system.**
 
 ```bash
 # modules/azurerm_storage_account/tests/test_env.sh
@@ -73,19 +73,19 @@ export ARM_SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID}"
 export ARM_TENANT_ID="${AZURE_TENANT_ID}"
 ```
 
-## Podstawowy cykl życia testu
+## Basic Test Lifecycle
 
-Każdy test integracyjny z Terratestem przebiega według następującego schematu:
+Every integration test with Terratest follows this pattern:
 
-1.  **Setup (Przygotowanie)**:
-    - Test kopiuje odpowiednią konfigurację Terraform (tzw. `fixture`) do tymczasowego katalogu.
-    - Generowane są unikalne nazwy dla zasobów, aby uniknąć konfliktów podczas równoległego uruchamiania testów.
-2.  **Deploy (Wdrożenie)**:
-    - Uruchamiane są komendy `terraform init` i `terraform apply` w celu wdrożenia infrastruktury.
-3.  **Validate (Walidacja)**:
-    - Odczytywane są wartości wyjściowe (`outputs`) z wdrożonej konfiguracji.
-    - Za pomocą Azure SDK i asercji sprawdzany jest stan i konfiguracja wdrożonych zasobów.
-4.  **Cleanup (Sprzątanie)**:
-    - Uruchamiana jest komenda `terraform destroy`, aby usunąć wszystkie zasoby utworzone podczas testu. Ten krok jest wykonywany zawsze, nawet jeśli test się nie powiedzie, dzięki użyciu `defer`.
+1.  **Setup**:
+    - The test copies the appropriate Terraform configuration (a `fixture`) to a temporary directory.
+    - Unique names for resources are generated to avoid conflicts during parallel test execution.
+2.  **Deploy**:
+    - `terraform init` and `terraform apply` commands are run to deploy the infrastructure.
+3.  **Validate**:
+    - Output values are read from the deployed configuration.
+    - The state and configuration of the deployed resources are checked using the Azure SDK and assertions.
+4.  **Cleanup**:
+    - The `terraform destroy` command is run to remove all resources created during the test. This step is always executed, even if the test fails, thanks to the use of `defer`.
 
-Ten cykl zapewnia, że testy są **izolowane**, **powtarzalne** i **nie pozostawiają po sobie zbędnych zasobów**, co jest kluczowe dla kontroli kosztów.
+This cycle ensures that tests are **isolated**, **repeatable**, and **do not leave behind unnecessary resources**, which is crucial for cost control.

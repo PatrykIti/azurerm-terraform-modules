@@ -1,42 +1,42 @@
-# Fixtures i Uruchamianie Testów
+# Fixtures and Test Execution
 
-Efektywne zarządzanie konfiguracjami testowymi (`fixtures`) oraz zautomatyzowane uruchamianie testów są kluczowe dla wydajnego procesu CI/CD. W tej sekcji opisujemy standardy dotyczące organizacji `fixtures` oraz wykorzystania `Makefile` i skryptów `bash` do orkiestracji testów.
+Effective management of test configurations (`fixtures`) and automated test execution are key to an efficient CI/CD process. This section describes the standards for organizing `fixtures` and using `Makefile` and `bash` scripts to orchestrate tests.
 
-## Organizacja Fixtures
+## Fixture Organization
 
-Katalog `tests/fixtures` zawiera podkatalogi, z których każdy reprezentuje odrębny, izolowany scenariusz testowy w postaci kompletnej konfiguracji Terraform.
+The `tests/fixtures` directory contains subdirectories, each representing a separate, isolated test scenario in the form of a complete Terraform configuration.
 
-### Struktura Katalogu `fixtures`
+### `fixtures` Directory Structure
 
 ```
 tests/
 └── fixtures/
-    ├── simple/           # Minimalna, działająca konfiguracja modułu.
+    ├── simple/           # A minimal, working configuration of the module.
     │   ├── main.tf
     │   ├── variables.tf
     │   └── outputs.tf
-    ├── complete/         # Konfiguracja testująca wszystkie lub większość funkcji modułu.
-    ├── security/         # Konfiguracja z maksymalnie restrykcyjnymi ustawieniami bezpieczeństwa.
-    ├── network/          # Scenariusz testujący zaawansowane reguły sieciowe.
-    ├── private_endpoint/ # Scenariusz z użyciem Private Endpoint.
-    └── negative/         # Zbiór konfiguracji, które celowo są niepoprawne.
+    ├── complete/         # A configuration testing all or most of the module's features.
+    ├── security/         # A configuration with the most restrictive security settings.
+    ├── network/          # A scenario testing advanced network rules.
+    ├── private_endpoint/ # A scenario using a Private Endpoint.
+    └── negative/         # A collection of intentionally incorrect configurations.
         ├── invalid_name_short/
         └── invalid_replication_type/
 ```
 
-### Najlepsze Praktyki dla Fixtures
+### Best Practices for Fixtures
 
-1.  **Lokalne źródło modułu**: Każdy `fixture` musi odwoływać się do testowanego modułu za pomocą ścieżki względnej, aby testować lokalne zmiany.
+1.  **Local Module Source**: Each `fixture` must reference the module being tested using a relative path to test local changes.
     ```hcl
     # fixtures/simple/main.tf
     module "storage_account" {
-      source = "../../../" # Odwołanie do katalogu głównego modułu
+      source = "../../../" # Reference to the module's root directory
 
-      # ... zmienne
+      # ... variables
     }
     ```
 
-2.  **Unikalne nazwy zasobów**: Używaj zmiennej `random_suffix`, przekazywanej z testu Go, do tworzenia unikalnych nazw zasobów.
+2.  **Unique Resource Names**: Use the `random_suffix` variable, passed from the Go test, to create unique resource names.
     ```hcl
     # fixtures/simple/variables.tf
     variable "random_suffix" {
@@ -51,9 +51,9 @@ tests/
     }
     ```
 
-3.  **Minimalizm**: `Fixture` powinien zawierać tylko konfigurację niezbędną do przetestowania danego scenariusza. Unikaj dodawania niepowiązanych zasobów.
+3.  **Minimalism**: A `fixture` should only contain the configuration necessary to test a given scenario. Avoid adding unrelated resources.
 
-4.  **Wyjścia (Outputs)**: Każdy `fixture` musi definiować `outputs.tf`, które eksponują kluczowe atrybuty wdrożonych zasobów. Te wartości są następnie odczytywane i walidowane w testach Go.
+4.  **Outputs**: Each `fixture` must define an `outputs.tf` file that exposes key attributes of the deployed resources. These values are then read and validated in the Go tests.
     ```hcl
     # fixtures/simple/outputs.tf
     output "storage_account_id" {
@@ -65,94 +65,94 @@ tests/
     }
     ```
 
-## Uruchamianie Testów
+## Running Tests
 
-Używamy `Makefile` jako głównego interfejsu do uruchamiania testów, co upraszcza i standaryzuje proces zarówno lokalnie, jak i w CI/CD.
+We use `Makefile` as the main interface for running tests, which simplifies and standardizes the process both locally and in CI/CD.
 
 ### `Makefile`
 
-Plik `Makefile` definiuje zestaw komend (targetów) do zarządzania cyklem życia testów.
+The `Makefile` defines a set of commands (targets) to manage the test lifecycle.
 
-**Kluczowe Targety (`modules/azurerm_storage_account/tests/Makefile`):**
+**Key Targets (`modules/azurerm_storage_account/tests/Makefile`):**
 ```makefile
-# Zmienne konfiguracyjne
+# Configuration variables
 TIMEOUT ?= 30m
 PARALLEL ?= 8
 
-# Sprawdzenie zmiennych środowiskowych
+# Check environment variables
 check-env:
 	@test -n "$(AZURE_SUBSCRIPTION_ID)" || (echo "AZURE_SUBSCRIPTION_ID is not set" && exit 1)
-    # ... (pozostałe zmienne)
+    # ... (other variables)
 
-# Instalacja zależności
+# Install dependencies
 deps:
 	go mod download
 	go mod tidy
 
-# Uruchomienie wszystkich testów
+# Run all tests
 test: check-env deps
 	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...
 
-# Uruchomienie konkretnego testu
+# Run a specific test
 test-single: check-env deps
 	go test -v -timeout $(TIMEOUT) -run $(TEST_NAME) ./...
 
-# Uruchomienie testów z raportem pokrycia
+# Run tests with a coverage report
 test-coverage: check-env deps
 	go test -v -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out
 
-# Generowanie raportu JUnit dla CI/CD
+# Generate a JUnit report for CI/CD
 test-junit: check-env deps
 	go install github.com/jstemmer/go-junit-report/v2@latest
 	go test -v ./... 2>&1 | go-junit-report -set-exit-code > test-results.xml
 
-# Sprzątanie artefaktów
+# Clean up artifacts
 clean:
 	rm -f coverage.out test-results.xml
 	find . -name "*.tfstate*" -type f -delete
 ```
 
-**Sposób użycia:**
+**Usage:**
 ```bash
-# Uruchom wszystkie testy
+# Run all tests
 make test
 
-# Uruchom tylko testy podstawowe
+# Run only basic tests
 make test-basic
 
-# Uruchom konkretny test
+# Run a specific test
 make test-single TEST_NAME=TestStorageAccountSecurity
 
-# Wygeneruj raport pokrycia kodu
+# Generate a code coverage report
 make test-coverage
 ```
 
-### Skrypty Uruchomieniowe (`run_tests_*.sh`)
+### Execution Scripts (`run_tests_*.sh`)
 
-Dla bardziej zaawansowanej orkiestracji, zwłaszcza w kontekście generowania szczegółowych raportów, używamy skryptów `bash`.
+For more advanced orchestration, especially for generating detailed reports, we use `bash` scripts.
 
 #### `run_tests_parallel.sh`
 
--   **Cel**: Uruchamia wszystkie zdefiniowane testy równolegle, każdy w osobnym procesie.
--   **Kluczowe cechy**:
-    -   Uruchamia testy w tle (`&`).
-    -   Zbiera PID-y procesów i czeka na ich zakończenie (`wait`).
-    -   Dla każdego testu generuje osobny plik `.log` oraz `.json` z metadanymi (status, czas trwania, błąd).
-    -   Na koniec tworzy zbiorczy plik `summary.json` z wynikami wszystkich testów.
-    -   **Zawsze kończy się z kodem wyjścia 0**, aby w CI/CD można było przeanalizować pełny raport, nawet jeśli niektóre testy zawiodły.
+-   **Purpose**: Runs all defined tests in parallel, each in a separate process.
+-   **Key Features**:
+    -   Runs tests in the background (`&`).
+    -   Collects process PIDs and waits for them to complete (`wait`).
+    -   Generates a separate `.log` and `.json` file with metadata (status, duration, error) for each test.
+    -   Finally, creates a `summary.json` file with the results of all tests.
+    -   **Always exits with code 0** so that the full report can be analyzed in CI/CD, even if some tests failed.
 
 #### `run_tests_sequential.sh`
 
--   **Cel**: Uruchamia testy jeden po drugim. Idealne do debugowania.
--   **Kluczowe cechy**:
-    -   Uruchamia testy w pętli `for`.
-    -   Wyświetla logi na żywo w konsoli (`tee`).
-    -   Podobnie jak wersja równoległa, generuje indywidualne raporty JSON i zbiorcze podsumowanie.
+-   **Purpose**: Runs tests one after another. Ideal for debugging.
+-   **Key Features**:
+    -   Runs tests in a `for` loop.
+    -   Displays live logs in the console (`tee`).
+    -   Similar to the parallel version, generates individual JSON reports and a summary.
 
-### Konfiguracja Testów (`test_config.yaml`)
+### Test Configuration (`test_config.yaml`)
 
-Ten plik pozwala na zdefiniowanie zestawów testów (`test suites`) i innych parametrów, które mogą być wykorzystane przez skrypty uruchomieniowe lub narzędzia CI/CD do dynamicznego budowania macierzy testów.
+This file allows you to define test suites and other parameters that can be used by execution scripts or CI/CD tools to dynamically build test matrices.
 
 ```yaml
 # test_config.yaml
@@ -178,4 +178,4 @@ reporting:
   format: junit
   output_dir: test-results/
 ```
-Dzięki temu plikowi można łatwo zarządzać, które testy należą do jakiej kategorii (np. "szybkie", "pełne") bez modyfikowania skryptów.
+This file makes it easy to manage which tests belong to which category (e.g., "quick", "full") without modifying the scripts.

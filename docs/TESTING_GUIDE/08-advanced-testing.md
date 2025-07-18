@@ -1,45 +1,45 @@
-# Zaawansowane Scenariusze Testowe
+# Advanced Test Scenarios
 
-Poza podstawowymi testami integracyjnymi, kluczowe jest pokrycie bardziej zaawansowanych scenariuszy, takich jak testy wydajności, bezpieczeństwa i zgodności z politykami.
+Beyond basic integration tests, it is crucial to cover more advanced scenarios, such as performance, security, and policy compliance tests.
 
-## Testowanie Wydajności
+## Performance Testing
 
-Plik `performance_test.go` jest dedykowany do mierzenia i walidacji wydajności modułu.
+The `performance_test.go` file is dedicated to measuring and validating the module's performance.
 
-### Benchmarki Czasu Tworzenia
+### Creation Time Benchmarks
 
-Używamy wbudowanego w Go mechanizmu benchmarków do mierzenia czasu operacji `terraform apply`.
+We use Go's built-in benchmarking mechanism to measure the time of `terraform apply` operations.
 
 ```go
 // performance_test.go
 func BenchmarkStorageAccountCreationSimple(b *testing.B) {
-	b.ReportAllocs() // Raportuje alokacje pamięci
+	b.ReportAllocs() // Reports memory allocations
 
 	for i := 0; i < b.N; i++ {
-		b.StopTimer() // Zatrzymujemy timer na czas przygotowań
-		// ... przygotowanie (kopiowanie fixture, ustawienie opcji)
-		b.StartTimer() // Wznawiamy timer tuż przed operacją
+		b.StopTimer() // Stop the timer during setup
+		// ... setup (copying fixture, setting options)
+		b.StartTimer() // Resume the timer just before the operation
 
 		start := time.Now()
 		terraform.InitAndApply(b, terraformOptions)
 		creationTime := time.Since(start)
 
-		b.StopTimer() // Zatrzymujemy ponownie na czas sprzątania
+		b.StopTimer() // Stop again during cleanup
 		terraform.Destroy(b, terraformOptions)
 		b.StartTimer()
 
-		// Raportujemy metrykę, która pojawi się w wynikach benchmarku
+		// Report a metric that will appear in the benchmark results
 		b.ReportMetric(float64(creationTime.Milliseconds()), "creation_ms")
 	}
 }
 ```
--   **`b.N`**: Go automatycznie dostosowuje liczbę iteracji, aby uzyskać miarodajny wynik.
--   **`b.StopTimer()` / `b.StartTimer()`**: Kluczowe dla mierzenia tylko interesującego nas fragmentu kodu.
--   **`b.ReportMetric`**: Pozwala na dodanie niestandardowych metryk do wyników benchmarku.
+-   **`b.N`**: Go automatically adjusts the number of iterations to get a reliable result.
+-   **`b.StopTimer()` / `b.StartTimer()`**: Key for measuring only the code snippet of interest.
+-   **`b.ReportMetric`**: Allows adding custom metrics to the benchmark results.
 
-### Testy Czasu Wdrożenia
+### Deployment Time Tests
 
-Oprócz benchmarków, warto mieć standardowy test, który sprawdza, czy czas wdrożenia nie przekracza ustalonego progu (SLA).
+In addition to benchmarks, it's good to have a standard test that checks if the deployment time does not exceed a set threshold (SLA).
 
 ```go
 // performance_test.go
@@ -49,41 +49,41 @@ func TestStorageAccountCreationTime(t *testing.T) {
 	}
 	t.Parallel()
 
-	// ... przygotowanie
+	// ... setup
 	
 	start := time.Now()
 	terraform.InitAndApply(t, terraformOptions)
 	duration := time.Since(start)
 
-	// Definiujemy maksymalny akceptowalny czas
+	// Define the maximum acceptable time
 	maxDuration := 5 * time.Minute
 	require.LessOrEqual(t, duration, maxDuration,
 		"Storage account creation took %v, expected less than %v", duration, maxDuration)
 }
 ```
 
-## Testowanie Bezpieczeństwa i Zgodności
+## Security and Compliance Testing
 
-Te testy weryfikują, czy wdrożone zasoby spełniają standardy bezpieczeństwa i polityki firmowe.
+These tests verify that the deployed resources meet security standards and company policies.
 
-### Statyczna Analiza Bezpieczeństwa (CI/CD)
+### Static Security Analysis (CI/CD)
 
-Narzędzia takie jak `tfsec` i `checkov` są uruchamiane w pipeline CI/CD i stanowią pierwszą linię obrony.
+Tools like `tfsec` and `checkov` are run in the CI/CD pipeline and are the first line of defense.
 
-### Testy Zgodności w Terratest
+### Compliance Tests in Terratest
 
-W `integration_test.go` możemy stworzyć test, który weryfikuje kluczowe aspekty bezpieczeństwa na wdrożonym zasobie.
+In `integration_test.go`, we can create a test that verifies key security aspects of a deployed resource.
 
 ```go
 // integration_test.go
 func TestStorageAccountCompliance(t *testing.T) {
 	t.Parallel()
-	// ... wdrożenie zasobu z fixture/security
+	// ... deploy resource from fixture/security
 
 	helper := NewStorageAccountHelper(t)
 	account := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 	
-	// Definiujemy listę sprawdzeń zgodności
+	// Define a list of compliance checks
 	complianceChecks := []struct {
 		name      string
 		check     func() bool
@@ -99,7 +99,7 @@ func TestStorageAccountCompliance(t *testing.T) {
 			check:   func() bool { return *account.Properties.MinimumTLSVersion == armstorage.MinimumTLSVersionTLS12 },
 			message: "Minimum TLS version must be 1.2",
 		},
-		// ... inne sprawdzenia
+		// ... other checks
 	}
 	
 	for _, cc := range complianceChecks {
@@ -109,160 +109,46 @@ func TestStorageAccountCompliance(t *testing.T) {
 	}
 }
 ```
-Ten wzorzec pozwala na łatwe dodawanie nowych reguł zgodności w postaci małych, czytelnych funkcji.
+This pattern makes it easy to add new compliance rules in the form of small, readable functions.
 
-## Testowanie Cyklu Życia (Lifecycle)
+## Lifecycle Testing
 
-Testy cyklu życia weryfikują, jak zasób zachowuje się podczas aktualizacji i czy operacje są idempotentne.
-
-```go
-// integration_test.go
-func TestStorageAccountLifecycle(t *testing.T) {
-	// ...
-	
-	// 1. Początkowe wdrożenie
-	terraform.InitAndApply(t, terraformOptions)
-	
-	// 2. Weryfikacja stanu początkowego
-	accountBeforeUpdate := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
-	assert.False(t, *accountBeforeUpdate.Properties.IsVersioningEnabled) // Zakładając, że domyślnie jest wyłączone
-
-	// 3. Aktualizacja konfiguracji w zmiennych Terraform
-	terraformOptions.Vars["enable_blob_versioning"] = true
-	terraform.Apply(t, terraformOptions)
-
-	// 4. Weryfikacja, czy zmiana została zastosowana
-	accountAfterUpdate := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
-	assert.True(t, *accountAfterUpdate.Properties.IsVersioningEnabled)
-
-	// 5. Test na idempotentność
-	// Uruchomienie apply ponownie z tymi samymi zmiennymi nie powinno nic zmienić
-	exitCode := terraform.Apply(t, terraformOptions)
-	assert.Equal(t, 0, exitCode, "Second apply should show no changes")
-}
-```
-
-## Testy End-to-End (E2E)
-
-Testy E2E weryfikują integrację kilku modułów. Chociaż nie ma dedykowanego pliku, można je umieścić w `integration_test.go` lub w osobnym katalogu na poziomie repozytorium.
-
-**Przykład scenariusza E2E:**
-1.  Wdróż moduł `azurerm_virtual_network`.
-2.  Wdróż moduł `azurerm_storage_account` z `private_endpoint` w podsieci z kroku 1.
-3.  Wdróż moduł `azurerm_virtual_machine` w innej podsieci.
-4.  Użyj `terratest/modules/ssh` do połączenia się z VM.
-5.  Z wewnątrz VM spróbuj połączyć się z prywatnym adresem IP konta magazynu, aby zweryfikować łączność.
-
-Oprócz benchmarków, warto mieć standardowy test, który sprawdza, czy czas wdrożenia nie przekracza ustalonego progu (SLA).
-
-```go
-// performance_test.go
-func TestStorageAccountCreationTime(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping performance test in short mode")
-	}
-	t.Parallel()
-
-	// ... przygotowanie
-	
-	start := time.Now()
-	terraform.InitAndApply(t, terraformOptions)
-	duration := time.Since(start)
-
-	// Definiujemy maksymalny akceptowalny czas
-	maxDuration := 5 * time.Minute
-	require.LessOrEqual(t, duration, maxDuration,
-		"Storage account creation took %v, expected less than %v", duration, maxDuration)
-}
-```
-
-## Testowanie Bezpieczeństwa i Zgodności
-
-Te testy weryfikują, czy wdrożone zasoby spełniają standardy bezpieczeństwa i polityki firmowe.
-
-### Statyczna Analiza Bezpieczeństwa (CI/CD)
-
-Narzędzia takie jak `tfsec` i `checkov` są uruchamiane w pipeline CI/CD i stanowią pierwszą linię obrony.
-
-### Testy Zgodności w Terratest
-
-W `integration_test.go` możemy stworzyć test, który weryfikuje kluczowe aspekty bezpieczeństwa na wdrożonym zasobie.
-
-```go
-// integration_test.go
-func TestStorageAccountCompliance(t *testing.T) {
-	t.Parallel()
-	// ... wdrożenie zasobu z fixture/security
-
-	helper := NewStorageAccountHelper(t)
-	account := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
-	
-	// Definiujemy listę sprawdzeń zgodności
-	complianceChecks := []struct {
-		name      string
-		check     func() bool
-		message   string
-	}{
-		{
-			name:    "HTTPS Only",
-			check:   func() bool { return *account.Properties.EnableHTTPSTrafficOnly },
-			message: "HTTPS-only traffic must be enforced",
-		},
-		{
-			name:    "TLS Version",
-			check:   func() bool { return *account.Properties.MinimumTLSVersion == armstorage.MinimumTLSVersionTLS12 },
-			message: "Minimum TLS version must be 1.2",
-		},
-		// ... inne sprawdzenia
-	}
-	
-	for _, cc := range complianceChecks {
-		t.Run(cc.name, func(t *testing.T) {
-			assert.True(t, cc.check(), cc.message)
-		})
-	}
-}
-```
-Ten wzorzec pozwala na łatwe dodawanie nowych reguł zgodności w postaci małych, czytelnych funkcji.
-
-## Testowanie Cyklu Życia (Lifecycle)
-
-Testy cyklu życia weryfikują, jak zasób zachowuje się podczas aktualizacji i czy operacje są idempotentne.
+Lifecycle tests verify how a resource behaves during updates and whether operations are idempotent.
 
 ```go
 // integration_test.go
 func TestStorageAccountLifecycle(t *testing.T) {
 	// ...
 	
-	// 1. Początkowe wdrożenie
+	// 1. Initial deployment
 	terraform.InitAndApply(t, terraformOptions)
 	
-	// 2. Weryfikacja stanu początkowego
+	// 2. Verify initial state
 	accountBeforeUpdate := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
-	assert.False(t, *accountBeforeUpdate.Properties.IsVersioningEnabled) // Zakładając, że domyślnie jest wyłączone
+	assert.False(t, *accountBeforeUpdate.Properties.IsVersioningEnabled) // Assuming it's disabled by default
 
-	// 3. Aktualizacja konfiguracji w zmiennych Terraform
+	// 3. Update configuration in Terraform variables
 	terraformOptions.Vars["enable_blob_versioning"] = true
 	terraform.Apply(t, terraformOptions)
 
-	// 4. Weryfikacja, czy zmiana została zastosowana
+	// 4. Verify that the change was applied
 	accountAfterUpdate := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
 	assert.True(t, *accountAfterUpdate.Properties.IsVersioningEnabled)
 
-	// 5. Test na idempotentność
-	// Uruchomienie apply ponownie z tymi samymi zmiennymi nie powinno nic zmienić
+	// 5. Test for idempotency
+	// Running apply again with the same variables should result in no changes
 	exitCode := terraform.Apply(t, terraformOptions)
 	assert.Equal(t, 0, exitCode, "Second apply should show no changes")
 }
 ```
 
-## Testy End-to-End (E2E)
+## End-to-End (E2E) Tests
 
-Testy E2E weryfikują integrację kilku modułów. Chociaż nie ma dedykowanego pliku, można je umieścić w `integration_test.go` lub w osobnym katalogu na poziomie repozytorium.
+E2E tests verify the integration of several modules. Although there is no dedicated file, they can be placed in `integration_test.go` or in a separate directory at the repository level.
 
-**Przykład scenariusza E2E:**
-1.  Wdróż moduł `azurerm_virtual_network`.
-2.  Wdróż moduł `azurerm_storage_account` z `private_endpoint` w podsieci z kroku 1.
-3.  Wdróż moduł `azurerm_virtual_machine` w innej podsieci.
-4.  Użyj `terratest/modules/ssh` do połączenia się z VM.
-5.  Z wewnątrz VM spróbuj połączyć się z prywatnym adresem IP konta magazynu, aby zweryfikować łączność.
+**Example E2E Scenario:**
+1.  Deploy the `azurerm_virtual_network` module.
+2.  Deploy the `azurerm_storage_account` module with a `private_endpoint` in a subnet from step 1.
+3.  Deploy the `azurerm_virtual_machine` module in another subnet.
+4.  Use `terratest/modules/ssh` to connect to the VM.
+5.  From inside the VM, try to connect to the private IP address of the storage account to verify connectivity.

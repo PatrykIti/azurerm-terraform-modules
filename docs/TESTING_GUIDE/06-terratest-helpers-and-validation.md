@@ -1,16 +1,16 @@
-# Wzorzec Helpera i Funkcje Walidacyjne
+# Helper Pattern and Validation Functions
 
-Plik `test_helpers.go` jest fundamentem reużywalności i czytelności w naszych testach integracyjnych. Zamiast umieszczać logikę interakcji z Azure SDK i powtarzalne fragmenty kodu bezpośrednio w plikach testowych, centralizujemy je w helperach. Poniżej opisano standardowy wzorzec i najlepsze praktyki.
+The `test_helpers.go` file is the foundation of reusability and readability in our integration tests. Instead of placing Azure SDK interaction logic and repetitive code snippets directly in test files, we centralize them in helpers. The standard pattern and best practices are described below.
 
-## Wzorzec Klasy Pomocniczej (Helper Pattern)
+## Helper Class Pattern
 
-Dla każdego testowanego modułu tworzymy dedykowaną strukturę (klasę) pomocniczą, która enkapsuluje logikę specyficzną dla danego zasobu.
+For each module being tested, we create a dedicated helper struct (class) that encapsulates the logic specific to that resource.
 
-### Definicja Struktury
+### Struct Definition
 
-Struktura przechowuje uwierzytelnione klienty Azure SDK oraz inne niezbędne informacje, takie jak ID subskrypcji.
+The struct stores authenticated Azure SDK clients and other necessary information, such as the subscription ID.
 
-**Przykład (`test_helpers.go` dla `azurerm_storage_account`):**
+**Example (`test_helpers.go` for `azurerm_storage_account`):**
 ```go
 // StorageAccountHelper provides helper methods for storage account testing
 type StorageAccountHelper struct {
@@ -20,28 +20,28 @@ type StorageAccountHelper struct {
 	blobClient     *armstorage.BlobServicesClient
 }
 ```
--   `subscriptionID`: Przechowuje ID subskrypcji, aby uniknąć wielokrotnego odczytywania go ze zmiennych środowiskowych.
--   `credential`: Przechowuje obiekt `TokenCredential` z Azure SDK, używany do uwierzytelniania wszystkich klientów.
--   `client`, `blobClient`: Przechowują instancje klientów SDK specyficznych dla zasobu (w tym przypadku `AccountsClient` i `BlobServicesClient`).
+-   `subscriptionID`: Stores the subscription ID to avoid reading it from environment variables multiple times.
+-   `credential`: Stores the `TokenCredential` object from the Azure SDK, used to authenticate all clients.
+-   `client`, `blobClient`: Store instances of resource-specific SDK clients (in this case, `AccountsClient` and `BlobServicesClient`).
 
-### Inicjalizacja Helpera
+### Helper Initialization
 
-Funkcja fabryczna `New...Helper` jest odpowiedzialna za:
-1.  Odczytanie niezbędnych zmiennych środowiskowych.
-2.  Utworzenie obiektu `credential` (obsługując różne metody uwierzytelniania).
-3.  Inicjalizację wszystkich potrzebnych klientów SDK.
-4.  Zwrócenie w pełni skonfigurowanej instancji helpera.
+The `New...Helper` factory function is responsible for:
+1.  Reading the necessary environment variables.
+2.  Creating a `credential` object (handling different authentication methods).
+3.  Initializing all required SDK clients.
+4.  Returning a fully configured helper instance.
 
 ```go
 // NewStorageAccountHelper creates a new helper instance
 func NewStorageAccountHelper(t *testing.T) *StorageAccountHelper {
 	subscriptionID := getRequiredEnvVar(t, "AZURE_SUBSCRIPTION_ID")
 	
-	// Logika uwierzytelniania (Service Principal, Azure CLI, Default)
+	// Authentication logic (Service Principal, Azure CLI, Default)
 	credential, err := azidentity.NewDefaultAzureCredential(nil)
 	require.NoError(t, err, "Failed to create credential")
 
-	// Inicjalizacja klientów
+	// Initialize clients
 	client, err := armstorage.NewAccountsClient(subscriptionID, credential, nil)
 	require.NoError(t, err, "Failed to create storage accounts client")
 	
@@ -57,19 +57,19 @@ func NewStorageAccountHelper(t *testing.T) *StorageAccountHelper {
 }
 ```
 
-## Funkcje Walidacyjne
+## Validation Functions
 
-Metody walidacyjne są kluczową częścią helpera. Ich zadaniem jest weryfikacja, czy wdrożony zasób ma oczekiwaną konfigurację.
+Validation methods are a key part of the helper. Their task is to verify that the deployed resource has the expected configuration.
 
-### Najlepsze Praktyki
--   **Jedna odpowiedzialność**: Każda funkcja powinna walidować jeden logiczny aspekt zasobu (np. szyfrowanie, reguły sieciowe).
--   **Przyjmowanie obiektu zasobu**: Funkcje powinny przyjmować jako argument obiekt zasobu pobrany z Azure SDK (np. `armstorage.Account`), a nie tylko jego nazwę. To zmniejsza liczbę wywołań API.
--   **Użycie `require` i `assert`**: Używaj `require` dla krytycznych asercji, które muszą być spełnione, aby kontynuować test (np. `require.NotNil`). Używaj `assert` dla pozostałych sprawdzeń.
--   **Czytelne komunikaty o błędach**: Każda asercja powinna mieć jasny komunikat, co poszło nie tak.
+### Best Practices
+-   **Single Responsibility**: Each function should validate one logical aspect of the resource (e.g., encryption, network rules).
+-   **Accept a Resource Object**: Functions should accept a resource object retrieved from the Azure SDK (e.g., `armstorage.Account`) as an argument, not just its name. This reduces the number of API calls.
+-   **Use `require` and `assert`**: Use `require` for critical assertions that must be met to continue the test (e.g., `require.NotNil`). Use `assert` for other checks.
+-   **Clear Error Messages**: Every assertion should have a clear message explaining what went wrong.
 
-### Przykłady Funkcji Walidacyjnych
+### Examples of Validation Functions
 
-#### Walidacja Szyfrowania
+#### Encryption Validation
 ```go
 // ValidateStorageAccountEncryption validates encryption settings
 func (h *StorageAccountHelper) ValidateStorageAccountEncryption(t *testing.T, account armstorage.Account) {
@@ -82,7 +82,7 @@ func (h *StorageAccountHelper) ValidateStorageAccountEncryption(t *testing.T, ac
 }
 ```
 
-#### Walidacja Reguł Sieciowych
+#### Network Rule Validation
 ```go
 // ValidateNetworkRules validates network access rules
 func (h *StorageAccountHelper) ValidateNetworkRules(t *testing.T, account armstorage.Account, expectedIPRules []string) {
@@ -103,9 +103,9 @@ func (h *StorageAccountHelper) ValidateNetworkRules(t *testing.T, account armsto
 }
 ```
 
-## Funkcje Oczekujące (Waiters)
+## Waiter Functions
 
-Niektóre operacje w Azure są asynchroniczne. Funkcje oczekujące używają mechanizmu `retry` z Terratest, aby cyklicznie sprawdzać stan zasobu, aż osiągnie on pożądany stan lub upłynie limit czasu.
+Some operations in Azure are asynchronous. Waiter functions use the `retry` mechanism from Terratest to periodically check the state of a resource until it reaches the desired state or a timeout occurs.
 
 ```go
 // WaitForGRSSecondaryEndpoints waits for GRS secondary endpoints to be available
@@ -123,19 +123,19 @@ func (h *StorageAccountHelper) WaitForGRSSecondaryEndpoints(t *testing.T, accoun
 	})
 }
 ```
--   `retry.DoWithRetry`: Funkcja z Terratest.
--   `description`: Czytelny komunikat logowany podczas każdej próby.
--   `60`: Maksymalna liczba prób.
--   `10*time.Second`: Czas oczekiwania między próbami.
--   Funkcja anonimowa zawiera logikę sprawdzającą. Zwraca `nil` jako błąd, jeśli warunek jest spełniony, co kończy pętlę.
+-   `retry.DoWithRetry`: A function from Terratest.
+-   `description`: A readable message logged during each attempt.
+-   `60`: The maximum number of attempts.
+-   `10*time.Second`: The time to wait between attempts.
+-   The anonymous function contains the checking logic. It returns `nil` as an error if the condition is met, which ends the loop.
 
-## Ogólne Funkcje Pomocnicze
+## General Helper Functions
 
-Oprócz metod w helperze, plik `test_helpers.go` zawiera również globalne funkcje pomocnicze.
+In addition to methods in the helper, the `test_helpers.go` file also contains global helper functions.
 
-### Fabryka `terraform.Options`
+### `terraform.Options` Factory
 
-Funkcja `getTerraformOptions` centralizuje tworzenie konfiguracji dla Terratest, zapewniając spójność.
+The `getTerraformOptions` function centralizes the creation of Terratest configurations, ensuring consistency.
 
 ```go
 // getTerraformOptions helper function to get terraform options
@@ -149,7 +149,7 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 			"location":      "northeurope",
 		},
 		NoColor: true,
-		// Konfiguracja ponowień dla błędów przejściowych
+		// Retry configuration for transient errors
 		RetryableTerraformErrors: map[string]string{
 			".*timeout.*":                    "Timeout error - retrying",
 			".*ResourceGroupNotFound.*":      "Resource group not found - retrying",
@@ -159,10 +159,10 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	}
 }
 ```
--   **Unikalne nazwy**: Automatycznie generuje `random_suffix` i przekazuje go do zmiennych Terraform.
--   **Konfiguracja ponowień**: Definiuje, które błędy Terraform powinny być ponawiane (np. problemy z siecią, błędy `Eventually Consistent`).
+-   **Unique Names**: Automatically generates a `random_suffix` and passes it to Terraform variables.
+-   **Retry Configuration**: Defines which Terraform errors should be retried (e.g., network issues, `Eventually Consistent` errors).
 
-### Odczyt Zmiennych Środowiskowych
+### Reading Environment Variables
 
 ```go
 // getRequiredEnvVar gets a required environment variable or fails the test
@@ -172,4 +172,4 @@ func getRequiredEnvVar(t *testing.T, envVarName string) string {
 	return value
 }
 ```
-Ta prosta funkcja zapewnia, że test zakończy się niepowodzeniem, jeśli brakuje kluczowej zmiennej środowiskowej, zamiast kontynuować z nieprzewidywalnymi błędami.
+This simple function ensures that the test will fail if a key environment variable is missing, rather than continuing with unpredictable errors.
