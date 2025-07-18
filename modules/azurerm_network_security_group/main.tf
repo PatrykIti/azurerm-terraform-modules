@@ -1,24 +1,13 @@
 # Azure Network Security Group Module
 # This module creates an Azure Network Security Group with comprehensive security rules configuration
 
-locals {
-  # Merge default tags with user-provided tags
-  tags = merge(
-    {
-      Module    = "azurerm_network_security_group"
-      ManagedBy = "Terraform"
-    },
-    var.tags
-  )
-}
-
 # Main Network Security Group resource
 resource "azurerm_network_security_group" "network_security_group" {
   name                = var.name
   resource_group_name = var.resource_group_name
   location            = var.location
 
-  tags = local.tags
+  tags = var.tags
 }
 
 # Security Rules
@@ -60,7 +49,7 @@ resource "azurerm_network_watcher_flow_log" "flow_log" {
   name                      = "${var.name}-flow-log"
   network_watcher_name      = var.network_watcher_name
   resource_group_name       = var.resource_group_name
-  network_security_group_id = azurerm_network_security_group.network_security_group.id
+  target_resource_id        = azurerm_network_security_group.network_security_group.id
   storage_account_id        = var.flow_log_storage_account_id
   enabled                   = true
   version                   = var.flow_log_version
@@ -81,5 +70,5 @@ resource "azurerm_network_watcher_flow_log" "flow_log" {
     }
   }
 
-  tags = local.tags
+  tags = var.tags
 }
