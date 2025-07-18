@@ -36,8 +36,8 @@ tests/
 ├── test_helpers.go              # Helper functions, validation, and Azure SDK clients
 ├── test_config.yaml             # Test suite configuration for CI/CD
 ├── test_env.sh                  # Script for setting local environment variables
-├── run_tests_parallel.sh        # Script for running tests in parallel
-├── run_tests_sequential.sh      # Script for running tests sequentially
+├── run_tests_parallel.sh        # Script for running tests in parallel with reporting
+├── run_tests_sequential.sh      # Script for running tests sequentially with reporting
 └── test_outputs/                # Directory for test results (ignored by Git)
     └── .gitkeep
 ```

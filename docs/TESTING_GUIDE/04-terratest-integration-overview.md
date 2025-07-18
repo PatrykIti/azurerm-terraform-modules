@@ -55,7 +55,12 @@ Terratest tests require authentication with Azure. Our scripts and helpers suppo
 2.  **Azure CLI**: The default method for local development if the above variables are not set. You just need to be logged in via `az login`.
 3.  **Default Azure Credential**: The final method, which tries various mechanisms (Managed Identity, etc.).
 
-The `test_env.sh` file is used to set these variables locally. **You should never commit real credentials to the version control system.**
+Each module's `tests` directory should contain a `test_env.sh` file, which serves as a template for developers to set these environment variables for local test runs. **This file should be added to `.gitignore` and never be committed with real credentials.**
+
+To run tests locally, a user would:
+1.  Copy `test_env.sh` to `test_env.local.sh`.
+2.  Fill in their credentials in `test_env.local.sh`.
+3.  Source the file: `source test_env.local.sh`.
 
 ```bash
 # modules/azurerm_storage_account/tests/test_env.sh

@@ -127,3 +127,19 @@ make test-single TEST_NAME=TestStorageAccountPrivateEndpoint
 # Check for linting errors
 make lint
 ```
+
+## Advanced Test Execution Scripts (Per-Module)
+
+For more complex test orchestration, such as generating detailed reports or running a predefined list of tests for a specific module, each module's `tests` directory can contain reusable shell scripts.
+
+### `run_tests_parallel.sh`
+- **Purpose**: Executes all `Test...` functions in the Go test files in parallel. It captures the output of each test in a separate log file and generates a JSON summary report.
+- **Location**: Should be present in the `tests/` directory of a module that requires advanced test orchestration.
+- **Use Case**: Ideal for local development and CI/CD runs where you need a structured report of all test outcomes, even if some fail.
+
+### `run_tests_sequential.sh`
+- **Purpose**: Executes all `Test...` functions sequentially. This is slower but can be easier for debugging as the output is not interleaved.
+- **Location**: Should be present in the `tests/` directory of a module.
+- **Use Case**: Useful for local debugging of complex test failures.
+
+By using these standardized scripts and `Makefile` targets, we ensure a consistent and powerful testing workflow across all modules.
