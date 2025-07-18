@@ -103,9 +103,10 @@ This is where the primary resources are defined.
 - **Locals**: Use a `locals` block to compute values, merge tags, or define complex objects that are used multiple times.
 - **Resource Naming**: Use a consistent naming convention for resources within the module, e.g., `azurerm_resource_group.this`.
 - **Lifecycle Preconditions**: Use `lifecycle` blocks with `precondition` checks to validate complex inter-variable dependencies that cannot be handled in `variables.tf`.
-- **Dynamic Blocks**: Use `dynamic` blocks to conditionally create nested configuration blocks (e.g., for optional features).
+- **Dynamic Blocks**: Use `dynamic` blocks to conditionally create nested configuration blocks within a single resource (e.g., for optional features).
+- **Sub-Resource Creation**: For creating multiple instances of a sub-resource (e.g., storage containers, extra node pools), use a `list(object)` variable and iterate over it with a `for_each` meta-argument on the resource block. This is the standard pattern for managing zero-to-many child resources.
 
-**Template:**
+**Main Resource Template (`main.tf`):**
 ```hcl
 resource "azurerm_kubernetes_cluster" "this" {
   name                = var.name
@@ -130,6 +131,29 @@ resource "azurerm_kubernetes_cluster" "this" {
       error_message = "When private_cluster_enabled is true, private_dns_zone_id must be specified."
     }
   }
+}
+```
+
+**Sub-Resource Template (`main.tf`):**
+```hcl
+# In variables.tf
+variable "containers" {
+  description = "List of storage containers to create."
+  type = list(object({
+    name                  = string
+    container_access_type = optional(string, "private")
+  }))
+  default = []
+}
+
+# In main.tf
+resource "azurerm_storage_container" "this" {
+  # Create a map from the list for for_each, using the name as the key
+  for_each = { for container in var.containers : container.name => container }
+
+  name                  = each.value.name
+  storage_account_name  = azurerm_storage_account.this.name # Reference to the main resource
+  container_access_type = each.value.container_access_type
 }
 ```
 
