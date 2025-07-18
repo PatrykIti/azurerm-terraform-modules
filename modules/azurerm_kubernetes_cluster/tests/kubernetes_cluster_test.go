@@ -58,6 +58,9 @@ func TestCompleteKubernetesCluster(t *testing.T) {
 
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(t, testFolder)
+		// The 'complete' fixture requires a log_analytics_workspace_id, which we are creating within the fixture itself.
+		// We pass a placeholder here, which will be overridden by the fixture's own resource creation.
+		terraformOptions.Vars["log_analytics_workspace_id"] = "placeholder"
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
@@ -80,7 +83,6 @@ func TestCompleteKubernetesCluster(t *testing.T) {
 	})
 }
 
-// Test a security-hardened AKS cluster
 // Test a security-hardened AKS cluster
 func TestSecureKubernetesCluster(t *testing.T) {
 	t.Parallel()
@@ -138,9 +140,15 @@ func TestKubernetesClusterValidationRules(t *testing.T) {
 
 			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_kubernetes_cluster/tests/fixtures/negative")
 			
+			// Merge the random_suffix with the test case variables
+			vars := getTerraformOptions(t, testFolder).Vars
+			for k, v := range tc.vars {
+				vars[k] = v
+			}
+
 			terraformOptions := &terraform.Options{
 				TerraformDir: testFolder,
-				Vars:         tc.vars,
+				Vars:         vars,
 				NoColor:      true,
 			}
 
