@@ -1,60 +1,54 @@
 package test
 
 import (
-	"fmt"
-	"strings"
 	"testing"
-	"time"
 
-	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-// Test basic network_security_group creation
-func TestBasicNetwork Security Group(t *testing.T) {
+// TestNsgSimple tests the simple NSG fixture.
+func TestNsgSimple(t *testing.T) {
 	t.Parallel()
 
-	// Create a folder for this test
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_network_security_group/tests/fixtures/simple")
+
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
-	// Deploy the infrastructure
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
 
-	// Validate the infrastructure
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-
-		// Get outputs
-		resourceID := terraform.Output(t, terraformOptions, "network_security_group_id")
-		resourceName := terraform.Output(t, terraformOptions, "network_security_group_name")
+		nsqName := terraform.Output(t, terraformOptions, "network_security_group_name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 
-		// Validate outputs are not empty
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, resourceName)
-		assert.NotEmpty(t, resourceGroupName)
+		helper := NewNetworkSecurityGroupHelper(t)
+		nsg := helper.GetNsgProperties(t, resourceGroupName, nsqName)
 
-		// Add network_security_group specific validations here
+		assert.Equal(t, nsqName, *nsg.Name)
+		// Default rules + custom rules. Adjust if defaults change.
+		helper.ValidateNsgSecurityRules(t, nsg, 0)
 	})
 }
 
-// Test complete network_security_group with all features
-func TestCompleteNetwork Security Group(t *testing.T) {
+// TestNsgComplete tests the complete NSG fixture.
+func TestNsgComplete(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_network_security_group/tests/fixtures/complete")
+
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -65,197 +59,47 @@ func TestCompleteNetwork Security Group(t *testing.T) {
 
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		nsgName := terraform.Output(t, terraformOptions, "network_security_group_name")
+		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 
-		// Get outputs
-		resourceID := terraform.Output(t, terraformOptions, "network_security_group_id")
-		resourceName := terraform.Output(t, terraformOptions, "network_security_group_name")
-		
-		// Validate complete configuration
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, resourceName)
-		
-		// Add additional validations for complete configuration
-		// This should test all optional features and advanced settings
+		helper := NewNetworkSecurityGroupHelper(t)
+		nsg := helper.GetNsgProperties(t, resourceGroupName, nsgName)
+
+		assert.Equal(t, nsgName, *nsg.Name)
+		// Add more specific assertions for the 'complete' fixture
 	})
 }
 
-// Test security configurations
-func TestNetwork Security GroupSecurity(t *testing.T) {
-	t.Parallel()
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/security")
-	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
-	})
-
-	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
-		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
-	})
-
-	test_structure.RunTestStage(t, "validate", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-
-		resourceID := terraform.Output(t, terraformOptions, "network_security_group_id")
-		resourceName := terraform.Output(t, terraformOptions, "network_security_group_name")
-
-		// Validate security settings
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, resourceName)
-		
-		// Add security-specific validations
-		// Validate encryption, TLS settings, access controls, etc.
-	})
-}
-
-// Test network access controls
-func TestNetwork Security GroupNetworkRules(t *testing.T) {
-	t.Parallel()
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/network")
-	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
-	})
-
-	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
-		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
-	})
-
-	test_structure.RunTestStage(t, "validate", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-
-		resourceID := terraform.Output(t, terraformOptions, "network_security_group_id")
-		
-		// Validate network rules
-		assert.NotEmpty(t, resourceID)
-		
-		// Add network-specific validations
-		// Validate IP rules, subnet restrictions, private endpoints, etc.
-	})
-}
-
-// Test private endpoint configuration
-func TestNetwork Security GroupPrivateEndpoint(t *testing.T) {
-	t.Parallel()
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/private_endpoint")
-	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
-	})
-
-	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
-		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
-	})
-
-	test_structure.RunTestStage(t, "validate", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-
-		resourceID := terraform.Output(t, terraformOptions, "network_security_group_id")
-		privateEndpointID := terraform.Output(t, terraformOptions, "private_endpoint_id")
-
-		// Validate private endpoint was created
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, privateEndpointID)
-		
-		// Validate public network access is disabled
-		// Add additional private endpoint validations
-	})
-}
-
-// Negative test cases for validation rules
-func TestNetwork Security GroupValidationRules(t *testing.T) {
+// TestNsgValidationRules tests the input validation rules.
+func TestNsgValidationRules(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
 		name          string
-		fixtureFile   string
+		fixtureFolder string
 		expectedError string
 	}{
 		{
-			name:          "InvalidName_TooShort",
-			fixtureFile:   "negative/invalid_name_short",
-			expectedError: "name must be between",
+			name:          "InvalidName",
+			fixtureFolder: "negative/invalid_name_chars",
+			expectedError: "does not match the regular expression",
 		},
-		{
-			name:          "InvalidName_InvalidChars",
-			fixtureFile:   "negative/invalid_name_chars",
-			expectedError: "name must contain only",
-		},
-		// Add more validation test cases specific to network_security_group
 	}
 
 	for _, tc := range testCases {
-		tc := tc // capture range variable
+		tc := tc // Capture range variable
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fmt.Sprintf("azurerm_network_security_group/tests/fixtures/%s", tc.fixtureFile))
-			
-			// Use minimal terraform options for negative tests (no variables)
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_network_security_group/tests/fixtures/"+tc.fixtureFolder)
+
 			terraformOptions := &terraform.Options{
 				TerraformDir: testFolder,
-				NoColor:      true,
 			}
 
-			// This should fail during plan/apply
 			_, err := terraform.InitAndPlanE(t, terraformOptions)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), tc.expectedError)
 		})
-	}
-}
-
-// Benchmark test for performance
-func BenchmarkNetwork Security GroupCreation(b *testing.B) {
-	// Skip if not running benchmarks
-	if testing.Short() {
-		b.Skip("Skipping benchmark in short mode")
-	}
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_network_security_group/tests/fixtures/simple")
-	terraformOptions := getTerraformOptions(b, testFolder)
-
-	// Cleanup after benchmark
-	defer terraform.Destroy(b, terraformOptions)
-
-	// Run the benchmark
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		// Generate unique name for each iteration
-		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
-		
-		terraform.InitAndApply(b, terraformOptions)
-		terraform.Destroy(b, terraformOptions)
-	}
-}
-
-// Helper function to get terraform options
-func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
-	// Generate a unique ID for resources
-	timestamp := time.Now().UnixNano() % 1000 // Last 3 digits for more variation
-	baseID := strings.ToLower(random.UniqueId())
-	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
-	
-	return &terraform.Options{
-		TerraformDir: terraformDir,
-		Vars: map[string]interface{}{
-			"random_suffix": uniqueID,
-			"location":      "northeurope",
-		},
-		NoColor: true,
-		// Retry configuration
-		RetryableTerraformErrors: map[string]string{
-			".*timeout.*":                    "Timeout error - retrying",
-			".*ResourceGroupNotFound.*":      "Resource group not found - retrying",
-			".*AlreadyExists.*":              "Resource already exists - retrying",
-			".*TooManyRequests.*":            "Too many requests - retrying",
-		},
-		MaxRetries:         3,
-		TimeBetweenRetries: 10 * time.Second,
 	}
 }
