@@ -1,26 +1,49 @@
 # Secure Network Security Group Example
 
-This example demonstrates a maximum-security Network Security Group configuration suitable for highly sensitive data and regulated environments.
+This example demonstrates a maximum-security Network Security Group configuration suitable for a three-tier application (web, app, db) using a zero-trust approach.
 
 ## Features
 
-- Maximum security configuration with all security features enabled
-- Network isolation and private endpoints
-- Advanced threat protection
-- Comprehensive audit logging and monitoring
-- Encryption at rest and in transit
-- Compliance-ready configuration
+- **Zero-Trust Ruleset**: Denies all traffic by default and only allows specific, required communication paths.
+- **Application Security Groups (ASGs)**: Uses ASGs to create logical, application-based security boundaries instead of relying on IP subnets.
+- **Flow Logs & Traffic Analytics**: Enables comprehensive network monitoring and security analysis.
+- **Service Tag Integration**: Uses service tags for secure communication with Azure services.
 
-## Key Configuration
+## Architecture & Security Rules
 
-This example implements defense-in-depth security principles with multiple layers of protection suitable for highly regulated industries and sensitive workloads.
+This example implements the following security model:
 
-## Security Considerations
+```
+      Internet
+         |
+ (HTTPS Inbound on Port 443)
+         |
++--------v--------+
+|   ASG: Web-Tier |
++-----------------+
+         |
+ (API Traffic on Port 8080)
+         |
++--------v--------+
+|   ASG: App-Tier |
++-----------------+
+         |
+ (Database Traffic on Port 1433)
+         |
++--------v--------+
+|   ASG: DB-Tier  |
++-----------------+
+```
 
-- All public access is disabled by default
-- Network access is restricted to specific IP ranges
-- All data is encrypted at rest and in transit
-- Audit logging captures all access and modifications
+### Inbound Rules
+- **DenyAllInbound** (Priority 4096): Blocks all inbound traffic that doesn't match a higher-priority rule.
+- **AllowHttpsToWeb** (Priority 100): Allows inbound HTTPS traffic from the `Internet` to the `Web-Tier` ASG.
+- **AllowWebToApp** (Priority 110): Allows traffic from the `Web-Tier` ASG to the `App-Tier` ASG on port 8080.
+- **AllowAppToDb** (Priority 120): Allows traffic from the `App-Tier` ASG to the `DB-Tier` ASG on port 1433.
+
+### Outbound Rules
+- **DenyAllOutbound** (Priority 4096): Blocks all outbound traffic by default.
+- **AllowPaasOutbound** (Priority 100): Allows outbound traffic from all ASGs to essential Azure PaaS services (`Storage`, `Sql`, `AzureKeyVault`) for diagnostics and operations.
 
 ## Usage
 
@@ -35,6 +58,3 @@ terraform apply
 ```bash
 terraform destroy
 ```
-
-<!-- BEGIN_TF_DOCS -->
-<!-- END_TF_DOCS -->

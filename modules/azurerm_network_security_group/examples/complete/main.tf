@@ -1,19 +1,36 @@
+terraform {
+  required_version = ">= 1.3.0"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "4.36.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.0"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
 }
 
-locals {
-  location = "West Europe"
+resource "random_string" "suffix" {
+  length  = 6
+  special = false
+  upper   = false
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "rg-nsg-complete-example"
-  location = local.location
+  name     = "rg-nsg-complete-example-${random_string.suffix.result}"
+  location = var.location
 }
 
 # Create a storage account for flow logs
 resource "azurerm_storage_account" "flow_logs" {
-  name                     = "saflowlogs${substr(md5(azurerm_resource_group.example.id), 0, 8)}"
+  name                     = "saflowlogs${random_string.suffix.result}"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -28,7 +45,7 @@ resource "azurerm_storage_account" "flow_logs" {
 
 # Create Log Analytics workspace for Traffic Analytics
 resource "azurerm_log_analytics_workspace" "example" {
-  name                = "law-nsg-complete-example"
+  name                = "law-nsg-complete-example-${random_string.suffix.result}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
@@ -42,7 +59,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # Create Network Watcher if it doesn't exist
 resource "azurerm_network_watcher" "example" {
-  name                = "nw-${local.location}"
+  name                = "nw-${azurerm_resource_group.example.location}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -53,7 +70,7 @@ resource "azurerm_network_watcher" "example" {
 
 # Create Application Security Groups for demonstration
 resource "azurerm_application_security_group" "web_servers" {
-  name                = "asg-web-servers"
+  name                = "asg-web-servers-${random_string.suffix.result}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -64,7 +81,7 @@ resource "azurerm_application_security_group" "web_servers" {
 }
 
 resource "azurerm_application_security_group" "database_servers" {
-  name                = "asg-database-servers"
+  name                = "asg-database-servers-${random_string.suffix.result}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -78,7 +95,7 @@ resource "azurerm_application_security_group" "database_servers" {
 module "network_security_group" {
   source = "../../"
 
-  name                = "nsg-complete-example"
+  name                = "nsg-complete-example-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
@@ -109,7 +126,6 @@ module "network_security_group" {
       destination_address_prefix = "*"
       description                = "Allow Azure Load Balancer probes"
     }
-
     # Multiple Port Ranges Example
     allow_web_traffic = {
       priority                   = 110
@@ -122,7 +138,6 @@ module "network_security_group" {
       destination_address_prefix = "VirtualNetwork"
       description                = "Allow web traffic on multiple ports"
     }
-
     # Multiple Address Prefixes Example
     allow_management_subnets = {
       priority                   = 120
@@ -135,7 +150,6 @@ module "network_security_group" {
       destination_address_prefix = "VirtualNetwork"
       description                = "Allow SSH/RDP from management subnets"
     }
-
     # Application Security Group Example
     allow_web_to_db = {
       priority                                   = 130
@@ -148,7 +162,6 @@ module "network_security_group" {
       destination_application_security_group_ids = [azurerm_application_security_group.database_servers.id]
       description                                = "Allow SQL Server access from web servers to database servers"
     }
-
     # Outbound Rule Example
     allow_internet_https = {
       priority                   = 200
@@ -161,7 +174,6 @@ module "network_security_group" {
       destination_address_prefix = "Internet"
       description                = "Allow HTTPS outbound to Internet"
     }
-
     # Deny Rule Example
     deny_all_inbound = {
       priority                   = 4096

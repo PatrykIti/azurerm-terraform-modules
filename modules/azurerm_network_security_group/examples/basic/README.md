@@ -5,7 +5,7 @@ This example demonstrates a basic Network Security Group configuration with simp
 ## Features
 
 - Creates an NSG with basic security rules
-- Demonstrates common rule patterns (RDP, HTTP, HTTPS)
+- Demonstrates common rule patterns (SSH, HTTP, HTTPS)
 - Shows both inbound and outbound rule configuration
 - Uses rule descriptions for documentation
 - Creates a dedicated resource group
@@ -15,12 +15,12 @@ This example demonstrates a basic Network Security Group configuration with simp
 This example creates the following security rules:
 
 ### Inbound Rules
-- **Allow RDP** (Priority 100): Allows RDP access from internal networks (10.0.0.0/8)
-- **Allow HTTP** (Priority 110): Allows HTTP traffic from anywhere
-- **Allow HTTPS** (Priority 120): Allows HTTPS traffic from anywhere
+- **Allow SSH** (Priority 100): Allows SSH access from a specified IP address
+- **Allow HTTP** (Priority 110): Allows HTTP traffic from the Internet
+- **Allow HTTPS** (Priority 120): Allows HTTPS traffic from the Internet
 
 ### Outbound Rules
-- **Deny All Outbound** (Priority 4096): Denies all outbound traffic (demonstrating restrictive outbound rules)
+- **Allow All Outbound** (Priority 4096): Allows all outbound traffic
 
 ## Usage
 
@@ -35,6 +35,3 @@ terraform apply
 ```bash
 terraform destroy
 ```
-
-<!-- BEGIN_TF_DOCS -->
-<!-- END_TF_DOCS -->
