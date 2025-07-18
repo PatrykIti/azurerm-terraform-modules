@@ -6,29 +6,32 @@ This guide covers the standards for creating test configurations (`fixtures`) an
 
 Test fixtures are small, self-contained Terraform configurations located in the `tests/fixtures` directory. Each subdirectory represents a specific scenario to be tested.
 
-### Fixture Organization
+### Fixture Naming Conventions and Purpose
 
-A well-organized `fixtures` directory is crucial for covering a wide range of scenarios.
+To ensure consistency across all modules, the following fixture names and purposes should be used where applicable:
 
-**Standard Structure:**
-```
-tests/
-└── fixtures/
-    ├── simple/           # Minimal, valid configuration to test basic resource creation.
-    ├── complete/         # A complex configuration that enables most of the module's features.
-    ├── security/         # A configuration focused on security-hardened settings.
-    ├── network/          # Scenarios for advanced networking (e.g., VNet integration, IP rules).
-    ├── private_endpoint/ # A specific scenario for private endpoint integration.
-    ├── data_lake_gen2/   # Scenarios for Data Lake Gen2 features.
-    ├── identity_access/  # Tests for managed identity and CMK encryption.
-    └── negative/         # Subdirectories for configurations that are expected to fail validation.
-        ├── invalid_name_short/
-        └── invalid_replication_type/
-```
+| Fixture Name | Purpose |
+|---|---|
+| `simple` | A minimal, valid configuration to test basic resource creation and default values. |
+| `complete` | A complex configuration that enables and tests the majority of the module's features. |
+| `security` | A configuration focused on security-hardened settings (e.g., disabled public access, private endpoints, CMK). |
+| `network` | Scenarios for advanced networking (e.g., VNet integration, multiple IP rules, service endpoints). |
+| `private_endpoint`| A specific scenario dedicated to validating private endpoint integration. |
+| `data_lake_gen2` | (Or similar) For features specific to a certain SKU or configuration, like Data Lake Gen2. |
+| `identity_access` | Tests for managed identity (System and User Assigned) and Customer-Managed Key (CMK) encryption. |
+| `negative/` | A parent directory for configurations that are expected to fail Terraform validation or apply, used for negative testing. |
 
-### Best Practices for Fixtures
+### Fixture Internal Structure
 
-1.  **Use a Local Module Source**: Fixtures must always test the local version of the module using a relative path.
+Each fixture directory must contain the following files:
+
+-   `main.tf`: The main Terraform configuration for the test scenario.
+-   `variables.tf`: Defines the input variables for the fixture.
+-   `outputs.tf`: Exposes the key attributes of the created resources for validation in Go tests.
+
+### Best Practices for Writing Fixtures
+
+1.  **Use a Local Module Source**: Fixtures must always test the local version of the module using a relative path to ensure that changes are tested before they are merged.
     ```hcl
     # in fixtures/simple/main.tf
     module "storage_account" {
@@ -41,22 +44,41 @@ tests/
     }
     ```
 
-2.  **Ensure Unique Resource Names**: To enable parallel testing, all resources must have unique names. This is achieved by accepting a `random_suffix` variable from the Go test code.
+2.  **Ensure Unique and Descriptive Resource Names**: To enable parallel testing and easy identification in Azure, all resources within a fixture must have unique names. The standard pattern is:
+    -   **Resource Groups**: `rg-{project}-{scenario}-${var.random_suffix}`
+    -   **Main Module Resource**: `{prefix}{scenario}${var.random_suffix}`
+    -   **Other Resources**: `{type}-{project}-{scenario}-${var.random_suffix}`
+
+    **Example (`fixtures/simple/main.tf`):**
     ```hcl
-    # in fixtures/simple/variables.tf
+    # variables.tf
     variable "random_suffix" {
       type        = string
       description = "A random suffix passed from the test to ensure unique resource names."
     }
 
-    # in fixtures/simple/main.tf
+    # main.tf
     resource "azurerm_resource_group" "test" {
-      name     = "rg-test-${var.random_suffix}"
+      # e.g., rg-dpc-smp-a1b2c3
+      name     = "rg-dpc-smp-${var.random_suffix}"
       location = var.location
     }
-    ```
 
-3.  **Define Outputs for Validation**: Each fixture must expose the key attributes of the created resources as outputs. The Go tests will read these outputs to get the names and IDs needed for validation with the Azure SDK.
+    module "storage_account" {
+      source = "../../../"
+
+      # e.g., dpcsmpa1b2c3
+      name                     = "dpcsmp${var.random_suffix}"
+      resource_group_name      = azurerm_resource_group.test.name
+      # ... other variables
+    }
+    ```
+    - `{project}` is a short identifier for the overall project (e.g., `dpc`).
+    - `{scenario}` is a short identifier for the fixture (e.g., `smp` for simple, `cmp` for complete, `sec` for security).
+    - `{prefix}` is a short, lowercase identifier for the resource type (e.g., `st` for storage account).
+    - `var.random_suffix` is a unique string passed from the Go test.
+
+3.  **Define Clear Outputs for Validation**: Each fixture must expose the key attributes of the created resources as outputs. The Go tests will read these outputs to get the names and IDs needed for validation with the Azure SDK.
     ```hcl
     # in fixtures/simple/outputs.tf
     output "storage_account_id" {
@@ -104,43 +126,4 @@ make test-single TEST_NAME=TestStorageAccountPrivateEndpoint
 
 # Check for linting errors
 make lint
-```
-
-### Advanced Execution Scripts
-
-For more complex orchestration, such as generating custom reports, the following scripts are provided:
-
--   `run_tests_parallel.sh`: Executes all test functions in parallel as separate processes and generates a detailed JSON report for each. It creates a final `summary.json` with the results of the entire run.
--   `run_tests_sequential.sh`: Executes tests one by one. This is useful for debugging, as it makes logs easier to follow.
-
-### Test Configuration (`test_config.yaml`)
-
-This file provides a way to configure test execution behavior without modifying code or scripts. It can be used by CI/CD pipelines to define different test suites.
-
-**Example Structure:**
-```yaml
-# test_config.yaml
-test_suites:
-  - name: "Pull Request Quick Checks"
-    tests:
-      - TestBasicStorageAccount
-      - TestStorageAccountValidationRules
-    parallel: true
-    timeout: 15m
-    
-  - name: "Nightly Full Run"
-    tests:
-      - TestCompleteStorageAccount
-      - TestStorageAccountSecurity
-      - TestStorageAccountLifecycle
-    parallel: true
-    timeout: 45m
-
-coverage:
-  enabled: true
-  threshold: 80
-
-reporting:
-  format: junit
-  output_dir: test-results/
 ```
