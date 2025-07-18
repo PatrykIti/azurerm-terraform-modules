@@ -26,7 +26,7 @@ variable "location" {
 # Security Rules Configuration
 variable "security_rules" {
   description = <<-EOT
-    Map of security rule definitions. Each key is the rule name, and the value contains the rule configuration.
+    List of security rule objects to create. The `name` attribute is used as the unique identifier.
     
     Important notes:
     - Priority must be unique within the NSG (100-4096)
@@ -36,8 +36,9 @@ variable "security_rules" {
     
     Example:
     ```
-    security_rules = {
-      allow_ssh = {
+    security_rules = [
+      {
+        name                       = "allow_ssh"
         priority                   = 100
         direction                  = "Inbound"
         access                     = "Allow"
@@ -47,8 +48,9 @@ variable "security_rules" {
         source_address_prefix      = "10.0.0.0/8"
         destination_address_prefix = "*"
         description                = "Allow SSH from internal network"
-      }
-      allow_https_multiple = {
+      },
+      {
+        name                         = "allow_https_multiple"
         priority                     = 110
         direction                    = "Inbound"
         access                       = "Allow"
@@ -58,11 +60,13 @@ variable "security_rules" {
         source_address_prefixes      = ["10.0.0.0/8", "172.16.0.0/12"]
         destination_address_prefix   = "VirtualNetwork"
       }
-    }
+    ]
     ```
   EOT
 
-  type = map(object({
+  type = list(object({
+    name                                       = string
+    description                                = optional(string)
     priority                                   = number
     direction                                  = string
     access                                     = string
@@ -77,14 +81,13 @@ variable "security_rules" {
     destination_address_prefixes               = optional(list(string))
     source_application_security_group_ids      = optional(list(string))
     destination_application_security_group_ids = optional(list(string))
-    description                                = optional(string)
   }))
 
-  default = {}
+  default = []
 
   validation {
     condition = alltrue([
-      for rule_name, rule in var.security_rules :
+      for rule in var.security_rules :
       contains(["Inbound", "Outbound"], rule.direction)
     ])
     error_message = "Security rule direction must be either 'Inbound' or 'Outbound'."
@@ -92,7 +95,7 @@ variable "security_rules" {
 
   validation {
     condition = alltrue([
-      for rule_name, rule in var.security_rules :
+      for rule in var.security_rules :
       contains(["Allow", "Deny"], rule.access)
     ])
     error_message = "Security rule access must be either 'Allow' or 'Deny'."
@@ -100,7 +103,7 @@ variable "security_rules" {
 
   validation {
     condition = alltrue([
-      for rule_name, rule in var.security_rules :
+      for rule in var.security_rules :
       contains(["Tcp", "Udp", "Icmp", "Esp", "Ah", "*"], rule.protocol)
     ])
     error_message = "Security rule protocol must be one of: 'Tcp', 'Udp', 'Icmp', 'Esp', 'Ah', or '*'."
@@ -108,7 +111,7 @@ variable "security_rules" {
 
   validation {
     condition = alltrue([
-      for rule_name, rule in var.security_rules :
+      for rule in var.security_rules :
       rule.priority >= 100 && rule.priority <= 4096
     ])
     error_message = "Security rule priority must be between 100 and 4096."
@@ -117,14 +120,14 @@ variable "security_rules" {
   # Port validation: singular vs plural
   validation {
     condition = alltrue([
-      for rule in values(var.security_rules) : (rule.source_port_range == null || rule.source_port_ranges == null)
+      for rule in var.security_rules : (rule.source_port_range == null || rule.source_port_ranges == null)
     ])
     error_message = "In 'security_rules', a rule can have 'source_port_range' or 'source_port_ranges', but not both."
   }
 
   validation {
     condition = alltrue([
-      for rule in values(var.security_rules) : (rule.destination_port_range == null || rule.destination_port_ranges == null)
+      for rule in var.security_rules : (rule.destination_port_range == null || rule.destination_port_ranges == null)
     ])
     error_message = "In 'security_rules', a rule can have 'destination_port_range' or 'destination_port_ranges', but not both."
   }
@@ -132,7 +135,7 @@ variable "security_rules" {
   # Source address validation: prefix vs prefixes vs ASG IDs
   validation {
     condition = alltrue([
-      for rule in values(var.security_rules) :
+      for rule in var.security_rules :
       ((rule.source_address_prefix != null ? 1 : 0) +
         (rule.source_address_prefixes != null ? 1 : 0) +
       (rule.source_application_security_group_ids != null ? 1 : 0)) <= 1
@@ -143,7 +146,7 @@ variable "security_rules" {
   # Destination address validation: prefix vs prefixes vs ASG IDs
   validation {
     condition = alltrue([
-      for rule in values(var.security_rules) :
+      for rule in var.security_rules :
       ((rule.destination_address_prefix != null ? 1 : 0) +
         (rule.destination_address_prefixes != null ? 1 : 0) +
       (rule.destination_application_security_group_ids != null ? 1 : 0)) <= 1

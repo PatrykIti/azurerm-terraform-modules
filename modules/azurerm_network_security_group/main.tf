@@ -12,14 +12,14 @@ resource "azurerm_network_security_group" "network_security_group" {
 
 # Security Rules
 resource "azurerm_network_security_rule" "security_rules" {
-  for_each = var.security_rules
+  for_each = { for rule in var.security_rules : rule.name => rule }
 
-  name                        = each.key
+  name                        = each.value.name
   priority                    = each.value.priority
   direction                   = each.value.direction
   access                      = each.value.access
   protocol                    = each.value.protocol
-  description                 = each.value.description
+  description                 = try(each.value.description, null)
   resource_group_name         = var.resource_group_name
   network_security_group_name = azurerm_network_security_group.network_security_group.name
 
