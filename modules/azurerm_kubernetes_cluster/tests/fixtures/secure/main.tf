@@ -32,7 +32,10 @@ module "kubernetes_cluster" {
   name                = "aks-secure-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
-  dns_prefix          = "akssecure${var.random_suffix}"
+  
+  dns_config = {
+    dns_prefix = "akssecure${var.random_suffix}"
+  }
 
   default_node_pool = {
     name           = "default"
@@ -45,13 +48,13 @@ module "kubernetes_cluster" {
     type = "SystemAssigned"
   }
 
-  private_cluster_enabled = true
-  private_dns_zone_id     = azurerm_private_dns_zone.test.id
+  private_cluster_config = {
+    private_cluster_enabled = true
+    private_dns_zone_id     = azurerm_private_dns_zone.test.id
+  }
 
-  addon_profiles = {
-    azure_policy = {
-      enabled = true
-    }
+  features = {
+    azure_policy_enabled = true
   }
 
   tags = {

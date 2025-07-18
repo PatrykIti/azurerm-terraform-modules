@@ -4,6 +4,11 @@ variable "location" {
   default     = "West Europe"
 }
 
+variable "random_suffix" {
+  description = "A random suffix to ensure unique resource names."
+  type        = string
+}
+
 variable "kubernetes_version" {
   description = "Kubernetes version to use"
   type        = string

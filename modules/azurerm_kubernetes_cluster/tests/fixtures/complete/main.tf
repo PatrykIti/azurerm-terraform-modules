@@ -66,7 +66,9 @@ module "kubernetes_cluster" {
     dns_prefix = "akscomplete${var.random_suffix}"
   }
 
-  kubernetes_version = "1.28.5"
+  kubernetes_config = {
+    kubernetes_version = "1.28.5"
+  }
 
   # Identity configuration
   identity = {
@@ -81,19 +83,19 @@ module "kubernetes_cluster" {
     vnet_subnet_id = azurerm_subnet.test.id
   }
 
-  # Enable private cluster
-  private_cluster_enabled = true
-  private_dns_zone_id     = azurerm_private_dns_zone.test.id
+  # Private cluster configuration
+  private_cluster_config = {
+    private_cluster_enabled = true
+    private_dns_zone_id     = azurerm_private_dns_zone.test.id
+  }
 
   # Enable addons
-  addon_profiles = {
-    azure_policy = {
-      enabled = true
-    }
-    oms_agent = {
-      enabled                    = true
-      log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
-    }
+  oms_agent = {
+    log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
+  }
+  
+  features = {
+    azure_policy_enabled = true
   }
 
   # Restrict API server access
