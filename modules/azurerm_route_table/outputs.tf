@@ -21,8 +21,8 @@ output "resource_group_name" {
 
 # Route Configuration
 output "routes" {
-  description = "The routes within the Route Table"
-  value       = azurerm_route_table.route_table.route
+  description = "Map of routes within the Route Table, keyed by route name."
+  value       = azurerm_route.routes
 }
 
 output "bgp_route_propagation_enabled" {
