@@ -59,13 +59,13 @@ EOF
 
 # List of tests to run
 tests=(
-    #"TestBasicStorageAccount"
-    #"TestCompleteStorageAccount"
-    #"TestStorageAccountSecurity"
-    #"TestStorageAccountNetworkRules"
-    #"TestStorageAccountPrivateEndpoint"
+    "TestBasicStorageAccount"
+    "TestCompleteStorageAccount"
+    "TestStorageAccountSecurity"
+    "TestStorageAccountNetworkRules"
+    "TestStorageAccountPrivateEndpoint"
     "TestStorageAccountValidationRules"
-    #"BenchmarkStorageAccountCreation"
+    "BenchmarkStorageAccountCreation"
 )
 
 echo "Starting parallel test execution"
