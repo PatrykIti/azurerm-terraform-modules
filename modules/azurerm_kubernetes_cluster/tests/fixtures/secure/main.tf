@@ -34,7 +34,7 @@ module "kubernetes_cluster" {
   location            = azurerm_resource_group.test.location
   
   dns_config = {
-    dns_prefix = "akssecure${var.random_suffix}"
+    dns_prefix_private_cluster = "akssecure${var.random_suffix}"
   }
 
   default_node_pool = {

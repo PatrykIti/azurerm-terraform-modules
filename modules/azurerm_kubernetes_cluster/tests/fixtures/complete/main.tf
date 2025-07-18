@@ -63,7 +63,7 @@ module "kubernetes_cluster" {
   
   # DNS configuration
   dns_config = {
-    dns_prefix = "akscomplete${var.random_suffix}"
+    dns_prefix_private_cluster = "akscomplete${var.random_suffix}"
   }
 
   kubernetes_config = {

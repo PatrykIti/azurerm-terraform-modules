@@ -21,6 +21,9 @@ variables {
     vm_size    = "Standard_D2_v2"
     node_count = 1
   }
+  network_profile = {
+    network_plugin = "azure"
+  }
 }
 
 # Test default identity settings

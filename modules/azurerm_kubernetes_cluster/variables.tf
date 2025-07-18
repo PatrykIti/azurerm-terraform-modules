@@ -4,8 +4,8 @@ variable "name" {
   type        = string
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9-._]{0,61}[a-zA-Z0-9]$", var.name))
-    error_message = "The name must be between 1 and 63 characters long, start and end with a letter or number, and contain only letters, numbers, hyphens, underscores, and periods."
+    condition     = can(regex("^[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$", var.name))
+    error_message = "The name must be between 1 and 63 characters long, start and end with a letter or number, and contain only lowercase letters, numbers, and hyphens."
   }
 }
 
@@ -317,7 +317,7 @@ variable "network_profile" {
   EOT
 
   type = object({
-    network_plugin      = string
+    network_plugin      = optional(string, "azure")
     network_mode        = optional(string)
     network_policy      = optional(string)
     dns_service_ip      = optional(string)
@@ -363,7 +363,7 @@ variable "network_profile" {
   }
 
   validation {
-    condition     = var.network_profile.network_policy == null || contains(["calico", "azure", "cilium"], var.network_profile.network_policy)
+    condition     = var.network_profile == null || var.network_profile.network_policy == null || contains(["calico", "azure", "cilium"], var.network_profile.network_policy)
     error_message = "The network_policy must be one of: calico, azure, or cilium."
   }
 

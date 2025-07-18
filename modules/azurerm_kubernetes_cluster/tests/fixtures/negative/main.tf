@@ -12,7 +12,7 @@ module "kubernetes_cluster" {
 
   name                = var.cluster_name
   resource_group_name = azurerm_resource_group.test.name
-  location            = azurerm_resource_group.test.name
+  location            = azurerm_resource_group.test.location
 
   dns_config = {
     dns_prefix = "aksinvalid"
