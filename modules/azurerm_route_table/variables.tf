@@ -24,10 +24,10 @@ variable "location" {
 }
 
 # BGP Route Propagation
-variable "disable_bgp_route_propagation" {
-  description = "Disable routes learned by BGP on the Route Table. Defaults to false to allow BGP route propagation."
+variable "bgp_route_propagation_enabled" {
+  description = "Enable BGP route propagation on the Route Table. Defaults to true."
   type        = bool
-  default     = false
+  default     = true
 }
 
 # Custom Routes
