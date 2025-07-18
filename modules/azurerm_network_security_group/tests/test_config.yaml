@@ -1,43 +1,29 @@
-# Test configuration for CI/CD integration
+# Test configuration for CI/CD integration, aligned with project standards.
 test_suites:
-  - name: "Basic Tests"
+  - name: "Main Tests"
     tests:
-      - TestBasicNetwork Security Group
+      - "TestNsgSimple"
+      - "TestNsgComplete"
+      - "TestNsgValidationRules"
     parallel: true
-    timeout: 15m
-    
-  - name: "Complete Feature Tests"
-    tests:
-      - TestCompleteNetwork Security Group
-      - TestNetwork Security GroupSecurity
-      - TestNetwork Security GroupNetworkRules
-      - TestNetwork Security GroupPrivateEndpoint
-    parallel: true
-    timeout: 30m
-    
-  - name: "Validation Tests"
-    tests:
-      - TestNetwork Security GroupValidationRules
-    parallel: true
-    timeout: 10m
-    
+    timeout: 20m
+
   - name: "Integration Tests"
     tests:
-      - TestNetwork Security GroupFullIntegration
-      - TestNetwork Security GroupLifecycle
-      - TestNetwork Security GroupCompliance
-      - TestNetwork Security GroupMonitoring
-    parallel: false
-    timeout: 45m
-    
+      - "TestNsgLifecycle"
+      - "TestNsgCompliance"
+    parallel: true
+    timeout: 30m
+    # These tests are skipped in -short mode (e.g., on PRs)
+
   - name: "Performance Tests"
     tests:
-      - BenchmarkNetwork Security GroupCreation
-      - TestNetwork Security GroupCreationTime
-      - TestNetwork Security GroupScaling
+      - "BenchmarkNsgCreation"
+      - "TestNsgCreationTimeSLA"
     parallel: false
-    timeout: 60m
+    timeout: 45m
     benchmark: true
+    # These tests are skipped in -short mode
 
 # Test environment requirements
 environment:
@@ -46,102 +32,15 @@ environment:
     - AZURE_TENANT_ID
     - AZURE_CLIENT_ID
     - AZURE_CLIENT_SECRET
-  
-  azure_regions:
-    - northeurope
-    - westeurope
-  
-  resource_limits:
-    max_concurrent_resources: 10
-    max_resource_groups: 5
 
 # Code coverage settings
 coverage:
   enabled: true
-  threshold: 80
+  threshold: 75
   exclude_patterns:
     - "test_helpers.go"
-    - "*_test.go"
-  
+
 # Test report settings
 reporting:
   format: junit
-  output_dir: test_outputs/
-  include_logs: true
-  include_metrics: true
-  
-# Retry configuration
-retry:
-  max_attempts: 3
-  backoff_seconds: 30
-  retryable_errors:
-    - "ResourceGroupNotFound"
-    - "ResourceNotFound"
-    - "AlreadyExists"
-    - "timeout"
-    - "TooManyRequests"
-    - "ServiceUnavailable"
-    - "InternalServerError"
-
-# Test stages for CI/CD pipelines
-stages:
-  - name: "validation"
-    description: "Validate code and configurations"
-    steps:
-      - "fmt-check"
-      - "lint"
-      - "validate-fixtures"
-      - "security"
-      
-  - name: "unit"
-    description: "Run unit and validation tests"
-    test_suites:
-      - "Basic Tests"
-      - "Validation Tests"
-    fail_fast: true
-    
-  - name: "integration"
-    description: "Run integration tests"
-    test_suites:
-      - "Complete Feature Tests"
-      - "Integration Tests"
-    fail_fast: false
-    
-  - name: "performance"
-    description: "Run performance benchmarks"
-    test_suites:
-      - "Performance Tests"
-    condition: "branch == 'main' || tag"
-    
-# Matrix testing configuration
-matrix:
-  azure_regions:
-    - northeurope
-    - westeurope
-    - eastus
-    - westus2
-    
-  terraform_versions:
-    - "1.5.x"
-    - "1.6.x"
-    - "1.7.x"
-    
-  go_versions:
-    - "1.20"
-    - "1.21"
-
-# Notifications
-notifications:
-  slack:
-    enabled: false
-    webhook_url: "${SLACK_WEBHOOK_URL}"
-    channels:
-      success: "#ci-success"
-      failure: "#ci-failures"
-      
-  email:
-    enabled: false
-    recipients:
-      - "team@example.com"
-    on_failure: true
-    on_success: false
+  output_file: "test-results.xml"

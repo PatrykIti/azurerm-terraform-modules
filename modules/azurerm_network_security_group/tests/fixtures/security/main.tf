@@ -8,7 +8,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "network_security_group" {
-  source = "../../.."
+  source = "../../"
 
   name                = "networksecuritygroupexample003"
   resource_group_name = azurerm_resource_group.example.name
