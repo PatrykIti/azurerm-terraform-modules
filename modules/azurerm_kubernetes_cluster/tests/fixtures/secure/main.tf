@@ -32,7 +32,7 @@ module "kubernetes_cluster" {
   name                = "aks-secure-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
-  
+
   dns_config = {
     dns_prefix_private_cluster = "akssecure${var.random_suffix}"
   }

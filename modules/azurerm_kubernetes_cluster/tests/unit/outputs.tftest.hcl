@@ -3,9 +3,9 @@
 mock_provider "azurerm" {
   mock_resource "azurerm_kubernetes_cluster" {
     defaults = {
-      id      = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ContainerService/managedClusters/akstestcluster"
-      name    = "akstestcluster"
-      fqdn    = "akstestcluster-dns.westeurope.cloudapp.azure.com"
+      id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ContainerService/managedClusters/akstestcluster"
+      name = "akstestcluster"
+      fqdn = "akstestcluster-dns.westeurope.cloudapp.azure.com"
       identity = [{
         type         = "SystemAssigned"
         principal_id = "00000000-0000-0000-0000-000000000001"

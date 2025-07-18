@@ -46,13 +46,13 @@ resource "azurerm_network_security_rule" "security_rules" {
 resource "azurerm_network_watcher_flow_log" "flow_log" {
   count = var.flow_log_enabled ? 1 : 0
 
-  name                      = "${var.name}-flow-log"
-  network_watcher_name      = var.network_watcher_name
-  resource_group_name       = var.resource_group_name
-  target_resource_id        = azurerm_network_security_group.network_security_group.id
-  storage_account_id        = var.flow_log_storage_account_id
-  enabled                   = true
-  version                   = var.flow_log_version
+  name                 = "${var.name}-flow-log"
+  network_watcher_name = var.network_watcher_name
+  resource_group_name  = var.resource_group_name
+  target_resource_id   = azurerm_network_security_group.network_security_group.id
+  storage_account_id   = var.flow_log_storage_account_id
+  enabled              = true
+  version              = var.flow_log_version
 
   retention_policy {
     enabled = true

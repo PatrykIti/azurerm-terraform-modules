@@ -15,7 +15,7 @@ mock_provider "azurerm" {
       primary_location               = "northeurope"
     }
   }
-  
+
   mock_resource "azurerm_storage_container" {
     defaults = {
       id                      = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/testsa/blobServices/default/containers/testcontainer"
@@ -187,7 +187,7 @@ run "container_depends_on_storage_account" {
     condition     = length(azurerm_storage_container.storage_container) == 1
     error_message = "Container should be created successfully"
   }
-  
+
   # Verify container has correct name
   assert {
     condition     = azurerm_storage_container.storage_container["testcontainer"].name == "testcontainer"

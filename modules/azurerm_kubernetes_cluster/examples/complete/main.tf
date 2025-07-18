@@ -104,7 +104,7 @@ module "kubernetes_cluster" {
   name                = "aks-complete-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  
+
   # DNS configuration
   dns_config = {
     dns_prefix = "aks-complete-${random_string.suffix.result}"

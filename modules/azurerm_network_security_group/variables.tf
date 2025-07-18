@@ -134,7 +134,7 @@ variable "security_rules" {
     condition = alltrue([
       for rule in values(var.security_rules) :
       ((rule.source_address_prefix != null ? 1 : 0) +
-      (rule.source_address_prefixes != null ? 1 : 0) +
+        (rule.source_address_prefixes != null ? 1 : 0) +
       (rule.source_application_security_group_ids != null ? 1 : 0)) <= 1
     ])
     error_message = "In 'security_rules', a rule can only have one of 'source_address_prefix', 'source_address_prefixes', or 'source_application_security_group_ids' defined."
@@ -145,7 +145,7 @@ variable "security_rules" {
     condition = alltrue([
       for rule in values(var.security_rules) :
       ((rule.destination_address_prefix != null ? 1 : 0) +
-      (rule.destination_address_prefixes != null ? 1 : 0) +
+        (rule.destination_address_prefixes != null ? 1 : 0) +
       (rule.destination_application_security_group_ids != null ? 1 : 0)) <= 1
     ])
     error_message = "In 'security_rules', a rule can only have one of 'destination_address_prefix', 'destination_address_prefixes', or 'destination_application_security_group_ids' defined."

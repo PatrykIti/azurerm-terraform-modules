@@ -80,10 +80,10 @@ resource "azurerm_virtual_network" "devops" {
 
 # Subnet for DevOps private endpoint
 resource "azurerm_subnet" "devops_endpoint" {
-  name                                      = "snet-devops-endpoint-${random_string.suffix.result}"
-  resource_group_name                       = azurerm_resource_group.example.name
-  virtual_network_name                      = azurerm_virtual_network.devops.name
-  address_prefixes                          = ["10.1.1.0/24"]
+  name                              = "snet-devops-endpoint-${random_string.suffix.result}"
+  resource_group_name               = azurerm_resource_group.example.name
+  virtual_network_name              = azurerm_virtual_network.devops.name
+  address_prefixes                  = ["10.1.1.0/24"]
   private_endpoint_network_policies = "Disabled"
 }
 
@@ -97,10 +97,10 @@ resource "azurerm_virtual_network" "jumpbox" {
 
 # Subnet for Jumpbox private endpoint
 resource "azurerm_subnet" "jumpbox_endpoint" {
-  name                                      = "snet-jumpbox-endpoint-${random_string.suffix.result}"
-  resource_group_name                       = azurerm_resource_group.example.name
-  virtual_network_name                      = azurerm_virtual_network.jumpbox.name
-  address_prefixes                          = ["10.2.1.0/24"]
+  name                              = "snet-jumpbox-endpoint-${random_string.suffix.result}"
+  resource_group_name               = azurerm_resource_group.example.name
+  virtual_network_name              = azurerm_virtual_network.jumpbox.name
+  address_prefixes                  = ["10.2.1.0/24"]
   private_endpoint_network_policies = "Disabled"
 }
 

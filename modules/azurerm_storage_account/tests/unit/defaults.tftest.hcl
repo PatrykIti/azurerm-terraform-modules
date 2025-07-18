@@ -15,10 +15,10 @@ mock_provider "azurerm" {
       primary_location               = "northeurope"
     }
   }
-  
+
   mock_resource "azurerm_storage_container" {
     defaults = {
-      id                   = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/testsa/blobServices/default/containers/testcontainer"
+      id                      = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/testsa/blobServices/default/containers/testcontainer"
       has_immutability_policy = false
       has_legal_hold          = false
       resource_manager_id     = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/testsa/blobServices/default/containers/testcontainer"
@@ -65,7 +65,7 @@ run "verify_secure_defaults" {
     condition     = azurerm_storage_account.storage_account.infrastructure_encryption_enabled == true
     error_message = "Infrastructure encryption should be enabled by default"
   }
-  
+
   # Test public network access disabled by default
   assert {
     condition     = azurerm_storage_account.storage_account.public_network_access_enabled == false

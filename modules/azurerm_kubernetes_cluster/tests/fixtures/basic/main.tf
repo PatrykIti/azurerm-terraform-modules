@@ -45,7 +45,7 @@ module "kubernetes_cluster" {
   name                = "aks-basic-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
-  
+
   # DNS configuration
   dns_config = {
     dns_prefix = "aks-basic-${var.random_suffix}"

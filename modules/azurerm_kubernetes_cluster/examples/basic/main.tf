@@ -60,7 +60,7 @@ module "kubernetes_cluster" {
   name                = "aks-basic-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  
+
   # DNS configuration
   dns_config = {
     dns_prefix = "aks-basic-${random_string.suffix.result}"
@@ -90,8 +90,8 @@ module "kubernetes_cluster" {
   network_profile = {
     network_plugin = "azure"
     network_policy = "azure"
-    service_cidr   = "172.16.0.0/16"  # Non-overlapping with VNet CIDR
-    dns_service_ip = "172.16.0.10"    # Must be within service_cidr
+    service_cidr   = "172.16.0.0/16" # Non-overlapping with VNet CIDR
+    dns_service_ip = "172.16.0.10"   # Must be within service_cidr
   }
 
 

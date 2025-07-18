@@ -15,10 +15,10 @@ mock_provider "azurerm" {
       primary_location               = "northeurope"
     }
   }
-  
+
   mock_resource "azurerm_storage_container" {
     defaults = {
-      id                   = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/testsa/blobServices/default/containers/testcontainer"
+      id                      = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/testsa/blobServices/default/containers/testcontainer"
       has_immutability_policy = false
       has_legal_hold          = false
       resource_manager_id     = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/testsa/blobServices/default/containers/testcontainer"
@@ -36,7 +36,7 @@ run "invalid_storage_account_name_too_short" {
   command = plan
 
   variables {
-    name = "ab"  # Too short (minimum is 3)
+    name = "ab" # Too short (minimum is 3)
   }
 
   expect_failures = [
@@ -49,7 +49,7 @@ run "invalid_storage_account_name_too_long" {
   command = plan
 
   variables {
-    name = "thisstorageaccountnameistoolong123"  # Too long (maximum is 24)
+    name = "thisstorageaccountnameistoolong123" # Too long (maximum is 24)
   }
 
   expect_failures = [
@@ -62,7 +62,7 @@ run "invalid_storage_account_name_special_chars" {
   command = plan
 
   variables {
-    name = "test-storage-account"  # Contains hyphens
+    name = "test-storage-account" # Contains hyphens
   }
 
   expect_failures = [
@@ -75,7 +75,7 @@ run "invalid_storage_account_name_uppercase" {
   command = plan
 
   variables {
-    name = "TestStorageAccount"  # Contains uppercase letters
+    name = "TestStorageAccount" # Contains uppercase letters
   }
 
   expect_failures = [
@@ -88,7 +88,7 @@ run "invalid_storage_account_name_spaces" {
   command = plan
 
   variables {
-    name = "test storage"  # Contains spaces
+    name = "test storage" # Contains spaces
   }
 
   expect_failures = [
@@ -102,7 +102,7 @@ run "invalid_account_tier" {
 
   variables {
     name         = "validstorageaccount"
-    account_tier = "Basic"  # Invalid tier
+    account_tier = "Basic" # Invalid tier
   }
 
   expect_failures = [
@@ -116,7 +116,7 @@ run "invalid_replication_type" {
 
   variables {
     name                     = "validstorageaccount"
-    account_replication_type = "INVALID"  # Invalid replication type
+    account_replication_type = "INVALID" # Invalid replication type
   }
 
   expect_failures = [
@@ -130,7 +130,7 @@ run "invalid_account_kind" {
 
   variables {
     name         = "validstorageaccount"
-    account_kind = "InvalidKind"  # Invalid account kind
+    account_kind = "InvalidKind" # Invalid account kind
   }
 
   expect_failures = [
@@ -144,7 +144,7 @@ run "invalid_access_tier" {
 
   variables {
     name        = "validstorageaccount"
-    access_tier = "Warm"  # Invalid access tier
+    access_tier = "Warm" # Invalid access tier
   }
 
   expect_failures = [
@@ -159,7 +159,7 @@ run "invalid_tls_version" {
   variables {
     name = "validstorageaccount"
     security_settings = {
-      min_tls_version = "TLS1_3"  # Invalid TLS version
+      min_tls_version = "TLS1_3" # Invalid TLS version
     }
   }
 
@@ -175,7 +175,7 @@ run "invalid_network_rules_default_action" {
   variables {
     name = "validstorageaccount"
     network_rules = {
-      default_action = "Block"  # Should be "Allow" or "Deny"
+      default_action = "Block" # Should be "Allow" or "Deny"
     }
   }
 
@@ -193,7 +193,7 @@ run "invalid_container_access_type" {
     containers = [
       {
         name                  = "testcontainer"
-        container_access_type = "public"  # Should be "private", "blob", or "container"
+        container_access_type = "public" # Should be "private", "blob", or "container"
       }
     ]
   }
@@ -210,7 +210,7 @@ run "invalid_identity_type" {
   variables {
     name = "validstorageaccount"
     identity = {
-      type = "Invalid"  # Should be "SystemAssigned", "UserAssigned", or "SystemAssigned, UserAssigned"
+      type = "Invalid" # Should be "SystemAssigned", "UserAssigned", or "SystemAssigned, UserAssigned"
     }
   }
 

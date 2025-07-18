@@ -89,7 +89,7 @@ module "kubernetes_cluster" {
   name                = "aks-secure-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  
+
   # DNS configuration
   dns_config = {
     dns_prefix = "aks-secure-${random_string.suffix.result}"
@@ -97,7 +97,7 @@ module "kubernetes_cluster" {
 
   # Kubernetes configuration
   kubernetes_config = {
-    kubernetes_version        = "1.30.12"  # Updated to a supported version
+    kubernetes_version        = "1.30.12" # Updated to a supported version
     automatic_upgrade_channel = "stable"
     node_os_upgrade_channel   = "NodeImage"
   }
@@ -126,23 +126,23 @@ module "kubernetes_cluster" {
     max_count            = 5
     node_count           = 2
     vnet_subnet_id       = azurerm_subnet.nodes.id
-    
+
     # Security hardening
-    os_disk_type                 = "Managed"  # Changed from Ephemeral due to VM size constraints
+    os_disk_type                 = "Managed" # Changed from Ephemeral due to VM size constraints
     os_sku                       = "AzureLinux"
-    host_encryption_enabled      = false  # Enable if supported by subscription
+    host_encryption_enabled      = false # Enable if supported by subscription
     node_public_ip_enabled       = false
     only_critical_addons_enabled = true
-    fips_enabled                 = false  # Enable for FIPS compliance
-    
+    fips_enabled                 = false # Enable for FIPS compliance
+
     # Availability zones for resilience
-    zones = ["1"]  # Only zone 1 is supported in West Europe for this configuration
-    
+    zones = ["1"] # Only zone 1 is supported in West Europe for this configuration
+
     node_labels = {
       "nodepool-type" = "system"
       "environment"   = "secure"
     }
-    
+
     upgrade_settings = {
       max_surge = "33%"
     }
@@ -150,13 +150,13 @@ module "kubernetes_cluster" {
 
   # Network configuration
   network_profile = {
-    network_plugin      = "azure"
-    network_policy      = "azure"
-    load_balancer_sku   = "standard"
-    service_cidr        = "172.16.0.0/16"
-    dns_service_ip      = "172.16.0.10"
-    outbound_type       = "loadBalancer"
-    
+    network_plugin    = "azure"
+    network_policy    = "azure"
+    load_balancer_sku = "standard"
+    service_cidr      = "172.16.0.0/16"
+    dns_service_ip    = "172.16.0.10"
+    outbound_type     = "loadBalancer"
+
     load_balancer_profile = {
       managed_outbound_ip_count = 1
       idle_timeout_in_minutes   = 4
@@ -171,8 +171,8 @@ module "kubernetes_cluster" {
     oidc_issuer_enabled              = true
     open_service_mesh_enabled        = false
     image_cleaner_enabled            = true
-    run_command_enabled              = false  # Disable for security
-    local_account_disabled           = true   # Disable local accounts
+    run_command_enabled              = false # Disable for security
+    local_account_disabled           = true  # Disable local accounts
     cost_analysis_enabled            = true
   }
 
@@ -181,19 +181,19 @@ module "kubernetes_cluster" {
 
   # Private cluster configuration
   private_cluster_config = {
-    private_cluster_enabled             = false  # Set to true for private cluster
+    private_cluster_enabled             = false # Set to true for private cluster
     private_cluster_public_fqdn_enabled = false
   }
 
   # API Server Access Profile - Restrict access
   api_server_access_profile = {
-    authorized_ip_ranges = ["0.0.0.0/0"]  # Replace with your IP ranges
+    authorized_ip_ranges = ["0.0.0.0/0"] # Replace with your IP ranges
   }
 
   # Azure AD RBAC configuration
   azure_active_directory_role_based_access_control = {
     azure_rbac_enabled = true
-    tenant_id = "b8e7b798-6929-432e-b94b-8a117708f2c5"  # Using the provided tenant ID
+    tenant_id          = "b8e7b798-6929-432e-b94b-8a117708f2c5" # Using the provided tenant ID
   }
 
   # Enable monitoring
@@ -237,7 +237,7 @@ module "kubernetes_cluster" {
   diagnostic_settings = {
     name                       = "diag-aks-secure-${random_string.suffix.result}"
     log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    
+
     enabled_log_categories = [
       "kube-apiserver",
       "kube-audit",

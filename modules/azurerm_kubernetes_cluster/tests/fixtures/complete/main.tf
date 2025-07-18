@@ -60,7 +60,7 @@ module "kubernetes_cluster" {
   name                = "aks-complete-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
-  
+
   # DNS configuration
   dns_config = {
     dns_prefix_private_cluster = "akscomplete${var.random_suffix}"
@@ -93,7 +93,7 @@ module "kubernetes_cluster" {
   oms_agent = {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
   }
-  
+
   features = {
     azure_policy_enabled = true
   }
