@@ -1,12 +1,27 @@
+# Basic AKS Cluster Example
+# This example creates a minimal AKS cluster with secure defaults
+
+terraform {
+  required_version = ">= 1.3.0"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">=3.0"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
 }
 
+# Create a resource group
 resource "azurerm_resource_group" "test" {
   name     = "rg-aks-basic-${var.random_suffix}"
   location = var.location
 }
 
+# Create a virtual network for the cluster
 resource "azurerm_virtual_network" "test" {
   name                = "vnet-aks-basic-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
@@ -14,6 +29,7 @@ resource "azurerm_virtual_network" "test" {
   address_space       = ["10.0.0.0/16"]
 }
 
+# Create a subnet for the AKS nodes
 resource "azurerm_subnet" "test" {
   name                 = "snet-aks-nodes-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.test.name
@@ -21,21 +37,26 @@ resource "azurerm_subnet" "test" {
   address_prefixes     = ["10.0.1.0/24"]
 }
 
+# Create the AKS cluster
 module "kubernetes_cluster" {
   source = "../../.."
 
+  # Basic cluster configuration
   name                = "aks-basic-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
   
+  # DNS configuration
   dns_config = {
     dns_prefix = "aks-basic-${var.random_suffix}"
   }
 
+  # Use system-assigned managed identity (secure default)
   identity = {
     type = "SystemAssigned"
   }
 
+  # Default node pool with minimal configuration
   default_node_pool = {
     name           = "default"
     vm_size        = "Standard_D2s_v3"
@@ -43,8 +64,10 @@ module "kubernetes_cluster" {
     vnet_subnet_id = azurerm_subnet.test.id
   }
 
+  # Basic network profile
   network_profile = {
     network_plugin = "azure"
+    network_policy = "azure"
     service_cidr   = "172.16.0.0/16"
     dns_service_ip = "172.16.0.10"
   }
