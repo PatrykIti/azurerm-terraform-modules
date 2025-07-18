@@ -249,6 +249,15 @@ Each of these jobs runs in parallel for each affected module:
 - Module-isolated execution
 ```
 
+#### `unit-tests` - Unit Tests - ${{ matrix.module }}
+```yaml
+- Runs after terraform-validate for the specific module
+- Checks for the existence of a `tests/unit` directory
+- If found, runs `terraform test` to execute native HCL unit tests
+- Skips gracefully if no unit tests are found
+- Does not block other jobs on failure
+```
+
 #### `tflint` - Linting - ${{ matrix.module }}
 ```yaml
 - Runs TFLint on specific module
