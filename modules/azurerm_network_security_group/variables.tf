@@ -113,6 +113,43 @@ variable "security_rules" {
     ])
     error_message = "Security rule priority must be between 100 and 4096."
   }
+
+  # Port validation: singular vs plural
+  validation {
+    condition = alltrue([
+      for rule in values(var.security_rules) : (rule.source_port_range == null || rule.source_port_ranges == null)
+    ])
+    error_message = "In 'security_rules', a rule can have 'source_port_range' or 'source_port_ranges', but not both."
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in values(var.security_rules) : (rule.destination_port_range == null || rule.destination_port_ranges == null)
+    ])
+    error_message = "In 'security_rules', a rule can have 'destination_port_range' or 'destination_port_ranges', but not both."
+  }
+
+  # Source address validation: prefix vs prefixes vs ASG IDs
+  validation {
+    condition = alltrue([
+      for rule in values(var.security_rules) :
+      ((rule.source_address_prefix != null ? 1 : 0) +
+      (rule.source_address_prefixes != null ? 1 : 0) +
+      (rule.source_application_security_group_ids != null ? 1 : 0)) <= 1
+    ])
+    error_message = "In 'security_rules', a rule can only have one of 'source_address_prefix', 'source_address_prefixes', or 'source_application_security_group_ids' defined."
+  }
+
+  # Destination address validation: prefix vs prefixes vs ASG IDs
+  validation {
+    condition = alltrue([
+      for rule in values(var.security_rules) :
+      ((rule.destination_address_prefix != null ? 1 : 0) +
+      (rule.destination_address_prefixes != null ? 1 : 0) +
+      (rule.destination_application_security_group_ids != null ? 1 : 0)) <= 1
+    ])
+    error_message = "In 'security_rules', a rule can only have one of 'destination_address_prefix', 'destination_address_prefixes', or 'destination_application_security_group_ids' defined."
+  }
 }
 
 # Flow Log Configuration
