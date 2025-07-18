@@ -10,7 +10,7 @@ resource "azurerm_resource_group" "test" {
 module "kubernetes_cluster" {
   source = "../../.."
 
-  name                = "AKS-Invalid-Name" # Invalid name with uppercase letters and hyphens
+  name                = var.cluster_name
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
   dns_prefix          = "aksinvalid"

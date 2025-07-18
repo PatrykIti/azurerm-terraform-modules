@@ -81,6 +81,7 @@ func TestCompleteKubernetesCluster(t *testing.T) {
 }
 
 // Test a security-hardened AKS cluster
+// Test a security-hardened AKS cluster
 func TestSecureKubernetesCluster(t *testing.T) {
 	t.Parallel()
 
@@ -118,12 +119,14 @@ func TestKubernetesClusterValidationRules(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		fixtureFolder string
+		vars          map[string]interface{}
 		expectedError string
 	}{
 		{
-			name:          "InvalidName",
-			fixtureFolder: "negative",
+			name: "InvalidName",
+			vars: map[string]interface{}{
+				"cluster_name": "AKS-Invalid-Name",
+			},
 			expectedError: "only lowercase alphanumeric characters and hyphens are allowed, and must start and end with a letter or number",
 		},
 	}
@@ -133,14 +136,12 @@ func TestKubernetesClusterValidationRules(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_kubernetes_cluster/tests/fixtures/"+tc.fixtureFolder)
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_kubernetes_cluster/tests/fixtures/negative")
 			
 			terraformOptions := &terraform.Options{
 				TerraformDir: testFolder,
-				Vars: map[string]interface{}{
-					"random_suffix": strings.ToLower(random.UniqueId()),
-				},
-				NoColor: true,
+				Vars:         tc.vars,
+				NoColor:      true,
 			}
 
 			_, err := terraform.InitAndPlanE(t, terraformOptions)
