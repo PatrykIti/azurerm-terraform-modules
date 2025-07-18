@@ -149,7 +149,7 @@ Contains: Comprehensive guide for Terraform module development including resourc
 
 Contains: A comprehensive, structured guide to testing Terraform modules. It covers the testing philosophy, directory organization, native unit tests, Terratest integration tests (including file structure, helper patterns, fixtures, and execution), advanced scenarios (lifecycle, compliance, performance), CI/CD integration, and a troubleshooting guide.
 
-### 11. [Terraform New Module Guide](docs/TERRAFORM_NEW_MODULE_GUIDE.md)
+### 11. [Terraform New Module Guide](docs/MODULE_GUIDE/README.md)
 **MANDATORY REVIEW** when:
 - Creating a new Terraform module from scratch
 - Planning module architecture and structure
