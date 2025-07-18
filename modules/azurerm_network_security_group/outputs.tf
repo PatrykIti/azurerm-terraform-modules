@@ -38,6 +38,7 @@ output "security_rules" {
     for rule_name, rule in azurerm_network_security_rule.security_rules :
     rule_name => {
       id                           = rule.id
+      name                         = rule.name
       priority                     = rule.priority
       direction                    = rule.direction
       access                       = rule.access
