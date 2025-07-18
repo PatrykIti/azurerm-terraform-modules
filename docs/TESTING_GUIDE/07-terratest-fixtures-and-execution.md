@@ -19,6 +19,8 @@ tests/
     ├── security/         # A configuration focused on security-hardened settings.
     ├── network/          # Scenarios for advanced networking (e.g., VNet integration, IP rules).
     ├── private_endpoint/ # A specific scenario for private endpoint integration.
+    ├── data_lake_gen2/   # Scenarios for Data Lake Gen2 features.
+    ├── identity_access/  # Tests for managed identity and CMK encryption.
     └── negative/         # Subdirectories for configurations that are expected to fail validation.
         ├── invalid_name_short/
         └── invalid_replication_type/

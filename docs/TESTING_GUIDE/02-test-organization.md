@@ -16,6 +16,8 @@ tests/
 │   ├── security/                # Security-focused configuration
 │   ├── network/                 # Network scenarios
 │   ├── private_endpoint/        # Tests using Private Endpoint
+│   ├── data_lake_gen2/          # Scenarios for Data Lake Gen2 features
+│   ├── identity_access/         # Tests for managed identity and CMK encryption
 │   └── negative/                # Scenarios intended to fail (e.g., invalid names)
 │       ├── invalid_name_chars/
 │       └── ...
