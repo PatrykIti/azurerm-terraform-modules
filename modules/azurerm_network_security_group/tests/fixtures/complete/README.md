@@ -1,33 +1,7 @@
 # Complete Network Security Group Example
 
-This example demonstrates a comprehensive deployment of Network Security Group with all available features and configurations.
+This example demonstrates a comprehensive deployment of the Network Security Group module with all features enabled.
 
-## Features
-
-- Full network_security_group configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
-
-## Key Configuration
-
-This comprehensive example showcases all available features of the network_security_group module, demonstrating enterprise-grade capabilities suitable for production environments.
-
-## Usage
-
-```bash
-terraform init
-terraform plan
-terraform apply
-```
-
-## Cleanup
-
-```bash
-terraform destroy
-```
-
-<!-- BEGIN_TF_DOCS -->
-<!-- END_TF_DOCS -->
+- Creates a resource group, storage account, log analytics workspace, and network watcher.
+- Creates an NSG with custom security rules.
+- Enables NSG Flow Logs and Traffic Analytics.

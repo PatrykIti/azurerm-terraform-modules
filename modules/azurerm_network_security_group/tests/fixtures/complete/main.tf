@@ -2,16 +2,6 @@ provider "azurerm" {
   features {}
 }
 
-variable "random_suffix" {
-  type        = string
-  description = "A random suffix passed from the test to ensure unique resource names."
-}
-
-variable "location" {
-  type        = string
-  description = "The Azure region for the resources."
-}
-
 resource "azurerm_resource_group" "test" {
   name     = "rg-nsg-cmp-${var.random_suffix}"
   location = var.location
@@ -71,37 +61,17 @@ module "network_security_group" {
     }
   }
 
-  flow_log_enabled          = true
-  network_watcher_name      = azurerm_network_watcher.test.name
+  flow_log_enabled            = true
+  network_watcher_name        = azurerm_network_watcher.test.name
   flow_log_storage_account_id = azurerm_storage_account.test.id
 
-  traffic_analytics_enabled            = true
-  traffic_analytics_workspace_id       = azurerm_log_analytics_workspace.test.workspace_id
-  traffic_analytics_workspace_region   = azurerm_log_analytics_workspace.test.location
+  traffic_analytics_enabled             = true
+  traffic_analytics_workspace_id        = azurerm_log_analytics_workspace.test.workspace_id
+  traffic_analytics_workspace_region    = azurerm_log_analytics_workspace.test.location
   traffic_analytics_interval_in_minutes = 10
 
   tags = {
     Environment = "Test"
     Scenario    = "Complete"
   }
-}
-
-output "id" {
-  description = "The ID of the created Network Security Group."
-  value       = module.network_security_group.id
-}
-
-output "name" {
-  description = "The name of the created Network Security Group."
-  value       = module.network_security_group.name
-}
-
-output "resource_group_name" {
-  description = "The name of the resource group."
-  value       = azurerm_resource_group.test.name
-}
-
-output "flow_log_id" {
-  description = "The ID of the NSG Flow Log."
-  value       = module.network_security_group.flow_log_id
 }
