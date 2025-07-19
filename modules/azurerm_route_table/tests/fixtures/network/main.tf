@@ -10,7 +10,7 @@ resource "azurerm_resource_group" "test" {
 
 # Test with network rules
 module "route_table" {
-  source = "../../../"
+  source = "../../.."
 
   name                = "routetablenetworktest"
   resource_group_name = azurerm_resource_group.test.name
