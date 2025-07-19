@@ -25,76 +25,30 @@ type TestConfig struct {
 	UniqueID         string
 }
 
-// GetTestConfig returns a test configuration with required Azure credentials
-func GetTestConfig(t *testing.T) *TestConfig {
-	subscriptionID := os.Getenv("ARM_SUBSCRIPTION_ID")
-	require.NotEmpty(t, subscriptionID, "ARM_SUBSCRIPTION_ID environment variable must be set")
+// getTerraformOptions creates a standard terraform.Options object
+func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
+	randomSuffix := strings.ToLower(random.UniqueId())
 
-	tenantID := os.Getenv("ARM_TENANT_ID")
-	require.NotEmpty(t, tenantID, "ARM_TENANT_ID environment variable must be set")
-
-	clientID := os.Getenv("ARM_CLIENT_ID")
-	require.NotEmpty(t, clientID, "ARM_CLIENT_ID environment variable must be set")
-
-	clientSecret := os.Getenv("ARM_CLIENT_SECRET")
-	require.NotEmpty(t, clientSecret, "ARM_CLIENT_SECRET environment variable must be set")
-
-	location := os.Getenv("ARM_LOCATION")
-	if location == "" {
-		location = "West Europe"
-	}
-
-	uniqueID := strings.ToLower(random.UniqueId())
-
-	return &TestConfig{
-		SubscriptionID: subscriptionID,
-		TenantID:      tenantID,
-		ClientID:      clientID,
-		ClientSecret:  clientSecret,
-		Location:      location,
-		ResourceGroup: fmt.Sprintf("rg-test-route_table-%s", uniqueID),
-		UniqueID:      uniqueID,
+	return &terraform.Options{
+		TerraformDir: terraformDir,
+		Vars: map[string]interface{}{
+			"random_suffix": randomSuffix,
+			"location":      "northeurope",
+		},
+		NoColor: true,
+		RetryableTerraformErrors: map[string]string{
+			".*ResourceGroupNotFound.*":      "Resource group not found, retrying.",
+			".*Another operation is in progress.*": "Another operation is in progress, retrying.",
+			".*timeout.*":                    "Timeout error, retrying.",
+		},
+		MaxRetries:         3,
+		TimeBetweenRetries: 10 * time.Second,
 	}
 }
 
-// GetAzureCredential returns Azure credentials for SDK calls
-func GetAzureCredential(t *testing.T) azcore.TokenCredential {
-	cred, err := azidentity.NewDefaultAzureCredential(nil)
-	require.NoError(t, err, "Failed to create Azure credential")
-	return cred
-}
-
-// WaitForResourceDeletion waits for a resource to be deleted
-func WaitForResourceDeletion(ctx context.Context, checkFunc func() (bool, error), timeout time.Duration) error {
-	ticker := time.NewTicker(30 * time.Second)
-	defer ticker.Stop()
-
-	timeoutCh := time.After(timeout)
-
-	for {
-		select {
-		case <-timeoutCh:
-			return fmt.Errorf("timeout waiting for resource deletion")
-		case <-ticker.C:
-			exists, err := checkFunc()
-			if err != nil {
-				return fmt.Errorf("error checking resource existence: %w", err)
-			}
-			if !exists {
-				return nil
-			}
-		}
-	}
-}
-
-// GenerateResourceName generates a unique resource name for testing
-func GenerateResourceName(prefix string, uniqueID string) string {
-	// Ensure the name meets Azure naming requirements
-	name := fmt.Sprintf("%s%s", prefix, uniqueID)
-	// Remove any invalid characters and ensure length limits
-	name = strings.ReplaceAll(name, "-", "")
-	if len(name) > 24 {
-		name = name[:24]
-	}
-	return strings.ToLower(name)
+// getRequiredEnvVar gets a required environment variable or fails the test
+func getRequiredEnvVar(t *testing.T, envVarName string) string {
+	value := os.Getenv(envVarName)
+	require.NotEmpty(t, value, fmt.Sprintf("Required environment variable '%s' is not set.", envVarName))
+	return value
 }
