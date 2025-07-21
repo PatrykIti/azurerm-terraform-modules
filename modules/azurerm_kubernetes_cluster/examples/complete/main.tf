@@ -8,10 +8,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.36.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.0"
-    }
   }
 }
 
@@ -23,22 +19,16 @@ provider "azurerm" {
   }
 }
 
-# Generate random suffix for unique naming
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
 
 # Create a resource group
 resource "azurerm_resource_group" "example" {
-  name     = "rg-aks-complete-${random_string.suffix.result}"
+  name     = var.resource_group_name
   location = var.location
 }
 
 # Create Log Analytics Workspace for monitoring
 resource "azurerm_log_analytics_workspace" "example" {
-  name                = "law-aks-complete-${random_string.suffix.result}"
+  name                = var.log_analytics_workspace_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
@@ -47,7 +37,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # Create virtual network
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-aks-complete"
+  name                = var.virtual_network_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   address_space       = ["10.0.0.0/16"]
@@ -55,7 +45,7 @@ resource "azurerm_virtual_network" "example" {
 
 # Create subnet for AKS nodes
 resource "azurerm_subnet" "nodes" {
-  name                 = "snet-aks-nodes"
+  name                 = var.nodes_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -63,7 +53,7 @@ resource "azurerm_subnet" "nodes" {
 
 # Create subnet for pods (if using Azure CNI with custom pod subnet)
 resource "azurerm_subnet" "pods" {
-  name                 = "snet-aks-pods"
+  name                 = var.pods_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.4.0/22"]
@@ -78,7 +68,7 @@ resource "azurerm_subnet" "pods" {
 
 # Create Network Security Group for nodes
 resource "azurerm_network_security_group" "example" {
-  name                = "nsg-aks-nodes-${random_string.suffix.result}"
+  name                = var.nsg_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
@@ -91,7 +81,7 @@ resource "azurerm_subnet_network_security_group_association" "nodes" {
 
 # Create User Assigned Identity for the cluster
 resource "azurerm_user_assigned_identity" "example" {
-  name                = "uai-aks-complete-${random_string.suffix.result}"
+  name                = var.user_assigned_identity_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
@@ -101,13 +91,13 @@ module "kubernetes_cluster" {
   source = "../../"
 
   # Core configuration
-  name                = "aks-complete-${random_string.suffix.result}"
+  name                = var.aks_cluster_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
   # DNS configuration
   dns_config = {
-    dns_prefix = "aks-complete-${random_string.suffix.result}"
+    dns_prefix = var.dns_prefix
   }
 
   # Kubernetes configuration
@@ -124,7 +114,7 @@ module "kubernetes_cluster" {
   }
 
   # Node resource group
-  node_resource_group = "rg-aks-nodes-${random_string.suffix.result}"
+  node_resource_group = var.node_resource_group_name
 
   # Identity configuration
   identity = {

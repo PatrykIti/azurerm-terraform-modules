@@ -17,13 +17,13 @@ provider "azurerm" {
 
 # Create a resource group
 resource "azurerm_resource_group" "test" {
-  name     = "rg-aks-complete-${var.random_suffix}"
+  name     = "rg-dpc-cmp-${var.random_suffix}"
   location = var.location
 }
 
 # Create Log Analytics Workspace for monitoring
 resource "azurerm_log_analytics_workspace" "test" {
-  name                = "law-aks-complete-${var.random_suffix}"
+  name                = "law-dpc-cmp-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
   sku                 = "PerGB2018"
@@ -32,7 +32,7 @@ resource "azurerm_log_analytics_workspace" "test" {
 
 # Create virtual network
 resource "azurerm_virtual_network" "test" {
-  name                = "vnet-aks-complete-${var.random_suffix}"
+  name                = "vnet-dpc-cmp-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
   address_space       = ["10.0.0.0/16"]
@@ -40,7 +40,7 @@ resource "azurerm_virtual_network" "test" {
 
 # Create subnet for AKS nodes
 resource "azurerm_subnet" "test" {
-  name                 = "snet-aks-nodes-${var.random_suffix}"
+  name                 = "snet-dpc-cmp-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.test.name
   virtual_network_name = azurerm_virtual_network.test.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -57,13 +57,13 @@ module "kubernetes_cluster" {
   source = "../../.."
 
   # Core configuration
-  name                = "aks-complete-${var.random_suffix}"
+  name                = "aks-dpc-cmp-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
 
   # DNS configuration
   dns_config = {
-    dns_prefix_private_cluster = "akscomplete${var.random_suffix}"
+    dns_prefix_private_cluster = "aksdpccmp${var.random_suffix}"
   }
 
   kubernetes_config = {

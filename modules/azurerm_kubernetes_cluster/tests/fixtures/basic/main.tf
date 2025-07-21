@@ -17,13 +17,13 @@ provider "azurerm" {
 
 # Create a resource group
 resource "azurerm_resource_group" "test" {
-  name     = "rg-aks-basic-${var.random_suffix}"
+  name     = "rg-dpc-bas-${var.random_suffix}"
   location = var.location
 }
 
 # Create a virtual network for the cluster
 resource "azurerm_virtual_network" "test" {
-  name                = "vnet-aks-basic-${var.random_suffix}"
+  name                = "vnet-dpc-bas-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
   address_space       = ["10.0.0.0/16"]
@@ -31,7 +31,7 @@ resource "azurerm_virtual_network" "test" {
 
 # Create a subnet for the AKS nodes
 resource "azurerm_subnet" "test" {
-  name                 = "snet-aks-nodes-${var.random_suffix}"
+  name                 = "snet-dpc-bas-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.test.name
   virtual_network_name = azurerm_virtual_network.test.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -42,13 +42,13 @@ module "kubernetes_cluster" {
   source = "../../.."
 
   # Basic cluster configuration
-  name                = "aks-basic-${var.random_suffix}"
+  name                = "aks-dpc-bas-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
 
   # DNS configuration
   dns_config = {
-    dns_prefix = "aks-basic-${var.random_suffix}"
+    dns_prefix = "aks-dpc-bas-${var.random_suffix}"
   }
 
   # Use system-assigned managed identity (secure default)

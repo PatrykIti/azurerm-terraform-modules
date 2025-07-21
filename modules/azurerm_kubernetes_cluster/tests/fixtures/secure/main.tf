@@ -3,19 +3,19 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "test" {
-  name     = "rg-aks-secure-${var.random_suffix}"
+  name     = "rg-dpc-sec-${var.random_suffix}"
   location = var.location
 }
 
 resource "azurerm_virtual_network" "test" {
-  name                = "vnet-aks-secure-${var.random_suffix}"
+  name                = "vnet-dpc-sec-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
   address_space       = ["10.0.0.0/16"]
 }
 
 resource "azurerm_subnet" "test" {
-  name                 = "snet-aks-nodes-${var.random_suffix}"
+  name                 = "snet-dpc-sec-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.test.name
   virtual_network_name = azurerm_virtual_network.test.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -29,12 +29,12 @@ resource "azurerm_private_dns_zone" "test" {
 module "kubernetes_cluster" {
   source = "../../.."
 
-  name                = "aks-secure-${var.random_suffix}"
+  name                = "aks-dpc-sec-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
 
   dns_config = {
-    dns_prefix_private_cluster = "akssecure${var.random_suffix}"
+    dns_prefix_private_cluster = "aksdpcsec${var.random_suffix}"
   }
 
   default_node_pool = {

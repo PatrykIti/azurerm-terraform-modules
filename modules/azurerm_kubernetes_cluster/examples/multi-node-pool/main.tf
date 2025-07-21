@@ -1,5 +1,5 @@
-# Basic AKS Cluster Example
-# This example creates a minimal AKS cluster with secure defaults
+# Multi Node Pool AKS Cluster Example
+# This example creates an AKS cluster with multiple node pools for cost-effective testing
 
 terraform {
   required_version = ">= 1.3.0"
@@ -41,7 +41,7 @@ resource "azurerm_subnet" "example" {
   address_prefixes     = ["10.0.1.0/24"]
 }
 
-# Create the AKS cluster
+# Create the AKS cluster with multiple node pools
 module "kubernetes_cluster" {
   source = "../../"
 
@@ -55,37 +55,78 @@ module "kubernetes_cluster" {
     dns_prefix = var.dns_prefix
   }
 
-  # Use system-assigned managed identity (secure default)
+  # Use system-assigned managed identity
   identity = {
     type         = "SystemAssigned"
     identity_ids = null
   }
 
-  # Default node pool with minimal configuration
+  # System node pool - minimal configuration for cost savings
   default_node_pool = {
-    name                 = "default"
+    name                 = "system"
     vm_size              = "Standard_D2s_v3"
     node_count           = 2
     auto_scaling_enabled = false
     vnet_subnet_id       = azurerm_subnet.example.id
     os_disk_type         = "Managed"
     os_sku               = "Ubuntu"
+    mode                 = "System"  # Explicitly set as system pool
     upgrade_settings = {
       max_surge = "33%"
     }
   }
 
+  # Additional node pools
+  node_pools = [
+    {
+      # User pool for general workloads
+      name                 = "userpool"
+      vm_size              = "Standard_D2s_v3"
+      node_count           = 1  # Minimal nodes for cost savings
+      auto_scaling_enabled = false
+      vnet_subnet_id       = azurerm_subnet.example.id
+      os_disk_type         = "Managed"
+      os_sku               = "Ubuntu"
+      mode                 = "User"
+      priority             = "Regular"  # No spot instances for reliability
+      node_labels = {
+        "workload-type" = "general"
+        "pool-type"     = "user"
+      }
+      node_taints = []  # No taints for general workloads
+    }
+  ]
+
   # Basic network profile
   network_profile = {
     network_plugin = "azure"
     network_policy = "azure"
-    service_cidr   = "172.16.0.0/16" # Non-overlapping with VNet CIDR
-    dns_service_ip = "172.16.0.10"   # Must be within service_cidr
+    service_cidr   = "172.16.0.0/16"
+    dns_service_ip = "172.16.0.10"
   }
 
+  # Keep costs low with minimal features
+  features = {
+    azure_policy_enabled             = false
+    http_application_routing_enabled = false
+    workload_identity_enabled        = false
+    oidc_issuer_enabled              = false
+    open_service_mesh_enabled        = false
+    image_cleaner_enabled            = false
+    run_command_enabled              = true
+    local_account_disabled           = false
+    cost_analysis_enabled            = false
+  }
+
+  # Free tier for cost savings
+  sku_config = {
+    sku_tier     = "Free"
+    support_plan = "KubernetesOfficial"
+  }
 
   tags = {
     Environment = "Development"
-    Example     = "Basic"
+    Example     = "MultiNodePool"
+    CostProfile = "Minimal"
   }
 }

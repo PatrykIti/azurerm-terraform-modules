@@ -7,13 +7,13 @@ variable "location" {
 variable "resource_group_name" {
   description = "The name of the resource group"
   type        = string
-  default     = "rg-aks-basic-example"
+  default     = "rg-aks-multi-pool-example"
 }
 
 variable "virtual_network_name" {
   description = "The name of the virtual network"
   type        = string
-  default     = "vnet-aks-basic-example"
+  default     = "vnet-aks-multi-pool-example"
 }
 
 variable "subnet_name" {
@@ -25,11 +25,11 @@ variable "subnet_name" {
 variable "cluster_name" {
   description = "The name of the AKS cluster"
   type        = string
-  default     = "aks-basic-example"
+  default     = "aks-multi-pool-example"
 }
 
 variable "dns_prefix" {
   description = "DNS prefix for the AKS cluster"
   type        = string
-  default     = "aks-basic-example"
+  default     = "aks-multi-pool-example"
 }
