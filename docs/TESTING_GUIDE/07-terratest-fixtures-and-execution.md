@@ -44,10 +44,42 @@ Each fixture directory must contain the following files:
     }
     ```
 
-2.  **Ensure Unique and Descriptive Resource Names**: To enable parallel testing and easy identification in Azure, all resources within a fixture must have unique names. The standard pattern is:
+2.  **Ensure Unique and Descriptive Resource Names**: To enable parallel testing and easy identification in Azure, all resources within a fixture must have unique names. Test fixtures MUST follow the established naming patterns from the `azurerm_storage_account` and `azurerm_virtual_network` modules, which set the standard for this repository.
+
+    ### Resource Naming Pattern for Test Fixtures
+    
+    The standard pattern for test fixtures differs from examples and uses project identifiers:
     -   **Resource Groups**: `rg-{project}-{scenario}-${var.random_suffix}`
-    -   **Main Module Resource**: `{prefix}{scenario}${var.random_suffix}`
+    -   **Main Module Resource**: `{prefix}{project}{scenario}${var.random_suffix}`
     -   **Other Resources**: `{type}-{project}-{scenario}-${var.random_suffix}`
+
+    ### Resource Prefix Standards
+    
+    | Resource Type | Prefix | Test Example |
+    |--------------|--------|--------------|
+    | Resource Group | `rg-` | `rg-dpc-smp-${var.random_suffix}` |
+    | Virtual Network | `vnet-` | `vnet-dpc-cmp-${var.random_suffix}` |
+    | Subnet | `snet-` or `subnet-` | `snet-web` or `subnet-storage` |
+    | Storage Account | `st` or custom | `dpcsmp${var.random_suffix}` (no hyphens) |
+    | Network Security Group | `nsg-` | `nsg-dpc-sec-${var.random_suffix}` |
+    | Log Analytics Workspace | `law-` | `law-dpc-cmp-${var.random_suffix}` |
+    | Route Table | `rt-` | `rt-dpc-net-web-${var.random_suffix}` |
+    | DDoS Protection Plan | `ddos-` | `ddos-dpc-sec-${var.random_suffix}` |
+    | Network Watcher | `nw-` | `nw-dpc-sec-${var.random_suffix}` |
+
+    ### Standard Abbreviations
+    
+    - `{project}` is a short identifier for the overall project (e.g., `dpc`).
+    - `{scenario}` is a short identifier for the fixture:
+      - `bas` - basic
+      - `smp` - simple  
+      - `cmp` - complete
+      - `sec` - security/secure
+      - `net` - network
+      - `pe` - private endpoint
+      - `adv` - advanced
+      - `dlg` - data lake gen2
+      - `id` - identity
 
     **Example (`fixtures/simple/main.tf`):**
     ```hcl
@@ -73,10 +105,12 @@ Each fixture directory must contain the following files:
       # ... other variables
     }
     ```
-    - `{project}` is a short identifier for the overall project (e.g., `dpc`).
-    - `{scenario}` is a short identifier for the fixture (e.g., `smp` for simple, `cmp` for complete, `sec` for security).
-    - `{prefix}` is a short, lowercase identifier for the resource type (e.g., `st` for storage account).
-    - `var.random_suffix` is a unique string passed from the Go test.
+
+    **Key Differences from Examples:**
+    - Test fixtures ALWAYS use `var.random_suffix` for uniqueness (never `random_string` resource)
+    - Test fixtures use abbreviated scenario names (e.g., `smp` vs `simple`)
+    - Test fixtures include project identifier (`dpc`) in resource names
+    - All test resources must support parallel execution
 
 3.  **Define Clear Outputs for Validation**: Each fixture must expose the key attributes of the created resources as outputs. The Go tests will read these outputs to get the names and IDs needed for validation with the Azure SDK.
     ```hcl

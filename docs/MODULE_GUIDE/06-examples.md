@@ -40,6 +40,73 @@ Each example is a self-contained Terraform configuration and MUST have the follo
 - **`outputs.tf`**: Outputs any useful information from the created resources.
 - **`README.md`**: A dedicated documentation file for the example.
 
+## Resource Naming Conventions for Examples
+
+All examples MUST follow the established resource naming patterns from the `azurerm_storage_account` and `azurerm_virtual_network` modules, which were the first modules created and set the standard for this repository.
+
+### Standard Naming Pattern
+
+Resources in examples should use the following naming pattern:
+- **Format**: `{prefix}-{resource-type}-{example-type}-example`
+- **No random suffixes in basic examples** (use fixed names for simplicity)
+- **Random suffixes only where needed** (complete/secure examples for uniqueness)
+
+### Resource Prefix Standards
+
+| Resource Type | Prefix | Example |
+|--------------|--------|---------|
+| Resource Group | `rg-` | `rg-storage-basic-example` |
+| Virtual Network | `vnet-` | `vnet-storage-complete-example` |
+| Subnet | `snet-` or `subnet-` | `snet-private-endpoints` |
+| Storage Account | `st` | `stexamplebasic001` (no hyphens) |
+| Network Security Group | `nsg-` | `nsg-storage-secure-example` |
+| Log Analytics Workspace | `law-` | `law-storage-example-${random_suffix}` |
+| Key Vault | `kv-` | `kv-storage-${random_suffix}` |
+| User Assigned Identity | `id-` | `id-storage-cmk-${random_suffix}` |
+| Route Table | `rt-` | `rt-network-basic-example` |
+| DDoS Protection Plan | `ddos-` | `ddos-vnet-secure-example` |
+| Network Watcher | `nw-` | `nw-vnet-example-${location}` |
+| Private Endpoint | `pe-` | `pe-storage-blob` |
+
+### Example-Specific Guidelines
+
+#### Basic Examples
+- Use **fixed names** with variables and defaults
+- Pattern: `{prefix}-{resource-type}-basic-example`
+- Example: `var.resource_group_name` with default `"rg-storage-basic-example"`
+
+#### Complete Examples
+- Use **fixed base names** with optional random suffixes for globally unique resources
+- Pattern: `{prefix}-{resource-type}-complete-example[-${random_suffix}]`
+- Example: `"rg-storage-complete-example"` (no suffix for RG)
+- Example: `"stcomplete${random_string.suffix.result}"` (suffix for storage account)
+
+#### Secure Examples
+- Similar to complete examples but emphasize security features
+- Pattern: `{prefix}-{resource-type}-secure-example[-${random_suffix}]`
+- Use random suffixes for resources requiring uniqueness
+
+### Random Suffix Implementation
+
+When random suffixes are needed:
+```hcl
+resource "random_string" "suffix" {
+  length  = 8
+  special = false
+  upper   = false
+}
+```
+
+### Important Notes
+
+1. **Storage Account Names**: Due to Azure limitations, storage account names cannot contain hyphens and must be lowercase. Use patterns like `stexamplebasic001` or `stcomplete${random_suffix}`.
+
+2. **Fixed vs Random Names**: Basic examples should prefer fixed names for simplicity. Complete and secure examples should use random suffixes where global uniqueness is required.
+
+3. **Special Azure Requirements**: Some resources have specific naming requirements (e.g., `AzureFirewallSubnet` must be named exactly as shown).
+
+4. **Test Fixtures**: Note that test fixtures (in `/tests/` directories) follow a different pattern described in the Testing Guide.
+
 ### Example `README.md` Template
 
 The `README.md` within each example directory is crucial for context.
