@@ -109,11 +109,11 @@ module "kubernetes_cluster" {
   # Secure default node pool
   default_node_pool = {
     name                 = "system"
-    vm_size              = "Standard_D4s_v3"
+    vm_size              = "Standard_D2s_v3"
     auto_scaling_enabled = true
-    min_count            = 2
-    max_count            = 5
-    node_count           = 2
+    min_count            = 1
+    max_count            = 3
+    node_count           = 1
     vnet_subnet_id       = azurerm_subnet.nodes.id
 
     # Security hardening
@@ -125,7 +125,7 @@ module "kubernetes_cluster" {
     fips_enabled                 = false # Enable for FIPS compliance
 
     # Availability zones for resilience
-    zones = ["1"] # Only zone 1 is supported in West Europe for this configuration
+    zones = ["2"] # Only zone 2 is supported in North Europe for this configuration
 
     node_labels = {
       "nodepool-type" = "system"

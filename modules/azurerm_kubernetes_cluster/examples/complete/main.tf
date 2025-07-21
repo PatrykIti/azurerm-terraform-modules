@@ -125,11 +125,11 @@ module "kubernetes_cluster" {
   # Comprehensive default node pool configuration
   default_node_pool = {
     name                 = "system"
-    vm_size              = "Standard_D4s_v3"
-    node_count           = 2
+    vm_size              = "Standard_B2s"
+    node_count           = 1
     auto_scaling_enabled = true
-    min_count            = 2
-    max_count            = 5
+    min_count            = 1
+    max_count            = 3
     vnet_subnet_id       = azurerm_subnet.nodes.id
 
     # VM configuration
