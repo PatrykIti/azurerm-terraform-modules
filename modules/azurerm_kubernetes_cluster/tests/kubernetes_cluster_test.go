@@ -1,11 +1,8 @@
 package test
 
 import (
-	"strings"
 	"testing"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice"
-	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
@@ -16,7 +13,7 @@ import (
 func TestBasicKubernetesCluster(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_kubernetes_cluster/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_cluster/tests/fixtures/basic")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -39,8 +36,8 @@ func TestBasicKubernetesCluster(t *testing.T) {
 		cluster := helper.GetKubernetesClusterProperties(t, resourceGroupName, clusterName)
 
 		assert.Equal(t, "Succeeded", string(*cluster.Properties.ProvisioningState))
-		assert.Equal(t, armcontainerservice.ManagedServiceIdentityTypeSystemAssigned, *cluster.Properties.Identity.Type)
-		assert.Equal(t, armcontainerservice.LoadBalancerSKUStandard, *cluster.Properties.NetworkProfile.LoadBalancerSKU)
+		assert.Equal(t, "SystemAssigned", *cluster.Identity.Type)
+		assert.Equal(t, "standard", string(*cluster.Properties.NetworkProfile.LoadBalancerSKU))
 		assert.Equal(t, int32(1), *(*cluster.Properties.AgentPoolProfiles[0]).Count)
 	})
 }
@@ -49,7 +46,7 @@ func TestBasicKubernetesCluster(t *testing.T) {
 func TestCompleteKubernetesCluster(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_kubernetes_cluster/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_cluster/tests/fixtures/complete")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -87,7 +84,7 @@ func TestCompleteKubernetesCluster(t *testing.T) {
 func TestSecureKubernetesCluster(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_kubernetes_cluster/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_cluster/tests/fixtures/secure")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -138,7 +135,7 @@ func TestKubernetesClusterValidationRules(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_kubernetes_cluster/tests/fixtures/negative")
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_cluster/tests/fixtures/negative")
 			
 			// Merge the random_suffix with the test case variables
 			vars := getTerraformOptions(t, testFolder).Vars

@@ -15,7 +15,7 @@ func TestKubernetesClusterLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_kubernetes_cluster/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_cluster/tests/fixtures/basic")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -50,7 +50,6 @@ func TestKubernetesClusterLifecycle(t *testing.T) {
 		assert.Equal(t, int32(2), *(*clusterAfterUpdate.Properties.AgentPoolProfiles[0]).Count)
 
 		// Run apply again to check for idempotency
-		exitCode := terraform.ApplyExitCode(t, terraformOptions)
-		assert.Equal(t, 0, exitCode)
+		terraform.Apply(t, terraformOptions)
 	})
 }
