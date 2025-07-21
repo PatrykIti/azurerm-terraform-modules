@@ -85,6 +85,7 @@ output "identity" {
     tenant_id    = azurerm_kubernetes_cluster.kubernetes_cluster.identity[0].tenant_id
     identity_ids = try(azurerm_kubernetes_cluster.kubernetes_cluster.identity[0].identity_ids, null)
   }, null)
+  sensitive = true
 }
 
 output "kubelet_identity" {
@@ -94,6 +95,7 @@ output "kubelet_identity" {
     object_id                 = azurerm_kubernetes_cluster.kubernetes_cluster.kubelet_identity[0].object_id
     user_assigned_identity_id = azurerm_kubernetes_cluster.kubernetes_cluster.kubelet_identity[0].user_assigned_identity_id
   }, null)
+  sensitive = true
 }
 
 # Service Principal (if used instead of managed identity)

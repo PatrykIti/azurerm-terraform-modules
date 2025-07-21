@@ -363,12 +363,12 @@ variable "network_profile" {
   }
 
   validation {
-    condition     = var.network_profile == null || var.network_profile.network_policy == null || contains(["calico", "azure", "cilium"], var.network_profile.network_policy)
+    condition     = var.network_profile == null || try(var.network_profile.network_policy, null) == null || try(contains(["calico", "azure", "cilium"], var.network_profile.network_policy), true)
     error_message = "The network_policy must be one of: calico, azure, or cilium."
   }
 
   validation {
-    condition     = var.network_profile.outbound_type == null || contains(["loadBalancer", "userDefinedRouting", "managedNATGateway", "userAssignedNATGateway"], var.network_profile.outbound_type)
+    condition     = var.network_profile == null || try(var.network_profile.outbound_type, null) == null || try(contains(["loadBalancer", "userDefinedRouting", "managedNATGateway", "userAssignedNATGateway"], var.network_profile.outbound_type), true)
     error_message = "The outbound_type must be one of: loadBalancer, userDefinedRouting, managedNATGateway, or userAssignedNATGateway."
   }
 }

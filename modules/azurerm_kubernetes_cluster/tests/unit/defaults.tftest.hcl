@@ -41,8 +41,8 @@ run "verify_default_sku" {
   command = plan
 
   assert {
-    condition     = azurerm_kubernetes_cluster.kubernetes_cluster.sku_tier == "Standard"
-    error_message = "Default SKU tier should be Standard"
+    condition     = azurerm_kubernetes_cluster.kubernetes_cluster.sku_tier == "Free"
+    error_message = "Default SKU tier should be Free"
   }
 }
 

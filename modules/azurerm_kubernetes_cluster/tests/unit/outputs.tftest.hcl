@@ -33,6 +33,16 @@ variables {
 run "verify_basic_outputs" {
   command = plan
 
+  override_resource {
+    target = azurerm_kubernetes_cluster.kubernetes_cluster
+    values = {
+      id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ContainerService/managedClusters/akstestcluster"
+      name = "akstestcluster"
+      fqdn = "akstestcluster-dns.westeurope.cloudapp.azure.com"
+    }
+    override_during = plan
+  }
+
   assert {
     condition     = output.id == "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ContainerService/managedClusters/akstestcluster"
     error_message = "ID output should be the full resource ID"
@@ -52,6 +62,18 @@ run "verify_basic_outputs" {
 # Test identity outputs
 run "verify_identity_outputs" {
   command = plan
+
+  override_resource {
+    target = azurerm_kubernetes_cluster.kubernetes_cluster
+    values = {
+      identity = {
+        type         = "SystemAssigned"
+        principal_id = "00000000-0000-0000-0000-000000000001"
+        tenant_id    = "00000000-0000-0000-0000-000000000002"
+      }
+    }
+    override_during = plan
+  }
 
   assert {
     condition     = output.identity.principal_id == "00000000-0000-0000-0000-000000000001"

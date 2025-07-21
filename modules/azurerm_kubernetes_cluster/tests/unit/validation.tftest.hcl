@@ -58,7 +58,7 @@ run "missing_dns_prefix" {
   }
 
   expect_failures = [
-    azurerm_kubernetes_cluster.kubernetes_cluster, # The precondition is on the resource
+    var.dns_config, # The validation is on the variable
   ]
 }
 
@@ -75,6 +75,6 @@ run "both_dns_prefixes_set" {
   }
 
   expect_failures = [
-    azurerm_kubernetes_cluster.kubernetes_cluster,
+    var.dns_config,
   ]
 }
