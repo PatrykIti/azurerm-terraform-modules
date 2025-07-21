@@ -5,10 +5,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.36.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.0"
-    }
   }
 }
 
@@ -20,21 +16,14 @@ provider "azurerm" {
   }
 }
 
-# Generate random suffix for unique naming
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
-
 resource "azurerm_resource_group" "example" {
-  name     = "rg-aks-private-endpoint-${random_string.suffix.result}"
+  name     = "rg-aks-private-endpoint-example"
   location = "West Europe"
 }
 
 # Create Log Analytics Workspace for monitoring
 resource "azurerm_log_analytics_workspace" "example" {
-  name                = "law-aks-private-endpoint-${random_string.suffix.result}"
+  name                = "law-aks-private-endpoint-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
@@ -43,7 +32,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # Virtual Network for AKS
 resource "azurerm_virtual_network" "aks" {
-  name                = "vnet-aks-private-endpoint-${random_string.suffix.result}"
+  name                = "vnet-aks-private-endpoint-example"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
@@ -51,7 +40,7 @@ resource "azurerm_virtual_network" "aks" {
 
 # Subnet for AKS nodes
 resource "azurerm_subnet" "aks_nodes" {
-  name                 = "snet-aks-nodes-${random_string.suffix.result}"
+  name                 = "snet-aks-nodes-example"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.aks.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -59,7 +48,7 @@ resource "azurerm_subnet" "aks_nodes" {
 
 # Create Network Security Group for nodes
 resource "azurerm_network_security_group" "example" {
-  name                = "nsg-aks-nodes-${random_string.suffix.result}"
+  name                = "nsg-aks-nodes-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
@@ -72,7 +61,7 @@ resource "azurerm_subnet_network_security_group_association" "nodes" {
 
 # Virtual Network for DevOps VNet
 resource "azurerm_virtual_network" "devops" {
-  name                = "vnet-devops-${random_string.suffix.result}"
+  name                = "vnet-devops-example"
   address_space       = ["10.1.0.0/16"]
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
@@ -80,7 +69,7 @@ resource "azurerm_virtual_network" "devops" {
 
 # Subnet for DevOps private endpoint
 resource "azurerm_subnet" "devops_endpoint" {
-  name                              = "snet-devops-endpoint-${random_string.suffix.result}"
+  name                              = "snet-devops-endpoint-example"
   resource_group_name               = azurerm_resource_group.example.name
   virtual_network_name              = azurerm_virtual_network.devops.name
   address_prefixes                  = ["10.1.1.0/24"]
@@ -89,7 +78,7 @@ resource "azurerm_subnet" "devops_endpoint" {
 
 # Virtual Network for Jumpbox VNet
 resource "azurerm_virtual_network" "jumpbox" {
-  name                = "vnet-jumpbox-${random_string.suffix.result}"
+  name                = "vnet-jumpbox-example"
   address_space       = ["10.2.0.0/16"]
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
@@ -97,7 +86,7 @@ resource "azurerm_virtual_network" "jumpbox" {
 
 # Subnet for Jumpbox private endpoint
 resource "azurerm_subnet" "jumpbox_endpoint" {
-  name                              = "snet-jumpbox-endpoint-${random_string.suffix.result}"
+  name                              = "snet-jumpbox-endpoint-example"
   resource_group_name               = azurerm_resource_group.example.name
   virtual_network_name              = azurerm_virtual_network.jumpbox.name
   address_prefixes                  = ["10.2.1.0/24"]
@@ -127,7 +116,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "jumpbox" {
 
 # User-assigned identity for AKS (required for custom private DNS zone)
 resource "azurerm_user_assigned_identity" "aks" {
-  name                = "uai-aks-private-endpoint-${random_string.suffix.result}"
+  name                = "uai-aks-private-endpoint-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
@@ -150,13 +139,13 @@ resource "azurerm_role_assignment" "aks_network_contributor" {
 module "kubernetes_cluster" {
   source = "../../"
 
-  name                = "aks-private-endpoint-${random_string.suffix.result}"
+  name                = "aks-private-endpoint-example"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
   # DNS configuration for private cluster
   dns_config = {
-    dns_prefix_private_cluster = "aks-private-endpoint-${random_string.suffix.result}"
+    dns_prefix_private_cluster = "aks-private-endpoint-example"
   }
 
   # Kubernetes configuration
