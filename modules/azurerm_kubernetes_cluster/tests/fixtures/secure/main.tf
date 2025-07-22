@@ -26,6 +26,12 @@ resource "azurerm_private_dns_zone" "test" {
   resource_group_name = azurerm_resource_group.test.name
 }
 
+resource "azurerm_user_assigned_identity" "test" {
+  name                = "uai-dpc-sec-${var.random_suffix}"
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
+}
+
 module "kubernetes_cluster" {
   source = "../../.."
 
@@ -45,7 +51,8 @@ module "kubernetes_cluster" {
   }
 
   identity = {
-    type = "SystemAssigned"
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.test.id]
   }
 
   private_cluster_config = {

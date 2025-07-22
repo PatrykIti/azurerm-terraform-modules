@@ -3,6 +3,7 @@ package test
 import (
 	"testing"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
@@ -36,7 +37,7 @@ func TestBasicKubernetesCluster(t *testing.T) {
 		cluster := helper.GetKubernetesClusterProperties(t, resourceGroupName, clusterName)
 
 		assert.Equal(t, "Succeeded", string(*cluster.Properties.ProvisioningState))
-		assert.Equal(t, "SystemAssigned", *cluster.Identity.Type)
+		assert.Equal(t, armcontainerservice.ResourceIdentityTypeSystemAssigned, *cluster.Identity.Type)
 		assert.Equal(t, "standard", string(*cluster.Properties.NetworkProfile.LoadBalancerSKU))
 		assert.Equal(t, int32(1), *(*cluster.Properties.AgentPoolProfiles[0]).Count)
 	})
@@ -55,9 +56,6 @@ func TestCompleteKubernetesCluster(t *testing.T) {
 
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(t, testFolder)
-		// The 'complete' fixture requires a log_analytics_workspace_id, which we are creating within the fixture itself.
-		// We pass a placeholder here, which will be overridden by the fixture's own resource creation.
-		terraformOptions.Vars["log_analytics_workspace_id"] = "placeholder"
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
