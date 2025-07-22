@@ -52,6 +52,20 @@ resource "azurerm_private_dns_zone" "test" {
   resource_group_name = azurerm_resource_group.test.name
 }
 
+# Create user-assigned identity for AKS
+resource "azurerm_user_assigned_identity" "test" {
+  name                = "uai-dpc-cmp-${var.random_suffix}"
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
+}
+
+# Grant the identity permissions to the private DNS zone
+resource "azurerm_role_assignment" "dns_contributor" {
+  scope                = azurerm_private_dns_zone.test.id
+  role_definition_name = "Private DNS Zone Contributor"
+  principal_id         = azurerm_user_assigned_identity.test.principal_id
+}
+
 # Create the AKS cluster with comprehensive configuration
 module "kubernetes_cluster" {
   source = "../../.."
@@ -72,7 +86,8 @@ module "kubernetes_cluster" {
 
   # Identity configuration
   identity = {
-    type = "SystemAssigned"
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.test.id]
   }
 
   # Default node pool
@@ -107,4 +122,6 @@ module "kubernetes_cluster" {
     Environment = "Test"
     Example     = "Complete"
   }
+  
+  depends_on = [azurerm_role_assignment.dns_contributor]
 }

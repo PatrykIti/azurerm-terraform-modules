@@ -32,6 +32,13 @@ resource "azurerm_user_assigned_identity" "test" {
   resource_group_name = azurerm_resource_group.test.name
 }
 
+# Grant the identity permissions to the private DNS zone
+resource "azurerm_role_assignment" "dns_contributor" {
+  scope                = azurerm_private_dns_zone.test.id
+  role_definition_name = "Private DNS Zone Contributor"
+  principal_id         = azurerm_user_assigned_identity.test.principal_id
+}
+
 module "kubernetes_cluster" {
   source = "../../.."
 
@@ -68,4 +75,6 @@ module "kubernetes_cluster" {
     Environment = "Test"
     Example     = "Secure"
   }
+  
+  depends_on = [azurerm_role_assignment.dns_contributor]
 }
