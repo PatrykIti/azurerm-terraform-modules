@@ -126,7 +126,7 @@ func TestKubernetesClusterValidationRules(t *testing.T) {
 			vars: map[string]interface{}{
 				"cluster_name": "AKS-Invalid-Name",
 			},
-			expectedError: "only lowercase alphanumeric characters and hyphens are allowed, and must start and end with a letter or number",
+			expectedError: "must be between 1 and 63 characters long",
 		},
 	}
 
