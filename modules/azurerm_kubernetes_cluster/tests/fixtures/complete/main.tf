@@ -81,7 +81,7 @@ module "kubernetes_cluster" {
   }
 
   kubernetes_config = {
-    kubernetes_version = "1.28.5"
+    kubernetes_version = "1.30.5"
   }
 
   # Identity configuration
@@ -109,13 +109,14 @@ module "kubernetes_cluster" {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
   }
 
-  features = {
-    azure_policy_enabled = true
+  # Network configuration for private cluster
+  network_profile = {
+    service_cidr   = "172.16.0.0/16"
+    dns_service_ip = "172.16.0.10"
   }
 
-  # Restrict API server access
-  api_server_access_profile = {
-    authorized_ip_ranges = ["0.0.0.0/32"]
+  features = {
+    azure_policy_enabled = true
   }
 
   tags = {

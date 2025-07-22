@@ -67,6 +67,12 @@ module "kubernetes_cluster" {
     private_dns_zone_id     = azurerm_private_dns_zone.test.id
   }
 
+  # Network configuration for private cluster
+  network_profile = {
+    service_cidr   = "172.16.0.0/16"
+    dns_service_ip = "172.16.0.10"
+  }
+
   features = {
     azure_policy_enabled = true
   }

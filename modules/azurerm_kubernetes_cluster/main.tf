@@ -551,6 +551,16 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
       condition     = var.private_cluster_config.private_cluster_enabled == false || var.dns_config.dns_prefix_private_cluster != null
       error_message = "When private_cluster_enabled is true, dns_prefix_private_cluster must be specified."
     }
+
+    precondition {
+      condition = !(
+        var.private_cluster_config.private_cluster_enabled == true && 
+        var.api_server_access_profile != null && 
+        var.api_server_access_profile.authorized_ip_ranges != null && 
+        length(var.api_server_access_profile.authorized_ip_ranges) > 0
+      )
+      error_message = "Private cluster cannot be enabled with authorized IP ranges. These are mutually exclusive configurations."
+    }
   }
 }
 
