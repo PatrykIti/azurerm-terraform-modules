@@ -524,43 +524,8 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
   # Tags
   tags = var.tags
 
-  # Lifecycle management
+  # Lifecycle management - all validations moved to variables.tf
   lifecycle {
-    precondition {
-      condition = (
-        (var.dns_config.dns_prefix != null && var.dns_config.dns_prefix_private_cluster == null) ||
-        (var.dns_config.dns_prefix == null && var.dns_config.dns_prefix_private_cluster != null)
-      )
-      error_message = "You must define either dns_prefix or dns_prefix_private_cluster, but not both."
-    }
-
-    precondition {
-      condition = (
-        (var.identity != null && var.service_principal == null) ||
-        (var.identity == null && var.service_principal != null)
-      )
-      error_message = "You must define either identity or service_principal, but not both."
-    }
-
-    precondition {
-      condition     = var.features.cost_analysis_enabled == false || contains(["Standard", "Premium"], var.sku_config.sku_tier)
-      error_message = "Cost analysis can only be enabled when sku_tier is set to Standard or Premium."
-    }
-
-    precondition {
-      condition     = var.private_cluster_config.private_cluster_enabled == false || var.dns_config.dns_prefix_private_cluster != null
-      error_message = "When private_cluster_enabled is true, dns_prefix_private_cluster must be specified."
-    }
-
-    precondition {
-      condition = !(
-        var.private_cluster_config.private_cluster_enabled == true && 
-        var.api_server_access_profile != null && 
-        var.api_server_access_profile.authorized_ip_ranges != null && 
-        length(var.api_server_access_profile.authorized_ip_ranges) > 0
-      )
-      error_message = "Private cluster cannot be enabled with authorized IP ranges. These are mutually exclusive configurations."
-    }
   }
 }
 

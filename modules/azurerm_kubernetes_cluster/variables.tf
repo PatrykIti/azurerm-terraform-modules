@@ -285,6 +285,14 @@ variable "identity" {
     condition     = var.identity == null || var.identity.type != "UserAssigned" || (var.identity.identity_ids != null && length(coalesce(var.identity.identity_ids, [])) > 0)
     error_message = "When identity type is UserAssigned, identity_ids must be provided."
   }
+
+  validation {
+    condition = (
+      (var.identity != null && var.service_principal == null) ||
+      (var.identity == null && var.service_principal != null)
+    )
+    error_message = "You must define either identity or service_principal, but not both."
+  }
 }
 
 # Service Principal Configuration (Alternative to Identity)
@@ -386,6 +394,16 @@ variable "api_server_access_profile" {
   })
 
   default = null
+
+  validation {
+    condition = !(
+      var.private_cluster_config.private_cluster_enabled == true && 
+      var.api_server_access_profile != null && 
+      var.api_server_access_profile.authorized_ip_ranges != null && 
+      length(var.api_server_access_profile.authorized_ip_ranges) > 0
+    )
+    error_message = "Private cluster cannot be enabled with authorized IP ranges. These are mutually exclusive configurations."
+  }
 }
 
 # Private Cluster Configuration
@@ -407,6 +425,11 @@ variable "private_cluster_config" {
   default = {
     private_cluster_enabled             = false
     private_cluster_public_fqdn_enabled = false
+  }
+
+  validation {
+    condition     = var.private_cluster_config.private_cluster_enabled == false || var.dns_config.dns_prefix_private_cluster != null
+    error_message = "When private_cluster_enabled is true, dns_prefix_private_cluster must be specified."
   }
 }
 
@@ -448,6 +471,11 @@ variable "features" {
     run_command_enabled              = true
     local_account_disabled           = false
     cost_analysis_enabled            = false
+  }
+
+  validation {
+    condition     = var.features.cost_analysis_enabled == false || contains(["Standard", "Premium"], var.sku_config.sku_tier)
+    error_message = "Cost analysis can only be enabled when sku_tier is set to Standard or Premium."
   }
 }
 
