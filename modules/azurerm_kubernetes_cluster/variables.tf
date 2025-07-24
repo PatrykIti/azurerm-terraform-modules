@@ -397,10 +397,9 @@ variable "api_server_access_profile" {
 
   validation {
     condition = !(
-      var.private_cluster_config.private_cluster_enabled == true && 
+      try(var.private_cluster_config.private_cluster_enabled, false) == true && 
       var.api_server_access_profile != null && 
-      var.api_server_access_profile.authorized_ip_ranges != null && 
-      length(var.api_server_access_profile.authorized_ip_ranges) > 0
+      try(length(coalesce(var.api_server_access_profile.authorized_ip_ranges, [])), 0) > 0
     )
     error_message = "Private cluster cannot be enabled with authorized IP ranges. These are mutually exclusive configurations."
   }
@@ -428,7 +427,7 @@ variable "private_cluster_config" {
   }
 
   validation {
-    condition     = var.private_cluster_config.private_cluster_enabled == false || var.dns_config.dns_prefix_private_cluster != null
+    condition     = var.private_cluster_config.private_cluster_enabled == false || try(var.dns_config.dns_prefix_private_cluster, null) != null
     error_message = "When private_cluster_enabled is true, dns_prefix_private_cluster must be specified."
   }
 }
