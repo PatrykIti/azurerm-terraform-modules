@@ -40,7 +40,7 @@ output "connect_command" {
 
 output "workload_identity_setup_commands" {
   description = "Commands to set up workload identity in the cluster"
-  value = <<-EOT
+  value       = <<-EOT
     # Create namespace (if not using default)
     kubectl create namespace workload-identity-demo || true
     

@@ -131,7 +131,7 @@ module "kubernetes_cluster" {
   ]
 
   tags = var.tags
-  
+
   depends_on = [
     azurerm_role_assignment.dns_contributor,
     azurerm_role_assignment.network_contributor
@@ -141,7 +141,7 @@ module "kubernetes_cluster" {
 # Add delay to help with cleanup of private AKS resources
 resource "time_sleep" "wait_for_aks_cleanup" {
   depends_on = [module.kubernetes_cluster]
-  
+
   destroy_duration = "180s" # Wait 3 minutes on destroy to allow Azure to clean up managed resources
 }
 
@@ -151,7 +151,7 @@ resource "null_resource" "subnet_cleanup_dependency" {
     module.kubernetes_cluster,
     time_sleep.wait_for_aks_cleanup
   ]
-  
+
   triggers = {
     subnet_id = azurerm_subnet.aks_nodes.id
   }
@@ -163,7 +163,7 @@ resource "null_resource" "vnet_cleanup_dependency" {
     time_sleep.wait_for_aks_cleanup,
     null_resource.subnet_cleanup_dependency
   ]
-  
+
   triggers = {
     vnet_id = azurerm_virtual_network.aks.id
   }

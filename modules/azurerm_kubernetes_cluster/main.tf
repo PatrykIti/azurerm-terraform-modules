@@ -760,25 +760,25 @@ resource "azurerm_private_endpoint" "private_endpoint" {
 
 # Diagnostic Settings
 resource "azurerm_monitor_diagnostic_setting" "aks_diagnostics" {
-  count = var.diagnostic_settings != null ? 1 : 0
+  for_each = { for idx, ds in var.diagnostic_settings : idx => ds }
 
-  name                           = var.diagnostic_settings.name
+  name                           = each.value.name
   target_resource_id             = azurerm_kubernetes_cluster.kubernetes_cluster.id
-  log_analytics_workspace_id     = var.diagnostic_settings.log_analytics_workspace_id
-  storage_account_id             = var.diagnostic_settings.storage_account_id
-  eventhub_authorization_rule_id = var.diagnostic_settings.eventhub_authorization_rule_id
-  eventhub_name                  = var.diagnostic_settings.eventhub_name
-  partner_solution_id            = var.diagnostic_settings.partner_solution_id
+  log_analytics_workspace_id     = each.value.log_analytics_workspace_id
+  storage_account_id             = each.value.storage_account_id
+  eventhub_authorization_rule_id = each.value.eventhub_authorization_rule_id
+  eventhub_name                  = each.value.eventhub_name
+  partner_solution_id            = each.value.partner_solution_id
 
   dynamic "enabled_log" {
-    for_each = var.diagnostic_settings.enabled_log_categories
+    for_each = each.value.enabled_log_categories
     content {
       category = enabled_log.value
     }
   }
 
   dynamic "metric" {
-    for_each = var.diagnostic_settings.metrics
+    for_each = each.value.metrics
     content {
       category = metric.value.category
       enabled  = metric.value.enabled

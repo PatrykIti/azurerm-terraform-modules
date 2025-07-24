@@ -124,6 +124,21 @@ module "kubernetes_cluster" {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
   }
 
+  # Multiple diagnostic settings - demonstrating sending logs to different destinations
+  diagnostic_settings = [
+    {
+      name                       = "send-to-log-analytics"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
+      enabled_log_categories     = ["kube-apiserver", "kube-audit", "kube-controller-manager"]
+      metrics = [
+        {
+          category = "AllMetrics"
+          enabled  = true
+        }
+      ]
+    }
+  ]
+
   # Network configuration for private cluster
   network_profile = {
     service_cidr   = "172.16.0.0/16"
@@ -138,7 +153,7 @@ module "kubernetes_cluster" {
     Environment = "Test"
     Example     = "Complete"
   }
-  
+
   depends_on = [
     azurerm_role_assignment.dns_contributor,
     azurerm_role_assignment.network_contributor
@@ -148,7 +163,7 @@ module "kubernetes_cluster" {
 # Add delay to help with cleanup of private AKS resources
 resource "time_sleep" "wait_for_aks_cleanup" {
   depends_on = [module.kubernetes_cluster]
-  
+
   destroy_duration = "180s" # Wait 3 minutes on destroy to allow Azure to clean up managed resources
 }
 
@@ -158,7 +173,7 @@ resource "null_resource" "subnet_cleanup_dependency" {
     module.kubernetes_cluster,
     time_sleep.wait_for_aks_cleanup
   ]
-  
+
   # This ensures subnet is not deleted until AKS and time delay are complete
   triggers = {
     subnet_id = azurerm_subnet.test.id
@@ -171,7 +186,7 @@ resource "null_resource" "vnet_cleanup_dependency" {
     time_sleep.wait_for_aks_cleanup,
     null_resource.subnet_cleanup_dependency
   ]
-  
+
   # This ensures VNet is not deleted until subnet cleanup is complete
   triggers = {
     vnet_id = azurerm_virtual_network.test.id
@@ -183,7 +198,7 @@ resource "null_resource" "dns_zone_cleanup_dependency" {
     module.kubernetes_cluster,
     time_sleep.wait_for_aks_cleanup
   ]
-  
+
   # This ensures DNS zone is not deleted until AKS cleanup is complete
   triggers = {
     dns_zone_id = azurerm_private_dns_zone.test.id

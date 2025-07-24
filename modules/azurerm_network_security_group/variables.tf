@@ -241,9 +241,9 @@ variable "traffic_analytics_interval_in_minutes" {
 # Diagnostic Settings Configuration
 variable "diagnostic_settings" {
   description = <<-EOT
-    Configuration for Azure Monitor Diagnostic Settings for the NSG.
+    List of diagnostic settings configurations for the NSG. This allows configuring multiple diagnostic streams.
     
-    Properties:
+    Properties for each diagnostic setting:
     - name: Name of the diagnostic setting
     - log_analytics_workspace_id: ID of the Log Analytics workspace to send logs to
     - storage_account_id: ID of the Storage Account to send logs to (optional)
@@ -254,15 +254,22 @@ variable "diagnostic_settings" {
     
     Example:
     ```
-    diagnostic_settings = {
-      name                       = "nsg-diagnostics"
-      log_analytics_workspace_id = "/subscriptions/.../workspaces/my-workspace"
-      log_categories             = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
-      metric_categories          = ["AllMetrics"]
-    }
+    diagnostic_settings = [
+      {
+        name                       = "nsg-diagnostics-workspace"
+        log_analytics_workspace_id = "/subscriptions/.../workspaces/my-workspace"
+        log_categories             = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
+        metric_categories          = ["AllMetrics"]
+      },
+      {
+        name               = "nsg-diagnostics-storage"
+        storage_account_id = "/subscriptions/.../storageAccounts/mystorageaccount"
+        log_categories     = ["NetworkSecurityGroupEvent"]
+      }
+    ]
     ```
   EOT
-  type = object({
+  type = list(object({
     name                           = string
     log_analytics_workspace_id     = optional(string)
     storage_account_id             = optional(string)
@@ -270,8 +277,8 @@ variable "diagnostic_settings" {
     eventhub_authorization_rule_id = optional(string)
     log_categories                 = optional(list(string), ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"])
     metric_categories              = optional(list(string), ["AllMetrics"])
-  })
-  default = null
+  }))
+  default = []
 }
 
 # Tags

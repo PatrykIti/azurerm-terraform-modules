@@ -165,50 +165,70 @@ run "flow_logs_no_traffic_analytics" {
   }
 }
 
-# Test diagnostic settings enabled
-run "diagnostic_settings_enabled" {
+# Test single diagnostic setting
+run "diagnostic_settings_single" {
   command = plan
 
   variables {
-    diagnostic_settings = {
-      name                       = "test-diag"
-      log_analytics_workspace_id = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
-      log_categories             = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
-    }
+    diagnostic_settings = [
+      {
+        name                       = "test-diag"
+        log_analytics_workspace_id = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+        log_categories             = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
+      }
+    ]
   }
 
   assert {
     condition     = length(azurerm_monitor_diagnostic_setting.diagnostic_settings) == 1
-    error_message = "Diagnostic setting should be created when configuration is provided"
+    error_message = "Single diagnostic setting should be created"
   }
 
   assert {
-    condition     = azurerm_monitor_diagnostic_setting.diagnostic_settings[0].name == "test-diag"
+    condition     = azurerm_monitor_diagnostic_setting.diagnostic_settings["test-diag"].name == "test-diag"
     error_message = "Diagnostic setting name should match"
   }
 
   assert {
-    condition     = azurerm_monitor_diagnostic_setting.diagnostic_settings[0].log_analytics_workspace_id == "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+    condition     = azurerm_monitor_diagnostic_setting.diagnostic_settings["test-diag"].log_analytics_workspace_id == "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
     error_message = "Diagnostic setting workspace should be set"
   }
 }
 
-# Test diagnostic settings with storage account
-run "diagnostic_settings_with_storage" {
+# Test multiple diagnostic settings
+run "diagnostic_settings_multiple" {
   command = plan
 
   variables {
-    diagnostic_settings = {
-      name               = "test-diag"
-      storage_account_id = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/testsa"
-      log_categories     = ["NetworkSecurityGroupEvent"]
-      metric_categories  = ["AllMetrics"]
-    }
+    diagnostic_settings = [
+      {
+        name                       = "diag-workspace"
+        log_analytics_workspace_id = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+        log_categories             = ["NetworkSecurityGroupEvent"]
+        metric_categories          = ["AllMetrics"]
+      },
+      {
+        name               = "diag-storage"
+        storage_account_id = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/testsa"
+        log_categories     = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
+        metric_categories  = []
+      }
+    ]
   }
 
   assert {
-    condition     = azurerm_monitor_diagnostic_setting.diagnostic_settings[0].storage_account_id == "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/testsa"
-    error_message = "Diagnostic setting storage account should be set"
+    condition     = length(azurerm_monitor_diagnostic_setting.diagnostic_settings) == 2
+    error_message = "Two diagnostic settings should be created"
+  }
+
+  assert {
+    condition     = azurerm_monitor_diagnostic_setting.diagnostic_settings["diag-workspace"].log_analytics_workspace_id == "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+    error_message = "First diagnostic setting should use workspace"
+  }
+
+  assert {
+    condition     = azurerm_monitor_diagnostic_setting.diagnostic_settings["diag-storage"].storage_account_id == "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/testsa"
+    error_message = "Second diagnostic setting should use storage account"
   }
 }
 

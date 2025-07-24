@@ -28,14 +28,14 @@ output "traffic_analytics_enabled" {
   value       = module.network_security_group.traffic_analytics_enabled
 }
 
-output "diagnostic_settings_id" {
-  description = "The ID of the Diagnostic Settings resource."
-  value       = module.network_security_group.diagnostic_settings_id
+output "diagnostic_settings_ids" {
+  description = "Map of diagnostic setting names to their IDs."
+  value       = module.network_security_group.diagnostic_settings_ids
 }
 
-output "diagnostic_settings_enabled" {
-  description = "Whether Diagnostic Settings are enabled."
-  value       = module.network_security_group.diagnostic_settings_enabled
+output "diagnostic_settings_count" {
+  description = "Number of diagnostic settings configured."
+  value       = module.network_security_group.diagnostic_settings_count
 }
 
 output "application_security_group_ids" {

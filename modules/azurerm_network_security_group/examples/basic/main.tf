@@ -6,10 +6,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.36.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.0"
-    }
   }
 }
 
@@ -17,21 +13,15 @@ provider "azurerm" {
   features {}
 }
 
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
-
 resource "azurerm_resource_group" "example" {
-  name     = "rg-nsg-basic-example-${random_string.suffix.result}"
+  name     = "rg-nsg-basic-example"
   location = var.location
 }
 
 module "network_security_group" {
   source = "../../"
 
-  name                = "nsg-basic-example-${random_string.suffix.result}"
+  name                = "nsg-basic-example"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 

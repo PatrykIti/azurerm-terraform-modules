@@ -397,8 +397,8 @@ variable "api_server_access_profile" {
 
   validation {
     condition = !(
-      try(var.private_cluster_config.private_cluster_enabled, false) == true && 
-      var.api_server_access_profile != null && 
+      try(var.private_cluster_config.private_cluster_enabled, false) == true &&
+      var.api_server_access_profile != null &&
       try(length(coalesce(var.api_server_access_profile.authorized_ip_ranges, [])), 0) > 0
     )
     error_message = "Private cluster cannot be enabled with authorized IP ranges. These are mutually exclusive configurations."
@@ -1135,16 +1135,30 @@ variable "private_endpoints" {
 # Diagnostic Settings
 variable "diagnostic_settings" {
   description = <<-EOT
-    Diagnostic settings for the AKS cluster.
+    List of diagnostic settings for the AKS cluster.
     
-    Specify destinations for logs and metrics:
+    Allows multiple diagnostic configurations to send logs and metrics to different destinations:
     - Log Analytics workspace
     - Storage account
     - Event Hub
     - Partner solutions
+    
+    Example:
+    diagnostic_settings = [
+      {
+        name                       = "send-to-log-analytics"
+        log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+        enabled_log_categories     = ["kube-apiserver", "kube-audit"]
+      },
+      {
+        name               = "archive-to-storage"
+        storage_account_id = azurerm_storage_account.logs.id
+        enabled_log_categories = ["kube-audit-admin"]
+      }
+    ]
   EOT
 
-  type = object({
+  type = list(object({
     name                           = string
     log_analytics_workspace_id     = optional(string)
     storage_account_id             = optional(string)
@@ -1175,7 +1189,19 @@ variable "diagnostic_settings" {
         enabled  = true
       }
     ])
-  })
+  }))
 
-  default = null
+  default = []
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings : (
+        ds.log_analytics_workspace_id != null ||
+        ds.storage_account_id != null ||
+        ds.eventhub_authorization_rule_id != null ||
+        ds.partner_solution_id != null
+      )
+    ])
+    error_message = "Each diagnostic setting must specify at least one destination (log analytics workspace, storage account, event hub, or partner solution)."
+  }
 }

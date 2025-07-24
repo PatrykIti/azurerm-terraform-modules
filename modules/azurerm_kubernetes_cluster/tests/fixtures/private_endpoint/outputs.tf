@@ -28,3 +28,8 @@ output "resource_group_name" {
   value       = azurerm_resource_group.test.name
 }
 
+output "private_endpoint_name" {
+  description = "The name of the first private endpoint"
+  value       = length(module.kubernetes_cluster.private_endpoints) > 0 ? module.kubernetes_cluster.private_endpoints[0].name : ""
+}
+

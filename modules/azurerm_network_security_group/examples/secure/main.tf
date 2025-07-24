@@ -6,10 +6,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.36.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.0"
-    }
   }
 }
 
@@ -17,20 +13,14 @@ provider "azurerm" {
   features {}
 }
 
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
-
 resource "azurerm_resource_group" "example" {
-  name     = "rg-nsg-secure-example-${random_string.suffix.result}"
+  name     = "rg-nsg-secure-example"
   location = var.location
 }
 
 # Supporting resources for Flow Logs and Traffic Analytics
 resource "azurerm_storage_account" "flow_logs" {
-  name                     = "saflowlogssecure${random_string.suffix.result}"
+  name                     = "stnsgsecure001"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -38,7 +28,7 @@ resource "azurerm_storage_account" "flow_logs" {
 }
 
 resource "azurerm_log_analytics_workspace" "example" {
-  name                = "law-nsg-secure-example-${random_string.suffix.result}"
+  name                = "law-nsg-secure-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
@@ -46,26 +36,26 @@ resource "azurerm_log_analytics_workspace" "example" {
 }
 
 resource "azurerm_network_watcher" "example" {
-  name                = "nw-${azurerm_resource_group.example.location}"
+  name                = "nw-nsg-example-${azurerm_resource_group.example.location}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
 
 # Application Security Groups for a three-tier application
 resource "azurerm_application_security_group" "web_tier" {
-  name                = "asg-web-tier-${random_string.suffix.result}"
+  name                = "asg-web-tier"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
 
 resource "azurerm_application_security_group" "app_tier" {
-  name                = "asg-app-tier-${random_string.suffix.result}"
+  name                = "asg-app-tier"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
 
 resource "azurerm_application_security_group" "db_tier" {
-  name                = "asg-db-tier-${random_string.suffix.result}"
+  name                = "asg-db-tier"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
@@ -74,7 +64,7 @@ resource "azurerm_application_security_group" "db_tier" {
 module "network_security_group" {
   source = "../../"
 
-  name                = "nsg-secure-example-${random_string.suffix.result}"
+  name                = "nsg-secure-example"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 

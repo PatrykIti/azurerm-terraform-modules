@@ -6,10 +6,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.36.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.0"
-    }
   }
 }
 
@@ -17,20 +13,14 @@ provider "azurerm" {
   features {}
 }
 
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
-
 resource "azurerm_resource_group" "example" {
-  name     = "rg-nsg-complete-example-${random_string.suffix.result}"
+  name     = "rg-nsg-complete-example"
   location = var.location
 }
 
 # Create a storage account for flow logs
 resource "azurerm_storage_account" "flow_logs" {
-  name                     = "saflowlogs${random_string.suffix.result}"
+  name                     = "stnsgcomplete001"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -45,7 +35,7 @@ resource "azurerm_storage_account" "flow_logs" {
 
 # Create Log Analytics workspace for Traffic Analytics
 resource "azurerm_log_analytics_workspace" "example" {
-  name                = "law-nsg-complete-example-${random_string.suffix.result}"
+  name                = "law-nsg-complete-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
@@ -59,7 +49,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # Create Network Watcher if it doesn't exist
 resource "azurerm_network_watcher" "example" {
-  name                = "nw-${azurerm_resource_group.example.location}"
+  name                = "nw-nsg-example-${azurerm_resource_group.example.location}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -70,7 +60,7 @@ resource "azurerm_network_watcher" "example" {
 
 # Create Application Security Groups for demonstration
 resource "azurerm_application_security_group" "web_servers" {
-  name                = "asg-web-servers-${random_string.suffix.result}"
+  name                = "asg-web-servers"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -81,7 +71,7 @@ resource "azurerm_application_security_group" "web_servers" {
 }
 
 resource "azurerm_application_security_group" "database_servers" {
-  name                = "asg-database-servers-${random_string.suffix.result}"
+  name                = "asg-database-servers"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -95,7 +85,7 @@ resource "azurerm_application_security_group" "database_servers" {
 module "network_security_group" {
   source = "../../"
 
-  name                = "nsg-complete-example-${random_string.suffix.result}"
+  name                = "nsg-complete-example"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
@@ -113,13 +103,21 @@ module "network_security_group" {
   traffic_analytics_workspace_region       = azurerm_log_analytics_workspace.example.location
   traffic_analytics_interval_in_minutes    = 10
 
-  # Diagnostic Settings Configuration
-  diagnostic_settings = {
-    name                       = "nsg-complete-diagnostics"
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    log_categories             = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
-    metric_categories          = ["AllMetrics"]
-  }
+  # Diagnostic Settings Configuration - multiple streams example
+  diagnostic_settings = [
+    {
+      name                       = "nsg-diagnostics-workspace"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+      log_categories             = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
+      metric_categories          = ["AllMetrics"]
+    },
+    {
+      name               = "nsg-diagnostics-storage"
+      storage_account_id = azurerm_storage_account.flow_logs.id
+      log_categories     = ["NetworkSecurityGroupEvent"]
+      metric_categories  = []
+    }
+  ]
 
   # Comprehensive Security Rules
   security_rules = [

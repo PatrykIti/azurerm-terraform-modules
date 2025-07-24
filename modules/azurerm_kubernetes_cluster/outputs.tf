@@ -304,7 +304,9 @@ output "private_endpoints" {
 }
 
 # Diagnostic Settings Output
-output "diagnostic_settings_id" {
-  description = "The ID of the diagnostic settings"
-  value       = var.diagnostic_settings != null ? azurerm_monitor_diagnostic_setting.aks_diagnostics[0].id : null
+output "diagnostic_settings_ids" {
+  description = "Map of diagnostic settings IDs keyed by their index"
+  value = {
+    for idx, ds in azurerm_monitor_diagnostic_setting.aks_diagnostics : idx => ds.id
+  }
 }

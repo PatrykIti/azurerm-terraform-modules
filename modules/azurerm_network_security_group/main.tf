@@ -75,19 +75,19 @@ resource "azurerm_network_watcher_flow_log" "flow_log" {
 
 # Diagnostic Settings
 resource "azurerm_monitor_diagnostic_setting" "diagnostic_settings" {
-  count = var.diagnostic_settings != null ? 1 : 0
+  for_each = { for ds in var.diagnostic_settings : ds.name => ds }
 
-  name               = var.diagnostic_settings.name
+  name               = each.value.name
   target_resource_id = azurerm_network_security_group.network_security_group.id
 
-  log_analytics_workspace_id     = var.diagnostic_settings.log_analytics_workspace_id
-  storage_account_id             = var.diagnostic_settings.storage_account_id
-  eventhub_name                  = var.diagnostic_settings.eventhub_name
-  eventhub_authorization_rule_id = var.diagnostic_settings.eventhub_authorization_rule_id
+  log_analytics_workspace_id     = each.value.log_analytics_workspace_id
+  storage_account_id             = each.value.storage_account_id
+  eventhub_name                  = each.value.eventhub_name
+  eventhub_authorization_rule_id = each.value.eventhub_authorization_rule_id
 
   # Enable specified log categories
   dynamic "enabled_log" {
-    for_each = toset(var.diagnostic_settings.log_categories)
+    for_each = each.value.log_categories
     content {
       category = enabled_log.value
     }
@@ -95,7 +95,7 @@ resource "azurerm_monitor_diagnostic_setting" "diagnostic_settings" {
 
   # Enable specified metric categories
   dynamic "enabled_metric" {
-    for_each = toset(var.diagnostic_settings.metric_categories)
+    for_each = each.value.metric_categories
     content {
       category = enabled_metric.value
     }

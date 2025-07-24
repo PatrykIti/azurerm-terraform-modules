@@ -70,7 +70,7 @@ module "kubernetes_cluster" {
     vnet_subnet_id       = azurerm_subnet.example.id
     os_disk_type         = "Managed"
     os_sku               = "Ubuntu"
-    mode                 = "System"  # Explicitly set as system pool
+    mode                 = "System" # Explicitly set as system pool
     upgrade_settings = {
       max_surge = "33%"
     }
@@ -82,18 +82,18 @@ module "kubernetes_cluster" {
       # User pool for general workloads
       name                 = "userpool"
       vm_size              = "Standard_D2s_v3"
-      node_count           = 1  # Minimal nodes for cost savings
+      node_count           = 1 # Minimal nodes for cost savings
       auto_scaling_enabled = false
       vnet_subnet_id       = azurerm_subnet.example.id
       os_disk_type         = "Managed"
       os_sku               = "Ubuntu"
       mode                 = "User"
-      priority             = "Regular"  # No spot instances for reliability
+      priority             = "Regular" # No spot instances for reliability
       node_labels = {
         "workload-type" = "general"
         "pool-type"     = "user"
       }
-      node_taints = []  # No taints for general workloads
+      node_taints = [] # No taints for general workloads
     }
   ]
 

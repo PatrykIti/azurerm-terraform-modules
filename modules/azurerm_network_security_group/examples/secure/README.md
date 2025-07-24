@@ -58,3 +58,7 @@ terraform apply
 ```bash
 terraform destroy
 ```
+
+<!-- BEGIN_TF_DOCS -->
+<!-- This section will be populated by terraform-docs if configured -->
+<!-- END_TF_DOCS -->

@@ -42,7 +42,7 @@ resource "azuread_group" "aks_admins" {
   display_name     = var.aks_admins_group_name
   owners           = [data.azuread_client_config.current.object_id]
   security_enabled = true
-  
+
   description = "AKS Administrators for workload identity example cluster"
 }
 
@@ -113,12 +113,12 @@ module "kubernetes_cluster" {
   features = {
     azure_policy_enabled             = false
     http_application_routing_enabled = false
-    workload_identity_enabled        = true   # Enable workload identity
-    oidc_issuer_enabled              = true   # Enable OIDC issuer
+    workload_identity_enabled        = true # Enable workload identity
+    oidc_issuer_enabled              = true # Enable OIDC issuer
     open_service_mesh_enabled        = false
     image_cleaner_enabled            = false
     run_command_enabled              = true
-    local_account_disabled           = true   # Disable local accounts for security
+    local_account_disabled           = true # Disable local accounts for security
     cost_analysis_enabled            = false
   }
 
@@ -166,9 +166,9 @@ resource "azurerm_key_vault" "example" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   tenant_id           = data.azurerm_client_config.current.tenant_id
-  
+
   sku_name = "standard"
-  
+
   enable_rbac_authorization = true
   purge_protection_enabled  = false # Disabled for easy cleanup in examples
 }
