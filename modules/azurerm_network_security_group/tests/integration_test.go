@@ -8,14 +8,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestNsgLifecycle tests the resource lifecycle (update, idempotency).
-func TestNsgLifecycle(t *testing.T) {
+// TestNetworkSecurityGroupLifecycle tests the resource lifecycle (update, idempotency).
+func TestNetworkSecurityGroupLifecycle(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_network_security_group/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/simple")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -63,14 +63,14 @@ func TestNsgLifecycle(t *testing.T) {
 	})
 }
 
-// TestNsgCompliance tests security and compliance scenarios using the 'security' fixture.
-func TestNsgCompliance(t *testing.T) {
+// TestSecureNetworkSecurityGroup tests security and compliance scenarios using the 'security' fixture.
+func TestSecureNetworkSecurityGroup(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_network_security_group/tests/fixtures/security")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/security")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)

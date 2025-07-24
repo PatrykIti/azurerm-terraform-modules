@@ -23,10 +23,9 @@ resource "azurerm_log_analytics_workspace" "test" {
   retention_in_days   = 30
 }
 
-resource "azurerm_network_watcher" "test" {
-  name                = "nw-nsg-cmp-${var.random_suffix}"
-  location            = azurerm_resource_group.test.location
-  resource_group_name = azurerm_resource_group.test.name
+data "azurerm_network_watcher" "test" {
+  name                = "NetworkWatcher_${azurerm_resource_group.test.location}"
+  resource_group_name = "NetworkWatcherRG"
 }
 
 module "network_security_group" {
@@ -63,14 +62,16 @@ module "network_security_group" {
     }
   ]
 
-  flow_log_enabled            = true
-  network_watcher_name        = azurerm_network_watcher.test.name
-  flow_log_storage_account_id = azurerm_storage_account.test.id
+  flow_log_enabled                    = true
+  network_watcher_name                = data.azurerm_network_watcher.test.name
+  network_watcher_resource_group_name = "NetworkWatcherRG"
+  flow_log_storage_account_id         = azurerm_storage_account.test.id
 
-  traffic_analytics_enabled             = true
-  traffic_analytics_workspace_id        = azurerm_log_analytics_workspace.test.workspace_id
-  traffic_analytics_workspace_region    = azurerm_log_analytics_workspace.test.location
-  traffic_analytics_interval_in_minutes = 10
+  traffic_analytics_enabled                = true
+  traffic_analytics_workspace_id           = azurerm_log_analytics_workspace.test.workspace_id
+  traffic_analytics_workspace_resource_id  = azurerm_log_analytics_workspace.test.id
+  traffic_analytics_workspace_region       = azurerm_log_analytics_workspace.test.location
+  traffic_analytics_interval_in_minutes    = 10
 
   tags = {
     Environment = "Test"

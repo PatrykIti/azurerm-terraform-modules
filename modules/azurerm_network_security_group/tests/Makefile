@@ -17,7 +17,7 @@ test:
 # Example: make test-single TEST_NAME=TestNsgSimple
 test-single:
 	@echo "Running single test: $(TEST_NAME)..."
-	go test -v -timeout $(TIMEOUT) -run ^$(TEST_NAME)$ ./...
+	go test -v -timeout $(TIMEOUT) -run "^$(TEST_NAME)$$" ./...
 
 # Run unit tests only (skip integration tests)
 test-unit:
@@ -27,32 +27,32 @@ test-unit:
 # Run integration tests only
 test-integration:
 	@echo "Running integration tests only..."
-	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) -run "TestNsgLifecycle|TestNsgCompliance" ./...
+	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) -run "TestNetworkSecurityGroupLifecycle|TestSecureNetworkSecurityGroup" ./...
 
 # Run test for simple fixture
 test-simple:
 	@echo "Running test for simple fixture..."
-	go test -v -timeout $(TIMEOUT) -run ^TestNsgSimple$ ./...
+	go test -v -timeout $(TIMEOUT) -run "^TestSimpleNetworkSecurityGroup$$" ./...
 
 # Run test for complete fixture
 test-complete:
 	@echo "Running test for complete fixture..."
-	go test -v -timeout $(TIMEOUT) -run ^TestNsgComplete$ ./...
+	go test -v -timeout $(TIMEOUT) -run "^TestCompleteNetworkSecurityGroup$$" ./...
 
 # Run test for security fixture
 test-security:
 	@echo "Running test for security fixture..."
-	go test -v -timeout $(TIMEOUT) -run ^TestNsgCompliance$ ./...
+	go test -v -timeout $(TIMEOUT) -run "^TestSecureNetworkSecurityGroup$$" ./...
 
 # Run test for network fixture
 test-network:
 	@echo "Running test for network fixture..."
-	go test -v -timeout $(TIMEOUT) -run ^TestNsgNetwork$ ./...
+	go test -v -timeout $(TIMEOUT) -run "^TestNetworkNetworkSecurityGroup$$" ./...
 
 # Run test for negative fixture
 test-negative:
 	@echo "Running test for negative fixture..."
-	go test -v -timeout $(TIMEOUT) -run ^TestNsgValidationRules$ ./...
+	go test -v -timeout $(TIMEOUT) -run "^TestNetworkSecurityGroupValidationRules$$" ./...
 
 # Run all performance benchmarks.
 benchmark:
@@ -101,15 +101,15 @@ help:
 	@echo "Available targets:"
 	@echo "  make test              - Run all Go tests."
 	@echo "  make test-unit         - Run unit tests only (skip integration tests)."
-	@echo "  make test-integration  - Run integration tests only (TestNsgLifecycle, TestNsgCompliance)."
-	@echo "  make test-single       - Run a single test. Usage: make test-single TEST_NAME=TestNsgSimple"
+	@echo "  make test-integration  - Run integration tests only (TestNetworkSecurityGroupLifecycle, TestSecureNetworkSecurityGroup)."
+	@echo "  make test-single       - Run a single test. Usage: make test-single TEST_NAME=TestSimpleNetworkSecurityGroup"
 	@echo ""
 	@echo "Fixture-specific tests:"
-	@echo "  make test-simple       - Run test for simple fixture (TestNsgSimple)."
-	@echo "  make test-complete     - Run test for complete fixture (TestNsgComplete)."
-	@echo "  make test-security     - Run test for security fixture (TestNsgCompliance)."
-	@echo "  make test-network      - Run test for network fixture (TestNsgNetwork)."
-	@echo "  make test-negative     - Run test for negative fixture (TestNsgValidationRules)."
+	@echo "  make test-simple       - Run test for simple fixture (TestSimpleNetworkSecurityGroup)."
+	@echo "  make test-complete     - Run test for complete fixture (TestCompleteNetworkSecurityGroup)."
+	@echo "  make test-security     - Run test for security fixture (TestSecureNetworkSecurityGroup)."
+	@echo "  make test-network      - Run test for network fixture (TestNetworkNetworkSecurityGroup)."
+	@echo "  make test-negative     - Run test for negative fixture (TestNetworkSecurityGroupValidationRules)."
 	@echo ""
 	@echo "Other targets:"
 	@echo "  make benchmark         - Run all performance benchmarks."

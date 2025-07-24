@@ -56,13 +56,14 @@ EOF
 
 # List of tests to run
 tests=(
-    "TestNsgSimple"
-    "TestNsgComplete"
-    "TestNsgValidationRules"
-    "TestNsgLifecycle"
-    "TestNsgCompliance"
-    "TestNsgCreationTimeSLA"
-    "BenchmarkNsgCreation"
+    "TestSimpleNetworkSecurityGroup"
+    "TestCompleteNetworkSecurityGroup"
+    "TestNetworkNetworkSecurityGroup"
+    "TestSecureNetworkSecurityGroup"
+    "TestNetworkSecurityGroupValidationRules"
+    "TestNetworkSecurityGroupLifecycle"
+    "TestNetworkSecurityGroupCreationTime"
+    "BenchmarkNetworkSecurityGroupCreation"
 )
 
 echo "Starting parallel test execution for azurerm_network_security_group"
