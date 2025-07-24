@@ -71,3 +71,14 @@ output "traffic_analytics_enabled" {
   description = "Whether Traffic Analytics is enabled for the flow logs"
   value       = var.traffic_analytics_enabled
 }
+
+# Diagnostic Settings Output
+output "diagnostic_settings_id" {
+  description = "The ID of the Diagnostic Settings resource (if configured)"
+  value       = var.diagnostic_settings != null ? azurerm_monitor_diagnostic_setting.diagnostic_settings[0].id : null
+}
+
+output "diagnostic_settings_enabled" {
+  description = "Whether Diagnostic Settings are configured for the NSG"
+  value       = var.diagnostic_settings != null
+}

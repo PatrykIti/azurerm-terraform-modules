@@ -107,15 +107,25 @@ module "network_security_group" {
   flow_log_version            = 2
 
   # Traffic Analytics Configuration
-  traffic_analytics_enabled             = true
-  traffic_analytics_workspace_id        = azurerm_log_analytics_workspace.example.id
-  traffic_analytics_workspace_region    = azurerm_log_analytics_workspace.example.location
-  traffic_analytics_interval_in_minutes = 10
+  traffic_analytics_enabled                = true
+  traffic_analytics_workspace_id           = azurerm_log_analytics_workspace.example.workspace_id
+  traffic_analytics_workspace_resource_id  = azurerm_log_analytics_workspace.example.id
+  traffic_analytics_workspace_region       = azurerm_log_analytics_workspace.example.location
+  traffic_analytics_interval_in_minutes    = 10
+
+  # Diagnostic Settings Configuration
+  diagnostic_settings = {
+    name                       = "nsg-complete-diagnostics"
+    log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+    log_categories             = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
+    metric_categories          = ["AllMetrics"]
+  }
 
   # Comprehensive Security Rules
-  security_rules = {
+  security_rules = [
     # Service Tag Example
-    allow_azure_load_balancer = {
+    {
+      name                       = "allow_azure_load_balancer"
       priority                   = 100
       direction                  = "Inbound"
       access                     = "Allow"
@@ -125,9 +135,10 @@ module "network_security_group" {
       source_address_prefix      = "AzureLoadBalancer"
       destination_address_prefix = "*"
       description                = "Allow Azure Load Balancer probes"
-    }
+    },
     # Multiple Port Ranges Example
-    allow_web_traffic = {
+    {
+      name                       = "allow_web_traffic"
       priority                   = 110
       direction                  = "Inbound"
       access                     = "Allow"
@@ -137,9 +148,10 @@ module "network_security_group" {
       source_address_prefix      = "Internet"
       destination_address_prefix = "VirtualNetwork"
       description                = "Allow web traffic on multiple ports"
-    }
+    },
     # Multiple Address Prefixes Example
-    allow_management_subnets = {
+    {
+      name                       = "allow_management_subnets"
       priority                   = 120
       direction                  = "Inbound"
       access                     = "Allow"
@@ -149,9 +161,10 @@ module "network_security_group" {
       source_address_prefixes    = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
       destination_address_prefix = "VirtualNetwork"
       description                = "Allow SSH/RDP from management subnets"
-    }
+    },
     # Application Security Group Example
-    allow_web_to_db = {
+    {
+      name                                       = "allow_web_to_db"
       priority                                   = 130
       direction                                  = "Inbound"
       access                                     = "Allow"
@@ -161,9 +174,10 @@ module "network_security_group" {
       source_application_security_group_ids      = [azurerm_application_security_group.web_servers.id]
       destination_application_security_group_ids = [azurerm_application_security_group.database_servers.id]
       description                                = "Allow SQL Server access from web servers to database servers"
-    }
+    },
     # Outbound Rule Example
-    allow_internet_https = {
+    {
+      name                       = "allow_internet_https"
       priority                   = 200
       direction                  = "Outbound"
       access                     = "Allow"
@@ -173,9 +187,10 @@ module "network_security_group" {
       source_address_prefix      = "VirtualNetwork"
       destination_address_prefix = "Internet"
       description                = "Allow HTTPS outbound to Internet"
-    }
+    },
     # Deny Rule Example
-    deny_all_inbound = {
+    {
+      name                       = "deny_all_inbound"
       priority                   = 4096
       direction                  = "Inbound"
       access                     = "Deny"
@@ -186,7 +201,7 @@ module "network_security_group" {
       destination_address_prefix = "*"
       description                = "Deny all other inbound traffic"
     }
-  }
+  ]
 
   tags = {
     Environment = "Development"

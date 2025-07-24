@@ -28,6 +28,16 @@ output "traffic_analytics_enabled" {
   value       = module.network_security_group.traffic_analytics_enabled
 }
 
+output "diagnostic_settings_id" {
+  description = "The ID of the Diagnostic Settings resource."
+  value       = module.network_security_group.diagnostic_settings_id
+}
+
+output "diagnostic_settings_enabled" {
+  description = "Whether Diagnostic Settings are enabled."
+  value       = module.network_security_group.diagnostic_settings_enabled
+}
+
 output "application_security_group_ids" {
   description = "The IDs of the created Application Security Groups."
   value = {

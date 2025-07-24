@@ -35,8 +35,9 @@ module "network_security_group" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  security_rules = {
-    allow_ssh = {
+  security_rules = [
+    {
+      name                       = "allow_ssh"
       priority                   = 100
       direction                  = "Inbound"
       access                     = "Allow"
@@ -46,8 +47,9 @@ module "network_security_group" {
       source_address_prefix      = var.admin_source_ip_address
       destination_address_prefix = "*"
       description                = "Allow SSH from admin workstation"
-    }
-    allow_http = {
+    },
+    {
+      name                       = "allow_http"
       priority                   = 110
       direction                  = "Inbound"
       access                     = "Allow"
@@ -57,8 +59,9 @@ module "network_security_group" {
       source_address_prefix      = "Internet"
       destination_address_prefix = "*"
       description                = "Allow HTTP from anywhere"
-    }
-    allow_https = {
+    },
+    {
+      name                       = "allow_https"
       priority                   = 120
       direction                  = "Inbound"
       access                     = "Allow"
@@ -68,8 +71,9 @@ module "network_security_group" {
       source_address_prefix      = "Internet"
       destination_address_prefix = "*"
       description                = "Allow HTTPS from anywhere"
-    }
-    allow_all_outbound = {
+    },
+    {
+      name                       = "allow_all_outbound"
       priority                   = 4096
       direction                  = "Outbound"
       access                     = "Allow"
@@ -80,7 +84,7 @@ module "network_security_group" {
       destination_address_prefix = "*"
       description                = "Allow all outbound traffic"
     }
-  }
+  ]
 
   tags = {
     Environment = "Development"

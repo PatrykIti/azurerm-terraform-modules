@@ -12,7 +12,7 @@ variable "random_suffix" {
 variable "kubernetes_version" {
   description = "Kubernetes version to use"
   type        = string
-  default     = "1.27.9"
+  default     = "1.30.5"
 }
 
 variable "tags" {

@@ -88,9 +88,10 @@ module "network_security_group" {
   traffic_analytics_interval_in_minutes = 10
 
   # Zero-trust security rules
-  security_rules = {
+  security_rules = [
     # Inbound Rules
-    DenyAllInbound = {
+    {
+      name                       = "DenyAllInbound"
       priority                   = 4096
       direction                  = "Inbound"
       access                     = "Deny"
@@ -100,8 +101,9 @@ module "network_security_group" {
       source_address_prefix      = "*"
       destination_address_prefix = "*"
       description                = "Deny all inbound traffic by default."
-    }
-    AllowHttpsToWeb = {
+    },
+    {
+      name                                       = "AllowHttpsToWeb"
       priority                                   = 100
       direction                                  = "Inbound"
       access                                     = "Allow"
@@ -111,8 +113,9 @@ module "network_security_group" {
       source_address_prefix                      = "Internet"
       destination_application_security_group_ids = [azurerm_application_security_group.web_tier.id]
       description                                = "Allow inbound HTTPS to the web tier."
-    }
-    AllowWebToApp = {
+    },
+    {
+      name                                       = "AllowWebToApp"
       priority                                   = 110
       direction                                  = "Inbound"
       access                                     = "Allow"
@@ -122,8 +125,9 @@ module "network_security_group" {
       source_application_security_group_ids      = [azurerm_application_security_group.web_tier.id]
       destination_application_security_group_ids = [azurerm_application_security_group.app_tier.id]
       description                                = "Allow traffic from web tier to app tier."
-    }
-    AllowAppToDb = {
+    },
+    {
+      name                                       = "AllowAppToDb"
       priority                                   = 120
       direction                                  = "Inbound"
       access                                     = "Allow"
@@ -133,10 +137,11 @@ module "network_security_group" {
       source_application_security_group_ids      = [azurerm_application_security_group.app_tier.id]
       destination_application_security_group_ids = [azurerm_application_security_group.db_tier.id]
       description                                = "Allow traffic from app tier to database tier."
-    }
+    },
 
     # Outbound Rules
-    DenyAllOutbound = {
+    {
+      name                       = "DenyAllOutbound"
       priority                   = 4096
       direction                  = "Outbound"
       access                     = "Deny"
@@ -146,8 +151,9 @@ module "network_security_group" {
       source_address_prefix      = "*"
       destination_address_prefix = "*"
       description                = "Deny all outbound traffic by default."
-    }
-    AllowPaasOutbound = {
+    },
+    {
+      name                         = "AllowPaasOutbound"
       priority                     = 100
       direction                    = "Outbound"
       access                       = "Allow"
@@ -158,7 +164,7 @@ module "network_security_group" {
       destination_address_prefixes = ["Storage", "Sql", "AzureKeyVault"]
       description                  = "Allow outbound traffic to essential Azure PaaS services."
     }
-  }
+  ]
 
   tags = {
     Environment = "Production"

@@ -117,6 +117,12 @@ variable "security_rules" {
     error_message = "Security rule priority must be between 100 and 4096."
   }
 
+  # Validate no duplicate priorities
+  validation {
+    condition = length(distinct([for rule in var.security_rules : rule.priority])) == length(var.security_rules)
+    error_message = "Security rules must have unique priorities."
+  }
+
   # Port validation: singular vs plural
   validation {
     condition = alltrue([
@@ -204,7 +210,13 @@ variable "traffic_analytics_enabled" {
 }
 
 variable "traffic_analytics_workspace_id" {
-  description = "The ID of the Log Analytics workspace for Traffic Analytics. Required if traffic_analytics_enabled is true."
+  description = "The workspace GUID ID of the Log Analytics workspace for Traffic Analytics. Required if traffic_analytics_enabled is true."
+  type        = string
+  default     = null
+}
+
+variable "traffic_analytics_workspace_resource_id" {
+  description = "The full resource ID of the Log Analytics workspace for Traffic Analytics. Required if traffic_analytics_enabled is true."
   type        = string
   default     = null
 }
@@ -224,6 +236,42 @@ variable "traffic_analytics_interval_in_minutes" {
     condition     = contains([10, 60], var.traffic_analytics_interval_in_minutes)
     error_message = "Traffic analytics interval must be either 10 or 60 minutes."
   }
+}
+
+# Diagnostic Settings Configuration
+variable "diagnostic_settings" {
+  description = <<-EOT
+    Configuration for Azure Monitor Diagnostic Settings for the NSG.
+    
+    Properties:
+    - name: Name of the diagnostic setting
+    - log_analytics_workspace_id: ID of the Log Analytics workspace to send logs to
+    - storage_account_id: ID of the Storage Account to send logs to (optional)
+    - eventhub_name: Name of the Event Hub to send logs to (optional)
+    - eventhub_authorization_rule_id: ID of the Event Hub authorization rule (optional)
+    - log_categories: List of log categories to enable. Valid values: "NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"
+    - metric_categories: List of metric categories to enable. Valid values: "AllMetrics"
+    
+    Example:
+    ```
+    diagnostic_settings = {
+      name                       = "nsg-diagnostics"
+      log_analytics_workspace_id = "/subscriptions/.../workspaces/my-workspace"
+      log_categories             = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
+      metric_categories          = ["AllMetrics"]
+    }
+    ```
+  EOT
+  type = object({
+    name                           = string
+    log_analytics_workspace_id     = optional(string)
+    storage_account_id             = optional(string)
+    eventhub_name                  = optional(string)
+    eventhub_authorization_rule_id = optional(string)
+    log_categories                 = optional(list(string), ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"])
+    metric_categories              = optional(list(string), ["AllMetrics"])
+  })
+  default = null
 }
 
 # Tags
