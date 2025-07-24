@@ -72,6 +72,37 @@ func TestNsgComplete(t *testing.T) {
 	})
 }
 
+// TestNsgNetwork tests the network fixture with advanced networking rules.
+func TestNsgNetwork(t *testing.T) {
+	t.Parallel()
+
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "modules/azurerm_network_security_group/tests/fixtures/network")
+
+	defer test_structure.RunTestStage(t, "cleanup", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
+	})
+
+	test_structure.RunTestStage(t, "deploy", func() {
+		terraformOptions := getTerraformOptions(t, testFolder)
+		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
+		terraform.InitAndApply(t, terraformOptions)
+	})
+
+	test_structure.RunTestStage(t, "validate", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		nsgName := terraform.Output(t, terraformOptions, "name")
+		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+
+		helper := NewNetworkSecurityGroupHelper(t)
+		nsg := helper.GetNsgProperties(t, resourceGroupName, nsgName)
+
+		assert.Equal(t, nsgName, *nsg.Name, "NSG name should match the output.")
+		// The network fixture defines 1 custom rule with multiple source prefixes and destination port ranges
+		helper.ValidateNsgSecurityRules(t, nsg, 1)
+	})
+}
+
 // TestNsgValidationRules tests the input validation rules.
 func TestNsgValidationRules(t *testing.T) {
 	t.Parallel()

@@ -14,8 +14,9 @@ module "network_security_group" {
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
 
-  security_rules = {
-    deny_all_inbound = {
+  security_rules = [
+    {
+      name                       = "deny_all_inbound"
       priority                   = 4000
       direction                  = "Inbound"
       access                     = "Deny"
@@ -25,8 +26,9 @@ module "network_security_group" {
       source_address_prefix      = "Internet"
       destination_address_prefix = "*"
       description                = "Deny all inbound traffic from the Internet"
-    }
-    allow_corp_outbound = {
+    },
+    {
+      name                       = "allow_corp_outbound"
       priority                   = 100
       direction                  = "Outbound"
       access                     = "Allow"
@@ -37,7 +39,7 @@ module "network_security_group" {
       destination_address_prefix = "10.0.0.0/8" # Corp network
       description                = "Allow outbound HTTPS to corporate network"
     }
-  }
+  ]
 
   tags = {
     Environment = "Test"

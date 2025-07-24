@@ -14,8 +14,9 @@ module "network_security_group" {
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
 
-  security_rules = {
-    allow_multiple_ports_and_sources = {
+  security_rules = [
+    {
+      name                         = "allow_multiple_ports_and_sources"
       priority                     = 200
       direction                    = "Inbound"
       access                       = "Allow"
@@ -26,7 +27,7 @@ module "network_security_group" {
       destination_address_prefix   = "VirtualNetwork"
       description                  = "Allow web traffic from multiple sources"
     }
-  }
+  ]
 
   tags = {
     Environment = "Test"

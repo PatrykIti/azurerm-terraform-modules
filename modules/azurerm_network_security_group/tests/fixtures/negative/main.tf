@@ -14,8 +14,9 @@ module "network_security_group" {
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
 
-  security_rules = {
-    invalid_priority_rule = {
+  security_rules = [
+    {
+      name                       = "invalid_priority_rule"
       priority                   = 99 # Invalid priority, must be >= 100
       direction                  = "Inbound"
       access                     = "Allow"
@@ -25,5 +26,5 @@ module "network_security_group" {
       source_address_prefix      = "*"
       destination_address_prefix = "*"
     }
-  }
+  ]
 }
