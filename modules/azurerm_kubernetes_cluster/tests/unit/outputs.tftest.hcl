@@ -1,6 +1,7 @@
 # Test output validation for the Kubernetes Cluster module
 
 mock_provider "azurerm" {
+  override_during = plan
   mock_resource "azurerm_kubernetes_cluster" {
     defaults = {
       id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ContainerService/managedClusters/akstestcluster"
@@ -40,7 +41,7 @@ run "verify_basic_outputs" {
       name = "akstestcluster"
       fqdn = "akstestcluster-dns.westeurope.cloudapp.azure.com"
     }
-    override_during = plan
+    
   }
 
   assert {
@@ -72,7 +73,7 @@ run "verify_identity_outputs" {
         tenant_id    = "00000000-0000-0000-0000-000000000002"
       }
     }
-    override_during = plan
+    
   }
 
   assert {

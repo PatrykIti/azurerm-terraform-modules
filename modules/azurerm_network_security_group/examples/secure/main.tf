@@ -132,7 +132,7 @@ module "network_security_group" {
     # Outbound Rules
     {
       name                       = "DenyAllOutbound"
-      priority                   = 4096
+      priority                   = 4095
       direction                  = "Outbound"
       access                     = "Deny"
       protocol                   = "*"
@@ -144,7 +144,7 @@ module "network_security_group" {
     },
     {
       name                         = "AllowPaasOutbound"
-      priority                     = 100
+      priority                     = 200
       direction                    = "Outbound"
       access                       = "Allow"
       protocol                     = "Tcp"
