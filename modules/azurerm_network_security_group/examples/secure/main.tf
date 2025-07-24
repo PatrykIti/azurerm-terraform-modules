@@ -68,16 +68,17 @@ module "network_security_group" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  # Disable Flow Logs due to Network Watcher being in different resource group
-  # This is a limitation of the current module implementation
-  flow_log_enabled                      = false
-  # network_watcher_name                  = data.azurerm_network_watcher.example.name
-  # flow_log_storage_account_id           = azurerm_storage_account.flow_logs.id
-  # traffic_analytics_enabled             = true
-  # traffic_analytics_workspace_id        = azurerm_log_analytics_workspace.example.workspace_id
-  # traffic_analytics_workspace_resource_id = azurerm_log_analytics_workspace.example.id
-  # traffic_analytics_workspace_region    = azurerm_log_analytics_workspace.example.location
-  # traffic_analytics_interval_in_minutes = 10
+  # Enable Flow Logs and Traffic Analytics for security monitoring
+  flow_log_enabled                      = true
+  network_watcher_name                  = data.azurerm_network_watcher.example.name
+  network_watcher_resource_group_name   = "NetworkWatcherRG"
+  flow_log_storage_account_id           = azurerm_storage_account.flow_logs.id
+  flow_log_retention_in_days            = 30
+  traffic_analytics_enabled             = true
+  traffic_analytics_workspace_id        = azurerm_log_analytics_workspace.example.workspace_id
+  traffic_analytics_workspace_resource_id = azurerm_log_analytics_workspace.example.id
+  traffic_analytics_workspace_region    = azurerm_log_analytics_workspace.example.location
+  traffic_analytics_interval_in_minutes = 10
 
   # Zero-trust security rules
   security_rules = [

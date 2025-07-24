@@ -48,7 +48,7 @@ resource "azurerm_network_watcher_flow_log" "flow_log" {
 
   name                 = "${var.name}-flow-log"
   network_watcher_name = var.network_watcher_name
-  resource_group_name  = var.resource_group_name
+  resource_group_name  = coalesce(var.network_watcher_resource_group_name, var.resource_group_name)
   target_resource_id   = azurerm_network_security_group.network_security_group.id
   storage_account_id   = var.flow_log_storage_account_id
   enabled              = true

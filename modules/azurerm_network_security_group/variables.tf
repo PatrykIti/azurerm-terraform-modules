@@ -174,6 +174,12 @@ variable "network_watcher_name" {
   default     = null
 }
 
+variable "network_watcher_resource_group_name" {
+  description = "The resource group name of the Network Watcher. If not specified, defaults to the NSG's resource group."
+  type        = string
+  default     = null
+}
+
 variable "flow_log_storage_account_id" {
   description = "The ID of the Storage Account where flow logs will be stored. Required if flow_log_enabled is true."
   type        = string

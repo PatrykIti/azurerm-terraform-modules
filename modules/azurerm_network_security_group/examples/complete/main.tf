@@ -92,6 +92,7 @@ module "network_security_group" {
   # Flow Log Configuration
   flow_log_enabled            = true
   network_watcher_name        = azurerm_network_watcher.example.name
+  network_watcher_resource_group_name = azurerm_resource_group.example.name  # Network Watcher is in the same RG in this example
   flow_log_storage_account_id = azurerm_storage_account.flow_logs.id
   flow_log_retention_in_days  = 30
   flow_log_version            = 2
