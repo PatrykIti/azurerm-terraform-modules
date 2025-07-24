@@ -110,6 +110,76 @@ func TestSecureKubernetesCluster(t *testing.T) {
 	})
 }
 
+// Test AKS cluster with advanced network configuration
+func TestNetworkKubernetesCluster(t *testing.T) {
+	t.Parallel()
+
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_cluster/tests/fixtures/network")
+
+	defer test_structure.RunTestStage(t, "cleanup", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
+	})
+
+	test_structure.RunTestStage(t, "deploy", func() {
+		terraformOptions := getTerraformOptions(t, testFolder)
+		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
+		terraform.InitAndApply(t, terraformOptions)
+	})
+
+	test_structure.RunTestStage(t, "validate", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		helper := NewKubernetesClusterHelper(t)
+
+		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+		clusterName := terraform.Output(t, terraformOptions, "kubernetes_cluster_name")
+
+		cluster := helper.GetKubernetesClusterProperties(t, resourceGroupName, clusterName)
+
+		// Validate network configuration
+		assert.Equal(t, armcontainerservice.NetworkPluginAzure, *cluster.Properties.NetworkProfile.NetworkPlugin)
+		assert.Equal(t, armcontainerservice.NetworkPolicyAzure, *cluster.Properties.NetworkProfile.NetworkPolicy)
+		assert.NotNil(t, cluster.Properties.NetworkProfile.ServiceCidr)
+		assert.NotNil(t, cluster.Properties.NetworkProfile.DNSServiceIP)
+	})
+}
+
+// Test AKS cluster with private endpoints
+func TestPrivateEndpointKubernetesCluster(t *testing.T) {
+	t.Parallel()
+
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_cluster/tests/fixtures/private_endpoint")
+
+	defer test_structure.RunTestStage(t, "cleanup", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
+	})
+
+	test_structure.RunTestStage(t, "deploy", func() {
+		terraformOptions := getTerraformOptions(t, testFolder)
+		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
+		terraform.InitAndApply(t, terraformOptions)
+	})
+
+	test_structure.RunTestStage(t, "validate", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		helper := NewKubernetesClusterHelper(t)
+
+		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+		clusterName := terraform.Output(t, terraformOptions, "kubernetes_cluster_name")
+		
+		// Validate private endpoint exists
+		privateEndpointName := terraform.Output(t, terraformOptions, "private_endpoint_name")
+		require.NotEmpty(t, privateEndpointName)
+
+		cluster := helper.GetKubernetesClusterProperties(t, resourceGroupName, clusterName)
+
+		// Validate private cluster configuration
+		assert.True(t, *cluster.Properties.APIServerAccessProfile.EnablePrivateCluster)
+		assert.NotNil(t, cluster.Properties.PrivateFQDN)
+	})
+}
+
 // Negative test cases for validation rules
 func TestKubernetesClusterValidationRules(t *testing.T) {
 	t.Parallel()

@@ -2,7 +2,7 @@
 # This example demonstrates a comprehensive AKS cluster configuration with advanced features
 
 terraform {
-  required_version = ">= 1.12.2"
+  required_version = ">= 1.11.2"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -11,6 +11,10 @@ terraform {
     time = {
       source  = "hashicorp/time"
       version = "~> 0.9"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.2"
     }
   }
 }
