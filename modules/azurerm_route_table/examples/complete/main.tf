@@ -1,20 +1,33 @@
 # Complete Route Table Example
+# This example demonstrates a comprehensive deployment of Route Tables with all available features
 
-# Resource Group
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
+terraform {
+  required_version = ">= 1.5.0"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.36.0"
+    }
+  }
 }
 
+provider "azurerm" {
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
+}
+
+# Create a resource group
 resource "azurerm_resource_group" "example" {
-  name     = "rg-rt-complete-${random_string.suffix.result}"
+  name     = var.resource_group_name
   location = var.location
 }
 
-# Virtual Network
+# Create a virtual network
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-hub-complete-${random_string.suffix.result}"
+  name                = var.virtual_network_name
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
@@ -22,14 +35,14 @@ resource "azurerm_virtual_network" "example" {
 
 # Multiple Subnets for demonstration
 resource "azurerm_subnet" "app" {
-  name                 = "snet-app-${random_string.suffix.result}"
+  name                 = var.subnet_app_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
 resource "azurerm_subnet" "data" {
-  name                 = "snet-data-${random_string.suffix.result}"
+  name                 = var.subnet_data_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.2.0/24"]
@@ -46,7 +59,7 @@ resource "azurerm_subnet" "firewall" {
 module "route_table_complete" {
   source = "../../"
 
-  name                = "rt-hub-complete-${random_string.suffix.result}"
+  name                = var.route_table_hub_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
@@ -96,7 +109,7 @@ module "route_table_complete" {
 module "route_table_dmz" {
   source = "../../"
 
-  name                = "rt-dmz-${random_string.suffix.result}"
+  name                = var.route_table_dmz_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 

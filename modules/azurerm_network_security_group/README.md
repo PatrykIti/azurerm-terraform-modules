@@ -8,20 +8,50 @@ Current version: **vUnreleased**
 
 ## Description
 
-This module creates and manages an Azure Network Security Group (NSG) with comprehensive security rules configuration. It supports inbound and outbound rules, service tags, application security groups, and flow logs with traffic analytics.
+This module creates and manages an Azure Network Security Group (NSG) with comprehensive security rules configuration. It supports inbound and outbound rules, service tags, application security groups, and flow logs with traffic analytics. The module provides secure defaults while allowing full customization for production workloads.
+
+## Features
+
+- ✅ **Flexible Security Rules** - Support for inbound/outbound rules with priorities
+- ✅ **Service Tags** - Use Azure service tags for simplified rule management
+- ✅ **Application Security Groups** - Group VMs with similar functions
+- ✅ **Flow Logs** - Capture network traffic data for analysis
+- ✅ **Traffic Analytics** - Advanced network monitoring and diagnostics
+- ✅ **Multiple Port Ranges** - Support for single or multiple port configurations
+- ✅ **CIDR and Prefix Support** - Flexible source/destination addressing
+- ✅ **Integration Ready** - Easy attachment to subnets and network interfaces
+
+## Prerequisites
+
+- Azure subscription with appropriate permissions
+- Resource Group where the NSG will be deployed
+- Network Watcher (if using flow logs)
+- Storage Account (if using flow logs)
+- Log Analytics Workspace (if using traffic analytics)
 
 ## Usage
 
+### Basic Usage
+
 ```hcl
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "example" {
+  name     = "rg-nsg-example"
+  location = "West Europe"
+}
+
 module "network_security_group" {
-  source = "path/to/azurerm_network_security_group"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.0"
 
-  # Required variables
-  name                = "example-azurerm_network_security_group"
-  resource_group_name = "example-rg"
-  location            = "West Europe"
+  # Core configuration
+  name                = "nsg-example"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
 
-  # Optional configuration
+  # Basic security rules
   security_rules = [
     {
       name                       = "allow_ssh"
@@ -36,8 +66,80 @@ module "network_security_group" {
       description                = "Allow SSH from internal network"
     }
   ]
+
   tags = {
     Environment = "Development"
+    Project     = "Example"
+  }
+}
+```
+
+### Advanced Usage with Flow Logs and Traffic Analytics
+
+```hcl
+module "network_security_group" {
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.0"
+
+  # Core configuration
+  name                = "nsg-production"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+
+  # Comprehensive security rules
+  security_rules = [
+    {
+      name                       = "allow_https"
+      priority                   = 100
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_ranges    = ["443", "8443"]
+      source_address_prefix      = "Internet"
+      destination_address_prefix = "*"
+      description                = "Allow HTTPS from Internet"
+    },
+    {
+      name                         = "allow_app_to_db"
+      priority                     = 200
+      direction                    = "Inbound"
+      access                       = "Allow"
+      protocol                     = "Tcp"
+      source_port_range            = "*"
+      destination_port_range       = "1433"
+      source_application_security_group_ids = [azurerm_application_security_group.app.id]
+      destination_application_security_group_ids = [azurerm_application_security_group.db.id]
+      description                  = "Allow application servers to database"
+    },
+    {
+      name                       = "deny_all_inbound"
+      priority                   = 4096
+      direction                  = "Inbound"
+      access                     = "Deny"
+      protocol                   = "*"
+      source_port_range          = "*"
+      destination_port_range     = "*"
+      source_address_prefix      = "*"
+      destination_address_prefix = "*"
+      description                = "Deny all other inbound traffic"
+    }
+  ]
+
+  # Flow logs configuration
+  flow_log_enabled            = true
+  flow_log_storage_account_id = azurerm_storage_account.logs.id
+  flow_log_retention_in_days  = 30
+  flow_log_version            = 2
+  network_watcher_name        = "NetworkWatcher_westeurope"
+
+  # Traffic analytics
+  traffic_analytics_enabled             = true
+  traffic_analytics_workspace_id        = azurerm_log_analytics_workspace.example.id
+  traffic_analytics_workspace_region    = azurerm_log_analytics_workspace.example.location
+  traffic_analytics_interval_in_minutes = 10
+
+  tags = {
+    Environment = "Production"
     Project     = "Example"
   }
 }
@@ -112,8 +214,59 @@ No modules.
 | <a name="output_traffic_analytics_enabled"></a> [traffic\_analytics\_enabled](#output\_traffic\_analytics\_enabled) | Whether Traffic Analytics is enabled for the flow logs |
 <!-- END_TF_DOCS -->
 
+## Security Considerations
+
+This module implements several security best practices by default:
+
+- **Explicit deny rules** - Recommended to add explicit deny rules at high priority
+- **Least privilege access** - Only allow necessary ports and protocols
+- **Service tags** - Use Azure service tags instead of IP ranges where possible
+- **Application Security Groups** - Group resources by function for easier management
+- **Flow logs** - Enable for security monitoring and compliance
+- **Traffic analytics** - Gain insights into network traffic patterns
+- **Regular reviews** - Audit rules regularly to remove unnecessary access
+
+For production deployments, see the [secure example](examples/secure) which demonstrates all security features.
+
+## Monitoring and Compliance
+
+The module supports comprehensive monitoring through:
+
+- **NSG Flow Logs** - Capture all network traffic for analysis
+- **Traffic Analytics** - Advanced network monitoring and threat detection
+- **Log Analytics Integration** - Centralized logging and alerting
+- **Diagnostic Settings** - Export logs to various destinations
+- **Compliance Reporting** - Support for regulatory requirements
+
+## Best Practices
+
+To ensure optimal security and performance:
+
+- **Rule Priority** - Plan rule priorities carefully (100-4096)
+- **Explicit Deny** - Always include explicit deny rules
+- **Service Tags** - Prefer service tags over IP addresses
+- **Documentation** - Document each rule's purpose
+- **Regular Audits** - Review and update rules periodically
+- **Testing** - Test rule changes in non-production first
+
+## Troubleshooting
+
+Common issues and solutions:
+
+1. **Rules not taking effect**: Check rule priority and conflicts
+2. **Flow logs not appearing**: Verify Network Watcher is enabled
+3. **Traffic blocked unexpectedly**: Review all rules and their priorities
+4. **Performance issues**: Consider rule complexity and number of rules
+
 ## Additional Documentation
 
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+
+## External Resources
+
+- [Azure Network Security Groups Documentation](https://docs.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview)
+- [NSG Best Practices](https://docs.microsoft.com/en-us/azure/virtual-network/network-security-group-how-it-works)
+- [Service Tags Overview](https://docs.microsoft.com/en-us/azure/virtual-network/service-tags-overview)
+- [NSG Flow Logs](https://docs.microsoft.com/en-us/azure/network-watcher/network-watcher-nsg-flow-logging-overview)

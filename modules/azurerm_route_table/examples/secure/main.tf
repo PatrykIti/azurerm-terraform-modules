@@ -1,20 +1,33 @@
 # Secure Route Table Example
+# This example demonstrates a maximum-security Route Table configuration suitable for highly sensitive data
 
-# Resource Group
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
+terraform {
+  required_version = ">= 1.5.0"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.36.0"
+    }
+  }
 }
 
+provider "azurerm" {
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
+}
+
+# Create a resource group
 resource "azurerm_resource_group" "example" {
-  name     = "rg-rt-secure-${random_string.suffix.result}"
+  name     = var.resource_group_name
   location = var.location
 }
 
-# Virtual Network
+# Create a virtual network
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-rt-secure-${random_string.suffix.result}"
+  name                = var.virtual_network_name
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
@@ -22,14 +35,14 @@ resource "azurerm_virtual_network" "example" {
 
 # Subnets
 resource "azurerm_subnet" "workload" {
-  name                 = "snet-workload-${random_string.suffix.result}"
+  name                 = var.subnet_workload_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
 resource "azurerm_subnet" "firewall" {
-  name                 = "snet-firewall-${random_string.suffix.result}"
+  name                 = var.subnet_firewall_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.0.0/24"]
@@ -37,7 +50,7 @@ resource "azurerm_subnet" "firewall" {
 
 # Network Interface to simulate a Network Virtual Appliance (NVA)
 resource "azurerm_network_interface" "nva" {
-  name                = "nic-nva-${random_string.suffix.result}"
+  name                = var.nva_nic_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -54,7 +67,7 @@ resource "azurerm_network_interface" "nva" {
 module "route_table" {
   source = "../../"
 
-  name                = "rt-secure-${random_string.suffix.result}"
+  name                = var.route_table_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
