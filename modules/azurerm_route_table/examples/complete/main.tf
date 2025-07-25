@@ -17,6 +17,7 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
+  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
 }
 
 # Create a resource group
@@ -91,12 +92,6 @@ module "route_table_complete" {
     }
   ]
 
-  # Associate with multiple subnets
-  subnet_ids_to_associate = [
-    azurerm_subnet.app.id,
-    azurerm_subnet.data.id
-  ]
-
   tags = {
     Environment = "Production"
     Example     = "Complete"
@@ -130,4 +125,15 @@ module "route_table_dmz" {
     Purpose     = "DMZ"
     ManagedBy   = "Terraform"
   }
+}
+
+# Subnet Route Table Associations - managed at the example level
+resource "azurerm_subnet_route_table_association" "app" {
+  subnet_id      = azurerm_subnet.app.id
+  route_table_id = module.route_table_complete.id
+}
+
+resource "azurerm_subnet_route_table_association" "data" {
+  subnet_id      = azurerm_subnet.data.id
+  route_table_id = module.route_table_complete.id
 }

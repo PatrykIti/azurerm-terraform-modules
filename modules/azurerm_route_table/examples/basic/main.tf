@@ -17,6 +17,7 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
+  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
 }
 
 # Create a resource group
@@ -63,13 +64,14 @@ module "route_table" {
     }
   ]
 
-  # Associate with subnet
-  subnet_ids_to_associate = [
-    azurerm_subnet.example.id
-  ]
-
   tags = {
     Environment = "Development"
     Example     = "Basic"
   }
+}
+
+# Subnet Route Table Association - managed at the example level
+resource "azurerm_subnet_route_table_association" "example" {
+  subnet_id      = azurerm_subnet.example.id
+  route_table_id = module.route_table.id
 }

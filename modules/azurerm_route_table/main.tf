@@ -57,10 +57,6 @@
  * - [Firewall](examples/firewall) - Route table for firewall scenarios
  */
 
-locals {
-  subnet_associations = { for subnet_id in var.subnet_ids_to_associate : basename(subnet_id) => subnet_id }
-}
-
 # Azure Route Table Module
 resource "azurerm_route_table" "route_table" {
   name                          = var.name
@@ -80,12 +76,4 @@ resource "azurerm_route" "routes" {
   address_prefix         = each.value.address_prefix
   next_hop_type          = each.value.next_hop_type
   next_hop_in_ip_address = each.value.next_hop_in_ip_address
-}
-
-# Subnet Route Table Associations
-resource "azurerm_subnet_route_table_association" "associations" {
-  for_each = local.subnet_associations
-
-  subnet_id      = each.value
-  route_table_id = azurerm_route_table.route_table.id
 }

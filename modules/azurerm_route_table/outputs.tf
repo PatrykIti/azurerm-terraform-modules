@@ -30,17 +30,6 @@ output "bgp_route_propagation_enabled" {
   value       = azurerm_route_table.route_table.bgp_route_propagation_enabled
 }
 
-# Subnet Associations
-output "subnet_associations" {
-  description = "Map of subnet associations, keyed by subnet name."
-  value       = azurerm_subnet_route_table_association.associations
-}
-
-output "associated_subnet_ids" {
-  description = "List of subnet IDs associated with this Route Table."
-  value       = values(local.subnet_associations)
-}
-
 # Tags
 output "tags" {
   description = "The tags assigned to the Route Table"

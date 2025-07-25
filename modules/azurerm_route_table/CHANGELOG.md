@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial release of the azurerm_route_table module
-- Core functionality for Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations
+- Core functionality for managing Azure Route Tables with custom routes configuration and BGP route propagation settings
+- Network wrapper example demonstrating subnet association pattern
+
+### Changed
+- BREAKING: Removed subnet association functionality from the module. Subnet associations should now be managed at the wrapper/consumer level using `azurerm_subnet_route_table_association` resources. This change addresses Terraform's limitation with for_each and unknown values at plan time.
 
 ### Security
 - All security features are enabled by default
