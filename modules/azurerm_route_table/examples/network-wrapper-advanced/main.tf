@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.85.0, < 4.0"
+      version = "~> 4.36.0"
     }
   }
 }
@@ -80,34 +80,26 @@ module "route_table" {
   tags = var.tags
 }
 
-# Subnet Route Table Associations - with object pattern to handle unknowns
+# Subnet Route Table Associations - simplified approach
 resource "azurerm_subnet_route_table_association" "associations" {
-  # Use object pattern with null handling
   for_each = {
     for subnet_key, subnet_config in var.subnets :
-    subnet_key => {
-      subnet_id      = try(azurerm_subnet.subnets[subnet_key].id, null)
-      route_table_id = module.route_table.id
-    }
-    if subnet_config.associate_route_table == true && try(azurerm_subnet.subnets[subnet_key].id, null) != null
+    subnet_key => subnet_config
+    if subnet_config.associate_route_table == true
   }
 
-  subnet_id      = each.value.subnet_id
-  route_table_id = each.value.route_table_id
+  subnet_id      = azurerm_subnet.subnets[each.key].id
+  route_table_id = module.route_table.id
 }
 
-# Subnet NSG Associations - also with object pattern
+# Subnet NSG Associations - simplified approach
 resource "azurerm_subnet_network_security_group_association" "associations" {
-  # Use object pattern with null handling
   for_each = {
     for subnet_key, subnet_config in var.subnets :
-    subnet_key => {
-      subnet_id                 = try(azurerm_subnet.subnets[subnet_key].id, null)
-      network_security_group_id = azurerm_network_security_group.example.id
-    }
-    if subnet_config.associate_nsg == true && try(azurerm_subnet.subnets[subnet_key].id, null) != null
+    subnet_key => subnet_config
+    if subnet_config.associate_nsg == true
   }
 
-  subnet_id                 = each.value.subnet_id
-  network_security_group_id = each.value.network_security_group_id
+  subnet_id                 = azurerm_subnet.subnets[each.key].id
+  network_security_group_id = azurerm_network_security_group.example.id
 }
