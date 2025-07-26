@@ -19,11 +19,6 @@ output "routes" {
   value       = module.route_table.routes
 }
 
-output "associated_subnet_ids" {
-  description = "The subnet IDs associated with the Route Table"
-  value       = module.route_table.associated_subnet_ids
-}
-
 # Supporting Resource Outputs
 output "resource_group_name" {
   description = "The name of the resource group"

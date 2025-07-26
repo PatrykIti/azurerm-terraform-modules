@@ -8,8 +8,6 @@ output "complete_route_table" {
     resource_group_name           = module.route_table_complete.resource_group_name
     bgp_route_propagation_enabled = module.route_table_complete.bgp_route_propagation_enabled
     routes                        = module.route_table_complete.routes
-    associated_subnet_ids         = module.route_table_complete.associated_subnet_ids
-    subnet_associations           = module.route_table_complete.subnet_associations
     tags                          = module.route_table_complete.tags
   }
 }
@@ -52,6 +50,22 @@ output "subnets" {
       id               = azurerm_subnet.firewall.id
       name             = azurerm_subnet.firewall.name
       address_prefixes = azurerm_subnet.firewall.address_prefixes
+    }
+  }
+}
+
+output "subnet_route_table_associations" {
+  description = "Subnet to route table associations"
+  value = {
+    app = {
+      id             = azurerm_subnet_route_table_association.app.id
+      subnet_id      = azurerm_subnet_route_table_association.app.subnet_id
+      route_table_id = azurerm_subnet_route_table_association.app.route_table_id
+    }
+    data = {
+      id             = azurerm_subnet_route_table_association.data.id
+      subnet_id      = azurerm_subnet_route_table_association.data.subnet_id
+      route_table_id = azurerm_subnet_route_table_association.data.route_table_id
     }
   }
 }
