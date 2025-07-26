@@ -57,6 +57,43 @@ variable "routes" {
     ])
     error_message = "The next_hop_in_ip_address must be provided when next_hop_type is 'VirtualAppliance' and must be null otherwise."
   }
+
+  validation {
+    condition = alltrue([
+      for route in var.routes :
+      route.next_hop_in_ip_address == null || can(regex("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", route.next_hop_in_ip_address))
+    ])
+    error_message = "The next_hop_in_ip_address must be a valid IPv4 address (e.g., 10.0.0.4)."
+  }
+
+  validation {
+    condition = alltrue([
+      for route in var.routes :
+      can(cidrhost(route.address_prefix, 0))
+    ])
+    error_message = "The address_prefix must be a valid CIDR notation (e.g., 10.0.0.0/16)."
+  }
+
+  validation {
+    condition = length(var.routes) == length(distinct([for r in var.routes : r.name]))
+    error_message = "Route names must be unique within the route table."
+  }
+
+  validation {
+    condition = alltrue([
+      for route in var.routes :
+      length(route.name) > 0 && length(route.name) <= 80
+    ])
+    error_message = "Route names must be between 1 and 80 characters long."
+  }
+
+  validation {
+    condition = alltrue([
+      for route in var.routes :
+      can(regex("^[a-zA-Z0-9][a-zA-Z0-9-._]*[a-zA-Z0-9_]$", route.name))
+    ])
+    error_message = "Route names must start with a letter or number, end with a letter, number or underscore, and may contain only letters, numbers, underscores, periods or hyphens."
+  }
 }
 
 
