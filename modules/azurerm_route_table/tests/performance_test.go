@@ -17,7 +17,7 @@ func BenchmarkRouteTableCreation(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../fixtures", "basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_route_table/tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		b.StartTimer()
 
@@ -35,7 +35,7 @@ func TestRouteTableCreationTime(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../fixtures", "basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_route_table/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)

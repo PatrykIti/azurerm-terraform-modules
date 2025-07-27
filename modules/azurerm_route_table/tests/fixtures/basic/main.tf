@@ -2,7 +2,7 @@
 # This example creates a minimal route table with secure defaults
 
 terraform {
-  required_version = ">= 1.12.2"
+  required_version = ">= 1.11.2"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"

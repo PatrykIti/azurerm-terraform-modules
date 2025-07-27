@@ -2,7 +2,7 @@
 # This example demonstrates all available features of the route table module
 
 terraform {
-  required_version = ">= 1.12.2"
+  required_version = ">= 1.11.2"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -56,7 +56,7 @@ resource "azurerm_network_interface" "nva" {
   name                 = "nic-nva-${var.random_suffix}"
   location             = azurerm_resource_group.test.location
   resource_group_name  = azurerm_resource_group.test.name
-  enable_ip_forwarding = true
+  ip_forwarding_enabled = true
 
   ip_configuration {
     name                          = "internal"

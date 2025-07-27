@@ -2,7 +2,7 @@
 # This fixture contains multiple test cases that should fail validation
 
 terraform {
-  required_version = ">= 1.12.2"
+  required_version = ">= 1.11.2"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"

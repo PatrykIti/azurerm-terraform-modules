@@ -50,6 +50,11 @@ test-network: check-env deps
 	@echo "Running network tests..."
 	go test -v -timeout 45m -run TestNetworkRouteTable ./...
 
+# Run network tests
+test-negative: check-env deps
+	@echo "Running network tests..."
+	go test -v -timeout 45m -run TestRouteTableValidationRules ./...
+
 # Run validation tests
 test-validation: check-env deps
 	@echo "Running validation tests..."
