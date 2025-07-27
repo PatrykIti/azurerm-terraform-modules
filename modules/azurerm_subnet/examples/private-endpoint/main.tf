@@ -78,9 +78,6 @@ module "subnet_private_endpoint" {
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
 
-  # Associate NSG for security
-  network_security_group_id = azurerm_network_security_group.example.id
-
   # No service endpoints needed for private endpoint subnet
   service_endpoints = []
 
@@ -95,6 +92,12 @@ module "subnet_private_endpoint" {
   tags = merge(var.tags, {
     Purpose = "PrivateEndpoints"
   })
+}
+
+# Network Security Group Association - managed at wrapper level
+resource "azurerm_subnet_network_security_group_association" "subnet_pe" {
+  subnet_id                 = module.subnet_private_endpoint.id
+  network_security_group_id = azurerm_network_security_group.example.id
 }
 
 # Additional subnet for resources that will use private endpoints

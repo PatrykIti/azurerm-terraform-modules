@@ -36,19 +36,6 @@ variable "address_prefixes" {
   }
 }
 
-# Network Security Group Association
-variable "network_security_group_id" {
-  description = "The ID of the Network Security Group to associate with the subnet."
-  type        = string
-  default     = null
-}
-
-# Route Table Association
-variable "route_table_id" {
-  description = "The ID of the Route Table to associate with the subnet."
-  type        = string
-  default     = null
-}
 
 # Service Endpoints
 variable "service_endpoints" {

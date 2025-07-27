@@ -8,16 +8,12 @@ output "subnet_name" {
   value       = module.subnet.name
 }
 
-output "private_endpoints" {
-  description = "Information about the created private endpoints"
-  value       = module.subnet.private_endpoints
+output "subnet_address_prefixes" {
+  description = "The address prefixes of the created Subnet"
+  value       = module.subnet.address_prefixes
 }
 
-# Create module.json and .releaserc.js
-print_info "Creating module.json and .releaserc.js..."
-if [[ -x "/Users/pciechanski/Documents/_moje_projekty/terraform_modules/azurerm-terraform-modules/scripts/create-module-json.sh" ]]; then
-    "/Users/pciechanski/Documents/_moje_projekty/terraform_modules/azurerm-terraform-modules/scripts/create-module-json.sh" "/Users/pciechanski/Documents/_moje_projekty/terraform_modules/azurerm-terraform-modules/modules/azurerm_subnet" "Subnet" "subnet" "SN"
-else
-    print_warning "scripts/create-module-json.sh not found or not executable."
-fi
-
+output "private_endpoint_network_policies_enabled" {
+  description = "Whether network policies are enabled for private endpoints"
+  value       = module.subnet.private_endpoint_network_policies_enabled
+}

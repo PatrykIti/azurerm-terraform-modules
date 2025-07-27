@@ -94,12 +94,6 @@ module "subnet" {
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
 
-  # Network Security Group Association
-  network_security_group_id = azurerm_network_security_group.example.id
-
-  # Route Table Association  
-  route_table_id = azurerm_route_table.example.id
-
   # Service Endpoints
   service_endpoints = [
     "Microsoft.Storage",
@@ -131,6 +125,18 @@ module "subnet" {
   private_link_service_network_policies_enabled = false
 
   tags = var.tags
+}
+
+# Network Security Group Association - managed at wrapper level
+resource "azurerm_subnet_network_security_group_association" "subnet" {
+  subnet_id                 = module.subnet.id
+  network_security_group_id = azurerm_network_security_group.example.id
+}
+
+# Route Table Association - managed at wrapper level
+resource "azurerm_subnet_route_table_association" "subnet" {
+  subnet_id      = module.subnet.id
+  route_table_id = azurerm_route_table.example.id
 }
 
 # Additional subnet without delegation to show multiple subnet patterns

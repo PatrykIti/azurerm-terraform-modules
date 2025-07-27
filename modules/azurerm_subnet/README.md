@@ -8,18 +8,19 @@ Current version: **vUnreleased**
 
 ## Description
 
-This module creates and manages Azure Subnets with advanced configuration options including service endpoints, delegations, network policies, and associations with Network Security Groups (NSG) and Route Tables. It's designed to provide comprehensive subnet management capabilities beyond the basic subnet creation included in virtual network modules.
+This module creates and manages Azure Subnets with advanced configuration options including service endpoints, delegations, and network policies. It's designed to provide comprehensive subnet management capabilities beyond the basic subnet creation included in virtual network modules.
+
+> **Note**: Network Security Group and Route Table associations should be managed at the wrapper/composition level for maximum flexibility. See the examples for best practices on managing associations.
 
 ## Features
 
 - **Service Endpoints**: Configure access to Azure services (Storage, SQL, KeyVault, etc.)
 - **Subnet Delegation**: Delegate subnets to specific Azure services
 - **Network Policies**: Control private endpoint and private link service policies
-- **NSG Association**: Associate Network Security Groups for security rules
-- **Route Table Association**: Associate Route Tables for custom routing
 - **Service Endpoint Policies**: Apply policies to restrict service endpoint access
 - **Private Endpoint Support**: Configure subnets specifically for private endpoints
 - **Security-First Design**: Secure defaults with flexible overrides
+- **Flexible Architecture**: Designed to work with external NSG and Route Table associations
 
 ## Usage
 
@@ -52,10 +53,6 @@ module "secure_subnet" {
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.2.0/24"]
 
-  # Security associations
-  network_security_group_id = azurerm_network_security_group.example.id
-  route_table_id           = azurerm_route_table.example.id
-
   # Service endpoints
   service_endpoints = [
     "Microsoft.Storage",
@@ -75,6 +72,18 @@ module "secure_subnet" {
     SecurityLevel = "High"
   }
 }
+
+# Network Security Group Association - managed at wrapper level
+resource "azurerm_subnet_network_security_group_association" "secure" {
+  subnet_id                 = module.secure_subnet.id
+  network_security_group_id = azurerm_network_security_group.example.id
+}
+
+# Route Table Association - managed at wrapper level
+resource "azurerm_subnet_route_table_association" "secure" {
+  subnet_id      = module.secure_subnet.id
+  route_table_id = azurerm_route_table.example.id
+}
 ```
 
 ### Private Endpoint Subnet Example
@@ -92,12 +101,15 @@ module "private_endpoint_subnet" {
   private_endpoint_network_policies_enabled     = false
   private_link_service_network_policies_enabled = false
 
-  # Optional NSG for additional security
-  network_security_group_id = azurerm_network_security_group.pe.id
-
   tags = {
     Purpose = "PrivateEndpoints"
   }
+}
+
+# Optional NSG association for additional security - managed at wrapper level
+resource "azurerm_subnet_network_security_group_association" "pe" {
+  subnet_id                 = module.private_endpoint_subnet.id
+  network_security_group_id = azurerm_network_security_group.pe.id
 }
 ```
 
@@ -137,6 +149,7 @@ module "delegated_subnet" {
 <!-- BEGIN_EXAMPLES -->
 - [basic](examples/basic) - Basic subnet configuration with minimal inputs
 - [complete](examples/complete) - Complete configuration showcasing all features
+- [network-wrapper](examples/network-wrapper) - Recommended pattern for managing subnet associations at wrapper level
 - [private-endpoint](examples/private-endpoint) - Subnet configuration for hosting private endpoints
 - [secure](examples/secure) - Security-hardened subnet with NSG, route table, and service endpoint policies
 <!-- END_EXAMPLES -->
@@ -166,8 +179,6 @@ No modules.
 | Name | Type |
 |------|------|
 | [azurerm_subnet.subnet](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/subnet) | resource |
-| [azurerm_subnet_network_security_group_association.subnet](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/subnet_network_security_group_association) | resource |
-| [azurerm_subnet_route_table_association.subnet](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/subnet_route_table_association) | resource |
 
 ## Inputs
 
@@ -176,11 +187,9 @@ No modules.
 | <a name="input_address_prefixes"></a> [address\_prefixes](#input\_address\_prefixes) | The address prefixes to use for the subnet. This is a list of IPv4 or IPv6 address ranges. | `list(string)` | n/a | yes |
 | <a name="input_delegations"></a> [delegations](#input\_delegations) | One or more delegation blocks for the subnet. | <pre>map(object({<br/>    name = string<br/>    service_delegation = object({<br/>      name    = string<br/>      actions = optional(list(string), [])<br/>    })<br/>  }))</pre> | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the subnet. Changing this forces a new resource to be created. | `string` | n/a | yes |
-| <a name="input_network_security_group_id"></a> [network\_security\_group\_id](#input\_network\_security\_group\_id) | The ID of the Network Security Group to associate with the subnet. | `string` | `null` | no |
 | <a name="input_private_endpoint_network_policies_enabled"></a> [private\_endpoint\_network\_policies\_enabled](#input\_private\_endpoint\_network\_policies\_enabled) | Enable or Disable network policies for the private endpoint on the subnet. Setting this to true will Enable the policy and setting this to false will Disable the policy. Defaults to true. | `bool` | `true` | no |
 | <a name="input_private_link_service_network_policies_enabled"></a> [private\_link\_service\_network\_policies\_enabled](#input\_private\_link\_service\_network\_policies\_enabled) | Enable or Disable network policies for the private link service on the subnet. Setting this to true will Enable the policy and setting this to false will Disable the policy. Defaults to true. | `bool` | `true` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group where the Virtual Network exists. | `string` | n/a | yes |
-| <a name="input_route_table_id"></a> [route\_table\_id](#input\_route\_table\_id) | The ID of the Route Table to associate with the subnet. | `string` | `null` | no |
 | <a name="input_service_endpoint_policy_ids"></a> [service\_endpoint\_policy\_ids](#input\_service\_endpoint\_policy\_ids) | The list of IDs of Service Endpoint Policies to associate with the subnet. | `list(string)` | `[]` | no |
 | <a name="input_service_endpoints"></a> [service\_endpoints](#input\_service\_endpoints) | The list of Service endpoints to associate with the subnet. Possible values include: Microsoft.AzureActiveDirectory, Microsoft.AzureCosmosDB, Microsoft.ContainerRegistry, Microsoft.EventHub, Microsoft.KeyVault, Microsoft.ServiceBus, Microsoft.Sql, Microsoft.Storage, Microsoft.Storage.Global and Microsoft.Web. | `list(string)` | `[]` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the subnet. | `map(string)` | `{}` | no |
@@ -194,13 +203,9 @@ No modules.
 | <a name="output_delegations"></a> [delegations](#output\_delegations) | The delegations configured on the subnet |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the Subnet |
 | <a name="output_name"></a> [name](#output\_name) | The name of the Subnet |
-| <a name="output_network_security_group_association_id"></a> [network\_security\_group\_association\_id](#output\_network\_security\_group\_association\_id) | The ID of the Subnet to Network Security Group Association |
-| <a name="output_network_security_group_id"></a> [network\_security\_group\_id](#output\_network\_security\_group\_id) | The ID of the Network Security Group associated with the subnet |
 | <a name="output_private_endpoint_network_policies_enabled"></a> [private\_endpoint\_network\_policies\_enabled](#output\_private\_endpoint\_network\_policies\_enabled) | Whether network policies are enabled for private endpoints on this subnet |
 | <a name="output_private_link_service_network_policies_enabled"></a> [private\_link\_service\_network\_policies\_enabled](#output\_private\_link\_service\_network\_policies\_enabled) | Whether network policies are enabled for private link service on this subnet |
 | <a name="output_resource_group_name"></a> [resource\_group\_name](#output\_resource\_group\_name) | The name of the Resource Group where the subnet exists |
-| <a name="output_route_table_association_id"></a> [route\_table\_association\_id](#output\_route\_table\_association\_id) | The ID of the Subnet to Route Table Association |
-| <a name="output_route_table_id"></a> [route\_table\_id](#output\_route\_table\_id) | The ID of the Route Table associated with the subnet |
 | <a name="output_service_endpoint_policy_ids"></a> [service\_endpoint\_policy\_ids](#output\_service\_endpoint\_policy\_ids) | The list of Service Endpoint Policy IDs associated with the subnet |
 | <a name="output_service_endpoints"></a> [service\_endpoints](#output\_service\_endpoints) | The list of Service endpoints enabled on this subnet |
 | <a name="output_virtual_network_name"></a> [virtual\_network\_name](#output\_virtual\_network\_name) | The name of the Virtual Network where the subnet exists |

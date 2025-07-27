@@ -57,24 +57,3 @@ output "delegations" {
   }
 }
 
-# Associated Resources
-output "network_security_group_id" {
-  description = "The ID of the Network Security Group associated with the subnet"
-  value       = var.network_security_group_id
-}
-
-output "route_table_id" {
-  description = "The ID of the Route Table associated with the subnet"
-  value       = var.route_table_id
-}
-
-# Association Resource IDs
-output "network_security_group_association_id" {
-  description = "The ID of the Subnet to Network Security Group Association"
-  value       = length(azurerm_subnet_network_security_group_association.subnet) > 0 ? azurerm_subnet_network_security_group_association.subnet[0].id : null
-}
-
-output "route_table_association_id" {
-  description = "The ID of the Subnet to Route Table Association"
-  value       = length(azurerm_subnet_route_table_association.subnet) > 0 ? azurerm_subnet_route_table_association.subnet[0].id : null
-}

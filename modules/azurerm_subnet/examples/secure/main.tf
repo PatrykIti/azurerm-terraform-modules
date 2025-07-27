@@ -159,12 +159,6 @@ module "subnet" {
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
 
-  # Mandatory NSG association for security
-  network_security_group_id = azurerm_network_security_group.example.id
-
-  # Force traffic through firewall
-  route_table_id = azurerm_route_table.example.id
-
   # Enable service endpoints for key services with restrictions
   service_endpoints = [
     "Microsoft.Storage",
@@ -189,6 +183,18 @@ module "subnet" {
   })
 }
 
+# Network Security Group Association - managed at wrapper level for security
+resource "azurerm_subnet_network_security_group_association" "subnet" {
+  subnet_id                 = module.subnet.id
+  network_security_group_id = azurerm_network_security_group.example.id
+}
+
+# Route Table Association - force traffic through firewall
+resource "azurerm_subnet_route_table_association" "subnet" {
+  subnet_id      = module.subnet.id
+  route_table_id = azurerm_route_table.example.id
+}
+
 # Additional secure subnet for private endpoints
 module "subnet_private_endpoints" {
   source = "../../"
@@ -197,9 +203,6 @@ module "subnet_private_endpoints" {
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.2.0/24"]
-
-  # Mandatory NSG for private endpoint subnet
-  network_security_group_id = azurerm_network_security_group.example.id
 
   # No service endpoints on private endpoint subnet
   service_endpoints = []
@@ -211,4 +214,10 @@ module "subnet_private_endpoints" {
   tags = merge(var.tags, {
     Purpose = "PrivateEndpoints"
   })
+}
+
+# Network Security Group Association for private endpoint subnet
+resource "azurerm_subnet_network_security_group_association" "subnet_pe" {
+  subnet_id                 = module.subnet_private_endpoints.id
+  network_security_group_id = azurerm_network_security_group.example.id
 }
