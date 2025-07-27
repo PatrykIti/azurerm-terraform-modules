@@ -14,7 +14,7 @@ import (
 func TestBasicRouteTable(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_route_table/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../fixtures", "basic")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -46,7 +46,7 @@ func TestBasicRouteTable(t *testing.T) {
 func TestCompleteRouteTable(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_route_table/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../fixtures", "complete")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -87,7 +87,7 @@ func TestCompleteRouteTable(t *testing.T) {
 func TestSecureRouteTable(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_route_table/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../fixtures", "secure")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -127,7 +127,7 @@ func TestSecureRouteTable(t *testing.T) {
 func TestNetworkRouteTable(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_route_table/tests/fixtures/network")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../fixtures", "network")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -221,7 +221,7 @@ func TestRouteTableValidationRules(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_route_table/tests/fixtures/negative")
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../fixtures", "negative")
 			
 			// Merge the random_suffix with the test case variables
 			vars := getTerraformOptions(t, testFolder).Vars

@@ -15,7 +15,7 @@ func TestRouteTableLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_route_table/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../fixtures", "basic")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -53,6 +53,7 @@ func TestRouteTableLifecycle(t *testing.T) {
 
 		// Validate the updated route table
 		routeTableAfterUpdate := helper.GetRouteTableProperties(t, resourceGroupName, routeTableName)
+		assert.NotNil(t, routeTableAfterUpdate)
 		routes := helper.GetRoutes(t, resourceGroupName, routeTableName)
 		assert.Equal(t, 1, len(routes))
 		assert.Equal(t, "new-route", *routes[0].Name)
@@ -69,7 +70,7 @@ func TestRouteTableMultipleUpdates(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_route_table/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../fixtures", "complete")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -138,7 +139,7 @@ func TestRouteTableWithSubnetAssociation(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_route_table/tests/fixtures/network")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../fixtures", "network")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
