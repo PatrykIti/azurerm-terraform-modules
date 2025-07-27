@@ -152,22 +152,17 @@ resource "azurerm_resource_group" "test" {
 #   ]
 # }
 
-# Valid configuration for testing - uncomment one invalid test case above to test
-module "valid_route_table" {
+# Module configuration for validation testing
+module "route_table_validation" {
   source = "../../.."
 
-  name                = "rt-neg-valid-${var.random_suffix}"
+  # Use provided name or default name
+  name                = var.name != "" ? var.name : "rt-neg-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
 
-  routes = [
-    {
-      name                   = "valid-route"
-      address_prefix         = "10.0.0.0/16"
-      next_hop_type          = "Internet"
-      next_hop_in_ip_address = null
-    }
-  ]
+  # Routes come from variables for validation testing
+  routes = var.routes
 
   tags = {
     Environment = "Test"

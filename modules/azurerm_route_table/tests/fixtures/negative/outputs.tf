@@ -1,11 +1,11 @@
 output "route_table_id" {
-  description = "The ID of the created Route Table (valid case)."
-  value       = module.valid_route_table.id
+  description = "The ID of the created Route Table."
+  value       = module.route_table_validation.id
 }
 
 output "route_table_name" {
-  description = "The name of the created Route Table (valid case)."
-  value       = module.valid_route_table.name
+  description = "The name of the created Route Table."
+  value       = module.route_table_validation.name
 }
 
 output "resource_group_name" {

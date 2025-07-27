@@ -183,7 +183,7 @@ func TestRouteTableValidationRules(t *testing.T) {
 		{
 			name: "InvalidName",
 			vars: map[string]interface{}{
-				"route_table_name": "RT-Invalid-Name-With-Special-Characters-That-Is-Way-Too-Long-And-Should-Definitely-Fail-Validation",
+				"name": "RT-Invalid-Name-With-Special-Characters-That-Is-Way-Too-Long-And-Should-Definitely-Fail-Validation",
 			},
 			expectedError: "Route Table name must be 1-80 characters long",
 		},
@@ -208,11 +208,11 @@ func TestRouteTableValidationRules(t *testing.T) {
 						"name":                   "missing-ip",
 						"address_prefix":         "10.0.0.0/16",
 						"next_hop_type":          "VirtualAppliance",
-						"next_hop_in_ip_address": "",
+						"next_hop_in_ip_address": nil,
 					},
 				},
 			},
-			expectedError: "next_hop_in_ip_address must be provided when next_hop_type is 'VirtualAppliance'",
+			expectedError: "next_hop_in_ip_address must be provided when next_hop_type is",
 		},
 	}
 

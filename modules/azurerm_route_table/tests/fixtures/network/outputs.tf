@@ -1,3 +1,8 @@
+output "route_table_name" {
+  description = "The name of the hub route table (for test compatibility)."
+  value       = module.hub_route_table.name
+}
+
 output "hub_route_table_id" {
   description = "The ID of the hub Route Table."
   value       = module.hub_route_table.id

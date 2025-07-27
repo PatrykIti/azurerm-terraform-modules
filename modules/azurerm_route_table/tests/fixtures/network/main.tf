@@ -106,6 +106,12 @@ resource "azurerm_virtual_network_peering" "hub_to_spoke1" {
   remote_virtual_network_id = azurerm_virtual_network.spoke1.id
   allow_gateway_transit     = true
   allow_forwarded_traffic   = true
+  
+  depends_on = [
+    azurerm_subnet.hub_gateway,
+    azurerm_subnet.hub_firewall,
+    azurerm_subnet.hub_shared
+  ]
 }
 
 resource "azurerm_virtual_network_peering" "spoke1_to_hub" {
@@ -115,6 +121,11 @@ resource "azurerm_virtual_network_peering" "spoke1_to_hub" {
   remote_virtual_network_id = azurerm_virtual_network.hub.id
   use_remote_gateways       = false # Set to true when gateway is deployed
   allow_forwarded_traffic   = true
+  
+  depends_on = [
+    azurerm_subnet.spoke1_workload,
+    azurerm_virtual_network_peering.hub_to_spoke1
+  ]
 }
 
 # VNet peering - Hub to Spoke2
@@ -125,6 +136,12 @@ resource "azurerm_virtual_network_peering" "hub_to_spoke2" {
   remote_virtual_network_id = azurerm_virtual_network.spoke2.id
   allow_gateway_transit     = true
   allow_forwarded_traffic   = true
+  
+  depends_on = [
+    azurerm_subnet.hub_gateway,
+    azurerm_subnet.hub_firewall,
+    azurerm_subnet.hub_shared
+  ]
 }
 
 resource "azurerm_virtual_network_peering" "spoke2_to_hub" {
@@ -134,6 +151,11 @@ resource "azurerm_virtual_network_peering" "spoke2_to_hub" {
   remote_virtual_network_id = azurerm_virtual_network.hub.id
   use_remote_gateways       = false # Set to true when gateway is deployed
   allow_forwarded_traffic   = true
+  
+  depends_on = [
+    azurerm_subnet.spoke2_workload,
+    azurerm_virtual_network_peering.hub_to_spoke2
+  ]
 }
 
 # Hub route table
