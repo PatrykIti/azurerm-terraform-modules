@@ -36,9 +36,16 @@ EOF
 
 # List of tests to run
 tests=(
-    "TestRouteTableBasic"
-    "TestRouteTableComplete"
-    "TestRouteTableSecure"
+    "TestBasicRouteTable"
+    "TestCompleteRouteTable"
+    "TestSecureRouteTable"
+    "TestNetworkRouteTable"
+    "TestRouteTableValidationRules"
+    "TestRouteTableLifecycle"
+    "TestRouteTableMultipleUpdates"
+    "TestRouteTableWithSubnetAssociation"
+    "TestRouteTableCreationTime"
+    "BenchmarkRouteTableCreation"
 )
 
 echo "Starting sequential test execution for azurerm_route_table"

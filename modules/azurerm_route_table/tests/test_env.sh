@@ -1,20 +1,18 @@
 #!/bin/bash
-# This script sets environment variables required for running Terratest against Azure.
-# It is sourced by the main test execution scripts.
+# Azure credentials for testing
+export AZURE_CLIENT_ID="YOUR_AZURE_CLIENT_ID_HERE"
+export AZURE_CLIENT_SECRET="YOUR_AZURE_CLIENT_SECRET_HERE"
+export AZURE_SUBSCRIPTION_ID="YOUR_AZURE_SUBSCRIPTION_ID_HERE"
+export AZURE_TENANT_ID="YOUR_AZURE_TENANT_ID_HERE"
 
-# To run tests, you must provide credentials for an Azure Service Principal.
-# It is recommended to set these in your CI/CD environment or a local .env file.
-#
-# Example:
-# export AZURE_SUBSCRIPTION_ID="your-subscription-id"
-# export AZURE_TENANT_ID="your-tenant-id"
-# export AZURE_CLIENT_ID="your-client-id"
-# export AZURE_CLIENT_SECRET="your-client-secret"
+# ARM_ prefixed variables for Terraform provider
+export ARM_CLIENT_ID="${AZURE_CLIENT_ID}"
+export ARM_CLIENT_SECRET="${AZURE_CLIENT_SECRET}"
+export ARM_SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID}"
+export ARM_TENANT_ID="${AZURE_TENANT_ID}"
 
-# Check for required environment variables
-if [ -z "$AZURE_SUBSCRIPTION_ID" ] || [ -z "$AZURE_TENANT_ID" ] || [ -z "$AZURE_CLIENT_ID" ] || [ -z "$AZURE_CLIENT_SECRET" ]; then
-    echo "Warning: One or more required Azure environment variables are not set."
-    echo "Please set: AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET"
-fi
+# Additional settings
+export ARM_SKIP_PROVIDER_REGISTRATION=true
+export AZURE_LOCATION="northeurope"
 
-echo "Test environment script loaded."
+echo "Azure credentials set for testing"

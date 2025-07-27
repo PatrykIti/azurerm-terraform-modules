@@ -1,21 +1,40 @@
+# Basic Route Table Example
+# This example creates a minimal route table with secure defaults
+
+terraform {
+  required_version = ">= 1.12.2"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 4.36.0"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-route_table-basic-example"
-  location = "West Europe"
+# Create a resource group
+resource "azurerm_resource_group" "test" {
+  name     = "rg-rt-bas-${var.random_suffix}"
+  location = var.location
 }
 
+# Create the route table
 module "route_table" {
   source = "../../.."
 
-  name                = "routetableexample001"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  # Basic route table configuration
+  name                = "rt-bas-${var.random_suffix}"
+  resource_group_name = azurerm_resource_group.test.name
+  location            = azurerm_resource_group.test.location
+
+  # BGP route propagation enabled by default (secure default)
+  bgp_route_propagation_enabled = true
 
   tags = {
-    Environment = "Development"
+    Environment = "Test"
     Example     = "Basic"
   }
 }

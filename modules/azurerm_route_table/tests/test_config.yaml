@@ -2,39 +2,36 @@
 test_suites:
   - name: "Basic Tests"
     tests:
-      - TestBasicRoute Table
+      - TestBasicRouteTable
     parallel: true
     timeout: 15m
     
   - name: "Complete Feature Tests"
     tests:
-      - TestCompleteRoute Table
-      - TestRoute TableSecurity
-      - TestRoute TableNetworkRules
-      - TestRoute TablePrivateEndpoint
+      - TestCompleteRouteTable
+      - TestSecureRouteTable
+      - TestNetworkRouteTable
     parallel: true
     timeout: 30m
     
   - name: "Validation Tests"
     tests:
-      - TestRoute TableValidationRules
+      - TestRouteTableValidationRules
     parallel: true
     timeout: 10m
     
   - name: "Integration Tests"
     tests:
-      - TestRoute TableFullIntegration
-      - TestRoute TableLifecycle
-      - TestRoute TableCompliance
-      - TestRoute TableMonitoring
+      - TestRouteTableLifecycle
+      - TestRouteTableMultipleUpdates
+      - TestRouteTableWithSubnetAssociation
     parallel: false
     timeout: 45m
     
   - name: "Performance Tests"
     tests:
-      - BenchmarkRoute TableCreation
-      - TestRoute TableCreationTime
-      - TestRoute TableScaling
+      - BenchmarkRouteTableCreation
+      - TestRouteTableCreationTime
     parallel: false
     timeout: 60m
     benchmark: true

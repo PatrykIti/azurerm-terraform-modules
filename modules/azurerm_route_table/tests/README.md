@@ -18,7 +18,7 @@ export ARM_SUBSCRIPTION_ID="your-subscription-id"
 export ARM_TENANT_ID="your-tenant-id"
 export ARM_CLIENT_ID="your-client-id"
 export ARM_CLIENT_SECRET="your-client-secret"
-export ARM_LOCATION="West Europe"  # Optional, defaults to West Europe
+export ARM_LOCATION="northeurope"  # Optional, defaults to North Europe
 ```
 
 ## Running Tests
@@ -50,16 +50,28 @@ make test-integration
 ### Run Specific Test
 
 ```bash
-go test -v -run TestModuleBasic -timeout 30m
+go test -v -run TestBasicRouteTable -timeout 30m
+```
+
+### Run Tests in Parallel
+
+```bash
+./run_tests_parallel.sh
+```
+
+### Run Tests Sequentially
+
+```bash
+./run_tests_sequential.sh
 ```
 
 ## Test Structure
 
 ### Test Files
 
-- `module_test.go` - Main module functionality tests
-- `integration_test.go` - Integration tests with other Azure services
-- `performance_test.go` - Performance and load tests
+- `route_table_test.go` - Main module functionality tests
+- `integration_test.go` - Integration tests with Virtual Networks and Subnets
+- `performance_test.go` - Performance benchmarks and timing tests
 - `test_helpers.go` - Common test utilities and helpers
 - `test_config.yaml` - Test configuration and scenarios
 
@@ -67,36 +79,36 @@ go test -v -run TestModuleBasic -timeout 30m
 
 The `fixtures/` directory contains Terraform configurations for different test scenarios:
 
-- `fixtures/basic/` - Basic module configuration
-- `fixtures/complete/` - Complete feature demonstration
-- `fixtures/secure/` - Security-focused configuration
-- `fixtures/private_endpoint/` - Private endpoint configuration
-- `fixtures/network/` - Network integration tests
-- `fixtures/negative/` - Negative test cases
+- `fixtures/basic/` - Basic route table configuration with minimal routes
+- `fixtures/complete/` - Complete feature demonstration with multiple routes
+- `fixtures/secure/` - Security-focused configuration with firewall routes
+- `fixtures/network/` - Network integration tests with subnet associations
+- `fixtures/negative/` - Negative test cases for validation rules
 
 ## Test Scenarios
 
 ### Basic Tests (`-short` flag)
 
-- Module deployment and destruction
-- Basic functionality validation
+- Route table creation and destruction
+- Basic route configuration validation
 - Output verification
 - Resource naming validation
+- Default route behavior
 
 ### Integration Tests
 
-- Integration with other Azure services
-- Network connectivity tests
-- Security compliance validation
-- Disaster recovery scenarios
-- Monitoring and logging validation
+- Route table association with subnets
+- Multiple route updates and lifecycle management
+- Integration with Virtual Networks
+- Route propagation settings
+- Next hop type validations
 
 ### Performance Tests
 
-- Resource creation time
-- Concurrent deployment handling
-- Resource limits testing
-- Cleanup performance
+- Route table creation time benchmarks
+- Concurrent route table deployments
+- Large number of routes handling
+- Update performance testing
 
 ## Test Configuration
 
