@@ -18,7 +18,7 @@ provider "azurerm" {
 
 # Resource Group
 resource "azurerm_resource_group" "example" {
-  name     = "rg-subnet-secure-${var.name_suffix}"
+  name     = var.resource_group_name
   location = var.location
 
   tags = var.tags
@@ -26,7 +26,7 @@ resource "azurerm_resource_group" "example" {
 
 # Virtual Network with DDoS Protection (optional)
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-secure-${var.name_suffix}"
+  name                = var.virtual_network_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   address_space       = ["10.0.0.0/16"]
@@ -43,7 +43,7 @@ resource "azurerm_virtual_network" "example" {
 
 # Network Security Group with restrictive rules
 resource "azurerm_network_security_group" "example" {
-  name                = "nsg-secure-${var.name_suffix}"
+  name                = var.nsg_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -107,7 +107,7 @@ resource "azurerm_network_security_group" "example" {
 
 # Route Table to force traffic through firewall/NVA
 resource "azurerm_route_table" "example" {
-  name                          = "rt-secure-${var.name_suffix}"
+  name                          = var.route_table_name
   location                      = azurerm_resource_group.example.location
   resource_group_name           = azurerm_resource_group.example.name
   disable_bgp_route_propagation = true
@@ -133,7 +133,7 @@ resource "azurerm_route_table" "example" {
 
 # Service Endpoint Policy to restrict access to specific storage accounts
 resource "azurerm_subnet_service_endpoint_storage_policy" "example" {
-  name                = "sep-secure-${var.name_suffix}"
+  name                = "sep-subnet-secure-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -154,7 +154,7 @@ resource "azurerm_subnet_service_endpoint_storage_policy" "example" {
 module "subnet" {
   source = "../../"
 
-  name                 = "subnet-secure-${var.name_suffix}"
+  name                 = var.app_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -199,7 +199,7 @@ resource "azurerm_subnet_route_table_association" "subnet" {
 module "subnet_private_endpoints" {
   source = "../../"
 
-  name                 = "subnet-pe-${var.name_suffix}"
+  name                 = var.db_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.2.0/24"]

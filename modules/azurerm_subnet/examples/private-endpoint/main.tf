@@ -18,7 +18,7 @@ provider "azurerm" {
 
 # Resource Group
 resource "azurerm_resource_group" "example" {
-  name     = "rg-subnet-pe-${var.name_suffix}"
+  name     = var.resource_group_name
   location = var.location
 
   tags = var.tags
@@ -26,7 +26,7 @@ resource "azurerm_resource_group" "example" {
 
 # Virtual Network
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-pe-${var.name_suffix}"
+  name                = var.virtual_network_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   address_space       = ["10.0.0.0/16"]
@@ -36,7 +36,7 @@ resource "azurerm_virtual_network" "example" {
 
 # Network Security Group for private endpoint subnet
 resource "azurerm_network_security_group" "example" {
-  name                = "nsg-pe-${var.name_suffix}"
+  name                = var.nsg_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -73,7 +73,7 @@ resource "azurerm_network_security_group" "example" {
 module "subnet_private_endpoint" {
   source = "../../"
 
-  name                 = "subnet-pe-${var.name_suffix}"
+  name                 = var.subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]

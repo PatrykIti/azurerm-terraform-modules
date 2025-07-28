@@ -19,7 +19,7 @@ provider "azurerm" {
 
 # Resource Group
 resource "azurerm_resource_group" "example" {
-  name     = "rg-subnet-wrapper-${var.name_suffix}"
+  name     = var.resource_group_name
   location = var.location
 
   tags = var.tags
@@ -27,7 +27,7 @@ resource "azurerm_resource_group" "example" {
 
 # Virtual Network
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-wrapper-${var.name_suffix}"
+  name                = var.virtual_network_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   address_space       = ["10.0.0.0/16"]
@@ -37,7 +37,7 @@ resource "azurerm_virtual_network" "example" {
 
 # Network Security Groups
 resource "azurerm_network_security_group" "app" {
-  name                = "nsg-app-${var.name_suffix}"
+  name                = var.app_nsg_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -57,7 +57,7 @@ resource "azurerm_network_security_group" "app" {
 }
 
 resource "azurerm_network_security_group" "data" {
-  name                = "nsg-data-${var.name_suffix}"
+  name                = var.data_nsg_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -79,7 +79,7 @@ resource "azurerm_network_security_group" "data" {
 
 # Route Tables
 resource "azurerm_route_table" "app" {
-  name                          = "rt-app-${var.name_suffix}"
+  name                          = var.app_route_table_name
   location                      = azurerm_resource_group.example.location
   resource_group_name           = azurerm_resource_group.example.name
   disable_bgp_route_propagation = false
@@ -94,7 +94,7 @@ resource "azurerm_route_table" "app" {
 }
 
 resource "azurerm_route_table" "data" {
-  name                          = "rt-data-${var.name_suffix}"
+  name                          = var.data_route_table_name
   location                      = azurerm_resource_group.example.location
   resource_group_name           = azurerm_resource_group.example.name
   disable_bgp_route_propagation = true
@@ -114,7 +114,7 @@ resource "azurerm_route_table" "data" {
 module "subnet_app" {
   source = "../../"
 
-  name                 = "subnet-app-${var.name_suffix}"
+  name                 = var.app_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -132,7 +132,7 @@ module "subnet_app" {
 module "subnet_data" {
   source = "../../"
 
-  name                 = "subnet-data-${var.name_suffix}"
+  name                 = var.data_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.2.0/24"]
@@ -150,7 +150,7 @@ module "subnet_data" {
 module "subnet_management" {
   source = "../../"
 
-  name                 = "subnet-mgmt-${var.name_suffix}"
+  name                 = var.mgmt_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.3.0/24"]

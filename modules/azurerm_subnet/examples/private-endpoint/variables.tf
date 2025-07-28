@@ -1,13 +1,31 @@
 variable "location" {
   description = "Azure region for resources"
   type        = string
-  default     = "northeurope"
+  default     = "West Europe"
 }
 
-variable "name_suffix" {
-  description = "Suffix for resource names to ensure uniqueness"
+variable "resource_group_name" {
+  description = "The name of the resource group"
   type        = string
-  default     = "004"
+  default     = "rg-subnet-pe-example"
+}
+
+variable "virtual_network_name" {
+  description = "The name of the virtual network"
+  type        = string
+  default     = "vnet-subnet-pe-example"
+}
+
+variable "subnet_name" {
+  description = "The name of the private endpoint subnet"
+  type        = string
+  default     = "snet-pe-example"
+}
+
+variable "nsg_name" {
+  description = "The name of the network security group"
+  type        = string
+  default     = "nsg-subnet-pe-example"
 }
 
 variable "tags" {
