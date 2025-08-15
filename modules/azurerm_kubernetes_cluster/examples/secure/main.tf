@@ -222,32 +222,6 @@ module "kubernetes_cluster" {
     ]
   }
 
-  # Diagnostic settings
-  diagnostic_settings = {
-    name                       = "diag-aks-secure-example"
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-
-    enabled_log_categories = [
-      "kube-apiserver",
-      "kube-audit",
-      "kube-audit-admin",
-      "kube-controller-manager",
-      "kube-scheduler",
-      "cluster-autoscaler",
-      "cloud-controller-manager",
-      "guard",
-      "csi-azuredisk-controller",
-      "csi-azurefile-controller",
-      "csi-snapshot-controller"
-    ]
-
-    metrics = [
-      {
-        category = "AllMetrics"
-        enabled  = true
-      }
-    ]
-  }
 
   tags = {
     Environment = "Production"

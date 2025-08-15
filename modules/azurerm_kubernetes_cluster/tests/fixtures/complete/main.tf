@@ -124,20 +124,6 @@ module "kubernetes_cluster" {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
   }
 
-  # Multiple diagnostic settings - demonstrating sending logs to different destinations
-  diagnostic_settings = [
-    {
-      name                       = "send-to-log-analytics"
-      log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
-      enabled_log_categories     = ["kube-apiserver", "kube-audit", "kube-controller-manager"]
-      metrics = [
-        {
-          category = "AllMetrics"
-          enabled  = true
-        }
-      ]
-    }
-  ]
 
   # Network configuration for private cluster
   network_profile = {
