@@ -18,24 +18,24 @@ output "virtual_network_guid" {
   value       = module.virtual_network.guid
 }
 
-output "virtual_network_flow_log" {
-  description = "Information about network flow log configuration"
-  value       = module.virtual_network.flow_log
+output "virtual_network_flow_log_id" {
+  description = "ID of the network flow log"
+  value       = azurerm_network_watcher_flow_log.test.id
 }
 
-output "virtual_network_diagnostic_setting" {
-  description = "Information about diagnostic settings"
-  value       = module.virtual_network.diagnostic_setting
+output "virtual_network_diagnostic_setting_id" {
+  description = "ID of the diagnostic setting"
+  value       = azurerm_monitor_diagnostic_setting.test.id
 }
 
 output "flow_logs_configuration" {
   description = "Summary of flow logs configuration"
   value = {
-    flow_logs_enabled  = module.virtual_network.flow_log != null
-    flow_log_version   = module.virtual_network.flow_log != null ? module.virtual_network.flow_log.version : null
-    flow_log_id        = module.virtual_network.flow_log != null ? module.virtual_network.flow_log.id : null
-    storage_account_id = module.virtual_network.flow_log != null ? module.virtual_network.flow_log.storage_account_id : null
-    monitoring_enabled = module.virtual_network.diagnostic_setting != null
+    flow_logs_enabled  = true
+    flow_log_version   = azurerm_network_watcher_flow_log.test.version
+    flow_log_id        = azurerm_network_watcher_flow_log.test.id
+    storage_account_id = azurerm_network_watcher_flow_log.test.storage_account_id
+    monitoring_enabled = true
   }
 }
 

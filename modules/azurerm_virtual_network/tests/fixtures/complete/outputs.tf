@@ -18,19 +18,19 @@ output "virtual_network_guid" {
   value       = module.virtual_network.guid
 }
 
-output "virtual_network_peerings" {
-  description = "Information about Virtual Network peerings"
-  value       = module.virtual_network.peerings
+output "virtual_network_peering_id" {
+  description = "ID of the Virtual Network peering"
+  value       = azurerm_virtual_network_peering.test.id
 }
 
-output "virtual_network_dns_links" {
-  description = "Information about Private DNS Zone links"
-  value       = module.virtual_network.private_dns_zone_links
+output "virtual_network_dns_link_id" {
+  description = "ID of the Private DNS Zone link"
+  value       = azurerm_private_dns_zone_virtual_network_link.test.id
 }
 
-output "virtual_network_diagnostic_setting" {
-  description = "Information about diagnostic settings"
-  value       = module.virtual_network.diagnostic_setting
+output "virtual_network_diagnostic_setting_id" {
+  description = "ID of the diagnostic setting"
+  value       = azurerm_monitor_diagnostic_setting.test.id
 }
 
 output "virtual_network_configuration" {

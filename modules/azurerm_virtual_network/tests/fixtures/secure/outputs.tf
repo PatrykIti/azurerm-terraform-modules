@@ -23,23 +23,23 @@ output "virtual_network_ddos_protection" {
   value       = "DDoS protection configured via input variables"
 }
 
-output "virtual_network_flow_log" {
-  description = "Information about network flow log configuration"
-  value       = module.virtual_network.flow_log
+output "virtual_network_flow_log_id" {
+  description = "ID of the network flow log"
+  value       = azurerm_network_watcher_flow_log.test.id
 }
 
-output "virtual_network_diagnostic_setting" {
-  description = "Information about diagnostic settings"
-  value       = module.virtual_network.diagnostic_setting
+output "virtual_network_diagnostic_setting_id" {
+  description = "ID of the diagnostic setting"
+  value       = azurerm_monitor_diagnostic_setting.test.id
 }
 
 output "virtual_network_security_configuration" {
   description = "Summary of security configuration"
   value = {
     ddos_protection_enabled = true
-    flow_logs_enabled       = module.virtual_network.flow_log != null
+    flow_logs_enabled       = true
     encryption_enabled      = true
-    monitoring_enabled      = module.virtual_network.diagnostic_setting != null
+    monitoring_enabled      = true
   }
 }
 

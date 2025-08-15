@@ -99,43 +99,63 @@ module "virtual_network" {
   # Network Flow Configuration
   flow_timeout_in_minutes = 10
 
-  # Network Watcher Flow Log for monitoring
-  flow_log = {
-    network_watcher_name                = local.network_watcher_name
-    network_watcher_resource_group_name = local.network_watcher_rg
-    network_security_group_id           = azurerm_network_security_group.test.id
-    storage_account_id                  = azurerm_storage_account.flow.id
-    enabled                             = true
-    version                             = 2
-    retention_policy = {
-      enabled = true
-      days    = 7
-    }
-    traffic_analytics = {
-      enabled               = true
-      workspace_id          = azurerm_log_analytics_workspace.flow.workspace_id
-      workspace_region      = azurerm_log_analytics_workspace.flow.location
-      workspace_resource_id = azurerm_log_analytics_workspace.flow.id
-      interval_in_minutes   = 10
-    }
+  tags = {
+    Environment = "Test"
+    Module      = "azurerm_virtual_network"
+    Test        = "FlowLogs"
+  }
+}
+
+# Network Watcher Flow Log - now managed as separate resource for monitoring
+resource "azurerm_network_watcher_flow_log" "test" {
+  network_watcher_name = local.network_watcher_name
+  resource_group_name  = local.network_watcher_rg
+  name                 = "${module.virtual_network.name}-flowlog"
+  target_resource_id   = azurerm_network_security_group.test.id
+  storage_account_id   = azurerm_storage_account.flow.id
+  enabled              = true
+  version              = 2
+
+  retention_policy {
+    enabled = true
+    days    = 7
   }
 
-  # Basic diagnostic settings
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.flow.id
-    storage_account_id         = azurerm_storage_account.flow.id
-    logs = {
-      vm_protection_alerts = true
-    }
-    metrics = {
-      all_metrics = true
-    }
+  traffic_analytics {
+    enabled               = true
+    workspace_id          = azurerm_log_analytics_workspace.flow.workspace_id
+    workspace_region      = azurerm_log_analytics_workspace.flow.location
+    workspace_resource_id = azurerm_log_analytics_workspace.flow.id
+    interval_in_minutes   = 10
   }
 
   tags = {
     Environment = "Test"
     Module      = "azurerm_virtual_network"
     Test        = "FlowLogs"
+    Purpose     = "Flow Log Monitoring"
   }
+
+  depends_on = [module.virtual_network]
+}
+
+# Diagnostic Settings - now managed as separate resource
+resource "azurerm_monitor_diagnostic_setting" "test" {
+  name                       = "${module.virtual_network.name}-diag"
+  target_resource_id         = module.virtual_network.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.flow.id
+  storage_account_id         = azurerm_storage_account.flow.id
+
+  # Virtual Network Logs
+  enabled_log {
+    category = "VMProtectionAlerts"
+  }
+
+  # Virtual Network Metrics
+  metric {
+    category = "AllMetrics"
+    enabled  = true
+  }
+
+  depends_on = [module.virtual_network]
 }

@@ -131,39 +131,6 @@ module "virtual_network" {
     enforcement = "AllowUnencrypted"
   }
 
-  # Network Watcher Flow Log for security monitoring
-  flow_log = {
-    network_watcher_name                = azurerm_network_watcher.example.name
-    network_watcher_resource_group_name = azurerm_resource_group.example.name
-    network_security_group_id           = azurerm_network_security_group.example.id
-    storage_account_id                  = azurerm_storage_account.security.id
-    enabled                             = true
-    version                             = 2
-    retention_policy = {
-      enabled = true
-      days    = 90
-    }
-    traffic_analytics = {
-      enabled               = true
-      workspace_id          = azurerm_log_analytics_workspace.security.workspace_id
-      workspace_region      = azurerm_log_analytics_workspace.security.location
-      workspace_resource_id = azurerm_log_analytics_workspace.security.id
-      interval_in_minutes   = 10
-    }
-  }
-
-  # Comprehensive diagnostic settings for security monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.security.id
-    storage_account_id         = azurerm_storage_account.security.id
-    logs = {
-      vm_protection_alerts = true
-    }
-    metrics = {
-      all_metrics = true
-    }
-  }
 
   # Lifecycle Management - prevent accidental deletion
 
@@ -176,4 +143,58 @@ module "virtual_network" {
     Owner         = "Security Team"
     CostCenter    = "Security-Infrastructure"
   }
+}
+
+# Network Watcher Flow Log - now managed as separate resource for security monitoring
+resource "azurerm_network_watcher_flow_log" "example" {
+  network_watcher_name = azurerm_network_watcher.example.name
+  resource_group_name  = azurerm_resource_group.example.name
+  name                 = "${module.virtual_network.name}-flowlog"
+  target_resource_id   = azurerm_network_security_group.example.id
+  storage_account_id   = azurerm_storage_account.security.id
+  enabled              = true
+  version              = 2
+
+  retention_policy {
+    enabled = true
+    days    = 90
+  }
+
+  traffic_analytics {
+    enabled               = true
+    workspace_id          = azurerm_log_analytics_workspace.security.workspace_id
+    workspace_region      = azurerm_log_analytics_workspace.security.location
+    workspace_resource_id = azurerm_log_analytics_workspace.security.id
+    interval_in_minutes   = 10
+  }
+
+  tags = {
+    Environment   = "Production"
+    Example       = "Secure"
+    Purpose       = "Security Monitoring"
+    SecurityLevel = "High"
+  }
+
+  depends_on = [module.virtual_network]
+}
+
+# Diagnostic Settings - now managed as separate resource for security monitoring
+resource "azurerm_monitor_diagnostic_setting" "example" {
+  name                       = "${module.virtual_network.name}-diag"
+  target_resource_id         = module.virtual_network.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.security.id
+  storage_account_id         = azurerm_storage_account.security.id
+
+  # Virtual Network Logs
+  enabled_log {
+    category = "VMProtectionAlerts"
+  }
+
+  # Virtual Network Metrics
+  metric {
+    category = "AllMetrics"
+    enabled  = true
+  }
+
+  depends_on = [module.virtual_network]
 }

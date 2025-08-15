@@ -102,46 +102,6 @@ module "virtual_network" {
     enforcement = "AllowUnencrypted"
   }
 
-  # Virtual Network Peerings
-  peerings = [
-    {
-      name                         = "peer-to-vnet-peer"
-      remote_virtual_network_id    = azurerm_virtual_network.peer.id
-      allow_virtual_network_access = true
-      allow_forwarded_traffic      = true
-      allow_gateway_transit        = false
-      use_remote_gateways          = false
-      triggers = {
-        remote_address_space = join(",", azurerm_virtual_network.peer.address_space)
-      }
-    }
-  ]
-
-  # Private DNS Zone Links
-  private_dns_zone_links = [
-    {
-      name                  = "link-to-example-internal"
-      resource_group_name   = azurerm_resource_group.example.name
-      private_dns_zone_name = azurerm_private_dns_zone.example.name
-      registration_enabled  = true
-      tags = {
-        Purpose = "DNS Resolution"
-      }
-    }
-  ]
-
-  # Diagnostic Settings
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    storage_account_id         = azurerm_storage_account.example.id
-    logs = {
-      vm_protection_alerts = true
-    }
-    metrics = {
-      all_metrics = true
-    }
-  }
 
   # Lifecycle Management
 
@@ -152,4 +112,62 @@ module "virtual_network" {
     Owner       = "Platform Team"
     CostCenter  = "IT-Infrastructure"
   }
+}
+
+# Virtual Network Peering - now managed as separate resource
+resource "azurerm_virtual_network_peering" "example" {
+  name                         = "peer-to-vnet-peer"
+  resource_group_name          = azurerm_resource_group.example.name
+  virtual_network_name         = module.virtual_network.name
+  remote_virtual_network_id    = azurerm_virtual_network.peer.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = true
+  allow_gateway_transit        = false
+  use_remote_gateways          = false
+
+  # Triggers for recreation when peering configuration changes
+  triggers = {
+    remote_address_space = join(",", azurerm_virtual_network.peer.address_space)
+  }
+
+  depends_on = [module.virtual_network]
+}
+
+# Private DNS Zone Virtual Network Link - now managed as separate resource
+resource "azurerm_private_dns_zone_virtual_network_link" "example" {
+  name                  = "link-to-example-internal"
+  resource_group_name   = azurerm_resource_group.example.name
+  private_dns_zone_name = azurerm_private_dns_zone.example.name
+  virtual_network_id    = module.virtual_network.id
+  registration_enabled  = true
+
+  tags = merge({
+    Purpose = "DNS Resolution"
+  }, {
+    Environment = "Development"
+    Example     = "Complete"
+  })
+
+  depends_on = [module.virtual_network]
+}
+
+# Diagnostic Settings - now managed as separate resource
+resource "azurerm_monitor_diagnostic_setting" "example" {
+  name                       = "${module.virtual_network.name}-diag"
+  target_resource_id         = module.virtual_network.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+  storage_account_id         = azurerm_storage_account.example.id
+
+  # Virtual Network Logs
+  enabled_log {
+    category = "VMProtectionAlerts"
+  }
+
+  # Virtual Network Metrics
+  metric {
+    category = "AllMetrics"
+    enabled  = true
+  }
+
+  depends_on = [module.virtual_network]
 }
