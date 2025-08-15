@@ -112,18 +112,6 @@ module "storage_account" {
     bypass                     = ["AzureServices"]
   }
 
-  # Diagnostic settings
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
-    metrics = {
-      enabled = true
-      retention_policy = {
-        enabled = true
-        days    = 30
-      }
-    }
-  }
 
   # Tags
   tags = {

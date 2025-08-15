@@ -323,33 +323,6 @@ module "secure_storage" {
     virtual_network_subnet_ids = [azurerm_subnet.app.id]
   }
 
-  # Private endpoints for all services
-  private_endpoints = [
-    {
-      name                 = "blob"
-      subresource_names    = ["blob"]
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
-    },
-    {
-      name                 = "file"
-      subresource_names    = ["file"]
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.file.id]
-    },
-    {
-      name                 = "queue"
-      subresource_names    = ["queue"]
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.queue.id]
-    },
-    {
-      name                 = "table"
-      subresource_names    = ["table"]
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.table.id]
-    }
-  ]
 
   # Identity for managed authentication
   identity = {
@@ -372,20 +345,6 @@ module "secure_storage" {
     }
   }
 
-  # Comprehensive logging
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    logs = {
-      storage_read   = true
-      storage_write  = true
-      storage_delete = true
-    }
-    metrics = {
-      transaction = true
-      capacity    = true
-    }
-  }
 
   # Containers with security configurations
   containers = [
@@ -418,4 +377,139 @@ module "secure_storage" {
     azurerm_private_dns_zone_virtual_network_link.blob,
     azurerm_private_dns_zone_virtual_network_link.file
   ]
+}
+
+# Private endpoints for all storage services
+resource "azurerm_private_endpoint" "blob" {
+  name                = "${module.secure_storage.name}-pe-blob"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  subnet_id           = azurerm_subnet.private_endpoints.id
+
+  private_service_connection {
+    name                           = "${module.secure_storage.name}-psc-blob"
+    private_connection_resource_id = module.secure_storage.id
+    is_manual_connection           = false
+    subresource_names              = ["blob"]
+  }
+
+  private_dns_zone_group {
+    name                 = "default"
+    private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
+  }
+
+  tags = merge(var.tags, {
+    Purpose = "Blob storage private access"
+  })
+}
+
+resource "azurerm_private_endpoint" "file" {
+  name                = "${module.secure_storage.name}-pe-file"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  subnet_id           = azurerm_subnet.private_endpoints.id
+
+  private_service_connection {
+    name                           = "${module.secure_storage.name}-psc-file"
+    private_connection_resource_id = module.secure_storage.id
+    is_manual_connection           = false
+    subresource_names              = ["file"]
+  }
+
+  private_dns_zone_group {
+    name                 = "default"
+    private_dns_zone_ids = [azurerm_private_dns_zone.file.id]
+  }
+
+  tags = merge(var.tags, {
+    Purpose = "File storage private access"
+  })
+}
+
+resource "azurerm_private_endpoint" "queue" {
+  name                = "${module.secure_storage.name}-pe-queue"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  subnet_id           = azurerm_subnet.private_endpoints.id
+
+  private_service_connection {
+    name                           = "${module.secure_storage.name}-psc-queue"
+    private_connection_resource_id = module.secure_storage.id
+    is_manual_connection           = false
+    subresource_names              = ["queue"]
+  }
+
+  private_dns_zone_group {
+    name                 = "default"
+    private_dns_zone_ids = [azurerm_private_dns_zone.queue.id]
+  }
+
+  tags = merge(var.tags, {
+    Purpose = "Queue storage private access"
+  })
+}
+
+resource "azurerm_private_endpoint" "table" {
+  name                = "${module.secure_storage.name}-pe-table"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  subnet_id           = azurerm_subnet.private_endpoints.id
+
+  private_service_connection {
+    name                           = "${module.secure_storage.name}-psc-table"
+    private_connection_resource_id = module.secure_storage.id
+    is_manual_connection           = false
+    subresource_names              = ["table"]
+  }
+
+  private_dns_zone_group {
+    name                 = "default"
+    private_dns_zone_ids = [azurerm_private_dns_zone.table.id]
+  }
+
+  tags = merge(var.tags, {
+    Purpose = "Table storage private access"
+  })
+}
+
+# Diagnostic settings for comprehensive logging
+resource "azurerm_monitor_diagnostic_setting" "storage_account" {
+  name                       = "${module.secure_storage.name}-diag"
+  target_resource_id         = module.secure_storage.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+
+  # Storage account level only has metrics, no logs
+  metric {
+    category = "Transaction"
+  }
+
+  metric {
+    category = "Capacity"
+  }
+}
+
+resource "azurerm_monitor_diagnostic_setting" "blob_service" {
+  name                       = "${module.secure_storage.name}-blob-diag"
+  target_resource_id         = "${module.secure_storage.id}/blobServices/default"
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+
+  enabled_log {
+    category = "StorageRead"
+  }
+
+  enabled_log {
+    category = "StorageWrite"
+  }
+
+  enabled_log {
+    category = "StorageDelete"
+  }
+
+  metric {
+    category = "Transaction"
+  }
+
+  metric {
+    category = "Capacity"
+  }
 }

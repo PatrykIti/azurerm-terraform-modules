@@ -144,20 +144,6 @@ module "data_lake_storage" {
     }
   }
 
-  # Monitoring configuration
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    logs = {
-      storage_read   = true
-      storage_write  = true
-      storage_delete = true
-    }
-    metrics = {
-      transaction = true
-      capacity    = true
-    }
-  }
 
   # Lifecycle management for data lake
   lifecycle_rules = [

@@ -194,42 +194,6 @@ module "storage_account" {
     virtual_network_subnet_ids = [] # Only private endpoints
   }
 
-  # Private endpoints for all services
-  private_endpoints = [
-    {
-      name                 = "blob"
-      subresource_names    = ["blob"]
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.storage["blob"].id]
-    },
-    {
-      name                 = "web"
-      subresource_names    = ["web"]
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.storage["web"].id]
-    },
-    {
-      name                 = "dfs"
-      subresource_names    = ["dfs"]
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.storage["dfs"].id]
-    }
-  ]
-
-  # Comprehensive monitoring and auditing
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    logs = {
-      storage_read   = true
-      storage_write  = true
-      storage_delete = true
-    }
-    metrics = {
-      transaction = true
-      capacity    = true
-    }
-  }
 
   # Identity configuration
   identity = {

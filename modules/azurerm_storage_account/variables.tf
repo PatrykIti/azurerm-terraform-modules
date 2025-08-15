@@ -107,24 +107,6 @@ variable "network_rules" {
   }
 }
 
-# Private Endpoints
-variable "private_endpoints" {
-  description = "List of private endpoints to create for the storage account."
-  type = list(object({
-    name                            = string
-    subresource_names               = list(string)
-    subnet_id                       = string
-    private_dns_zone_ids            = optional(list(string), [])
-    private_service_connection_name = optional(string)
-    is_manual_connection            = optional(bool, false)
-    request_message                 = optional(string)
-    private_dns_zone_group_name     = optional(string, "default")
-    custom_network_interface_name   = optional(string)
-    tags                            = optional(map(string), {})
-  }))
-  default = []
-}
-
 # Azure AD Authentication
 variable "azure_files_authentication" {
   description = "Azure Files authentication configuration."
@@ -209,31 +191,6 @@ variable "identity" {
       try(var.identity.type, "")
     )
     error_message = "Identity type must be 'SystemAssigned', 'UserAssigned', or 'SystemAssigned, UserAssigned'."
-  }
-}
-
-# Diagnostic Settings
-variable "diagnostic_settings" {
-  description = "Diagnostic settings configuration for audit logging."
-  type = object({
-    enabled                    = optional(bool, true)
-    log_analytics_workspace_id = optional(string)
-    storage_account_id         = optional(string)
-    eventhub_auth_rule_id      = optional(string)
-    logs = optional(object({
-      storage_read   = optional(bool, true)
-      storage_write  = optional(bool, true)
-      storage_delete = optional(bool, true)
-      retention_days = optional(number, 7)
-    }), {})
-    metrics = optional(object({
-      transaction    = optional(bool, true)
-      capacity       = optional(bool, true)
-      retention_days = optional(number, 7)
-    }), {})
-  })
-  default = {
-    enabled = false
   }
 }
 

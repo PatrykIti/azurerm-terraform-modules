@@ -70,15 +70,31 @@ module "storage_account" {
     bypass                     = [] # No bypass, completely private
   }
 
-  # Private endpoint configuration
-  private_endpoints = [
-    {
-      name                 = "blob-endpoint"
-      subnet_id            = azurerm_subnet.endpoint.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
-      subresource_names    = ["blob"]
-    }
-  ]
+
+  tags = {
+    Environment = "Test"
+    TestType    = "PrivateEndpoint"
+  }
+}
+
+# Private endpoint for blob storage
+resource "azurerm_private_endpoint" "blob" {
+  name                = "pe-${module.storage_account.name}-blob"
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
+  subnet_id           = azurerm_subnet.endpoint.id
+
+  private_service_connection {
+    name                           = "psc-${module.storage_account.name}-blob"
+    private_connection_resource_id = module.storage_account.id
+    is_manual_connection           = false
+    subresource_names              = ["blob"]
+  }
+
+  private_dns_zone_group {
+    name                 = "default"
+    private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
+  }
 
   tags = {
     Environment = "Test"
@@ -99,5 +115,5 @@ output "resource_group_name" {
 }
 
 output "private_endpoint_id" {
-  value = try(values(module.storage_account.private_endpoints)[0].id, null)
+  value = azurerm_private_endpoint.blob.id
 }

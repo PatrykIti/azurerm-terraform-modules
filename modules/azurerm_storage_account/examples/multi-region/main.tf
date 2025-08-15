@@ -95,20 +95,6 @@ module "primary_storage" {
     ip_rules       = var.allowed_ip_ranges
   }
 
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
-    logs = {
-      storage_read   = true
-      storage_write  = true
-      storage_delete = true
-    }
-    metrics = {
-      transaction = true
-      capacity    = true
-    }
-  }
 
   # Blob properties for replication
   blob_properties = {
@@ -239,20 +225,6 @@ module "secondary_storage" {
     ip_rules       = var.allowed_ip_ranges
   }
 
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
-    logs = {
-      storage_read   = true
-      storage_write  = true
-      storage_delete = true
-    }
-    metrics = {
-      transaction = true
-      capacity    = true
-    }
-  }
 
   # Blob properties
   blob_properties = {
@@ -344,20 +316,6 @@ module "dr_storage" {
     ip_rules       = var.allowed_ip_ranges
   }
 
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
-    logs = {
-      storage_read   = true
-      storage_write  = true
-      storage_delete = true
-    }
-    metrics = {
-      transaction = true
-      capacity    = true
-    }
-  }
 
   # Blob properties optimized for archive
   blob_properties = {
@@ -451,20 +409,6 @@ module "replication_metadata" {
     allow_nested_items_to_be_public = false
   }
 
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
-    logs = {
-      storage_read   = true
-      storage_write  = true
-      storage_delete = true
-    }
-    metrics = {
-      transaction = true
-      capacity    = true
-    }
-  }
 
   # Containers for replication tracking
   containers = [

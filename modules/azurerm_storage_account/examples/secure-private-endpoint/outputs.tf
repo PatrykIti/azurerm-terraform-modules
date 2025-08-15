@@ -10,7 +10,28 @@ output "storage_account_name" {
 
 output "private_endpoints" {
   description = "Details of the private endpoints"
-  value       = module.secure_storage.private_endpoints
+  value = {
+    blob = {
+      id                 = azurerm_private_endpoint.blob.id
+      name               = azurerm_private_endpoint.blob.name
+      private_ip_address = azurerm_private_endpoint.blob.private_service_connection[0].private_ip_address
+    }
+    file = {
+      id                 = azurerm_private_endpoint.file.id
+      name               = azurerm_private_endpoint.file.name
+      private_ip_address = azurerm_private_endpoint.file.private_service_connection[0].private_ip_address
+    }
+    queue = {
+      id                 = azurerm_private_endpoint.queue.id
+      name               = azurerm_private_endpoint.queue.name
+      private_ip_address = azurerm_private_endpoint.queue.private_service_connection[0].private_ip_address
+    }
+    table = {
+      id                 = azurerm_private_endpoint.table.id
+      name               = azurerm_private_endpoint.table.name
+      private_ip_address = azurerm_private_endpoint.table.private_service_connection[0].private_ip_address
+    }
+  }
 }
 
 output "private_endpoint_subnet_id" {
