@@ -14,25 +14,6 @@ mock_provider "azurerm" {
     }
   }
 
-  mock_resource "azurerm_monitor_diagnostic_setting" {
-    defaults = {
-      id = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Network/networkSecurityGroups/test-nsg|test-diag"
-    }
-  }
-
-  mock_resource "azurerm_network_watcher_flow_log" {
-    defaults = {
-      id = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Network/networkWatchers/test-nw/flowLogs/test-flow-log"
-    }
-  }
-
-  mock_data "azurerm_network_watcher" {
-    defaults = {
-      id       = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Network/networkWatchers/test-nw"
-      name     = "test-nw"
-      location = "northeurope"
-    }
-  }
 }
 
 variables {
@@ -103,23 +84,4 @@ run "verify_no_security_rules" {
   }
 }
 
-# Test flow logs disabled by default
-run "verify_flow_logs_disabled_by_default" {
-  command = plan
-
-  assert {
-    condition     = length(azurerm_network_watcher_flow_log.flow_log) == 0
-    error_message = "Flow logs should be disabled by default"
-  }
-}
-
-# Test diagnostic settings disabled by default
-run "verify_diagnostic_settings_disabled_by_default" {
-  command = plan
-
-  assert {
-    condition     = length(azurerm_monitor_diagnostic_setting.diagnostic_settings) == 0
-    error_message = "Diagnostic settings should be disabled by default"
-  }
-}
 

@@ -56,32 +56,3 @@ output "security_rules" {
   }
 }
 
-# Flow Log Output
-output "flow_log_id" {
-  description = "The ID of the NSG Flow Log resource (if enabled)"
-  value       = var.flow_log_enabled ? azurerm_network_watcher_flow_log.flow_log[0].id : null
-}
-
-output "flow_log_enabled" {
-  description = "Whether NSG Flow Logs are enabled"
-  value       = var.flow_log_enabled
-}
-
-output "traffic_analytics_enabled" {
-  description = "Whether Traffic Analytics is enabled for the flow logs"
-  value       = var.traffic_analytics_enabled
-}
-
-# Diagnostic Settings Output
-output "diagnostic_settings_ids" {
-  description = "Map of diagnostic setting names to their resource IDs"
-  value = {
-    for name, ds in azurerm_monitor_diagnostic_setting.diagnostic_settings :
-    name => ds.id
-  }
-}
-
-output "diagnostic_settings_count" {
-  description = "Number of diagnostic settings configured for the NSG"
-  value       = length(var.diagnostic_settings)
-}

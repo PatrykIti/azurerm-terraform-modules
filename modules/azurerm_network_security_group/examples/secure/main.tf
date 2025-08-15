@@ -18,28 +18,6 @@ resource "azurerm_resource_group" "example" {
   location = var.location
 }
 
-# Supporting resources for Flow Logs and Traffic Analytics
-resource "azurerm_storage_account" "flow_logs" {
-  name                     = "stnsgsecure001"
-  resource_group_name      = azurerm_resource_group.example.name
-  location                 = azurerm_resource_group.example.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
-
-resource "azurerm_log_analytics_workspace" "example" {
-  name                = "law-nsg-secure-example"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
-}
-
-# Use existing Network Watcher in the region
-data "azurerm_network_watcher" "example" {
-  name                = "NetworkWatcher_${azurerm_resource_group.example.location}"
-  resource_group_name = "NetworkWatcherRG"
-}
 
 # Application Security Groups for a three-tier application
 resource "azurerm_application_security_group" "web_tier" {
@@ -68,17 +46,6 @@ module "network_security_group" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  # Enable Flow Logs and Traffic Analytics for security monitoring
-  flow_log_enabled                      = true
-  network_watcher_name                  = data.azurerm_network_watcher.example.name
-  network_watcher_resource_group_name   = "NetworkWatcherRG"
-  flow_log_storage_account_id           = azurerm_storage_account.flow_logs.id
-  flow_log_retention_in_days            = 30
-  traffic_analytics_enabled             = true
-  traffic_analytics_workspace_id        = azurerm_log_analytics_workspace.example.workspace_id
-  traffic_analytics_workspace_resource_id = azurerm_log_analytics_workspace.example.id
-  traffic_analytics_workspace_region    = azurerm_log_analytics_workspace.example.location
-  traffic_analytics_interval_in_minutes = 10
 
   # Zero-trust security rules
   security_rules = [

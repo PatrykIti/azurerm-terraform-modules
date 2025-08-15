@@ -18,45 +18,6 @@ resource "azurerm_resource_group" "example" {
   location = var.location
 }
 
-# Create a storage account for flow logs
-resource "azurerm_storage_account" "flow_logs" {
-  name                     = "stnsgcomplete001"
-  resource_group_name      = azurerm_resource_group.example.name
-  location                 = azurerm_resource_group.example.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  min_tls_version          = "TLS1_2"
-
-  tags = {
-    Environment = "Development"
-    Purpose     = "Flow Logs Storage"
-  }
-}
-
-# Create Log Analytics workspace for Traffic Analytics
-resource "azurerm_log_analytics_workspace" "example" {
-  name                = "law-nsg-complete-example"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
-
-  tags = {
-    Environment = "Development"
-    Purpose     = "Traffic Analytics"
-  }
-}
-
-# Create Network Watcher if it doesn't exist
-resource "azurerm_network_watcher" "example" {
-  name                = "nw-nsg-example-${azurerm_resource_group.example.location}"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-
-  tags = {
-    Environment = "Development"
-  }
-}
 
 # Create Application Security Groups for demonstration
 resource "azurerm_application_security_group" "web_servers" {
@@ -89,36 +50,6 @@ module "network_security_group" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  # Flow Log Configuration
-  flow_log_enabled            = true
-  network_watcher_name        = azurerm_network_watcher.example.name
-  network_watcher_resource_group_name = azurerm_resource_group.example.name  # Network Watcher is in the same RG in this example
-  flow_log_storage_account_id = azurerm_storage_account.flow_logs.id
-  flow_log_retention_in_days  = 30
-  flow_log_version            = 2
-
-  # Traffic Analytics Configuration
-  traffic_analytics_enabled                = true
-  traffic_analytics_workspace_id           = azurerm_log_analytics_workspace.example.workspace_id
-  traffic_analytics_workspace_resource_id  = azurerm_log_analytics_workspace.example.id
-  traffic_analytics_workspace_region       = azurerm_log_analytics_workspace.example.location
-  traffic_analytics_interval_in_minutes    = 10
-
-  # Diagnostic Settings Configuration - multiple streams example
-  diagnostic_settings = [
-    {
-      name                       = "nsg-diagnostics-workspace"
-      log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-      log_categories             = ["NetworkSecurityGroupEvent", "NetworkSecurityGroupRuleCounter"]
-      metric_categories          = ["AllMetrics"]
-    },
-    {
-      name               = "nsg-diagnostics-storage"
-      storage_account_id = azurerm_storage_account.flow_logs.id
-      log_categories     = ["NetworkSecurityGroupEvent"]
-      metric_categories  = []
-    }
-  ]
 
   # Comprehensive Security Rules
   security_rules = [

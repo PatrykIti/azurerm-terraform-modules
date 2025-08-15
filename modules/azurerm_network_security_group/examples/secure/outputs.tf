@@ -17,7 +17,3 @@ output "application_security_group_ids" {
   }
 }
 
-output "flow_log_id" {
-  description = "The ID of the NSG Flow Log resource."
-  value       = module.network_security_group.flow_log_id
-}
