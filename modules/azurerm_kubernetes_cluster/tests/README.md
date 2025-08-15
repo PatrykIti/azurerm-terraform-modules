@@ -70,7 +70,6 @@ The `fixtures/` directory contains Terraform configurations for different test s
 - `fixtures/basic/` - Basic module configuration
 - `fixtures/complete/` - Complete feature demonstration
 - `fixtures/secure/` - Security-focused configuration
-- `fixtures/private_endpoint/` - Private endpoint configuration
 - `fixtures/network/` - Network integration tests
 - `fixtures/negative/` - Negative test cases
 

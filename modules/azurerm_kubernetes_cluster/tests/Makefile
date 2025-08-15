@@ -50,10 +50,6 @@ test-network: check-env deps
 	@echo "Running network tests..."
 	go test -v -timeout 45m -run TestNetworkKubernetesCluster ./...
 
-# Run private endpoint tests
-test-private-endpoint: check-env deps
-	@echo "Running private endpoint tests..."
-	go test -v -timeout 45m -run TestPrivateEndpointKubernetesCluster ./...
 
 # Run validation tests
 test-validation: check-env deps
@@ -105,4 +101,4 @@ lint:
 ci: clean fmt lint test-coverage test-junit
 	@echo "CI pipeline completed successfully!"
 
-.PHONY: check-env deps test test-single test-basic test-complete test-secure test-network test-private-endpoint test-validation test-integration benchmark test-coverage test-junit clean fmt lint ci
+.PHONY: check-env deps test test-single test-basic test-complete test-secure test-network test-validation test-integration benchmark test-coverage test-junit clean fmt lint ci
