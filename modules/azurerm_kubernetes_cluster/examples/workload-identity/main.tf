@@ -2,7 +2,7 @@
 # This example creates an AKS cluster with Azure AD RBAC and Workload Identity enabled
 
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.12.2"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"

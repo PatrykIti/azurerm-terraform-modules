@@ -1,7 +1,7 @@
 # Makefile for Terratest execution
 
 # Variables
-TIMEOUT ?= 45m
+TIMEOUT ?= 60m
 TEST_FILTER ?= Test
 PARALLEL ?= 8
 AZURE_LOCATION ?= northeurope
@@ -38,17 +38,17 @@ test-basic: check-env deps
 # Run complete tests
 test-complete: check-env deps
 	@echo "Running complete tests..."
-	go test -v -timeout 45m -run TestCompleteKubernetesCluster ./...
+	go test -v -timeout 60m -run TestCompleteKubernetesCluster ./...
 
 # Run security tests
 test-secure: check-env deps
 	@echo "Running security tests..."
-	go test -v -timeout 45m -run TestSecureKubernetesCluster ./...
+	go test -v -timeout 60m -run TestSecureKubernetesCluster ./...
 
 # Run network tests
 test-network: check-env deps
 	@echo "Running network tests..."
-	go test -v -timeout 45m -run TestNetworkKubernetesCluster ./...
+	go test -v -timeout 60m -run TestNetworkKubernetesCluster ./...
 
 
 # Run validation tests

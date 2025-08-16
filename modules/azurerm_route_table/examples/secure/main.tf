@@ -2,11 +2,12 @@
 # This example demonstrates a maximum-security Route Table configuration suitable for highly sensitive data
 
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = ">= 1.12.2"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.36.0"
+      version = "4.36.0"
     }
   }
 }

@@ -2,11 +2,12 @@
 # This example demonstrates a comprehensive deployment of Route Tables with all available features
 
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = ">= 1.12.2"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.36.0"
+      version = "4.36.0"
     }
   }
 }
