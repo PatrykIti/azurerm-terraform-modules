@@ -9,10 +9,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.36.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.1.0"
-    }
   }
 }
 
@@ -31,12 +27,6 @@ provider "azurerm" {
 # Data source for current client
 data "azurerm_client_config" "current" {}
 
-# Random suffix for unique names
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
 
 # Resource Group with resource lock for production
 resource "azurerm_resource_group" "example" {
@@ -168,7 +158,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "web" {
 
 # Key Vault for Customer Managed Keys
 resource "azurerm_key_vault" "example" {
-  name                = "kv-storage-${random_string.suffix.result}"
+  name                = "kv-storage-secprivateep"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
@@ -191,7 +181,7 @@ resource "azurerm_key_vault" "example" {
 
 # User Assigned Identity for Storage Account
 resource "azurerm_user_assigned_identity" "storage" {
-  name                = "id-storage-${var.resource_prefix}-${random_string.suffix.result}"
+  name                = "id-storage-${var.resource_prefix}-secpe"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -274,7 +264,7 @@ resource "azurerm_key_vault_key" "storage" {
 
 # Log Analytics Workspace for Diagnostics
 resource "azurerm_log_analytics_workspace" "example" {
-  name                = "log-storage-secure-${random_string.suffix.result}"
+  name                = "log-storage-secure-privep"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
@@ -286,7 +276,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 module "secure_storage" {
   source = "../../"
 
-  name                = "stsecure${random_string.suffix.result}"
+  name                = "stsecureprivateendpoint"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 

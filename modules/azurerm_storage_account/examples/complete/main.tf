@@ -17,12 +17,6 @@ provider "azurerm" {
   }
 }
 
-# Random suffix for unique names
-resource "random_string" "suffix" {
-  length  = 8
-  special = false
-  upper   = false
-}
 
 # Resource Group
 resource "azurerm_resource_group" "example" {
@@ -60,7 +54,7 @@ resource "azurerm_subnet" "services" {
 
 # Log Analytics Workspace for diagnostics
 resource "azurerm_log_analytics_workspace" "example" {
-  name                = "law-storage-example-${random_string.suffix.result}"
+  name                = "law-storage-complete-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
@@ -69,14 +63,14 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # User Assigned Identity for CMK
 resource "azurerm_user_assigned_identity" "storage" {
-  name                = "id-storage-cmk-${random_string.suffix.result}"
+  name                = "id-storage-complete-cmk"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
 
 # Key Vault for Customer Managed Keys
 resource "azurerm_key_vault" "example" {
-  name                       = "kv-st-${random_string.suffix.result}"
+  name                       = "kv-storage-complete-ex"
   location                   = azurerm_resource_group.example.location
   resource_group_name        = azurerm_resource_group.example.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -161,7 +155,7 @@ data "azurerm_client_config" "current" {}
 module "storage_account" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
-  name                = "stcomplete${random_string.suffix.result}"
+  name                = "stcompleteexample001"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 

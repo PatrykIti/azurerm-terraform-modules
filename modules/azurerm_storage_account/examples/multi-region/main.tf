@@ -5,10 +5,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 4.0.0, < 5.0.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.1.0"
-    }
   }
 }
 
@@ -23,12 +19,6 @@ provider "azurerm" {
   }
 }
 
-# Random suffix for unique names
-resource "random_string" "suffix" {
-  length  = 8
-  special = false
-  upper   = false
-}
 
 
 # Primary region resource group
@@ -51,7 +41,7 @@ resource "azurerm_resource_group" "dr" {
 
 # Log Analytics Workspace (shared across regions)
 resource "azurerm_log_analytics_workspace" "shared" {
-  name                = "law-storage-multi-${random_string.suffix.result}"
+  name                = "law-storage-multiregion-ex"
   location            = azurerm_resource_group.primary.location
   resource_group_name = azurerm_resource_group.primary.name
   sku                 = "PerGB2018"
@@ -62,7 +52,7 @@ resource "azurerm_log_analytics_workspace" "shared" {
 module "primary_storage" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
-  name                = "stprimary${random_string.suffix.result}"
+  name                = "stprimarymultiregionex"
   resource_group_name = azurerm_resource_group.primary.name
   location            = azurerm_resource_group.primary.location
 
@@ -192,7 +182,7 @@ module "primary_storage" {
 module "secondary_storage" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
-  name                = "stsecond${random_string.suffix.result}"
+  name                = "stsecondmultiregionex"
   resource_group_name = azurerm_resource_group.secondary.name
   location            = azurerm_resource_group.secondary.location
 
@@ -286,7 +276,7 @@ module "secondary_storage" {
 module "dr_storage" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
-  name                = "stdr${random_string.suffix.result}"
+  name                = "stdrmultiregionexample"
   resource_group_name = azurerm_resource_group.dr.name
   location            = azurerm_resource_group.dr.location
 
@@ -377,7 +367,7 @@ module "dr_storage" {
 module "replication_metadata" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
-  name                = "strepmeta${random_string.suffix.result}"
+  name                = "strepmetamultiregionex"
   resource_group_name = azurerm_resource_group.primary.name
   location            = azurerm_resource_group.primary.location
 

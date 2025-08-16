@@ -9,10 +9,6 @@ terraform {
       source  = "hashicorp/azuread"
       version = ">= 2.0.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.1.0"
-    }
   }
 }
 
@@ -24,19 +20,13 @@ provider "azurerm" {
   }
 }
 
-# Random suffix for unique names
-resource "random_string" "suffix" {
-  length  = 8
-  special = false
-  upper   = false
-}
 
 # Current Azure AD configuration
 data "azurerm_client_config" "current" {}
 
 # Service Principal for demonstrating ACLs
 resource "azuread_application" "data_engineer" {
-  display_name = "sp-datalake-data-engineer-${random_string.suffix.result}"
+  display_name = "sp-datalake-data-engineer-example"
 }
 
 resource "azuread_service_principal" "data_engineer" {
@@ -45,7 +35,7 @@ resource "azuread_service_principal" "data_engineer" {
 
 # Another Service Principal for demonstrating different ACL permissions
 resource "azuread_application" "data_analyst" {
-  display_name = "sp-datalake-data-analyst-${random_string.suffix.result}"
+  display_name = "sp-datalake-data-analyst-example"
 }
 
 resource "azuread_service_principal" "data_analyst" {
@@ -78,7 +68,7 @@ resource "azurerm_subnet" "nfs_clients" {
 
 # Log Analytics Workspace for diagnostics
 resource "azurerm_log_analytics_workspace" "example" {
-  name                = "law-datalake-${random_string.suffix.result}"
+  name                = "law-datalake-gen2-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
@@ -89,7 +79,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 module "data_lake_storage" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
-  name                = "datalake${random_string.suffix.result}"
+  name                = "stdatalakegen2example"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
@@ -383,7 +373,7 @@ resource "azurerm_storage_data_lake_gen2_path" "sample_data_dir" {
 
 # Azure Databricks Integration
 # resource "azurerm_databricks_workspace" "example" {
-#   name                = "databricks-${random_string.suffix.result}"
+#   name                = "databricks-datalake-gen2-example"
 #   resource_group_name = azurerm_resource_group.example.name
 #   location            = azurerm_resource_group.example.location
 #   sku                 = "standard"
@@ -402,7 +392,7 @@ resource "azurerm_storage_data_lake_gen2_path" "sample_data_dir" {
 
 # Azure Synapse Analytics Integration
 # resource "azurerm_synapse_workspace" "example" {
-#   name                                 = "synapse${random_string.suffix.result}"
+#   name                                 = "synapsedatalakegen2ex"
 #   resource_group_name                  = azurerm_resource_group.example.name
 #   location                             = azurerm_resource_group.example.location
 #   storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.bronze.id
@@ -423,7 +413,7 @@ resource "azurerm_storage_data_lake_gen2_path" "sample_data_dir" {
 
 # Azure Data Factory Integration
 # resource "azurerm_data_factory" "example" {
-#   name                = "adf${random_string.suffix.result}"
+#   name                = "adfdatalakegen2example"
 #   location            = azurerm_resource_group.example.location
 #   resource_group_name = azurerm_resource_group.example.name
 #   

@@ -5,10 +5,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 3.0.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.1.0"
-    }
   }
 }
 
@@ -21,12 +17,6 @@ provider "azurerm" {
   }
 }
 
-# Random suffix for unique names
-resource "random_string" "suffix" {
-  length  = 8
-  special = false
-  upper   = false
-}
 
 # Resource Group
 resource "azurerm_resource_group" "example" {
@@ -54,7 +44,7 @@ resource "azurerm_subnet" "private_endpoints" {
 
 # Log Analytics Workspace for security monitoring
 resource "azurerm_log_analytics_workspace" "example" {
-  name                = "law-storage-secure-${random_string.suffix.result}"
+  name                = "law-storage-secure-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
@@ -63,14 +53,14 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # User Assigned Identity for CMK
 resource "azurerm_user_assigned_identity" "storage" {
-  name                = "id-storage-secure-${random_string.suffix.result}"
+  name                = "id-storage-secure-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
 
 # Key Vault with enhanced security
 resource "azurerm_key_vault" "example" {
-  name                            = "kv-sec-${random_string.suffix.result}"
+  name                            = "kv-storage-secure-ex"
   location                        = azurerm_resource_group.example.location
   resource_group_name             = azurerm_resource_group.example.name
   tenant_id                       = data.azurerm_client_config.current.tenant_id
@@ -154,7 +144,7 @@ data "azurerm_client_config" "current" {}
 module "storage_account" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
-  name                = "stsecure${random_string.suffix.result}"
+  name                = "stsecureexample001"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 

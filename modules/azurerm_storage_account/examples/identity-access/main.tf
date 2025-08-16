@@ -34,7 +34,7 @@ resource "azurerm_resource_group" "example" {
 # ==============================================================================
 
 resource "azurerm_key_vault" "example" {
-  name                = "kv-identity-${substr(md5(timestamp()), 0, 8)}"
+  name                = "kv-identity-access-ex"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
@@ -99,7 +99,7 @@ resource "azurerm_role_assignment" "uai_kv_crypto_user" {
 module "storage_system_assigned" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
-  name                     = "stsysidentity${substr(md5(timestamp()), 0, 8)}"
+  name                     = "stsysidentityexample"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -155,7 +155,7 @@ resource "azurerm_role_assignment" "system_identity_kv_access" {
 module "storage_user_assigned" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
-  name                     = "stuseridentity${substr(md5(timestamp()), 0, 8)}"
+  name                     = "stuseridentityexample"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -216,7 +216,7 @@ module "storage_user_assigned" {
 module "storage_combined" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
 
-  name                     = "stcombidentity${substr(md5(timestamp()), 0, 8)}"
+  name                     = "stcombidentityexample"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
