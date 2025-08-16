@@ -2,7 +2,7 @@
 # This example demonstrates Virtual Network configuration for private endpoint scenarios
 
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.12.2"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -58,19 +58,6 @@ module "virtual_network" {
   # Network flow configuration
   flow_timeout_in_minutes = 10
 
-  # Private DNS Zone Links for private endpoint resolution
-  private_dns_zone_links = [
-    {
-      name                  = "link-to-blob-storage"
-      resource_group_name   = azurerm_resource_group.test.name
-      private_dns_zone_name = azurerm_private_dns_zone.blob.name
-      registration_enabled  = false # Auto-registration not needed for private endpoints
-      tags = {
-        Purpose = "Private Endpoint DNS Resolution"
-      }
-    }
-  ]
-
   # Lifecycle Management
 
   tags = {
@@ -125,16 +112,6 @@ module "storage_account" {
     virtual_network_subnet_ids = []
     bypass                     = [] # No bypass, completely private
   }
-
-  # Private endpoint configuration
-  private_endpoints = [
-    {
-      name                 = "blob-endpoint"
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
-      subresource_names    = ["blob"]
-    }
-  ]
 
   tags = {
     Environment = "Test"
