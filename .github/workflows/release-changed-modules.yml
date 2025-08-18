@@ -23,7 +23,7 @@ jobs:
       modules: ${{ steps.changes.outputs.modules }}
       matrix: ${{ steps.changes.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           token: ${{ secrets.PAT || github.token }}
