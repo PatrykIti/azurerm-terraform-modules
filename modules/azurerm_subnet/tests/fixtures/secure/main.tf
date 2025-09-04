@@ -7,17 +7,53 @@ resource "azurerm_resource_group" "example" {
   location = "West Europe"
 }
 
-module "subnet" {
-  source = "../../"
-
-  name                = "subnetexample003"
-  resource_group_name = azurerm_resource_group.example.name
+# Create DDoS Protection Plan for enhanced security
+resource "azurerm_network_ddos_protection_plan" "example" {
+  name                = "ddos-subnet-secure-example"
   location            = azurerm_resource_group.example.location
-
-  # Add security-focused configuration here
+  resource_group_name = azurerm_resource_group.example.name
 
   tags = {
     Environment = "Production"
-    Example     = "Secure"
+    Purpose     = "DDoS Protection"
   }
+}
+
+resource "azurerm_virtual_network" "example" {
+  name                = "vnet-subnet-secure-example"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  address_space       = ["10.0.0.0/16"]
+
+  # DDoS Protection Plan
+  ddos_protection_plan {
+    id     = azurerm_network_ddos_protection_plan.example.id
+    enable = true
+  }
+
+  tags = {
+    Environment   = "Production"
+    Example       = "Secure"
+    SecurityLevel = "High"
+  }
+}
+
+module "subnet" {
+  source = "../../"
+
+  name                 = "subnetexample003"
+  resource_group_name  = azurerm_resource_group.example.name
+  virtual_network_name = azurerm_virtual_network.example.name
+  address_prefixes     = ["10.0.1.0/24"]
+
+  # Service endpoints for secure access to Azure services
+  service_endpoints = [
+    "Microsoft.Storage",
+    "Microsoft.KeyVault",
+    "Microsoft.AzureActiveDirectory"
+  ]
+
+  # Enable network policies for enhanced security
+  private_endpoint_network_policies_enabled     = true
+  private_link_service_network_policies_enabled = true
 }
