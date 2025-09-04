@@ -57,8 +57,7 @@ azurerm-terraform-modules/
 │       └── terraform-setup/         # Terraform environment setup
 └── modules/
     └── <module_name>/
-        └── .github/
-            └── module-config.yml    # Module metadata
+        └── module.json              # Module metadata and configuration
 ```
 
 ## Core Workflows

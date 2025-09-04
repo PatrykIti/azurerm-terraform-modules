@@ -6,8 +6,6 @@ A consistent directory structure is essential for maintainability and ease of us
 
 ```
 modules/azurerm_<resource_name>/
-├─── .github/
-│    └─── module-config.yml
 ├─── docs/
 │    └─── README.md
 ├─── examples/
@@ -58,7 +56,6 @@ modules/azurerm_<resource_name>/
 
 ## Key Components Explained
 
-- **`.github/module-config.yml`**: (Optional) Module-specific CI/CD configuration.
 - **`docs/`**: Contains supplementary documentation, such as architecture diagrams or migration guides.
 - **`examples/`**: Contains practical, runnable examples for different use cases. Each example should have its own `README.md`.
 - **`tests/`**: Contains all tests for the module.

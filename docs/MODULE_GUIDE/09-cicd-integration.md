@@ -33,33 +33,19 @@ The release process is handled by `semantic-release`. The configuration is manag
 
 2.  **`.releaserc.js`**: This file should be copied from a reference module like `azurerm_kubernetes_cluster`. It is designed to be dynamic and reads its configuration from `module.json`, so you typically don't need to modify it.
 
-### Step 2: (Optional) Create Module-Specific CI Configuration
+### Step 2: Verify CI/CD Integration
 
-In some cases, a module may have unique testing requirements (e.g., requires specific regions, has longer timeouts). You can create a `.github/module-config.yml` file inside your module directory to override the default CI settings.
+The CI/CD pipeline will automatically detect your module based on:
+- The presence of the module directory in `modules/`
+- The `module.json` file for release configuration
+- Standard Terraform module structure (main.tf, variables.tf, outputs.tf)
 
-**File to Create**: `modules/azurerm_new_module/.github/module-config.yml`
-
-**Example (`module-config.yml`):**
-```yaml
-name: azurerm_new_module
-description: "Manages the new Azure resource"
-version: 1.0.0 # Initial version
-
-# CI specific settings
-ci:
-  # Regions to run integration tests in
-  test_regions:
-    - westeurope
-    - eastus
-  # Scenarios (fixture names) to test
-  test_scenarios:
-    - basic
-    - complete
-  # Override default timeout for performance tests
-  performance_tests:
-    enabled: true
-    timeout: 60m
-```
+No additional configuration is needed for standard modules. The workflows will:
+- Automatically detect changes to your module
+- Run validation and linting
+- Execute unit tests
+- Run integration tests if configured
+- Generate documentation
 
 ## The Release Process
 

@@ -8,13 +8,7 @@ Thank you for your interest in contributing to our Azure Terraform Modules repos
 azurerm-terraform-modules/
 ├── modules/                        # Individual Terraform modules
 │   └── <module_name>/
-│       ├── .github/
-│       │   ├── actions/           # Module-specific composite actions
-│       │   │   ├── validate/      # Validation logic
-│       │   │   ├── test/          # Testing logic
-│       │   │   ├── security/      # Security scanning
-│       │   │   └── release/       # Release preparation
-│       │   └── module-config.yml  # Module metadata
+│       ├── module.json            # Module metadata and configuration
 │       ├── main.tf                # Main resource definitions
 │       ├── variables.tf           # Input variables
 │       ├── outputs.tf             # Output values
@@ -88,14 +82,11 @@ git checkout -b feature/module-name-description
 
 1. Create module directory: `modules/azurerm_<resource_name>/`
 2. Copy the structure from an existing module as a template
-3. Create the composite actions structure:
-   ```bash
-   mkdir -p modules/azurerm_<resource_name>/.github/actions/{validate,test,security,release}
-   ```
-4. Update workflow configurations:
-   - Add module to `.github/workflows/module-ci.yml` filters
-   - Add module to `.github/workflows/module-release.yml` options
-5. Create module configuration: `.github/module-config.yml`
+3. Create module configuration: `module.json` with metadata
+4. The workflows will automatically detect your module based on:
+   - The presence of the module directory in `modules/`
+   - The `module.json` file for release configuration
+   - Standard Terraform module structure
 
 See [docs/WORKFLOWS.md](docs/WORKFLOWS.md#adding-new-modules) for detailed instructions.
 
