@@ -18,7 +18,7 @@ func TestBasicSubnet(t *testing.T) {
 	t.Parallel()
 
 	// Create a folder for this test
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -83,7 +83,7 @@ func TestCompleteSubnet(t *testing.T) {
 func TestSubnetSecurity(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/security")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -217,7 +217,7 @@ func BenchmarkSubnetCreation(b *testing.B) {
 		b.Skip("Skipping benchmark in short mode")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_subnet/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_subnet/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(b, testFolder)
 
 	// Cleanup after benchmark

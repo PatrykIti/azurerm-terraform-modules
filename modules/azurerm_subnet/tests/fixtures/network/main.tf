@@ -4,15 +4,15 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "test" {
-  name     = "rg-subnet-network-test"
-  location = "West Europe"
+  name     = "rg-subnet-network-test-${var.subnet_suffix}"
+  location = var.location
 }
 
-resource "azurerm_virtual_network" "test" {
-  name                = "vnet-subnet-network-test"
+resource "azurerm_virtual_network" "test_vnet" {
+  name                = "vnet-subnet-network-test-${var.subnet_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
-  address_space       = ["10.0.0.0/16"]
+  address_space       = var.vnet_address_space
 
   tags = {
     Environment = "Test"
@@ -22,7 +22,7 @@ resource "azurerm_virtual_network" "test" {
 
 # Test with network security group association
 resource "azurerm_network_security_group" "test" {
-  name                = "nsg-subnet-network-test"
+  name                = "nsg-subnet-network-test-${var.subnet_suffix}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
 
@@ -48,10 +48,10 @@ resource "azurerm_network_security_group" "test" {
 module "subnet" {
   source = "../../../"
 
-  name                 = "subnetnetworktest"
+  name                 = "subnet-network-test-${var.subnet_suffix}"
   resource_group_name  = azurerm_resource_group.test.name
-  virtual_network_name = azurerm_virtual_network.test.name
-  address_prefixes     = ["10.0.1.0/24"]
+  virtual_network_name = azurerm_virtual_network.test_vnet.name
+  address_prefixes     = var.subnet_address_prefix
 
   # Service endpoints for network testing
   service_endpoints = [
