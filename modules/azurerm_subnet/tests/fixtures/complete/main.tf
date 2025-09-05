@@ -4,7 +4,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "example" {
   name     = "rg-subnet-complete-example"
-  location = "West Europe"
+  location = var.location
 }
 
 resource "azurerm_virtual_network" "example" {
@@ -34,7 +34,7 @@ resource "azurerm_storage_account" "example" {
 }
 
 module "subnet" {
-  source = "../../"
+  source = "../../../"
 
   name                 = "subnetexample002"
   resource_group_name  = azurerm_resource_group.example.name

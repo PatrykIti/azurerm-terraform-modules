@@ -7,7 +7,7 @@ data "azurerm_client_config" "current" {}
 
 resource "azurerm_resource_group" "example" {
   name     = "rg-subnet-private-endpoint-example"
-  location = "West Europe"
+  location = var.location
 }
 
 # Virtual Network for private endpoint
@@ -42,7 +42,7 @@ resource "azurerm_storage_account" "example" {
 
 # Subnet optimized for private endpoints
 module "subnet" {
-  source = "../../"
+  source = "../../../"
 
   name                 = "subnetexample004"
   resource_group_name  = azurerm_resource_group.example.name

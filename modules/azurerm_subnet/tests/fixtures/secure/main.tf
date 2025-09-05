@@ -4,7 +4,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "example" {
   name     = "rg-subnet-secure-example"
-  location = "West Europe"
+  location = var.location
 }
 
 # Create DDoS Protection Plan for enhanced security
@@ -39,7 +39,7 @@ resource "azurerm_virtual_network" "example" {
 }
 
 module "subnet" {
-  source = "../../"
+  source = "../../../"
 
   name                 = "subnetexample003"
   resource_group_name  = azurerm_resource_group.example.name

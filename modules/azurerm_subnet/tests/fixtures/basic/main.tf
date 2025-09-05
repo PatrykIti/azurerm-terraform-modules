@@ -20,7 +20,7 @@ resource "azurerm_virtual_network" "example" {
 }
 
 module "subnet" {
-  source = "../../"
+  source = "../../../"
 
   name                 = "subnet-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.example.name
