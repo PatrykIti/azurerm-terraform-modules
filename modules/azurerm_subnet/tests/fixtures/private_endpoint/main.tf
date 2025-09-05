@@ -6,13 +6,13 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_resource_group" "example" {
-  name     = "rg-subnet-private-endpoint-example"
+  name     = "rg-subnet-pe-${var.random_suffix}"
   location = var.location
 }
 
 # Virtual Network for private endpoint
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-subnet-private-endpoint-example"
+  name                = "vnet-subnet-pe-${var.random_suffix}"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
@@ -25,7 +25,7 @@ resource "azurerm_virtual_network" "example" {
 
 # Storage Account for private endpoint demo
 resource "azurerm_storage_account" "example" {
-  name                     = "stsubnetprivateendpt"
+  name                     = "stsubpe${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -44,7 +44,7 @@ resource "azurerm_storage_account" "example" {
 module "subnet" {
   source = "../../../"
 
-  name                 = "subnet-private_endpoint-${var.random_suffix}"
+  name                 = "subnet-pe-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
