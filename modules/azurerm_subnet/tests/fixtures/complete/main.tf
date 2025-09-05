@@ -3,12 +3,12 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "rg-subnet-complete-example"
+  name     = "rg-subnet-complete-${var.random_suffix}"
   location = var.location
 }
 
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-subnet-complete-example"
+  name                = "vnet-subnet-complete-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   address_space       = ["10.0.0.0/16"]
@@ -21,7 +21,7 @@ resource "azurerm_virtual_network" "example" {
 
 # Create Storage Account for service endpoint policy
 resource "azurerm_storage_account" "example" {
-  name                     = "stsubnetcompletetest"
+  name                     = "stsubnet${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -36,10 +36,11 @@ resource "azurerm_storage_account" "example" {
 module "subnet" {
   source = "../../../"
 
-  name                 = "subnetexample002"
+  name                 = "subnet-complete-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
-  address_prefixes     = ["10.0.1.0/24", "10.0.2.0/24"]
+  # Note: When using delegation, only single address prefix is supported
+  address_prefixes     = ["10.0.1.0/24"]
 
   # Service endpoints configuration
   service_endpoints = [
