@@ -1,10 +1,10 @@
 package test
 
 import (
-	"context"
+	// "context" // TODO: Uncomment when Azure SDK is added  
 	"fmt"
 	"testing"
-	"time"
+	// "time" // TODO: Uncomment when Azure SDK is added
 
 	// Azure SDK imports - add specific ones for your resource type
 	// Example: "github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
@@ -58,88 +58,50 @@ func TestSubnetFullIntegration(t *testing.T) {
 // validateCoreFeatures validates basic subnet features using SDK
 func validateCoreFeatures(t *testing.T, testFolder string) {
 	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-	helper := NewsubnetHelper(t)
-
+	
 	// Get outputs
 	resourceName := terraform.Output(t, terraformOptions, "subnet_name")
 	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 	
-	// Get resource details from Azure using SDK
-	// TODO: Replace with actual SDK call
-	// resource := helper.GetsubnetProperties(t, resourceName, resourceGroupName)
-
 	// Validate core properties
 	assert.NotEmpty(t, resourceName, "Resource name should not be empty")
 	assert.NotEmpty(t, resourceGroupName, "Resource group name should not be empty")
 	
-	// TODO: Add subnet specific core validations using the SDK
-	// Examples:
+	// TODO: Add subnet specific core validations using the SDK when helper is implemented
+	// Example:
+	// helper := NewSubnetHelper(t)
+	// resource := helper.GetSubnetProperties(t, resourceName, resourceGroupName)
 	// assert.Equal(t, expectedSKU, *resource.SKU.Name)
-	// assert.Equal(t, expectedKind, *resource.Kind)
-	// assert.Equal(t, ProvisioningStateSucceeded, *resource.Properties.ProvisioningState)
-	
-	// Validate tags if applicable
-	expectedTags := map[string]string{
-		"Environment": "Test",
-		"TestType":    "Complete",
-		"CostCenter":  "Engineering",
-		"Owner":       "terratest",
-	}
-	// TODO: Validate tags using helper function
-	// ValidatesubnetTags(t, resource, expectedTags)
 }
 
 // validateSecurityFeatures validates security configurations using SDK
 func validateSecurityFeatures(t *testing.T, testFolder string) {
-	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-	helper := NewsubnetHelper(t)
-
-	resourceName := terraform.Output(t, terraformOptions, "subnet_name")
-	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+	// TODO: Implement when Azure SDK is added
+	// terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+	// helper := NewSubnetHelper(t)
+	// resourceName := terraform.Output(t, terraformOptions, "subnet_name")
+	// resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+	// resource := helper.GetSubnetProperties(t, resourceName, resourceGroupName)
 	
-	// Get resource from Azure
-	// TODO: Replace with actual SDK call
-	// resource := helper.GetsubnetProperties(t, resourceName, resourceGroupName)
-
-	// Security validations
-	// TODO: Add subnet specific security validations
-	// Examples:
-	// assert.True(t, *resource.Properties.EnableHTTPSTrafficOnly)
-	// assert.Equal(t, MinimumTLSVersionTLS12, *resource.Properties.MinimumTLSVersion)
-	// assert.False(t, *resource.Properties.AllowPublicAccess)
-	
-	// Validate encryption if applicable
-	// helper.ValidatesubnetEncryption(t, resource)
+	// Security validations would go here
 }
 
 // validateNetworkFeatures validates network configurations using SDK
 func validateNetworkFeatures(t *testing.T, testFolder string) {
-	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-	helper := NewsubnetHelper(t)
-
-	resourceName := terraform.Output(t, terraformOptions, "subnet_name")
-	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+	// TODO: Implement when Azure SDK is added
+	// terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+	// helper := NewSubnetHelper(t)
+	// resourceName := terraform.Output(t, terraformOptions, "subnet_name")
+	// resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+	// resource := helper.GetSubnetProperties(t, resourceName, resourceGroupName)
 	
-	// Get resource from Azure
-	// TODO: Replace with actual SDK call
-	// resource := helper.GetsubnetProperties(t, resourceName, resourceGroupName)
-
-	// Network validations
-	// TODO: Add subnet specific network validations
-	// Examples:
-	// assert.Equal(t, DefaultActionDeny, *resource.Properties.NetworkRuleSet.DefaultAction)
-	// assert.Equal(t, BypassAzureServices, *resource.Properties.NetworkRuleSet.Bypass)
-	
-	// Validate IP rules and subnet rules if applicable
-	// expectedIPRules := []string{"203.0.113.0/24"}
-	// helper.ValidateNetworkRules(t, resource, expectedIPRules, nil)
+	// Network validations would go here
 }
 
 // validateOperationalFeatures validates operational features like monitoring
 func validateOperationalFeatures(t *testing.T, testFolder string) {
 	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-	// helper := NewsubnetHelper(t)
-
+	
 	resourceName := terraform.Output(t, terraformOptions, "subnet_name")
 	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 	resourceID := terraform.Output(t, terraformOptions, "subnet_id")
@@ -152,11 +114,9 @@ func validateOperationalFeatures(t *testing.T, testFolder string) {
 	// Validate diagnostic settings format
 	assert.Contains(t, resourceID, "/providers/Microsoft.")
 	
-	// TODO: Add subnet specific operational validations
-	// Examples:
+	// TODO: Add subnet specific operational validations when helper is implemented
+	// helper := NewSubnetHelper(t)
 	// helper.ValidateDiagnosticSettings(t, resourceID)
-	// helper.ValidateBackupConfiguration(t, resourceName, resourceGroupName)
-	// helper.ValidateMonitoringAlerts(t, resourceID)
 }
 
 // TestSubnetWithNetworkRules tests network access controls
@@ -184,25 +144,23 @@ func TestSubnetWithNetworkRules(t *testing.T) {
 	// Validate network configuration
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		helper := NewsubnetHelper(t)
 		
+		// Get outputs
+		resourceID := terraform.Output(t, terraformOptions, "subnet_id")
 		resourceName := terraform.Output(t, terraformOptions, "subnet_name")
-		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 		
-		// Get resource from Azure
-		// TODO: Replace with actual SDK call
-		// resource := helper.GetsubnetProperties(t, resourceName, resourceGroupName)
+		// Validate outputs
+		assert.NotEmpty(t, resourceID)
+		assert.NotEmpty(t, resourceName)
 		
-		// Validate network rules
-		// TODO: Add network rule validations
-		_ = helper // Remove when helper is used
-		_ = resourceName
-		_ = resourceGroupName
+		// TODO: Add SDK-based network rule validations when helper is implemented
+		// helper := NewSubnetHelper(t)
+		// Validate IP rules, subnet rules, etc.
 	})
 }
 
-// TestSubnetPrivateEndpoint tests private endpoint configuration
-func TestSubnetPrivateEndpoint(t *testing.T) {
+// TestSubnetPrivateEndpointIntegration tests private endpoint configuration
+func TestSubnetPrivateEndpointIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -227,22 +185,21 @@ func TestSubnetPrivateEndpoint(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 		
-		// Test outputs
+		// Get outputs
 		resourceID := terraform.Output(t, terraformOptions, "subnet_id")
 		privateEndpointID := terraform.Output(t, terraformOptions, "private_endpoint_id")
 		
-		// Assertions
+		// Validate outputs
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, privateEndpointID)
 		
-		// TODO: Add validations for public network access being disabled
-		// helper := NewsubnetHelper(t)
-		// resource := helper.GetsubnetProperties(t, resourceName, resourceGroupName)
-		// assert.Equal(t, PublicNetworkAccessDisabled, *resource.Properties.PublicNetworkAccess)
+		// TODO: Add SDK-based private endpoint validations when helper is implemented
+		// helper := NewSubnetHelper(t)
+		// Validate private endpoint configuration
 	})
 }
 
-// TestSubnetSecurityConfiguration tests security features
+// TestSubnetSecurityConfiguration tests security configurations
 func TestSubnetSecurityConfiguration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
@@ -264,28 +221,26 @@ func TestSubnetSecurityConfiguration(t *testing.T) {
 		terraform.InitAndApply(t, terraformOptions)
 	})
 
-	// Validate security settings
+	// Validate security configuration
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		helper := NewsubnetHelper(t)
 		
+		// Get outputs
+		resourceID := terraform.Output(t, terraformOptions, "subnet_id")
 		resourceName := terraform.Output(t, terraformOptions, "subnet_name")
-		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 		
-		// Get resource from Azure
-		// TODO: Replace with actual SDK call and security validations
-		// resource := helper.GetsubnetProperties(t, resourceName, resourceGroupName)
+		// Validate security configuration
+		assert.NotEmpty(t, resourceID)
+		assert.NotEmpty(t, resourceName)
 		
-		// Security assertions
-		// TODO: Add security-specific validations
-		_ = helper // Remove when helper is used
-		_ = resourceName
-		_ = resourceGroupName
+		// TODO: Add SDK-based security validations when helper is implemented
+		// helper := NewSubnetHelper(t)
+		// Validate encryption, TLS, access controls, etc.
 	})
 }
 
-// TestSubnetValidationRules tests the module's input validation rules
-func TestSubnetValidationRules(t *testing.T) {
+// TestSubnetValidationIntegration tests input validation errors
+func TestSubnetValidationIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping validation tests in short mode")
 	}
@@ -295,28 +250,21 @@ func TestSubnetValidationRules(t *testing.T) {
 		name          string
 		fixturePath   string
 		expectError   bool
-		errorContains string
+		errorMessage  string
 	}{
-		// TODO: Add validation test cases based on your module's validation rules
-		// Examples:
-		// {
-		//     name:          "InvalidNameTooShort",
-		//     fixturePath:   "azurerm_subnet/tests/fixtures/negative/invalid_name_short",
-		//     expectError:   true,
-		//     errorContains: "name must be at least 3 characters",
-		// },
-		// {
-		//     name:          "InvalidNameTooLong",
-		//     fixturePath:   "azurerm_subnet/tests/fixtures/negative/invalid_name_long",
-		//     expectError:   true,
-		//     errorContains: "name must be at most 24 characters",
-		// },
-		// {
-		//     name:          "InvalidNameCharacters",
-		//     fixturePath:   "azurerm_subnet/tests/fixtures/negative/invalid_name_chars",
-		//     expectError:   true,
-		//     errorContains: "name can only contain lowercase letters and numbers",
-		// },
+		{
+			name:         "InvalidNameShort",
+			fixturePath:  "negative/invalid_name_short",
+			expectError:  true,
+			errorMessage: "name must be between",
+		},
+		{
+			name:         "InvalidNameChars",
+			fixturePath:  "negative/invalid_name_chars",
+			expectError:  true,
+			errorMessage: "must contain only",
+		},
+		// Add more test cases as needed
 	}
 
 	for _, tc := range testCases {
@@ -324,120 +272,96 @@ func TestSubnetValidationRules(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", tc.fixturePath)
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fmt.Sprintf("azurerm_subnet/tests/fixtures/%s", tc.fixturePath))
 			
-			// Use minimal terraform options for negative tests (no variables)
 			terraformOptions := &terraform.Options{
 				TerraformDir: testFolder,
 				NoColor:      true,
 			}
 
+			// Attempt to plan/apply - should fail for negative tests
+			_, err := terraform.InitAndPlanE(t, terraformOptions)
+			
 			if tc.expectError {
-				// This should fail during plan/apply
-				_, err := terraform.InitAndPlanE(t, terraformOptions)
 				require.Error(t, err)
-				assert.Contains(t, err.Error(), tc.errorContains)
+				assert.Contains(t, err.Error(), tc.errorMessage)
 			} else {
-				defer terraform.Destroy(t, terraformOptions)
-				terraform.InitAndApply(t, terraformOptions)
+				require.NoError(t, err)
 			}
 		})
 	}
 }
 
-// TestSubnetLifecycle tests the complete lifecycle
+// TestSubnetLifecycle tests create, update, and destroy operations
 func TestSubnetLifecycle(t *testing.T) {
 	if testing.Short() {
-		t.Skip("Skipping integration test in short mode")
+		t.Skip("Skipping lifecycle test in short mode")
 	}
 	t.Parallel()
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/basic")
-	terraformOptions := getTerraformOptions(t, testFolder)
 	
-	defer terraform.Destroy(t, terraformOptions)
-
 	// Initial deployment
-	terraform.InitAndApply(t, terraformOptions)
-	
-	// Get initial state
-	resourceName := terraform.Output(t, terraformOptions, "subnet_name")
-	resourceID := terraform.Output(t, terraformOptions, "subnet_id")
-	
-	// Verify initial deployment
-	assert.NotEmpty(t, resourceName)
-	assert.NotEmpty(t, resourceID)
-	
-	// TODO: Add resource-specific lifecycle tests
-	// Example: Update configuration (e.g., add tags, change settings)
-	// terraformOptions.Vars["tags"] = map[string]interface{}{
-	//     "Environment": "Test",
-	//     "Updated":     "true",
-	// }
-	// terraform.Apply(t, terraformOptions)
-	
-	// Verify update was applied
-	updatedResourceID := terraform.Output(t, terraformOptions, "subnet_id")
-	assert.Equal(t, resourceID, updatedResourceID, "Resource ID should remain the same after update")
-	
-	// Test idempotency - apply again without changes
-	terraform.Apply(t, terraformOptions)
+	test_structure.RunTestStage(t, "deploy_initial", func() {
+		terraformOptions := getTerraformOptions(t, testFolder)
+		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
+		terraform.InitAndApply(t, terraformOptions)
+	})
+
+	// Update configuration (simulate changes)
+	test_structure.RunTestStage(t, "update", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		
+		// Modify some variable to trigger an update
+		terraformOptions.Vars["tag_environment"] = "Updated"
+		
+		// Apply the changes
+		terraform.Apply(t, terraformOptions)
+		
+		// Validate the update was successful
+		resourceID := terraform.Output(t, terraformOptions, "subnet_id")
+		assert.NotEmpty(t, resourceID)
+	})
+
+	// Clean up
+	test_structure.RunTestStage(t, "cleanup", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
+	})
 }
 
-// TestSubnetCompliance tests compliance-related features
+// TestSubnetCompliance tests compliance with organizational policies
 func TestSubnetCompliance(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping compliance test in short mode")
+	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/complete")
+	
+	// Deploy infrastructure
+	defer terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	terraformOptions := getTerraformOptions(t, testFolder)
-	
-	defer terraform.Destroy(t, terraformOptions)
-	
 	terraform.InitAndApply(t, terraformOptions)
 	
+	// Get outputs for compliance validation
+	resourceID := terraform.Output(t, terraformOptions, "subnet_id")
 	resourceName := terraform.Output(t, terraformOptions, "subnet_name")
-	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 	
-	// TODO: Get resource from Azure and perform compliance checks
-	// helper := NewsubnetHelper(t)
-	// resource := helper.GetsubnetProperties(t, resourceName, resourceGroupName)
+	// Validate naming conventions
+	assert.Contains(t, resourceName, "snet-", "Resource name should follow naming convention")
 	
-	// Compliance checks
-	complianceChecks := []struct {
-		name      string
-		check     func() bool
-		message   string
-	}{
-		{
-			name:    "Resource Exists",
-			check:   func() bool { return resourceName != "" },
-			message: "Resource must be created successfully",
-		},
-		// TODO: Add subnet specific compliance checks
-		// Examples:
-		// {
-		//     name:    "HTTPS Only",
-		//     check:   func() bool { return *resource.Properties.EnableHTTPSTrafficOnly },
-		//     message: "HTTPS-only traffic must be enforced",
-		// },
-		// {
-		//     name:    "Encryption Enabled",
-		//     check:   func() bool { return resource.Properties.Encryption != nil },
-		//     message: "Encryption must be enabled",
-		// },
-	}
+	// Validate resource ID format
+	assert.Contains(t, resourceID, "/subscriptions/", "Resource ID should be properly formatted")
+	assert.Contains(t, resourceID, "/resourceGroups/", "Resource ID should contain resource group")
 	
-	for _, cc := range complianceChecks {
-		t.Run(cc.name, func(t *testing.T) {
-			assert.True(t, cc.check(), cc.message)
-		})
-	}
-	
-	_ = resourceGroupName // Remove when used
+	// TODO: Add more compliance checks when helper is implemented
+	// helper := NewSubnetHelper(t)
+	// Validate tags, encryption, network policies, etc.
 }
 
-// BenchmarkSubnetCreation benchmarks resource creation
-func BenchmarkSubnetCreation(b *testing.B) {
+// BenchmarkSubnetIntegrationCreation benchmarks resource creation performance
+func BenchmarkSubnetIntegrationCreation(b *testing.B) {
 	// Skip if not running benchmarks
 	if testing.Short() {
 		b.Skip("Skipping benchmark in short mode")

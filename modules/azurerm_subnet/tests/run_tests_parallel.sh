@@ -54,16 +54,29 @@ EOF
     return $exit_status
 }
 
-# List of tests to run
-tests=(
+# List of tests to run from subnet_test.go
+tests_subnet=(
     "TestBasicSubnet"
     "TestCompleteSubnet"
     "TestSubnetSecurity"
     "TestSubnetNetworkRules"
     "TestSubnetPrivateEndpoint"
     "TestSubnetValidationRules"
-    "TestSubnetFullIntegration"
 )
+
+# List of tests to run from integration_test.go
+tests_integration=(
+    "TestSubnetFullIntegration"
+    "TestSubnetWithNetworkRules"
+    "TestSubnetPrivateEndpointIntegration"
+    "TestSubnetSecurityConfiguration"
+    "TestSubnetValidationIntegration"
+    "TestSubnetLifecycle"
+    "TestSubnetCompliance"
+)
+
+# Combine all tests
+tests=("${tests_subnet[@]}" "${tests_integration[@]}")
 
 echo "Starting parallel test execution for azurerm_subnet"
 echo "Total tests to run: ${#tests[@]}"
