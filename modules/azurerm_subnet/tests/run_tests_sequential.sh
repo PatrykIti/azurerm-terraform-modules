@@ -42,10 +42,7 @@ tests=(
     "TestSubnetNetworkRules"
     "TestSubnetPrivateEndpoint"
     "TestSubnetValidationRules"
-    "TestSubnetCreationTime"
-    "TestSubnetScaling"
-    "TestSubnetUpdatePerformance"
-    "TestSubnetDestroyPerformance"
+    "TestSubnetFullIntegration"
 )
 
 echo "Starting sequential test execution for azurerm_subnet"

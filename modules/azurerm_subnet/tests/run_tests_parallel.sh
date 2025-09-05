@@ -62,10 +62,7 @@ tests=(
     "TestSubnetNetworkRules"
     "TestSubnetPrivateEndpoint"
     "TestSubnetValidationRules"
-    "TestSubnetCreationTime"
-    "TestSubnetScaling"
-    "TestSubnetUpdatePerformance"
-    "TestSubnetDestroyPerformance"
+    "TestSubnetFullIntegration"
 )
 
 echo "Starting parallel test execution for azurerm_subnet"
