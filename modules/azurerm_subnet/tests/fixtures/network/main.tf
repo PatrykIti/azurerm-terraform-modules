@@ -4,12 +4,12 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "test" {
-  name     = "rg-subnet-network-test-${var.subnet_suffix}"
+  name     = "rg-subnet-network-${var.random_suffix}"
   location = var.location
 }
 
 resource "azurerm_virtual_network" "test_vnet" {
-  name                = "vnet-subnet-network-test-${var.subnet_suffix}"
+  name                = "vnet-subnet-network-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
   address_space       = var.vnet_address_space
@@ -22,7 +22,7 @@ resource "azurerm_virtual_network" "test_vnet" {
 
 # Test with network security group association
 resource "azurerm_network_security_group" "test" {
-  name                = "nsg-subnet-network-test-${var.subnet_suffix}"
+  name                = "nsg-subnet-network-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
 
@@ -48,7 +48,7 @@ resource "azurerm_network_security_group" "test" {
 module "subnet" {
   source = "../../../"
 
-  name                 = "subnet-network-test-${var.subnet_suffix}"
+  name                 = "subnet-network-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.test.name
   virtual_network_name = azurerm_virtual_network.test_vnet.name
   address_prefixes     = var.subnet_address_prefix

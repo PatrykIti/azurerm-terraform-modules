@@ -3,13 +3,13 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "rg-subnet-secure-example"
+  name     = "rg-subnet-secure-${var.random_suffix}"
   location = var.location
 }
 
 # Create DDoS Protection Plan for enhanced security
 resource "azurerm_network_ddos_protection_plan" "example" {
-  name                = "ddos-subnet-secure-example"
+  name                = "ddos-subnet-secure-${var.random_suffix}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -20,7 +20,7 @@ resource "azurerm_network_ddos_protection_plan" "example" {
 }
 
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-subnet-secure-example"
+  name                = "vnet-subnet-secure-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   address_space       = ["10.0.0.0/16"]
@@ -41,7 +41,7 @@ resource "azurerm_virtual_network" "example" {
 module "subnet" {
   source = "../../../"
 
-  name                 = "subnetexample003"
+  name                 = "subnet-secure-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
