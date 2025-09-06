@@ -92,16 +92,16 @@ run "multiple_address_prefixes" {
   variables {
     security_rules = [
       {
-        name                         = "allow-management"
-        priority                     = 120
-        direction                    = "Inbound"
-        access                       = "Allow"
-        protocol                     = "Tcp"
-        source_port_range            = "*"
-        destination_port_range       = "3389"
-        source_address_prefixes      = ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24"]
-        destination_address_prefix   = "*"
-        description                  = "Allow RDP from management subnets"
+        name                       = "allow-management"
+        priority                   = 120
+        direction                  = "Inbound"
+        access                     = "Allow"
+        protocol                   = "Tcp"
+        source_port_range          = "*"
+        destination_port_range     = "3389"
+        source_address_prefixes    = ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24"]
+        destination_address_prefix = "*"
+        description                = "Allow RDP from management subnets"
       }
     ]
   }
@@ -146,28 +146,28 @@ run "outbound_rules" {
   variables {
     security_rules = [
       {
-        name                         = "allow-internet-https"
-        priority                     = 200
-        direction                    = "Outbound"
-        access                       = "Allow"
-        protocol                     = "Tcp"
-        source_port_range            = "*"
-        destination_port_range       = "443"
-        source_address_prefix        = "VirtualNetwork"
-        destination_address_prefix   = "Internet"
-        description                  = "Allow HTTPS to Internet"
+        name                       = "allow-internet-https"
+        priority                   = 200
+        direction                  = "Outbound"
+        access                     = "Allow"
+        protocol                   = "Tcp"
+        source_port_range          = "*"
+        destination_port_range     = "443"
+        source_address_prefix      = "VirtualNetwork"
+        destination_address_prefix = "Internet"
+        description                = "Allow HTTPS to Internet"
       },
       {
-        name                         = "deny-all-outbound"
-        priority                     = 4096
-        direction                    = "Outbound"
-        access                       = "Deny"
-        protocol                     = "*"
-        source_port_range            = "*"
-        destination_port_range       = "*"
-        source_address_prefix        = "*"
-        destination_address_prefix   = "*"
-        description                  = "Deny all other outbound"
+        name                       = "deny-all-outbound"
+        priority                   = 4096
+        direction                  = "Outbound"
+        access                     = "Deny"
+        protocol                   = "*"
+        source_port_range          = "*"
+        destination_port_range     = "*"
+        source_address_prefix      = "*"
+        destination_address_prefix = "*"
+        description                = "Deny all other outbound"
       }
     ]
   }

@@ -63,9 +63,9 @@ resource "azurerm_subnet" "security" {
 
 # Create network interface for security appliance (firewall/IDS)
 resource "azurerm_network_interface" "security_appliance" {
-  name                 = "nic-secapp-${var.random_suffix}"
-  location             = azurerm_resource_group.test.location
-  resource_group_name  = azurerm_resource_group.test.name
+  name                  = "nic-secapp-${var.random_suffix}"
+  location              = azurerm_resource_group.test.location
+  resource_group_name   = azurerm_resource_group.test.name
   ip_forwarding_enabled = true
 
   ip_configuration {

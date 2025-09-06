@@ -75,7 +75,7 @@ variable "routes" {
   }
 
   validation {
-    condition = length(var.routes) == length(distinct([for r in var.routes : r.name]))
+    condition     = length(var.routes) == length(distinct([for r in var.routes : r.name]))
     error_message = "Route names must be unique within the route table."
   }
 

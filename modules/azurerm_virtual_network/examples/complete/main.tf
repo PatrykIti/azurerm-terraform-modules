@@ -143,7 +143,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "example" {
 
   tags = merge({
     Purpose = "DNS Resolution"
-  }, {
+    }, {
     Environment = "Development"
     Example     = "Complete"
   })

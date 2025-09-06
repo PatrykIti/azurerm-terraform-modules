@@ -53,9 +53,9 @@ resource "azurerm_network_security_group" "test" {
 
 # Create a network interface for virtual appliance
 resource "azurerm_network_interface" "nva" {
-  name                 = "nic-nva-${var.random_suffix}"
-  location             = azurerm_resource_group.test.location
-  resource_group_name  = azurerm_resource_group.test.name
+  name                  = "nic-nva-${var.random_suffix}"
+  location              = azurerm_resource_group.test.location
+  resource_group_name   = azurerm_resource_group.test.name
   ip_forwarding_enabled = true
 
   ip_configuration {
@@ -113,11 +113,11 @@ module "route_table" {
   ]
 
   tags = {
-    Environment  = "Test"
-    Example      = "Complete"
-    CostCenter   = "Engineering"
-    ManagedBy    = "Terraform"
-    Purpose      = "Comprehensive routing demonstration"
+    Environment = "Test"
+    Example     = "Complete"
+    CostCenter  = "Engineering"
+    ManagedBy   = "Terraform"
+    Purpose     = "Comprehensive routing demonstration"
   }
 }
 

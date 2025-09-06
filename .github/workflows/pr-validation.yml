@@ -196,6 +196,13 @@ jobs:
           scopes: |
             storage-account
             virtual-network
+            kubernetes-cluster
+            network-security-group
+            app-gateway
+            subnet
+            route-table
+            bastion-host
+            container-registry
             key-vault
             app-service
             sql-database

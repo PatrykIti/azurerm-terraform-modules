@@ -12,7 +12,7 @@ mock_provider "azurerm" {
       tags                          = {}
     }
   }
-  
+
   mock_resource "azurerm_route" {
     defaults = {
       id                     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/routeTables/test-rt/routes/test-route"
@@ -91,7 +91,7 @@ run "verify_tags" {
     condition     = azurerm_route_table.route_table.tags["Environment"] == "Test"
     error_message = "Environment tag should be set correctly"
   }
-  
+
   assert {
     condition     = azurerm_route_table.route_table.tags["Project"] == "UnitTest"
     error_message = "Project tag should be set correctly"

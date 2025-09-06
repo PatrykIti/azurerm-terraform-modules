@@ -186,9 +186,9 @@ module "subnet_regular" {
   delegations = {}
 
   # Standard configuration
-  service_endpoints                               = []
-  private_endpoint_network_policies_enabled       = true
-  private_link_service_network_policies_enabled   = true
+  service_endpoints                             = []
+  private_endpoint_network_policies_enabled     = true
+  private_link_service_network_policies_enabled = true
 
   depends_on = [azurerm_virtual_network.example]
 }

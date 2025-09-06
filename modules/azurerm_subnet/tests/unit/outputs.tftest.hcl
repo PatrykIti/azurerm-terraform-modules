@@ -9,7 +9,7 @@ mock_provider "azurerm" {
       resource_group_name                           = "test-rg"
       address_prefixes                              = ["10.0.1.0/24"]
       service_endpoints                             = []
-      service_endpoint_policy_ids                  = []
+      service_endpoint_policy_ids                   = []
       private_endpoint_network_policies             = "Disabled"
       private_link_service_network_policies_enabled = false
     }

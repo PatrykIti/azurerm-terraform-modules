@@ -29,7 +29,7 @@ run "verify_default_network_policies" {
     condition     = azurerm_subnet.subnet.private_endpoint_network_policies == "Enabled"
     error_message = "Default private endpoint network policies should be Enabled (default value is true)"
   }
-  
+
   assert {
     condition     = azurerm_subnet.subnet.private_link_service_network_policies_enabled == true
     error_message = "Default private link service network policies should be enabled (default value is true)"
@@ -61,7 +61,7 @@ run "verify_network_policies_disabled" {
   command = plan
 
   variables {
-    private_endpoint_network_policies_enabled = false
+    private_endpoint_network_policies_enabled     = false
     private_link_service_network_policies_enabled = false
   }
 
@@ -69,7 +69,7 @@ run "verify_network_policies_disabled" {
     condition     = azurerm_subnet.subnet.private_endpoint_network_policies == "Disabled"
     error_message = "Private endpoint network policies should be Disabled when explicitly set to false"
   }
-  
+
   assert {
     condition     = azurerm_subnet.subnet.private_link_service_network_policies_enabled == false
     error_message = "Private link service network policies should be disabled when explicitly set to false"

@@ -85,9 +85,9 @@ resource "azurerm_subnet" "spoke2_workload" {
 
 # Create network interface for NVA in hub
 resource "azurerm_network_interface" "hub_nva" {
-  name                 = "nic-hub-nva-${var.random_suffix}"
-  location             = azurerm_resource_group.test.location
-  resource_group_name  = azurerm_resource_group.test.name
+  name                  = "nic-hub-nva-${var.random_suffix}"
+  location              = azurerm_resource_group.test.location
+  resource_group_name   = azurerm_resource_group.test.name
   ip_forwarding_enabled = true
 
   ip_configuration {
@@ -106,7 +106,7 @@ resource "azurerm_virtual_network_peering" "hub_to_spoke1" {
   remote_virtual_network_id = azurerm_virtual_network.spoke1.id
   allow_gateway_transit     = true
   allow_forwarded_traffic   = true
-  
+
   depends_on = [
     azurerm_subnet.hub_gateway,
     azurerm_subnet.hub_firewall,
@@ -121,7 +121,7 @@ resource "azurerm_virtual_network_peering" "spoke1_to_hub" {
   remote_virtual_network_id = azurerm_virtual_network.hub.id
   use_remote_gateways       = false # Set to true when gateway is deployed
   allow_forwarded_traffic   = true
-  
+
   depends_on = [
     azurerm_subnet.spoke1_workload,
     azurerm_virtual_network_peering.hub_to_spoke1
@@ -136,7 +136,7 @@ resource "azurerm_virtual_network_peering" "hub_to_spoke2" {
   remote_virtual_network_id = azurerm_virtual_network.spoke2.id
   allow_gateway_transit     = true
   allow_forwarded_traffic   = true
-  
+
   depends_on = [
     azurerm_subnet.hub_gateway,
     azurerm_subnet.hub_firewall,
@@ -151,7 +151,7 @@ resource "azurerm_virtual_network_peering" "spoke2_to_hub" {
   remote_virtual_network_id = azurerm_virtual_network.hub.id
   use_remote_gateways       = false # Set to true when gateway is deployed
   allow_forwarded_traffic   = true
-  
+
   depends_on = [
     azurerm_subnet.spoke2_workload,
     azurerm_virtual_network_peering.hub_to_spoke2

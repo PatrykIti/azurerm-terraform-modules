@@ -113,16 +113,16 @@ module "network_security_group" {
       description                = "Deny all outbound traffic by default."
     },
     {
-      name                         = "AllowPaasOutbound"
-      priority                     = 200
-      direction                    = "Outbound"
-      access                       = "Allow"
-      protocol                     = "Tcp"
-      source_port_range            = "*"
-      destination_port_range       = "443"
-      source_address_prefix        = "*"
+      name                       = "AllowPaasOutbound"
+      priority                   = 200
+      direction                  = "Outbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_range     = "443"
+      source_address_prefix      = "*"
       destination_address_prefix = "AzureCloud.WestEurope"
-      description                  = "Allow outbound traffic to essential Azure PaaS services."
+      description                = "Allow outbound traffic to essential Azure PaaS services."
     }
   ]
 

@@ -10,7 +10,7 @@ mock_provider "azurerm" {
       bgp_route_propagation_enabled = true
     }
   }
-  
+
   mock_resource "azurerm_route" {
     defaults = {
       id                     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/routeTables/test-rt/routes/test-route"
@@ -121,7 +121,7 @@ run "invalid_cidr_format" {
     routes = [
       {
         name           = "bad-cidr"
-        address_prefix = "10.0.0.0"  # Missing CIDR notation
+        address_prefix = "10.0.0.0" # Missing CIDR notation
         next_hop_type  = "VnetLocal"
       }
     ]

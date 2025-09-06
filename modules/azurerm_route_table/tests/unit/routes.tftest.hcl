@@ -10,7 +10,7 @@ mock_provider "azurerm" {
       bgp_route_propagation_enabled = true
     }
   }
-  
+
   mock_resource "azurerm_route" {
     defaults = {
       id                     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/routeTables/test-rt/routes/test-route"
@@ -48,12 +48,12 @@ run "single_route" {
     condition     = length(azurerm_route.routes) == 1
     error_message = "Should create exactly one route"
   }
-  
+
   assert {
     condition     = azurerm_route.routes["internet-route"].address_prefix == "0.0.0.0/0"
     error_message = "Route address prefix should be 0.0.0.0/0"
   }
-  
+
   assert {
     condition     = azurerm_route.routes["internet-route"].next_hop_type == "Internet"
     error_message = "Route next hop type should be Internet"
@@ -130,7 +130,7 @@ run "virtual_network_gateway_route" {
     condition     = azurerm_route.routes["to-onprem"].next_hop_type == "VirtualNetworkGateway"
     error_message = "Route should use VirtualNetworkGateway as next hop"
   }
-  
+
   assert {
     condition     = azurerm_route.routes["to-onprem"].next_hop_in_ip_address == null
     error_message = "VirtualNetworkGateway route should not have next hop IP"
@@ -194,7 +194,7 @@ run "route_names_as_keys" {
     condition     = contains(keys(azurerm_route.routes), "route-1")
     error_message = "Route should be accessible by name as key"
   }
-  
+
   assert {
     condition     = contains(keys(azurerm_route.routes), "route-2")
     error_message = "Route should be accessible by name as key"

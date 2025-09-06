@@ -31,30 +31,30 @@ variable "route_table_name" {
 variable "subnets" {
   description = "Map of subnet configurations"
   type = map(object({
-    address_prefix         = string
-    associate_route_table  = bool
+    address_prefix        = string
+    associate_route_table = bool
     associate_nsg         = bool
   }))
   default = {
     "snet-app" = {
       address_prefix        = "10.0.1.0/24"
       associate_route_table = true
-      associate_nsg        = true
+      associate_nsg         = true
     }
     "snet-data" = {
       address_prefix        = "10.0.2.0/24"
       associate_route_table = true
-      associate_nsg        = true
+      associate_nsg         = true
     }
     "snet-gateway" = {
       address_prefix        = "10.0.3.0/24"
-      associate_route_table = false  # Gateway subnets typically don't need route tables
-      associate_nsg        = false  # Gateway subnets can't have NSGs
+      associate_route_table = false # Gateway subnets typically don't need route tables
+      associate_nsg         = false # Gateway subnets can't have NSGs
     }
     "snet-management" = {
       address_prefix        = "10.0.4.0/24"
       associate_route_table = false
-      associate_nsg        = true
+      associate_nsg         = true
     }
   }
 }

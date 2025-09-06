@@ -45,11 +45,11 @@ module "subnet" {
   address_prefixes     = ["10.0.1.0/24"]
 
   # Basic configuration with defaults
-  service_endpoints                               = []
-  service_endpoint_policy_ids                     = []
-  delegations                                     = {}
-  private_endpoint_network_policies_enabled       = true
-  private_link_service_network_policies_enabled   = true
+  service_endpoints                             = []
+  service_endpoint_policy_ids                   = []
+  delegations                                   = {}
+  private_endpoint_network_policies_enabled     = true
+  private_link_service_network_policies_enabled = true
 
   depends_on = [azurerm_virtual_network.example]
 }

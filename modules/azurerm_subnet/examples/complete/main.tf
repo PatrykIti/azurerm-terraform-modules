@@ -81,9 +81,9 @@ resource "azurerm_route_table" "example" {
 
   # Route to force traffic through a virtual appliance
   route {
-    name           = "RouteToFirewall"
-    address_prefix = "0.0.0.0/0"
-    next_hop_type  = "VirtualAppliance"
+    name                   = "RouteToFirewall"
+    address_prefix         = "0.0.0.0/0"
+    next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = "10.0.10.4"
   }
 

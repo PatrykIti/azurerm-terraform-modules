@@ -119,7 +119,7 @@ variable "security_rules" {
 
   # Validate no duplicate priorities
   validation {
-    condition = length(distinct([for rule in var.security_rules : rule.priority])) == length(var.security_rules)
+    condition     = length(distinct([for rule in var.security_rules : rule.priority])) == length(var.security_rules)
     error_message = "Security rules must have unique priorities."
   }
 

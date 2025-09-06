@@ -102,9 +102,9 @@ output "all_subnet_address_prefixes" {
   description = "Address prefixes for all subnets"
   value = {
     container_instances = module.subnet_container_instances.address_prefixes
-    postgresql         = module.subnet_postgresql.address_prefixes
-    app_service        = module.subnet_app_service.address_prefixes
-    batch             = module.subnet_batch.address_prefixes
-    regular           = module.subnet_regular.address_prefixes
+    postgresql          = module.subnet_postgresql.address_prefixes
+    app_service         = module.subnet_app_service.address_prefixes
+    batch               = module.subnet_batch.address_prefixes
+    regular             = module.subnet_regular.address_prefixes
   }
 }
