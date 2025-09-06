@@ -131,7 +131,7 @@ resource "azurerm_subnet_service_endpoint_storage_policy" "example" {
 
 # Complete Subnet configuration with all features
 module "subnet" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
+  source = "../../"
 
   name                 = "subnet-complete-example"
   resource_group_name  = azurerm_resource_group.example.name

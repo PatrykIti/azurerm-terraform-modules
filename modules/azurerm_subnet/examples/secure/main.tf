@@ -77,7 +77,7 @@ resource "azurerm_network_security_group" "secure" {
 
 # Secure Subnet configuration
 module "subnet" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
+  source = "../../"
 
   name                 = "subnet-secure-example"
   resource_group_name  = azurerm_resource_group.example.name
