@@ -24,22 +24,26 @@ A comprehensive collection of production-ready Terraform modules for Azure infra
 
 ```
 azurerm-terraform-modules/
-├── modules/                     # Terraform modules
-│   └── azurerm_storage_account/ # Storage Account module
-│   └── azurerm_virtual_network/ # Virtual Network module
-├── docs/                        # Shared documentation
-├── scripts/                     # Automation scripts
-├── examples/                    # Cross-module examples
-├── tests/                       # Shared test utilities
-├── security-policies/           # Custom security policies
-├── build-templates/             # Azure Pipelines templates (coming soon)
-│   ├── versioning/              # Versioning pipeline templates
-│   ├── documentation/           # Documentation generation templates
-│   ├── security/                # Security scanning templates
-│   ├── testing/                 # Testing pipeline templates
-│   └── release/                 # Release pipeline templates
-├── .github/workflows/           # CI/CD workflows
-└── .claude/references/          # AI development guides
+├── modules/                             # Terraform modules
+│   ├── azurerm_kubernetes_cluster/     # AKS Kubernetes cluster module
+│   ├── azurerm_network_security_group/ # Network Security Group module
+│   ├── azurerm_route_table/            # Route Table module
+│   ├── azurerm_storage_account/        # Storage Account module
+│   ├── azurerm_subnet/                 # Subnet module
+│   └── azurerm_virtual_network/        # Virtual Network module
+├── docs/                                # Shared documentation
+├── scripts/                             # Automation scripts
+├── examples/                            # Cross-module examples
+├── tests/                               # Shared test utilities
+├── security-policies/                   # Custom security policies
+├── build-templates/                     # Azure Pipelines templates (coming soon)
+│   ├── versioning/                      # Versioning pipeline templates
+│   ├── documentation/                   # Documentation generation templates
+│   ├── security/                        # Security scanning templates
+│   ├── testing/                         # Testing pipeline templates
+│   └── release/                         # Release pipeline templates
+├── .github/workflows/                   # CI/CD workflows
+└── .claude/references/                  # AI development guides
 ```
 
 ## 🚀 Quick Start
@@ -73,25 +77,37 @@ module "storage_account" {
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
 | [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv1.0.0) | Azure Storage Account with enterprise features |
-| [Virtual Network](./modules/azurerm_storage_account/) | ✅ Completed | [VNv1.0.1](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=VNv1.0.0) | Virtual Network single module |
+| [Virtual Network](./modules/azurerm_virtual_network/) | ✅ Completed | [VNv1.0.1](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=VNv1.0.0) | Virtual Network with full networking capabilities |
+| [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | v1.0.0 | Azure Kubernetes Service (AKS) cluster with enterprise features |
+| [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | v1.0.0 | Network Security Group with comprehensive rule management |
+| [Route Table](./modules/azurerm_route_table/) | ✅ Completed | v1.0.0 | Route Table with custom routing rules and BGP support |
+| [Subnet](./modules/azurerm_subnet/) | ✅ Completed | v1.0.0 | Subnet module with service endpoints and delegation support |
 
 ### In Development
 
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
 | SQL Server | 🔧 Development | - | Azure SQL Server |
-| AKS | 🔧 Development | - | Azure Kubernetes Service cluster |
 | Key Vault | 🔧 Development | - | Key management all features |
 | App Service Plan | 🔧 Development | - | App Service Plan with enterprise features |
 
 ### Development Roadmap
 
-- **Phase 1**: Storage Account module with comprehensive features ✅
-- **Phase 2**: Virtual Networks single module
-- **Phase 3**: Key Vault module with enterprise security
-- **Phase 4**: SQL Server 
-- **Phase 5**: AKS module for Kubernetes workloads
-- **Phase 6**: App Service Plan with enterprise features
+- **Phase 1**: Core Infrastructure Modules ✅
+  - Storage Account with comprehensive features ✅
+  - Virtual Network with full networking capabilities ✅
+  - Subnet with service endpoints and delegation ✅
+  - Network Security Group with rule management ✅
+  - Route Table with custom routing ✅
+- **Phase 2**: Container and Orchestration ✅
+  - AKS (Azure Kubernetes Service) cluster ✅
+- **Phase 3**: Security and Data (In Progress)
+  - Key Vault module with enterprise security
+  - SQL Server with high availability
+- **Phase 4**: Application Platform (Planned)
+  - App Service Plan with enterprise features
+  - Application Gateway
+  - API Management
 ### Storage Account Module Examples
 
 The Storage Account module includes comprehensive examples demonstrating various use cases:
