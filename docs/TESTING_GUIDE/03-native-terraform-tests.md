@@ -922,7 +922,7 @@ jobs:
         module: [storage_account, virtual_network, key_vault]
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - uses: hashicorp/setup-terraform@v3
         with:

@@ -22,7 +22,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT || github.token }}
       
@@ -177,7 +177,7 @@ jobs:
       - name: Check PR title follows conventional commits
         # Skip validation for Dependabot PRs
         if: ${{ !startsWith(github.head_ref, 'dependabot/') }}
-        uses: amannn/action-semantic-pull-request@v5
+        uses: amannn/action-semantic-pull-request@v6
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         with:
@@ -233,7 +233,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT || github.token }}
       
@@ -282,7 +282,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT || github.token }}
       
@@ -348,7 +348,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT || github.token }}
       
@@ -393,7 +393,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT || github.token }}
       
@@ -406,7 +406,7 @@ jobs:
             ${{ runner.os }}-tflint-
       
       - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v4
+        uses: terraform-linters/setup-tflint@v5
         with:
           tflint_version: latest
       
@@ -455,7 +455,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT || github.token }}
       
@@ -541,7 +541,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT || github.token }}
       

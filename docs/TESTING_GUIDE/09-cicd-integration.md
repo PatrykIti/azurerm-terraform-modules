@@ -23,7 +23,7 @@ jobs:
     outputs:
       modules: ${{ steps.filter.outputs.changes }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dorny/paths-filter@v2
         id: filter
         with:
