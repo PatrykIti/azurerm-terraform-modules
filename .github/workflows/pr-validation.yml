@@ -485,6 +485,10 @@ jobs:
           if [[ -d "$module_dir/examples" ]] && [[ -x "./scripts/update-examples-list.sh" ]]; then
             echo "Updating examples list for ${{ matrix.module }}..."
             ./scripts/update-examples-list.sh "$module_dir"
+            
+            # Regenerate terraform-docs after updating examples list
+            echo "Regenerating terraform-docs for ${{ matrix.module }}..."
+            terraform-docs markdown table --output-file "$module_dir/README.md" "$module_dir"
           fi
           
           if [[ -f "$module_dir/README.md" ]]; then
