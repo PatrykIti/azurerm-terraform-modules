@@ -197,7 +197,7 @@ jobs:
       - name: Setup Terraform
         uses: ./.github/actions/terraform-setup
         with:
-          terraform-version: ${{ vars.TERRAFORM_VERSION || '1.10.3' }}
+          terraform-version: ${{ vars.TERRAFORM_VERSION || '1.12.2' }}
           install-tflint: true
         
       - name: Validate Module ${{ matrix.module }}
@@ -205,7 +205,7 @@ jobs:
         with:
           module: ${{ matrix.module }}
           action: validate
-          terraform-version: ${{ vars.TERRAFORM_VERSION || '1.10.3' }}
+          terraform-version: ${{ vars.TERRAFORM_VERSION || '1.12.2' }}
           github-token: ${{ secrets.PAT }}
 
   test:

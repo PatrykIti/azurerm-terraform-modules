@@ -309,7 +309,7 @@ find modules -name "main.tf" -type f
 **Purpose**: Standardized Terraform environment setup with caching.
 
 **Inputs**:
-- `terraform-version`: Version to install (default: 1.10.3)
+- `terraform-version`: Version to install (default: 1.12.2)
 - `install-tflint`: Whether to install TFLint (uses official terraform-linters/setup-tflint@v4)
 - `install-terraform-docs`: Whether to install terraform-docs
 

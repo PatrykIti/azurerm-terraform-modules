@@ -11,7 +11,7 @@ inputs:
   terraform-version:
     description: 'Terraform version'
     required: false
-    default: '1.10.3'
+    default: '1.12.2'
   github-token:
     description: 'GitHub token for security scan'
     required: false

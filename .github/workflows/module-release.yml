@@ -87,7 +87,7 @@ jobs:
       - name: Setup Terraform
         uses: ./.github/actions/terraform-setup
         with:
-          terraform-version: '1.10.3'
+          terraform-version: '1.12.2'
           install-terraform-docs: true
       
       - name: Validate module before release
@@ -95,7 +95,7 @@ jobs:
         with:
           module: ${{ inputs.module }}
           action: validate
-          terraform-version: '1.10.3'
+          terraform-version: '1.12.2'
           github-token: ${{ steps.app-token.outputs.token }}
       
       - name: Validate module exists

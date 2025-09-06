@@ -37,7 +37,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.10.3  # Pin to specific version for consistency
+          terraform_version: 1.12.2  # Pin to specific version for consistency
 
       - name: Terraform Format Check
         id: fmt
@@ -139,7 +139,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.10.3
+          terraform_version: 1.12.2
 
       - name: Terraform Init with Azure Backend
         run: |
@@ -258,7 +258,7 @@ jobs:
   terraform:
     strategy:
       matrix:
-        terraform: [1.9.8, 1.10.3]
+        terraform: [1.9.8, 1.12.2]
         module: [storage_account, virtual_network, key_vault]
     
     steps:
@@ -417,7 +417,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.10.3
+          terraform_version: 1.12.2
           terraform_wrapper: false
 
       - name: Run Terratest

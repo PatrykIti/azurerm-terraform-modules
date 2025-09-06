@@ -28,7 +28,7 @@ body:
     attributes:
       label: Terraform Version
       description: Output of `terraform version`
-      placeholder: "e.g., 1.10.3"
+      placeholder: "e.g., 1.12.2"
     validations:
       required: true
 

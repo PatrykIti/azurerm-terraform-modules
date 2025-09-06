@@ -6,7 +6,7 @@ set -e
 
 MODULE="$1"
 ACTION="$2"
-TERRAFORM_VERSION="${3:-1.10.3}"
+TERRAFORM_VERSION="${3:-1.12.2}"
 
 echo "Executing ${ACTION} action for module ${MODULE}..."
 

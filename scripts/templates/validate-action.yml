@@ -5,7 +5,7 @@ inputs:
   terraform-version:
     description: 'Terraform version to use'
     required: true
-    default: '1.10.3'
+    default: '1.12.2'
 
 runs:
   using: 'composite'
