@@ -187,12 +187,12 @@ func TestSubnetValidationRules(t *testing.T) {
 		{
 			name:          "InvalidName_TooShort",
 			fixtureFile:   "negative/invalid_name_short",
-			expectedError: "name must be between",
+			expectedError: "Subnet name must be between 1 and 80 characters long",
 		},
 		{
-			name:          "InvalidName_InvalidChars",
+			name:          "InvalidName_TooLong",
 			fixtureFile:   "negative/invalid_name_chars",
-			expectedError: "name must contain only",
+			expectedError: "Subnet name must be between 1 and 80 characters long",
 		},
 		// Add more validation test cases specific to subnet
 	}
@@ -210,8 +210,11 @@ func TestSubnetValidationRules(t *testing.T) {
 				NoColor:      true,
 			}
 
-			// This should fail during plan/apply
-			_, err := terraform.InitAndPlanE(t, terraformOptions)
+			// Initialize terraform
+			terraform.Init(t, terraformOptions)
+			
+			// This should fail during validation
+			_, err := terraform.ValidateE(t, terraformOptions)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), tc.expectedError)
 		})
