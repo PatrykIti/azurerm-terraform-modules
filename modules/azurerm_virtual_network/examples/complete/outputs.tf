@@ -18,21 +18,6 @@ output "virtual_network_guid" {
   value       = module.virtual_network.guid
 }
 
-output "virtual_network_peerings" {
-  description = "Information about Virtual Network peerings"
-  value       = module.virtual_network.peerings
-}
-
-output "virtual_network_dns_links" {
-  description = "Information about Private DNS Zone links"
-  value       = module.virtual_network.private_dns_zone_links
-}
-
-output "virtual_network_diagnostic_setting" {
-  description = "Information about diagnostic settings"
-  value       = module.virtual_network.diagnostic_setting
-}
-
 output "virtual_network_configuration" {
   description = "Summary of Virtual Network configuration"
   value       = module.virtual_network.network_configuration

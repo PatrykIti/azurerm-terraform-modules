@@ -18,11 +18,6 @@ output "identity_principal_id" {
   value       = module.storage_account.identity.principal_id
 }
 
-output "private_endpoint_ids" {
-  description = "Map of private endpoint IDs"
-  value       = module.storage_account.private_endpoints
-}
-
 output "key_vault_uri" {
   description = "The URI of the Key Vault"
   value       = azurerm_key_vault.example.vault_uri
@@ -57,7 +52,6 @@ output "security_configuration" {
     cross_tenant_replication_enabled = false
     queue_encryption_key_type        = "Account"
     table_encryption_key_type        = "Account"
-    private_endpoints_count          = length(module.storage_account.private_endpoints)
     customer_managed_key_enabled     = true
     key_rotation_enabled             = true
     audit_logging_enabled            = true
