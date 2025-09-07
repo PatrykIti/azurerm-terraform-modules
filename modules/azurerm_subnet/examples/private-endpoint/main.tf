@@ -206,12 +206,6 @@ resource "azurerm_route_table" "secure" {
     next_hop_in_ip_address = "10.0.10.4" # Replace with your security appliance IP
   }
 
-  # Route to Azure services via service endpoints (no internet routing)
-  route {
-    name           = "AzureServicesViaSvcEndpoints"
-    address_prefix = "Storage"
-    next_hop_type  = "VirtualNetworkServiceEndpoint"
-  }
 
   tags = {
     Environment   = "Production"
