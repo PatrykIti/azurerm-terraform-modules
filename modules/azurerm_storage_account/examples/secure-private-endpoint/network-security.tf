@@ -87,7 +87,7 @@ resource "azurerm_network_watcher" "example" {
 # Storage Account for NSG Flow Logs
 resource "azurerm_storage_account" "flow_logs" {
   count                    = var.enable_network_flow_logs ? 1 : 0
-  name                     = "stflowlogs${random_string.suffix.result}"
+  name                     = "stflowlogsexample01"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"

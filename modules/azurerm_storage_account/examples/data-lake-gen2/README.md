@@ -247,24 +247,22 @@ terraform destroy
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
 | <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | >= 2.0.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.0.0 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.1.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.41.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azuread"></a> [azuread](#provider\_azuread) | 3.4.0 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.36.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.7.2 |
+| <a name="provider_azuread"></a> [azuread](#provider\_azuread) | >= 2.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.41.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_data_lake_storage"></a> [data\_lake\_storage](#module\_data\_lake\_storage) | github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0 | n/a |
+| <a name="module_data_lake_storage"></a> [data\_lake\_storage](#module\_data\_lake\_storage) | ../../ | n/a |
 
 ## Resources
 
@@ -274,25 +272,24 @@ terraform destroy
 | [azuread_application.data_engineer](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/application) | resource |
 | [azuread_service_principal.data_analyst](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/service_principal) | resource |
 | [azuread_service_principal.data_engineer](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/service_principal) | resource |
-| [azurerm_log_analytics_workspace.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
-| [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
-| [azurerm_role_assignment.current_user_owner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.data_analyst_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.data_analyst_reader_gold](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.data_engineer_owner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_storage_account_local_user.sftp_user](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_local_user) | resource |
-| [azurerm_storage_data_lake_gen2_filesystem.bronze](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_filesystem) | resource |
-| [azurerm_storage_data_lake_gen2_filesystem.gold](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_filesystem) | resource |
-| [azurerm_storage_data_lake_gen2_filesystem.silver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_filesystem) | resource |
-| [azurerm_storage_data_lake_gen2_path.bronze_raw](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) | resource |
-| [azurerm_storage_data_lake_gen2_path.bronze_staging](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) | resource |
-| [azurerm_storage_data_lake_gen2_path.gold_reports](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) | resource |
-| [azurerm_storage_data_lake_gen2_path.sample_data_dir](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) | resource |
-| [azurerm_storage_data_lake_gen2_path.silver_processed](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_data_lake_gen2_path) | resource |
-| [azurerm_subnet.nfs_clients](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
-| [azurerm_virtual_network.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
-| [random_string.suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
-| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
+| [azurerm_log_analytics_workspace.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/log_analytics_workspace) | resource |
+| [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/resource_group) | resource |
+| [azurerm_role_assignment.current_user_owner](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.data_analyst_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.data_analyst_reader_gold](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.data_engineer_owner](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/role_assignment) | resource |
+| [azurerm_storage_account_local_user.sftp_user](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/storage_account_local_user) | resource |
+| [azurerm_storage_data_lake_gen2_filesystem.bronze](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/storage_data_lake_gen2_filesystem) | resource |
+| [azurerm_storage_data_lake_gen2_filesystem.gold](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/storage_data_lake_gen2_filesystem) | resource |
+| [azurerm_storage_data_lake_gen2_filesystem.silver](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/storage_data_lake_gen2_filesystem) | resource |
+| [azurerm_storage_data_lake_gen2_path.bronze_raw](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/storage_data_lake_gen2_path) | resource |
+| [azurerm_storage_data_lake_gen2_path.bronze_staging](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/storage_data_lake_gen2_path) | resource |
+| [azurerm_storage_data_lake_gen2_path.gold_reports](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/storage_data_lake_gen2_path) | resource |
+| [azurerm_storage_data_lake_gen2_path.sample_data_dir](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/storage_data_lake_gen2_path) | resource |
+| [azurerm_storage_data_lake_gen2_path.silver_processed](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/storage_data_lake_gen2_path) | resource |
+| [azurerm_subnet.nfs_clients](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/subnet) | resource |
+| [azurerm_virtual_network.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/resources/virtual_network) | resource |
+| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/4.41.0/docs/data-sources/client_config) | data source |
 
 ## Inputs
 

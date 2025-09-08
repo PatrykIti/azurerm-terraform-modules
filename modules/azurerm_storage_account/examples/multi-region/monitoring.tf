@@ -197,7 +197,7 @@ resource "azurerm_monitor_metric_alert" "capacity_alert" {
 # Application Insights for Monitoring Dashboard
 resource "azurerm_application_insights" "replication" {
   count               = var.enable_monitoring_alerts ? 1 : 0
-  name                = "appi-replication-${random_string.suffix.result}"
+  name                = "appi-replication-example"
   location            = azurerm_resource_group.primary.location
   resource_group_name = azurerm_resource_group.primary.name
   workspace_id        = azurerm_log_analytics_workspace.shared.id
