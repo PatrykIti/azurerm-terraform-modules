@@ -12,9 +12,9 @@ variable "random_suffix" {
 variable "routes" {
   description = "List of routes to be created in the route table."
   type = list(object({
-    name           = string
-    address_prefix = string
-    next_hop_type  = string
+    name                   = string
+    address_prefix         = string
+    next_hop_type          = string
     next_hop_in_ip_address = optional(string)
   }))
   default = []
