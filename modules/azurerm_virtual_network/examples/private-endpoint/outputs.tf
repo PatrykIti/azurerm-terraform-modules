@@ -13,11 +13,6 @@ output "virtual_network_address_space" {
   value       = module.virtual_network.address_space
 }
 
-output "virtual_network_dns_links" {
-  description = "Information about Private DNS Zone links"
-  value       = module.virtual_network.private_dns_zone_links
-}
-
 output "private_endpoint_subnet_id" {
   description = "The ID of the private endpoint subnet"
   value       = azurerm_subnet.private_endpoints.id
