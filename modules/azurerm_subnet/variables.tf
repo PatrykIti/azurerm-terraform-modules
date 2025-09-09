@@ -7,6 +7,11 @@ variable "name" {
     condition     = length(var.name) > 0 && length(var.name) <= 80
     error_message = "Subnet name must be between 1 and 80 characters long."
   }
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9][a-zA-Z0-9-._]*[a-zA-Z0-9_]$", var.name))
+    error_message = "Subnet name must contain only alphanumeric characters, hyphens, underscores, and periods."
+  }
 }
 
 variable "resource_group_name" {

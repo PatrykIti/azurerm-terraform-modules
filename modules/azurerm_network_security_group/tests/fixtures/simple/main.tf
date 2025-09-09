@@ -13,8 +13,5 @@ module "network_security_group" {
   name                = "nsg-smp-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
-  tags = {
-    Environment = "Test"
-    Scenario    = "Simple"
-  }
+  tags                = var.tags
 }

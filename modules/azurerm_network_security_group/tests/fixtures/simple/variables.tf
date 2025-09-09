@@ -8,3 +8,12 @@ variable "location" {
   description = "The Azure region for the resources."
   default     = "northeurope"
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "Tags to apply to the resources."
+  default = {
+    Environment = "Test"
+    Scenario    = "Simple"
+  }
+}

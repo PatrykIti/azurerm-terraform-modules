@@ -32,6 +32,9 @@ module "route_table" {
 
   # BGP route propagation enabled by default (secure default)
   bgp_route_propagation_enabled = true
+  
+  # Routes can be passed dynamically
+  routes = var.routes
 
   tags = {
     Environment = "Test"
