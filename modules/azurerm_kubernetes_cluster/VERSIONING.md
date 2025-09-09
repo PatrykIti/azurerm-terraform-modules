@@ -117,7 +117,7 @@ module "kubernetes_cluster" {
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| AKSv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
+| AKSv1.0.x | >= 1.3.0 | 4.43.0 (pinned) | TBD |
 
 **Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
 

@@ -34,3 +34,21 @@ resource "azurerm_subnet" "subnet" {
   private_endpoint_network_policies             = var.private_endpoint_network_policies_enabled ? "Enabled" : "Disabled"
   private_link_service_network_policies_enabled = var.private_link_service_network_policies_enabled
 }
+
+resource "azurerm_subnet_nat_gateway_association" "subnet_nat_gateway_association" {
+  count          = var.associations != null && var.associations.nat_gateway != null ? 1 : 0
+  subnet_id      = azurerm_subnet.subnet.id
+  nat_gateway_id = var.associations.nat_gateway.id
+}
+
+resource "azurerm_subnet_network_security_group_association" "subnet_network_security_group_association" {
+  count                     = var.associations != null && var.associations.network_security_group != null ? 1 : 0
+  subnet_id                 = azurerm_subnet.subnet.id
+  network_security_group_id = var.associations.network_security_group.id
+}
+
+resource "azurerm_subnet_route_table_association" "subnet_route_table_association" {
+  count          = var.associations != null && var.associations.route_table != null ? 1 : 0
+  subnet_id      = azurerm_subnet.subnet.id
+  route_table_id = var.associations.route_table.id
+}

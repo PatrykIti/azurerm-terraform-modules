@@ -159,13 +159,13 @@ module "network_security_group" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.36.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.43.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.36.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.43.0 |
 
 ## Modules
 
@@ -175,9 +175,9 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_network_security_group.network_security_group](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/network_security_group) | resource |
-| [azurerm_network_security_rule.security_rules](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/network_security_rule) | resource |
-| [azurerm_network_watcher_flow_log.flow_log](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/network_watcher_flow_log) | resource |
+| [azurerm_network_security_group.network_security_group](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/network_security_group) | resource |
+| [azurerm_network_security_rule.security_rules](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/network_security_rule) | resource |
+| [azurerm_network_watcher_flow_log.flow_log](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/network_watcher_flow_log) | resource |
 
 ## Inputs
 

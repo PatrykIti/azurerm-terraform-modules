@@ -134,10 +134,24 @@ variable "private_link_service_network_policies_enabled" {
   default     = true
 }
 
-# Tags
-variable "tags" {
-  description = "A mapping of tags to assign to the subnet."
-  type        = map(string)
-  default     = {}
+variable "associations" {
+  description = <<-EOT
+    List of parameters to associate other resources to Subnet:
+      nat_gateway_id - ID of NAT gateway to associate with
+      network_security_group_id - D of network security group to associate with
+      route_table_id - ID of route table to associate with
+  EOT
+  type = object({
+    nat_gateway = optional(object({
+      id = string
+    }), null)
+    network_security_group = optional(object({
+      id = string
+    }), null)
+    route_table = optional(object({
+      id = string
+    }), null)
+  })
+  default = null
 }
 

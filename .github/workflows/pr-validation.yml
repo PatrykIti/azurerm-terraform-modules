@@ -488,7 +488,7 @@ jobs:
             
             # Regenerate terraform-docs after updating examples list
             echo "Regenerating terraform-docs for ${{ matrix.module }}..."
-            terraform-docs markdown table --output-file "$module_dir/README.md" "$module_dir"
+            cd "$module_dir" && terraform-docs markdown table --output-file README.md .
           fi
           
           if [[ -f "$module_dir/README.md" ]]; then
@@ -586,7 +586,7 @@ jobs:
     
     steps:
       - name: Quality gates summary
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.PAT }}
           script: |

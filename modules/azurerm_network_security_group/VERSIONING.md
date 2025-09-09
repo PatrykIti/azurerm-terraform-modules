@@ -117,7 +117,7 @@ module "network_security_group" {
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| NSGv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
+| NSGv1.0.x | >= 1.3.0 | 4.43.0 (pinned) | TBD |
 
 **Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
 

@@ -69,7 +69,7 @@ This configuration is suitable for:
 
 - Azure subscription with appropriate security clearances
 - Terraform >= 1.3.0
-- AzureRM Provider 4.36.0 (as specified in the module's [versions.tf](../../versions.tf))
+- AzureRM Provider 4.43.0 (as specified in the module's [versions.tf](../../versions.tf))
 - Permissions to create:
   - Premium Key Vault with HSM
   - Private endpoints and DNS zones
@@ -77,7 +77,7 @@ This configuration is suitable for:
   - Monitor alerts
 - Network connectivity to private endpoints
 
-**Note**: The module uses a pinned version of the AzureRM provider (4.36.0) to ensure consistent behavior across all deployments.
+**Note**: The module uses a pinned version of the AzureRM provider (4.43.0) to ensure consistent behavior across all deployments.
 
 ## Deployment Considerations
 
