@@ -488,7 +488,7 @@ jobs:
             
             # Regenerate terraform-docs after updating examples list
             echo "Regenerating terraform-docs for ${{ matrix.module }}..."
-            cd "$module_dir" && terraform-docs markdown table --output-file README.md .
+            (cd "$module_dir" && terraform-docs markdown table --output-file README.md .)
           fi
           
           if [[ -f "$module_dir/README.md" ]]; then

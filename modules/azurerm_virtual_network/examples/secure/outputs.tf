@@ -23,11 +23,6 @@ output "virtual_network_ddos_protection" {
   value       = "DDoS protection configured via input variables"
 }
 
-output "virtual_network_diagnostic_setting" {
-  description = "Information about diagnostic settings"
-  value       = module.virtual_network.diagnostic_setting
-}
-
 output "virtual_network_security_configuration" {
   description = "Summary of security configuration"
   value = {
