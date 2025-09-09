@@ -43,11 +43,6 @@ output "private_endpoint_ip_address" {
   value       = azurerm_private_endpoint.storage.private_service_connection[0].private_ip_address
 }
 
-output "private_dns_zone_id" {
-  description = "The ID of the private DNS zone"
-  value       = azurerm_private_dns_zone.blob.id
-}
-
 output "resource_group_name" {
   description = "The name of the resource group"
   value       = azurerm_resource_group.example.name

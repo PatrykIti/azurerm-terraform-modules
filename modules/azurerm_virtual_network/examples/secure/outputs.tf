@@ -28,7 +28,6 @@ output "virtual_network_security_configuration" {
   value = {
     ddos_protection_enabled = true
     encryption_enabled      = true
-    monitoring_enabled      = module.virtual_network.diagnostic_setting != null
   }
 }
 
