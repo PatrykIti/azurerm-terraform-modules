@@ -18,9 +18,9 @@ variable "bgp_route_propagation_enabled" {
 variable "additional_routes" {
   description = "Additional routes to add to the route table"
   type = list(object({
-    name           = string
-    address_prefix = string
-    next_hop_type  = string
+    name                   = string
+    address_prefix         = string
+    next_hop_type          = string
     next_hop_in_ip_address = optional(string)
   }))
   default = []
