@@ -12,5 +12,16 @@ variable "random_suffix" {
 variable "bgp_route_propagation_enabled" {
   description = "Boolean flag which controls propagation of routes learned by BGP"
   type        = bool
-  default     = true
+  default     = false
+}
+
+variable "additional_routes" {
+  description = "Additional routes to add to the route table"
+  type = list(object({
+    name           = string
+    address_prefix = string
+    next_hop_type  = string
+    next_hop_in_ip_address = optional(string)
+  }))
+  default = []
 }

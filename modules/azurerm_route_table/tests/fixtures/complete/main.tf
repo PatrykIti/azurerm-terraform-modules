@@ -79,7 +79,7 @@ module "route_table" {
   bgp_route_propagation_enabled = var.bgp_route_propagation_enabled
 
   # Define multiple custom routes
-  routes = [
+  routes = concat([
     {
       name                   = "route-to-internet"
       address_prefix         = "0.0.0.0/0"
@@ -110,7 +110,7 @@ module "route_table" {
       next_hop_type          = "None"
       next_hop_in_ip_address = null
     }
-  ]
+  ], var.additional_routes)
 
   tags = {
     Environment = "Test"
