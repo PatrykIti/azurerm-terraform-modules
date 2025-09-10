@@ -5,52 +5,61 @@ TIMEOUT ?= 30m
 PARALLEL ?= 8
 TEST_NAME ?= ""
 
+# Environment check
+check-env:
+	@echo "Checking required environment variables..."
+	@test -n "$(ARM_SUBSCRIPTION_ID)" || test -n "$(AZURE_SUBSCRIPTION_ID)" || (echo "ARM_SUBSCRIPTION_ID or AZURE_SUBSCRIPTION_ID is not set" && exit 1)
+	@test -n "$(ARM_TENANT_ID)" || test -n "$(AZURE_TENANT_ID)" || (echo "ARM_TENANT_ID or AZURE_TENANT_ID is not set" && exit 1)
+	@test -n "$(ARM_CLIENT_ID)" || test -n "$(AZURE_CLIENT_ID)" || (echo "ARM_CLIENT_ID or AZURE_CLIENT_ID is not set" && exit 1)
+	@test -n "$(ARM_CLIENT_SECRET)" || test -n "$(AZURE_CLIENT_SECRET)" || (echo "ARM_CLIENT_SECRET or AZURE_CLIENT_SECRET is not set" && exit 1)
+	@echo "All required environment variables are set."
+
 # Default target
 all: test
 
 # Run all Go tests in parallel. This is the default command for a full test run.
-test:
+test: check-env
 	@echo "Running all Go tests..."
 	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...
 
 # Run a single, specific test function. Useful for debugging.
-# Example: make test-single TEST_NAME=TestNsgSimple
-test-single:
+# Example: make test-single TEST_NAME=TestSimpleNetworkSecurityGroup
+test-single: check-env
 	@echo "Running single test: $(TEST_NAME)..."
 	go test -v -timeout $(TIMEOUT) -run "^$(TEST_NAME)$$" ./...
 
 # Run unit tests only (skip integration tests)
-test-unit:
+test-unit: check-env
 	@echo "Running unit tests only..."
 	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) -short ./...
 
 # Run integration tests only
-test-integration:
+test-integration: check-env
 	@echo "Running integration tests only..."
 	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) -run "TestNetworkSecurityGroupLifecycle|TestSecureNetworkSecurityGroup" ./...
 
 # Run test for simple fixture
-test-simple:
+test-simple: check-env
 	@echo "Running test for simple fixture..."
 	go test -v -timeout $(TIMEOUT) -run TestSimpleNetworkSecurityGroup ./...
 
 # Run test for complete fixture
-test-complete:
+test-complete: check-env
 	@echo "Running test for complete fixture..."
 	go test -v -timeout $(TIMEOUT) -run TestCompleteNetworkSecurityGroup ./...
 
 # Run test for security fixture
-test-security:
+test-security: check-env
 	@echo "Running test for security fixture..."
 	go test -v -timeout $(TIMEOUT) -run TestSecureNetworkSecurityGroup ./...
 
 # Run test for network fixture
-test-network:
+test-network: check-env
 	@echo "Running test for network fixture..."
 	go test -v -timeout $(TIMEOUT) -run TestNetworkNetworkSecurityGroup ./...
 
 # Run test for negative fixture
-test-negative:
+test-negative: check-env
 	@echo "Running test for negative fixture..."
 	go test -v -timeout $(TIMEOUT) -run TestNetworkSecurityGroupValidationRules ./...
 
@@ -60,14 +69,14 @@ benchmark:
 	go test -run=^$ -bench=.
 
 # Run tests and generate an HTML code coverage report.
-test-coverage:
+test-coverage: check-env
 	@echo "Running tests with coverage..."
 	go test -v -coverprofile=coverage.out -covermode=atomic ./...
 	go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report generated: coverage.html"
 
 # Run tests and generate a JUnit XML report for CI/CD integration.
-test-junit:
+test-junit: check-env
 	@echo "Running tests and generating JUnit report..."
 	go install github.com/jstemmer/go-junit-report/v2@latest
 	go test -v ./... 2>&1 | go-junit-report -set-exit-code > test-results.xml
