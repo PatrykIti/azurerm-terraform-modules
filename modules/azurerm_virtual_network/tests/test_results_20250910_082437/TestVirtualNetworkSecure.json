@@ -1,0 +1,7 @@
+{
+  "test_name": "TestVirtualNetworkSecure",
+  "timestamp": "2025-09-10T06:39:12Z",
+  "exit_status": 1,
+  "success": false,
+  "log_file": "test_results_20250910_082437/TestVirtualNetworkSecure.log"
+}

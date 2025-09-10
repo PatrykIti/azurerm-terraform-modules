@@ -36,7 +36,7 @@ resource "azurerm_storage_account" "example" {
 module "subnet" {
   source = "../../../"
 
-  name                 = "subnet-complete-${var.random_suffix}"
+  name                 = "snet-complete-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   # Note: When using delegation, only single address prefix is supported

@@ -45,7 +45,7 @@ func TestRouteTableLifecycle(t *testing.T) {
 		terraformOptions.Vars["routes"] = []map[string]interface{}{
 			{
 				"name":           "new-route",
-				"address_prefix": "10.0.0.0/16",
+				"address_prefix": "0.0.0.0/0",
 				"next_hop_type":  "Internet",
 			},
 		}

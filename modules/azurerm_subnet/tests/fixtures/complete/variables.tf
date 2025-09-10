@@ -9,3 +9,9 @@ variable "random_suffix" {
   type        = string
   default     = ""
 }
+
+variable "tag_environment" {
+  description = "Environment tag for resources"
+  type        = string
+  default     = "Development"
+}

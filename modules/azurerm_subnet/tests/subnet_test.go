@@ -191,7 +191,7 @@ func TestSubnetValidationRules(t *testing.T) {
 		},
 		{
 			name:          "InvalidName_TooLong",
-			fixtureFile:   "negative/invalid_name_chars",
+			fixtureFile:   "negative/invalid_name_long",
 			expectedError: "Subnet name must be between 1 and 80 characters long",
 		},
 		// Add more validation test cases specific to subnet

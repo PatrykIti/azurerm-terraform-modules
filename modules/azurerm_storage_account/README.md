@@ -8,7 +8,7 @@ Current version: **SAv1.0.0**
 
 ## Description
 
-This module creates a comprehensive Azure Storage Account with support for all enterprise features including security, monitoring, private endpoints, and lifecycle management.
+This module creates a comprehensive Azure Storage Account with support for all enterprise features including security, monitoring, and lifecycle management.
 
 ## Usage
 
@@ -62,7 +62,7 @@ module "storage_account" {
 - [Identity Access](examples/identity-access) - This example demonstrates how to configure an Azure Storage Account with **keyless authentication** using managed identities and Microsoft Entra ID (formerly Azure AD) integration. This approach eliminates the need for shared access keys, providing enhanced security through identity-based access control.
 - [Multi Region](examples/multi-region) - This example demonstrates a comprehensive multi-region Azure Storage Account deployment strategy with enhanced disaster recovery capabilities, cross-tenant replication, and optimized geo-redundancy configurations.
 - [Secure](examples/secure) - This example demonstrates a maximum-security Azure Storage Account configuration suitable for highly sensitive data and regulated environments.
-- [Secure Private Endpoint](examples/secure-private-endpoint) - This example demonstrates how to deploy a highly secure Azure Storage Account suitable for production environments handling sensitive data.
+- [Secure Private Endpoint](examples/secure-private-endpoint) - This example demonstrates how to deploy a highly secure Azure Storage Account suitable for production environments handling sensitive data (Note: Private endpoints should be created separately outside this module).
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
@@ -72,7 +72,7 @@ module "storage_account" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.43.0 |
 
 ## Providers
@@ -89,9 +89,6 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_monitor_diagnostic_setting.blob_diagnostic_setting](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/monitor_diagnostic_setting) | resource |
-| [azurerm_monitor_diagnostic_setting.monitor_diagnostic_setting](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/monitor_diagnostic_setting) | resource |
-| [azurerm_private_endpoint.private_endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/private_endpoint) | resource |
 | [azurerm_storage_account.storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/storage_account) | resource |
 | [azurerm_storage_account_queue_properties.queue_properties](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/storage_account_queue_properties) | resource |
 | [azurerm_storage_account_static_website.static_website](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/storage_account_static_website) | resource |
@@ -116,7 +113,6 @@ No modules.
 | <a name="input_cross_tenant_replication_enabled"></a> [cross\_tenant\_replication\_enabled](#input\_cross\_tenant\_replication\_enabled) | Should cross Tenant replication be enabled? Defaults to false. | `bool` | `null` | no |
 | <a name="input_custom_domain"></a> [custom\_domain](#input\_custom\_domain) | Custom domain configuration for the storage account. | <pre>object({<br/>    name          = string<br/>    use_subdomain = optional(bool)<br/>  })</pre> | `null` | no |
 | <a name="input_default_to_oauth_authentication"></a> [default\_to\_oauth\_authentication](#input\_default\_to\_oauth\_authentication) | Default to Azure Active Directory authorization in the Azure portal when accessing the Storage Account. The default value is false. This will have no effect when the account is not in the same tenant as your Azure subscription. | `bool` | `null` | no |
-| <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Diagnostic settings configuration for audit logging. | <pre>object({<br/>    enabled                    = optional(bool, true)<br/>    log_analytics_workspace_id = optional(string)<br/>    storage_account_id         = optional(string)<br/>    eventhub_auth_rule_id      = optional(string)<br/>    logs = optional(object({<br/>      storage_read   = optional(bool, true)<br/>      storage_write  = optional(bool, true)<br/>      storage_delete = optional(bool, true)<br/>      retention_days = optional(number, 7)<br/>    }), {})<br/>    metrics = optional(object({<br/>      transaction    = optional(bool, true)<br/>      capacity       = optional(bool, true)<br/>      retention_days = optional(number, 7)<br/>    }), {})<br/>  })</pre> | <pre>{<br/>  "enabled": false<br/>}</pre> | no |
 | <a name="input_edge_zone"></a> [edge\_zone](#input\_edge\_zone) | Specifies the Edge Zone within the Azure Region where this Storage Account should exist. Defaults to null for backward compatibility. | `string` | `null` | no |
 | <a name="input_encryption"></a> [encryption](#input\_encryption) | Encryption configuration for the storage account. | <pre>object({<br/>    enabled                           = optional(bool, true)<br/>    infrastructure_encryption_enabled = optional(bool, true)<br/>    key_vault_key_id                  = optional(string)<br/>    user_assigned_identity_id         = optional(string)<br/>  })</pre> | <pre>{<br/>  "enabled": true,<br/>  "infrastructure_encryption_enabled": true<br/>}</pre> | no |
 | <a name="input_file_shares"></a> [file\_shares](#input\_file\_shares) | List of file shares to create. | <pre>list(object({<br/>    name             = string<br/>    quota            = optional(number, 5120)<br/>    access_tier      = optional(string, "Hot")<br/>    enabled_protocol = optional(string, "SMB")<br/>    metadata         = optional(map(string), {})<br/>  }))</pre> | `[]` | no |
@@ -130,7 +126,6 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | The name of the storage account. Must be globally unique. | `string` | n/a | yes |
 | <a name="input_network_rules"></a> [network\_rules](#input\_network\_rules) | Network rules for the storage account. | <pre>object({<br/>    default_action             = string<br/>    bypass                     = optional(set(string), ["AzureServices"])<br/>    ip_rules                   = optional(set(string), [])<br/>    virtual_network_subnet_ids = optional(set(string), [])<br/>    private_link_access = optional(list(object({<br/>      endpoint_resource_id = string<br/>      endpoint_tenant_id   = optional(string)<br/>    })), [])<br/>  })</pre> | <pre>{<br/>  "bypass": [<br/>    "AzureServices"<br/>  ],<br/>  "default_action": "Deny"<br/>}</pre> | no |
 | <a name="input_nfsv3_enabled"></a> [nfsv3\_enabled](#input\_nfsv3\_enabled) | Is NFSv3 protocol enabled for this storage account? | `bool` | `null` | no |
-| <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints) | List of private endpoints to create for the storage account. | <pre>list(object({<br/>    name                            = string<br/>    subresource_names               = list(string)<br/>    subnet_id                       = string<br/>    private_dns_zone_ids            = optional(list(string), [])<br/>    private_service_connection_name = optional(string)<br/>    is_manual_connection            = optional(bool, false)<br/>    request_message                 = optional(string)<br/>    private_dns_zone_group_name     = optional(string, "default")<br/>    custom_network_interface_name   = optional(string)<br/>    tags                            = optional(map(string), {})<br/>  }))</pre> | `[]` | no |
 | <a name="input_queue_encryption_key_type"></a> [queue\_encryption\_key\_type](#input\_queue\_encryption\_key\_type) | The encryption key type to use for the Queue service. Possible values are Service and Account. | `string` | `null` | no |
 | <a name="input_queue_properties"></a> [queue\_properties](#input\_queue\_properties) | Queue service properties including logging configuration. | <pre>object({<br/>    logging = optional(object({<br/>      delete                = optional(bool, true)<br/>      read                  = optional(bool, true)<br/>      write                 = optional(bool, true)<br/>      version               = optional(string, "1.0")<br/>      retention_policy_days = optional(number, 7)<br/>      }), {<br/>      delete                = true<br/>      read                  = true<br/>      write                 = true<br/>      version               = "1.0"<br/>      retention_policy_days = 7<br/>    })<br/>  })</pre> | `{}` | no |
 | <a name="input_queues"></a> [queues](#input\_queues) | List of storage queues to create. | <pre>list(object({<br/>    name     = string<br/>    metadata = optional(map(string), {})<br/>  }))</pre> | `[]` | no |
@@ -156,7 +151,6 @@ No modules.
 | <a name="output_allow_nested_items_to_be_public"></a> [allow\_nested\_items\_to\_be\_public](#output\_allow\_nested\_items\_to\_be\_public) | Are nested items allowed to be public for the storage account |
 | <a name="output_containers"></a> [containers](#output\_containers) | Map of created storage containers with all available attributes |
 | <a name="output_cross_tenant_replication_enabled"></a> [cross\_tenant\_replication\_enabled](#output\_cross\_tenant\_replication\_enabled) | Is cross tenant replication enabled for the storage account |
-| <a name="output_diagnostic_settings"></a> [diagnostic\_settings](#output\_diagnostic\_settings) | Map of diagnostic settings created for the storage account |
 | <a name="output_file_shares"></a> [file\_shares](#output\_file\_shares) | Map of created file shares |
 | <a name="output_https_traffic_only_enabled"></a> [https\_traffic\_only\_enabled](#output\_https\_traffic\_only\_enabled) | Is HTTPS traffic only enabled for the storage account |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the Storage Account |
@@ -201,8 +195,6 @@ No modules.
 | <a name="output_primary_web_internet_host"></a> [primary\_web\_internet\_host](#output\_primary\_web\_internet\_host) | The internet routing hostname with port if applicable for web storage in the primary location |
 | <a name="output_primary_web_microsoft_endpoint"></a> [primary\_web\_microsoft\_endpoint](#output\_primary\_web\_microsoft\_endpoint) | The microsoft routing endpoint URL for web storage in the primary location |
 | <a name="output_primary_web_microsoft_host"></a> [primary\_web\_microsoft\_host](#output\_primary\_web\_microsoft\_host) | The microsoft routing hostname with port if applicable for web storage in the primary location |
-| <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints) | Map of private endpoints created for the storage account, keyed by endpoint name |
-| <a name="output_private_endpoints_by_subresource"></a> [private\_endpoints\_by\_subresource](#output\_private\_endpoints\_by\_subresource) | Private endpoints grouped by subresource type (blob, file, table, queue, web, dfs) |
 | <a name="output_queue_encryption_key_type"></a> [queue\_encryption\_key\_type](#output\_queue\_encryption\_key\_type) | The encryption type of the queue service |
 | <a name="output_queue_properties_id"></a> [queue\_properties\_id](#output\_queue\_properties\_id) | The ID of the Storage Account Queue Properties |
 | <a name="output_queues"></a> [queues](#output\_queues) | Map of created storage queues |
