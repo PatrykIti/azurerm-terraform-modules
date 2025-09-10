@@ -43,7 +43,7 @@ module "subnet" {
   address_prefixes = ["10.0.1.0/24"]
 
   # Service endpoints configuration
-  service_endpoints = [
+  service_endpoints = length(var.service_endpoints) > 0 ? var.service_endpoints : [
     "Microsoft.Storage",
     "Microsoft.KeyVault",
     "Microsoft.Sql"
@@ -64,6 +64,6 @@ module "subnet" {
   }
 
   # Network policies
-  private_endpoint_network_policies_enabled     = true
+  private_endpoint_network_policies_enabled     = var.enforce_private_link_endpoint_network_policies
   private_link_service_network_policies_enabled = true
 }

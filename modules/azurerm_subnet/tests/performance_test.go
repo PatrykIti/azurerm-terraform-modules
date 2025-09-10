@@ -238,7 +238,8 @@ func TestSubnetUpdatePerformance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/basic")
+	// Use complete fixture which has more configuration options
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/complete")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -247,23 +248,21 @@ func TestSubnetUpdatePerformance(t *testing.T) {
 	terraform.InitAndApply(t, terraformOptions)
 
 	// Measure update times for different changes
+	// Note: Subnets have limited update capabilities in Azure
 	updateScenarios := []struct {
 		name   string
 		update map[string]interface{}
 	}{
 		{
-			name: "UpdateTags",
+			name: "UpdateServiceEndpoints",
 			update: map[string]interface{}{
-				"tags": map[string]interface{}{
-					"Environment": "Test",
-					"Updated":     "true",
-				},
+				"service_endpoints": []string{"Microsoft.Storage", "Microsoft.KeyVault"},
 			},
 		},
 		{
-			name: "UpdateConfiguration",
+			name: "UpdateNetworkPolicies",
 			update: map[string]interface{}{
-				"enable_monitoring": true,
+				"enforce_private_link_endpoint_network_policies": false,
 			},
 		},
 		// Add more update scenarios specific to subnet

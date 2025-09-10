@@ -15,3 +15,15 @@ variable "tag_environment" {
   type        = string
   default     = "Development"
 }
+
+variable "service_endpoints" {
+  description = "List of Service endpoints to associate with the subnet"
+  type        = list(string)
+  default     = []
+}
+
+variable "enforce_private_link_endpoint_network_policies" {
+  description = "Enable or Disable network policies for the private link endpoint on the subnet"
+  type        = bool
+  default     = true
+}

@@ -103,7 +103,7 @@ func TestRouteTableMultipleUpdates(t *testing.T) {
 		terraformOptions.Vars["additional_routes"] = []map[string]interface{}{
 			{
 				"name":           "extra-route",
-				"address_prefix": "192.168.0.0/16",
+				"address_prefix": "172.16.0.0/16",
 				"next_hop_type":  "VnetLocal",
 			},
 		}
