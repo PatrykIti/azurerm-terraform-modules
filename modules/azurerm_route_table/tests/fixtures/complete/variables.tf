@@ -25,3 +25,15 @@ variable "additional_routes" {
   }))
   default = []
 }
+
+variable "tags" {
+  description = "A mapping of tags to assign to the resources"
+  type        = map(string)
+  default = {
+    Environment = "Test"
+    Example     = "Complete"
+    CostCenter  = "Engineering"
+    ManagedBy   = "Terraform"
+    Purpose     = "Comprehensive routing demonstration"
+  }
+}

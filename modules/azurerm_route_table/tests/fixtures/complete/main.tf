@@ -112,13 +112,7 @@ module "route_table" {
     }
   ], var.additional_routes)
 
-  tags = {
-    Environment = "Test"
-    Example     = "Complete"
-    CostCenter  = "Engineering"
-    ManagedBy   = "Terraform"
-    Purpose     = "Comprehensive routing demonstration"
-  }
+  tags = var.tags
 }
 
 # Associate route table with subnets
