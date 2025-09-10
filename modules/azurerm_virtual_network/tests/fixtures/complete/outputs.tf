@@ -25,17 +25,17 @@ output "virtual_network_peering_id" {
 
 output "virtual_network_peerings" {
   description = "Virtual Network peerings information"
-  value       = jsonencode([{
-    id                     = azurerm_virtual_network_peering.test.id
-    name                   = azurerm_virtual_network_peering.test.name
-    remote_network_id      = azurerm_virtual_network.peer.id
+  value = jsonencode([{
+    id                      = azurerm_virtual_network_peering.test.id
+    name                    = azurerm_virtual_network_peering.test.name
+    remote_network_id       = azurerm_virtual_network.peer.id
     allow_forwarded_traffic = azurerm_virtual_network_peering.test.allow_forwarded_traffic
   }])
 }
 
 output "virtual_network_dns_links" {
   description = "Private DNS zone links information"
-  value       = jsonencode([{
+  value = jsonencode([{
     id                    = azurerm_private_dns_zone_virtual_network_link.test.id
     name                  = azurerm_private_dns_zone_virtual_network_link.test.name
     private_dns_zone_name = azurerm_private_dns_zone.test.name
@@ -49,7 +49,7 @@ output "virtual_network_dns_link_id" {
 
 output "virtual_network_diagnostic_setting" {
   description = "Diagnostic setting information"
-  value       = jsonencode({
+  value = jsonencode({
     id                         = azurerm_monitor_diagnostic_setting.test.id
     name                       = azurerm_monitor_diagnostic_setting.test.name
     log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
