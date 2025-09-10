@@ -33,7 +33,6 @@ output "virtual_network_security_configuration" {
   description = "Summary of security configuration"
   value = {
     ddos_protection_enabled = true
-    flow_logs_enabled       = true
     encryption_enabled      = true
     monitoring_enabled      = true
   }
