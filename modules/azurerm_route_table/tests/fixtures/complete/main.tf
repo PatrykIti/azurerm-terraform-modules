@@ -75,8 +75,8 @@ module "route_table" {
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
 
-  # Disable BGP route propagation for custom routing control
-  bgp_route_propagation_enabled = false
+  # BGP route propagation configuration
+  bgp_route_propagation_enabled = var.bgp_route_propagation_enabled
 
   # Define multiple custom routes
   routes = [

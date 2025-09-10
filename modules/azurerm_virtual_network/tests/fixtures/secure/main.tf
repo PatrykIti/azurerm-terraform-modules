@@ -140,38 +140,6 @@ module "virtual_network" {
   ]
 }
 
-# Network Watcher Flow Log - now managed as separate resource for security monitoring
-resource "azurerm_network_watcher_flow_log" "test" {
-  network_watcher_name = local.network_watcher_name
-  resource_group_name  = local.network_watcher_rg
-  name                 = "${module.virtual_network.name}-flowlog"
-  target_resource_id   = azurerm_network_security_group.test.id
-  storage_account_id   = azurerm_storage_account.security.id
-  enabled              = true
-  version              = 2
-
-  retention_policy {
-    enabled = true
-    days    = 90
-  }
-
-  traffic_analytics {
-    enabled               = true
-    workspace_id          = azurerm_log_analytics_workspace.security.workspace_id
-    workspace_region      = azurerm_log_analytics_workspace.security.location
-    workspace_resource_id = azurerm_log_analytics_workspace.security.id
-    interval_in_minutes   = 10
-  }
-
-  tags = {
-    Environment = "Test"
-    Module      = "azurerm_virtual_network"
-    Test        = "Secure"
-    Purpose     = "Security Monitoring"
-  }
-
-  depends_on = [module.virtual_network]
-}
 
 # Diagnostic Settings - now managed as separate resource for security monitoring
 resource "azurerm_monitor_diagnostic_setting" "test" {

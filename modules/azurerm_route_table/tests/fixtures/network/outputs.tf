@@ -58,3 +58,12 @@ output "peering_connections" {
     azurerm_virtual_network_peering.spoke2_to_hub.name
   ]
 }
+
+output "associated_subnet_ids" {
+  description = "IDs of subnets associated with route tables"
+  value = [
+    azurerm_subnet.hub_shared.id,
+    azurerm_subnet.spoke1_workload.id,
+    azurerm_subnet.spoke2_workload.id
+  ]
+}

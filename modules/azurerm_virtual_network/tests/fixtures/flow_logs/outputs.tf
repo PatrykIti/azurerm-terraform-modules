@@ -18,10 +18,6 @@ output "virtual_network_guid" {
   value       = module.virtual_network.guid
 }
 
-output "virtual_network_flow_log_id" {
-  description = "ID of the network flow log"
-  value       = azurerm_network_watcher_flow_log.test.id
-}
 
 output "virtual_network_diagnostic_setting_id" {
   description = "ID of the diagnostic setting"

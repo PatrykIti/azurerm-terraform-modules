@@ -1,7 +1,0 @@
-{
-  "test_name": "TestVirtualNetworkWithPeering",
-  "timestamp": "2025-09-10T06:42:47Z",
-  "exit_status": 0,
-  "success": true,
-  "log_file": "test_results_20250910_082437/TestVirtualNetworkWithPeering.log"
-}

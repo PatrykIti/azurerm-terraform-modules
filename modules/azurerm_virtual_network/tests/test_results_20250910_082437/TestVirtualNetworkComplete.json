@@ -1,7 +1,0 @@
-{
-  "test_name": "TestVirtualNetworkComplete",
-  "timestamp": "2025-09-10T06:34:33Z",
-  "exit_status": 1,
-  "success": false,
-  "log_file": "test_results_20250910_082437/TestVirtualNetworkComplete.log"
-}
