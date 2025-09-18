@@ -1075,6 +1075,12 @@ variable "node_pools" {
   }))
 
   default = []
+
+  # Validate node pool names are unique (required for for_each in main.tf)
+  validation {
+    condition     = length(distinct([for p in var.node_pools : p.name])) == length(var.node_pools)
+    error_message = "Each node pool must have a unique name."
+  }
 }
 
 # Cluster Extensions
