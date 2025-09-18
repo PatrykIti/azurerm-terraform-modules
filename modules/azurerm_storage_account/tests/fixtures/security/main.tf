@@ -48,9 +48,9 @@ module "storage_account" {
 
   # Network security - deny all by default
   network_rules = {
-    ip_rules       = []
-    subnet_ids     = []
-    bypass         = []
+    ip_rules   = []
+    subnet_ids = []
+    bypass     = []
   }
 
   tags = {

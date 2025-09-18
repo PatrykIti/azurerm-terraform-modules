@@ -72,8 +72,8 @@ resource "azurerm_key_vault" "example" {
   enabled_for_template_deployment = false
 
   network_acls {
-    bypass         = "AzureServices"
-    ip_rules       = [] # Add your management IPs here
+    bypass   = "AzureServices"
+    ip_rules = [] # Add your management IPs here
   }
 
   access_policy {
