@@ -161,7 +161,7 @@ module "delegated_subnet" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.43.0 |
 
 ## Providers
@@ -179,12 +179,16 @@ No modules.
 | Name | Type |
 |------|------|
 | [azurerm_subnet.subnet](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/subnet) | resource |
+| [azurerm_subnet_nat_gateway_association.subnet_nat_gateway_association](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/subnet_nat_gateway_association) | resource |
+| [azurerm_subnet_network_security_group_association.subnet_network_security_group_association](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/subnet_network_security_group_association) | resource |
+| [azurerm_subnet_route_table_association.subnet_route_table_association](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/subnet_route_table_association) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_address_prefixes"></a> [address\_prefixes](#input\_address\_prefixes) | The address prefixes to use for the subnet. This is a list of IPv4 or IPv6 address ranges. | `list(string)` | n/a | yes |
+| <a name="input_associations"></a> [associations](#input\_associations) | List of parameters to associate other resources to Subnet:<br/>  nat\_gateway\_id - ID of NAT gateway to associate with<br/>  network\_security\_group\_id - D of network security group to associate with<br/>  route\_table\_id - ID of route table to associate with | <pre>object({<br/>    nat_gateway = optional(object({<br/>      id = string<br/>    }), null)<br/>    network_security_group = optional(object({<br/>      id = string<br/>    }), null)<br/>    route_table = optional(object({<br/>      id = string<br/>    }), null)<br/>  })</pre> | `null` | no |
 | <a name="input_delegations"></a> [delegations](#input\_delegations) | One or more delegation blocks for the subnet. | <pre>map(object({<br/>    name = string<br/>    service_delegation = object({<br/>      name    = string<br/>      actions = optional(list(string), [])<br/>    })<br/>  }))</pre> | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the subnet. Changing this forces a new resource to be created. | `string` | n/a | yes |
 | <a name="input_private_endpoint_network_policies_enabled"></a> [private\_endpoint\_network\_policies\_enabled](#input\_private\_endpoint\_network\_policies\_enabled) | Enable or Disable network policies for the private endpoint on the subnet. Setting this to true will Enable the policy and setting this to false will Disable the policy. Defaults to true. | `bool` | `true` | no |
@@ -192,7 +196,6 @@ No modules.
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group where the Virtual Network exists. | `string` | n/a | yes |
 | <a name="input_service_endpoint_policy_ids"></a> [service\_endpoint\_policy\_ids](#input\_service\_endpoint\_policy\_ids) | The list of IDs of Service Endpoint Policies to associate with the subnet. | `list(string)` | `[]` | no |
 | <a name="input_service_endpoints"></a> [service\_endpoints](#input\_service\_endpoints) | The list of Service endpoints to associate with the subnet. Possible values include: Microsoft.AzureActiveDirectory, Microsoft.AzureCosmosDB, Microsoft.ContainerRegistry, Microsoft.EventHub, Microsoft.KeyVault, Microsoft.ServiceBus, Microsoft.Sql, Microsoft.Storage, Microsoft.Storage.Global and Microsoft.Web. | `list(string)` | `[]` | no |
-| <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the subnet. | `map(string)` | `{}` | no |
 | <a name="input_virtual_network_name"></a> [virtual\_network\_name](#input\_virtual\_network\_name) | The name of the Virtual Network where this subnet should be created. | `string` | n/a | yes |
 
 ## Outputs
