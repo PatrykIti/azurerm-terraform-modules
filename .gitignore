@@ -156,3 +156,8 @@ dev-debug.log
 # Task files
 # tasks.json
 # tasks/ 
+
+# Act local testing
+.act.secrets
+.act.vars
+.actrc

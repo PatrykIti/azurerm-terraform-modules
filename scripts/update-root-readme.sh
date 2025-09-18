@@ -35,19 +35,20 @@ cp "$ROOT_README" "$TMP_FILE"
 
 # Function to escape special characters for sed
 escape_sed() {
-    echo "$1" | sed -e 's/[[\.*^$()+?{|]/\\&/g'
+    echo "$1" | sed -e 's/[[\.*^$()+?{|]/\\&/g' -e 's/ /\\ /g'
 }
 
 # Escaped values
 ESCAPED_MODULE_NAME=$(escape_sed "$MODULE_NAME")
 ESCAPED_TAG_PREFIX=$(escape_sed "$TAG_PREFIX")
+ESCAPED_MODULE_DISPLAY_NAME=$(escape_sed "$MODULE_DISPLAY_NAME")
 
 # Update module status - handle both Development and already Completed status
 # First, try to update from Development status
-sed -i.bak "s|\[${MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) | 🔧 Development | - |\[${MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) | ✅ Completed | [${TAG_PREFIX}${VERSION}](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag/${TAG_PREFIX}${VERSION}) |g" "$TMP_FILE"
+sed -i.bak "s|\[${ESCAPED_MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) | 🔧 Development | - |\[${MODULE_DISPLAY_NAME}\](./modules/${MODULE_NAME}/) | ✅ Completed | [${TAG_PREFIX}${VERSION}](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag/${TAG_PREFIX}${VERSION}) |g" "$TMP_FILE"
 
 # Then, update existing Completed status with new version (handles any previous version)
-sed -i.bak -E "s|\[${MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) \| ✅ Completed \| \[${ESCAPED_TAG_PREFIX}[^]]+\]\([^)]+\)|\[${MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) | ✅ Completed | [${TAG_PREFIX}${VERSION}](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag/${TAG_PREFIX}${VERSION})|g" "$TMP_FILE"
+sed -i.bak -E "s|\[${ESCAPED_MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) \| ✅ Completed \| \[${ESCAPED_TAG_PREFIX}[^]]+\]\([^)]+\)|\[${MODULE_DISPLAY_NAME}\](./modules/${MODULE_NAME}/) | ✅ Completed | [${TAG_PREFIX}${VERSION}](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag/${TAG_PREFIX}${VERSION})|g" "$TMP_FILE"
 
 # Add or update module version badge at the top of the file
 echo "Adding/updating version badge for ${MODULE_NAME}"
@@ -63,11 +64,14 @@ if ! grep -q "<!-- MODULE BADGES START -->" "$TMP_FILE"; then
 fi
 
 # Remove existing badge for this module if it exists
-sed -i.bak "/\[${MODULE_DISPLAY_NAME}\].*img.shields.io.*${ESCAPED_TAG_PREFIX}/d" "$TMP_FILE"
+sed -i.bak "/\[${ESCAPED_MODULE_DISPLAY_NAME}\].*img.shields.io.*${ESCAPED_TAG_PREFIX}/d" "$TMP_FILE"
+
+# URL encode the module display name for the badge label
+URL_ENCODED_NAME=$(echo "$MODULE_DISPLAY_NAME" | sed 's/ /%20/g')
 
 # Add the new badge in the badges section
 sed -i.bak "/<!-- MODULE BADGES START -->/a\\
-[![${MODULE_DISPLAY_NAME}](https://img.shields.io/github/v/tag/${REPO_OWNER}/${REPO_NAME}?filter=${TAG_PREFIX}*&label=${MODULE_DISPLAY_NAME}&color=success)](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases?q=${TAG_PREFIX})" "$TMP_FILE"
+[![${MODULE_DISPLAY_NAME}](https://img.shields.io/github/v/tag/${REPO_OWNER}/${REPO_NAME}?filter=${TAG_PREFIX}*&label=${URL_ENCODED_NAME}&color=success)](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases?q=${TAG_PREFIX})" "$TMP_FILE"
 
 # Update the example module reference with correct source path
 echo "Updating example module reference"
