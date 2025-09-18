@@ -171,8 +171,9 @@ resource "azurerm_key_vault" "example" {
   enabled_for_template_deployment = false
 
   network_acls {
-    bypass   = "AzureServices"
-    ip_rules = var.allowed_ip_ranges
+    default_action = "Deny"
+    bypass         = "AzureServices"
+    ip_rules       = var.allowed_ip_ranges
   }
 
   tags = var.tags

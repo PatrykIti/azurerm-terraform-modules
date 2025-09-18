@@ -77,12 +77,12 @@ module "primary_storage" {
     infrastructure_encryption_enabled = true
   }
 
-  # Network rules with restrictive defaults
-  network_rules = {
-    default_action = var.enable_private_endpoints ? "Deny" : "Allow"
-    bypass         = ["AzureServices", "Logging", "Metrics"]
-    ip_rules       = var.allowed_ip_ranges
-  }
+  # Network rules - automatically defaults to Deny for security
+  # Only specify if you need to allow specific IPs or subnets
+  network_rules = var.enable_private_endpoints ? {
+    bypass   = ["AzureServices", "Logging", "Metrics"]
+    ip_rules = var.allowed_ip_ranges
+  } : null
 
 
   # Blob properties for replication
@@ -207,12 +207,12 @@ module "secondary_storage" {
     infrastructure_encryption_enabled = true
   }
 
-  # Network rules with restrictive defaults
-  network_rules = {
-    default_action = var.enable_private_endpoints ? "Deny" : "Allow"
-    bypass         = ["AzureServices", "Logging", "Metrics"]
-    ip_rules       = var.allowed_ip_ranges
-  }
+  # Network rules - automatically defaults to Deny for security
+  # Only specify if you need to allow specific IPs or subnets
+  network_rules = var.enable_private_endpoints ? {
+    bypass   = ["AzureServices", "Logging", "Metrics"]
+    ip_rules = var.allowed_ip_ranges
+  } : null
 
 
   # Blob properties
@@ -298,12 +298,12 @@ module "dr_storage" {
     infrastructure_encryption_enabled = true
   }
 
-  # Network rules with restrictive defaults
-  network_rules = {
-    default_action = var.enable_private_endpoints ? "Deny" : "Allow"
-    bypass         = ["AzureServices", "Logging", "Metrics"]
-    ip_rules       = var.allowed_ip_ranges
-  }
+  # Network rules - automatically defaults to Deny for security
+  # Only specify if you need to allow specific IPs or subnets
+  network_rules = var.enable_private_endpoints ? {
+    bypass   = ["AzureServices", "Logging", "Metrics"]
+    ip_rules = var.allowed_ip_ranges
+  } : null
 
 
   # Blob properties optimized for archive
