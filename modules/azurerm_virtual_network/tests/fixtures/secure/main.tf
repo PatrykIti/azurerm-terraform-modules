@@ -21,19 +21,6 @@ resource "azurerm_resource_group" "test" {
   location = var.location
 }
 
-# Create DDoS Protection Plan - each test gets its own to avoid conflicts
-resource "azurerm_network_ddos_protection_plan" "test" {
-  name                = "ddos-dpc-sec-${var.random_suffix}"
-  location            = azurerm_resource_group.test.location
-  resource_group_name = azurerm_resource_group.test.name
-
-  tags = {
-    Environment = "Test"
-    Module      = "azurerm_virtual_network"
-    Test        = "Secure"
-  }
-}
-
 # Create Log Analytics Workspace for security monitoring
 resource "azurerm_log_analytics_workspace" "security" {
   name                = "law-dpc-sec-${var.random_suffix}"
@@ -115,11 +102,9 @@ module "virtual_network" {
   # Network Flow Configuration
   flow_timeout_in_minutes = 30 # Maximum timeout for better tracking
 
-  # DDoS Protection Plan for enhanced security
-  ddos_protection_plan = {
-    id     = azurerm_network_ddos_protection_plan.test.id
-    enable = true
-  }
+  # DDoS Protection Plan disabled due to Azure subscription limitation
+  # (only 1 DDoS plan allowed per subscription per region)
+  ddos_protection_plan = null
 
   # Encryption Configuration - allow unencrypted (subscription limitation)
   encryption = {
@@ -135,9 +120,6 @@ module "virtual_network" {
     Test        = "Secure"
   }
 
-  depends_on = [
-    azurerm_network_ddos_protection_plan.test
-  ]
 }
 
 
