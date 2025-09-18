@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.0.0, < 5.0.0"
+      version = "4.43.0"
     }
   }
 }
@@ -18,7 +18,7 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  source = "../../../.."
 
   # Invalid: name too short (less than 3 characters)
   name                     = "st"

@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_kubernetes_cluster",
+  "title": "Kubernetes Cluster",
+  "commit_scope": "kubernetes-cluster",
+  "tag_prefix": "AKSv",
+  "description": "Azure Kubernetes Service (AKS) Terraform module for managing clusters with node pools, addons, and enterprise-grade security features"
+}

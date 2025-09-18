@@ -344,68 +344,6 @@ output "identity" {
   }, null)
 }
 
-output "private_endpoints" {
-  description = "Map of private endpoints created for the storage account, keyed by endpoint name"
-  value = length(azurerm_private_endpoint.private_endpoint) > 0 ? {
-    for k, v in azurerm_private_endpoint.private_endpoint : k => {
-      id                 = v.id
-      name               = v.name
-      private_ip_address = v.private_service_connection[0].private_ip_address
-      subresource_names  = v.private_service_connection[0].subresource_names
-      network_interface = {
-        id   = v.network_interface[0].id
-        name = v.network_interface[0].name
-      }
-      custom_dns_configs = [
-        for config in v.custom_dns_configs : {
-          fqdn         = config.fqdn
-          ip_addresses = config.ip_addresses
-        }
-      ]
-      private_dns_zone_configs = [
-        for config in v.private_dns_zone_configs : {
-          name                = config.name
-          id                  = config.id
-          private_dns_zone_id = config.private_dns_zone_id
-          record_sets = [
-            for rs in config.record_sets : {
-              name         = rs.name
-              type         = rs.type
-              fqdn         = rs.fqdn
-              ttl          = rs.ttl
-              ip_addresses = rs.ip_addresses
-            }
-          ]
-        }
-      ]
-      private_dns_zone_group = length(v.private_dns_zone_group) > 0 ? {
-        id                   = v.private_dns_zone_group[0].id
-        name                 = v.private_dns_zone_group[0].name
-        private_dns_zone_ids = v.private_dns_zone_group[0].private_dns_zone_ids
-      } : null
-    }
-  } : {}
-}
-
-output "private_endpoints_by_subresource" {
-  description = "Private endpoints grouped by subresource type (blob, file, table, queue, web, dfs)"
-  value = length(azurerm_private_endpoint.private_endpoint) > 0 ? {
-    for subresource in distinct(flatten([
-      for pe in azurerm_private_endpoint.private_endpoint : pe.private_service_connection[0].subresource_names
-      ])) : subresource => {
-      for k, v in azurerm_private_endpoint.private_endpoint : k => {
-        id                 = v.id
-        name               = v.name
-        private_ip_address = v.private_service_connection[0].private_ip_address
-        fqdn               = try(v.custom_dns_configs[0].fqdn, null)
-        network_interface = {
-          id   = v.network_interface[0].id
-          name = v.network_interface[0].name
-        }
-      } if contains(v.private_service_connection[0].subresource_names, subresource)
-    }
-  } : {}
-}
 
 output "lifecycle_management_policy_id" {
   description = "The ID of the Storage Account Management Policy"
@@ -484,19 +422,6 @@ output "static_website_id" {
   value       = try(azurerm_storage_account_static_website.static_website[0].id, null)
 }
 
-output "diagnostic_settings" {
-  description = "Map of diagnostic settings created for the storage account"
-  value = {
-    storage_account = var.diagnostic_settings.enabled ? {
-      id   = azurerm_monitor_diagnostic_setting.monitor_diagnostic_setting[0].id
-      name = azurerm_monitor_diagnostic_setting.monitor_diagnostic_setting[0].name
-    } : null
-    blob_service = var.diagnostic_settings.enabled && var.account_kind != "FileStorage" ? {
-      id   = azurerm_monitor_diagnostic_setting.blob_diagnostic_setting[0].id
-      name = azurerm_monitor_diagnostic_setting.blob_diagnostic_setting[0].name
-    } : null
-  }
-}
 
 output "account_tier" {
   description = "The Tier of the storage account"

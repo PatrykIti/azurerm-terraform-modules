@@ -3,11 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.0.0, < 5.0.0"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.6"
+      version = "4.43.0"
     }
   }
 }
@@ -16,11 +12,6 @@ provider "azurerm" {
   features {}
 }
 
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
 
 resource "azurerm_resource_group" "test" {
   name     = "rg-dpc-pep-${var.random_suffix}"
@@ -58,9 +49,9 @@ resource "azurerm_private_dns_zone_virtual_network_link" "blob" {
 }
 
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  source = "../../../"
 
-  name                     = "dpcpep${random_string.suffix.result}${var.random_suffix}"
+  name                     = "dpcpep${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"
@@ -73,21 +64,36 @@ module "storage_account" {
 
   # Network rules - deny all public access
   network_rules = {
-    default_action             = "Deny"
     ip_rules                   = []
     virtual_network_subnet_ids = []
     bypass                     = [] # No bypass, completely private
   }
 
-  # Private endpoint configuration
-  private_endpoints = [
-    {
-      name                 = "blob-endpoint"
-      subnet_id            = azurerm_subnet.endpoint.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
-      subresource_names    = ["blob"]
-    }
-  ]
+
+  tags = {
+    Environment = "Test"
+    TestType    = "PrivateEndpoint"
+  }
+}
+
+# Private endpoint for blob storage
+resource "azurerm_private_endpoint" "blob" {
+  name                = "pe-${module.storage_account.name}-blob"
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
+  subnet_id           = azurerm_subnet.endpoint.id
+
+  private_service_connection {
+    name                           = "psc-${module.storage_account.name}-blob"
+    private_connection_resource_id = module.storage_account.id
+    is_manual_connection           = false
+    subresource_names              = ["blob"]
+  }
+
+  private_dns_zone_group {
+    name                 = "default"
+    private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
+  }
 
   tags = {
     Environment = "Test"
@@ -108,5 +114,5 @@ output "resource_group_name" {
 }
 
 output "private_endpoint_id" {
-  value = try(values(module.storage_account.private_endpoints)[0].id, null)
+  value = azurerm_private_endpoint.blob.id
 }

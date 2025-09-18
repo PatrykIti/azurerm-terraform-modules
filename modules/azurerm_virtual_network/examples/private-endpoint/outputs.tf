@@ -13,11 +13,6 @@ output "virtual_network_address_space" {
   value       = module.virtual_network.address_space
 }
 
-output "virtual_network_dns_links" {
-  description = "Information about Private DNS Zone links"
-  value       = module.virtual_network.private_dns_zone_links
-}
-
 output "private_endpoint_subnet_id" {
   description = "The ID of the private endpoint subnet"
   value       = azurerm_subnet.private_endpoints.id
@@ -41,11 +36,6 @@ output "private_endpoint_id" {
 output "private_endpoint_ip_address" {
   description = "The private IP address of the private endpoint"
   value       = azurerm_private_endpoint.storage.private_service_connection[0].private_ip_address
-}
-
-output "private_dns_zone_id" {
-  description = "The ID of the private DNS zone"
-  value       = azurerm_private_dns_zone.blob.id
 }
 
 output "resource_group_name" {

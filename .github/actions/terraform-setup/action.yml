@@ -5,7 +5,7 @@ inputs:
   terraform-version:
     description: 'Terraform version to use'
     required: false
-    default: '1.10.3'
+    default: '1.12.2'
   install-tflint:
     description: 'Whether to install TFLint'
     required: false
@@ -36,7 +36,7 @@ runs:
 
     - name: Setup TFLint
       if: inputs.install-tflint == 'true'
-      uses: terraform-linters/setup-tflint@v4
+      uses: terraform-linters/setup-tflint@v5
       with:
         tflint_version: latest
 

@@ -69,7 +69,7 @@ This configuration is suitable for:
 
 - Azure subscription with appropriate security clearances
 - Terraform >= 1.3.0
-- AzureRM Provider 4.36.0 (as specified in the module's [versions.tf](../../versions.tf))
+- AzureRM Provider 4.43.0 (as specified in the module's [versions.tf](../../versions.tf))
 - Permissions to create:
   - Premium Key Vault with HSM
   - Private endpoints and DNS zones
@@ -77,7 +77,7 @@ This configuration is suitable for:
   - Monitor alerts
 - Network connectivity to private endpoints
 
-**Note**: The module uses a pinned version of the AzureRM provider (4.36.0) to ensure consistent behavior across all deployments.
+**Note**: The module uses a pinned version of the AzureRM provider (4.43.0) to ensure consistent behavior across all deployments.
 
 ## Deployment Considerations
 
@@ -192,22 +192,20 @@ This configuration implements a **Defense-in-Depth** strategy with multiple laye
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.0.0 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.1.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.36.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.7.2 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 3.0.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0 | n/a |
+| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | ../../ | n/a |
 
 ## Resources
 
@@ -224,7 +222,6 @@ This configuration implements a **Defense-in-Depth** strategy with multiple laye
 | [azurerm_subnet.private_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_user_assigned_identity.storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_virtual_network.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
-| [random_string.suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 
 ## Inputs
@@ -241,7 +238,6 @@ No inputs.
 | <a name="output_log_analytics_workspace_id"></a> [log\_analytics\_workspace\_id](#output\_log\_analytics\_workspace\_id) | The ID of the Log Analytics workspace for security monitoring |
 | <a name="output_network_security_status"></a> [network\_security\_status](#output\_network\_security\_status) | Network security configuration status |
 | <a name="output_primary_blob_endpoint"></a> [primary\_blob\_endpoint](#output\_primary\_blob\_endpoint) | The primary blob endpoint (accessible only via private endpoint) |
-| <a name="output_private_endpoint_ids"></a> [private\_endpoint\_ids](#output\_private\_endpoint\_ids) | Map of private endpoint IDs |
 | <a name="output_security_alert_id"></a> [security\_alert\_id](#output\_security\_alert\_id) | The ID of the authentication failure alert |
 | <a name="output_security_configuration"></a> [security\_configuration](#output\_security\_configuration) | Summary of security settings applied to the storage account |
 | <a name="output_storage_account_id"></a> [storage\_account\_id](#output\_storage\_account\_id) | The ID of the storage account |

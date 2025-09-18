@@ -17,7 +17,7 @@ runs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
-        terraform_version: '1.10.3'
+        terraform_version: '1.12.2'
         terraform_wrapper: false
     
     - name: Cache Go modules

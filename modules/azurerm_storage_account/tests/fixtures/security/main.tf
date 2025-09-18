@@ -3,11 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.0.0, < 5.0.0"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.6"
+      version = "4.43.0"
     }
   }
 }
@@ -16,11 +12,6 @@ provider "azurerm" {
   features {}
 }
 
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
 
 resource "azurerm_resource_group" "test" {
   name     = "rg-dpc-sec-${var.random_suffix}"
@@ -28,9 +19,9 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  source = "../../../"
 
-  name                     = "dpcsec${random_string.suffix.result}${var.random_suffix}"
+  name                     = "dpcsec${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"
@@ -57,10 +48,9 @@ module "storage_account" {
 
   # Network security - deny all by default
   network_rules = {
-    default_action = "Deny"
-    ip_rules       = []
-    subnet_ids     = []
-    bypass         = []
+    ip_rules   = []
+    subnet_ids = []
+    bypass     = []
   }
 
   tags = {

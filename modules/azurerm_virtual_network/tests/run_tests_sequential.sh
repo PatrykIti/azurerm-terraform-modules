@@ -47,7 +47,6 @@ tests=(
     "TestVirtualNetworkWithPeering"
     "TestVirtualNetworkPrivateEndpoint"
     "TestVirtualNetworkDNS"
-    "TestVirtualNetworkFlowLogs"
     "TestVirtualNetworkValidationRules"
     "TestVirtualNetworkFullIntegration"
 )

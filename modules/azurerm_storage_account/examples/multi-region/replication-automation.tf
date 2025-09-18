@@ -5,7 +5,7 @@
 # Storage Account for Function/Logic App
 resource "azurerm_storage_account" "replication_app" {
   count                    = var.enable_replication_automation ? 1 : 0
-  name                     = "strepapp${random_string.suffix.result}"
+  name                     = "strepappexample01"
   resource_group_name      = azurerm_resource_group.primary.name
   location                 = azurerm_resource_group.primary.location
   account_tier             = "Standard"
@@ -20,7 +20,7 @@ resource "azurerm_storage_account" "replication_app" {
 # App Service Plan for Logic App
 resource "azurerm_service_plan" "replication" {
   count               = var.enable_replication_automation ? 1 : 0
-  name                = "asp-replication-${random_string.suffix.result}"
+  name                = "asp-replication-example"
   resource_group_name = azurerm_resource_group.primary.name
   location            = azurerm_resource_group.primary.location
   os_type             = "Windows"
@@ -34,7 +34,7 @@ resource "azurerm_service_plan" "replication" {
 # Logic App for Replication Orchestration
 resource "azurerm_logic_app_standard" "replication" {
   count                      = var.enable_replication_automation ? 1 : 0
-  name                       = "logic-replication-${random_string.suffix.result}"
+  name                       = "logic-replication-example"
   location                   = azurerm_resource_group.primary.location
   resource_group_name        = azurerm_resource_group.primary.name
   app_service_plan_id        = azurerm_service_plan.replication[0].id
@@ -103,7 +103,7 @@ resource "azurerm_role_assignment" "logic_app_metadata" {
 
 # resource "azurerm_linux_function_app" "replication" {
 #   count                      = var.enable_replication_automation ? 1 : 0
-#   name                       = "func-replication-${random_string.suffix.result}"
+#   name                       = "func-replication-example"
 #   resource_group_name        = azurerm_resource_group.primary.name
 #   location                   = azurerm_resource_group.primary.location
 #   storage_account_name       = azurerm_storage_account.replication_app[0].name

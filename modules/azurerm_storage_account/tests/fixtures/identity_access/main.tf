@@ -3,11 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.0.0, < 5.0.0"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.6"
+      version = "4.43.0"
     }
   }
 }
@@ -20,11 +16,6 @@ provider "azurerm" {
   }
 }
 
-resource "random_string" "suffix" {
-  length  = 6
-  special = false
-  upper   = false
-}
 
 data "azurerm_client_config" "current" {}
 
@@ -35,7 +26,7 @@ resource "azurerm_resource_group" "test" {
 
 # Key Vault for CMK
 resource "azurerm_key_vault" "test" {
-  name                       = "kvdpcida${random_string.suffix.result}"
+  name                       = "kvdpcida${var.random_suffix}"
   location                   = azurerm_resource_group.test.location
   resource_group_name        = azurerm_resource_group.test.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -74,7 +65,7 @@ resource "azurerm_role_assignment" "current_user_kv" {
 
 # User-assigned identity
 resource "azurerm_user_assigned_identity" "test" {
-  name                = "uai-dpc-ida-${random_string.suffix.result}"
+  name                = "uai-dpc-ida-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
 }
@@ -87,9 +78,9 @@ resource "azurerm_role_assignment" "uai_kv_access" {
 }
 
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  source = "../../.."
 
-  name                     = "dpcida${random_string.suffix.result}${var.random_suffix}"
+  name                     = "dpcida${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"

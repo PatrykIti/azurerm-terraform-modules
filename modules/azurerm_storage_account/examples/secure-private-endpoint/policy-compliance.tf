@@ -143,7 +143,7 @@ resource "azurerm_log_analytics_saved_search" "policy_compliance" {
   query                      = <<-QUERY
     AzureActivity
     | where CategoryValue == "Policy"
-    | where Resource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+    | where ResourceGroup == "${azurerm_resource_group.example.name}"
     | where Properties contains "Microsoft.Storage/storageAccounts"
     | summarize ComplianceStatus = count() by PolicyAssignmentName = tostring(Properties.policyAssignmentName), ComplianceState = tostring(Properties.complianceState)
     | order by ComplianceState asc

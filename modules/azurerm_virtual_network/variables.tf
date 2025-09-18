@@ -95,93 +95,9 @@ variable "encryption" {
 
 }
 
-# Virtual Network Peerings
-variable "peerings" {
-  description = "List of Virtual Network peerings to create."
-  type = list(object({
-    name                         = string
-    remote_virtual_network_id    = string
-    allow_virtual_network_access = optional(bool, true)
-    allow_forwarded_traffic      = optional(bool, false)
-    allow_gateway_transit        = optional(bool, false)
-    use_remote_gateways          = optional(bool, false)
-    triggers                     = optional(map(string), {})
-  }))
-  default = []
-
-  validation {
-    condition = alltrue([
-      for peering in var.peerings : !(peering.allow_gateway_transit && peering.use_remote_gateways)
-    ])
-    error_message = "allow_gateway_transit and use_remote_gateways cannot both be true for the same peering."
-  }
-}
-
-# Network Watcher Flow Log
-variable "flow_log" {
-  description = "Network Watcher Flow Log configuration."
-  type = object({
-    network_watcher_name                = string
-    network_watcher_resource_group_name = string
-    network_security_group_id           = string
-    storage_account_id                  = string
-    enabled                             = optional(bool, true)
-    version                             = optional(number, 2)
-    retention_policy = optional(object({
-      enabled = bool
-      days    = number
-    }))
-    traffic_analytics = optional(object({
-      enabled               = bool
-      workspace_id          = string
-      workspace_region      = string
-      workspace_resource_id = string
-      interval_in_minutes   = optional(number, 10)
-    }))
-  })
-  default = null
 
 
-}
 
-# Private DNS Zone Links
-variable "private_dns_zone_links" {
-  description = "List of Private DNS Zone Virtual Network Links to create."
-  type = list(object({
-    name                  = string
-    resource_group_name   = string
-    private_dns_zone_name = string
-    registration_enabled  = optional(bool, false)
-    tags                  = optional(map(string), {})
-  }))
-  default = []
-}
-
-# Diagnostic Settings
-variable "diagnostic_settings" {
-  description = "Diagnostic settings configuration for monitoring and logging."
-  type = object({
-    enabled                    = optional(bool, false)
-    log_analytics_workspace_id = optional(string)
-    storage_account_id         = optional(string)
-    eventhub_auth_rule_id      = optional(string)
-    logs = optional(object({
-      vm_protection_alerts = optional(bool, true)
-    }), {})
-    metrics = optional(object({
-      all_metrics = optional(bool, true)
-    }), {})
-  })
-  default = {
-    enabled = false
-    logs = {
-      vm_protection_alerts = true
-    }
-    metrics = {
-      all_metrics = true
-    }
-  }
-}
 
 # Tags
 variable "tags" {

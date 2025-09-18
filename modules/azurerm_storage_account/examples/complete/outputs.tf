@@ -437,15 +437,27 @@ output "identity" {
   value       = module.storage_account.identity
 }
 
-# Private Endpoints
+# Private Endpoints (from separate resources)
 output "private_endpoints" {
   description = "Map of private endpoints"
-  value       = module.storage_account.private_endpoints
-}
-
-output "private_endpoints_by_subresource" {
-  description = "Private endpoints grouped by subresource type"
-  value       = module.storage_account.private_endpoints_by_subresource
+  value = {
+    blob = {
+      id   = azurerm_private_endpoint.blob.id
+      name = azurerm_private_endpoint.blob.name
+    }
+    file = {
+      id   = azurerm_private_endpoint.file.id
+      name = azurerm_private_endpoint.file.name
+    }
+    queue = {
+      id   = azurerm_private_endpoint.queue.id
+      name = azurerm_private_endpoint.queue.name
+    }
+    table = {
+      id   = azurerm_private_endpoint.table.id
+      name = azurerm_private_endpoint.table.name
+    }
+  }
 }
 
 # Storage Resources
@@ -490,9 +502,19 @@ output "static_website_id" {
   value       = module.storage_account.static_website_id
 }
 
+# Diagnostic Settings (from separate resources)
 output "diagnostic_settings" {
   description = "Map of diagnostic settings created"
-  value       = module.storage_account.diagnostic_settings
+  value = {
+    storage_account = {
+      id   = azurerm_monitor_diagnostic_setting.storage_account.id
+      name = azurerm_monitor_diagnostic_setting.storage_account.name
+    }
+    blob_service = {
+      id   = azurerm_monitor_diagnostic_setting.blob_service.id
+      name = azurerm_monitor_diagnostic_setting.blob_service.name
+    }
+  }
 }
 
 output "tags" {

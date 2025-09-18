@@ -8,6 +8,21 @@ NEVER create files unless they're absolutely necessary for achieving your goal.
 ALWAYS prefer editing an existing file to creating a new one.
 NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
 
+## Multi-Agent Execution Guidelines
+
+**MANDATORY**: When working with TaskMaster tasks that have subtasks, you MUST:
+- Always use multiple agents (subagents) for parallel execution wherever possible
+- Assign each independent subtask to a different agent for maximum efficiency
+- Provide each agent with:
+  - This CLAUDE.md file for project context
+  - Specific, detailed instructions for their subtask
+  - All necessary reference files and paths
+  - Clear success criteria
+- Use `mcp__taskmaster-ai__set_task_status` to mark subtasks as "in-progress" when assigning to agents
+- Monitor progress and coordinate results between agents
+
+This approach is REQUIRED to maximize development speed and efficiency. Sequential execution of independent tasks is NOT acceptable when parallel execution is possible.
+
 ## Important Instructions
 
 - **ALWAYS** review the relevant reference files based on your current task
@@ -121,7 +136,7 @@ Contains: Architectural patterns and guidelines for organizing GitHub Actions in
 
 Contains: Comprehensive guide for Terraform module development including resource naming conventions, module structure, variable design patterns, security best practices, testing requirements, documentation standards, contribution process, and common pitfalls to avoid. This is the primary reference for all Terraform module development standards in this repository.
 
-### 10. [Terraform Testing Guide](docs/TERRAFORM_TESTING_GUIDE.md)
+### 10. [Terraform Testing Guide](docs/TESTING_GUIDE/README.md)
 **MANDATORY REVIEW** when:
 - Setting up testing for new modules
 - Writing unit tests with native Terraform test framework
@@ -132,9 +147,9 @@ Contains: Comprehensive guide for Terraform module development including resourc
 - Optimizing test performance and costs
 - Using mock strategies for expensive resources
 
-Contains: Comprehensive testing strategies including testing pyramid (static analysis, unit, integration, E2E), native Terraform test examples with mock providers, Terratest patterns for Azure resources, security and compliance testing, performance testing, CI/CD integration with GitHub Actions, test organization best practices, and cost optimization strategies for testing infrastructure. Includes detailed explanation of test file organization (main test file, integration tests, test helpers, performance tests), test fixtures structure, test execution flow, and running tests with Go and Makefile.
+Contains: A comprehensive, structured guide to testing Terraform modules. It covers the testing philosophy, directory organization, native unit tests, Terratest integration tests (including file structure, helper patterns, fixtures, and execution), advanced scenarios (lifecycle, compliance, performance), CI/CD integration, and a troubleshooting guide.
 
-### 11. [Terraform New Module Guide](docs/TERRAFORM_NEW_MODULE_GUIDE.md)
+### 11. [Terraform New Module Guide](docs/MODULE_GUIDE/README.md)
 **MANDATORY REVIEW** when:
 - Creating a new Terraform module from scratch
 - Planning module architecture and structure

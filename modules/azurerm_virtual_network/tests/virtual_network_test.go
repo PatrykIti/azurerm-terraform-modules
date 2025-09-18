@@ -228,15 +228,12 @@ func validateSecureVirtualNetwork(t *testing.T, terraformOptions *terraform.Opti
 	// Get outputs
 	vnetID := terraform.Output(t, terraformOptions, "virtual_network_id")
 	ddosProtection := terraform.Output(t, terraformOptions, "virtual_network_ddos_protection")
-	flowLog := terraform.Output(t, terraformOptions, "virtual_network_flow_log")
 	securityConfig := terraform.OutputMap(t, terraformOptions, "virtual_network_security_configuration")
 
 	// Assertions
 	assert.NotEmpty(t, vnetID)
 	assert.NotEmpty(t, ddosProtection)
-	assert.NotEmpty(t, flowLog)
 	assert.Equal(t, "true", securityConfig["ddos_protection_enabled"])
-	assert.Equal(t, "true", securityConfig["flow_logs_enabled"])
 	assert.Equal(t, "true", securityConfig["encryption_enabled"])
 	assert.Equal(t, "true", securityConfig["monitoring_enabled"])
 }

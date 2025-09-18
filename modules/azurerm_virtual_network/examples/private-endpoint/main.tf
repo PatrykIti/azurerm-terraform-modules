@@ -2,11 +2,11 @@
 # This example demonstrates Virtual Network configuration for private endpoint scenarios
 
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.12.2"
   required_providers {
     azurerm = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.1"
-      version = "4.36.0"
+      source  = "hashicorp/azurerm"
+      version = "4.43.0"
     }
   }
 }
@@ -51,7 +51,7 @@ resource "azurerm_private_dns_zone" "blob" {
 
 # Virtual Network optimized for private endpoint scenarios
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.1"
+  source = "../../"
 
   name                = "vnet-private-endpoint-example"
   resource_group_name = azurerm_resource_group.example.name
@@ -63,19 +63,6 @@ module "virtual_network" {
 
   # Network flow configuration
   flow_timeout_in_minutes = 10
-
-  # Private DNS Zone Links for private endpoint resolution
-  private_dns_zone_links = [
-    {
-      name                  = "link-to-blob-storage"
-      resource_group_name   = azurerm_resource_group.example.name
-      private_dns_zone_name = azurerm_private_dns_zone.blob.name
-      registration_enabled  = false # Auto-registration not needed for private endpoints
-      tags = {
-        Purpose = "Private Endpoint DNS Resolution"
-      }
-    }
-  ]
 
   # Lifecycle Management
 
@@ -121,7 +108,7 @@ resource "azurerm_private_endpoint" "storage" {
     name                           = "psc-storage-blob"
     private_connection_resource_id = azurerm_storage_account.example.id
     is_manual_connection           = false
-    subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.0.1"]
+    subresource_names              = ["blob"]
   }
 
   private_dns_zone_group {

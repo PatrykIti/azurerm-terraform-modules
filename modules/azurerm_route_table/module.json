@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_route_table",
+  "title": "Route Table",
+  "commit_scope": "route-table",
+  "tag_prefix": "RTv",
+  "description": "Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations"
+}

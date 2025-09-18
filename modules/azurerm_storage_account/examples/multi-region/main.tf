@@ -2,12 +2,8 @@ terraform {
   required_version = ">= 1.5.0"
   required_providers {
     azurerm = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
-      version = ">= 4.0.0, < 5.0.0"
-    }
-    random = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
-      version = ">= 3.1.0"
+      source  = "hashicorp/azurerm"
+      version = "4.43.0"
     }
   }
 }
@@ -21,13 +17,6 @@ provider "azurerm" {
       purge_soft_delete_on_destroy = true
     }
   }
-}
-
-# Random suffix for unique names
-resource "random_string" "suffix" {
-  length  = 8
-  special = false
-  upper   = false
 }
 
 
@@ -51,7 +40,7 @@ resource "azurerm_resource_group" "dr" {
 
 # Log Analytics Workspace (shared across regions)
 resource "azurerm_log_analytics_workspace" "shared" {
-  name                = "law-storage-multi-${random_string.suffix.result}"
+  name                = "law-storage-multiregion-ex"
   location            = azurerm_resource_group.primary.location
   resource_group_name = azurerm_resource_group.primary.name
   sku                 = "PerGB2018"
@@ -60,9 +49,9 @@ resource "azurerm_log_analytics_workspace" "shared" {
 
 # Primary Region Storage Account (GRS with failover capability)
 module "primary_storage" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  source = "../../"
 
-  name                = "stprimary${random_string.suffix.result}"
+  name                = "stprimarymultiregionex"
   resource_group_name = azurerm_resource_group.primary.name
   location            = azurerm_resource_group.primary.location
 
@@ -88,27 +77,13 @@ module "primary_storage" {
     infrastructure_encryption_enabled = true
   }
 
-  # Network rules with restrictive defaults
-  network_rules = {
-    default_action = var.enable_private_endpoints ? "Deny" : "Allow"
-    bypass         = ["AzureServices", "Logging", "Metrics"]
-    ip_rules       = var.allowed_ip_ranges
-  }
+  # Network rules - automatically defaults to Deny for security
+  # Only specify if you need to allow specific IPs or subnets
+  network_rules = var.enable_private_endpoints ? {
+    bypass   = ["AzureServices", "Logging", "Metrics"]
+    ip_rules = var.allowed_ip_ranges
+  } : null
 
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
-    logs = {
-      storage_read   = true
-      storage_write  = true
-      storage_delete = true
-    }
-    metrics = {
-      transaction = true
-      capacity    = true
-    }
-  }
 
   # Blob properties for replication
   blob_properties = {
@@ -204,9 +179,9 @@ module "primary_storage" {
 
 # Secondary Region Storage Account (Zone redundant)
 module "secondary_storage" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  source = "../../"
 
-  name                = "stsecond${random_string.suffix.result}"
+  name                = "stsecondmultiregionex"
   resource_group_name = azurerm_resource_group.secondary.name
   location            = azurerm_resource_group.secondary.location
 
@@ -232,27 +207,13 @@ module "secondary_storage" {
     infrastructure_encryption_enabled = true
   }
 
-  # Network rules with restrictive defaults
-  network_rules = {
-    default_action = var.enable_private_endpoints ? "Deny" : "Allow"
-    bypass         = ["AzureServices", "Logging", "Metrics"]
-    ip_rules       = var.allowed_ip_ranges
-  }
+  # Network rules - automatically defaults to Deny for security
+  # Only specify if you need to allow specific IPs or subnets
+  network_rules = var.enable_private_endpoints ? {
+    bypass   = ["AzureServices", "Logging", "Metrics"]
+    ip_rules = var.allowed_ip_ranges
+  } : null
 
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
-    logs = {
-      storage_read   = true
-      storage_write  = true
-      storage_delete = true
-    }
-    metrics = {
-      transaction = true
-      capacity    = true
-    }
-  }
 
   # Blob properties
   blob_properties = {
@@ -312,9 +273,9 @@ module "secondary_storage" {
 
 # Disaster Recovery Storage Account (Archive focused)
 module "dr_storage" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  source = "../../"
 
-  name                = "stdr${random_string.suffix.result}"
+  name                = "stdrmultiregionexample"
   resource_group_name = azurerm_resource_group.dr.name
   location            = azurerm_resource_group.dr.location
 
@@ -337,27 +298,13 @@ module "dr_storage" {
     infrastructure_encryption_enabled = true
   }
 
-  # Network rules with restrictive defaults
-  network_rules = {
-    default_action = var.enable_private_endpoints ? "Deny" : "Allow"
-    bypass         = ["AzureServices", "Logging", "Metrics"]
-    ip_rules       = var.allowed_ip_ranges
-  }
+  # Network rules - automatically defaults to Deny for security
+  # Only specify if you need to allow specific IPs or subnets
+  network_rules = var.enable_private_endpoints ? {
+    bypass   = ["AzureServices", "Logging", "Metrics"]
+    ip_rules = var.allowed_ip_ranges
+  } : null
 
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
-    logs = {
-      storage_read   = true
-      storage_write  = true
-      storage_delete = true
-    }
-    metrics = {
-      transaction = true
-      capacity    = true
-    }
-  }
 
   # Blob properties optimized for archive
   blob_properties = {
@@ -417,9 +364,9 @@ module "dr_storage" {
 
 # Storage account for cross-region replication metadata
 module "replication_metadata" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  source = "../../"
 
-  name                = "strepmeta${random_string.suffix.result}"
+  name                = "strepmetamultiregionex"
   resource_group_name = azurerm_resource_group.primary.name
   location            = azurerm_resource_group.primary.location
 
@@ -451,20 +398,6 @@ module "replication_metadata" {
     allow_nested_items_to_be_public = false
   }
 
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
-    logs = {
-      storage_read   = true
-      storage_write  = true
-      storage_delete = true
-    }
-    metrics = {
-      transaction = true
-      capacity    = true
-    }
-  }
 
   # Containers for replication tracking
   containers = [

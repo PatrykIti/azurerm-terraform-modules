@@ -79,7 +79,7 @@ jobs:
       modules: ${{ steps.filter.outputs.changes }}
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - uses: dorny/paths-filter@v3
         id: filter
@@ -108,7 +108,7 @@ jobs:
       matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Setup Terraform
         uses: ./.github/actions/terraform-setup
@@ -126,7 +126,7 @@ jobs:
       matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Test Module ${{ matrix.module }}
         uses: ./modules/${{ matrix.module }}/.github/actions/test
@@ -288,7 +288,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Release Module
         uses: ./modules/${{ inputs.module }}/.github/actions/release
@@ -306,7 +306,7 @@ jobs:
   build-shared:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build shared components
         run: |
           # Build shared terraform utilities

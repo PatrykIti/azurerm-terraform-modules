@@ -96,9 +96,8 @@ func BenchmarkStorageAccountCreationWithNetworkRules(b *testing.B) {
 
 				if count > 0 {
 					terraformOptions.Vars["network_rules"] = map[string]interface{}{
-						"default_action": "Deny",
-						"ip_rules":       ipRules,
-						"bypass":         "AzureServices",
+						"ip_rules": ipRules,
+						"bypass":   []string{"AzureServices"},
 					}
 				}
 				// Override the random_suffix for benchmarking

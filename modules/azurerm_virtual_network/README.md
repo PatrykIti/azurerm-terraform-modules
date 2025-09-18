@@ -1,9 +1,5 @@
 # Terraform Azure Virtual Network Module
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.3.0-blue.svg)](https://www.terraform.io/)
-[![AzureRM](https://img.shields.io/badge/AzureRM-4.36.0-blue.svg)](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0)
-
 ## Module Version
 
 <!-- BEGIN_VERSION -->
@@ -102,13 +98,13 @@ module "secure_virtual_network" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.36.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.43.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.36.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.43.0 |
 
 ## Modules
 
@@ -118,11 +114,11 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_monitor_diagnostic_setting.diagnostic_setting](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/monitor_diagnostic_setting) | resource |
-| [azurerm_network_watcher_flow_log.flow_log](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/network_watcher_flow_log) | resource |
-| [azurerm_private_dns_zone_virtual_network_link.dns_zone_link](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/private_dns_zone_virtual_network_link) | resource |
-| [azurerm_virtual_network.virtual_network](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/virtual_network) | resource |
-| [azurerm_virtual_network_peering.peering](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0/docs/resources/virtual_network_peering) | resource |
+| [azurerm_monitor_diagnostic_setting.diagnostic_setting](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/monitor_diagnostic_setting) | resource |
+| [azurerm_network_watcher_flow_log.flow_log](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/network_watcher_flow_log) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.dns_zone_link](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_virtual_network.virtual_network](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/virtual_network) | resource |
+| [azurerm_virtual_network_peering.peering](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/virtual_network_peering) | resource |
 
 ## Inputs
 

@@ -39,7 +39,7 @@ module "storage_account" {
 
 **Important**: This module requires specific provider versions as defined in the module's [versions.tf](../versions.tf):
 - **Terraform**: >= 1.3.0
-- **AzureRM Provider**: 4.36.0 (pinned version)
+- **AzureRM Provider**: 4.43.0 (pinned version)
 
 The examples inherit these version constraints from the module. While you can override them in your root configuration, it's recommended to use the same versions for compatibility.
 

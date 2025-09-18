@@ -1,9 +1,10 @@
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = ">= 1.12.2"
+
   required_providers {
     azurerm = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
-      version = ">= 4.0.0, < 5.0.0"
+      source  = "hashicorp/azurerm"
+      version = "4.43.0"
     }
   }
 }
@@ -18,7 +19,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  source = "../../"
 
   name                     = var.storage_account_name
   resource_group_name      = azurerm_resource_group.example.name

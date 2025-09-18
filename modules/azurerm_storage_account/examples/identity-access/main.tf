@@ -1,11 +1,12 @@
 terraform {
+  required_version = ">= 1.12.2"
+
   required_providers {
     azurerm = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
-      version = ">= 3.0"
+      source  = "hashicorp/azurerm"
+      version = "4.43.0"
     }
   }
-  required_version = ">= 1.3"
 }
 
 provider "azurerm" {
@@ -33,7 +34,7 @@ resource "azurerm_resource_group" "example" {
 # ==============================================================================
 
 resource "azurerm_key_vault" "example" {
-  name                = "kv-identity-${substr(md5(timestamp()), 0, 8)}"
+  name                = "kv-identity-access-ex"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
@@ -96,9 +97,9 @@ resource "azurerm_role_assignment" "uai_kv_crypto_user" {
 # ==============================================================================
 
 module "storage_system_assigned" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  source = "../../"
 
-  name                     = "stsysidentity${substr(md5(timestamp()), 0, 8)}"
+  name                     = "stsysidentityexample"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -122,9 +123,8 @@ module "storage_system_assigned" {
   }
 
   network_rules = {
-    default_action = "Deny"
-    bypass         = ["AzureServices"]
-    ip_rules       = []
+    bypass   = ["AzureServices"]
+    ip_rules = []
   }
 
   containers = [
@@ -152,9 +152,9 @@ resource "azurerm_role_assignment" "system_identity_kv_access" {
 # ==============================================================================
 
 module "storage_user_assigned" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  source = "../../"
 
-  name                     = "stuseridentity${substr(md5(timestamp()), 0, 8)}"
+  name                     = "stuseridentityexample"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -186,9 +186,8 @@ module "storage_user_assigned" {
   }
 
   network_rules = {
-    default_action = "Deny"
-    bypass         = ["AzureServices"]
-    ip_rules       = []
+    bypass   = ["AzureServices"]
+    ip_rules = []
   }
 
   containers = [
@@ -213,9 +212,9 @@ module "storage_user_assigned" {
 # ==============================================================================
 
 module "storage_combined" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  source = "../../"
 
-  name                     = "stcombidentity${substr(md5(timestamp()), 0, 8)}"
+  name                     = "stcombidentityexample"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -247,9 +246,8 @@ module "storage_combined" {
   }
 
   network_rules = {
-    default_action = "Deny"
-    bypass         = ["AzureServices"]
-    ip_rules       = []
+    bypass   = ["AzureServices"]
+    ip_rules = []
   }
 
   containers = [

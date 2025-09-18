@@ -1,5 +1,11 @@
 package test
 
+// NOTE: This file uses both the new Azure SDK (github.com/Azure/azure-sdk-for-go/sdk/...)
+// and Terratest's azure module which uses the old Azure SDK (github.com/Azure/azure-sdk-for-go v51).
+// The two SDKs have incompatible types, so we cannot directly use Terratest's GetStorageAccountE
+// with our armstorage types. Instead, we use Terratest functions where possible (like
+// StorageBlobContainerExists) and implement our own using the new SDK where needed.
+
 import (
 	"context"
 	"fmt"
@@ -11,7 +17,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
-	// "github.com/gruntwork-io/terratest/modules/azure" // Commented out due to SQL import issue
+	"github.com/gruntwork-io/terratest/modules/azure"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/retry"
 	"github.com/stretchr/testify/require"
@@ -195,9 +201,16 @@ func GenerateValidStorageAccountName(prefix string) string {
 
 // ValidateContainerExists checks if a container exists in the storage account
 func ValidateContainerExists(t *testing.T, accountName, resourceGroupName, containerName string) {
-	// TODO: Implement container existence check without azure module
-	// For now, we'll skip this validation due to Terratest import issues
-	logger.Logf(t, "Skipping container existence check for %s due to Terratest import issues", containerName)
+	subscriptionID := getRequiredEnvVar(t, "AZURE_SUBSCRIPTION_ID")
+	exists := azure.StorageBlobContainerExists(t, containerName, accountName, resourceGroupName, subscriptionID)
+	require.True(t, exists, fmt.Sprintf("Container %s should exist in storage account %s", containerName, accountName))
+}
+
+// ValidateStorageAccountExists checks if a storage account exists using Terratest
+func ValidateStorageAccountExists(t *testing.T, accountName, resourceGroupName string) {
+	subscriptionID := getRequiredEnvVar(t, "AZURE_SUBSCRIPTION_ID")
+	exists := azure.StorageAccountExists(t, accountName, resourceGroupName, subscriptionID)
+	require.True(t, exists, fmt.Sprintf("Storage account %s should exist in resource group %s", accountName, resourceGroupName))
 }
 
 // ValidateBlobServiceProperties validates blob service properties like versioning, soft delete, etc.
@@ -233,8 +246,8 @@ func (h *StorageAccountHelper) ValidateBlobServiceProperties(t *testing.T, accou
 func CreateTestResourceGroup(t *testing.T, subscriptionID, location string) string {
 	resourceGroupName := fmt.Sprintf("rg-terratest-%d", time.Now().Unix())
 	
-	// TODO: Implement resource group creation without azure module
-	// For now, we'll expect the resource group to be created by Terraform
+	// Note: Terratest's azure module has functions for resource groups, but they use the old SDK.
+	// Since we're using Terraform to manage resources, we'll let Terraform create the resource group.
 	logger.Logf(t, "Resource group %s should be created by Terraform", resourceGroupName)
 	
 	return resourceGroupName
@@ -276,7 +289,6 @@ type TestFixtureConfig struct {
 
 // NetworkRulesConfig represents network rules configuration
 type NetworkRulesConfig struct {
-	DefaultAction string
 	IPRules       []string
 	SubnetIDs     []string
 	Bypass        string
@@ -363,24 +375,22 @@ func GenerateTestFixtureHCL(config TestFixtureConfig) string {
 	if config.NetworkRules != nil {
 		hcl.WriteString(`  network_rules = {
 `)
-		hcl.WriteString(fmt.Sprintf(`    default_action = "%s"
-`, config.NetworkRules.DefaultAction))
-		
+
 		if len(config.NetworkRules.IPRules) > 0 {
 			hcl.WriteString(fmt.Sprintf(`    ip_rules = %s
 `, formatStringList(config.NetworkRules.IPRules)))
 		}
-		
+
 		if len(config.NetworkRules.SubnetIDs) > 0 {
-			hcl.WriteString(fmt.Sprintf(`    subnet_ids = %s
+			hcl.WriteString(fmt.Sprintf(`    virtual_network_subnet_ids = %s
 `, formatStringList(config.NetworkRules.SubnetIDs)))
 		}
-		
+
 		if config.NetworkRules.Bypass != "" {
-			hcl.WriteString(fmt.Sprintf(`    bypass = "%s"
+			hcl.WriteString(fmt.Sprintf(`    bypass = ["%s"]
 `, config.NetworkRules.Bypass))
 		}
-		
+
 		hcl.WriteString(`  }
 `)
 	}

@@ -57,8 +57,7 @@ azurerm-terraform-modules/
 │       └── terraform-setup/         # Terraform environment setup
 └── modules/
     └── <module_name>/
-        └── .github/
-            └── module-config.yml    # Module metadata
+        └── module.json              # Module metadata and configuration
 ```
 
 ## Core Workflows
@@ -249,6 +248,15 @@ Each of these jobs runs in parallel for each affected module:
 - Module-isolated execution
 ```
 
+#### `unit-tests` - Unit Tests - ${{ matrix.module }}
+```yaml
+- Runs after terraform-validate for the specific module
+- Checks for the existence of a `tests/unit` directory
+- If found, runs `terraform test` to execute native HCL unit tests
+- Skips gracefully if no unit tests are found
+- Does not block other jobs on failure
+```
+
 #### `tflint` - Linting - ${{ matrix.module }}
 ```yaml
 - Runs TFLint on specific module
@@ -301,7 +309,7 @@ find modules -name "main.tf" -type f
 **Purpose**: Standardized Terraform environment setup with caching.
 
 **Inputs**:
-- `terraform-version`: Version to install (default: 1.10.3)
+- `terraform-version`: Version to install (default: 1.12.2)
 - `install-tflint`: Whether to install TFLint (uses official terraform-linters/setup-tflint@v4)
 - `install-terraform-docs`: Whether to install terraform-docs
 

@@ -1,0 +1,46 @@
+# Test configuration for CI/CD integration, aligned with project standards.
+test_suites:
+  - name: "Main Tests"
+    tests:
+      - "TestNsgSimple"
+      - "TestNsgComplete"
+      - "TestNsgValidationRules"
+    parallel: true
+    timeout: 20m
+
+  - name: "Integration Tests"
+    tests:
+      - "TestNsgLifecycle"
+      - "TestNsgCompliance"
+    parallel: true
+    timeout: 30m
+    # These tests are skipped in -short mode (e.g., on PRs)
+
+  - name: "Performance Tests"
+    tests:
+      - "BenchmarkNsgCreation"
+      - "TestNsgCreationTimeSLA"
+    parallel: false
+    timeout: 45m
+    benchmark: true
+    # These tests are skipped in -short mode
+
+# Test environment requirements
+environment:
+  required_vars:
+    - AZURE_SUBSCRIPTION_ID
+    - AZURE_TENANT_ID
+    - AZURE_CLIENT_ID
+    - AZURE_CLIENT_SECRET
+
+# Code coverage settings
+coverage:
+  enabled: true
+  threshold: 75
+  exclude_patterns:
+    - "test_helpers.go"
+
+# Test report settings
+reporting:
+  format: junit
+  output_file: "test-results.xml"

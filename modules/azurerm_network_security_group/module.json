@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_network_security_group",
+  "title": "Network Security Group",
+  "commit_scope": "network-security-group",
+  "tag_prefix": "NSGv",
+  "description": "Manages Azure Network Security Groups with comprehensive security rules configuration"
+}

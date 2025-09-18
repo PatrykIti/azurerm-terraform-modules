@@ -1,13 +1,10 @@
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = ">= 1.12.2"
+
   required_providers {
     azurerm = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
-      version = ">= 4.0.0, < 5.0.0"
-    }
-    random = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
-      version = ">= 3.1.0"
+      source  = "hashicorp/azurerm"
+      version = "4.43.0"
     }
   }
 }
@@ -20,12 +17,6 @@ provider "azurerm" {
   }
 }
 
-# Random suffix for unique names
-resource "random_string" "suffix" {
-  length  = 8
-  special = false
-  upper   = false
-}
 
 # Resource Group
 resource "azurerm_resource_group" "example" {
@@ -63,7 +54,7 @@ resource "azurerm_subnet" "services" {
 
 # Log Analytics Workspace for diagnostics
 resource "azurerm_log_analytics_workspace" "example" {
-  name                = "law-storage-example-${random_string.suffix.result}"
+  name                = "law-storage-complete-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
@@ -72,14 +63,14 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # User Assigned Identity for CMK
 resource "azurerm_user_assigned_identity" "storage" {
-  name                = "id-storage-cmk-${random_string.suffix.result}"
+  name                = "id-storage-complete-cmk"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
 
 # Key Vault for Customer Managed Keys
 resource "azurerm_key_vault" "example" {
-  name                       = "kv-st-${random_string.suffix.result}"
+  name                       = "kv-storage-complete-ex"
   location                   = azurerm_resource_group.example.location
   resource_group_name        = azurerm_resource_group.example.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -162,9 +153,9 @@ data "azurerm_client_config" "current" {}
 
 # Complete Storage Account with all features
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  source = "../../"
 
-  name                = "stcomplete${random_string.suffix.result}"
+  name                = "stcompleteexample001"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
@@ -200,55 +191,14 @@ module "storage_account" {
   }
 
   # Network security - Allow for initial setup, then restrict
+  # Network rules - only specify what should have access
   network_rules = {
-    default_action             = "Deny" # Secure by default - add your IP ranges below
     bypass                     = ["AzureServices", "Logging", "Metrics"]
-    ip_rules                   = [] # Add your IP ranges here
-    virtual_network_subnet_ids = []
+    ip_rules                   = [] # Add your IP ranges here for access
+    virtual_network_subnet_ids = [] # Add subnet IDs here for access
+    # When both are empty, all public access is denied (secure by default)
   }
 
-  # Private endpoints
-  private_endpoints = [
-    {
-      name                 = "blob"
-      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
-    },
-    {
-      name                 = "file"
-      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.file.id]
-    },
-    {
-      name                 = "queue"
-      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.queue.id]
-    },
-    {
-      name                 = "table"
-      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.table.id]
-    }
-  ]
-
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    logs = {
-      storage_read   = true
-      storage_write  = true
-      storage_delete = true
-    }
-    metrics = {
-      transaction = true
-      capacity    = true
-    }
-  }
 
   # Identity
   identity = {
@@ -501,4 +451,142 @@ module "storage_account" {
     azurerm_private_dns_zone_virtual_network_link.blob,
     azurerm_private_dns_zone_virtual_network_link.file
   ]
+}
+
+# Private endpoints for storage services
+resource "azurerm_private_endpoint" "blob" {
+  name                = "${module.storage_account.name}-pe-blob"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  subnet_id           = azurerm_subnet.private_endpoints.id
+
+  private_service_connection {
+    name                           = "${module.storage_account.name}-psc-blob"
+    private_connection_resource_id = module.storage_account.id
+    is_manual_connection           = false
+    subresource_names              = ["blob"]
+  }
+
+  private_dns_zone_group {
+    name                 = "default"
+    private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
+  }
+
+  tags = {
+    Environment = "Development"
+    Example     = "Complete"
+  }
+}
+
+resource "azurerm_private_endpoint" "file" {
+  name                = "${module.storage_account.name}-pe-file"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  subnet_id           = azurerm_subnet.private_endpoints.id
+
+  private_service_connection {
+    name                           = "${module.storage_account.name}-psc-file"
+    private_connection_resource_id = module.storage_account.id
+    is_manual_connection           = false
+    subresource_names              = ["file"]
+  }
+
+  private_dns_zone_group {
+    name                 = "default"
+    private_dns_zone_ids = [azurerm_private_dns_zone.file.id]
+  }
+
+  tags = {
+    Environment = "Development"
+    Example     = "Complete"
+  }
+}
+
+resource "azurerm_private_endpoint" "queue" {
+  name                = "${module.storage_account.name}-pe-queue"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  subnet_id           = azurerm_subnet.private_endpoints.id
+
+  private_service_connection {
+    name                           = "${module.storage_account.name}-psc-queue"
+    private_connection_resource_id = module.storage_account.id
+    is_manual_connection           = false
+    subresource_names              = ["queue"]
+  }
+
+  private_dns_zone_group {
+    name                 = "default"
+    private_dns_zone_ids = [azurerm_private_dns_zone.queue.id]
+  }
+
+  tags = {
+    Environment = "Development"
+    Example     = "Complete"
+  }
+}
+
+resource "azurerm_private_endpoint" "table" {
+  name                = "${module.storage_account.name}-pe-table"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  subnet_id           = azurerm_subnet.private_endpoints.id
+
+  private_service_connection {
+    name                           = "${module.storage_account.name}-psc-table"
+    private_connection_resource_id = module.storage_account.id
+    is_manual_connection           = false
+    subresource_names              = ["table"]
+  }
+
+  private_dns_zone_group {
+    name                 = "default"
+    private_dns_zone_ids = [azurerm_private_dns_zone.table.id]
+  }
+
+  tags = {
+    Environment = "Development"
+    Example     = "Complete"
+  }
+}
+
+# Diagnostic settings for monitoring
+resource "azurerm_monitor_diagnostic_setting" "storage_account" {
+  name                       = "${module.storage_account.name}-diag"
+  target_resource_id         = module.storage_account.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+
+  metric {
+    category = "Transaction"
+  }
+
+  metric {
+    category = "Capacity"
+  }
+}
+
+resource "azurerm_monitor_diagnostic_setting" "blob_service" {
+  name                       = "${module.storage_account.name}-blob-diag"
+  target_resource_id         = "${module.storage_account.id}/blobServices/default"
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+
+  enabled_log {
+    category = "StorageRead"
+  }
+
+  enabled_log {
+    category = "StorageWrite"
+  }
+
+  enabled_log {
+    category = "StorageDelete"
+  }
+
+  metric {
+    category = "Transaction"
+  }
+
+  metric {
+    category = "Capacity"
+  }
 }

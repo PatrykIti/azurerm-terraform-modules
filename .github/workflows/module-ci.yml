@@ -43,7 +43,7 @@ jobs:
       modules: ${{ steps.set-matrix.outputs.modules }}
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       # Extract module from PR title if it's a PR
       - name: Extract module from PR title
@@ -192,12 +192,12 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Setup Terraform
         uses: ./.github/actions/terraform-setup
         with:
-          terraform-version: ${{ vars.TERRAFORM_VERSION || '1.10.3' }}
+          terraform-version: ${{ vars.TERRAFORM_VERSION || '1.12.2' }}
           install-tflint: true
         
       - name: Validate Module ${{ matrix.module }}
@@ -205,7 +205,7 @@ jobs:
         with:
           module: ${{ matrix.module }}
           action: validate
-          terraform-version: ${{ vars.TERRAFORM_VERSION || '1.10.3' }}
+          terraform-version: ${{ vars.TERRAFORM_VERSION || '1.12.2' }}
           github-token: ${{ secrets.PAT }}
 
   test:
@@ -216,7 +216,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Azure Login via OIDC
         uses: azure/login@v2
@@ -246,7 +246,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Security Scan Module ${{ matrix.module }}
         uses: ./.github/actions/module-runner
@@ -262,7 +262,7 @@ jobs:
     if: always()
     steps:
       - name: Quality gates summary
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         if: github.event_name == 'pull_request'
         with:
           script: |

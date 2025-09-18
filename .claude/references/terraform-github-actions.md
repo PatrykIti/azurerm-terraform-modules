@@ -30,14 +30,14 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Fetch all history for proper diff detection
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.10.3  # Pin to specific version for consistency
+          terraform_version: 1.12.2  # Pin to specific version for consistency
 
       - name: Terraform Format Check
         id: fmt
@@ -72,7 +72,7 @@ jobs:
         shell: bash
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
@@ -127,7 +127,7 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Azure Login via OIDC
         uses: azure/login@v1
@@ -139,7 +139,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.10.3
+          terraform_version: 1.12.2
 
       - name: Terraform Init with Azure Backend
         run: |
@@ -170,7 +170,7 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run Trivy Security Scan
         uses: aquasecurity/trivy-action@master
@@ -218,7 +218,7 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ github.head_ref }}
@@ -258,7 +258,7 @@ jobs:
   terraform:
     strategy:
       matrix:
-        terraform: [1.9.8, 1.10.3]
+        terraform: [1.9.8, 1.12.2]
         module: [storage_account, virtual_network, key_vault]
     
     steps:
@@ -407,7 +407,7 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Go
         uses: actions/setup-go@v4
@@ -417,7 +417,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.10.3
+          terraform_version: 1.12.2
           terraform_wrapper: false
 
       - name: Run Terratest

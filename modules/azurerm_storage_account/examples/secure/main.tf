@@ -1,13 +1,9 @@
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.12.2"
   required_providers {
     azurerm = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+      source  = "hashicorp/azurerm"
       version = ">= 3.0.0"
-    }
-    random = {
-      source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
-      version = ">= 3.1.0"
     }
   }
 }
@@ -21,12 +17,6 @@ provider "azurerm" {
   }
 }
 
-# Random suffix for unique names
-resource "random_string" "suffix" {
-  length  = 8
-  special = false
-  upper   = false
-}
 
 # Resource Group
 resource "azurerm_resource_group" "example" {
@@ -54,7 +44,7 @@ resource "azurerm_subnet" "private_endpoints" {
 
 # Log Analytics Workspace for security monitoring
 resource "azurerm_log_analytics_workspace" "example" {
-  name                = "law-storage-secure-${random_string.suffix.result}"
+  name                = "law-storage-secure-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
@@ -63,14 +53,14 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # User Assigned Identity for CMK
 resource "azurerm_user_assigned_identity" "storage" {
-  name                = "id-storage-secure-${random_string.suffix.result}"
+  name                = "id-storage-secure-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
 
 # Key Vault with enhanced security
 resource "azurerm_key_vault" "example" {
-  name                            = "kv-sec-${random_string.suffix.result}"
+  name                            = "kv-storage-secure-ex"
   location                        = azurerm_resource_group.example.location
   resource_group_name             = azurerm_resource_group.example.name
   tenant_id                       = data.azurerm_client_config.current.tenant_id
@@ -152,9 +142,9 @@ data "azurerm_client_config" "current" {}
 
 # Highly secure Storage Account
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+  source = "../../"
 
-  name                = "stsecure${random_string.suffix.result}"
+  name                = "stsecureexample001"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
@@ -188,48 +178,11 @@ module "storage_account" {
 
   # Strict network rules (deny all)
   network_rules = {
-    default_action             = "Deny"
     bypass                     = [] # No bypass, not even for Azure services
     ip_rules                   = [] # No public IPs allowed
     virtual_network_subnet_ids = [] # Only private endpoints
   }
 
-  # Private endpoints for all services
-  private_endpoints = [
-    {
-      name                 = "blob"
-      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.storage["blob"].id]
-    },
-    {
-      name                 = "web"
-      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.storage["web"].id]
-    },
-    {
-      name                 = "dfs"
-      subresource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"]
-      subnet_id            = azurerm_subnet.private_endpoints.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.storage["dfs"].id]
-    }
-  ]
-
-  # Comprehensive monitoring and auditing
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    logs = {
-      storage_read   = true
-      storage_write  = true
-      storage_delete = true
-    }
-    metrics = {
-      transaction = true
-      capacity    = true
-    }
-  }
 
   # Identity configuration
   identity = {

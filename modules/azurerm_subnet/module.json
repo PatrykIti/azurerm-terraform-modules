@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_subnet",
+  "title": "Subnet",
+  "commit_scope": "subnet",
+  "tag_prefix": "SNv",
+  "description": "Azure Subnet Terraform module for managing subnets with service endpoints, delegations, network policies, and enterprise-grade security features"
+}

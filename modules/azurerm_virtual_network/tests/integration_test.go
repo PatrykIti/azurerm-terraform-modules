@@ -225,6 +225,7 @@ func TestVirtualNetworkDNS(t *testing.T) {
 
 // TestVirtualNetworkFlowLogs tests Virtual Network with flow logs enabled
 func TestVirtualNetworkFlowLogs(t *testing.T) {
+	t.Skip("Skipping flow logs test - NSG flow logs are deprecated and being blocked by Azure")
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}

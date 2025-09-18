@@ -22,7 +22,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT || github.token }}
       
@@ -177,7 +177,7 @@ jobs:
       - name: Check PR title follows conventional commits
         # Skip validation for Dependabot PRs
         if: ${{ !startsWith(github.head_ref, 'dependabot/') }}
-        uses: amannn/action-semantic-pull-request@v5
+        uses: amannn/action-semantic-pull-request@v6
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         with:
@@ -196,6 +196,13 @@ jobs:
           scopes: |
             storage-account
             virtual-network
+            kubernetes-cluster
+            network-security-group
+            app-gateway
+            subnet
+            route-table
+            bastion-host
+            container-registry
             key-vault
             app-service
             sql-database
@@ -233,7 +240,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT || github.token }}
       
@@ -282,7 +289,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT || github.token }}
       
@@ -336,6 +343,51 @@ jobs:
             done
           fi
 
+  # Per-module unit tests
+  unit-tests:
+    name: Unit Tests - ${{ matrix.module }}
+    needs: [detect-changes, terraform-validate]
+    if: ${{ needs.detect-changes.outputs.has_modules == 'true' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.PAT || github.token }}
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+      
+      - name: Run Unit Tests for ${{ matrix.module }}
+        run: |
+          module_dir="modules/${{ matrix.module }}"
+          unit_test_dir="${module_dir}/tests/unit"
+          
+          if [ -d "$unit_test_dir" ]; then
+            echo "## Running unit tests for: $module_dir"
+            cd "$module_dir"
+            
+            if terraform init -backend=false; then
+              if ! terraform test -test-directory=./tests/unit; then
+                echo "❌ Unit tests failed for module: ${{ matrix.module }}"
+                exit 1
+              else
+                echo "✅ Unit tests passed for module: ${{ matrix.module }}"
+              fi
+            else
+              echo "❌ Failed to initialize module for unit tests: ${{ matrix.module }}"
+              exit 1
+            fi
+          else
+            echo "⏭️ No unit tests found for module: ${{ matrix.module }}. Skipping."
+          fi
+
   # Per-module TFLint analysis
   tflint:
     name: TFLint - ${{ matrix.module }}
@@ -348,7 +400,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT || github.token }}
       
@@ -361,7 +413,7 @@ jobs:
             ${{ runner.os }}-tflint-
       
       - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v4
+        uses: terraform-linters/setup-tflint@v5
         with:
           tflint_version: latest
       
@@ -410,7 +462,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT || github.token }}
       
@@ -433,6 +485,10 @@ jobs:
           if [[ -d "$module_dir/examples" ]] && [[ -x "./scripts/update-examples-list.sh" ]]; then
             echo "Updating examples list for ${{ matrix.module }}..."
             ./scripts/update-examples-list.sh "$module_dir"
+            
+            # Regenerate terraform-docs after updating examples list
+            echo "Regenerating terraform-docs for ${{ matrix.module }}..."
+            (cd "$module_dir" && terraform-docs markdown table --output-file README.md .)
           fi
           
           if [[ -f "$module_dir/README.md" ]]; then
@@ -496,7 +552,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PAT || github.token }}
       
@@ -525,12 +581,12 @@ jobs:
   quality-gates:
     name: Quality Gates Summary
     runs-on: ubuntu-latest
-    needs: [detect-changes, validate-pr-title, terraform-fmt, terraform-validate, tflint, documentation-check, security-scan]
+    needs: [detect-changes, validate-pr-title, terraform-fmt, terraform-validate, unit-tests, tflint, documentation-check, security-scan]
     if: always()
     
     steps:
       - name: Quality gates summary
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.PAT }}
           script: |
