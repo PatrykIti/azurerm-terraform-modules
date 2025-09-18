@@ -60,7 +60,6 @@ module "storage_account" {
 
   # Network rules with multiple configurations
   network_rules = {
-    default_action = "Deny"
     ip_rules = [
       "198.51.100.0/24", # Test IP range 1
       "203.0.113.0/24",  # Test IP range 2

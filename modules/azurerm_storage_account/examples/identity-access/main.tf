@@ -123,7 +123,6 @@ module "storage_system_assigned" {
   }
 
   network_rules = {
-    default_action = "Deny"
     bypass         = ["AzureServices"]
     ip_rules       = []
   }
@@ -187,7 +186,6 @@ module "storage_user_assigned" {
   }
 
   network_rules = {
-    default_action = "Deny"
     bypass         = ["AzureServices"]
     ip_rules       = []
   }
@@ -248,7 +246,6 @@ module "storage_combined" {
   }
 
   network_rules = {
-    default_action = "Deny"
     bypass         = ["AzureServices"]
     ip_rules       = []
   }

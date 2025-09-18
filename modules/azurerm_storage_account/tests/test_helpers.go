@@ -289,7 +289,6 @@ type TestFixtureConfig struct {
 
 // NetworkRulesConfig represents network rules configuration
 type NetworkRulesConfig struct {
-	DefaultAction string
 	IPRules       []string
 	SubnetIDs     []string
 	Bypass        string
@@ -376,24 +375,22 @@ func GenerateTestFixtureHCL(config TestFixtureConfig) string {
 	if config.NetworkRules != nil {
 		hcl.WriteString(`  network_rules = {
 `)
-		hcl.WriteString(fmt.Sprintf(`    default_action = "%s"
-`, config.NetworkRules.DefaultAction))
-		
+
 		if len(config.NetworkRules.IPRules) > 0 {
 			hcl.WriteString(fmt.Sprintf(`    ip_rules = %s
 `, formatStringList(config.NetworkRules.IPRules)))
 		}
-		
+
 		if len(config.NetworkRules.SubnetIDs) > 0 {
-			hcl.WriteString(fmt.Sprintf(`    subnet_ids = %s
+			hcl.WriteString(fmt.Sprintf(`    virtual_network_subnet_ids = %s
 `, formatStringList(config.NetworkRules.SubnetIDs)))
 		}
-		
+
 		if config.NetworkRules.Bypass != "" {
-			hcl.WriteString(fmt.Sprintf(`    bypass = "%s"
+			hcl.WriteString(fmt.Sprintf(`    bypass = ["%s"]
 `, config.NetworkRules.Bypass))
 		}
-		
+
 		hcl.WriteString(`  }
 `)
 	}

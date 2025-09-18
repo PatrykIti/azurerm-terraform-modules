@@ -61,7 +61,6 @@ module "storage_account" {
 
   # Network configuration
   network_rules = {
-    default_action             = "Allow"
     bypass                     = ["AzureServices"]
     ip_rules                   = []
     virtual_network_subnet_ids = [azurerm_subnet.test.id]

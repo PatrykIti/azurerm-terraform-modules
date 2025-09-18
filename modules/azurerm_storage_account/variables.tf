@@ -85,9 +85,21 @@ variable "security_settings" {
 
 # Network Security
 variable "network_rules" {
-  description = "Network rules for the storage account."
+  description = <<-EOT
+    Network access control rules for the storage account.
+
+    When ip_rules or virtual_network_subnet_ids are specified, only those sources will have access (default_action will be "Deny").
+    When both are empty/null, all public access will be denied (default_action will be "Deny").
+
+    To allow all public access, set this entire variable to null.
+
+    bypass: Azure services that should bypass network rules (default: ["AzureServices"])
+    ip_rules: Set of public IP addresses or CIDR blocks that should have access
+    virtual_network_subnet_ids: Set of subnet IDs that should have access via service endpoints
+    private_link_access: Private endpoints that should have access
+  EOT
+
   type = object({
-    default_action             = string
     bypass                     = optional(set(string), ["AzureServices"])
     ip_rules                   = optional(set(string), [])
     virtual_network_subnet_ids = optional(set(string), [])
@@ -96,14 +108,10 @@ variable "network_rules" {
       endpoint_tenant_id   = optional(string)
     })), [])
   })
-  default = {
-    default_action = "Deny" # Security by default
-    bypass         = ["AzureServices"]
-  }
 
-  validation {
-    condition     = contains(["Allow", "Deny"], var.network_rules.default_action)
-    error_message = "Network rules default action must be either 'Allow' or 'Deny'."
+  default = {
+    bypass = ["AzureServices"]
+    # Empty ip_rules and virtual_network_subnet_ids means no public access (secure by default)
   }
 }
 

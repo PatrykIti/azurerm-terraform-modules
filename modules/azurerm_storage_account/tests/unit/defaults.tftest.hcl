@@ -146,9 +146,10 @@ run "verify_network_rules_defaults" {
   }
 
   # Network rules are applied via a separate resource in the actual implementation
-  # Here we verify the configuration is valid
+  # The default_action is now automatically set to "Deny" for security by default
+  # Here we verify the network rules structure is valid
   assert {
-    condition     = var.network_rules.default_action == "Deny"
-    error_message = "Network rules default action should be Deny"
+    condition     = can(var.network_rules.bypass)
+    error_message = "Network rules should have bypass field"
   }
 }

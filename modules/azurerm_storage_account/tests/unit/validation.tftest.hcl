@@ -168,21 +168,8 @@ run "invalid_tls_version" {
   ]
 }
 
-# Test invalid network rules default action
-run "invalid_network_rules_default_action" {
-  command = plan
-
-  variables {
-    name = "validstorageaccount"
-    network_rules = {
-      default_action = "Block" # Should be "Allow" or "Deny"
-    }
-  }
-
-  expect_failures = [
-    var.network_rules,
-  ]
-}
+# Test removed - default_action is now automatically set to "Deny"
+# The module no longer requires users to specify default_action
 
 # Test invalid container access type
 run "invalid_container_access_type" {

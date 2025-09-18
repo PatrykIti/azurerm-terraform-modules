@@ -120,15 +120,20 @@ resource "azurerm_storage_account" "storage_account" {
     }
   }
 
-  # Network rules
+  # Network rules - Intelligent default_action based on provided rules
   #checkov:skip=CKV_AZURE_36:False positive with dynamic blocks - https://github.com/bridgecrewio/checkov/issues/6724
   dynamic "network_rules" {
-    for_each = var.network_rules.default_action != null ? [1] : []
+    for_each = var.network_rules != null ? [var.network_rules] : []
     content {
-      default_action             = var.network_rules.default_action
-      bypass                     = var.network_rules.bypass
-      ip_rules                   = var.network_rules.ip_rules
-      virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
+      # Automatically determine default_action:
+      # - If any IP rules or subnet IDs are specified: Deny all except those (most common scenario)
+      # - If both are empty: Deny all public access (secure by default)
+      # This means you only specify what SHOULD have access, everything else is blocked
+      default_action = "Deny"
+
+      bypass                     = network_rules.value.bypass
+      ip_rules                   = network_rules.value.ip_rules
+      virtual_network_subnet_ids = network_rules.value.virtual_network_subnet_ids
     }
   }
 

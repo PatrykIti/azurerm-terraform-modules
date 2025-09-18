@@ -105,7 +105,6 @@ module "data_lake_storage" {
 
   # Network configuration for NFSv3
   network_rules = {
-    default_action             = "Allow" # Required for initial setup
     bypass                     = ["AzureServices"]
     ip_rules                   = [] # Add your client IP ranges here
     virtual_network_subnet_ids = [azurerm_subnet.nfs_clients.id]

@@ -171,7 +171,6 @@ resource "azurerm_key_vault" "example" {
   enabled_for_template_deployment = false
 
   network_acls {
-    default_action = "Deny"
     bypass         = "AzureServices"
     ip_rules       = var.allowed_ip_ranges
   }
@@ -295,7 +294,6 @@ module "secure_storage" {
   }
 
   # Note: public_network_access_enabled = false would be set here if the module supported it
-  # Currently, network isolation is achieved through network_rules with default_action = "Deny"
 
   # Encryption settings
   encryption = {
@@ -307,7 +305,6 @@ module "secure_storage" {
 
   # Network security - deny all by default
   network_rules = {
-    default_action             = "Deny"
     bypass                     = ["AzureServices"]
     ip_rules                   = var.allowed_ip_ranges
     virtual_network_subnet_ids = [azurerm_subnet.app.id]

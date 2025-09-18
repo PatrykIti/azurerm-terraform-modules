@@ -191,11 +191,12 @@ module "storage_account" {
   }
 
   # Network security - Allow for initial setup, then restrict
+  # Network rules - only specify what should have access
   network_rules = {
-    default_action             = "Deny" # Secure by default - add your IP ranges below
     bypass                     = ["AzureServices", "Logging", "Metrics"]
-    ip_rules                   = [] # Add your IP ranges here
-    virtual_network_subnet_ids = []
+    ip_rules                   = [] # Add your IP ranges here for access
+    virtual_network_subnet_ids = [] # Add subnet IDs here for access
+    # When both are empty, all public access is denied (secure by default)
   }
 
 
