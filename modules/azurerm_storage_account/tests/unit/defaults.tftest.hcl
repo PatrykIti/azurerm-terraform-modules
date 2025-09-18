@@ -140,8 +140,7 @@ run "verify_network_rules_defaults" {
     resource_group_name = "test-rg"
     location            = "northeurope"
     network_rules = {
-      default_action = "Deny"
-      bypass         = ["AzureServices"]
+      bypass = ["AzureServices"]
     }
   }
 
