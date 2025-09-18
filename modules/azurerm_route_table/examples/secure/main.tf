@@ -67,7 +67,7 @@ resource "azurerm_network_interface" "nva" {
 
 # Secure Route Table
 module "route_table" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.0"
 
   name                = var.route_table_name
   resource_group_name = azurerm_resource_group.example.name
