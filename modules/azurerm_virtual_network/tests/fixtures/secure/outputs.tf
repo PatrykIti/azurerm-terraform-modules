@@ -20,7 +20,7 @@ output "virtual_network_guid" {
 
 output "virtual_network_ddos_protection" {
   description = "Information about DDoS protection configuration"
-  value       = "DDoS protection configured via input variables"
+  value       = "DDoS protection disabled due to Azure subscription limitation"
 }
 
 
@@ -32,15 +32,10 @@ output "virtual_network_diagnostic_setting_id" {
 output "virtual_network_security_configuration" {
   description = "Summary of security configuration"
   value = {
-    ddos_protection_enabled = true
+    ddos_protection_enabled = false # Disabled due to Azure subscription limitation
     encryption_enabled      = true
     monitoring_enabled      = true
   }
-}
-
-output "ddos_protection_plan_id" {
-  description = "The ID of the DDoS protection plan"
-  value       = azurerm_network_ddos_protection_plan.test.id
 }
 
 
