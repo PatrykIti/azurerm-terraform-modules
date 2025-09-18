@@ -127,8 +127,8 @@ func TestRouteTableMultipleUpdates(t *testing.T) {
 		terraform.Apply(t, terraformOptions)
 
 		routeTable3 := helper.GetRouteTableProperties(t, resourceGroupName, routeTableName)
-		assert.Equal(t, "Test-Updated", routeTable3.Tags["Environment"])
-		assert.Equal(t, "Terratest", routeTable3.Tags["Managed"])
+		assert.Equal(t, "Test-Updated", *routeTable3.Tags["Environment"])
+		assert.Equal(t, "Terratest", *routeTable3.Tags["Managed"])
 	})
 }
 
