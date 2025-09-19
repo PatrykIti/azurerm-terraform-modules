@@ -110,7 +110,7 @@ module.exports = {
     [
       '@semantic-release/changelog',
       {
-        changelogFile: 'CHANGELOG.md',
+        changelogFile: `modules/${MODULE_NAME}/CHANGELOG.md`,
         changelogTitle: `# Changelog
 
 All notable changes to the ${MODULE_TITLE} Terraform module will be documented in this file.

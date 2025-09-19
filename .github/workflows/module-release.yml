@@ -153,30 +153,6 @@ jobs:
             npx semantic-release --extends "$MODULE_CONFIG"
           fi
       
-      - name: Update module documentation
-        if: ${{ inputs.dry_run != 'true' }}
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-          HUSKY: 0
-        run: |
-          MODULE_DIR="modules/${{ inputs.module }}"
-          
-          # Configure git to use the GitHub App token
-          git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
-          
-          # Check if any release was made in the module directory
-          if git diff --name-only HEAD~1 | grep -q "$MODULE_DIR/CHANGELOG.md"; then
-            echo "📝 Updating module documentation..."
-            terraform-docs markdown table --output-file "$MODULE_DIR/README.md" "$MODULE_DIR"
-            
-            # Commit documentation updates if changed
-            if git diff --exit-code "$MODULE_DIR/README.md"; then
-              echo "No documentation changes needed."
-            else
-              git add "$MODULE_DIR/README.md"
-              git commit -m "docs(${{ steps.module-config.outputs.scope }}): update terraform-docs [skip ci]"
-              git push origin HEAD
-            fi
-          else
-            echo "No release was made, skipping documentation update."
-          fi
+      # REMOVED: Update module documentation step
+      # This step was redundant because semantic-release already updates the module documentation
+      # in the prepare phase using the correct terraform-docs command with proper config
