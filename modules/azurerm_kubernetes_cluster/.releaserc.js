@@ -110,7 +110,7 @@ module.exports = {
     [
       '@semantic-release/changelog',
       {
-        changelogFile: 'CHANGELOG.md',
+        changelogFile: `modules/${MODULE_NAME}/CHANGELOG.md`,
         changelogTitle: `# Changelog
 
 All notable changes to the ${MODULE_TITLE} Terraform module will be documented in this file.
@@ -137,19 +137,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
           find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's| ../../ | ${SOURCE_URL} |g' {} +
           find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's| ../.. | ${SOURCE_URL} |g' {} +
 
-          if [[ -x "./scripts/update-module-version.sh" ]]; then
+          if [ -x "./scripts/update-module-version.sh" ]; then
             ./scripts/update-module-version.sh "modules/${MODULE_NAME}" "\${nextRelease.version}"
           fi
 
-          if [[ -x "./scripts/update-examples-list.sh" ]]; then
+          if [ -x "./scripts/update-examples-list.sh" ]; then
             ./scripts/update-examples-list.sh "modules/${MODULE_NAME}"
           fi
 
-          if command -v terraform-docs &> /dev/null; then
+          if command -v terraform-docs > /dev/null 2>&1; then
             terraform-docs --config "$(pwd)/modules/${MODULE_NAME}/.terraform-docs.yml" "$(pwd)/modules/${MODULE_NAME}"
           fi
 
-          if [[ -x "./scripts/update-root-readme.sh" ]]; then
+          if [ -x "./scripts/update-root-readme.sh" ]; then
             ./scripts/update-root-readme.sh "${MODULE_NAME}" "${MODULE_TITLE}" "${TAG_PREFIX}" "\${nextRelease.version}" "PatrykIti" "azurerm-terraform-modules"
           fi
         `.trim()
