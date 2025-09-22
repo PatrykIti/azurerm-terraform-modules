@@ -23,7 +23,7 @@ resource "azurerm_resource_group" "test" {
 
 # Create the route table
 module "route_table" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
 
   # Basic route table configuration
   name                = "rt-bas-${var.random_suffix}"

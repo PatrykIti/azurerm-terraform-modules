@@ -3,7 +3,7 @@
 ## Module Version
 
 <!-- BEGIN_VERSION -->
-Current version: **vUnreleased**
+Current version: **1.0.2**
 <!-- END_VERSION -->
 
 ## Description
@@ -43,6 +43,8 @@ module "route_table" {
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates a basic deployment of an Azure Route Table with simple route configuration.
 - [Complete](examples/complete) - This example demonstrates a comprehensive deployment of Route Tables with all available features and advanced routing scenarios.
+- [Network Wrapper](examples/network-wrapper) - This example demonstrates the recommended pattern for managing route table subnet associations at the network wrapper level. This approach solves the Terraform limitation where subnet IDs are not known at plan time when creating resources from scratch.
+- [Network Wrapper Advanced](examples/network-wrapper-advanced) - This example demonstrates an advanced pattern for managing route table subnet associations using object iteration with null handling. This approach allows for dynamic subnet creation and association while avoiding the Terraform "for_each with unknown values" error.
 - [Secure](examples/secure) - This example demonstrates a maximum-security Route Table configuration suitable for highly sensitive data and regulated environments.
 <!-- END_EXAMPLES -->
 

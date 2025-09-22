@@ -3,7 +3,7 @@
 ## Module Version
 
 <!-- BEGIN_VERSION -->
-Current version: **vUnreleased**
+Current version: **1.0.2**
 <!-- END_VERSION -->
 
 ## Description
@@ -147,11 +147,11 @@ module "delegated_subnet" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [basic](examples/basic) - Basic subnet configuration with minimal inputs
-- [complete](examples/complete) - Complete configuration showcasing all features
-- [network-wrapper](examples/network-wrapper) - Recommended pattern for managing subnet associations at wrapper level
-- [private-endpoint](examples/private-endpoint) - Subnet configuration for hosting private endpoints
-- [secure](examples/secure) - Security-hardened subnet with NSG, route table, and service endpoint policies
+- [Basic](examples/basic) - This example demonstrates the minimal configuration required to create a subnet within an Azure Virtual Network.
+- [Complete](examples/complete) - This example demonstrates a comprehensive subnet configuration with all available features including service endpoints, network security groups, route tables, and service endpoint policies.
+- [Delegation](examples/delegation) - This example demonstrates subnet delegation to various Azure services, showing how to configure subnets that are dedicated to specific Azure service types and their required network policies.
+- [Private Endpoint](examples/private-endpoint) - This example demonstrates subnet configuration optimized for private endpoint scenarios, showing how to properly configure subnets for private endpoint connectivity to Azure services.
+- [Secure](examples/secure) - This example demonstrates a security-focused subnet configuration with enhanced security features including DDoS protection, restrictive network security groups, secure routing, and comprehensive monitoring.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->

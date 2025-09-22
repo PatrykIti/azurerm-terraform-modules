@@ -21,7 +21,7 @@ resource "azurerm_virtual_network" "example" {
 }
 
 module "subnet" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
 
   name                 = "subnet-secure-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.example.name

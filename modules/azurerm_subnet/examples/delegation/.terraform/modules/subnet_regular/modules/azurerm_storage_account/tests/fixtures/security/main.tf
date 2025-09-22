@@ -19,7 +19,7 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
 
   name                     = "dpcsec${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name

@@ -78,7 +78,7 @@ resource "azurerm_role_assignment" "uai_kv_access" {
 }
 
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
 
   name                     = "dpcida${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name

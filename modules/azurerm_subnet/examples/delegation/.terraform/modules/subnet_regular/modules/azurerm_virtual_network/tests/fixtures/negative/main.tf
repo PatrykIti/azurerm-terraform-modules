@@ -20,7 +20,7 @@ resource "azurerm_resource_group" "test" {
 
 # This should fail due to invalid name
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
 
   name                = "INVALID-NAME-WITH-UPPERCASE" # Should fail validation
   resource_group_name = azurerm_resource_group.test.name

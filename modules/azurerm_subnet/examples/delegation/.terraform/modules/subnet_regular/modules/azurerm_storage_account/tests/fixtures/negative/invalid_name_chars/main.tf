@@ -18,7 +18,7 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
 
   # Invalid: name contains uppercase and special characters
   name                     = "Storage-Account-123"
