@@ -13,16 +13,16 @@ REPO_NAME="${6}"
 
 # Path to root README
 # When called from semantic-release running at root, adjust path
-if [[ -f "README.md" ]]; then
+if [ -f "README.md" ]; then
     ROOT_README="README.md"
-elif [[ -f "../../README.md" ]]; then
+elif [ -f "../../README.md" ]; then
     ROOT_README="../../README.md"
 else
     echo "Root README.md not found"
     exit 1
 fi
 
-if [[ ! -f "$ROOT_README" ]]; then
+if [ ! -f "$ROOT_README" ]; then
     echo "Root README.md not found at $ROOT_README"
     exit 1
 fi
@@ -35,7 +35,7 @@ cp "$ROOT_README" "$TMP_FILE"
 
 # Function to escape special characters for sed
 escape_sed() {
-    echo "$1" | sed -e 's/[\[\.*^$()+?{|]/\\&/g' -e 's/ /\\ /g'
+    echo "$1" | sed -e 's/[\[\.*^$()+?{|]/\\&/g'
 }
 
 # Escaped values
@@ -45,10 +45,11 @@ ESCAPED_MODULE_DISPLAY_NAME=$(escape_sed "$MODULE_DISPLAY_NAME")
 
 # Update module status - handle both Development and already Completed status
 # First, try to update from Development status
-sed -i.bak "s|\[${ESCAPED_MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) | 🔧 Development | - |\[${MODULE_DISPLAY_NAME}\](./modules/${MODULE_NAME}/) | ✅ Completed | [${TAG_PREFIX}${VERSION}](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag/${TAG_PREFIX}${VERSION}) |g" "$TMP_FILE"
+sed -i.bak "s#\[${ESCAPED_MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) \| 🔧 Development \| -#\[${MODULE_DISPLAY_NAME}\](./modules/${MODULE_NAME}/) | ✅ Completed | [${TAG_PREFIX}${VERSION}](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag/${TAG_PREFIX}${VERSION})#g" "$TMP_FILE"
 
 # Then, update existing Completed status with new version (handles any previous version)
-sed -i.bak -E "s|\[${ESCAPED_MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) \| ✅ Completed \| \[${ESCAPED_TAG_PREFIX}[^]]+\]\([^)]+\)|\[${MODULE_DISPLAY_NAME}\](./modules/${MODULE_NAME}/) | ✅ Completed | [${TAG_PREFIX}${VERSION}](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag/${TAG_PREFIX}${VERSION})|g" "$TMP_FILE"
+# This regex matches any existing version format (v1.0.0, AKSv1.0.0, or links)
+sed -i.bak -E "s#\[${ESCAPED_MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) \| ✅ Completed \| [^\|]+#\[${MODULE_DISPLAY_NAME}\](./modules/${MODULE_NAME}/) | ✅ Completed | [${TAG_PREFIX}${VERSION}](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag/${TAG_PREFIX}${VERSION})#g" "$TMP_FILE"
 
 # Add or update module version badge at the top of the file
 echo "Adding/updating version badge for ${MODULE_NAME}"
