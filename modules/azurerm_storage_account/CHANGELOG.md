@@ -5,6 +5,12 @@ All notable changes to the Storage Account Terraform module will be documented i
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.3](https://github.com/PatrykIti/azurerm-terraform-modules/compare/SAv1.2.2...SAv1.2.3) (2025-09-22)
+
+### 🐛 Bug Fixes
+
+* **kubernetes-cluster,network-security-group,route-table,storage-account,subnet,virtual-network:** complete module implementation with tests and examples ([#70](https://github.com/PatrykIti/azurerm-terraform-modules/issues/70)) ([2c06cfe](https://github.com/PatrykIti/azurerm-terraform-modules/commit/2c06cfecb8b8cf13951016c52cbb74cf4dc871ca))
+
 ## [1.2.2](https://github.com/PatrykIti/azurerm-terraform-modules/compare/SAv1.2.1...SAv1.2.2) (2025-09-22)
 
 ### 🐛 Bug Fixes

@@ -85,7 +85,7 @@ resource "azurerm_private_dns_zone" "test" {
 
 # Complete Virtual Network configuration with all features
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.3"
 
   name                = "vnet-dpc-cmp-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
