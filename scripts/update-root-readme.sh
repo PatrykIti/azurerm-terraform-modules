@@ -35,7 +35,7 @@ cp "$ROOT_README" "$TMP_FILE"
 
 # Function to escape special characters for sed
 escape_sed() {
-    echo "$1" | sed -e 's/[[\.*^$()+?{|]/\\&/g' -e 's/ /\\ /g'
+    echo "$1" | sed -e 's/[\[\.*^$()+?{|]/\\&/g' -e 's/ /\\ /g'
 }
 
 # Escaped values

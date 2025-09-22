@@ -125,7 +125,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       {
         prepareCmd: `
           CONFIG_FILE="modules/${MODULE_NAME}/.github/module-config.yml"
-          if [[ -f "$CONFIG_FILE" ]]; then
+          if [ -f "$CONFIG_FILE" ]; then
             sed -i "s/^version: .*/version: \${nextRelease.version}/" "$CONFIG_FILE"
           fi
 
