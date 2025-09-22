@@ -3,7 +3,7 @@
 ## Module Version
 
 <!-- BEGIN_VERSION -->
-Current version: **vUnreleased**
+Current version: **1.0.2**
 <!-- END_VERSION -->
 
 ## Description
@@ -130,9 +130,9 @@ module "network_security_group" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - Simple NSG with basic security rules
-- [Complete](examples/complete) - Full configuration with all features
-- [Secure](examples/secure) - Security-hardened configuration
+- [Basic](examples/basic) - This example demonstrates a basic Network Security Group configuration with simple inbound and outbound security rules.
+- [Complete](examples/complete) - This example demonstrates a comprehensive deployment of Azure Network Security Group with all available features including flow logs, traffic analytics, and complex security rule configurations.
+- [Secure](examples/secure) - This example demonstrates a maximum-security Network Security Group configuration suitable for a three-tier application (web, app, db) using a zero-trust approach.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->

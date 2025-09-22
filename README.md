@@ -39,8 +39,8 @@ Stable binaries are also available on the [releases] page. To install, download 
 binary for your platform from "Assets" and place this into your `$PATH`:
 
 ```bash
-curl[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3)Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.20.0/terraform-docs-v0.20.0-$(uname)-amd64.tar.gz
-tar[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3)xzf terraform-docs.tar.gz
+curl[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2)Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.20.0/terraform-docs-v0.20.0-$(uname)-amd64.tar.gz
+tar[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2)xzf terraform-docs.tar.gz
 chmod +x terraform-docs
 mv terraform-docs /usr/local/bin/terraform-docs
 ```
@@ -77,7 +77,7 @@ $(go env GOPATH)/src/github.com/terraform-docs/terraform-docs/bin/$(uname | tr '
 To run and generate documentation into README within a directory:
 
 ```bash
-terraform-docs markdown table[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3)-output-file README.md[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3)-output-mode inject /path/to/module
+terraform-docs markdown table[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2)-output-file README.md[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2)-output-mode inject /path/to/module
 ```
 
 Check [`output`] configuration for more details and examples.
@@ -88,14 +88,14 @@ terraform-docs can be run as a container by mounting a directory with `.tf`
 files in it and run the following command:
 
 ```bash
-docker run[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3)-rm[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3)-volume "$(pwd):/terraform-docs"[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3)u $(id[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3)u) quay.io/terraform-docs/terraform-docs:0.20.0 markdown /terraform-docs
+docker run[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2)-rm[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2)-volume "$(pwd):/terraform-docs"[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2)u $(id[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2)u) quay.io/terraform-docs/terraform-docs:0.20.0 markdown /terraform-docs
 ```
 
 If `output.file` is not enabled for this module, generated output can be redirected
 back to a file:
 
 ```bash
-docker run[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3)-rm[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3)-volume "$(pwd):/terraform-docs"[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3)u $(id[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3)u) quay.io/terraform-docs/terraform-docs:0.20.0 markdown /terraform-docs > doc.md
+docker run[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2)-rm[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2)-volume "$(pwd):/terraform-docs"[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2)u $(id[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2)u) quay.io/terraform-docs/terraform-docs:0.20.0 markdown /terraform-docs > doc.md
 ```
 
 **NOTE:** Docker tag `latest` refers to _latest_ stable released version and `edge`
@@ -109,17 +109,17 @@ To use terraform-docs GitHub Action, configure a YAML workflow file (e.g.
 ```yaml
 name: Generate terraform docs
 on:
- [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3) pull_request
+ [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2) pull_request
 
 jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-   [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3) uses: actions/checkout@v3
+   [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2) uses: actions/checkout@v3
       with:
         ref: ${{ github.event.pull_request.head.ref }}
 
-   [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3) name: Render terraform docs and push changes back to PR
+   [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2) name: Render terraform docs and push changes back to PR
       uses: terraform-docs/gh-actions@main
       with:
         working-dir: .
@@ -141,10 +141,10 @@ in the root of your Git repo with at least the following content:
 
 ```yaml
 repos:
- [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3) repo: https://github.com/terraform-docs/terraform-docs
+ [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2) repo: https://github.com/terraform-docs/terraform-docs
     rev: "v0.20.0"
     hooks:
-     [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3) id: terraform-docs-go
+     [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2) id: terraform-docs-go
         args: ["markdown", "table", "--output-file", "README.md", "./mymodule/path"]
 ```
 
@@ -192,9 +192,9 @@ output:
   file: ""
   mode: inject
   template: |-
-    <!-- BEGIN_TF_DOCS[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3)->
+    <!-- BEGIN_TF_DOCS[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2)->
     {{ .Content }}
-    <!-- END_TF_DOCS[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3)->
+    <!-- END_TF_DOCS[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2)->
 
 output-values:
   enabled: false
@@ -287,7 +287,7 @@ content: |-
   ## Resources
 
   {{ range .Module.Resources }}
- [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3) {{ .GetMode }}.{{ .Spec }} ({{ .Position.Filename }}#{{ .Position.Line }})
+ [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2) {{ .GetMode }}.{{ .Spec }} ({{ .Position.Filename }}#{{ .Position.Line }})
   {{- end }}
 ````
 
@@ -396,11 +396,11 @@ repository from it by clicking on `Use this template` button.
 ## Documentation
 
 - **Users**
- [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3) Read the [User Guide] to learn how to use terraform-docs
- [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3) Read the [Formats Guide] to learn about different output formats of terraform-docs
- [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3) Refer to [Config File Reference] for all the available configuration options
+ [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2) Read the [User Guide] to learn how to use terraform-docs
+ [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2) Read the [Formats Guide] to learn about different output formats of terraform-docs
+ [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2) Refer to [Config File Reference] for all the available configuration options
 - **Developers**
- [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3) Read [Contributing Guide] before submitting a pull request
+ [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2) Read [Contributing Guide] before submitting a pull request
 
 Visit [our website] for all documentation.
 
@@ -410,7 +410,7 @@ Visit [our website] for all documentation.
 
 ## License
 
-MIT License[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.3) Copyright (c) 2021 The terraform-docs Authors.
+MIT License[Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.2) Copyright (c) 2021 The terraform-docs Authors.
 
 [Chocolatey]: https://www.chocolatey.org
 [Config File Reference]: https://terraform-docs.io/user-guide/configuration/
