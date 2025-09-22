@@ -78,7 +78,7 @@ resource "azurerm_network_interface" "security_appliance" {
 
 # Create the secure route table
 module "route_table" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
 
   # Route table configuration
   name                = "rt-sec-${var.random_suffix}"

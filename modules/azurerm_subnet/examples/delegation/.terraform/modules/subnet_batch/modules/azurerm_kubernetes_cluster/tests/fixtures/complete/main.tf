@@ -83,7 +83,7 @@ resource "azurerm_role_assignment" "network_contributor" {
 
 # Create the AKS cluster with comprehensive configuration
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.3"
 
   # Core configuration
   name                = "aks-dpc-cmp-${var.random_suffix}"

@@ -77,7 +77,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # Data Lake Storage Gen2 Account
 module "data_lake_storage" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.3"
 
   name                = "stdatalakegen2example"
   resource_group_name = azurerm_resource_group.example.name

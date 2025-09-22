@@ -154,7 +154,7 @@ resource "azurerm_resource_group" "test" {
 
 # Module configuration for validation testing
 module "route_table_validation" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
 
   # Use provided name or default name
   name                = var.name != "" ? var.name : "rt-neg-${var.random_suffix}"

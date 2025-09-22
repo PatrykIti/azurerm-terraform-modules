@@ -3,7 +3,7 @@
 ## Module Version
 
 <!-- BEGIN_VERSION -->
-Current version: **SAv1.0.0**
+Current version: **1.2.2**
 <!-- END_VERSION -->
 
 ## Description
@@ -62,7 +62,7 @@ module "storage_account" {
 - [Identity Access](examples/identity-access) - This example demonstrates how to configure an Azure Storage Account with **keyless authentication** using managed identities and Microsoft Entra ID (formerly Azure AD) integration. This approach eliminates the need for shared access keys, providing enhanced security through identity-based access control.
 - [Multi Region](examples/multi-region) - This example demonstrates a comprehensive multi-region Azure Storage Account deployment strategy with enhanced disaster recovery capabilities, cross-tenant replication, and optimized geo-redundancy configurations.
 - [Secure](examples/secure) - This example demonstrates a maximum-security Azure Storage Account configuration suitable for highly sensitive data and regulated environments.
-- [Secure Private Endpoint](examples/secure-private-endpoint) - This example demonstrates how to deploy a highly secure Azure Storage Account suitable for production environments handling sensitive data (Note: Private endpoints should be created separately outside this module).
+- [Secure Private Endpoint](examples/secure-private-endpoint) - This example demonstrates how to deploy a highly secure Azure Storage Account suitable for production environments handling sensitive data.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->

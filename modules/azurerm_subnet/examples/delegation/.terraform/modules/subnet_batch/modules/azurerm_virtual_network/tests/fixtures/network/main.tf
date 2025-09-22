@@ -24,7 +24,7 @@ resource "azurerm_resource_group" "test" {
 
 # Virtual Network - Simple module call without subnets
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.3"
 
   name                    = "vnet-dpc-net-${var.random_suffix}"
   resource_group_name     = azurerm_resource_group.test.name

@@ -142,7 +142,7 @@ data "azurerm_client_config" "current" {}
 
 # Highly secure Storage Account
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.3"
 
   name                = "stsecureexample001"
   resource_group_name = azurerm_resource_group.example.name

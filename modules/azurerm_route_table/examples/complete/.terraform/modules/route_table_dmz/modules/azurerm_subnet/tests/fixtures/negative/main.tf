@@ -22,7 +22,7 @@ resource "azurerm_virtual_network" "test" {
 
 # This should fail due to invalid address prefix
 module "subnet" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.3"
 
   name                 = "subnettest"
   resource_group_name  = azurerm_resource_group.test.name

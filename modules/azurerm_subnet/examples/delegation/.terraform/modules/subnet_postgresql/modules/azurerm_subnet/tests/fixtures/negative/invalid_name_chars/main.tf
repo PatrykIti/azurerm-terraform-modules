@@ -1,5 +1,5 @@
 module "subnet" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.3"
 
   name                 = "subnet-with-invalid!@#chars" # Invalid characters
   resource_group_name  = "test-rg"

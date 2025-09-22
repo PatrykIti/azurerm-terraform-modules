@@ -68,7 +68,7 @@ resource "azurerm_network_interface" "nva" {
 
 # Create the route table with comprehensive configuration
 module "route_table" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.3"
 
   # Route table configuration
   name                = "rt-com-${var.random_suffix}"

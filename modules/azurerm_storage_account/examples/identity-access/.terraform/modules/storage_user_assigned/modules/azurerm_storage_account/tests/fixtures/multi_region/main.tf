@@ -27,7 +27,7 @@ resource "azurerm_resource_group" "secondary" {
 
 # Primary storage account with GRS replication
 module "primary_storage" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
 
   name                     = "dpcmpr${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.primary.name
@@ -94,7 +94,7 @@ module "primary_storage" {
 
 # Secondary storage account in different region
 module "secondary_storage" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
 
   name                     = "dpcmsc${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.secondary.name

@@ -24,7 +24,7 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.3"
 
   # Invalid: name too long (81 characters)
   name                = "vnet-this-is-a-very-long-name-that-exceeds-the-maximum-allowed-length-of-eighty-c"

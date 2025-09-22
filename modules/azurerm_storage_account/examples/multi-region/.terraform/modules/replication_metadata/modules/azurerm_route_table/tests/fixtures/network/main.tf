@@ -160,7 +160,7 @@ resource "azurerm_virtual_network_peering" "spoke2_to_hub" {
 
 # Hub route table
 module "hub_route_table" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
 
   name                = "rt-hub-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
@@ -194,7 +194,7 @@ module "hub_route_table" {
 
 # Spoke1 route table
 module "spoke1_route_table" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
 
   name                = "rt-spoke1-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
@@ -235,7 +235,7 @@ module "spoke1_route_table" {
 
 # Spoke2 route table
 module "spoke2_route_table" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
 
   name                = "rt-spoke2-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name

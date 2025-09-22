@@ -65,7 +65,7 @@ resource "azurerm_role_assignment" "network_contributor" {
 }
 
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.3"
 
   name                = "aks-dpc-sec-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
