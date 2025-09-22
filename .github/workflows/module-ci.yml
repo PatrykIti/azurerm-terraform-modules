@@ -7,13 +7,6 @@ on:
       - 'shared/**'
       - '.github/workflows/module-ci.yml'
       - '.github/actions/**'
-  push:
-    branches:
-      - main
-      - 'release/**'
-    paths:
-      - 'modules/**'
-      - 'shared/**'
   workflow_dispatch:
     inputs:
       test_type:
