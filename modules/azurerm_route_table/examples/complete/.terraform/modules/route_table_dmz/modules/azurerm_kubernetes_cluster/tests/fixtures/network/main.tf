@@ -24,7 +24,7 @@ resource "azurerm_subnet" "test" {
 
 # Test with network configuration
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.3"
 
   name                = "aks-dpc-net-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name

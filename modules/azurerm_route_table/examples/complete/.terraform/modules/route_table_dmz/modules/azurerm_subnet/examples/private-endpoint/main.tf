@@ -216,7 +216,7 @@ resource "azurerm_route_table" "secure" {
 
 # Secure Subnet configuration
 module "subnet" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.3"
 
   name                 = "subnet-secure-example"
   resource_group_name  = azurerm_resource_group.example.name

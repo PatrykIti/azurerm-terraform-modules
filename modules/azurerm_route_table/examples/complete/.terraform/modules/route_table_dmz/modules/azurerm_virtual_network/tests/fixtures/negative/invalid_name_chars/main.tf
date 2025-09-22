@@ -24,7 +24,7 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.3"
 
   # Invalid: name contains spaces (invalid characters)
   name                = "vnet with spaces"
