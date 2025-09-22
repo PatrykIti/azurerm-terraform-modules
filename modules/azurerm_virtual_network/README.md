@@ -3,7 +3,7 @@
 ## Module Version
 
 <!-- BEGIN_VERSION -->
-Current version: **vUnreleased**
+Current version: **1.1.2**
 <!-- END_VERSION -->
 
 ## Description
@@ -87,7 +87,10 @@ module "secure_virtual_network" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-<!-- Examples list will be auto-generated here -->
+- [Basic](examples/basic) - This example demonstrates a basic Virtual Network configuration using secure defaults and minimal setup.
+- [Complete](examples/complete) - This example demonstrates a comprehensive deployment of Virtual Network with all available features and configurations.
+- [Private Endpoint](examples/private-endpoint) - This example demonstrates a Virtual Network configuration with private endpoint connectivity for enhanced security and network isolation.
+- [Secure](examples/secure) - This example demonstrates a maximum-security Virtual Network configuration suitable for highly sensitive data and regulated environments.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
