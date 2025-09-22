@@ -39,7 +39,7 @@ resource "azurerm_subnet" "test" {
 
 # Create the AKS cluster
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
 
   # Basic cluster configuration
   name                = "aks-dpc-bas-${var.random_suffix}"
