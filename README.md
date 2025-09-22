@@ -1,206 +1,432 @@
-# Azure Terraform Modules Repository
+# terraform-docs
 
-## Project Overview
+[![Build Status](https://github.com/terraform-docs/terraform-docs/workflows/ci/badge.svg)](https://github.com/terraform-docs/terraform-docs/actions) [![GoDoc](https://pkg.go.dev/badge/github.com/terraform-docs/terraform-docs)](https://pkg.go.dev/github.com/terraform-docs/terraform-docs) [![Go Report Card](https://goreportcard.com/badge/github.com/terraform-docs/terraform-docs)](https://goreportcard.com/report/github.com/terraform-docs/terraform-docs) [![Codecov Report](https://codecov.io/gh/terraform-docs/terraform-docs/branch/master/graph/badge.svg)](https://codecov.io/gh/terraform-docs/terraform-docs) [![License](https://img.shields.io/github/license/terraform-docs/terraform-docs)](https://github.com/terraform-docs/terraform-docs/blob/master/LICENSE) [![Latest release](https://img.shields.io/github/v/release/terraform-docs/terraform-docs)](https://github.com/terraform-docs/terraform-docs/releases)
 
-This repository is a comprehensive collection of production-ready Terraform modules for Microsoft Azure infrastructure deployment. It follows HashiCorp best practices and enterprise security standards to provide reusable, secure, and scalable infrastructure components for Azure cloud environments.
+![terraform-docs-teaser](./images/terraform-docs-teaser.png)
 
-## Goals and Objectives
+## What is terraform-docs
 
-### Primary Goals
-1. **Standardization**: Provide consistent, reusable Terraform modules for common Azure resources
-2. **Security-First**: Implement secure-by-default configurations with enterprise-grade security controls
-3. **Compliance**: Support major compliance standards (SOC 2, ISO 27001, GDPR, PCI DSS)
-4. **Automation**: Fully automated versioning, documentation, and release processes
-5. **Quality**: Comprehensive testing at multiple levels (unit, integration, E2E)
+A utility to generate documentation from Terraform modules in various output formats.
 
-### Objectives
-- Create production-ready modules that can be used across different organizations
-- Minimize manual processes through automation (CI/CD, documentation, releases)
-- Provide clear examples and documentation for each module
-- Ensure modules are cost-optimized and performant
-- Support multi-region deployments and disaster recovery scenarios
+## Installation
 
-## Architecture and Structure
+macOS users can install using [Homebrew]:
 
-### Repository Architecture
-
-```
-azurerm-terraform-modules/
-├── modules/                     # Individual Terraform modules
-│   └── azurerm_<resource>/     # Module for specific Azure resource
-│       ├── main.tf             # Main resource definitions
-│       ├── variables.tf        # Input variables
-│       ├── outputs.tf          # Output values
-│       ├── versions.tf         # Provider requirements
-│       ├── examples/           # Usage examples
-│       ├── tests/              # Unit and integration tests
-│       └── README.md          # Module documentation
-├── docs/                       # Shared documentation
-├── scripts/                    # Automation scripts
-├── .github/                    # GitHub Actions workflows
-│   ├── workflows/              # CI/CD pipelines
-│   └── actions/               # Reusable composite actions
-├── .claude/                    # AI development guidelines
-│   └── references/            # Development reference docs
-└── .taskmaster/               # TaskMaster configuration
+```bash
+brew install terraform-docs
 ```
 
-### Module Architecture
+or
 
-Each module follows a standardized structure:
-- **Flat module design**: No nested modules for simplicity
-- **Single responsibility**: Each module manages one Azure resource type
-- **Composable**: Modules can be combined for complex architectures
-- **Self-contained**: All module dependencies are explicit
+```bash
+brew install terraform-docs/tap/terraform-docs
+```
 
-### CI/CD Architecture
+Windows users can install using [Scoop]:
 
-The repository uses a sophisticated GitHub Actions architecture:
-- **Dynamic module discovery**: Automatically detects changed modules
-- **Parallel execution**: Tests and validates multiple modules concurrently
-- **Composite actions**: Reusable workflows via module-runner pattern
-- **Automated releases**: Semantic versioning with zero manual intervention
+```bash
+scoop bucket add terraform-docs https://github.com/terraform-docs/scoop-bucket
+scoop install terraform-docs
+```
 
-## Key Features and Capabilities
+or [Chocolatey]:
 
-### 1. Security Features
-- **Secure defaults**: All security settings enabled by default
-- **Network isolation**: Private endpoint support for all applicable resources
-- **Encryption**: At-rest and in-transit encryption enforced
-- **Identity-based access**: Managed identities preferred over keys
-- **Compliance scanning**: Automated security checks in CI/CD
+```bash
+choco install terraform-docs
+```
 
-### 2. Module Features
-- **Comprehensive variable validation**: Prevents misconfiguration
-- **Flexible configuration**: Support for simple to complex deployments
-- **Rich examples**: Multiple examples per module (basic, secure, complete)
-- **Enterprise features**: Diagnostic settings, monitoring, backup, DR
+Stable binaries are also available on the [releases] page. To install, download the
+binary for your platform from "Assets" and place this into your `$PATH`:
 
-### 3. Development Features
-- **AI-assisted development**: Integrated with Claude and TaskMaster
-- **Automated documentation**: terraform-docs integration
-- **Conventional commits**: Enforced for automated versioning
-- **Pre-commit hooks**: Local validation before commits
-- **Multi-agent support**: Coordination between multiple Claude instances
+```bash
+curl[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5)Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.20.0/terraform-docs-v0.20.0-$(uname)-amd64.tar.gz
+tar[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5)xzf terraform-docs.tar.gz
+chmod +x terraform-docs
+mv terraform-docs /usr/local/bin/terraform-docs
+```
 
-### 4. Testing Capabilities
-- **Multi-level testing pyramid**: Static → Unit → Integration → E2E
-- **Native Terraform tests**: Fast unit testing with mocks
-- **Terratest integration**: Real infrastructure validation
-- **Cost optimization**: Mock strategies for expensive resources
-- **Security testing**: Continuous compliance validation
+**NOTE:** Windows releases are in `ZIP` format.
 
-## Technology Stack
+The latest version can be installed using `go install` or `go get`:
 
-### Core Technologies
-- **Terraform**: >= 1.5.0 (Infrastructure as Code)
-- **Azure Provider**: >= 3.0.0 (Cloud provider)
-- **Go**: >= 1.19 (Testing framework)
-- **Node.js**: For semantic-release automation
+```bash
+# go1.17+
+go install github.com/terraform-docs/terraform-docs@v0.20.0
+```
 
-### Development Tools
-- **terraform-docs**: Automatic documentation generation
-- **TFLint**: Terraform linting and best practices
-- **Checkov**: Infrastructure security scanning
-- **tfsec**: Terraform-specific security analysis
-- **Terratest**: Go-based infrastructure testing
+```bash
+# go1.16
+GO111MODULE="on" go get github.com/terraform-docs/terraform-docs@v0.20.0
+```
 
-### CI/CD Tools
-- **GitHub Actions**: Primary CI/CD platform
-- **semantic-release**: Automated versioning and changelog
-- **Commitizen**: Conventional commit helper
-- **Husky**: Git hooks management
+**NOTE:** please use the latest Go to do this, minimum `go1.16` is required.
 
-### AI/Automation Tools
-- **Claude**: AI development assistant
-- **TaskMaster**: Task management and tracking
-- **MCP (Model Context Protocol)**: Tool integration
-- **Gemini/Perplexity**: Research and analysis
+This will put `terraform-docs` in `$(go env GOPATH)/bin`. If you encounter the error
+`terraform-docs: command not found` after installation then you may need to either add
+that directory to your `$PATH` as shown [here] or do a manual installation by cloning
+the repo and run `make build` from the repository which will put `terraform-docs` in:
 
-## Development Methodologies
+```bash
+$(go env GOPATH)/src/github.com/terraform-docs/terraform-docs/bin/$(uname | tr '[:upper:]' '[:lower:]')-amd64/terraform-docs
+```
 
-### 1. Infrastructure as Code (IaC) Principles
-- **Declarative configuration**: Define desired state
-- **Version control**: All infrastructure in Git
-- **Immutable infrastructure**: Replace rather than modify
-- **Idempotency**: Safe to apply multiple times
+## Usage
 
-### 2. GitOps Workflow
-- **Git as single source of truth**
-- **Pull request-based changes**
-- **Automated validation and testing**
-- **Audit trail through Git history**
+### Running the binary directly
 
-### 3. DevSecOps Integration
-- **Security scanning in CI/CD**
-- **Compliance as code**
-- **Automated vulnerability management**
-- **Security-first module design**
+To run and generate documentation into README within a directory:
 
-### 4. Agile/Scrum Elements
-- **TaskMaster integration for sprint planning**
-- **Iterative module development**
-- **Continuous improvement**
-- **Regular releases**
+```bash
+terraform-docs markdown table[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5)-output-file README.md[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5)-output-mode inject /path/to/module
+```
 
-## Module Inventory
+Check [`output`] configuration for more details and examples.
 
-### Production Ready Modules
-1. **Storage Account** (SAv1.0.0)
-   - Comprehensive Azure Storage with enterprise features
-   - Support for Data Lake Gen2, SFTP, private endpoints
-   - Advanced lifecycle management and security policies
+### Using docker
 
-### Planned Modules (Roadmap)
-- **Virtual Network**: Advanced networking with security features
-- **Key Vault**: Enterprise secret management
-- **Application Gateway**: Layer 7 load balancing with WAF
-- **SQL Database**: Managed database with security features
-- **App Service**: Web application hosting platform
+terraform-docs can be run as a container by mounting a directory with `.tf`
+files in it and run the following command:
 
-## Quality Standards
+```bash
+docker run[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5)-rm[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5)-volume "$(pwd):/terraform-docs"[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5)u $(id[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5)u) quay.io/terraform-docs/terraform-docs:0.20.0 markdown /terraform-docs
+```
 
-### Code Quality
-- **Naming conventions**: Strict adherence to patterns
-- **Resource naming**: Match resource type without provider prefix
-- **Variable design**: Grouped configurations with validation
-- **Documentation**: Comprehensive README for each module
+If `output.file` is not enabled for this module, generated output can be redirected
+back to a file:
 
-### Security Standards
-- **Least privilege access**
-- **Defense in depth**
-- **Zero trust principles**
-- **Encryption by default**
+```bash
+docker run[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5)-rm[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5)-volume "$(pwd):/terraform-docs"[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5)u $(id[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5)u) quay.io/terraform-docs/terraform-docs:0.20.0 markdown /terraform-docs > doc.md
+```
 
-### Testing Standards
-- **100% example coverage**: All features demonstrated
-- **Security validation**: Compliance checks in tests
-- **Performance benchmarks**: Deployment time tracking
-- **Cost optimization**: Minimal test infrastructure
+**NOTE:** Docker tag `latest` refers to _latest_ stable released version and `edge`
+refers to HEAD of `master` at any given point in time.
 
-## Project Philosophy
+### Using GitHub Actions
 
-1. **Nothing Manual**: Everything that can be automated should be
-2. **Security First**: Never compromise security for convenience
-3. **Developer Experience**: Make the right thing the easy thing
-4. **Community Driven**: Open source with clear contribution guidelines
-5. **Enterprise Ready**: Production-grade from day one
+To use terraform-docs GitHub Action, configure a YAML workflow file (e.g.
+`.github/workflows/documentation.yml`) with the following:
 
-## Integration Capabilities
+```yaml
+name: Generate terraform docs
+on:
+ [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5) pull_request
 
-- **GitHub Projects**: Native project management integration
-- **Azure DevOps**: Compatible with ADO pipelines
-- **Terraform Cloud/Enterprise**: Remote backend support
-- **Service Management**: Integration with ITSM tools
-- **Monitoring**: Azure Monitor and third-party APM tools
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+   [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5) uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
 
-## Success Metrics
+   [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5) name: Render terraform docs and push changes back to PR
+      uses: terraform-docs/gh-actions@main
+      with:
+        working-dir: .
+        output-file: README.md
+        output-method: inject
+        git-push: "true"
+```
 
-- **Module adoption rate**: Usage across projects
-- **Security compliance**: 100% passing security scans
-- **Test coverage**: >80% code coverage
-- **Documentation completeness**: All modules fully documented
-- **Release frequency**: Regular updates and improvements
-- **Community engagement**: Issues, PRs, and discussions
+Read more about [terraform-docs GitHub Action] and its configuration and
+examples.
 
-This repository represents a best-in-class implementation of Terraform modules for Azure, combining security, automation, and developer experience into a comprehensive infrastructure-as-code solution.
+### pre-commit hook
+
+With pre-commit, you can ensure your Terraform module documentation is kept
+up-to-date each time you make a commit.
+
+First [install pre-commit] and then create or update a `.pre-commit-config.yaml`
+in the root of your Git repo with at least the following content:
+
+```yaml
+repos:
+ [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5) repo: https://github.com/terraform-docs/terraform-docs
+    rev: "v0.20.0"
+    hooks:
+     [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5) id: terraform-docs-go
+        args: ["markdown", "table", "--output-file", "README.md", "./mymodule/path"]
+```
+
+Then run:
+
+```bash
+pre-commit install
+pre-commit install-hooks
+```
+
+Further changes to your module's `.tf` files will cause an update to documentation
+when you make a commit.
+
+## Configuration
+
+terraform-docs can be configured with a yaml file. The default name of this file is
+`.terraform-docs.yml` and the path order for locating it is:
+
+1. root of module directory
+1. `.config/` folder at root of module directory
+1. current directory
+1. `.config/` folder at current directory
+1. `$HOME/.tfdocs.d/`
+
+```yaml
+formatter: "" # this is required
+
+version: ""
+
+header-from: main.tf
+footer-from: ""
+
+recursive:
+  enabled: false
+  path: modules
+  include-main: true
+
+sections:
+  hide: []
+  show: []
+
+content: ""
+
+output:
+  file: ""
+  mode: inject
+  template: |-
+    <!-- BEGIN_TF_DOCS[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5)->
+    {{ .Content }}
+    <!-- END_TF_DOCS[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5)->
+
+output-values:
+  enabled: false
+  from: ""
+
+sort:
+  enabled: true
+  by: name
+
+settings:
+  anchor: true
+  color: true
+  default: true
+  description: false
+  escape: true
+  hide-empty: false
+  html: true
+  indent: 2
+  lockfile: true
+  read-comments: true
+  required: true
+  sensitive: true
+  type: true
+```
+
+## Content Template
+
+Generated content can be customized further away with `content` in configuration.
+If the `content` is empty the default order of sections is used.
+
+Compatible formatters for customized content are `asciidoc` and `markdown`. `content`
+will be ignored for other formatters.
+
+`content` is a Go template with following additional variables:
+
+- `{{ .Header }}`
+- `{{ .Footer }}`
+- `{{ .Inputs }}`
+- `{{ .Modules }}`
+- `{{ .Outputs }}`
+- `{{ .Providers }}`
+- `{{ .Requirements }}`
+- `{{ .Resources }}`
+
+and following functions:
+
+- `{{ include "relative/path/to/file" }}`
+
+These variables are the generated output of individual sections in the selected
+formatter. For example `{{ .Inputs }}` is Markdown Table representation of _inputs_
+when formatter is set to `markdown table`.
+
+Note that sections visibility (i.e. `sections.show` and `sections.hide`) takes
+precedence over the `content`.
+
+Additionally there's also one extra special variable avaialble to the `content`:
+
+- `{{ .Module }}`
+
+As opposed to the other variables mentioned above, which are generated sections
+based on a selected formatter, the `{{ .Module }}` variable is just a `struct`
+representing a [Terraform module].
+
+````yaml
+content: |-
+  Any arbitrary text can be placed anywhere in the content
+
+  {{ .Header }}
+
+  and even in between sections
+
+  {{ .Providers }}
+
+  and they don't even need to be in the default order
+
+  {{ .Outputs }}
+
+  include any relative files
+
+  {{ include "relative/path/to/file" }}
+
+  {{ .Inputs }}
+
+  # Examples
+
+  ```hcl
+  {{ include "examples/foo/main.tf" }}
+  ```
+
+  ## Resources
+
+  {{ range .Module.Resources }}
+ [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5) {{ .GetMode }}.{{ .Spec }} ({{ .Position.Filename }}#{{ .Position.Line }})
+  {{- end }}
+````
+
+## Build on top of terraform-docs
+
+terraform-docs primary use-case is to be utilized as a standalone binary, but
+some parts of it is also available publicly and can be imported in your project
+as a library.
+
+```go
+import (
+    "github.com/terraform-docs/terraform-docs/format"
+    "github.com/terraform-docs/terraform-docs/print"
+    "github.com/terraform-docs/terraform-docs/terraform"
+)
+
+// buildTerraformDocs for module root `path` and provided content `tmpl`.
+func buildTerraformDocs(path string, tmpl string) (string, error) {
+    config := print.DefaultConfig()
+    config.ModuleRoot = path // module root path (can be relative or absolute)
+
+    module, err := terraform.LoadWithOptions(config)
+    if err != nil {
+        return "", err
+    }
+
+    // Generate in Markdown Table format
+    formatter := format.NewMarkdownTable(config)
+
+    if err := formatter.Generate(module); err != nil {
+        return "", err
+    }
+
+    // // Note: if you don't intend to provide additional template for the generated
+    // // content, or the target format doesn't provide templating (e.g. json, yaml,
+    // // xml, or toml) you can use `Content()` function instead of `Render()`.
+    // // `Content()` returns all the sections combined with predefined order.
+    // return formatter.Content(), nil
+
+    return formatter.Render(tmpl)
+}
+```
+
+## Plugin
+
+Generated output can be heavily customized with [`content`], but if using that
+is not enough for your use-case, you can write your own plugin.
+
+In order to install a plugin the following steps are needed:
+
+- download the plugin and place it in `~/.tfdocs.d/plugins` (or `./.tfdocs.d/plugins`)
+- make sure the plugin file name is `tfdocs-format-<NAME>`
+- modify [`formatter`] of `.terraform-docs.yml` file to be `<NAME>`
+
+**Important notes:**
+
+- if the plugin file name is different than the example above, terraform-docs won't
+be able to to pick it up nor register it properly
+- you can only use plugin thorough `.terraform-docs.yml` file and it cannot be used
+with CLI arguments
+
+To create a new plugin create a new repository called `tfdocs-format-<NAME>` with
+following `main.go`:
+
+```go
+package main
+
+import (
+    _ "embed" //nolint
+
+    "github.com/terraform-docs/terraform-docs/plugin"
+    "github.com/terraform-docs/terraform-docs/print"
+    "github.com/terraform-docs/terraform-docs/template"
+    "github.com/terraform-docs/terraform-docs/terraform"
+)
+
+func main() {
+    plugin.Serve(&plugin.ServeOpts{
+        Name:    "<NAME>",
+        Version: "0.1.0",
+        Printer: printerFunc,
+    })
+}
+
+//go:embed sections.tmpl
+var tplCustom []byte
+
+// printerFunc the function being executed by the plugin client.
+func printerFunc(config *print.Config, module *terraform.Module) (string, error) {
+    tpl := template.New(config,
+        &template.Item{Name: "custom", Text: string(tplCustom)},
+    )
+
+    rendered, err := tpl.Render("custom", module)
+    if err != nil {
+        return "", err
+    }
+
+    return rendered, nil
+}
+```
+
+Please refer to [tfdocs-format-template] for more details. You can create a new
+repository from it by clicking on `Use this template` button.
+
+## Documentation
+
+- **Users**
+ [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5) Read the [User Guide] to learn how to use terraform-docs
+ [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5) Read the [Formats Guide] to learn about different output formats of terraform-docs
+ [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5) Refer to [Config File Reference] for all the available configuration options
+- **Developers**
+ [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5) Read [Contributing Guide] before submitting a pull request
+
+Visit [our website] for all documentation.
+
+## Community
+
+- Discuss terraform-docs on [Slack]
+
+## License
+
+MIT License[Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.5](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.5) Copyright (c) 2021 The terraform-docs Authors.
+
+[Chocolatey]: https://www.chocolatey.org
+[Config File Reference]: https://terraform-docs.io/user-guide/configuration/
+[`content`]: https://terraform-docs.io/user-guide/configuration/content/
+[Contributing Guide]: CONTRIBUTING.md
+[Formats Guide]: https://terraform-docs.io/reference/terraform-docs/
+[`formatter`]: https://terraform-docs.io/user-guide/configuration/formatter/
+[here]: https://golang.org/doc/code.html#GOPATH
+[Homebrew]: https://brew.sh
+[install pre-commit]: https://pre-commit.com/#install
+[`output`]: https://terraform-docs.io/user-guide/configuration/output/
+[releases]: https://github.com/terraform-docs/terraform-docs/releases
+[Scoop]: https://scoop.sh/
+[Slack]: https://slack.terraform-docs.io/
+[terraform-docs GitHub Action]: https://github.com/terraform-docs/gh-actions
+[Terraform module]: https://pkg.go.dev/github.com/terraform-docs/terraform-docs/terraform#Module
+[tfdocs-format-template]: https://github.com/terraform-docs/tfdocs-format-template
+[our website]: https://terraform-docs.io/
+[User Guide]: https://terraform-docs.io/user-guide/introduction/
