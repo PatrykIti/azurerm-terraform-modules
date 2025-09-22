@@ -45,7 +45,7 @@ resource "azurerm_log_analytics_workspace" "test" {
 }
 
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.1"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
 
   name                     = "dpccmp${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
