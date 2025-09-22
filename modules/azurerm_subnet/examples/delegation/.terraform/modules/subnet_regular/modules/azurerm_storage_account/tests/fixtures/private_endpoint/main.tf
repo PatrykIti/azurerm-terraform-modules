@@ -49,7 +49,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "blob" {
 }
 
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.3"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.4"
 
   name                     = "dpcpep${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name

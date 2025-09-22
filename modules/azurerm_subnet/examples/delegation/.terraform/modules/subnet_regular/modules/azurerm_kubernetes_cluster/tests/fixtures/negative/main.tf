@@ -8,7 +8,7 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.3"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.4"
 
   name                = var.cluster_name
   resource_group_name = azurerm_resource_group.test.name

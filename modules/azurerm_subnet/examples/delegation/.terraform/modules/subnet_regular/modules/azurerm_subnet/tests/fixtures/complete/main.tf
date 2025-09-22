@@ -34,7 +34,7 @@ resource "azurerm_storage_account" "example" {
 }
 
 module "subnet" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.3"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.4"
 
   name                 = "snet-complete-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.example.name
