@@ -46,7 +46,24 @@ runs:
       run: |
         # Use consistent version across all workflows
         TERRAFORM_DOCS_VERSION="v0.20.0"
-        curl -sSLo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/${TERRAFORM_DOCS_VERSION}/terraform-docs-${TERRAFORM_DOCS_VERSION}-linux-amd64.tar.gz
+
+        # Download with retry logic
+        for i in {1..3}; do
+          echo "Attempt $i: Downloading terraform-docs..."
+          if curl -sSLf --retry 3 --retry-delay 2 -o ./terraform-docs.tar.gz \
+            "https://github.com/terraform-docs/terraform-docs/releases/download/${TERRAFORM_DOCS_VERSION}/terraform-docs-${TERRAFORM_DOCS_VERSION}-linux-amd64.tar.gz"; then
+            echo "Download successful"
+            break
+          else
+            echo "Download failed, attempt $i/3"
+            if [ $i -eq 3 ]; then
+              echo "All download attempts failed"
+              exit 1
+            fi
+            sleep 5
+          fi
+        done
+
         tar -xzf terraform-docs.tar.gz
         chmod +x terraform-docs
         sudo mv terraform-docs /usr/local/bin/
