@@ -145,8 +145,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
             ./scripts/update-examples-list.sh "modules/${MODULE_NAME}"
           fi
 
-          if command -v terraform-docs > /dev/null 2>&1; then
-            terraform-docs --config "$(pwd)/modules/${MODULE_NAME}/.terraform-docs.yml" --output-file "$(pwd)/modules/${MODULE_NAME}/README.md" --output-mode inject "$(pwd)/modules/${MODULE_NAME}"
+          # Use our safe wrapper script instead of terraform-docs directly
+          # This ensures root README is never overwritten
+          if [ -x "./scripts/update-module-docs.sh" ]; then
+            ./scripts/update-module-docs.sh "${MODULE_NAME}"
           fi
 
           if [ -x "./scripts/update-root-readme.sh" ]; then
