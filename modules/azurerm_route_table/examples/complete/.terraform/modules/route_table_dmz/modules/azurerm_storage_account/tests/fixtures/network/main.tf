@@ -45,7 +45,7 @@ resource "azurerm_subnet" "app" {
 }
 
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.3"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.4"
 
   name                     = "dpcnet${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name
