@@ -81,7 +81,7 @@ resource "azurerm_private_dns_zone" "example" {
 
 # Complete Virtual Network configuration with all features
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.3"
 
   name                = "vnet-complete-example"
   resource_group_name = azurerm_resource_group.example.name

@@ -9,7 +9,7 @@ resource "azurerm_resource_group" "test" {
 
 
 module "network_security_group" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.3"
 
   name                = "nsg-cmp-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name

@@ -102,7 +102,7 @@ resource "azurerm_network_security_group" "test" {
 
 # Secure Virtual Network configuration with enhanced security features
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.3"
 
   name                = "vnet-dpc-sec-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
