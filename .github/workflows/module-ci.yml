@@ -36,7 +36,7 @@ jobs:
       modules: ${{ steps.set-matrix.outputs.modules }}
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       
       # Extract module from PR title if it's a PR
       - name: Extract module from PR title
@@ -185,7 +185,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       
       - name: Setup Terraform
         uses: ./.github/actions/terraform-setup
@@ -209,7 +209,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       
       - name: Azure Login via OIDC
         uses: azure/login@v2
@@ -239,7 +239,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       
       - name: Security Scan Module ${{ matrix.module }}
         uses: ./.github/actions/module-runner
