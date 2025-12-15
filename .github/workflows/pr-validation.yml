@@ -405,7 +405,7 @@ jobs:
           token: ${{ secrets.PAT || github.token }}
       
       - name: Cache tflint plugins
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.tflint.d/plugins
           key: ${{ runner.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
