@@ -12,3 +12,8 @@ output "external_secret_names" {
   description = "ExternalSecret names"
   value       = module.kubernetes_secrets.external_secret_names
 }
+
+output "resource_group_name" {
+  description = "Resource group name"
+  value       = azurerm_resource_group.test.name
+}

@@ -5,7 +5,7 @@
 **Category:** Terraform Module (AKS / Secrets)  
 **Estimated Effort:** Large  
 **Dependencies:** TASK-001 (AKS module stabilizacja)  
-**Status:** ⏳ **To Do**
+**Status:** ✅ **Done** (2025-12-23)
 
 ---
 
@@ -947,48 +947,48 @@ Uwagi implementacyjne:
 
 Generator został już zaktualizowany w **TASK-003** (standard repo, `module.json`/`.releaserc.js`, pin AzureRM `4.57.0`).
 
-- [ ] Użyć `scripts/create-new-module.sh` z nowymi template’ami do wygenerowania szkieletu modułu.
-- [ ] Nie wprowadzać dodatkowych zmian w generatorze w ramach TASK-002.
-- [ ] Dokumentacja generatora: `docs/_TASKS/TASK-003_Module_Scaffold_Fix.md` → sekcja **Specyfikacja CLI (flagi i skladnia)** oraz `docs/PROMPT_FOR_MODULE_CREATION.md` → sekcja **Use scaffolding script**.
+- [x] Użyć `scripts/create-new-module.sh` z nowymi template’ami do wygenerowania szkieletu modułu.
+- [x] Nie wprowadzać dodatkowych zmian w generatorze w ramach TASK-002.
+- [x] Dokumentacja generatora: `docs/_TASKS/TASK-003_Module_Scaffold_Fix.md` → sekcja **Specyfikacja CLI (flagi i skladnia)** oraz `docs/PROMPT_FOR_MODULE_CREATION.md` → sekcja **Use scaffolding script**.
 
 ### TASK-002-1: Skeleton modułu + README
 
-- [ ] Wygenerować szkielet modułu przez `scripts/create-new-module.sh` (templates repo), a następnie **tylko** dostosować/uzupełnić pliki do standardu (AKS jako wzorzec), m.in.:
+- [x] Wygenerować szkielet modułu przez `scripts/create-new-module.sh` (templates repo), a następnie **tylko** dostosować/uzupełnić pliki do standardu (AKS jako wzorzec), m.in.:
   - `main.tf`, `variables.tf`, `outputs.tf`, `versions.tf`
   - `README.md`, `CHANGELOG.md`, `VERSIONING.md`, `CONTRIBUTING.md`, `SECURITY.md`
   - `module.json`, `.releaserc.js`, `.terraform-docs.yml`, `generate-docs.sh`, `Makefile`
-- [ ] Opisać “Decision tree”: kiedy `manual` vs `csi` vs `eso`
-- [ ] Dodać ostrzeżenie o Terraform state dla `manual`
+- [x] Opisać “Decision tree”: kiedy `manual` vs `csi` vs `eso`
+- [x] Dodać ostrzeżenie o Terraform state dla `manual`
 
 ### TASK-002-2: Strategia `manual` (KV → TF → K8s Secret)
 
-- [ ] `data.azurerm_key_vault_secret` dla każdego sekretu (z opcjonalnym `version`)
-- [ ] `kubernetes_secret_v1` (lub `kubernetes_secret`) tworzący jeden Secret z mapą `data`
-- [ ] Walidacje: unikalność kluczy, wymagane pola, spójność `strategy`
+- [x] `data.azurerm_key_vault_secret` dla każdego sekretu (z opcjonalnym `version`)
+- [x] `kubernetes_secret_v1` (lub `kubernetes_secret`) tworzący jeden Secret z mapą `data`
+- [x] Walidacje: unikalność kluczy, wymagane pola, spójność `strategy`
 
 ### TASK-002-3: Strategia `csi` (SecretProviderClass)
 
-- [ ] `kubernetes_manifest` (lub provider `kubectl` jeśli jest standardem repo) tworzący `SecretProviderClass`
-- [ ] Opcjonalnie sync do `Secret` (secretObjects)
-- [ ] Walidacje: poprawne `objectType`, wymagane pola
+- [x] `kubernetes_manifest` (lub provider `kubectl` jeśli jest standardem repo) tworzący `SecretProviderClass`
+- [x] Opcjonalnie sync do `Secret` (secretObjects)
+- [x] Walidacje: poprawne `objectType`, wymagane pola
 
 ### TASK-002-4: Strategia `eso` (SecretStore + ExternalSecret)
 
-- [ ] `kubernetes_manifest` dla `SecretStore`/`ClusterSecretStore`
-- [ ] `kubernetes_manifest` dla `ExternalSecret` (z mapowaniem keys)
-- [ ] Walidacje: wymagane auth/refs, poprawne kind
+- [x] `kubernetes_manifest` dla `SecretStore`/`ClusterSecretStore`
+- [x] `kubernetes_manifest` dla `ExternalSecret` (z mapowaniem keys)
+- [x] Walidacje: wymagane auth/refs, poprawne kind
 
 ### TASK-002-5: Examples + testy
 
-- [ ] Dodać przykłady dla `manual`, `csi`, `eso`
-- [ ] Przykłady utrzymać w strukturze jak AKS module (`README.md`, `main.tf`, `variables.tf`, `outputs.tf` + preferowane `.terraform-docs.yml`)
-- [ ] Dodać fixtures odpowiadające przykładom (spójne nazewnictwo i zawartość)
-- [ ] Struktura testów identyczna jak w innych modułach (AKS jako wzorzec):
+- [x] Dodać przykłady dla `manual`, `csi`, `eso`
+- [x] Przykłady utrzymać w strukturze jak AKS module (`README.md`, `main.tf`, `variables.tf`, `outputs.tf` + preferowane `.terraform-docs.yml`)
+- [x] Dodać fixtures odpowiadające przykładom (spójne nazewnictwo i zawartość)
+- [x] Struktura testów identyczna jak w innych modułach (AKS jako wzorzec):
   - `tests/` z `Makefile`, `README.md`, `test_config.yaml`, `test_helpers.go`
   - `tests/unit/*.tftest.hcl` (walidacje wejść, strategii, nazw)
   - `tests/fixtures/*` odpowiadające przykładom
   - Go testy: `{module}_test.go`, `integration_test.go`, `performance_test.go`
-- [ ] Dodać `terraform test` (unit) + Terratest (integracja) zgodnie z `docs/TESTING_GUIDE/*`
+- [x] Dodać `terraform test` (unit) + Terratest (integracja) zgodnie z `docs/TESTING_GUIDE/*`
 
 ---
 

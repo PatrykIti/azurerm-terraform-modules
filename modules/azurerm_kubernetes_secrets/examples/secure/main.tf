@@ -98,12 +98,12 @@ resource "kubernetes_namespace_v1" "app" {
 }
 
 resource "azurerm_key_vault" "example" {
-  name                       = var.key_vault_name
-  location                   = azurerm_resource_group.example.location
-  resource_group_name        = azurerm_resource_group.example.name
-  tenant_id                  = data.azurerm_client_config.current.tenant_id
-  enable_rbac_authorization  = true
-  sku_name                   = "standard"
+  name                      = var.key_vault_name
+  location                  = azurerm_resource_group.example.location
+  resource_group_name       = azurerm_resource_group.example.name
+  tenant_id                 = data.azurerm_client_config.current.tenant_id
+  enable_rbac_authorization = true
+  sku_name                  = "standard"
 }
 
 resource "azurerm_role_assignment" "kv_admin" {

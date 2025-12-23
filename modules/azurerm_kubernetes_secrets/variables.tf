@@ -14,9 +14,9 @@ variable "strategy" {
   validation {
     condition = (
       var.strategy == "manual" && var.manual != null && var.csi == null && var.eso == null
-    ) || (
+      ) || (
       var.strategy == "csi" && var.csi != null && var.manual == null && var.eso == null
-    ) || (
+      ) || (
       var.strategy == "eso" && var.eso != null && var.manual == null && var.csi == null
     )
     error_message = "Set exactly one strategy block that matches strategy (manual/csi/eso), and keep the others null."
@@ -126,12 +126,12 @@ variable "csi" {
   EOT
 
   type = object({
-    tenant_id                         = string
-    key_vault_name                    = string
-    user_assigned_identity_client_id  = optional(string)
-    sync_to_kubernetes_secret         = optional(bool, false)
-    kubernetes_secret_name            = optional(string)
-    kubernetes_secret_type            = optional(string, "Opaque")
+    tenant_id                        = string
+    key_vault_name                   = string
+    user_assigned_identity_client_id = optional(string)
+    sync_to_kubernetes_secret        = optional(bool, false)
+    kubernetes_secret_name           = optional(string)
+    kubernetes_secret_type           = optional(string, "Opaque")
     objects = list(object({
       name           = string
       object_name    = string
@@ -250,12 +250,12 @@ variable "eso" {
       var.eso.secret_store.auth.workload_identity != null &&
       var.eso.secret_store.auth.service_principal == null &&
       var.eso.secret_store.auth.managed_identity == null
-    ) || (
+      ) || (
       var.eso.secret_store.auth.type == "service_principal" &&
       var.eso.secret_store.auth.service_principal != null &&
       var.eso.secret_store.auth.workload_identity == null &&
       var.eso.secret_store.auth.managed_identity == null
-    ) || (
+      ) || (
       var.eso.secret_store.auth.type == "managed_identity" &&
       var.eso.secret_store.auth.managed_identity != null &&
       var.eso.secret_store.auth.workload_identity == null &&

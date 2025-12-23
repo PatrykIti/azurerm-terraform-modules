@@ -51,11 +51,6 @@ test-network: check-env deps
 	@echo "Running network tests..."
 	go test -v -timeout 20m -run TestNetworkKubernetesSecrets ./...
 
-# Run private endpoint tests
-test-private-endpoint: check-env deps
-	@echo "Running private endpoint tests..."
-	go test -v -timeout 20m -run TestKubernetesSecretsPrivateEndpoint ./...
-
 # Run validation tests
 test-validation: check-env deps
 	@echo "Running validation tests..."
@@ -64,13 +59,12 @@ test-validation: check-env deps
 # Run integration tests
 test-integration: check-env deps
 	@echo "Running integration tests..."
-	go test -v -timeout 45m -run TestKubernetesSecretsFullIntegration ./...
+	go test -v -timeout 45m -run TestKubernetesSecretsLifecycle ./...
 
 # Run performance tests
 test-performance: check-env deps
 	@echo "Running performance tests..."
 	go test -v -timeout 60m -run TestKubernetesSecretsCreationTime ./...
-	go test -v -timeout 60m -run TestKubernetesSecretsScaling ./...
 
 # Run benchmarks
 benchmark: check-env deps
@@ -162,7 +156,6 @@ help:
 	@echo "  make test-complete       - Run complete tests"
 	@echo "  make test-secure         - Run security tests"
 	@echo "  make test-network        - Run network tests"
-	@echo "  make test-private-endpoint - Run private endpoint tests"
 	@echo "  make test-validation     - Run validation tests"
 	@echo "  make test-integration    - Run integration tests"
 	@echo "  make test-performance    - Run performance tests"
@@ -179,4 +172,4 @@ help:
 	@echo "  make ci                 - Run CI pipeline"
 	@echo "  make cd                 - Run CD pipeline (includes integration tests)"
 
-.PHONY: check-env deps test test-single test-basic test-complete test-secure test-network test-private-endpoint test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help
+.PHONY: check-env deps test test-single test-basic test-complete test-secure test-network test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help

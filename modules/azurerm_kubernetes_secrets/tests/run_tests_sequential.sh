@@ -40,12 +40,9 @@ tests=(
     "TestCompleteKubernetesSecrets"
     "TestSecureKubernetesSecrets"
     "TestNetworkKubernetesSecrets"
-    "TestKubernetesSecretsPrivateEndpoint"
     "TestKubernetesSecretsValidationRules"
-    "TestKubernetesSecretsFullIntegration"
     "TestKubernetesSecretsLifecycle"
     "TestKubernetesSecretsCreationTime"
-    "BenchmarkKubernetesSecretsCreation"
 )
 
 echo "Starting sequential test execution for azurerm_kubernetes_secrets"

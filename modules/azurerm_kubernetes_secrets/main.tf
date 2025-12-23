@@ -25,11 +25,11 @@ locals {
     ]
   }) : null
 
-  eso_store                    = local.is_eso ? var.eso.secret_store : null
-  eso_vault_url                = local.is_eso ? coalesce(var.eso.secret_store.key_vault_url, "https://${var.eso.secret_store.key_vault_name}.vault.azure.net") : null
-  eso_auth_type                = local.is_eso ? var.eso.secret_store.auth.type : null
-  eso_auth_type_map            = { workload_identity = "WorkloadIdentity", service_principal = "ServicePrincipal", managed_identity = "ManagedIdentity" }
-  eso_service_principal_secret = local.is_eso && local.eso_auth_type == "service_principal" ? "${var.name}-eso-sp" : null
+  eso_store                       = local.is_eso ? var.eso.secret_store : null
+  eso_vault_url                   = local.is_eso ? coalesce(var.eso.secret_store.key_vault_url, "https://${var.eso.secret_store.key_vault_name}.vault.azure.net") : null
+  eso_auth_type                   = local.is_eso ? var.eso.secret_store.auth.type : null
+  eso_auth_type_map               = { workload_identity = "WorkloadIdentity", service_principal = "ServicePrincipal", managed_identity = "ManagedIdentity" }
+  eso_service_principal_secret    = local.is_eso && local.eso_auth_type == "service_principal" ? "${var.name}-eso-sp" : null
   eso_workload_identity_client_id = local.is_eso && local.eso_auth_type == "workload_identity" ? try(var.eso.secret_store.auth.workload_identity.client_id, null) : null
   eso_managed_identity_id = local.is_eso && local.eso_auth_type == "managed_identity" ? coalesce(
     try(var.eso.secret_store.auth.managed_identity.client_id, null),
@@ -59,9 +59,9 @@ resource "kubernetes_secret_v1" "manual" {
   count = local.is_manual ? 1 : 0
 
   metadata {
-    name      = var.name
-    namespace = var.namespace
-    labels    = var.labels
+    name        = var.name
+    namespace   = var.namespace
+    labels      = var.labels
     annotations = var.annotations
   }
 
@@ -95,11 +95,11 @@ resource "kubernetes_manifest" "secret_provider_class" {
         provider = "azure"
         parameters = merge(
           {
-            usePodIdentity      = "false"
+            usePodIdentity       = "false"
             useVMManagedIdentity = "true"
-            keyvaultName        = each.value.key_vault_name
-            tenantId            = each.value.tenant_id
-            objects             = local.csi_objects_yaml
+            keyvaultName         = each.value.key_vault_name
+            tenantId             = each.value.tenant_id
+            objects              = local.csi_objects_yaml
           },
           try(each.value.user_assigned_identity_client_id, null) != null ? {
             userAssignedIdentityID = each.value.user_assigned_identity_client_id
@@ -132,9 +132,9 @@ resource "kubernetes_secret_v1" "eso_service_principal" {
   count = local.is_eso && local.eso_auth_type == "service_principal" ? 1 : 0
 
   metadata {
-    name      = local.eso_service_principal_secret
-    namespace = var.namespace
-    labels    = var.labels
+    name        = local.eso_service_principal_secret
+    namespace   = var.namespace
+    labels      = var.labels
     annotations = var.annotations
   }
 

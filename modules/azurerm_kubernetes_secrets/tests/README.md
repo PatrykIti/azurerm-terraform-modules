@@ -5,7 +5,7 @@ This directory contains automated tests for the Kubernetes Secrets Terraform mod
 ## Prerequisites
 
 1. **Go**: Version 1.21 or later
-2. **Terraform**: Version 1.3.0 or later
+2. **Terraform**: Version 1.12.2 or later
 3. **Azure CLI**: Authenticated with appropriate permissions
 4. **Azure Service Principal**: With Contributor access to the test subscription
 
@@ -18,7 +18,7 @@ export ARM_SUBSCRIPTION_ID="your-subscription-id"
 export ARM_TENANT_ID="your-tenant-id"
 export ARM_CLIENT_ID="your-client-id"
 export ARM_CLIENT_SECRET="your-client-secret"
-export ARM_LOCATION="West Europe"  # Optional, defaults to West Europe
+export ARM_LOCATION="northeurope"  # Optional, defaults to northeurope
 ```
 
 ## Running Tests
@@ -32,13 +32,13 @@ go mod download
 ### Run All Tests
 
 ```bash
-make test-all
+make test
 ```
 
 ### Run Short Tests Only
 
 ```bash
-make test-short
+make test-quick
 ```
 
 ### Run Integration Tests Only
@@ -50,28 +50,27 @@ make test-integration
 ### Run Specific Test
 
 ```bash
-go test -v -run TestModuleBasic -timeout 30m
+go test -v -run TestBasicKubernetesSecrets -timeout 30m
 ```
 
 ## Test Structure
 
 ### Test Files
 
-- `module_test.go` - Main module functionality tests
-- `integration_test.go` - Integration tests with other Azure services
-- `performance_test.go` - Performance and load tests
+- `kubernetes_secrets_test.go` - Main module functionality tests
+- `integration_test.go` - Lifecycle/idempotency test
+- `performance_test.go` - Performance and timing tests
 - `test_helpers.go` - Common test utilities and helpers
-- `test_config.yaml` - Test configuration and scenarios
+- `unit/*.tftest.hcl` - Native Terraform unit tests
 
 ### Test Fixtures
 
 The `fixtures/` directory contains Terraform configurations for different test scenarios:
 
-- `fixtures/basic/` - Basic module configuration
-- `fixtures/complete/` - Complete feature demonstration
-- `fixtures/secure/` - Security-focused configuration
-- `fixtures/private_endpoint/` - Private endpoint configuration
-- `fixtures/network/` - Network integration tests
+- `fixtures/basic/` - Manual strategy configuration
+- `fixtures/complete/` - CSI strategy configuration
+- `fixtures/secure/` - ESO strategy configuration
+- `fixtures/network/` - Network scenario fixture (manual)
 - `fixtures/negative/` - Negative test cases
 
 ## Test Scenarios
@@ -85,34 +84,18 @@ The `fixtures/` directory contains Terraform configurations for different test s
 
 ### Integration Tests
 
-- Integration with other Azure services
-- Network connectivity tests
-- Security compliance validation
-- Disaster recovery scenarios
-- Monitoring and logging validation
+- Idempotency checks for the basic fixture
 
 ### Performance Tests
 
-- Resource creation time
-- Concurrent deployment handling
-- Resource limits testing
-- Cleanup performance
-
-## Test Configuration
-
-Tests are configured via `test_config.yaml`. Key configuration options:
-
-- **Environments**: Different Azure regions and configurations
-- **Scenarios**: Test case definitions and timeouts
-- **Performance**: Load testing parameters
-- **Integration**: Cross-service testing settings
+- Resource creation time tracking
 
 ## Debugging Tests
 
 ### Verbose Output
 
 ```bash
-go test -v -run TestModuleBasic
+go test -v -run TestBasicKubernetesSecrets
 ```
 
 ### Keep Resources After Test Failure
@@ -121,7 +104,7 @@ Set the `SKIP_TEARDOWN` environment variable:
 
 ```bash
 export SKIP_TEARDOWN=true
-go test -v -run TestModuleBasic
+go test -v -run TestBasicKubernetesSecrets
 ```
 
 ### Debug Terraform
@@ -130,7 +113,7 @@ Enable Terraform debug logging:
 
 ```bash
 export TF_LOG=DEBUG
-go test -v -run TestModuleBasic
+go test -v -run TestBasicKubernetesSecrets
 ```
 
 ## Continuous Integration
@@ -147,21 +130,5 @@ When adding new tests:
 
 1. Follow the existing test structure and naming conventions
 2. Add appropriate fixtures in the `fixtures/` directory
-3. Update `test_config.yaml` if adding new scenarios
-4. Ensure tests are idempotent and clean up resources
-5. Add documentation for any new test scenarios
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Authentication Errors**: Verify Azure credentials and permissions
-2. **Resource Conflicts**: Ensure unique resource naming
-3. **Timeout Issues**: Increase test timeouts for complex scenarios
-4. **Quota Limits**: Check Azure subscription quotas
-
-### Getting Help
-
-- Check the [Terratest documentation](https://terratest.gruntwork.io/)
-- Review Azure provider documentation
-- Check module-specific troubleshooting in the main README
+3. Ensure tests are idempotent and clean up resources
+4. Update this README if you add new scenarios
