@@ -1,5 +1,5 @@
-variable "location" {
-  description = "Azure region for resources"
+variable "project_name" {
+  description = "Name of the Azure DevOps project."
   type        = string
-  default     = "West Europe"
+  default     = "ado-project-basic-example"
 }

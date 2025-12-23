@@ -1,29 +1,24 @@
 # Basic Azure DevOps Project Example
 
-This example demonstrates a basic Azure DevOps Project configuration using secure defaults and minimal setup.
+This example demonstrates a basic Azure DevOps project configuration with minimal settings.
 
 ## Features
 
-- Creates a basic azuredevops_project with standard configuration
-- Uses secure defaults following Azure best practices
-- Creates a dedicated resource group
-- Demonstrates basic module usage patterns
-- Uses variables for configuration flexibility
-
-## Key Configuration
-
-This example uses secure defaults and demonstrates:
-- Basic resource creation with minimal configuration
-- Using variables for easy configuration customization
-- Following security best practices by default
+- Creates a private Azure DevOps project
+- Uses Git version control and Agile work item template
+- Adds a small set of tags
 
 ## Usage
 
-```bash
-terraform init
-terraform plan
-terraform apply
-```
+1. Initialize Terraform:
+   ```bash
+   terraform init
+   ```
+2. Review and apply:
+   ```bash
+   terraform plan
+   terraform apply
+   ```
 
 ## Cleanup
 
@@ -32,4 +27,5 @@ terraform destroy
 ```
 
 <!-- BEGIN_TF_DOCS -->
+<!-- This section will be populated by terraform-docs if configured -->
 <!-- END_TF_DOCS -->

@@ -1,4 +1,4 @@
-# Terraform Azure Azure DevOps Project Module
+# Terraform Azure DevOps Project Module
 
 ## Module Version
 
@@ -8,24 +8,25 @@ Current version: **vUnreleased**
 
 ## Description
 
-Manages Azure DevOps projects, settings, tags, dashboards, and permissions
+Manages Azure DevOps projects, settings, tags, dashboards, and permissions.
 
 ## Usage
 
 ```hcl
+provider "azuredevops" {}
+
 module "azuredevops_project" {
   source = "path/to/azuredevops_project"
 
-  # Required variables
-  name                = "example-azuredevops_project"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-
-  # Optional configuration
-  tags = {
-    Environment = "Development"
-    Project     = "Example"
+  project = {
+    name               = "ado-project-basic-example"
+    description        = "Managed by Terraform"
+    visibility         = "private"
+    version_control    = "Git"
+    work_item_template = "Agile"
   }
+
+  project_tags = ["terraform", "example"]
 }
 ```
 

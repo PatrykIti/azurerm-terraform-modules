@@ -1,23 +1,54 @@
-provider "azurerm" {
-  features {}
+provider "azuredevops" {}
+
+provider "random" {}
+
+resource "random_string" "suffix" {
+  length  = 6
+  upper   = false
+  special = false
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-azuredevops_project-secure-example"
-  location = "West Europe"
+data "azuredevops_group" "project_collection_admins" {
+  name = "Project Collection Administrators"
 }
 
 module "azuredevops_project" {
-  source = "../../"
+  source = "../../../"
 
-  name                = "azuredevopsprojectexample003"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-
-  # Add security-focused configuration here
-
-  tags = {
-    Environment = "Production"
-    Example     = "Secure"
+  project = {
+    name               = "${var.project_name}-${random_string.suffix.result}"
+    description        = "Test secure Azure DevOps project"
+    visibility         = "private"
+    version_control    = "Git"
+    work_item_template = "Agile"
   }
+
+  project_features = {
+    boards       = "enabled"
+    repositories = "enabled"
+    pipelines    = "enabled"
+    testplans    = "disabled"
+    artifacts    = "disabled"
+  }
+
+  pipeline_settings = {
+    enforce_job_scope                    = true
+    enforce_referenced_repo_scoped_token = true
+    enforce_settable_var                 = true
+    publish_pipeline_metadata            = false
+    status_badges_are_private            = true
+    enforce_job_scope_for_release        = true
+  }
+
+  project_tags = ["test", "secure"]
+
+  project_permissions = [
+    {
+      principal = data.azuredevops_group.project_collection_admins.id
+      permissions = {
+        GENERIC_READ = "Allow"
+      }
+      replace = false
+    }
+  ]
 }

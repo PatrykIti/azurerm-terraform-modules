@@ -1,9 +1,7 @@
-output "azuredevops_project_id" {
-  description = "The ID of the created Azure DevOps Project"
-  value       = module.azuredevops_project.id
+output "project_id" {
+  value = module.azuredevops_project.project_id
 }
 
-output "azuredevops_project_name" {
-  description = "The name of the created Azure DevOps Project"
-  value       = module.azuredevops_project.name
+output "project_name" {
+  value = module.azuredevops_project.project_name
 }

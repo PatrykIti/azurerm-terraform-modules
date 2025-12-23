@@ -1,34 +1,25 @@
 # Secure Azure DevOps Project Example
 
-This example demonstrates a maximum-security Azure DevOps Project configuration suitable for highly sensitive data and regulated environments.
+This example demonstrates a security-focused Azure DevOps project configuration with restrictive pipeline settings and limited features.
 
 ## Features
 
-- Maximum security configuration with all security features enabled
-- Network isolation and private endpoints
-- Advanced threat protection
-- Comprehensive audit logging and monitoring
-- Encryption at rest and in transit
-- Compliance-ready configuration
-
-## Key Configuration
-
-This example implements defense-in-depth security principles with multiple layers of protection suitable for highly regulated industries and sensitive workloads.
-
-## Security Considerations
-
-- All public access is disabled by default
-- Network access is restricted to specific IP ranges
-- All data is encrypted at rest and in transit
-- Audit logging captures all access and modifications
+- Private project visibility
+- Feature set reduced to core services
+- Strict pipeline security settings
+- Minimal permissions assignment
 
 ## Usage
 
-```bash
-terraform init
-terraform plan
-terraform apply
-```
+1. Initialize Terraform:
+   ```bash
+   terraform init
+   ```
+2. Review and apply:
+   ```bash
+   terraform plan
+   terraform apply
+   ```
 
 ## Cleanup
 
@@ -37,4 +28,5 @@ terraform destroy
 ```
 
 <!-- BEGIN_TF_DOCS -->
+<!-- This section will be populated by terraform-docs if configured -->
 <!-- END_TF_DOCS -->

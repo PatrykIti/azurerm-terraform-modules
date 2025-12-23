@@ -1,21 +1,15 @@
-provider "azurerm" {
-  features {}
-}
-
-resource "azurerm_resource_group" "example" {
-  name     = "rg-azuredevops_project-basic-example"
-  location = "West Europe"
-}
+provider "azuredevops" {}
 
 module "azuredevops_project" {
   source = "../../"
 
-  name                = "azuredevopsprojectexample001"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-
-  tags = {
-    Environment = "Development"
-    Example     = "Basic"
+  project = {
+    name               = var.project_name
+    description        = "Basic Azure DevOps project managed by Terraform"
+    visibility         = "private"
+    version_control    = "Git"
+    work_item_template = "Agile"
   }
+
+  project_tags = ["basic", "terraform"]
 }

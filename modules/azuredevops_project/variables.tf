@@ -1,135 +1,139 @@
-# Core Azure DevOps Project Variables
-variable "name" {
-  description = "The name of the azuredevops_project. Must be globally unique."
-  type        = string
+# -----------------------------------------------------------------------------
+# Core Project Configuration
+# -----------------------------------------------------------------------------
+
+variable "project" {
+  description = "Configuration for the Azure DevOps project."
+  type = object({
+    name               = string
+    description        = optional(string)
+    visibility         = optional(string, "private")
+    version_control    = optional(string, "Git")
+    work_item_template = optional(string, "Agile")
+    features           = optional(map(string))
+  })
 
   validation {
-    condition     = can(regex("^[a-z0-9]{3,24}$", var.name))
-    error_message = "Azure DevOps Project name must be between 3 and 24 characters long and use numbers and lower-case letters only."
-  }
-}
-
-variable "resource_group_name" {
-  description = "The name of the resource group in which to create the azuredevops_project."
-  type        = string
-}
-
-variable "location" {
-  description = "The Azure Region where the Azure DevOps Project should exist."
-  type        = string
-}
-
-# TODO: Add specific configuration variables for this resource type
-# Example variables based on common Azure resource patterns:
-
-# variable "account_tier" {
-#   description = "Defines the Tier to use for this resource. Valid options are Standard and Premium."
-#   type        = string
-#   default     = "Standard"
-#
-#   validation {
-#     condition     = contains(["Standard", "Premium"], var.account_tier)
-#     error_message = "Account tier must be either 'Standard' or 'Premium'."
-#   }
-# }
-
-# variable "account_replication_type" {
-#   description = "Defines the type of replication to use for this resource."
-#   type        = string
-#   default     = "ZRS"
-#
-#   validation {
-#     condition     = contains(["LRS", "GRS", "RAGRS", "ZRS", "GZRS", "RAGZRS"], var.account_replication_type)
-#     error_message = "Valid replication types are LRS, GRS, RAGRS, ZRS, GZRS, RAGZRS."
-#   }
-# }
-
-# Security Configuration
-variable "security_settings" {
-  description = "Security configuration for the azuredevops_project."
-  type = object({
-    https_traffic_only_enabled      = optional(bool, true)
-    min_tls_version                 = optional(string, "TLS1_2")
-    public_network_access_enabled   = optional(bool, false)
-    shared_access_key_enabled       = optional(bool, false)
-    allow_nested_items_to_be_public = optional(bool, false)
-  })
-  default = {
-    https_traffic_only_enabled      = true
-    min_tls_version                 = "TLS1_2"
-    public_network_access_enabled   = false
-    shared_access_key_enabled       = false
-    allow_nested_items_to_be_public = false
+    condition     = trim(var.project.name) != ""
+    error_message = "project.name must not be empty."
   }
 
   validation {
-    condition     = contains(["TLS1_0", "TLS1_1", "TLS1_2"], var.security_settings.min_tls_version)
-    error_message = "The min_tls_version must be one of: TLS1_0, TLS1_1, TLS1_2."
+    condition     = contains(["private", "public"], lower(var.project.visibility))
+    error_message = "project.visibility must be one of: private, public."
   }
-}
-
-# Network Rules
-variable "network_rules" {
-  description = "Network rules configuration for the azuredevops_project."
-  type = object({
-    default_action             = optional(string, "Deny")
-    bypass                     = optional(list(string), ["AzureServices"])
-    ip_rules                   = optional(list(string), [])
-    virtual_network_subnet_ids = optional(list(string), [])
-  })
-  default = null
 
   validation {
-    condition     = var.network_rules == null || contains(["Allow", "Deny"], var.network_rules.default_action)
-    error_message = "The default_action must be either 'Allow' or 'Deny'."
+    condition     = contains(["Git", "Tfvc"], var.project.version_control)
+    error_message = "project.version_control must be one of: Git, Tfvc."
+  }
+
+  validation {
+    condition = var.project.features == null || alltrue([
+      for status in values(var.project.features) : contains(["enabled", "disabled"], status)
+    ])
+    error_message = "project.features values must be one of: enabled, disabled."
   }
 }
 
-# Private Endpoints
-variable "private_endpoints" {
-  description = "List of private endpoints to create for the azuredevops_project."
-  type = list(object({
-    name                            = string
-    subnet_id                       = string
-    subresource_names               = optional(list(string), ["azuredevops_project"])
-    private_dns_zone_ids            = optional(list(string), [])
-    private_service_connection_name = optional(string)
-    is_manual_connection            = optional(bool, false)
-    request_message                 = optional(string)
-    tags                            = optional(map(string), {})
-  }))
-  default = []
-}
+# -----------------------------------------------------------------------------
+# Project Features (separate resource)
+# -----------------------------------------------------------------------------
 
-# Diagnostic Settings
-variable "diagnostic_settings" {
-  description = "Diagnostic settings configuration for audit logging."
-  type = object({
-    enabled                    = optional(bool, false)
-    log_analytics_workspace_id = optional(string)
-    storage_account_id         = optional(string)
-    eventhub_auth_rule_id      = optional(string)
-    logs = optional(object({
-      # TODO: Add specific log categories for this resource type
-      # Example log categories (update based on actual resource):
-      # storage_read     = optional(bool, true)
-      # storage_write    = optional(bool, true)
-      # storage_delete   = optional(bool, true)
-      retention_days = optional(number, 7)
-    }), {})
-    metrics = optional(object({
-      enabled        = optional(bool, true)
-      retention_days = optional(number, 7)
-    }), {})
-  })
-  default = {
-    enabled = false
-  }
-}
-
-# Tags
-variable "tags" {
-  description = "A mapping of tags to assign to the resource."
+variable "project_features" {
+  description = "Map of project features managed via azuredevops_project_features. Use either this or project.features, not both."
   type        = map(string)
   default     = {}
+
+  validation {
+    condition = alltrue([
+      for key in keys(var.project_features) : contains([
+        "boards",
+        "repositories",
+        "pipelines",
+        "testplans",
+        "artifacts"
+      ], key)
+    ])
+    error_message = "project_features keys must be one of: boards, repositories, pipelines, testplans, artifacts."
+  }
+
+  validation {
+    condition = alltrue([
+      for status in values(var.project_features) : contains(["enabled", "disabled"], status)
+    ])
+    error_message = "project_features values must be one of: enabled, disabled."
+  }
+}
+
+# -----------------------------------------------------------------------------
+# Pipeline Settings
+# -----------------------------------------------------------------------------
+
+variable "pipeline_settings" {
+  description = "Pipeline settings for the project. When null, settings are not managed."
+  type = object({
+    enforce_job_scope                    = optional(bool)
+    enforce_referenced_repo_scoped_token = optional(bool)
+    enforce_settable_var                 = optional(bool)
+    publish_pipeline_metadata            = optional(bool)
+    status_badges_are_private            = optional(bool)
+    enforce_job_scope_for_release        = optional(bool)
+  })
+  default = null
+}
+
+# -----------------------------------------------------------------------------
+# Project Tags
+# -----------------------------------------------------------------------------
+
+variable "project_tags" {
+  description = "List of tags to assign to the project."
+  type        = list(string)
+  default     = []
+}
+
+# -----------------------------------------------------------------------------
+# Project Permissions
+# -----------------------------------------------------------------------------
+
+variable "project_permissions" {
+  description = "List of project permission assignments (group principals only)."
+  type = list(object({
+    principal   = string
+    permissions = map(string)
+    replace     = optional(bool, true)
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for permission in var.project_permissions : alltrue([
+        for status in values(permission.permissions) : contains(["Allow", "Deny", "NotSet"], status)
+      ])
+    ])
+    error_message = "project_permissions values must be one of: Allow, Deny, NotSet."
+  }
+}
+
+# -----------------------------------------------------------------------------
+# Dashboards
+# -----------------------------------------------------------------------------
+
+variable "dashboards" {
+  description = "List of dashboards to create in the project."
+  type = list(object({
+    name             = string
+    description      = optional(string)
+    team_id          = optional(string)
+    refresh_interval = optional(number, 0)
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for dashboard in var.dashboards : contains([0, 5], dashboard.refresh_interval)
+    ])
+    error_message = "dashboards.refresh_interval must be 0 or 5."
+  }
 }

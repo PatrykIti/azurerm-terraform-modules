@@ -1,27 +1,25 @@
 # Complete Azure DevOps Project Example
 
-This example demonstrates a comprehensive deployment of Azure DevOps Project with all available features and configurations.
+This example demonstrates a complete Azure DevOps project configuration with features, pipeline settings, tags, dashboards, and permissions.
 
 ## Features
 
-- Full azuredevops_project configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
-
-## Key Configuration
-
-This comprehensive example showcases all available features of the azuredevops_project module, demonstrating enterprise-grade capabilities suitable for production environments.
+- Project features management (boards, repos, pipelines, artifacts)
+- Pipeline security settings enabled
+- Project tags and dashboards
+- Project permissions for org-level administrators
 
 ## Usage
 
-```bash
-terraform init
-terraform plan
-terraform apply
-```
+1. Initialize Terraform:
+   ```bash
+   terraform init
+   ```
+2. Review and apply:
+   ```bash
+   terraform plan
+   terraform apply
+   ```
 
 ## Cleanup
 
@@ -30,4 +28,5 @@ terraform destroy
 ```
 
 <!-- BEGIN_TF_DOCS -->
+<!-- This section will be populated by terraform-docs if configured -->
 <!-- END_TF_DOCS -->
