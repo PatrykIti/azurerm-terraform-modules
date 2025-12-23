@@ -13,11 +13,16 @@ This guide provides a comprehensive overview of the philosophy and standards for
 
 ## Module Naming Convention
 
-Module names are critical for identification and organization. They MUST follow the pattern: `azurerm_<main_resource_type>`.
+Module names are critical for identification and organization. They MUST follow the provider prefix pattern:
+
+- `azurerm_<main_resource_type>` for AzureRM provider modules
+- `azuredevops_<main_resource_type>` for Azure DevOps provider modules
 
 The name should reflect the primary Azure resource the module manages. If the module orchestrates multiple primary resources, choose the most significant one.
 
+Note: The repository name may still reference AzureRM. Azure DevOps modules are still expected to use the `azuredevops_` prefix and live alongside `azurerm_` modules.
+
 ### Examples
 
-- **Correct**: `azurerm_storage_account`, `azurerm_virtual_network`, `azurerm_kubernetes_cluster`
-- **Incorrect**: `storage`, `vnet_module`, `Azure-AKS`
+- **Correct**: `azurerm_storage_account`, `azurerm_virtual_network`, `azuredevops_project`, `azuredevops_repository`
+- **Incorrect**: `storage`, `vnet_module`, `Azure-AKS`, `azdo_project`

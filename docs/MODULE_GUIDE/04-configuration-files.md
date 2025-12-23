@@ -7,7 +7,7 @@ Configuration files are the backbone of the automation and standardization withi
 This file provides essential metadata about the module. It is used by various automation scripts, including the `semantic-release` configuration, to dynamically get information about the module.
 
 **Fields:**
-- `name`: The technical name of the module (e.g., `azurerm_kubernetes_cluster`). MUST match the directory name.
+- `name`: The technical name of the module (e.g., `azurerm_kubernetes_cluster` or `azuredevops_project`). MUST match the directory name.
 - `title`: A human-friendly name for the module (e.g., `Kubernetes Cluster`).
 - `commit_scope`: The scope used in conventional commits (e.g., `kubernetes-cluster`).
 - `tag_prefix`: The prefix for git tags for this module (e.g., `AKSv`).

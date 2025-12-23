@@ -437,6 +437,12 @@ Use the scaffolding script (preferred):
 ./scripts/create-new-module.sh azurerm_virtual_network "Virtual Network" VN virtual-network "Manages Azure Virtual Networks"
 ```
 
+For Azure DevOps provider modules, use the `azuredevops_` prefix:
+
+```bash
+./scripts/create-new-module.sh azuredevops_repository "Repository" ADORepo repository "Manages Azure DevOps Git repositories"
+```
+
 Optional examples:
 
 ```bash

@@ -4,7 +4,7 @@ Before submitting a pull request for a new module, please review this checklist 
 
 ## Module Structure & Files
 
-- [ ] Module directory is named correctly (`azurerm_<resource_type>`).
+- [ ] Module directory is named correctly (`azurerm_<resource_type>` or `azuredevops_<resource_type>`).
 - [ ] All required files and directories are present as per the [Module Structure guide](./02-module-structure.md).
 - [ ] `versions.tf` is present and pins the `azurerm` provider version.
 - [ ] `variables.tf` is complete with descriptions and validation for all variables.

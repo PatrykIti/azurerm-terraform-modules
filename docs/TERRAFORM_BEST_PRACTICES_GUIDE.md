@@ -39,7 +39,7 @@ This guide outlines the best practices and standards for contributing to this op
 
 ```
 modules/
-└── azurerm_<resource_name>/
+└── <provider>_<resource_name>/
     ├── examples/
     │   ├── basic/
     │   │   ├── main.tf
@@ -61,12 +61,13 @@ modules/
     ├── outputs.tf
     └── versions.tf
 ```
+Use `azurerm_` for AzureRM modules and `azuredevops_` for Azure DevOps modules.
 
 ## Naming Conventions
 
 ### Resource Naming Rules
 
-**CRITICAL**: For any `azurerm_*` resource, the local name should match the resource type without the provider prefix:
+**CRITICAL**: For any provider resource (`azurerm_*` or `azuredevops_*`), the local name should match the resource type without the provider prefix:
 
 ```hcl
 # ❌ WRONG - Never do this
@@ -95,6 +96,7 @@ resource "azurerm_key_vault" "key_vault" {
   # ...
 }
 ```
+This rule also applies to `azuredevops_*` resources.
 
 ### Iteration Variable Naming
 
