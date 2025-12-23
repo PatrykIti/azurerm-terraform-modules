@@ -485,30 +485,26 @@ jobs:
           if [[ -d "$module_dir/examples" ]] && [[ -x "./scripts/update-examples-list.sh" ]]; then
             echo "Updating examples list for ${{ matrix.module }}..."
             ./scripts/update-examples-list.sh "$module_dir"
-            
-            # Regenerate terraform-docs after updating examples list
-            echo "Regenerating terraform-docs for ${{ matrix.module }}..."
-            (cd "$module_dir" && terraform-docs markdown table --output-file README.md .)
+          fi
+          
+          # Regenerate terraform-docs using the safe wrapper to avoid root README overwrite
+          if [[ -x "./scripts/update-module-docs.sh" ]]; then
+            echo "Regenerating terraform-docs for ${{ matrix.module }} via wrapper..."
+            ./scripts/update-module-docs.sh "${{ matrix.module }}"
+          else
+            echo "❌ update-module-docs.sh not found or not executable"
+            docs_outdated=true
           fi
           
           if [[ -f "$module_dir/README.md" ]]; then
-            # Check if terraform-docs content is up to date
-            if [[ -x "./scripts/check-terraform-docs.sh" ]]; then
-              if ! ./scripts/check-terraform-docs.sh "$module_dir"; then
-                echo "❌ Documentation is outdated for module: ${{ matrix.module }}"
-                docs_outdated=true
-              else
-                echo "✅ Documentation is up to date for module: ${{ matrix.module }}"
-              fi
+            if ! grep -q "<!-- BEGIN_TF_DOCS -->" "$module_dir/README.md" || ! grep -q "<!-- END_TF_DOCS -->" "$module_dir/README.md"; then
+              echo "❌ terraform-docs markers not found in README for module: ${{ matrix.module }}"
+              docs_outdated=true
+            elif ! git diff --quiet -- "$module_dir/README.md"; then
+              echo "❌ Documentation is outdated for module: ${{ matrix.module }}"
+              docs_outdated=true
             else
-              # Fallback to old method
-              if terraform-docs markdown table --output-file README.md.tmp "$module_dir" 2>/dev/null; then
-                if ! diff -q "$module_dir/README.md" "$module_dir/README.md.tmp" > /dev/null 2>&1; then
-                  echo "❌ Documentation is outdated for module: ${{ matrix.module }}"
-                  docs_outdated=true
-                fi
-                rm -f "$module_dir/README.md.tmp"
-              fi
+              echo "✅ Documentation is up to date for module: ${{ matrix.module }}"
             fi
           else
             echo "❌ Missing README.md for module: ${{ matrix.module }}"
