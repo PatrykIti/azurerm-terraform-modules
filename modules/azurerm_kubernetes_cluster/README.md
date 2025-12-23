@@ -166,6 +166,7 @@ Notes:
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates a basic Azure Kubernetes Service (AKS) cluster configuration using secure defaults and minimal setup.
 - [Complete](examples/complete) - This example demonstrates a comprehensive Azure Kubernetes Service (AKS) cluster configuration showcasing advanced features and production-ready settings.
+- [Diagnostic Settings](examples/diagnostic-settings) - This example demonstrates configuring AKS control plane diagnostic settings with a Log Analytics workspace.
 - [Multi Node Pool](examples/multi-node-pool) - This example demonstrates an Azure Kubernetes Service (AKS) cluster with multiple node pools, optimized for cost-effective testing scenarios.
 - [Secure](examples/secure) - This example demonstrates a maximum-security Kubernetes Cluster configuration suitable for highly sensitive data and regulated environments.
 - [Workload Identity](examples/workload-identity) - This example demonstrates an Azure Kubernetes Service (AKS) cluster with Azure AD RBAC and Workload Identity enabled for secure, passwordless authentication.

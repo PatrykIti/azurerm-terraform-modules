@@ -34,6 +34,19 @@ variable "project" {
     ])
     error_message = "project.features values must be one of: enabled, disabled."
   }
+
+  validation {
+    condition = var.project.features == null || alltrue([
+      for key in keys(var.project.features) : contains([
+        "boards",
+        "repositories",
+        "pipelines",
+        "testplans",
+        "artifacts"
+      ], key)
+    ])
+    error_message = "project.features keys must be one of: boards, repositories, pipelines, testplans, artifacts."
+  }
 }
 
 # -----------------------------------------------------------------------------

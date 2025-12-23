@@ -1,21 +1,12 @@
-# Basic Azure DevOps Project Example
+# Basic Azure DevOps Project Fixture
 
-This example demonstrates a basic Azure DevOps Project configuration using secure defaults and minimal setup.
+This fixture provisions a basic Azure DevOps project for Terratest execution.
 
 ## Features
 
-- Creates a basic azuredevops_project with standard configuration
-- Uses secure defaults following Azure best practices
-- Creates a dedicated resource group
-- Demonstrates basic module usage patterns
-- Uses variables for configuration flexibility
-
-## Key Configuration
-
-This example uses secure defaults and demonstrates:
-- Basic resource creation with minimal configuration
-- Using variables for easy configuration customization
-- Following security best practices by default
+- Minimal project configuration
+- Private visibility
+- Basic project tags
 
 ## Usage
 
@@ -30,6 +21,3 @@ terraform apply
 ```bash
 terraform destroy
 ```
-
-<!-- BEGIN_TF_DOCS -->
-<!-- END_TF_DOCS -->

@@ -8,7 +8,7 @@ locals {
 resource "azuredevops_project" "project" {
   name               = var.project.name
   description        = var.project.description
-  visibility         = var.project.visibility
+  visibility         = lower(var.project.visibility)
   version_control    = var.project.version_control
   work_item_template = var.project.work_item_template
   features           = var.project.features

@@ -1,5 +1,9 @@
 # Terraform gitignore - Based on HashiCorp recommendations
 
+# kubeconfig
+.kube/config
+kubeconfig
+
 # Local .terraform directories
 **/.terraform/*
 

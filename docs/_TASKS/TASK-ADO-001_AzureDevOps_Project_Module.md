@@ -26,19 +26,19 @@ Moduł startowy dla ADO. Zakłada zarządzanie projektem oraz jego kluczowymi us
 
 ### Inputs
 
-- project (object): name, description, visibility, version_control, process_template_id, work_item_template, etc.
-- features (object|list): mapowanie flag z azuredevops_project_features.
+- project (object): name, description, visibility, version_control, work_item_template, features.
+- project_features (map): mapowanie flag z azuredevops_project_features.
 - pipeline_settings (object): ustawienia z azuredevops_project_pipeline_settings.
-- tags (list(string)): tagi projektu (azuredevops_project_tags).
-- permissions (list(object)): principal_descriptor, permissions map, merge strategies dla azuredevops_project_permissions.
-- dashboards (list(object)): name, description, widgets (opcjonalnie) dla azuredevops_dashboard.
+- project_tags (list(string)): tagi projektu (azuredevops_project_tags).
+- project_permissions (list(object)): principal, permissions map, replace dla azuredevops_project_permissions.
+- dashboards (list(object)): name, description, team_id, refresh_interval dla azuredevops_dashboard.
 
 ### Outputs
 
 - project_id
 - project_name
-- project_url
-- project_descriptor
+- project_visibility
+- project_process_template_id
 - dashboard_ids
 
 ### Notes
