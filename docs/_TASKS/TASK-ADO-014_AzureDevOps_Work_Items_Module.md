@@ -1,10 +1,10 @@
-# TASK-023: Azure DevOps Work Items Module
-# FileName: TASK-023_AzureDevOps_Work_Items_Module.md
+# TASK-ADO-014: Azure DevOps Work Items Module
+# FileName: TASK-ADO-014_AzureDevOps_Work_Items_Module.md
 
 **Priority:** 🟡 Medium
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Large
-**Dependencies:** TASK-010, TASK-011 (opcjonalnie)
+**Dependencies:** TASK-ADO-001, TASK-ADO-002 (opcjonalnie)
 **Status:** ⏳ **To Do**
 
 ---

@@ -1,10 +1,10 @@
-# TASK-016: Azure DevOps Pipelines Module
-# FileName: TASK-016_AzureDevOps_Pipelines_Module.md
+# TASK-ADO-007: Azure DevOps Pipelines Module
+# FileName: TASK-ADO-007_AzureDevOps_Pipelines_Module.md
 
 **Priority:** 🔴 High
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Large
-**Dependencies:** TASK-010
+**Dependencies:** TASK-ADO-001
 **Status:** ⏳ **To Do**
 
 ---

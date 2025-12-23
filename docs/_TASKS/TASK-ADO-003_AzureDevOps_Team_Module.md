@@ -1,46 +1,47 @@
-# TASK-020: Azure DevOps Artifacts Feed Module
-# FileName: TASK-020_AzureDevOps_Artifacts_Feed_Module.md
+# TASK-ADO-003: Azure DevOps Team Module
+# FileName: TASK-ADO-003_AzureDevOps_Team_Module.md
 
 **Priority:** 🟡 Medium
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
-**Dependencies:** TASK-010
+**Dependencies:** TASK-ADO-001
 **Status:** ⏳ **To Do**
 
 ---
 
 ## Overview
 
-Moduł do zarządzania feedami artefaktów + retention + permissions.
+Moduł zespołów w ramach projektu: tworzenie teamów, przypisywanie członków i adminów.
 
 ## Scope (Provider Resources)
 
-- `azuredevops_feed`
-- `azuredevops_feed_permission`
-- `azuredevops_feed_retention_policy`
+- `azuredevops_team`
+- `azuredevops_team_members`
+- `azuredevops_team_administrators`
 
 ## Module Design
 
 ### Inputs
 
-- feeds (list(object)): name, project_id (opcjonalnie), description.
-- feed_permissions (list(object)): feed_id, principal_descriptor, permissions.
-- feed_retention_policies (list(object)): feed_id, days_to_keep, count_limit.
+- project_id (string).
+- teams (list(object)): name, description, identity_id (opcjonalnie), area_path/iteration_path.
+- team_members (list(object)): team_id/team_name + member_descriptors.
+- team_administrators (list(object)): team_id/team_name + admin_descriptors.
 
 ### Outputs
 
-- feed_ids
-- feed_urls
+- team_ids
+- team_descriptors
 
 ### Notes
 
-- Feed może być project-scoped lub org-scoped - zaprojektować wejścia tak, by wspierały oba.
+- Zależność od modułu project; opcjonalnie od identity (descriptors).
 
 ## Examples
 
-- basic: feed projektowy bez retention.
-- complete: feed + retention + permissions.
-- secure: retention limit + ograniczenia dostępu.
+- basic: jeden team + członkowie.
+- complete: wiele teamów + admini + konfiguracja area/iteration.
+- secure: ograniczona liczba adminów, brak wildcard membership.
 
 ## Tests
 
@@ -56,7 +57,7 @@ Moduł do zarządzania feedami artefaktów + retention + permissions.
 
 ## Acceptance Criteria
 
-- Moduł `modules/azuredevops_artifacts_feed` zgodny z wzorcem `modules/azurerm_kubernetes_cluster/`.
+- Moduł `modules/azuredevops_team` zgodny z wzorcem `modules/azurerm_kubernetes_cluster/`.
 - Pokrycie wszystkich wskazanych resources z listy Scope.
 - README generowany przez terraform-docs + kompletne examples.
 - Testy unit + integration + negative dodane i przechodzą.

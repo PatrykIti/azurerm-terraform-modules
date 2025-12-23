@@ -1,10 +1,10 @@
-# TASK-021: Azure DevOps Service Hooks Module
-# FileName: TASK-021_AzureDevOps_ServiceHooks_Module.md
+# TASK-ADO-012: Azure DevOps Service Hooks Module
+# FileName: TASK-ADO-012_AzureDevOps_ServiceHooks_Module.md
 
 **Priority:** 🟡 Medium
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
-**Dependencies:** TASK-010
+**Dependencies:** TASK-ADO-001
 **Status:** ⏳ **To Do**
 
 ---

@@ -1,10 +1,10 @@
-# TASK-019: Azure DevOps Variable Groups Module
-# FileName: TASK-019_AzureDevOps_Variable_Groups_Module.md
+# TASK-ADO-010: Azure DevOps Variable Groups Module
+# FileName: TASK-ADO-010_AzureDevOps_Variable_Groups_Module.md
 
 **Priority:** 🟡 Medium
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
-**Dependencies:** TASK-010
+**Dependencies:** TASK-ADO-001
 **Status:** ⏳ **To Do**
 
 ---

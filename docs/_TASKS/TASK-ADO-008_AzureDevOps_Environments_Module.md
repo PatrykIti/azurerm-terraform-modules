@@ -1,45 +1,52 @@
-# TASK-022: Azure DevOps Wiki Module
-# FileName: TASK-022_AzureDevOps_Wiki_Module.md
+# TASK-ADO-008: Azure DevOps Environments Module
+# FileName: TASK-ADO-008_AzureDevOps_Environments_Module.md
 
 **Priority:** 🟡 Medium
 **Category:** Azure DevOps Modules
-**Estimated Effort:** Small
-**Dependencies:** TASK-010
+**Estimated Effort:** Large
+**Dependencies:** TASK-ADO-001
 **Status:** ⏳ **To Do**
 
 ---
 
 ## Overview
 
-Zarządzanie wiki projektową i stronami wiki.
+Environments + checks (approvals, business hours, etc.) w jednym module.
 
 ## Scope (Provider Resources)
 
-- `azuredevops_wiki`
-- `azuredevops_wiki_page`
+- `azuredevops_environment`
+- `azuredevops_environment_kubernetes_resource`
+- `azuredevops_check_approval`
+- `azuredevops_check_branch_control`
+- `azuredevops_check_business_hours`
+- `azuredevops_check_exclusive_lock`
+- `azuredevops_check_required_template`
+- `azuredevops_check_rest_api`
 
 ## Module Design
 
 ### Inputs
 
 - project_id (string).
-- wikis (list(object)): name, type, repository_id (opcjonalnie).
-- wiki_pages (list(object)): wiki_id, path, content, version.
+- environments (list(object)): name, description.
+- kubernetes_resources (list(object)): environment_id, service_endpoint_id, namespace, cluster_name.
+- checks (list(object) per typ): parametry dla check_* (target_id, approvers, restrictions, schedules).
 
 ### Outputs
 
-- wiki_ids
-- wiki_page_paths
+- environment_ids
+- check_ids
 
 ### Notes
 
-- Wiki może być repo-based - potrzebny repository_id.
+- check_* zasięg: environment lub service connection - wymagane czytelne mapowanie target_id.
 
 ## Examples
 
-- basic: projektowa wiki + strona startowa.
-- complete: kilka stron i struktura katalogów.
-- secure: brak danych wrażliwych w treści, kontrola dostępu.
+- basic: jedno environment bez checks.
+- complete: env + k8s resource + approvals + branch control.
+- secure: approvals + exclusive lock + business hours.
 
 ## Tests
 
@@ -55,7 +62,7 @@ Zarządzanie wiki projektową i stronami wiki.
 
 ## Acceptance Criteria
 
-- Moduł `modules/azuredevops_wiki` zgodny z wzorcem `modules/azurerm_kubernetes_cluster/`.
+- Moduł `modules/azuredevops_environments` zgodny z wzorcem `modules/azurerm_kubernetes_cluster/`.
 - Pokrycie wszystkich wskazanych resources z listy Scope.
 - README generowany przez terraform-docs + kompletne examples.
 - Testy unit + integration + negative dodane i przechodzą.

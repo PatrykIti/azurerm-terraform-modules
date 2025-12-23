@@ -1,41 +1,47 @@
-# TASK-014: Azure DevOps Extension Module
-# FileName: TASK-014_AzureDevOps_Extension_Module.md
+# TASK-ADO-004: Azure DevOps Agent Pools Module
+# FileName: TASK-ADO-004_AzureDevOps_Agent_Pools_Module.md
 
 **Priority:** 🟡 Medium
 **Category:** Azure DevOps Modules
-**Estimated Effort:** Small
-**Dependencies:** —
+**Estimated Effort:** Medium
+**Dependencies:** TASK-ADO-001
 **Status:** ⏳ **To Do**
 
 ---
 
 ## Overview
 
-Moduł do instalacji/zarządzania rozszerzeniami Marketplace na poziomie organizacji.
+Moduł do zarządzania pulami agentów i kolejkami w projekcie oraz elastic pools.
 
 ## Scope (Provider Resources)
 
-- `azuredevops_extension`
+- `azuredevops_agent_pool`
+- `azuredevops_agent_queue`
+- `azuredevops_elastic_pool`
 
 ## Module Design
 
 ### Inputs
 
-- extensions (list(object)): publisher_id, extension_id, version (opcjonalnie).
+- agent_pools (list(object)): name, auto_provision, auto_update, pool_type.
+- agent_queues (list(object)): project_id, name, agent_pool_id.
+- elastic_pools (list(object)): name, service_endpoint_id, azure_resource_id, desired_idle, max_capacity.
 
 ### Outputs
 
-- extension_ids
+- agent_pool_ids
+- agent_queue_ids
+- elastic_pool_ids
 
 ### Notes
 
-- Org-level. Dobry kandydat na szybki moduł o małej złożoności.
+- agent_queue jest project-scoped; agent_pool i elastic_pool org-level.
 
 ## Examples
 
-- basic: instalacja jednego rozszerzenia.
-- complete: kilka rozszerzeń z pinem wersji.
-- secure: tylko zatwierdzone rozszerzenia (whitelist).
+- basic: jedna pula + kolejka w projekcie.
+- complete: kilka pul + elastic pool (np. Azure VMSS).
+- secure: ograniczone uprawnienia do kolejek + minimalne capacity.
 
 ## Tests
 
@@ -51,7 +57,7 @@ Moduł do instalacji/zarządzania rozszerzeniami Marketplace na poziomie organiz
 
 ## Acceptance Criteria
 
-- Moduł `modules/azuredevops_extension` zgodny z wzorcem `modules/azurerm_kubernetes_cluster/`.
+- Moduł `modules/azuredevops_agent_pools` zgodny z wzorcem `modules/azurerm_kubernetes_cluster/`.
 - Pokrycie wszystkich wskazanych resources z listy Scope.
 - README generowany przez terraform-docs + kompletne examples.
 - Testy unit + integration + negative dodane i przechodzą.

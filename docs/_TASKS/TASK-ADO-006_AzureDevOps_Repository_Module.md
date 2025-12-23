@@ -1,10 +1,10 @@
-# TASK-015: Azure DevOps Repository Module
-# FileName: TASK-015_AzureDevOps_Repository_Module.md
+# TASK-ADO-006: Azure DevOps Repository Module
+# FileName: TASK-ADO-006_AzureDevOps_Repository_Module.md
 
 **Priority:** 🔴 High
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Large
-**Dependencies:** TASK-010
+**Dependencies:** TASK-ADO-001
 **Status:** ⏳ **To Do**
 
 ---

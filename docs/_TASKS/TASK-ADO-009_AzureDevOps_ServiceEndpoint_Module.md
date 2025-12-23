@@ -1,10 +1,10 @@
-# TASK-018: Azure DevOps Service Endpoints Module
-# FileName: TASK-018_AzureDevOps_ServiceEndpoint_Module.md
+# TASK-ADO-009: Azure DevOps Service Endpoints Module
+# FileName: TASK-ADO-009_AzureDevOps_ServiceEndpoint_Module.md
 
 **Priority:** 🔴 High
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Large
-**Dependencies:** TASK-010
+**Dependencies:** TASK-ADO-001
 **Status:** ⏳ **To Do**
 
 ---
