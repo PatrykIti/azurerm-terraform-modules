@@ -4,15 +4,12 @@
 TIMEOUT ?= 30m
 TEST_FILTER ?= Test
 PARALLEL ?= 8
-AZURE_LOCATION ?= northeurope
 
 # Environment check
 check-env:
 	@echo "Checking required environment variables..."
-	@test -n "$(ARM_SUBSCRIPTION_ID)" || test -n "$(AZURE_SUBSCRIPTION_ID)" || (echo "ARM_SUBSCRIPTION_ID or AZURE_SUBSCRIPTION_ID is not set" && exit 1)
-	@test -n "$(ARM_TENANT_ID)" || test -n "$(AZURE_TENANT_ID)" || (echo "ARM_TENANT_ID or AZURE_TENANT_ID is not set" && exit 1)
-	@test -n "$(ARM_CLIENT_ID)" || test -n "$(AZURE_CLIENT_ID)" || (echo "ARM_CLIENT_ID or AZURE_CLIENT_ID is not set" && exit 1)
-	@test -n "$(ARM_CLIENT_SECRET)" || test -n "$(AZURE_CLIENT_SECRET)" || (echo "ARM_CLIENT_SECRET or AZURE_CLIENT_SECRET is not set" && exit 1)
+	@test -n "$(AZDO_ORG_SERVICE_URL)" || (echo "AZDO_ORG_SERVICE_URL is not set" && exit 1)
+	@test -n "$(AZDO_PERSONAL_ACCESS_TOKEN)" || (echo "AZDO_PERSONAL_ACCESS_TOKEN is not set" && exit 1)
 	@echo "All required environment variables are set."
 
 # Install dependencies
@@ -46,16 +43,6 @@ test-secure: check-env deps
 	@echo "Running security tests..."
 	go test -v -timeout 30m -run TestSecureAzuredevopsIdentity ./...
 
-# Run network tests
-test-network: check-env deps
-	@echo "Running network tests..."
-	go test -v -timeout 20m -run TestNetworkAzuredevopsIdentity ./...
-
-# Run private endpoint tests
-test-private-endpoint: check-env deps
-	@echo "Running private endpoint tests..."
-	go test -v -timeout 20m -run TestAzuredevopsIdentityPrivateEndpoint ./...
-
 # Run validation tests
 test-validation: check-env deps
 	@echo "Running validation tests..."
@@ -65,12 +52,6 @@ test-validation: check-env deps
 test-integration: check-env deps
 	@echo "Running integration tests..."
 	go test -v -timeout 45m -run TestAzuredevopsIdentityFullIntegration ./...
-
-# Run performance tests
-test-performance: check-env deps
-	@echo "Running performance tests..."
-	go test -v -timeout 60m -run TestAzuredevopsIdentityCreationTime ./...
-	go test -v -timeout 60m -run TestAzuredevopsIdentityScaling ./...
 
 # Run benchmarks
 benchmark: check-env deps
@@ -117,66 +98,9 @@ validate-fixtures:
 # Format check
 fmt-check:
 	@echo "Checking Go formatting..."
-	@if [ -n "$$(gofmt -l .)" ]; then \
-		echo "Go files are not formatted. Run 'make fmt' to fix."; \
+	@if [ -n "$(shell gofmt -l .)" ]; then \
+		echo "Go files are not formatted:"; \
 		gofmt -l .; \
 		exit 1; \
 	fi
-
-# Format code
-fmt:
-	@echo "Formatting Go code..."
-	gofmt -w .
-
-# Lint code
-lint:
-	@echo "Running linters..."
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-	golangci-lint run ./...
-
-# Security scan
-security:
-	@echo "Running security scan..."
-	go install github.com/securego/gosec/v2/cmd/gosec@latest
-	gosec -fmt=json -out=security-report.json ./...
-
-# Run quick smoke tests
-test-quick: check-env deps
-	@echo "Running quick smoke tests..."
-	go test -v -timeout 5m -short ./...
-
-# CI/CD pipeline simulation
-ci: clean fmt-check lint test-coverage test-junit
-	@echo "CI pipeline completed successfully!"
-
-# CD pipeline simulation (includes performance and integration tests)
-cd: ci test-integration test-performance
-	@echo "CD pipeline completed successfully!"
-
-# Help
-help:
-	@echo "Available targets:"
-	@echo "  make test                 - Run all tests"
-	@echo "  make test-single TEST_NAME=TestName - Run specific test"
-	@echo "  make test-basic          - Run basic tests only"
-	@echo "  make test-complete       - Run complete tests"
-	@echo "  make test-secure         - Run security tests"
-	@echo "  make test-network        - Run network tests"
-	@echo "  make test-private-endpoint - Run private endpoint tests"
-	@echo "  make test-validation     - Run validation tests"
-	@echo "  make test-integration    - Run integration tests"
-	@echo "  make test-performance    - Run performance tests"
-	@echo "  make test-quick          - Run quick smoke tests (with -short flag)"
-	@echo "  make benchmark           - Run benchmarks"
-	@echo "  make test-coverage       - Run tests with coverage"
-	@echo "  make test-race          - Run tests with race detection"
-	@echo "  make test-junit         - Generate JUnit report"
-	@echo "  make validate-fixtures   - Validate Terraform fixtures"
-	@echo "  make clean              - Clean test artifacts"
-	@echo "  make fmt                - Format Go code"
-	@echo "  make lint               - Run linters"
-	@echo "  make security           - Run security scan"
-	@echo "  make ci                 - Run CI pipeline"
-	@echo "  make cd                 - Run CD pipeline (includes integration tests)"
-
-.PHONY: check-env deps test test-single test-basic test-complete test-secure test-network test-private-endpoint test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help
+	@echo "Go formatting is OK."

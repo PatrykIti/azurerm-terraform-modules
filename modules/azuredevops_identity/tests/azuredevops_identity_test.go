@@ -2,8 +2,6 @@ package test
 
 import (
 	"fmt"
-	"os"
-	"strings"
 	"testing"
 	"time"
 
@@ -17,41 +15,34 @@ import (
 // Test basic azuredevops_identity creation
 func TestBasicAzuredevopsIdentity(t *testing.T) {
 	t.Parallel()
+	requireADOEnv(t)
 
-	// Create a folder for this test
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_identity/tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
 
-	// Deploy the infrastructure
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
 
-	// Validate the infrastructure
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		// Get outputs
-		resourceID := terraform.Output(t, terraformOptions, "azuredevops_identity_id")
-		resourceName := terraform.Output(t, terraformOptions, "azuredevops_identity_name")
-		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+		groupIDs := terraform.OutputMap(t, terraformOptions, "group_ids")
+		groupDescriptors := terraform.OutputMap(t, terraformOptions, "group_descriptors")
 
-		// Validate outputs are not empty
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, resourceName)
-		assert.NotEmpty(t, resourceGroupName)
-
-		// Add azuredevops_identity specific validations here
+		assert.NotEmpty(t, groupIDs)
+		assert.NotEmpty(t, groupDescriptors)
 	})
 }
 
-// Test complete azuredevops_identity with all features
+// Test complete azuredevops_identity with memberships
 func TestCompleteAzuredevopsIdentity(t *testing.T) {
 	t.Parallel()
+	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_identity/tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -67,22 +58,18 @@ func TestCompleteAzuredevopsIdentity(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		// Get outputs
-		resourceID := terraform.Output(t, terraformOptions, "azuredevops_identity_id")
-		resourceName := terraform.Output(t, terraformOptions, "azuredevops_identity_name")
-		
-		// Validate complete configuration
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, resourceName)
-		
-		// Add additional validations for complete configuration
-		// This should test all optional features and advanced settings
+		groupIDs := terraform.OutputMap(t, terraformOptions, "group_ids")
+		groupMemberships := terraform.OutputMap(t, terraformOptions, "group_membership_ids")
+
+		assert.GreaterOrEqual(t, len(groupIDs), 2)
+		assert.NotEmpty(t, groupMemberships)
 	})
 }
 
-// Test security configurations
+// Test secure azuredevops_identity configuration
 func TestSecureAzuredevopsIdentity(t *testing.T) {
 	t.Parallel()
+	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_identity/tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -98,164 +85,42 @@ func TestSecureAzuredevopsIdentity(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		resourceID := terraform.Output(t, terraformOptions, "azuredevops_identity_id")
-		resourceName := terraform.Output(t, terraformOptions, "azuredevops_identity_name")
+		groupIDs := terraform.OutputMap(t, terraformOptions, "group_ids")
+		groupMemberships := terraform.OutputMap(t, terraformOptions, "group_membership_ids")
 
-		// Validate security settings
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, resourceName)
-		
-		// Add security-specific validations
-		// Validate encryption, TLS settings, access controls, etc.
+		assert.GreaterOrEqual(t, len(groupIDs), 2)
+		assert.NotEmpty(t, groupMemberships)
 	})
 }
 
-// Test network access controls
-func TestNetworkAzuredevopsIdentity(t *testing.T) {
-	t.Parallel()
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_identity/tests/fixtures/network")
-	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
-	})
-
-	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
-		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
-	})
-
-	test_structure.RunTestStage(t, "validate", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-
-		resourceID := terraform.Output(t, terraformOptions, "azuredevops_identity_id")
-		
-		// Validate network rules
-		assert.NotEmpty(t, resourceID)
-		
-		// Add network-specific validations
-		// Validate IP rules, subnet restrictions, private endpoints, etc.
-	})
-}
-
-// Test private endpoint configuration
-func TestAzuredevopsIdentityPrivateEndpoint(t *testing.T) {
-	t.Parallel()
-
-	if _, err := os.Stat("fixtures/private_endpoint"); os.IsNotExist(err) {
-		t.Skip("Private endpoint fixture not found; skipping test")
-	}
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_identity/tests/fixtures/private_endpoint")
-	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
-	})
-
-	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
-		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
-	})
-
-	test_structure.RunTestStage(t, "validate", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-
-		resourceID := terraform.Output(t, terraformOptions, "azuredevops_identity_id")
-		privateEndpointID := terraform.Output(t, terraformOptions, "private_endpoint_id")
-
-		// Validate private endpoint was created
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, privateEndpointID)
-		
-		// Validate public network access is disabled
-		// Add additional private endpoint validations
-	})
-}
-
-// Negative test cases for validation rules
+// Validate group membership selector rules
 func TestAzuredevopsIdentityValidationRules(t *testing.T) {
 	t.Parallel()
+	requireADOEnv(t)
 
-	testCases := []struct {
-		name          string
-		fixtureFile   string
-		expectedError string
-	}{
-		{
-			name:          "InvalidName",
-			fixtureFile:   "negative",
-			expectedError: "",
-		},
-		// Add more validation test cases specific to azuredevops_identity
-	}
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_identity/tests/fixtures/negative")
+	terraformOptions := getTerraformOptions(t, testFolder)
 
-	for _, tc := range testCases {
-		tc := tc // capture range variable
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fmt.Sprintf("azuredevops_identity/tests/fixtures/%s", tc.fixtureFile))
-			
-			// Use minimal terraform options for negative tests (no variables)
-			terraformOptions := &terraform.Options{
-				TerraformDir: testFolder,
-				NoColor:      true,
-			}
-
-			// This should fail during plan/apply
-			_, err := terraform.InitAndPlanE(t, terraformOptions)
-			require.Error(t, err)
-			if tc.expectedError != "" {
-				assert.Contains(t, err.Error(), tc.expectedError)
-			}
-		})
-	}
-}
-
-// Benchmark test for performance
-func BenchmarkAzuredevopsIdentityCreation(b *testing.B) {
-	// Skip if not running benchmarks
-	if testing.Short() {
-		b.Skip("Skipping benchmark in short mode")
-	}
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azuredevops_identity/tests/fixtures/basic")
-	terraformOptions := getTerraformOptions(b, testFolder)
-
-	// Cleanup after benchmark
-	defer terraform.Destroy(b, terraformOptions)
-
-	// Run the benchmark
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		// Generate unique name for each iteration
-		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
-		
-		terraform.InitAndApply(b, terraformOptions)
-		terraform.Destroy(b, terraformOptions)
-	}
+	_, err := terraform.InitAndPlanE(t, terraformOptions)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "group_descriptor or group_key")
 }
 
 // Helper function to get terraform options
 func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
-	// Generate a unique ID for resources
-	timestamp := time.Now().UnixNano() % 1000 // Last 3 digits for more variation
-	baseID := strings.ToLower(random.UniqueId())
-	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
-	
+	t.Helper()
+
+	uniqueID := random.UniqueId()
+
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
-			"random_suffix": uniqueID,
-			"location":      "northeurope",
+			"group_name_prefix": fmt.Sprintf("ado-identity-%s", uniqueID),
 		},
 		NoColor: true,
-		// Retry configuration
 		RetryableTerraformErrors: map[string]string{
-			".*timeout.*":                    "Timeout error - retrying",
-			".*ResourceGroupNotFound.*":      "Resource group not found - retrying",
-			".*AlreadyExists.*":              "Resource already exists - retrying",
-			".*TooManyRequests.*":            "Too many requests - retrying",
+			".*timeout.*":         "Timeout error - retrying",
+			".*TooManyRequests.*": "Too many requests - retrying",
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,
