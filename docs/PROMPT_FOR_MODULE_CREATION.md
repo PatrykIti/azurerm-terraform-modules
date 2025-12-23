@@ -42,6 +42,15 @@ bash @scripts/create-new-module.sh {{ module name}} (each module folder has name
 ```
 - Validate that `main.tf`, `variables.tf`, `outputs.tf`, `README.md`, and test directory were created
 
+Optional flags:
+```bash
+# include private-endpoint example (only if the resource supports it)
+bash @scripts/create-new-module.sh --with-private-endpoint {{ module name}} "Display Name" XX scope "Description"
+
+# customize examples list
+bash @scripts/create-new-module.sh --examples=basic,secure {{ module name}} "Display Name" XX scope "Description"
+```
+
 Most of the files for module documentation have place holders which should be replaced with proper name of module but most of them are for review and standard correction where the script is not correcting them.
 
 ---

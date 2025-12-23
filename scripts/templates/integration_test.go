@@ -2,7 +2,7 @@ package test
 
 import (
 	"context"
-	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -12,11 +12,10 @@ import (
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-// TestMODULE_DISPLAY_NAME_PLACEHOLDERFullIntegration tests all features working together
-func TestMODULE_DISPLAY_NAME_PLACEHOLDERFullIntegration(t *testing.T) {
+// TestMODULE_PASCAL_PLACEHOLDERFullIntegration tests all features working together
+func TestMODULE_PASCAL_PLACEHOLDERFullIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -159,8 +158,8 @@ func validateOperationalFeatures(t *testing.T, testFolder string) {
 	// helper.ValidateMonitoringAlerts(t, resourceID)
 }
 
-// TestMODULE_DISPLAY_NAME_PLACEHOLDERWithNetworkRules tests network access controls
-func TestMODULE_DISPLAY_NAME_PLACEHOLDERWithNetworkRules(t *testing.T) {
+// TestMODULE_PASCAL_PLACEHOLDERWithNetworkRules tests network access controls
+func TestMODULE_PASCAL_PLACEHOLDERWithNetworkRules(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -201,12 +200,16 @@ func TestMODULE_DISPLAY_NAME_PLACEHOLDERWithNetworkRules(t *testing.T) {
 	})
 }
 
-// TestMODULE_DISPLAY_NAME_PLACEHOLDERPrivateEndpoint tests private endpoint configuration
-func TestMODULE_DISPLAY_NAME_PLACEHOLDERPrivateEndpoint(t *testing.T) {
+// TestMODULE_PASCAL_PLACEHOLDERPrivateEndpointIntegration tests private endpoint configuration
+func TestMODULE_PASCAL_PLACEHOLDERPrivateEndpointIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
 	t.Parallel()
+
+	if _, err := os.Stat("fixtures/private_endpoint"); os.IsNotExist(err) {
+		t.Skip("Private endpoint fixture not found; skipping test")
+	}
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/private_endpoint")
 	
@@ -242,8 +245,8 @@ func TestMODULE_DISPLAY_NAME_PLACEHOLDERPrivateEndpoint(t *testing.T) {
 	})
 }
 
-// TestMODULE_DISPLAY_NAME_PLACEHOLDERSecurityConfiguration tests security features
-func TestMODULE_DISPLAY_NAME_PLACEHOLDERSecurityConfiguration(t *testing.T) {
+// TestMODULE_PASCAL_PLACEHOLDERSecurityConfiguration tests security features
+func TestMODULE_PASCAL_PLACEHOLDERSecurityConfiguration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -284,69 +287,8 @@ func TestMODULE_DISPLAY_NAME_PLACEHOLDERSecurityConfiguration(t *testing.T) {
 	})
 }
 
-// TestMODULE_DISPLAY_NAME_PLACEHOLDERValidationRules tests the module's input validation rules
-func TestMODULE_DISPLAY_NAME_PLACEHOLDERValidationRules(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping validation tests in short mode")
-	}
-	t.Parallel()
-
-	testCases := []struct {
-		name          string
-		fixturePath   string
-		expectError   bool
-		errorContains string
-	}{
-		// TODO: Add validation test cases based on your module's validation rules
-		// Examples:
-		// {
-		//     name:          "InvalidNameTooShort",
-		//     fixturePath:   "MODULE_NAME_PLACEHOLDER/tests/fixtures/negative/invalid_name_short",
-		//     expectError:   true,
-		//     errorContains: "name must be at least 3 characters",
-		// },
-		// {
-		//     name:          "InvalidNameTooLong",
-		//     fixturePath:   "MODULE_NAME_PLACEHOLDER/tests/fixtures/negative/invalid_name_long",
-		//     expectError:   true,
-		//     errorContains: "name must be at most 24 characters",
-		// },
-		// {
-		//     name:          "InvalidNameCharacters",
-		//     fixturePath:   "MODULE_NAME_PLACEHOLDER/tests/fixtures/negative/invalid_name_chars",
-		//     expectError:   true,
-		//     errorContains: "name can only contain lowercase letters and numbers",
-		// },
-	}
-
-	for _, tc := range testCases {
-		tc := tc // capture range variable
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", tc.fixturePath)
-			
-			// Use minimal terraform options for negative tests (no variables)
-			terraformOptions := &terraform.Options{
-				TerraformDir: testFolder,
-				NoColor:      true,
-			}
-
-			if tc.expectError {
-				// This should fail during plan/apply
-				_, err := terraform.InitAndPlanE(t, terraformOptions)
-				require.Error(t, err)
-				assert.Contains(t, err.Error(), tc.errorContains)
-			} else {
-				defer terraform.Destroy(t, terraformOptions)
-				terraform.InitAndApply(t, terraformOptions)
-			}
-		})
-	}
-}
-
-// TestMODULE_DISPLAY_NAME_PLACEHOLDERLifecycle tests the complete lifecycle
-func TestMODULE_DISPLAY_NAME_PLACEHOLDERLifecycle(t *testing.T) {
+// TestMODULE_PASCAL_PLACEHOLDERLifecycle tests the complete lifecycle
+func TestMODULE_PASCAL_PLACEHOLDERLifecycle(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -384,8 +326,8 @@ func TestMODULE_DISPLAY_NAME_PLACEHOLDERLifecycle(t *testing.T) {
 	terraform.Apply(t, terraformOptions)
 }
 
-// TestMODULE_DISPLAY_NAME_PLACEHOLDERCompliance tests compliance-related features
-func TestMODULE_DISPLAY_NAME_PLACEHOLDERCompliance(t *testing.T) {
+// TestMODULE_PASCAL_PLACEHOLDERCompliance tests compliance-related features
+func TestMODULE_PASCAL_PLACEHOLDERCompliance(t *testing.T) {
 	t.Parallel()
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/secure")
@@ -434,28 +376,4 @@ func TestMODULE_DISPLAY_NAME_PLACEHOLDERCompliance(t *testing.T) {
 	}
 	
 	_ = resourceGroupName // Remove when used
-}
-
-// BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERCreation benchmarks resource creation
-func BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERCreation(b *testing.B) {
-	// Skip if not running benchmarks
-	if testing.Short() {
-		b.Skip("Skipping benchmark in short mode")
-	}
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
-	terraformOptions := getTerraformOptions(b, testFolder)
-
-	// Cleanup after benchmark
-	defer terraform.Destroy(b, terraformOptions)
-
-	// Run the benchmark
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		// Generate unique name for each iteration
-		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
-		
-		terraform.InitAndApply(b, terraformOptions)
-		terraform.Destroy(b, terraformOptions)
-	}
 }

@@ -9,10 +9,10 @@ AZURE_LOCATION ?= northeurope
 # Environment check
 check-env:
 	@echo "Checking required environment variables..."
-	@test -n "$(AZURE_SUBSCRIPTION_ID)" || (echo "AZURE_SUBSCRIPTION_ID is not set" && exit 1)
-	@test -n "$(AZURE_TENANT_ID)" || (echo "AZURE_TENANT_ID is not set" && exit 1)
-	@test -n "$(AZURE_CLIENT_ID)" || (echo "AZURE_CLIENT_ID is not set" && exit 1)
-	@test -n "$(AZURE_CLIENT_SECRET)" || (echo "AZURE_CLIENT_SECRET is not set" && exit 1)
+	@test -n "$(ARM_SUBSCRIPTION_ID)" || test -n "$(AZURE_SUBSCRIPTION_ID)" || (echo "ARM_SUBSCRIPTION_ID or AZURE_SUBSCRIPTION_ID is not set" && exit 1)
+	@test -n "$(ARM_TENANT_ID)" || test -n "$(AZURE_TENANT_ID)" || (echo "ARM_TENANT_ID or AZURE_TENANT_ID is not set" && exit 1)
+	@test -n "$(ARM_CLIENT_ID)" || test -n "$(AZURE_CLIENT_ID)" || (echo "ARM_CLIENT_ID or AZURE_CLIENT_ID is not set" && exit 1)
+	@test -n "$(ARM_CLIENT_SECRET)" || test -n "$(AZURE_CLIENT_SECRET)" || (echo "ARM_CLIENT_SECRET or AZURE_CLIENT_SECRET is not set" && exit 1)
 	@echo "All required environment variables are set."
 
 # Install dependencies
@@ -34,43 +34,43 @@ test-single: check-env deps
 # Run basic tests only
 test-basic: check-env deps
 	@echo "Running basic tests..."
-	go test -v -timeout 15m -run TestBasicMODULE_DISPLAY_NAME_PLACEHOLDER ./...
+	go test -v -timeout 15m -run TestBasicMODULE_PASCAL_PLACEHOLDER ./...
 
 # Run complete tests
 test-complete: check-env deps
 	@echo "Running complete tests..."
-	go test -v -timeout 30m -run TestCompleteMODULE_DISPLAY_NAME_PLACEHOLDER ./...
+	go test -v -timeout 30m -run TestCompleteMODULE_PASCAL_PLACEHOLDER ./...
 
 # Run security tests
 test-secure: check-env deps
 	@echo "Running security tests..."
-	go test -v -timeout 30m -run TestMODULE_DISPLAY_NAME_PLACEHOLDERSecurity ./...
+	go test -v -timeout 30m -run TestSecureMODULE_PASCAL_PLACEHOLDER ./...
 
 # Run network tests
 test-network: check-env deps
 	@echo "Running network tests..."
-	go test -v -timeout 20m -run TestMODULE_DISPLAY_NAME_PLACEHOLDERNetworkRules ./...
+	go test -v -timeout 20m -run TestNetworkMODULE_PASCAL_PLACEHOLDER ./...
 
 # Run private endpoint tests
 test-private-endpoint: check-env deps
 	@echo "Running private endpoint tests..."
-	go test -v -timeout 20m -run TestMODULE_DISPLAY_NAME_PLACEHOLDERPrivateEndpoint ./...
+	go test -v -timeout 20m -run TestMODULE_PASCAL_PLACEHOLDERPrivateEndpoint ./...
 
 # Run validation tests
 test-validation: check-env deps
 	@echo "Running validation tests..."
-	go test -v -timeout 10m -run TestMODULE_DISPLAY_NAME_PLACEHOLDERValidationRules ./...
+	go test -v -timeout 10m -run TestMODULE_PASCAL_PLACEHOLDERValidationRules ./...
 
 # Run integration tests
 test-integration: check-env deps
 	@echo "Running integration tests..."
-	go test -v -timeout 45m -run TestMODULE_DISPLAY_NAME_PLACEHOLDERFullIntegration ./...
+	go test -v -timeout 45m -run TestMODULE_PASCAL_PLACEHOLDERFullIntegration ./...
 
 # Run performance tests
 test-performance: check-env deps
 	@echo "Running performance tests..."
-	go test -v -timeout 60m -run TestMODULE_DISPLAY_NAME_PLACEHOLDERCreationTime ./...
-	go test -v -timeout 60m -run TestMODULE_DISPLAY_NAME_PLACEHOLDERScaling ./...
+	go test -v -timeout 60m -run TestMODULE_PASCAL_PLACEHOLDERCreationTime ./...
+	go test -v -timeout 60m -run TestMODULE_PASCAL_PLACEHOLDERScaling ./...
 
 # Run benchmarks
 benchmark: check-env deps

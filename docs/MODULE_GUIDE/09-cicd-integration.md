@@ -33,6 +33,8 @@ The release process is handled by `semantic-release`. The configuration is manag
 
 2.  **`.releaserc.js`**: This file should be copied from a reference module like `azurerm_kubernetes_cluster`. It is designed to be dynamic and reads its configuration from `module.json`, so you typically don't need to modify it.
 
+> Note: `.github/module-config.yml` is deprecated and not used by the release workflow.
+
 ### Step 2: Verify CI/CD Integration
 
 The CI/CD pipeline will automatically detect your module based on:

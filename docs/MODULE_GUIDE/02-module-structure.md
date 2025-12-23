@@ -16,20 +16,23 @@ modules/azurerm_<resource_name>/
 │    │    └─── README.md
 │    ├─── complete/
 │    │    └─── ...
-│    ├─── private-endpoint/
+│    ├─── secure/
 │    │    └─── ...
-│    └─── secure/
+│    └─── private-endpoint/ (optional)
 │         └─── ...
 ├─── tests/
 │    ├─── fixtures/
 │    │    ├─── basic/
 │    │    ├─── complete/
+│    │    ├─── secure/
+│    │    ├─── network/
 │    │    ├─── negative/
-│    │    └─── secure/
+│    │    └─── private_endpoint/ (optional)
 │    ├─── unit/
 │    │    ├─── defaults.tftest.hcl
 │    │    ├─── naming.tftest.hcl
-│    │    └─── validation.tftest.hcl
+│    │    ├─── validation.tftest.hcl
+│    │    └─── outputs.tftest.hcl
 │    ├─── .gitignore
 │    ├─── go.mod
 │    ├─── go.sum
@@ -57,7 +60,7 @@ modules/azurerm_<resource_name>/
 ## Key Components Explained
 
 - **`docs/`**: Contains supplementary documentation, such as architecture diagrams or migration guides.
-- **`examples/`**: Contains practical, runnable examples for different use cases. Each example should have its own `README.md`.
+- **`examples/`**: Contains practical, runnable examples for different use cases. Each example should have its own `README.md`. `private-endpoint` is optional and only when the resource supports it.
 - **`tests/`**: Contains all tests for the module.
   - **`fixtures/`**: Terraform code for different test scenarios used by Terratest.
   - **`unit/`**: Native Terraform tests (`.tftest.hcl`) for fast, resource-independent validation.

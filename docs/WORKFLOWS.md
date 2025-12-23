@@ -162,7 +162,7 @@ Each of these jobs runs in parallel for each detected module:
   - Analyzes commits since last release
   - Determines version bump (major/minor/patch)
   - Updates CHANGELOG.md following Keep a Changelog
-  - Updates module-config.yml version
+  - Updates module.json metadata/version references (if applicable)
   - Creates git tag with module prefix (e.g., SAv1.2.3)
   - Commits changes
   - Creates GitHub release with notes
@@ -430,47 +430,36 @@ sequenceDiagram
 
 ### Step 1: Create Module Structure
 
+Use the scaffolding script (preferred):
+
 ```bash
-# Create module directory
-mkdir -p modules/azurerm_virtual_network
-
-# Create .github directory for module configuration
-mkdir -p modules/azurerm_virtual_network/.github
-
-# Copy module configuration from existing module
-cp modules/azurerm_storage_account/.github/module-config.yml modules/azurerm_virtual_network/.github/
-
-# Create Terraform files
-touch modules/azurerm_virtual_network/{main,variables,outputs,versions}.tf
+./scripts/create-new-module.sh azurerm_virtual_network "Virtual Network" VN virtual-network "Manages Azure Virtual Networks"
 ```
 
-### Step 2: Update Module Configuration
+Optional examples:
 
-Edit `modules/azurerm_virtual_network/.github/module-config.yml`:
-
-```yaml
-name: azurerm_virtual_network
-description: "Azure Virtual Network Terraform module"
-version: 0.1.0
-terraform:
-  required_version: ">= 1.5.0"
-  required_providers:
-    azurerm: ">= 3.0.0"
+```bash
+./scripts/create-new-module.sh --with-private-endpoint azurerm_storage_account "Storage Account" SA storage-account "Manages storage accounts"
+./scripts/create-new-module.sh --examples=basic,secure azurerm_subnet "Subnet" SN subnet "Manages Azure subnets"
 ```
 
-### Step 3: Update Workflow Filters
+### Step 2: Module Metadata (Release)
 
-Edit `.github/workflows/module-ci.yml`:
+The release workflow uses `module.json` + `.releaserc.js` in each module. Ensure `module.json` exists and is correct:
 
-```yaml
-filters: |
-  azurerm_storage_account:
-    - 'modules/azurerm_storage_account/**'
-    - 'shared/**'
-  azurerm_virtual_network:    # Add new module
-    - 'modules/azurerm_virtual_network/**'
-    - 'shared/**'
+```json
+{
+  "name": "azurerm_virtual_network",
+  "title": "Virtual Network",
+  "commit_scope": "virtual-network",
+  "tag_prefix": "VNv",
+  "description": "Azure Virtual Network Terraform module"
+}
 ```
+
+### Step 3: Workflow Auto-Detection
+
+No manual updates are needed. CI/CD workflows automatically detect modules under `modules/`.
 
 ### Step 4: Release Workflow
 
@@ -496,7 +485,7 @@ No additional configuration needed!
 
 1. **Module not detected**
    - Check if `main.tf` exists in the module directory
-   - Verify path filters in `module-ci.yml`
+   - Verify the module lives under `modules/` and has `module.json`
 
 2. **Composite action not found**
    - Ensure `action.yml` exists in the action directory

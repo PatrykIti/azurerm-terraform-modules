@@ -50,8 +50,9 @@ check_module() {
     
     # Recommended files
     check_file "$module" "SECURITY.md" "recommended"
-    check_file "$module" "examples/simple/main.tf" "recommended"
+    check_file "$module" "examples/basic/main.tf" "recommended"
     check_file "$module" "examples/complete/main.tf" "recommended"
+    check_file "$module" "examples/secure/main.tf" "recommended"
 }
 
 # Check each module directory
