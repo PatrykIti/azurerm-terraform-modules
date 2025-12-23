@@ -1,32 +1,21 @@
-# Secure Kubernetes Secrets Example
+# Secure AKS Secrets Example (ESO + Workload Identity)
 
-This example demonstrates a maximum-security Kubernetes Secrets configuration suitable for highly sensitive data and regulated environments.
+This example demonstrates the **ESO** strategy with Workload Identity.
 
 ## Features
 
-- Maximum security configuration with all security features enabled
-- Network isolation and private endpoints
-- Advanced threat protection
-- Comprehensive audit logging and monitoring
-- Encryption at rest and in transit
-- Compliance-ready configuration
+- AKS with Workload Identity enabled
+- User-assigned identity + federated identity credential
+- SecretStore + ExternalSecret in the cluster
 
-## Key Configuration
+## Prerequisites
 
-This example implements defense-in-depth security principles with multiple layers of protection suitable for highly regulated industries and sensitive workloads.
-
-## Security Considerations
-
-- All public access is disabled by default
-- Network access is restricted to specific IP ranges
-- All data is encrypted at rest and in transit
-- Audit logging captures all access and modifications
+- External Secrets Operator installed in the cluster
 
 ## Usage
 
 ```bash
 terraform init
-terraform plan
 terraform apply
 ```
 

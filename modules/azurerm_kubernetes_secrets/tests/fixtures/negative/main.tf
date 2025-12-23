@@ -1,23 +1,20 @@
-# Negative test cases - should fail validation
-provider "azurerm" {
-  features {}
-}
+# Negative test case - should fail validation
 
-resource "azurerm_resource_group" "test" {
-  name     = "rg-kubernetes_secrets-negative-test"
-  location = "West Europe"
-}
-
-# This should fail due to invalid name
 module "kubernetes_secrets" {
   source = "../../../"
 
-  name                = "INVALID-NAME-WITH-UPPERCASE"  # Should fail validation
-  resource_group_name = azurerm_resource_group.test.name
-  location            = azurerm_resource_group.test.location
+  strategy  = "manual"
+  namespace = "app"
+  name      = "INVALID-NAME-WITH-UPPERCASE"
 
-  tags = {
-    Environment = "Test"
-    Scenario    = "Negative"
+  manual = {
+    key_vault_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.KeyVault/vaults/test-kv"
+    secrets = [
+      {
+        name                  = "db-password"
+        key_vault_secret_name = "db-password"
+        kubernetes_secret_key = "DB_PASSWORD"
+      }
+    ]
   }
 }

@@ -1,25 +1,21 @@
-# Complete Kubernetes Secrets Example
+# Complete AKS Secrets Example (CSI)
 
-This example demonstrates a comprehensive deployment of Kubernetes Secrets with all available features and configurations.
+This example demonstrates the **CSI** strategy using `SecretProviderClass` with optional sync to a Kubernetes Secret.
 
 ## Features
 
-- Full kubernetes_secrets configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
+- AKS cluster with Key Vault Secrets Provider enabled
+- SecretProviderClass configuration for Azure Key Vault
+- Optional sync to Kubernetes Secret
 
-## Key Configuration
+## Prerequisites
 
-This comprehensive example showcases all available features of the kubernetes_secrets module, demonstrating enterprise-grade capabilities suitable for production environments.
+- CSI driver is enabled via the AKS addon (`key_vault_secrets_provider`)
 
 ## Usage
 
 ```bash
 terraform init
-terraform plan
 terraform apply
 ```
 

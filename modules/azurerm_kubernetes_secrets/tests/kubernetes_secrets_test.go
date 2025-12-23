@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -14,42 +13,35 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Test basic kubernetes_secrets creation
+// Test basic Kubernetes Secrets configuration (manual strategy)
 func TestBasicKubernetesSecrets(t *testing.T) {
 	t.Parallel()
 
-	// Create a folder for this test
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_secrets/tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
 
-	// Deploy the infrastructure
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
 
-	// Validate the infrastructure
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		// Get outputs
-		resourceID := terraform.Output(t, terraformOptions, "kubernetes_secrets_id")
-		resourceName := terraform.Output(t, terraformOptions, "kubernetes_secrets_name")
+		strategy := terraform.Output(t, terraformOptions, "strategy")
+		secretName := terraform.Output(t, terraformOptions, "kubernetes_secret_name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 
-		// Validate outputs are not empty
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, resourceName)
+		assert.Equal(t, "manual", strategy)
+		assert.NotEmpty(t, secretName)
 		assert.NotEmpty(t, resourceGroupName)
-
-		// Add kubernetes_secrets specific validations here
 	})
 }
 
-// Test complete kubernetes_secrets with all features
+// Test complete Kubernetes Secrets configuration (CSI strategy)
 func TestCompleteKubernetesSecrets(t *testing.T) {
 	t.Parallel()
 
@@ -67,20 +59,17 @@ func TestCompleteKubernetesSecrets(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		// Get outputs
-		resourceID := terraform.Output(t, terraformOptions, "kubernetes_secrets_id")
-		resourceName := terraform.Output(t, terraformOptions, "kubernetes_secrets_name")
-		
-		// Validate complete configuration
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, resourceName)
-		
-		// Add additional validations for complete configuration
-		// This should test all optional features and advanced settings
+		strategy := terraform.Output(t, terraformOptions, "strategy")
+		secretProviderClassName := terraform.Output(t, terraformOptions, "secret_provider_class_name")
+		secretName := terraform.Output(t, terraformOptions, "kubernetes_secret_name")
+
+		assert.Equal(t, "csi", strategy)
+		assert.NotEmpty(t, secretProviderClassName)
+		assert.NotEmpty(t, secretName)
 	})
 }
 
-// Test security configurations
+// Test secure Kubernetes Secrets configuration (ESO strategy)
 func TestSecureKubernetesSecrets(t *testing.T) {
 	t.Parallel()
 
@@ -98,19 +87,17 @@ func TestSecureKubernetesSecrets(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		resourceID := terraform.Output(t, terraformOptions, "kubernetes_secrets_id")
-		resourceName := terraform.Output(t, terraformOptions, "kubernetes_secrets_name")
+		strategy := terraform.Output(t, terraformOptions, "strategy")
+		secretStoreName := terraform.Output(t, terraformOptions, "secret_store_name")
+		externalSecretNames := terraform.OutputList(t, terraformOptions, "external_secret_names")
 
-		// Validate security settings
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, resourceName)
-		
-		// Add security-specific validations
-		// Validate encryption, TLS settings, access controls, etc.
+		assert.Equal(t, "eso", strategy)
+		assert.NotEmpty(t, secretStoreName)
+		assert.Greater(t, len(externalSecretNames), 0)
 	})
 }
 
-// Test network access controls
+// Test additional fixture (network naming scenario)
 func TestNetworkKubernetesSecrets(t *testing.T) {
 	t.Parallel()
 
@@ -128,47 +115,11 @@ func TestNetworkKubernetesSecrets(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		resourceID := terraform.Output(t, terraformOptions, "kubernetes_secrets_id")
-		
-		// Validate network rules
-		assert.NotEmpty(t, resourceID)
-		
-		// Add network-specific validations
-		// Validate IP rules, subnet restrictions, private endpoints, etc.
-	})
-}
+		strategy := terraform.Output(t, terraformOptions, "strategy")
+		secretName := terraform.Output(t, terraformOptions, "kubernetes_secret_name")
 
-// Test private endpoint configuration
-func TestKubernetesSecretsPrivateEndpoint(t *testing.T) {
-	t.Parallel()
-
-	if _, err := os.Stat("fixtures/private_endpoint"); os.IsNotExist(err) {
-		t.Skip("Private endpoint fixture not found; skipping test")
-	}
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_secrets/tests/fixtures/private_endpoint")
-	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
-	})
-
-	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
-		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
-	})
-
-	test_structure.RunTestStage(t, "validate", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-
-		resourceID := terraform.Output(t, terraformOptions, "kubernetes_secrets_id")
-		privateEndpointID := terraform.Output(t, terraformOptions, "private_endpoint_id")
-
-		// Validate private endpoint was created
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, privateEndpointID)
-		
-		// Validate public network access is disabled
-		// Add additional private endpoint validations
+		assert.Equal(t, "manual", strategy)
+		assert.NotEmpty(t, secretName)
 	})
 }
 
@@ -176,64 +127,16 @@ func TestKubernetesSecretsPrivateEndpoint(t *testing.T) {
 func TestKubernetesSecretsValidationRules(t *testing.T) {
 	t.Parallel()
 
-	testCases := []struct {
-		name          string
-		fixtureFile   string
-		expectedError string
-	}{
-		{
-			name:          "InvalidName",
-			fixtureFile:   "negative",
-			expectedError: "",
-		},
-		// Add more validation test cases specific to kubernetes_secrets
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_secrets/tests/fixtures/negative")
+
+	terraformOptions := &terraform.Options{
+		TerraformDir: testFolder,
+		NoColor:      true,
 	}
 
-	for _, tc := range testCases {
-		tc := tc // capture range variable
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fmt.Sprintf("azurerm_kubernetes_secrets/tests/fixtures/%s", tc.fixtureFile))
-			
-			// Use minimal terraform options for negative tests (no variables)
-			terraformOptions := &terraform.Options{
-				TerraformDir: testFolder,
-				NoColor:      true,
-			}
-
-			// This should fail during plan/apply
-			_, err := terraform.InitAndPlanE(t, terraformOptions)
-			require.Error(t, err)
-			if tc.expectedError != "" {
-				assert.Contains(t, err.Error(), tc.expectedError)
-			}
-		})
-	}
-}
-
-// Benchmark test for performance
-func BenchmarkKubernetesSecretsCreation(b *testing.B) {
-	// Skip if not running benchmarks
-	if testing.Short() {
-		b.Skip("Skipping benchmark in short mode")
-	}
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_kubernetes_secrets/tests/fixtures/basic")
-	terraformOptions := getTerraformOptions(b, testFolder)
-
-	// Cleanup after benchmark
-	defer terraform.Destroy(b, terraformOptions)
-
-	// Run the benchmark
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		// Generate unique name for each iteration
-		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
-		
-		terraform.InitAndApply(b, terraformOptions)
-		terraform.Destroy(b, terraformOptions)
-	}
+	_, err := terraform.InitAndPlanE(t, terraformOptions)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "name must be a valid DNS-1123 label")
 }
 
 // Helper function to get terraform options
@@ -242,7 +145,7 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	timestamp := time.Now().UnixNano() % 1000 // Last 3 digits for more variation
 	baseID := strings.ToLower(random.UniqueId())
 	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
-	
+
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
@@ -252,10 +155,10 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		NoColor: true,
 		// Retry configuration
 		RetryableTerraformErrors: map[string]string{
-			".*timeout.*":                    "Timeout error - retrying",
-			".*ResourceGroupNotFound.*":      "Resource group not found - retrying",
-			".*AlreadyExists.*":              "Resource already exists - retrying",
-			".*TooManyRequests.*":            "Too many requests - retrying",
+			".*timeout.*":               "Timeout error - retrying",
+			".*ResourceGroupNotFound.*": "Resource group not found - retrying",
+			".*AlreadyExists.*":         "Resource already exists - retrying",
+			".*TooManyRequests.*":       "Too many requests - retrying",
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,

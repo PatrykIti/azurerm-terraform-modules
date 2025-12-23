@@ -1,16 +1,66 @@
-# Placeholder naming test for Kubernetes Secrets
+# Naming validation tests for Kubernetes Secrets module
 
-variables {
-  name                = "example-kubernetes_secrets"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
+mock_provider "azurerm" {
+  mock_data "azurerm_key_vault_secret" {
+    defaults = {
+      value = "mock-secret"
+    }
+  }
 }
 
-run "naming_plan" {
+mock_provider "kubernetes" {
+  mock_resource "kubernetes_secret_v1" {}
+  mock_resource "kubernetes_manifest" {}
+}
+
+variables {
+  strategy  = "manual"
+  namespace = "app"
+  name      = "app-secrets"
+  manual = {
+    key_vault_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.KeyVault/vaults/test-kv"
+    secrets = [
+      {
+        name                  = "db-password"
+        key_vault_secret_name = "db-password"
+        kubernetes_secret_key = "DB_PASSWORD"
+      }
+    ]
+  }
+}
+
+run "invalid_name_uppercase" {
   command = plan
 
-  assert {
-    condition     = true
-    error_message = "Update naming tests for Kubernetes Secrets."
+  variables {
+    name = "InvalidName"
   }
+
+  expect_failures = [
+    var.name,
+  ]
+}
+
+run "invalid_name_special_chars" {
+  command = plan
+
+  variables {
+    name = "invalid_name"
+  }
+
+  expect_failures = [
+    var.name,
+  ]
+}
+
+run "invalid_namespace" {
+  command = plan
+
+  variables {
+    namespace = "InvalidNamespace"
+  }
+
+  expect_failures = [
+    var.namespace,
+  ]
 }

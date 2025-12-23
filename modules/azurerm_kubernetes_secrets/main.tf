@@ -1,100 +1,243 @@
-# Azure Kubernetes Secrets Module - Initial Release
-resource "azurerm_kubernetes_secrets" "main" {
-  name                = var.name
-  resource_group_name = var.resource_group_name
-  location            = var.location
+# AKS Secrets Module
 
-  # TODO: Add specific configuration for this resource type
-  # Example configuration based on common Azure resource patterns:
+locals {
+  is_manual = var.strategy == "manual"
+  is_csi    = var.strategy == "csi"
+  is_eso    = var.strategy == "eso"
 
-  # Basic configuration
-  # account_tier             = var.account_tier
-  # account_replication_type = var.account_replication_type
+  common_metadata = merge(
+    {},
+    length(var.labels) > 0 ? { labels = var.labels } : {},
+    length(var.annotations) > 0 ? { annotations = var.annotations } : {}
+  )
 
-  # Security settings
-  # https_traffic_only_enabled = var.security_settings.https_traffic_only_enabled
-  # min_tls_version           = var.security_settings.min_tls_version
-  # public_network_access_enabled = var.security_settings.public_network_access_enabled
+  manual_secrets = local.is_manual ? { for secret in var.manual.secrets : secret.name => secret } : {}
 
-  tags = var.tags
+  csi_objects_yaml = local.is_csi ? yamlencode({
+    array = [
+      for object in var.csi.objects : merge(
+        {
+          objectName = object.object_name
+          objectType = object.object_type
+        },
+        try(object.object_version, null) != null ? { objectVersion = object.object_version } : {}
+      )
+    ]
+  }) : null
+
+  eso_store                    = local.is_eso ? var.eso.secret_store : null
+  eso_vault_url                = local.is_eso ? coalesce(var.eso.secret_store.key_vault_url, "https://${var.eso.secret_store.key_vault_name}.vault.azure.net") : null
+  eso_auth_type                = local.is_eso ? var.eso.secret_store.auth.type : null
+  eso_auth_type_map            = { workload_identity = "WorkloadIdentity", service_principal = "ServicePrincipal", managed_identity = "ManagedIdentity" }
+  eso_service_principal_secret = local.is_eso && local.eso_auth_type == "service_principal" ? "${var.name}-eso-sp" : null
+  eso_workload_identity_client_id = local.is_eso && local.eso_auth_type == "workload_identity" ? try(var.eso.secret_store.auth.workload_identity.client_id, null) : null
+  eso_managed_identity_id = local.is_eso && local.eso_auth_type == "managed_identity" ? coalesce(
+    try(var.eso.secret_store.auth.managed_identity.client_id, null),
+    try(var.eso.secret_store.auth.managed_identity.resource_id, null)
+  ) : null
+  eso_service_account_namespace = local.is_eso && local.eso_auth_type == "workload_identity" && local.eso_store.kind == "ClusterSecretStore" ? coalesce(
+    try(var.eso.secret_store.auth.workload_identity.service_account_namespace, null),
+    var.namespace
+  ) : null
+
+  eso_external_secrets = local.is_eso ? { for external_secret in var.eso.external_secrets : external_secret.name => external_secret } : {}
 }
 
-# Network Rules (if applicable)
-resource "azurerm_kubernetes_secrets_network_rules" "main" {
-  count = var.network_rules != null ? 1 : 0
+# -----------------------------------------------------------------------------
+# Manual Strategy (KV -> TF -> K8s Secret)
+# -----------------------------------------------------------------------------
 
-  # TODO: Configure network rules based on resource type
-  # storage_account_id = azurerm_kubernetes_secrets.main.id
+data "azurerm_key_vault_secret" "manual" {
+  for_each = local.manual_secrets
 
-  default_action             = var.network_rules.default_action
-  bypass                     = var.network_rules.bypass
-  ip_rules                   = var.network_rules.ip_rules
-  virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
+  name         = each.value.key_vault_secret_name
+  key_vault_id = try(var.manual.key_vault_id, null)
+  version      = try(each.value.key_vault_secret_version, null)
 }
 
-# Private Endpoints
-resource "azurerm_private_endpoint" "main" {
-  count = length(var.private_endpoints)
+resource "kubernetes_secret_v1" "manual" {
+  count = local.is_manual ? 1 : 0
 
-  name                = var.private_endpoints[count.index].name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  subnet_id           = var.private_endpoints[count.index].subnet_id
-
-  private_service_connection {
-    name                           = coalesce(var.private_endpoints[count.index].private_service_connection_name, "${var.private_endpoints[count.index].name}-psc")
-    private_connection_resource_id = azurerm_kubernetes_secrets.main.id
-    subresource_names              = var.private_endpoints[count.index].subresource_names
-    is_manual_connection           = var.private_endpoints[count.index].is_manual_connection
-    request_message                = var.private_endpoints[count.index].request_message
+  metadata {
+    name      = var.name
+    namespace = var.namespace
+    labels    = var.labels
+    annotations = var.annotations
   }
 
-  dynamic "private_dns_zone_group" {
-    for_each = length(var.private_endpoints[count.index].private_dns_zone_ids) > 0 ? [1] : []
-    content {
-      name                 = "${var.private_endpoints[count.index].name}-dns-zone-group"
-      private_dns_zone_ids = var.private_endpoints[count.index].private_dns_zone_ids
+  type = local.is_manual ? try(var.manual.kubernetes_secret_type, "Opaque") : "Opaque"
+
+  string_data = local.is_manual ? {
+    for key, secret in local.manual_secrets :
+    secret.kubernetes_secret_key => data.azurerm_key_vault_secret.manual[key].value
+  } : {}
+}
+
+# -----------------------------------------------------------------------------
+# CSI Strategy (SecretProviderClass)
+# -----------------------------------------------------------------------------
+
+resource "kubernetes_manifest" "secret_provider_class" {
+  for_each = local.is_csi ? { "csi" = var.csi } : {}
+
+  manifest = {
+    apiVersion = "secrets-store.csi.x-k8s.io/v1"
+    kind       = "SecretProviderClass"
+    metadata = merge(
+      {
+        name      = var.name
+        namespace = var.namespace
+      },
+      local.common_metadata
+    )
+    spec = merge(
+      {
+        provider = "azure"
+        parameters = merge(
+          {
+            usePodIdentity      = "false"
+            useVMManagedIdentity = "true"
+            keyvaultName        = each.value.key_vault_name
+            tenantId            = each.value.tenant_id
+            objects             = local.csi_objects_yaml
+          },
+          try(each.value.user_assigned_identity_client_id, null) != null ? {
+            userAssignedIdentityID = each.value.user_assigned_identity_client_id
+          } : {}
+        )
+      },
+      each.value.sync_to_kubernetes_secret ? {
+        secretObjects = [
+          {
+            secretName = each.value.kubernetes_secret_name
+            type       = each.value.kubernetes_secret_type
+            data = [
+              for object in each.value.objects : {
+                objectName = object.object_name
+                key        = object.secret_key
+              }
+            ]
+          }
+        ]
+      } : {}
+    )
+  }
+}
+
+# -----------------------------------------------------------------------------
+# ESO Strategy (SecretStore + ExternalSecret)
+# -----------------------------------------------------------------------------
+
+resource "kubernetes_secret_v1" "eso_service_principal" {
+  count = local.is_eso && local.eso_auth_type == "service_principal" ? 1 : 0
+
+  metadata {
+    name      = local.eso_service_principal_secret
+    namespace = var.namespace
+    labels    = var.labels
+    annotations = var.annotations
+  }
+
+  type = "Opaque"
+
+  string_data = {
+    clientId     = var.eso.secret_store.auth.service_principal.client_id
+    clientSecret = var.eso.secret_store.auth.service_principal.client_secret
+  }
+}
+
+resource "kubernetes_manifest" "secret_store" {
+  for_each = local.is_eso ? { "store" = var.eso.secret_store } : {}
+
+  manifest = {
+    apiVersion = "external-secrets.io/v1beta1"
+    kind       = each.value.kind
+    metadata = merge(
+      {
+        name = each.value.name
+      },
+      each.value.kind == "SecretStore" ? { namespace = var.namespace } : {},
+      local.common_metadata
+    )
+    spec = {
+      provider = {
+        azurekv = merge(
+          {
+            tenantId = each.value.tenant_id
+            vaultUrl = local.eso_vault_url
+            authType = local.eso_auth_type_map[local.eso_auth_type]
+          },
+          local.eso_auth_type == "workload_identity" ? {
+            serviceAccountRef = merge(
+              {
+                name = each.value.auth.workload_identity.service_account_name
+              },
+              local.eso_service_account_namespace != null ? { namespace = local.eso_service_account_namespace } : {}
+            )
+          } : {},
+          local.eso_auth_type == "workload_identity" && local.eso_workload_identity_client_id != null ? {
+            identityId = local.eso_workload_identity_client_id
+          } : {},
+          local.eso_auth_type == "managed_identity" && local.eso_managed_identity_id != null ? {
+            identityId = local.eso_managed_identity_id
+          } : {},
+          local.eso_auth_type == "service_principal" ? {
+            authSecretRef = {
+              clientId = {
+                name = local.eso_service_principal_secret
+                key  = "clientId"
+              }
+              clientSecret = {
+                name = local.eso_service_principal_secret
+                key  = "clientSecret"
+              }
+            }
+          } : {}
+        )
+      }
     }
   }
 
-  tags = merge(var.tags, var.private_endpoints[count.index].tags)
+  depends_on = local.eso_auth_type == "service_principal" ? [kubernetes_secret_v1.eso_service_principal] : []
 }
 
-# Diagnostic Settings
-resource "azurerm_monitor_diagnostic_setting" "main" {
-  count = var.diagnostic_settings.enabled ? 1 : 0
+resource "kubernetes_manifest" "external_secret" {
+  for_each = local.eso_external_secrets
 
-  name                           = "${var.name}-diagnostics"
-  target_resource_id             = azurerm_kubernetes_secrets.main.id
-  log_analytics_workspace_id     = var.diagnostic_settings.log_analytics_workspace_id
-  storage_account_id             = var.diagnostic_settings.storage_account_id
-  eventhub_authorization_rule_id = var.diagnostic_settings.eventhub_auth_rule_id
-
-  # TODO: Configure specific log categories for this resource type
-  # Example log categories (update based on actual resource):
-  # enabled_log {
-  #   category = "StorageRead"
-  #   retention_policy {
-  #     enabled = true
-  #     days    = var.diagnostic_settings.logs.retention_days
-  #   }
-  # }
-
-  # enabled_log {
-  #   category = "StorageWrite"
-  #   retention_policy {
-  #     enabled = true
-  #     days    = var.diagnostic_settings.logs.retention_days
-  #   }
-  # }
-
-  metric {
-    category = "AllMetrics"
-    enabled  = var.diagnostic_settings.metrics.enabled
-
-    retention_policy {
-      enabled = true
-      days    = var.diagnostic_settings.metrics.retention_days
-    }
+  manifest = {
+    apiVersion = "external-secrets.io/v1beta1"
+    kind       = "ExternalSecret"
+    metadata = merge(
+      {
+        name      = each.value.name
+        namespace = var.namespace
+      },
+      local.common_metadata
+    )
+    spec = merge(
+      {
+        secretStoreRef = {
+          name = var.eso.secret_store.name
+          kind = var.eso.secret_store.kind
+        }
+        target = {
+          name = each.value.target.secret_name
+        }
+        data = [
+          {
+            secretKey = each.value.target.secret_key
+            remoteRef = merge(
+              {
+                key = each.value.remote_ref.name
+              },
+              try(each.value.remote_ref.version, null) != null ? { version = each.value.remote_ref.version } : {}
+            )
+          }
+        ]
+      },
+      try(each.value.refresh_interval, null) != null ? { refreshInterval = each.value.refresh_interval } : {}
+    )
   }
+
+  depends_on = [kubernetes_manifest.secret_store]
 }

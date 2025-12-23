@@ -1,74 +1,36 @@
-output "id" {
-  description = "The ID of the Kubernetes Secrets"
-  value       = try(azurerm_kubernetes_secrets.main.id, null)
+output "strategy" {
+  description = "Selected secret management strategy."
+  value       = var.strategy
 }
 
 output "name" {
-  description = "The name of the Kubernetes Secrets"
-  value       = try(azurerm_kubernetes_secrets.main.name, null)
+  description = "Base name for created Kubernetes objects."
+  value       = var.name
 }
 
-output "location" {
-  description = "The primary location of the kubernetes_secrets"
-  value       = try(azurerm_kubernetes_secrets.main.location, null)
+output "namespace" {
+  description = "Namespace for created Kubernetes objects."
+  value       = var.namespace
 }
 
-output "resource_group_name" {
-  description = "The name of the resource group containing the Kubernetes Secrets"
-  value       = try(azurerm_kubernetes_secrets.main.resource_group_name, null)
+output "kubernetes_secret_name" {
+  description = "Name of the Kubernetes Secret created by manual strategy or CSI sync."
+  value = var.strategy == "manual" ? var.name : (
+    var.strategy == "csi" ? (try(var.csi.sync_to_kubernetes_secret, false) ? var.csi.kubernetes_secret_name : null) : null
+  )
 }
 
-# TODO: Add specific outputs based on the resource type
-# Example outputs for common Azure resources:
-
-# output "primary_endpoint" {
-#   description = "The endpoint URL for the primary location"
-#   value       = try(azurerm_kubernetes_secrets.main.primary_endpoint, null)
-# }
-
-# output "secondary_endpoint" {
-#   description = "The endpoint URL for the secondary location"
-#   value       = try(azurerm_kubernetes_secrets.main.secondary_endpoint, null)
-# }
-
-# output "primary_access_key" {
-#   description = "The primary access key for the kubernetes_secrets"
-#   value       = try(azurerm_kubernetes_secrets.main.primary_access_key, null)
-#   sensitive   = true
-# }
-
-# output "secondary_access_key" {
-#   description = "The secondary access key for the kubernetes_secrets"
-#   value       = try(azurerm_kubernetes_secrets.main.secondary_access_key, null)
-#   sensitive   = true
-# }
-
-# output "connection_string" {
-#   description = "The connection string for the kubernetes_secrets"
-#   value       = try(azurerm_kubernetes_secrets.main.primary_connection_string, null)
-#   sensitive   = true
-# }
-
-# Private Endpoint Outputs
-output "private_endpoints" {
-  description = "Information about the created private endpoints"
-  value = {
-    for idx, pe in azurerm_private_endpoint.main : pe.name => {
-      id                 = pe.id
-      name               = pe.name
-      private_ip_address = pe.private_service_connection[0].private_ip_address
-      fqdn               = try(pe.custom_dns_configs[0].fqdn, null)
-    }
-  }
+output "secret_provider_class_name" {
+  description = "Name of the SecretProviderClass (CSI strategy)."
+  value       = var.strategy == "csi" ? var.name : null
 }
 
-# Network Rules Output
-output "network_rules" {
-  description = "The network rules configuration applied to the kubernetes_secrets"
-  value = var.network_rules != null ? {
-    default_action             = var.network_rules.default_action
-    bypass                     = var.network_rules.bypass
-    ip_rules                   = var.network_rules.ip_rules
-    virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
-  } : null
+output "secret_store_name" {
+  description = "Name of the SecretStore/ClusterSecretStore (ESO strategy)."
+  value       = var.strategy == "eso" ? try(var.eso.secret_store.name, null) : null
+}
+
+output "external_secret_names" {
+  description = "Names of ExternalSecret resources (ESO strategy)."
+  value       = var.strategy == "eso" ? [for external_secret in var.eso.external_secrets : external_secret.name] : []
 }

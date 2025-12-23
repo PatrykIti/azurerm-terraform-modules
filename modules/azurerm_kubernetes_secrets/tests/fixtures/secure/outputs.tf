@@ -1,9 +1,14 @@
-output "kubernetes_secrets_id" {
-  description = "The ID of the created Kubernetes Secrets"
-  value       = module.kubernetes_secrets.id
+output "strategy" {
+  description = "Selected strategy"
+  value       = module.kubernetes_secrets.strategy
 }
 
-output "kubernetes_secrets_name" {
-  description = "The name of the created Kubernetes Secrets"
-  value       = module.kubernetes_secrets.name
+output "secret_store_name" {
+  description = "SecretStore name"
+  value       = module.kubernetes_secrets.secret_store_name
+}
+
+output "external_secret_names" {
+  description = "ExternalSecret names"
+  value       = module.kubernetes_secrets.external_secret_names
 }

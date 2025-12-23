@@ -1,135 +1,288 @@
-# Core Kubernetes Secrets Variables
+# -----------------------------------------------------------------------------
+# Core Configuration
+# -----------------------------------------------------------------------------
+
+variable "strategy" {
+  description = "Secret management strategy to use. Valid values: manual, csi, eso."
+  type        = string
+
+  validation {
+    condition     = contains(["manual", "csi", "eso"], var.strategy)
+    error_message = "strategy must be one of: manual, csi, eso."
+  }
+
+  validation {
+    condition = (
+      var.strategy == "manual" && var.manual != null && var.csi == null && var.eso == null
+    ) || (
+      var.strategy == "csi" && var.csi != null && var.manual == null && var.eso == null
+    ) || (
+      var.strategy == "eso" && var.eso != null && var.manual == null && var.csi == null
+    )
+    error_message = "Set exactly one strategy block that matches strategy (manual/csi/eso), and keep the others null."
+  }
+}
+
+variable "namespace" {
+  description = "Kubernetes namespace for created objects."
+  type        = string
+
+  validation {
+    condition     = length(var.namespace) > 0 && length(var.namespace) <= 253
+    error_message = "namespace must be between 1 and 253 characters."
+  }
+
+  validation {
+    condition     = can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", var.namespace))
+    error_message = "namespace must be a valid DNS-1123 label (lowercase letters, numbers, hyphens)."
+  }
+}
+
 variable "name" {
-  description = "The name of the kubernetes_secrets. Must be globally unique."
+  description = "Base name for the created Kubernetes objects (Secret / SecretProviderClass / ExternalSecret)."
   type        = string
 
   validation {
-    condition     = can(regex("^[a-z0-9]{3,24}$", var.name))
-    error_message = "Kubernetes Secrets name must be between 3 and 24 characters long and use numbers and lower-case letters only."
-  }
-}
-
-variable "resource_group_name" {
-  description = "The name of the resource group in which to create the kubernetes_secrets."
-  type        = string
-}
-
-variable "location" {
-  description = "The Azure Region where the Kubernetes Secrets should exist."
-  type        = string
-}
-
-# TODO: Add specific configuration variables for this resource type
-# Example variables based on common Azure resource patterns:
-
-# variable "account_tier" {
-#   description = "Defines the Tier to use for this resource. Valid options are Standard and Premium."
-#   type        = string
-#   default     = "Standard"
-#
-#   validation {
-#     condition     = contains(["Standard", "Premium"], var.account_tier)
-#     error_message = "Account tier must be either 'Standard' or 'Premium'."
-#   }
-# }
-
-# variable "account_replication_type" {
-#   description = "Defines the type of replication to use for this resource."
-#   type        = string
-#   default     = "ZRS"
-#
-#   validation {
-#     condition     = contains(["LRS", "GRS", "RAGRS", "ZRS", "GZRS", "RAGZRS"], var.account_replication_type)
-#     error_message = "Valid replication types are LRS, GRS, RAGRS, ZRS, GZRS, RAGZRS."
-#   }
-# }
-
-# Security Configuration
-variable "security_settings" {
-  description = "Security configuration for the kubernetes_secrets."
-  type = object({
-    https_traffic_only_enabled      = optional(bool, true)
-    min_tls_version                 = optional(string, "TLS1_2")
-    public_network_access_enabled   = optional(bool, false)
-    shared_access_key_enabled       = optional(bool, false)
-    allow_nested_items_to_be_public = optional(bool, false)
-  })
-  default = {
-    https_traffic_only_enabled      = true
-    min_tls_version                 = "TLS1_2"
-    public_network_access_enabled   = false
-    shared_access_key_enabled       = false
-    allow_nested_items_to_be_public = false
+    condition     = length(var.name) > 0 && length(var.name) <= 253
+    error_message = "name must be between 1 and 253 characters."
   }
 
   validation {
-    condition     = contains(["TLS1_0", "TLS1_1", "TLS1_2"], var.security_settings.min_tls_version)
-    error_message = "The min_tls_version must be one of: TLS1_0, TLS1_1, TLS1_2."
+    condition     = can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", var.name))
+    error_message = "name must be a valid DNS-1123 label (lowercase letters, numbers, hyphens)."
   }
 }
 
-# Network Rules
-variable "network_rules" {
-  description = "Network rules configuration for the kubernetes_secrets."
+variable "labels" {
+  description = "Labels to apply to all Kubernetes objects created by the module."
+  type        = map(string)
+  default     = {}
+}
+
+variable "annotations" {
+  description = "Annotations to apply to all Kubernetes objects created by the module."
+  type        = map(string)
+  default     = {}
+}
+
+# -----------------------------------------------------------------------------
+# Manual Strategy (KV -> TF -> K8s Secret)
+# -----------------------------------------------------------------------------
+
+variable "manual" {
+  description = <<-EOT
+    Manual strategy configuration (KV -> Terraform -> Kubernetes Secret).
+
+    key_vault_id: Key Vault ID to read secrets from.
+    kubernetes_secret_type: Kubernetes Secret type (default: Opaque).
+    secrets: List of mappings from Key Vault secrets to Kubernetes Secret keys.
+  EOT
+
   type = object({
-    default_action             = optional(string, "Deny")
-    bypass                     = optional(list(string), ["AzureServices"])
-    ip_rules                   = optional(list(string), [])
-    virtual_network_subnet_ids = optional(list(string), [])
+    key_vault_id           = string
+    kubernetes_secret_type = optional(string, "Opaque")
+    secrets = list(object({
+      name                     = string
+      key_vault_secret_name    = string
+      key_vault_secret_version = optional(string)
+      kubernetes_secret_key    = string
+    }))
   })
+
   default = null
 
   validation {
-    condition     = var.network_rules == null || contains(["Allow", "Deny"], var.network_rules.default_action)
-    error_message = "The default_action must be either 'Allow' or 'Deny'."
+    condition     = var.manual == null || length(var.manual.secrets) > 0
+    error_message = "manual.secrets must contain at least one entry when manual is set."
+  }
+
+  validation {
+    condition = var.manual == null || length(distinct([
+      for secret in var.manual.secrets : secret.name
+    ])) == length(var.manual.secrets)
+    error_message = "manual.secrets[*].name must be unique."
+  }
+
+  validation {
+    condition = var.manual == null || length(distinct([
+      for secret in var.manual.secrets : secret.kubernetes_secret_key
+    ])) == length(var.manual.secrets)
+    error_message = "manual.secrets[*].kubernetes_secret_key must be unique."
   }
 }
 
-# Private Endpoints
-variable "private_endpoints" {
-  description = "List of private endpoints to create for the kubernetes_secrets."
-  type = list(object({
-    name                            = string
-    subnet_id                       = string
-    subresource_names               = optional(list(string), ["kubernetes_secrets"])
-    private_dns_zone_ids            = optional(list(string), [])
-    private_service_connection_name = optional(string)
-    is_manual_connection            = optional(bool, false)
-    request_message                 = optional(string)
-    tags                            = optional(map(string), {})
-  }))
-  default = []
-}
+# -----------------------------------------------------------------------------
+# CSI Strategy (SecretProviderClass)
+# -----------------------------------------------------------------------------
 
-# Diagnostic Settings
-variable "diagnostic_settings" {
-  description = "Diagnostic settings configuration for audit logging."
+variable "csi" {
+  description = <<-EOT
+    CSI strategy configuration (SecretProviderClass).
+
+    tenant_id: Azure Tenant ID.
+    key_vault_name: Key Vault name.
+    user_assigned_identity_client_id: Optional client ID for user-assigned identity (CSI).
+    sync_to_kubernetes_secret: Whether to sync to a Kubernetes Secret.
+  EOT
+
   type = object({
-    enabled                    = optional(bool, false)
-    log_analytics_workspace_id = optional(string)
-    storage_account_id         = optional(string)
-    eventhub_auth_rule_id      = optional(string)
-    logs = optional(object({
-      # TODO: Add specific log categories for this resource type
-      # Example log categories (update based on actual resource):
-      # storage_read     = optional(bool, true)
-      # storage_write    = optional(bool, true)
-      # storage_delete   = optional(bool, true)
-      retention_days = optional(number, 7)
-    }), {})
-    metrics = optional(object({
-      enabled        = optional(bool, true)
-      retention_days = optional(number, 7)
-    }), {})
+    tenant_id                         = string
+    key_vault_name                    = string
+    user_assigned_identity_client_id  = optional(string)
+    sync_to_kubernetes_secret         = optional(bool, false)
+    kubernetes_secret_name            = optional(string)
+    kubernetes_secret_type            = optional(string, "Opaque")
+    objects = list(object({
+      name           = string
+      object_name    = string
+      object_type    = string
+      object_version = optional(string)
+      secret_key     = optional(string)
+    }))
   })
-  default = {
-    enabled = false
+
+  default = null
+
+  validation {
+    condition     = var.csi == null || length(var.csi.objects) > 0
+    error_message = "csi.objects must contain at least one entry when csi is set."
+  }
+
+  validation {
+    condition = var.csi == null || length(distinct([
+      for object in var.csi.objects : object.name
+    ])) == length(var.csi.objects)
+    error_message = "csi.objects[*].name must be unique."
+  }
+
+  validation {
+    condition = var.csi == null || alltrue([
+      for object in var.csi.objects : contains(["secret", "key", "cert"], object.object_type)
+    ])
+    error_message = "csi.objects[*].object_type must be one of: secret, key, cert."
+  }
+
+  validation {
+    condition = var.csi == null || (
+      var.csi.sync_to_kubernetes_secret == false || (
+        var.csi.kubernetes_secret_name != null &&
+        alltrue([for object in var.csi.objects : try(object.secret_key, null) != null])
+      )
+    )
+    error_message = "When csi.sync_to_kubernetes_secret is true, kubernetes_secret_name and objects[*].secret_key are required."
   }
 }
 
-# Tags
-variable "tags" {
-  description = "A mapping of tags to assign to the resource."
-  type        = map(string)
-  default     = {}
+# -----------------------------------------------------------------------------
+# ESO Strategy (SecretStore + ExternalSecret)
+# -----------------------------------------------------------------------------
+
+variable "eso" {
+  description = <<-EOT
+    External Secrets Operator strategy configuration.
+
+    secret_store: SecretStore/ClusterSecretStore configuration.
+    external_secrets: List of ExternalSecret definitions.
+  EOT
+
+  type = object({
+    secret_store = object({
+      kind           = string
+      name           = string
+      tenant_id      = string
+      key_vault_url  = optional(string)
+      key_vault_name = optional(string)
+      auth = object({
+        type = string
+        workload_identity = optional(object({
+          service_account_name      = string
+          service_account_namespace = optional(string)
+          client_id                 = optional(string)
+        }))
+        service_principal = optional(object({
+          client_id     = string
+          client_secret = string
+          tenant_id     = string
+        }))
+        managed_identity = optional(object({
+          client_id   = optional(string)
+          resource_id = optional(string)
+        }))
+      })
+    })
+    external_secrets = list(object({
+      name             = string
+      refresh_interval = optional(string)
+      remote_ref = object({
+        name    = string
+        version = optional(string)
+      })
+      target = object({
+        secret_name = string
+        secret_key  = string
+      })
+    }))
+  })
+
+  default   = null
+  sensitive = true
+
+  validation {
+    condition     = var.eso == null || contains(["SecretStore", "ClusterSecretStore"], var.eso.secret_store.kind)
+    error_message = "eso.secret_store.kind must be SecretStore or ClusterSecretStore."
+  }
+
+  validation {
+    condition = var.eso == null || (
+      (var.eso.secret_store.key_vault_url != null) != (var.eso.secret_store.key_vault_name != null)
+    )
+    error_message = "Set exactly one of eso.secret_store.key_vault_url or eso.secret_store.key_vault_name."
+  }
+
+  validation {
+    condition     = var.eso == null || contains(["workload_identity", "service_principal", "managed_identity"], var.eso.secret_store.auth.type)
+    error_message = "eso.secret_store.auth.type must be workload_identity, service_principal, or managed_identity."
+  }
+
+  validation {
+    condition = var.eso == null || (
+      var.eso.secret_store.auth.type == "workload_identity" &&
+      var.eso.secret_store.auth.workload_identity != null &&
+      var.eso.secret_store.auth.service_principal == null &&
+      var.eso.secret_store.auth.managed_identity == null
+    ) || (
+      var.eso.secret_store.auth.type == "service_principal" &&
+      var.eso.secret_store.auth.service_principal != null &&
+      var.eso.secret_store.auth.workload_identity == null &&
+      var.eso.secret_store.auth.managed_identity == null
+    ) || (
+      var.eso.secret_store.auth.type == "managed_identity" &&
+      var.eso.secret_store.auth.managed_identity != null &&
+      var.eso.secret_store.auth.workload_identity == null &&
+      var.eso.secret_store.auth.service_principal == null
+    )
+    error_message = "Provide exactly one auth block that matches eso.secret_store.auth.type."
+  }
+
+  validation {
+    condition = var.eso == null || (
+      var.eso.secret_store.auth.type != "managed_identity" || (
+        try(var.eso.secret_store.auth.managed_identity.client_id, null) != null ||
+        try(var.eso.secret_store.auth.managed_identity.resource_id, null) != null
+      )
+    )
+    error_message = "managed_identity requires client_id or resource_id."
+  }
+
+  validation {
+    condition     = var.eso == null || length(var.eso.external_secrets) > 0
+    error_message = "eso.external_secrets must contain at least one entry when eso is set."
+  }
+
+  validation {
+    condition = var.eso == null || length(distinct([
+      for external_secret in var.eso.external_secrets : external_secret.name
+    ])) == length(var.eso.external_secrets)
+    error_message = "eso.external_secrets[*].name must be unique."
+  }
 }

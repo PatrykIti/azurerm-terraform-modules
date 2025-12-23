@@ -1,27 +1,22 @@
-# Basic Kubernetes Secrets Example
+# Basic AKS Secrets Example (manual)
 
-This example demonstrates a basic Kubernetes Secrets configuration using secure defaults and minimal setup.
+This example demonstrates the **manual** strategy: Key Vault → Terraform → Kubernetes Secret.
 
 ## Features
 
-- Creates a basic kubernetes_secrets with standard configuration
-- Uses secure defaults following Azure best practices
-- Creates a dedicated resource group
-- Demonstrates basic module usage patterns
-- Uses variables for configuration flexibility
+- Creates a minimal AKS cluster
+- Reads a secret from Azure Key Vault
+- Creates a Kubernetes Secret via Terraform
 
-## Key Configuration
+## Notes
 
-This example uses secure defaults and demonstrates:
-- Basic resource creation with minimal configuration
-- Using variables for easy configuration customization
-- Following security best practices by default
+- Secret values are stored in Terraform state.
+- Key Vault name must be globally unique (adjust `key_vault_name` if needed).
 
 ## Usage
 
 ```bash
 terraform init
-terraform plan
 terraform apply
 ```
 

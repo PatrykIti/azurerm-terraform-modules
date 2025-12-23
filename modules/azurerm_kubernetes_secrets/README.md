@@ -8,23 +8,109 @@ Current version: **vUnreleased**
 
 ## Description
 
-Manages AKS secrets via manual, CSI, and ESO strategies
+This module provides a unified, user-friendly API for managing Kubernetes secrets on AKS using three strategies:
+
+- **manual**: Key Vault → Terraform → Kubernetes Secret (manual rotation, secrets in state)
+- **csi**: Key Vault → CSI SecretProviderClass (runtime sync, optional K8s Secret sync)
+- **eso**: Key Vault → External Secrets Operator (runtime sync with refresh and mapping)
+
+## Decision Tree (Quick Pick)
+
+- **manual**: choose when you need predictable rollouts/`helm upgrade` and accept secrets in state
+- **csi**: choose when you want runtime sync via SecretProviderClass
+- **eso**: choose when you want runtime sync with ESO features (refresh, mapping)
+
+## Security Notes
+
+- **manual** writes secret values to Terraform state — use a secure backend and strict RBAC.
+- **csi/eso** keep secrets out of state, but rely on runtime components in the cluster.
 
 ## Usage
 
+### Manual (KV → TF → K8s Secret)
 ```hcl
-module "azurerm_kubernetes_secrets" {
-  source = "path/to/azurerm_kubernetes_secrets"
+module "kubernetes_secrets" {
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_secrets?ref=AKSSv1.0.0"
 
-  # Required variables
-  name                = "example-azurerm_kubernetes_secrets"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  strategy  = "manual"
+  namespace = "app"
+  name      = "app-secrets"
 
-  # Optional configuration
-  tags = {
-    Environment = "Development"
-    Project     = "Example"
+  manual = {
+    key_vault_id           = azurerm_key_vault.example.id
+    kubernetes_secret_type = "Opaque"
+    secrets = [
+      {
+        name                     = "db-password"
+        key_vault_secret_name    = "db-password"
+        key_vault_secret_version = null
+        kubernetes_secret_key    = "DB_PASSWORD"
+      }
+    ]
+  }
+}
+```
+
+### CSI (SecretProviderClass)
+```hcl
+module "kubernetes_secrets" {
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_secrets?ref=AKSSv1.0.0"
+
+  strategy  = "csi"
+  namespace = "app"
+  name      = "app-spc"
+
+  csi = {
+    tenant_id                 = var.tenant_id
+    key_vault_name            = azurerm_key_vault.example.name
+    sync_to_kubernetes_secret = true
+    kubernetes_secret_name    = "app-secrets"
+    objects = [
+      {
+        name        = "db-password"
+        object_name = "db-password"
+        object_type = "secret"
+        secret_key  = "DB_PASSWORD"
+      }
+    ]
+  }
+}
+```
+
+### ESO (SecretStore + ExternalSecret)
+```hcl
+module "kubernetes_secrets" {
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_secrets?ref=AKSSv1.0.0"
+
+  strategy  = "eso"
+  namespace = "app"
+  name      = "app-eso"
+
+  eso = {
+    secret_store = {
+      kind           = "SecretStore"
+      name           = "kv-store"
+      tenant_id      = var.tenant_id
+      key_vault_name = azurerm_key_vault.example.name
+      auth = {
+        type = "workload_identity"
+        workload_identity = {
+          service_account_name = "eso-sa"
+        }
+      }
+    }
+    external_secrets = [
+      {
+        name = "db-secret"
+        remote_ref = {
+          name = "db-password"
+        }
+        target = {
+          secret_name = "app-secrets"
+          secret_key  = "DB_PASSWORD"
+        }
+      }
+    ]
   }
 }
 ```

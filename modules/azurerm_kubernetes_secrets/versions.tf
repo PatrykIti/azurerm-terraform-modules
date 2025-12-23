@@ -4,7 +4,11 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.41.0" # Pinned to ensure consistent behavior
+      version = "4.57.0" # Pinned to ensure consistent behavior
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.20.0"
     }
   }
 }
