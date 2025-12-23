@@ -1,23 +1,21 @@
 # Negative test cases - should fail validation
-provider "azurerm" {
-  features {}
-}
+provider "azuredevops" {}
 
-resource "azurerm_resource_group" "test" {
-  name     = "rg-azuredevops_identity-negative-test"
-  location = "West Europe"
-}
-
-# This should fail due to invalid name
+# This should fail due to conflicting membership selectors
 module "azuredevops_identity" {
   source = "../../../"
 
-  name                = "INVALID-NAME-WITH-UPPERCASE"  # Should fail validation
-  resource_group_name = azurerm_resource_group.test.name
-  location            = azurerm_resource_group.test.location
-
-  tags = {
-    Environment = "Test"
-    Scenario    = "Negative"
+  groups = {
+    bad = {
+      display_name = "ado-identity-negative"
+    }
   }
+
+  group_memberships = [
+    {
+      group_descriptor  = "vssgp.invalid"
+      group_key         = "bad"
+      member_descriptors = ["vssgp.invalid-member"]
+    }
+  ]
 }

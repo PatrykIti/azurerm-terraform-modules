@@ -1,19 +1,15 @@
 # Secure Azure DevOps Identity Example
 
-This example demonstrates a maximum-security Azure DevOps Identity configuration suitable for highly sensitive data and regulated environments.
+This fixture demonstrates security-focused identity configuration for tests.
 
 ## Features
 
-- Maximum security configuration with all security features enabled
-- Network isolation and private endpoints
-- Advanced threat protection
-- Comprehensive audit logging and monitoring
-- Encryption at rest and in transit
-- Compliance-ready configuration
+- Creates restricted groups
+- Applies explicit group membership with overwrite mode
 
 ## Key Configuration
 
-This example implements defense-in-depth security principles with multiple layers of protection suitable for highly regulated industries and sensitive workloads.
+Use this fixture to validate overwrite membership behavior.
 
 ## Security Considerations
 

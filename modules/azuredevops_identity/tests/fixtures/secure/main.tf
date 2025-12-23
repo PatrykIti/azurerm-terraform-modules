@@ -1,23 +1,32 @@
-provider "azurerm" {
-  features {}
-}
+provider "azuredevops" {}
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-azuredevops_identity-secure-example"
-  location = "West Europe"
+provider "random" {}
+
+resource "random_string" "suffix" {
+  length  = 6
+  upper   = false
+  special = false
 }
 
 module "azuredevops_identity" {
   source = "../../"
 
-  name                = "azuredevopsidentityexample003"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  groups = {
+    security = {
+      display_name = "${var.group_name_prefix}-security-${random_string.suffix.result}"
+      description  = "Security reviewers"
+    }
+    operators = {
+      display_name = "${var.group_name_prefix}-operators-${random_string.suffix.result}"
+      description  = "Operations access"
+    }
+  }
 
-  # Add security-focused configuration here
-
-  tags = {
-    Environment = "Production"
-    Example     = "Secure"
+  group_memberships = [
+    {
+      group_key         = "security"
+      member_group_keys = ["operators"]
+      mode              = "overwrite"
+    }
   }
 }
