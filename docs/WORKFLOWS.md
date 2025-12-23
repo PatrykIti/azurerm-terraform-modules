@@ -268,7 +268,8 @@ Each of these jobs runs in parallel for each affected module:
 ```yaml
 - Verifies documentation is up-to-date for module
 - Comments with update instructions
-- Checks README.md consistency
+- Regenerates docs via ./scripts/update-module-docs.sh and fails if README.md changed
+- Checks README.md consistency (requires TF_DOCS markers)
 ```
 
 #### `security-scan` - Security - ${{ matrix.module }}
