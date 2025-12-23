@@ -504,8 +504,12 @@ No additional configuration needed!
    - Avoids GitHub API rate limiting issues
 
 6. **terraform-docs overwriting root README during release**
-   - **WARNING**: When running terraform-docs from the root directory during semantic-release, it may overwrite the root README.md instead of the module's README.md
-   - **Solution**: Always run terraform-docs from within the module directory:
+   - **WARNING**: Running terraform-docs from the repository root may overwrite the root README.md instead of the module README.md
+   - **Release-safe solution**: Use the wrapper script from the repo root:
+     ```bash
+     ./scripts/update-module-docs.sh <module_name>
+     ```
+   - **Manual alternative**: Run terraform-docs from within the module directory:
      ```bash
      # ❌ WRONG - runs from root, overwrites root README
      terraform-docs "modules/${MODULE_NAME}"

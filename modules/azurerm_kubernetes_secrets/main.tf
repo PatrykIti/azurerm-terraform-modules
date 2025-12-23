@@ -198,7 +198,7 @@ resource "kubernetes_manifest" "secret_store" {
     }
   }
 
-  depends_on = local.eso_auth_type == "service_principal" ? [kubernetes_secret_v1.eso_service_principal] : []
+  depends_on = [kubernetes_secret_v1.eso_service_principal]
 }
 
 resource "kubernetes_manifest" "external_secret" {
