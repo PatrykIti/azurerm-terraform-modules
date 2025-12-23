@@ -96,3 +96,25 @@ run "multiple_additional_node_pools" {
     error_message = "VM size for the second node pool should be correct."
   }
 }
+
+# Test autoscaling node pool defaults node_count to min_count when not provided
+run "autoscaling_node_pool_defaults_node_count" {
+  command = plan
+
+  variables {
+    node_pools = [
+      {
+        name                 = "autoscale"
+        vm_size              = "Standard_D2_v2"
+        auto_scaling_enabled = true
+        min_count            = 1
+        max_count            = 2
+      }
+    ]
+  }
+
+  assert {
+    condition     = azurerm_kubernetes_cluster_node_pool.kubernetes_cluster_node_pool["autoscale"].node_count == 1
+    error_message = "When auto_scaling_enabled is true and node_count is omitted, node_count should default to min_count."
+  }
+}

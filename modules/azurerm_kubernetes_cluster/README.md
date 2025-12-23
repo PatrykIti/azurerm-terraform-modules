@@ -124,7 +124,7 @@ module "kubernetes_cluster" {
       priority            = "Spot"
       eviction_policy     = "Delete"
       spot_max_price      = -1
-      enable_auto_scaling = true
+      auto_scaling_enabled = true
       min_count           = 1
       max_count           = 5
       vnet_subnet_id      = azurerm_subnet.example.id

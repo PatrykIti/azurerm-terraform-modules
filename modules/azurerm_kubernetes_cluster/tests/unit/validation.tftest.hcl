@@ -78,3 +78,15 @@ run "both_dns_prefixes_set" {
     var.dns_config,
   ]
 }
+
+# Test that a single-character dns_prefix is allowed
+run "single_character_dns_prefix_passes" {
+  command = plan
+
+  variables {
+    name = "validname"
+    dns_config = {
+      dns_prefix = "a"
+    }
+  }
+}

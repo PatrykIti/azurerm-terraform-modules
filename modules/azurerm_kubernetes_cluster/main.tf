@@ -1,3 +1,12 @@
+locals {
+  # Identity configuration used when service_principal is not configured.
+  # Defaults to SystemAssigned when identity is omitted.
+  identity_effective = {
+    type         = try(var.identity.type, "SystemAssigned")
+    identity_ids = try(var.identity.identity_ids, null)
+  }
+}
+
 # Azure Kubernetes Service (AKS) Cluster
 resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
   name                = var.name
@@ -51,7 +60,8 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
     vm_size = var.default_node_pool.vm_size
 
     # Node Count Configuration
-    node_count           = var.default_node_pool.node_count
+    # AzureRM requires node_count even when autoscaling is enabled; default to min_count if omitted.
+    node_count           = var.default_node_pool.auto_scaling_enabled ? (var.default_node_pool.node_count != null ? var.default_node_pool.node_count : var.default_node_pool.min_count) : var.default_node_pool.node_count
     auto_scaling_enabled = var.default_node_pool.auto_scaling_enabled
     min_count            = var.default_node_pool.auto_scaling_enabled ? var.default_node_pool.min_count : null
     max_count            = var.default_node_pool.auto_scaling_enabled ? var.default_node_pool.max_count : null
@@ -182,12 +192,12 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
     }
   }
 
-  # Identity Configuration - One of identity or service_principal must be specified
+  # Identity Configuration - If service_principal is set, identity is not used.
   dynamic "identity" {
-    for_each = var.service_principal == null ? [var.identity] : []
+    for_each = var.service_principal == null ? [local.identity_effective] : []
     content {
       type         = identity.value.type
-      identity_ids = identity.value.identity_ids
+      identity_ids = try(identity.value.identity_ids, null)
     }
   }
 
@@ -251,7 +261,10 @@ resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
   dynamic "api_server_access_profile" {
     for_each = var.api_server_access_profile != null ? [var.api_server_access_profile] : []
     content {
-      authorized_ip_ranges = api_server_access_profile.value.authorized_ip_ranges
+      authorized_ip_ranges                = api_server_access_profile.value.authorized_ip_ranges
+      subnet_id                           = api_server_access_profile.value.subnet_id
+      virtual_network_integration_enabled = api_server_access_profile.value.virtual_network_integration_enabled
+
     }
   }
 
@@ -542,7 +555,8 @@ resource "azurerm_kubernetes_cluster_node_pool" "kubernetes_cluster_node_pool" {
   vm_size = each.value.vm_size
 
   # Node Count Configuration
-  node_count           = each.value.node_count
+  # AzureRM requires node_count even when autoscaling is enabled; default to min_count if omitted.
+  node_count           = each.value.auto_scaling_enabled ? (each.value.node_count != null ? each.value.node_count : each.value.min_count) : each.value.node_count
   auto_scaling_enabled = each.value.auto_scaling_enabled
   min_count            = each.value.auto_scaling_enabled ? each.value.min_count : null
   max_count            = each.value.auto_scaling_enabled ? each.value.max_count : null
@@ -718,4 +732,3 @@ resource "azurerm_kubernetes_cluster_extension" "kubernetes_cluster_extension" {
 
   depends_on = [azurerm_kubernetes_cluster.kubernetes_cluster]
 }
-
