@@ -143,50 +143,381 @@ W przykładach pokazujemy **pełną ścieżkę**: AKS outputs → konfiguracja a
 
 ### `examples/basic` (manual)
 
-- AKS module + Key Vault + sekrety KV.
-- Provider `kubernetes` skonfigurowany z `module.kubernetes_cluster.kube_config.*`.
-- `strategy = "manual"` i mapowanie KV → `kubernetes_secret`.
+AKS module + Key Vault + sekrety KV + module secrets w trybie manual.
 
 ```hcl
+provider "azurerm" {
+  features {}
+}
+
+data "azurerm_client_config" "current" {}
+
+resource "azurerm_resource_group" "example" {
+  name     = "rg-aks-secrets-basic"
+  location = "westeurope"
+}
+
+resource "azurerm_virtual_network" "example" {
+  name                = "vnet-aks-basic"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  address_space       = ["10.0.0.0/16"]
+}
+
+resource "azurerm_subnet" "example" {
+  name                 = "snet-aks-basic"
+  resource_group_name  = azurerm_resource_group.example.name
+  virtual_network_name = azurerm_virtual_network.example.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+module "kubernetes_cluster" {
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.4"
+
+  name                = "aks-basic"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+
+  dns_config = {
+    dns_prefix = "aks-basic"
+  }
+
+  identity = {
+    type = "SystemAssigned"
+  }
+
+  default_node_pool = {
+    name           = "default"
+    vm_size        = "Standard_D2s_v3"
+    node_count     = 1
+    vnet_subnet_id = azurerm_subnet.example.id
+  }
+
+  network_profile = {
+    network_plugin = "azure"
+    network_policy = "azure"
+    service_cidr   = "172.16.0.0/16"
+    dns_service_ip = "172.16.0.10"
+  }
+}
+
 provider "kubernetes" {
   host                   = module.kubernetes_cluster.kube_config.host
   client_certificate     = base64decode(module.kubernetes_cluster.kube_config.client_certificate)
   client_key             = base64decode(module.kubernetes_cluster.kube_config.client_key)
   cluster_ca_certificate = base64decode(module.kubernetes_cluster.kube_config.cluster_ca_certificate)
 }
+
+resource "azurerm_key_vault" "example" {
+  name                = "kv-aks-basic"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  enable_rbac_authorization = true
+  sku_name            = "standard"
+}
+
+resource "azurerm_key_vault_secret" "db_password" {
+  name         = "db-password"
+  value        = "change-me"
+  key_vault_id = azurerm_key_vault.example.id
+}
+
+module "kubernetes_secrets" {
+  source = "../../"
+
+  strategy  = "manual"
+  namespace = "app"
+  name      = "app-secrets"
+
+  manual = {
+    key_vault_id           = azurerm_key_vault.example.id
+    kubernetes_secret_type = "Opaque"
+    secrets = [
+      {
+        name                     = "db-password"
+        key_vault_secret_name    = azurerm_key_vault_secret.db_password.name
+        key_vault_secret_version = null
+        kubernetes_secret_key    = "DB_PASSWORD"
+      }
+    ]
+  }
+}
 ```
 
 ### `examples/complete` (csi)
 
-- AKS z włączonym `key_vault_secrets_provider`.
-- KV access/RBAC dla `module.kubernetes_cluster.key_vault_secrets_provider.object_id`.
-- `strategy = "csi"` + `SecretProviderClass` (opcjonalnie `secretObjects`).
-- Mapowanie do wejść modułu: `csi.tenant_id = module.kubernetes_cluster.identity.tenant_id`.
+AKS z włączonym `key_vault_secrets_provider` + `SecretProviderClass` (opcjonalnie sync do Secret).
 
 ```hcl
+provider "azurerm" {
+  features {}
+}
+
+data "azurerm_client_config" "current" {}
+
+resource "azurerm_resource_group" "example" {
+  name     = "rg-aks-secrets-complete"
+  location = "westeurope"
+}
+
+resource "azurerm_virtual_network" "example" {
+  name                = "vnet-aks-complete"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  address_space       = ["10.0.0.0/16"]
+}
+
+resource "azurerm_subnet" "example" {
+  name                 = "snet-aks-complete"
+  resource_group_name  = azurerm_resource_group.example.name
+  virtual_network_name = azurerm_virtual_network.example.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+module "kubernetes_cluster" {
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.4"
+
+  name                = "aks-complete"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+
+  dns_config = {
+    dns_prefix = "aks-complete"
+  }
+
+  identity = {
+    type = "SystemAssigned"
+  }
+
+  default_node_pool = {
+    name           = "default"
+    vm_size        = "Standard_D2s_v3"
+    node_count     = 1
+    vnet_subnet_id = azurerm_subnet.example.id
+  }
+
+  network_profile = {
+    network_plugin = "azure"
+    network_policy = "azure"
+    service_cidr   = "172.16.0.0/16"
+    dns_service_ip = "172.16.0.10"
+  }
+
+  key_vault_secrets_provider = {
+    secret_rotation_enabled  = true
+    secret_rotation_interval = "2m"
+  }
+}
+
+provider "kubernetes" {
+  host                   = module.kubernetes_cluster.kube_config.host
+  client_certificate     = base64decode(module.kubernetes_cluster.kube_config.client_certificate)
+  client_key             = base64decode(module.kubernetes_cluster.kube_config.client_key)
+  cluster_ca_certificate = base64decode(module.kubernetes_cluster.kube_config.cluster_ca_certificate)
+}
+
+resource "azurerm_key_vault" "example" {
+  name                       = "kv-aks-complete"
+  location                   = azurerm_resource_group.example.location
+  resource_group_name        = azurerm_resource_group.example.name
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  enable_rbac_authorization  = true
+  sku_name                   = "standard"
+}
+
+resource "azurerm_key_vault_secret" "db_password" {
+  name         = "db-password"
+  value        = "change-me"
+  key_vault_id = azurerm_key_vault.example.id
+}
+
 resource "azurerm_role_assignment" "kv_csi" {
   scope                = azurerm_key_vault.example.id
   role_definition_name = "Key Vault Secrets User"
   principal_id         = module.kubernetes_cluster.key_vault_secrets_provider.object_id
 }
+
+module "kubernetes_secrets" {
+  source = "../../"
+
+  strategy  = "csi"
+  namespace = "app"
+  name      = "app-spc"
+
+  csi = {
+    tenant_id                 = module.kubernetes_cluster.identity.tenant_id
+    key_vault_name            = azurerm_key_vault.example.name
+    sync_to_kubernetes_secret = true
+    kubernetes_secret_name    = "app-secrets"
+    objects = [
+      {
+        name           = "db-password"
+        object_name    = "db-password"
+        object_type    = "secret"
+        object_version = null
+        secret_key     = "DB_PASSWORD"
+      }
+    ]
+  }
+}
 ```
 
 ### `examples/secure` (eso + workload identity)
 
-- AKS z `features.workload_identity_enabled = true` i `features.oidc_issuer_enabled = true`.
-- UAI + `azurerm_federated_identity_credential` z `module.kubernetes_cluster.oidc_issuer_url`.
-- ServiceAccount z adnotacją `azure.workload.identity/client-id`.
-- `strategy = "eso"` i `secret_store.auth.type = "workload_identity"`.
-- Mapowanie do wejść modułu: `secret_store.tenant_id = module.kubernetes_cluster.identity.tenant_id`.
+AKS z Workload Identity + ESO SecretStore/ExternalSecret.
 
 ```hcl
+provider "azurerm" {
+  features {}
+}
+
+data "azurerm_client_config" "current" {}
+
+resource "azurerm_resource_group" "example" {
+  name     = "rg-aks-secrets-secure"
+  location = "westeurope"
+}
+
+resource "azurerm_virtual_network" "example" {
+  name                = "vnet-aks-secure"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  address_space       = ["10.0.0.0/16"]
+}
+
+resource "azurerm_subnet" "example" {
+  name                 = "snet-aks-secure"
+  resource_group_name  = azurerm_resource_group.example.name
+  virtual_network_name = azurerm_virtual_network.example.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+module "kubernetes_cluster" {
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.4"
+
+  name                = "aks-secure"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+
+  dns_config = {
+    dns_prefix = "aks-secure"
+  }
+
+  identity = {
+    type = "SystemAssigned"
+  }
+
+  default_node_pool = {
+    name           = "default"
+    vm_size        = "Standard_D2s_v3"
+    node_count     = 1
+    vnet_subnet_id = azurerm_subnet.example.id
+  }
+
+  network_profile = {
+    network_plugin = "azure"
+    network_policy = "azure"
+    service_cidr   = "172.16.0.0/16"
+    dns_service_ip = "172.16.0.10"
+  }
+
+  features = {
+    workload_identity_enabled = true
+    oidc_issuer_enabled       = true
+  }
+}
+
+provider "kubernetes" {
+  host                   = module.kubernetes_cluster.kube_config.host
+  client_certificate     = base64decode(module.kubernetes_cluster.kube_config.client_certificate)
+  client_key             = base64decode(module.kubernetes_cluster.kube_config.client_key)
+  cluster_ca_certificate = base64decode(module.kubernetes_cluster.kube_config.cluster_ca_certificate)
+}
+
+resource "azurerm_key_vault" "example" {
+  name                       = "kv-aks-secure"
+  location                   = azurerm_resource_group.example.location
+  resource_group_name        = azurerm_resource_group.example.name
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  enable_rbac_authorization  = true
+  sku_name                   = "standard"
+}
+
+resource "azurerm_key_vault_secret" "db_password" {
+  name         = "db-password"
+  value        = "change-me"
+  key_vault_id = azurerm_key_vault.example.id
+}
+
+resource "azurerm_user_assigned_identity" "eso" {
+  name                = "uai-eso"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+
 resource "azurerm_federated_identity_credential" "eso" {
   name                = "eso-fic"
   resource_group_name = azurerm_resource_group.example.name
   parent_id           = azurerm_user_assigned_identity.eso.id
   issuer              = module.kubernetes_cluster.oidc_issuer_url
-  subject             = "system:serviceaccount:${var.namespace}:${var.sa_name}"
+  subject             = "system:serviceaccount:app:eso-sa"
   audience            = ["api://AzureADTokenExchange"]
+}
+
+resource "azurerm_role_assignment" "kv_eso" {
+  scope                = azurerm_key_vault.example.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_user_assigned_identity.eso.principal_id
+}
+
+resource "kubernetes_service_account_v1" "eso" {
+  metadata {
+    name      = "eso-sa"
+    namespace = "app"
+    annotations = {
+      "azure.workload.identity/client-id" = azurerm_user_assigned_identity.eso.client_id
+    }
+  }
+}
+
+module "kubernetes_secrets" {
+  source = "../../"
+
+  strategy  = "eso"
+  namespace = "app"
+  name      = "app-eso"
+
+  eso = {
+    secret_store = {
+      kind           = "SecretStore"
+      name           = "kv-store"
+      tenant_id      = module.kubernetes_cluster.identity.tenant_id
+      key_vault_name = azurerm_key_vault.example.name
+      auth = {
+        type = "workload_identity"
+        workload_identity = {
+          service_account_name      = kubernetes_service_account_v1.eso.metadata[0].name
+          service_account_namespace = "app"
+          client_id                 = azurerm_user_assigned_identity.eso.client_id
+        }
+      }
+    }
+    external_secrets = [
+      {
+        name             = "db-secret"
+        refresh_interval = "1h"
+        remote_ref = {
+          name    = "db-password"
+          version = null
+        }
+        target = {
+          secret_name = "app-secrets"
+          secret_key  = "DB_PASSWORD"
+        }
+      }
+    ]
+  }
 }
 ```
 
