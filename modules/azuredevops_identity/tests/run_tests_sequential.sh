@@ -14,12 +14,12 @@ run_test() {
     local test_name=$1
     local output_file="$OUTPUT_DIR/${test_name}.json"
     local log_file="$OUTPUT_DIR/${test_name}.log"
-    
+
     echo "Running test: $test_name"
-    
+
     go test -v -timeout 60m -run "^${test_name}$" . 2>&1 | tee "$log_file"
     local exit_status=${PIPESTATUS[0]}
-    
+
     cat > "$output_file" << EOF
 {
   "test_name": "$test_name",
@@ -29,7 +29,7 @@ run_test() {
   "log_file": "$log_file"
 }
 EOF
-    
+
     echo "Test $test_name completed with status: $exit_status"
     return $exit_status
 }
@@ -39,13 +39,8 @@ tests=(
     "TestBasicAzuredevopsIdentity"
     "TestCompleteAzuredevopsIdentity"
     "TestSecureAzuredevopsIdentity"
-    "TestNetworkAzuredevopsIdentity"
-    "TestAzuredevopsIdentityPrivateEndpoint"
     "TestAzuredevopsIdentityValidationRules"
     "TestAzuredevopsIdentityFullIntegration"
-    "TestAzuredevopsIdentityLifecycle"
-    "TestAzuredevopsIdentityCreationTime"
-    "BenchmarkAzuredevopsIdentityCreation"
 )
 
 echo "Starting sequential test execution for azuredevops_identity"

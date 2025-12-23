@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 14 tasks
+- **To Do:** 13 tasks
 - **In Progress:** 0
-- **Done:** 4 tasks
+- **Done:** 5 tasks
 
 ---
 
@@ -14,7 +14,6 @@ Task board for module work. Update statuses in markdown files.
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
-| [TASK-ADO-002](./TASK-ADO-002_AzureDevOps_Identity_Module.md) | **Azure DevOps Identity module** | High | Large | `modules/azuredevops_identity/` |
 | [TASK-ADO-003](./TASK-ADO-003_AzureDevOps_Team_Module.md) | **Azure DevOps Team module** | Medium | Medium | `modules/azuredevops_team/` |
 | [TASK-ADO-004](./TASK-ADO-004_AzureDevOps_Agent_Pools_Module.md) | **Azure DevOps Agent Pools module** | Medium | Medium | `modules/azuredevops_agent_pools/` |
 | [TASK-ADO-005](./TASK-ADO-005_AzureDevOps_Extension_Module.md) | **Azure DevOps Extension module** | Medium | Small | `modules/azuredevops_extension/` |
@@ -44,3 +43,4 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-003](./TASK-003_Module_Scaffold_Fix.md) | **Generator scaffoldu – naprawa i zgodnosc z AKS** | High | Medium | `scripts/create-new-module.sh` + `scripts/templates/` |
 | [TASK-004](./TASK-004_AKS_Diagnostic_Settings.md) | **AKS diagnostic settings – multi-stream i obszary** | High | Medium | `modules/azurerm_kubernetes_cluster/` |
 | [TASK-ADO-001](./TASK-ADO-001_AzureDevOps_Project_Module.md) | **Azure DevOps Project module** | High | Large | `modules/azuredevops_project/` |
+| [TASK-ADO-002](./TASK-ADO-002_AzureDevOps_Identity_Module.md) | **Azure DevOps Identity module** | High | Large | `modules/azuredevops_identity/` |

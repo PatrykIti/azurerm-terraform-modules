@@ -30,7 +30,9 @@ module "azuredevops_identity" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-<!-- Examples list will be auto-generated here -->
+- [Basic](examples/basic) - This example demonstrates a minimal Azure DevOps identity configuration.
+- [Complete](examples/complete) - This example demonstrates groups, memberships, and optional entitlements.
+- [Secure](examples/secure) - This example demonstrates a security-focused identity configuration with explicit memberships and minimal entitlements.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
