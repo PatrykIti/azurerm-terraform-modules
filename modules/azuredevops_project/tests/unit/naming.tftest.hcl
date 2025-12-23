@@ -1,16 +1,33 @@
-# Placeholder naming test for Azure DevOps Project
+# Test naming rules for the Azure DevOps Project module
 
-variables {
-  name                = "example-azuredevops_project"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
+mock_provider "azuredevops" {
+  mock_resource "azuredevops_project" {
+    defaults = {
+      id = "00000000-0000-0000-0000-000000000000"
+    }
+  }
 }
 
-run "naming_plan" {
+variables {
+  project = {
+    name = "ado-project-naming"
+  }
+}
+
+run "valid_name" {
+  command = plan
+}
+
+run "empty_name_fails" {
   command = plan
 
-  assert {
-    condition     = true
-    error_message = "Update naming tests for Azure DevOps Project."
+  variables {
+    project = {
+      name = ""
+    }
   }
+
+  expect_failures = [
+    var.project,
+  ]
 }

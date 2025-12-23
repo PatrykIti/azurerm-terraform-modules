@@ -50,11 +50,19 @@ locals {
     })
   ]
 
-  # Entries that still have categories after filtering.
-  diagnostic_settings_effective = [
-    for ds in local.diagnostic_settings_resolved : ds
-    if length(ds.log_categories) + length(ds.metric_categories) > 0
-  ]
+  # Map resolved settings by name for easy lookup in resources.
+  diagnostic_settings_resolved_by_name = {
+    for ds in local.diagnostic_settings_resolved : ds.name => ds
+  }
+
+  # Skip only entries that explicitly set both categories lists to empty.
+  diagnostic_settings_for_each = {
+    for ds in var.diagnostic_settings : ds.name => ds
+    if !(
+      ds.log_categories != null && length(ds.log_categories) == 0 &&
+      ds.metric_categories != null && length(ds.metric_categories) == 0
+    )
+  }
 
   # Entries skipped due to having zero categories after filtering.
   diagnostic_settings_skipped = [
@@ -69,25 +77,25 @@ locals {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
-  for_each           = { for ds in local.diagnostic_settings_effective : ds.name => ds }
+  for_each           = local.diagnostic_settings_for_each
   name               = each.value.name
   target_resource_id = azurerm_kubernetes_cluster.kubernetes_cluster.id
 
-  log_analytics_workspace_id     = try(each.value.log_analytics_workspace_id, null)
-  log_analytics_destination_type = try(each.value.log_analytics_destination_type, null)
-  storage_account_id             = try(each.value.storage_account_id, null)
-  eventhub_authorization_rule_id = try(each.value.eventhub_authorization_rule_id, null)
-  eventhub_name                  = try(each.value.eventhub_name, null)
+  log_analytics_workspace_id     = try(local.diagnostic_settings_resolved_by_name[each.key].log_analytics_workspace_id, null)
+  log_analytics_destination_type = try(local.diagnostic_settings_resolved_by_name[each.key].log_analytics_destination_type, null)
+  storage_account_id             = try(local.diagnostic_settings_resolved_by_name[each.key].storage_account_id, null)
+  eventhub_authorization_rule_id = try(local.diagnostic_settings_resolved_by_name[each.key].eventhub_authorization_rule_id, null)
+  eventhub_name                  = try(local.diagnostic_settings_resolved_by_name[each.key].eventhub_name, null)
 
   dynamic "enabled_log" {
-    for_each = each.value.log_categories
+    for_each = local.diagnostic_settings_resolved_by_name[each.key].log_categories
     content {
       category = enabled_log.value
     }
   }
 
   dynamic "metric" {
-    for_each = each.value.metric_categories
+    for_each = local.diagnostic_settings_resolved_by_name[each.key].metric_categories
     content {
       category = metric.value
       enabled  = true

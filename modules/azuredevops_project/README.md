@@ -33,7 +33,9 @@ module "azuredevops_project" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-<!-- Examples list will be auto-generated here -->
+- [Basic](examples/basic) - This example demonstrates a basic Azure DevOps project configuration with minimal settings.
+- [Complete](examples/complete) - This example demonstrates a complete Azure DevOps project configuration with features, pipeline settings, tags, dashboards, and permissions.
+- [Secure](examples/secure) - This example demonstrates a security-focused Azure DevOps project configuration with restrictive pipeline settings and limited features.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->

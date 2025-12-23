@@ -2,163 +2,79 @@
 
 ## Overview
 
-This document details the security features and configurations available in the azuredevops_project Terraform module. The module implements comprehensive security controls following Azure best practices.
+This document describes security considerations for the Azure DevOps project module. The module focuses on project-level controls: visibility, pipeline settings, feature enablement, and permissions.
 
 ## Security Features
 
-### 1. **Encryption**
+### 1. Project Visibility
+- Default visibility is **private**.
+- Public projects should be used only when explicitly required.
 
-#### At Rest
-- **Default**: All data encrypted at rest using Azure-managed keys
-- **Infrastructure Encryption**: Additional layer of encryption when supported
-- **Customer-Managed Keys**: Optional BYOK support (if applicable)
+### 2. Pipeline Settings
+- Enforce job scope to the current project.
+- Limit repository-scoped tokens in YAML pipelines.
+- Limit variables that can be set at queue time.
+- Keep status badges private.
 
-#### In Transit
-- **HTTPS/TLS**: All communications encrypted in transit
-- **Minimum TLS Version**: TLS 1.2 enforced by default
+### 3. Feature Management
+- Disable unused features (e.g., artifacts, test plans) to reduce the attack surface.
 
-### 2. **Access Control**
+### 4. Permissions
+- Assign permissions to groups, not individual users.
+- Use least privilege for project-level roles.
 
-#### Authentication
-- **Azure AD Integration**: Preferred authentication method
-- **Managed Identity**: Support for system and user-assigned identities
-- **Key-based Access**: Disabled by default where possible
+## Security Configuration Example
 
-#### Network Security
-- **Private Endpoints**: Support for private connectivity
-- **Network Rules**: Default deny with explicit allow rules
-- **Service Endpoints**: Virtual network integration
-
-### 3. **Monitoring and Compliance**
-
-#### Audit Logging
-- **Diagnostic Settings**: Comprehensive logging to Log Analytics
-- **Activity Tracking**: All operations logged
-- **Metrics**: Performance and security metrics collected
-
-#### Compliance
-- **Azure Policy**: Compatible with organizational policies
-- **Security Center**: Integration ready
-- **Threat Protection**: Microsoft Defender support where applicable
-
-## Security Configuration Examples
-
-### Maximum Security Configuration
 ```hcl
 module "azuredevops_project" {
   source = "./modules/azuredevops_project"
 
-  name                = "example-secure"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-
-  # Security settings
-  enable_https_traffic_only = true
-  min_tls_version          = "TLS1_2"
-  
-  # Network isolation
-  network_rules = {
-    default_action = "Deny"
-    ip_rules       = []
-    bypass         = ["AzureServices"]
+  project = {
+    name               = "ado-project-secure"
+    description        = "Secure project managed by Terraform"
+    visibility         = "private"
+    version_control    = "Git"
+    work_item_template = "Agile"
   }
 
-  # Private endpoint
-  private_endpoints = [{
-    name                 = "example-pe"
-    subnet_id            = azurerm_subnet.private.id
-    private_dns_zone_ids = [azurerm_private_dns_zone.example.id]
-  }]
-
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+  project_features = {
+    boards       = "enabled"
+    repositories = "enabled"
+    pipelines    = "enabled"
+    testplans    = "disabled"
+    artifacts    = "disabled"
   }
 
-  tags = {
-    Environment        = "Production"
-    DataClassification = "Confidential"
+  pipeline_settings = {
+    enforce_job_scope                    = true
+    enforce_referenced_repo_scoped_token = true
+    enforce_settable_var                 = true
+    publish_pipeline_metadata            = false
+    status_badges_are_private            = true
+    enforce_job_scope_for_release        = true
   }
 }
 ```
 
 ## Security Hardening Checklist
 
-Before deploying to production:
-
-- [ ] Enable all applicable encryption features
-- [ ] Configure network isolation (private endpoints/service endpoints)
-- [ ] Disable public network access where possible
-- [ ] Enable audit logging and monitoring
-- [ ] Apply appropriate RBAC permissions
-- [ ] Configure Azure Policy compliance
-- [ ] Enable threat protection features
-- [ ] Review and apply security tags
-- [ ] Document security exceptions
+- [ ] Keep project visibility set to private.
+- [ ] Disable unused project features.
+- [ ] Enforce job scope and restrict pipeline tokens.
+- [ ] Keep status badges private.
+- [ ] Assign permissions to groups and review them regularly.
 
 ## Common Security Mistakes to Avoid
 
-1. **Leaving Public Access Enabled**
-   ```hcl
-   # ❌ AVOID
-   public_network_access_enabled = true
-   ```
-
-2. **Using Weak TLS Versions**
-   ```hcl
-   # ❌ AVOID
-   min_tls_version = "TLS1_0"
-   ```
-
-3. **Overly Permissive Network Rules**
-   ```hcl
-   # ❌ AVOID
-   network_rules = {
-     default_action = "Allow"
-   }
-   ```
-
-## Incident Response
-
-If a security incident occurs:
-
-1. **Immediate Actions**
-   - Review audit logs
-   - Check for unauthorized access
-   - Apply additional network restrictions
-
-2. **Investigation**
-   - Use Log Analytics queries
-   - Review security alerts
-   - Check configuration compliance
-
-3. **Remediation**
-   - Apply security patches
-   - Update configurations
-   - Document lessons learned
-
-## Compliance Mapping
-
-### SOC 2 Controls
-| Control | Implementation |
-|---------|---------------|
-| CC6.1 | RBAC and Azure AD |
-| CC6.6 | Encryption at rest/transit |
-| CC7.2 | Diagnostic logging |
-
-### ISO 27001 Controls
-| Control | Implementation |
-|---------|---------------|
-| A.10.1.1 | Cryptographic controls |
-| A.9.1.2 | Network access controls |
-| A.12.4.1 | Event logging |
+1. **Public project visibility without review**
+2. **Leaving pipeline metadata publicly accessible**
+3. **Granting broad project permissions to large groups**
+4. **Enabling unused features without governance**
 
 ## Additional Resources
 
-- [Azure Security Best Practices](https://docs.microsoft.com/en-us/azure/security/fundamentals/best-practices-and-patterns)
-- [Azure Security Center](https://docs.microsoft.com/en-us/azure/security-center/)
-- [Azure Policy](https://docs.microsoft.com/en-us/azure/governance/policy/)
+- [Azure DevOps Security Documentation](https://learn.microsoft.com/en-us/azure/devops/organizations/security/about-security-identity?view=azure-devops)
+- [Pipeline Security Best Practices](https://learn.microsoft.com/en-us/azure/devops/pipelines/security/overview?view=azure-devops)
 
 ---
 
