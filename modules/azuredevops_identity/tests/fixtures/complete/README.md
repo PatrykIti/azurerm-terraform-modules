@@ -1,19 +1,15 @@
 # Complete Azure DevOps Identity Example
 
-This example demonstrates a comprehensive deployment of Azure DevOps Identity with all available features and configurations.
+This fixture demonstrates groups and memberships for test coverage.
 
 ## Features
 
-- Full azuredevops_identity configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
+- Creates multiple Azure DevOps groups
+- Adds group-to-group memberships
 
 ## Key Configuration
 
-This comprehensive example showcases all available features of the azuredevops_identity module, demonstrating enterprise-grade capabilities suitable for production environments.
+Use this fixture to validate membership handling in tests.
 
 ## Usage
 

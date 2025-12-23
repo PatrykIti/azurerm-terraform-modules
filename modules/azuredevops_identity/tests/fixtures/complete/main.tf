@@ -1,23 +1,32 @@
-provider "azurerm" {
-  features {}
-}
+provider "azuredevops" {}
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-azuredevops_identity-complete-example"
-  location = "West Europe"
+provider "random" {}
+
+resource "random_string" "suffix" {
+  length  = 6
+  upper   = false
+  special = false
 }
 
 module "azuredevops_identity" {
   source = "../../"
 
-  name                = "azuredevopsidentityexample002"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  groups = {
+    platform = {
+      display_name = "${var.group_name_prefix}-platform-${random_string.suffix.result}"
+      description  = "Platform engineering group"
+    }
+    developers = {
+      display_name = "${var.group_name_prefix}-developers-${random_string.suffix.result}"
+      description  = "Development contributors"
+    }
+  }
 
-  # Add more comprehensive configuration here
-
-  tags = {
-    Environment = "Development"
-    Example     = "Complete"
+  group_memberships = [
+    {
+      group_key         = "platform"
+      member_group_keys = ["developers"]
+      mode              = "add"
+    }
   }
 }

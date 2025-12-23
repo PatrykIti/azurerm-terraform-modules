@@ -1,29 +1,23 @@
 # Basic Azure DevOps Identity Example
 
-This example demonstrates a basic Azure DevOps Identity configuration using secure defaults and minimal setup.
+This example demonstrates a minimal Azure DevOps identity configuration.
 
 ## Features
 
-- Creates a basic azuredevops_identity with standard configuration
-- Uses secure defaults following Azure best practices
-- Creates a dedicated resource group
-- Demonstrates basic module usage patterns
-- Uses variables for configuration flexibility
-
-## Key Configuration
-
-This example uses secure defaults and demonstrates:
-- Basic resource creation with minimal configuration
-- Using variables for easy configuration customization
-- Following security best practices by default
+- Creates a single Azure DevOps group
+- Uses a randomized suffix to avoid name collisions
 
 ## Usage
 
-```bash
-terraform init
-terraform plan
-terraform apply
-```
+1. Initialize Terraform:
+   ```bash
+   terraform init
+   ```
+2. Review and apply:
+   ```bash
+   terraform plan
+   terraform apply
+   ```
 
 ## Cleanup
 

@@ -1,27 +1,29 @@
 # Complete Azure DevOps Identity Example
 
-This example demonstrates a comprehensive deployment of Azure DevOps Identity with all available features and configurations.
+This example demonstrates groups, memberships, and optional entitlements.
 
 ## Features
 
-- Full azuredevops_identity configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
+- Creates multiple Azure DevOps groups
+- Adds group-to-group memberships
+- Supports optional entitlements for users, groups, and service principals
+- Accepts optional security role assignments via variables
 
 ## Key Configuration
 
-This comprehensive example showcases all available features of the azuredevops_identity module, demonstrating enterprise-grade capabilities suitable for production environments.
+Provide optional entitlement and role assignment variables to enable additional access management.
 
 ## Usage
 
-```bash
-terraform init
-terraform plan
-terraform apply
-```
+1. Initialize Terraform:
+   ```bash
+   terraform init
+   ```
+2. Review and apply:
+   ```bash
+   terraform plan
+   terraform apply
+   ```
 
 ## Cleanup
 

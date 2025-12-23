@@ -1,23 +1,59 @@
-provider "azurerm" {
-  features {}
-}
+provider "azuredevops" {}
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-azuredevops_identity-complete-example"
-  location = "West Europe"
+provider "random" {}
+
+resource "random_string" "suffix" {
+  length  = 6
+  upper   = false
+  special = false
 }
 
 module "azuredevops_identity" {
   source = "../../"
 
-  name                = "azuredevopsidentityexample002"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-
-  # Add more comprehensive configuration here
-
-  tags = {
-    Environment = "Development"
-    Example     = "Complete"
+  groups = {
+    platform = {
+      display_name = "${var.group_name_prefix}-platform-${random_string.suffix.result}"
+      description  = "Platform engineering group"
+    }
+    developers = {
+      display_name = "${var.group_name_prefix}-developers-${random_string.suffix.result}"
+      description  = "Development contributors"
+    }
   }
+
+  group_memberships = [
+    {
+      group_key          = "platform"
+      member_group_keys  = ["developers"]
+      mode               = "add"
+    }
+  ]
+
+  user_entitlements = var.user_principal_name != "" ? [
+    {
+      principal_name      = var.user_principal_name
+      account_license_type = "basic"
+      licensing_source    = "account"
+    }
+  ] : []
+
+  group_entitlements = var.aad_group_display_name != "" ? [
+    {
+      display_name         = var.aad_group_display_name
+      account_license_type = "basic"
+      licensing_source     = "account"
+    }
+  ] : []
+
+  service_principal_entitlements = var.service_principal_origin_id != "" ? [
+    {
+      origin_id            = var.service_principal_origin_id
+      origin               = "aad"
+      account_license_type = "basic"
+      licensing_source     = "account"
+    }
+  ] : []
+
+  securityrole_assignments = var.security_role_assignments
 }

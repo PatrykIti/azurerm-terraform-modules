@@ -1,9 +1,14 @@
-output "azuredevops_identity_id" {
-  description = "The ID of the created Azure DevOps Identity"
-  value       = module.azuredevops_identity.id
+output "group_ids" {
+  description = "Map of group IDs keyed by group key."
+  value       = module.azuredevops_identity.group_ids
 }
 
-output "azuredevops_identity_name" {
-  description = "The name of the created Azure DevOps Identity"
-  value       = module.azuredevops_identity.name
+output "group_descriptors" {
+  description = "Map of group descriptors keyed by group key."
+  value       = module.azuredevops_identity.group_descriptors
+}
+
+output "group_membership_ids" {
+  description = "Map of group membership IDs keyed by index."
+  value       = module.azuredevops_identity.group_membership_ids
 }

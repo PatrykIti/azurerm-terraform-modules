@@ -58,6 +58,15 @@ variable "group_memberships" {
     ])
     error_message = "group_memberships.mode must be one of: add, overwrite."
   }
+
+  validation {
+    condition = alltrue([
+      for membership in var.group_memberships : (
+        length(try(membership.member_descriptors, [])) + length(try(membership.member_group_keys, [])) > 0
+      )
+    ])
+    error_message = "Each group_membership must include at least one member descriptor or member group key."
+  }
 }
 
 # -----------------------------------------------------------------------------

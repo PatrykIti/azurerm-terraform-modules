@@ -1,21 +1,15 @@
 # Basic Azure DevOps Identity Example
 
-This example demonstrates a basic Azure DevOps Identity configuration using secure defaults and minimal setup.
+This fixture demonstrates a minimal Azure DevOps identity configuration for tests.
 
 ## Features
 
-- Creates a basic azuredevops_identity with standard configuration
-- Uses secure defaults following Azure best practices
-- Creates a dedicated resource group
-- Demonstrates basic module usage patterns
-- Uses variables for configuration flexibility
+- Creates a single Azure DevOps group
+- Uses a randomized suffix to avoid name collisions
 
 ## Key Configuration
 
-This example uses secure defaults and demonstrates:
-- Basic resource creation with minimal configuration
-- Using variables for easy configuration customization
-- Following security best practices by default
+This fixture keeps the configuration small to reduce test runtime.
 
 ## Usage
 

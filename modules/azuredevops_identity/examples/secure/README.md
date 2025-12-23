@@ -1,19 +1,16 @@
 # Secure Azure DevOps Identity Example
 
-This example demonstrates a maximum-security Azure DevOps Identity configuration suitable for highly sensitive data and regulated environments.
+This example demonstrates a security-focused identity configuration with explicit memberships and minimal entitlements.
 
 ## Features
 
-- Maximum security configuration with all security features enabled
-- Network isolation and private endpoints
-- Advanced threat protection
-- Comprehensive audit logging and monitoring
-- Encryption at rest and in transit
-- Compliance-ready configuration
+- Creates restricted groups for security and operations
+- Applies explicit group-to-group membership with overwrite mode
+- Uses stakeholder entitlements for least-privilege access
 
 ## Key Configuration
 
-This example implements defense-in-depth security principles with multiple layers of protection suitable for highly regulated industries and sensitive workloads.
+Use this pattern to keep access tightly controlled and reviewable.
 
 ## Security Considerations
 
@@ -24,11 +21,15 @@ This example implements defense-in-depth security principles with multiple layer
 
 ## Usage
 
-```bash
-terraform init
-terraform plan
-terraform apply
-```
+1. Initialize Terraform:
+   ```bash
+   terraform init
+   ```
+2. Review and apply:
+   ```bash
+   terraform plan
+   terraform apply
+   ```
 
 ## Cleanup
 

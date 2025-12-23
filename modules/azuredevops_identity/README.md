@@ -1,4 +1,4 @@
-# Terraform Azure Azure DevOps Identity Module
+# Terraform Azure DevOps Identity Module
 
 ## Module Version
 
@@ -8,23 +8,21 @@ Current version: **vUnreleased**
 
 ## Description
 
-Manages Azure DevOps identities, groups, entitlements, and role assignments
+Manages Azure DevOps identities (groups, memberships, entitlements, and security role assignments).
 
 ## Usage
 
 ```hcl
+provider "azuredevops" {}
+
 module "azuredevops_identity" {
   source = "path/to/azuredevops_identity"
 
-  # Required variables
-  name                = "example-azuredevops_identity"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-
-  # Optional configuration
-  tags = {
-    Environment = "Development"
-    Project     = "Example"
+  groups = {
+    platform = {
+      display_name = "ADO Platform Team"
+      description  = "Platform engineering group"
+    }
   }
 }
 ```

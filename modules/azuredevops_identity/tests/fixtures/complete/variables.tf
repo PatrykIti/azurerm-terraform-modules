@@ -1,5 +1,5 @@
-variable "location" {
-  description = "Azure region for resources"
+variable "group_name_prefix" {
+  description = "Prefix for Azure DevOps group names."
   type        = string
-  default     = "West Europe"
+  default     = "ado-identity-complete-fixture"
 }

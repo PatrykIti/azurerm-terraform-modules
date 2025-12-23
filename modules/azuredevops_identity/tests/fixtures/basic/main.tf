@@ -1,21 +1,20 @@
-provider "azurerm" {
-  features {}
-}
+provider "azuredevops" {}
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-azuredevops_identity-basic-example"
-  location = "West Europe"
+provider "random" {}
+
+resource "random_string" "suffix" {
+  length  = 6
+  upper   = false
+  special = false
 }
 
 module "azuredevops_identity" {
   source = "../../"
 
-  name                = "azuredevopsidentityexample001"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-
-  tags = {
-    Environment = "Development"
-    Example     = "Basic"
+  groups = {
+    readers = {
+      display_name = "${var.group_name_prefix}-${random_string.suffix.result}"
+      description  = "Test readers group"
+    }
   }
 }
