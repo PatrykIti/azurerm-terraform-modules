@@ -16,6 +16,8 @@ Dodać spójne, “przyjazne dla ludzi” podejście do zarządzania sekretami d
 1) **Standard (runtime)**: integracja z Azure Key Vault poprzez **CSI Secrets Store** i/lub **External Secrets Operator (ESO)** – bez przenoszenia wartości sekretów do state Terraforma.  
 2) **Manual rotation (Terraform jako pośrednik)**: Terraform czyta sekrety z Key Vault i tworzy/aktualizuje **Kubernetes Secret** – z możliwością “pinowania” wersji i ręcznego sterowania rotacją.
 
+Manual jest **pełnoprawną, wspieraną ścieżką**, aby w wybranych przypadkach **nie używać KV/CSI/ESO w runtime** i uniknąć spowolnień rolloutów/`helm upgrade`.
+
 ---
 
 ## Kontekst / problem
@@ -53,6 +55,14 @@ Moduł musi w README jasno rozróżniać:
 - **Manual (TF)**: wartości sekretów będą w **Terraform state** (wymaga bezpiecznego backendu, twardego RBAC, braku logowania planów z “sensitive” wartościami, itp.).  
 - **CSI/ESO**: wartości sekretów nie trafiają do state, ale runtime może mieć opóźnienia/“eventual consistency”.
 
+### 4) Integracja z AKS module (ważne)
+
+Moduł `azurerm_kubernetes_secrets` **nie tworzy** klastra AKS, ale powinien być spójny z istniejącym `modules/azurerm_kubernetes_cluster/`:
+
+- `strategy = "csi"` zakłada, że w AKS włączono `key_vault_secrets_provider` (addon CSI) oraz skonfigurowano odpowiednią tożsamość i uprawnienia do KV.
+- `strategy = "eso"` zakłada, że ESO jest zainstalowane w klastrze (poza zakresem modułu; preferowany osobny addon/helm).
+- Przykłady powinny pokazać “pełny flow”: AKS outputs (`oidc_issuer_url`, `key_vault_secrets_provider` itd.) → konfiguracja auth w module sekretów → obiekty K8s.
+
 ---
 
 ## Bloki Terraforma (co będzie użyte)
@@ -60,7 +70,7 @@ Moduł musi w README jasno rozróżniać:
 ### Wspólne (dla modułu)
 
 - `terraform { required_version, required_providers }`
-  - `hashicorp/azurerm` – odczyt z Key Vault
+  - `hashicorp/azurerm` – odczyt z Key Vault (pin `4.57.0`, docelowy standard repo)
   - `hashicorp/kubernetes` – tworzenie `Secret` + CRD manifesty (`kubernetes_manifest`)
   - opcjonalnie: `hashicorp/helm` – tylko jeśli zdecydujemy się instalować CSI/ESO w tym module (preferowane jako osobny moduł/addon)
 - `locals { ... }` – normalizacja mapowań (np. keys, nazwy, adnotacje)
@@ -141,6 +151,8 @@ W większości miejsc, gdzie potrzebujemy iteracji po wielu elementach, preferuj
 - **`list(object(...))`** zamiast `map(object(...))` (wejściowo)
 - wewnętrznie w module: konwersję na mapę pod `for_each` przez wzorzec:
   - `{ for x in var.xs : x.name => x }`
+- **snake_case** w nazwach zmiennych wejściowych (spójne z repo i AKS module)
+- w manifestach K8s mapujemy do camelCase tylko tam, gdzie wymagają tego CRD (np. `objectVersion`, `secretObjects`)
 
 ### Dlaczego takie podejście
 
@@ -154,9 +166,10 @@ Wymóg: `name` musi być unikalne w obrębie listy → moduł powinien mieć wal
 ### `strategy = "manual"` (KV → TF → K8s Secret)
 
 - `key_vault_id` (string)
-- `secrets` (map(object)):
+- `secrets` (list(object)):
+  - `name` (string) – unikalny klucz do `for_each`
   - `key_vault_secret_name` (string)
-  - `key_vault_secret_version` (optional(string)) – **pinowanie** wersji do manual rotation  
+  - `key_vault_secret_version` (optional(string)) – **pinowanie** wersji do manual rotation
   - `kubernetes_secret_key` (string) – klucz w `data` K8s Secret
 - `kubernetes_secret_type` (optional(string), default `"Opaque"`)
 
@@ -169,9 +182,9 @@ Zasady:
 - `tenant_id` (string)
 - `key_vault_name` (string)
 - `objects` (list(object)):
-  - `objectName` (string)
-  - `objectType` (string) – `secret`/`key`/`cert`
-  - `objectVersion` (optional(string)) – pozwala “pinować” wersję w CSI (manualny switch)
+  - `object_name` (string)
+  - `object_type` (string) – `secret`/`key`/`cert`
+  - `object_version` (optional(string)) – pozwala “pinować” wersję w CSI (manualny switch)
 - `sync_to_kubernetes_secret` (bool, default `false`)
 - jeśli `sync_to_kubernetes_secret = true`:
   - `kubernetes_secret_name` + mapowanie keys → secretObjects
@@ -185,9 +198,13 @@ Zasady:
   - `key_vault_url` / `key_vault_name`
   - `auth` (pod identity / workload identity / service principal) – zależnie od standardu repo
 - `external_secrets` (list(object)):
-  - `remoteRef` (name + optional version)
-  - `target` (k8s secret name + key)
-  - `refreshInterval` (optional)
+  - `remote_ref` (object):
+    - `name` (string)
+    - `version` (optional(string))
+  - `target` (object):
+    - `secret_name` (string)
+    - `secret_key` (string)
+  - `refresh_interval` (optional)
 
 ---
 
@@ -199,13 +216,16 @@ W repo jest generator: `scripts/create-new-module.sh` + templates w `scripts/tem
 
 Cel: dopiąć spójność wersji i uprościć tworzenie modułów “kubernetesowych”.
 
-- [ ] Ujednolicić wersje w `scripts/templates/module-config.yml` do standardu repo (Terraform `>= 1.12.2`, AzureRM `>= 4.57.0`/pinned)
-- [ ] Ujednolicić provider pin w `scripts/templates/versions.tf` (AzureRM `4.57.0`)
-- [ ] (Opcjonalnie) dodać w `scripts/create-new-module.sh` tryb/flagę dla modułów “kubernetesowych”, aby nie generował `private-endpoint` i pozwalał zadeklarować własne przykłady (np. `manual`, `csi`, `eso`)
+- [ ] Zaktualizować generator do standardu repo: używać `module.json` + `.releaserc.js` (zamiast `module-config.yml`), oraz poprawić instrukcje w dokumentacji/CONTRIBUTING jeśli nadal wskazują `module-config.yml`.
+- [ ] Ujednolicić provider pin w `scripts/templates/versions.tf` do AzureRM `4.57.0` (repo przechodzi na ten baseline).
+- [ ] (Opcjonalnie) dodać w `scripts/create-new-module.sh` tryb/flagę dla modułów “kubernetesowych”, aby nie generował `private-endpoint` i pozwalał zadeklarować własne przykłady (np. `manual`, `csi`, `eso`).
 
 ### TASK-002-1: Skeleton modułu + README
 
-- [ ] Utworzyć `modules/azurerm_kubernetes_secrets/` z plikami: `main.tf`, `variables.tf`, `outputs.tf`, `versions.tf`, `README.md`, `VERSIONING.md`, `CHANGELOG.md`
+- [ ] Utworzyć `modules/azurerm_kubernetes_secrets/` ze standardowym zestawem plików jak w repo (AKS jako wzorzec), m.in.:
+  - `main.tf`, `variables.tf`, `outputs.tf`, `versions.tf`
+  - `README.md`, `CHANGELOG.md`, `VERSIONING.md`, `CONTRIBUTING.md`, `SECURITY.md`
+  - `module.json`, `.releaserc.js`, `.terraform-docs.yml`, `generate-docs.sh`, `Makefile`
 - [ ] Opisać “Decision tree”: kiedy `manual` vs `csi` vs `eso`
 - [ ] Dodać ostrzeżenie o Terraform state dla `manual`
 
@@ -232,7 +252,12 @@ Cel: dopiąć spójność wersji i uprościć tworzenie modułów “kuberneteso
 - [ ] Dodać przykłady dla `manual`, `csi`, `eso`
 - [ ] Przykłady utrzymać w strukturze jak AKS module (`README.md`, `main.tf`, `variables.tf`, `outputs.tf` + preferowane `.terraform-docs.yml`)
 - [ ] Dodać fixtures odpowiadające przykładom (spójne nazewnictwo i zawartość)
-- [ ] Dodać `terraform test` (unit) dla walidacji i “planu” (mock/provider-free tam gdzie możliwe)
+- [ ] Struktura testów identyczna jak w innych modułach (AKS jako wzorzec):
+  - `tests/` z `Makefile`, `README.md`, `test_config.yaml`, `test_helpers.go`
+  - `tests/unit/*.tftest.hcl` (walidacje wejść, strategii, nazw)
+  - `tests/fixtures/*` odpowiadające przykładom
+  - Go testy: `{module}_test.go`, `integration_test.go`, `performance_test.go`
+- [ ] Dodać `terraform test` (unit) + Terratest (integracja) zgodnie z `docs/TESTING_GUIDE/*`
 
 ---
 
