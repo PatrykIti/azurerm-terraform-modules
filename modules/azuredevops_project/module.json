@@ -1,0 +1,7 @@
+{
+  "name": "azuredevops_project",
+  "title": "Azure DevOps Project",
+  "commit_scope": "azuredevops-project",
+  "tag_prefix": "ADOP",
+  "description": "Azure Azure DevOps Project Terraform module with enterprise-grade features"
+}
