@@ -152,7 +152,7 @@ W przykładach pokazujemy **pełną ścieżkę**: AKS outputs → konfiguracja a
   - Świadomość, że wartości trafią do state
 - CSI (SecretProviderClass):
   - AKS: `key_vault_secrets_provider` włączony
-  - KV RBAC/Access Policy dla `module.kubernetes_cluster.key_vault_secrets_provider.object_id`
+  - KV RBAC/Access Policy dla `module.kubernetes_cluster.key_vault_secrets_provider.secret_identity.object_id`
   - `SecretProviderClass` w namespace gdzie działa workload
   - (Opcjonalnie) `secretObjects` jeśli sync do K8s Secret jest wymagany
 - ESO (SecretStore/ExternalSecret):
@@ -364,7 +364,7 @@ resource "azurerm_key_vault_secret" "db_password" {
 resource "azurerm_role_assignment" "kv_csi" {
   scope                = azurerm_key_vault.example.id
   role_definition_name = "Key Vault Secrets User"
-  principal_id         = module.kubernetes_cluster.key_vault_secrets_provider.object_id
+  principal_id         = module.kubernetes_cluster.key_vault_secrets_provider.secret_identity.object_id
 }
 
 module "kubernetes_secrets" {
@@ -783,7 +783,7 @@ Cel: maksymalnie proste wejścia dla użytkownika, bez utraty kontroli nad przyp
 | Strategy | Identity | KV dostęp | State zawiera wartości |
 |---|---|---|---|
 | manual | TF (caller) | odczyt `azurerm_key_vault_secret` | tak |
-| csi | AKS CSI MI | `Key Vault Secrets User` dla `key_vault_secrets_provider.object_id` | nie |
+| csi | AKS CSI MI | `Key Vault Secrets User` dla `key_vault_secrets_provider.secret_identity.object_id` | nie |
 | eso (WI) | UAI + FIC | `Key Vault Secrets User` dla UAI | nie |
 | eso (SP) | Service Principal | `Key Vault Secrets User` dla SP object_id | nie |
 | eso (MI) | Managed Identity | `Key Vault Secrets User` dla MI object_id | nie |

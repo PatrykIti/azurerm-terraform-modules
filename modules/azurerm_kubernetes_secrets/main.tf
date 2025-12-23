@@ -90,7 +90,7 @@ resource "kubernetes_secret_v1" "manual" {
 
   data = local.is_manual ? {
     for key, secret in local.manual_secrets :
-    secret.kubernetes_secret_key => base64encode(data.azurerm_key_vault_secret.manual[key].value)
+    secret.kubernetes_secret_key => data.azurerm_key_vault_secret.manual[key].value
   } : {}
 }
 
@@ -162,8 +162,8 @@ resource "kubernetes_secret_v1" "eso_service_principal" {
   type = "Opaque"
 
   data = {
-    (local.eso_service_principal_keys.client_id)     = base64encode(var.eso.secret_store.auth.service_principal.client_id)
-    (local.eso_service_principal_keys.client_secret) = base64encode(var.eso.secret_store.auth.service_principal.client_secret)
+    (local.eso_service_principal_keys.client_id)     = var.eso.secret_store.auth.service_principal.client_id
+    (local.eso_service_principal_keys.client_secret) = var.eso.secret_store.auth.service_principal.client_secret
   }
 }
 

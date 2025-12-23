@@ -45,7 +45,7 @@ resource "azurerm_subnet" "example" {
 }
 
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.4"
+  source = "../../../azurerm_kubernetes_cluster"
 
   name                = var.cluster_name
   resource_group_name = azurerm_resource_group.example.name
@@ -98,12 +98,12 @@ resource "kubernetes_namespace_v1" "app" {
 }
 
 resource "azurerm_key_vault" "example" {
-  name                      = var.key_vault_name
-  location                  = azurerm_resource_group.example.location
-  resource_group_name       = azurerm_resource_group.example.name
-  tenant_id                 = data.azurerm_client_config.current.tenant_id
-  enable_rbac_authorization = true
-  sku_name                  = "standard"
+  name                       = var.key_vault_name
+  location                   = azurerm_resource_group.example.location
+  resource_group_name        = azurerm_resource_group.example.name
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  rbac_authorization_enabled = true
+  sku_name                   = "standard"
 }
 
 resource "azurerm_role_assignment" "kv_admin" {
@@ -115,7 +115,7 @@ resource "azurerm_role_assignment" "kv_admin" {
 resource "azurerm_role_assignment" "kv_csi" {
   scope                = azurerm_key_vault.example.id
   role_definition_name = "Key Vault Secrets User"
-  principal_id         = module.kubernetes_cluster.key_vault_secrets_provider.object_id
+  principal_id         = module.kubernetes_cluster.key_vault_secrets_provider.secret_identity.object_id
 }
 
 resource "azurerm_key_vault_secret" "db_password" {
@@ -127,7 +127,7 @@ resource "azurerm_key_vault_secret" "db_password" {
 }
 
 module "kubernetes_secrets" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_secrets?ref=AKSSv1.0.0"
+  source = "../.."
 
   strategy  = "csi"
   namespace = kubernetes_namespace_v1.app.metadata[0].name
@@ -136,7 +136,7 @@ module "kubernetes_secrets" {
   csi = {
     tenant_id                        = module.kubernetes_cluster.identity.tenant_id
     key_vault_name                   = azurerm_key_vault.example.name
-    user_assigned_identity_client_id = module.kubernetes_cluster.key_vault_secrets_provider.client_id
+    user_assigned_identity_client_id = module.kubernetes_cluster.key_vault_secrets_provider.secret_identity.client_id
     sync_to_kubernetes_secret        = true
     kubernetes_secret_name           = "app-secrets"
     objects = [

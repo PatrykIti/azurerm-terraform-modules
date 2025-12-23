@@ -45,7 +45,7 @@ resource "azurerm_subnet" "example" {
 }
 
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.4"
+  source = "../../../azurerm_kubernetes_cluster"
 
   name                = var.cluster_name
   resource_group_name = azurerm_resource_group.example.name
@@ -98,12 +98,12 @@ resource "kubernetes_namespace_v1" "app" {
 }
 
 resource "azurerm_key_vault" "example" {
-  name                      = var.key_vault_name
-  location                  = azurerm_resource_group.example.location
-  resource_group_name       = azurerm_resource_group.example.name
-  tenant_id                 = data.azurerm_client_config.current.tenant_id
-  enable_rbac_authorization = true
-  sku_name                  = "standard"
+  name                       = var.key_vault_name
+  location                   = azurerm_resource_group.example.location
+  resource_group_name        = azurerm_resource_group.example.name
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  rbac_authorization_enabled = true
+  sku_name                   = "standard"
 }
 
 resource "azurerm_role_assignment" "kv_admin" {
@@ -152,7 +152,7 @@ resource "kubernetes_service_account_v1" "eso" {
 }
 
 module "kubernetes_secrets" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_secrets?ref=AKSSv1.0.0"
+  source = "../.."
 
   strategy  = "eso"
   namespace = kubernetes_namespace_v1.app.metadata[0].name

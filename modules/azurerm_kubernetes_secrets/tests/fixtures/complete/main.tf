@@ -94,12 +94,12 @@ resource "kubernetes_namespace_v1" "app" {
 }
 
 resource "azurerm_key_vault" "test" {
-  name                      = "kv-akssec-cmp-${var.random_suffix}"
-  location                  = azurerm_resource_group.test.location
-  resource_group_name       = azurerm_resource_group.test.name
-  tenant_id                 = data.azurerm_client_config.current.tenant_id
-  enable_rbac_authorization = true
-  sku_name                  = "standard"
+  name                       = "kv-akssec-cmp-${var.random_suffix}"
+  location                   = azurerm_resource_group.test.location
+  resource_group_name        = azurerm_resource_group.test.name
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  rbac_authorization_enabled = true
+  sku_name                   = "standard"
 }
 
 resource "azurerm_role_assignment" "kv_admin" {
@@ -111,7 +111,7 @@ resource "azurerm_role_assignment" "kv_admin" {
 resource "azurerm_role_assignment" "kv_csi" {
   scope                = azurerm_key_vault.test.id
   role_definition_name = "Key Vault Secrets User"
-  principal_id         = module.kubernetes_cluster.key_vault_secrets_provider.object_id
+  principal_id         = module.kubernetes_cluster.key_vault_secrets_provider.secret_identity.object_id
 }
 
 resource "azurerm_key_vault_secret" "db_password" {
@@ -132,7 +132,7 @@ module "kubernetes_secrets" {
   csi = {
     tenant_id                        = module.kubernetes_cluster.identity.tenant_id
     key_vault_name                   = azurerm_key_vault.test.name
-    user_assigned_identity_client_id = module.kubernetes_cluster.key_vault_secrets_provider.client_id
+    user_assigned_identity_client_id = module.kubernetes_cluster.key_vault_secrets_provider.secret_identity.client_id
     sync_to_kubernetes_secret        = true
     kubernetes_secret_name           = "app-secrets"
     objects = [
