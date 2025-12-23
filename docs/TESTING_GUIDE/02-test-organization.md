@@ -11,11 +11,11 @@ The following is the standard directory structure, based on the `azurerm_storage
 ```
 tests/
 ├── fixtures/                    # Terraform configurations for various test scenarios
-│   ├── simple/                  # Minimal, basic configuration
+│   ├── basic/                   # Minimal, basic configuration
 │   ├── complete/                # Configuration with all features
-│   ├── security/                # Security-focused configuration
+│   ├── secure/                  # Security-focused configuration
 │   ├── network/                 # Network scenarios
-│   ├── private_endpoint/        # Tests using Private Endpoint
+│   ├── private_endpoint/        # Tests using Private Endpoint (optional)
 │   ├── data_lake_gen2/          # Scenarios for Data Lake Gen2 features
 │   ├── identity_access/         # Tests for managed identity and CMK encryption
 │   └── negative/                # Scenarios intended to fail (e.g., invalid names)
@@ -30,7 +30,7 @@ tests/
 ├── go.mod                       # Go module definition and dependencies
 ├── go.sum                       # Dependency checksums
 ├── Makefile                     # Helper scripts for running tests
-├── storage_account_test.go      # Main tests for basic scenarios (e.g., simple, complete)
+├── storage_account_test.go      # Main tests for basic scenarios (e.g., basic, complete)
 ├── integration_test.go          # More complex integration and lifecycle tests
 ├── performance_test.go          # Performance tests and benchmarks
 ├── test_helpers.go              # Helper functions, validation, and Azure SDK clients
@@ -41,6 +41,8 @@ tests/
 └── test_outputs/                # Directory for test results (ignored by Git)
     └── .gitkeep
 ```
+
+> Note: Legacy modules may still use `simple`/`security` fixture names. New modules should use `basic`/`secure`.
 
 ## Test File Naming Conventions
 
@@ -64,7 +66,7 @@ Located in the root of `tests/`, these files use the Go testing framework and Te
 
 | File | Purpose |
 |------|---------|
-| `{module_name}_test.go` | **Main Test File**: Contains the primary test functions for basic and common scenarios (e.g., `simple`, `complete`, `security`). |
+| `{module_name}_test.go` | **Main Test File**: Contains the primary test functions for basic and common scenarios (e.g., `basic`, `complete`, `secure`). |
 | `integration_test.go` | **Advanced Tests**: For complex scenarios, including resource lifecycle (updates, idempotency), disaster recovery, and compliance checks. |
 | `performance_test.go` | **Performance Tests**: Contains benchmarks (`Benchmark...`) and tests that validate deployment time SLAs. |
 | `test_helpers.go` | **Utilities**: A crucial file containing shared helper functions, Azure SDK clients, and custom validation logic to keep test files clean and DRY. |
@@ -143,7 +145,7 @@ func TestBasicStorageAccount(t *testing.T) {
     t.Parallel()
 
     // 1. Setup: Copy the fixture to a temp folder
-    testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/simple")
+    testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/basic")
 
     // 2. Defer Cleanup: Ensure destroy is always called
     defer test_structure.RunTestStage(t, "cleanup", func() {

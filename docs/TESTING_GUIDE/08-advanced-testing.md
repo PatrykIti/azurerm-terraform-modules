@@ -4,6 +4,8 @@ Beyond validating the initial creation of resources, a robust test suite must co
 
 **Note**: All advanced tests must be skippable in CI/CD for pull requests by including the `testing.Short()` check.
 
+> Note: Legacy modules may still reference `fixtures/simple` or `fixtures/security`. New modules should use `fixtures/basic` and `fixtures/secure`.
+
 ```go
 func TestStorageAccountLifecycle(t *testing.T) {
 	if testing.Short() {
@@ -33,7 +35,7 @@ func TestStorageAccountLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
 	defer terraform.Destroy(t, terraformOptions)
@@ -64,7 +66,7 @@ func TestStorageAccountLifecycle(t *testing.T) {
 
 ## 2. Security and Compliance Testing
 
-Compliance tests validate that a resource deployed with a security-focused configuration meets a predefined set of security rules. This is often done using a dedicated `security` fixture.
+Compliance tests validate that a resource deployed with a security-focused configuration meets a predefined set of security rules. This is often done using a dedicated `secure` fixture.
 
 The recommended pattern is to create a slice of check structs, allowing for easy extension and clear, granular test results using `t.Run()`.
 
@@ -72,7 +74,7 @@ The recommended pattern is to create a slice of check structs, allowing for easy
 ```go
 func TestStorageAccountCompliance(t *testing.T) {
 	t.Parallel()
-	// ... deploy resource from the "security" fixture ...
+	// ... deploy resource from the "secure" fixture ...
 
 	helper := NewStorageAccountHelper(t)
 	account := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
@@ -176,7 +178,7 @@ go test -run=^$ -bench=.
 
 ### SLA Validation Tests
 
-These are standard tests that validate the deployment time against a Service Level Agreement (SLA), such as "a simple storage account must be created in under 5 minutes."
+These are standard tests that validate the deployment time against a Service Level Agreement (SLA), such as "a basic storage account must be created in under 5 minutes."
 
 **Example (`performance_test.go`):**
 ```go

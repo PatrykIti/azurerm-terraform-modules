@@ -12,14 +12,16 @@ To ensure consistency across all modules, the following fixture names and purpos
 
 | Fixture Name | Purpose |
 |---|---|
-| `simple` | A minimal, valid configuration to test basic resource creation and default values. |
+| `basic` | A minimal, valid configuration to test basic resource creation and default values. |
 | `complete` | A complex configuration that enables and tests the majority of the module's features. |
-| `security` | A configuration focused on security-hardened settings (e.g., disabled public access, private endpoints, CMK). |
+| `secure` | A configuration focused on security-hardened settings (e.g., disabled public access, private endpoints, CMK). |
 | `network` | Scenarios for advanced networking (e.g., VNet integration, multiple IP rules, service endpoints). |
-| `private_endpoint`| A specific scenario dedicated to validating private endpoint integration. |
+| `private_endpoint`| A specific scenario dedicated to validating private endpoint integration (optional). |
 | `data_lake_gen2` | (Or similar) For features specific to a certain SKU or configuration, like Data Lake Gen2. |
 | `identity_access` | Tests for managed identity (System and User Assigned) and Customer-Managed Key (CMK) encryption. |
 | `negative/` | A parent directory for configurations that are expected to fail Terraform validation or apply, used for negative testing. |
+
+> Note: Legacy modules may still use `simple`/`security` fixture names. New modules should use `basic`/`secure`.
 
 ### Fixture Internal Structure
 
@@ -33,12 +35,12 @@ Each fixture directory must contain the following files:
 
 1.  **Use a Local Module Source**: Fixtures must always test the local version of the module using a relative path to ensure that changes are tested before they are merged.
     ```hcl
-    # in fixtures/simple/main.tf
+    # in fixtures/basic/main.tf
     module "storage_account" {
       # This path points to the module's root directory
       source = "../../../" 
 
-      name                = "stsimple${var.random_suffix}"
+      name                = "stbasic${var.random_suffix}"
       resource_group_name = azurerm_resource_group.test.name
       # ... other variables
     }
@@ -72,7 +74,7 @@ Each fixture directory must contain the following files:
     - `{project}` is a short identifier for the overall project (e.g., `dpc`).
     - `{scenario}` is a short identifier for the fixture:
       - `bas` - basic
-      - `smp` - simple  
+      - `smp` - legacy simple  
       - `cmp` - complete
       - `sec` - security/secure
       - `net` - network
@@ -81,7 +83,7 @@ Each fixture directory must contain the following files:
       - `dlg` - data lake gen2
       - `id` - identity
 
-    **Example (`fixtures/simple/main.tf`):**
+    **Example (`fixtures/basic/main.tf`):**
     ```hcl
     # variables.tf
     variable "random_suffix" {
@@ -91,16 +93,16 @@ Each fixture directory must contain the following files:
 
     # main.tf
     resource "azurerm_resource_group" "test" {
-      # e.g., rg-dpc-smp-a1b2c3
-      name     = "rg-dpc-smp-${var.random_suffix}"
+      # e.g., rg-dpc-bas-a1b2c3
+      name     = "rg-dpc-bas-${var.random_suffix}"
       location = var.location
     }
 
     module "storage_account" {
       source = "../../../"
 
-      # e.g., dpcsmpa1b2c3
-      name                     = "dpcsmp${var.random_suffix}"
+      # e.g., dpcbasa1b2c3
+      name                     = "dpcbas${var.random_suffix}"
       resource_group_name      = azurerm_resource_group.test.name
       # ... other variables
     }
@@ -108,13 +110,13 @@ Each fixture directory must contain the following files:
 
     **Key Differences from Examples:**
     - Test fixtures ALWAYS use `var.random_suffix` for uniqueness (never `random_string` resource)
-    - Test fixtures use abbreviated scenario names (e.g., `smp` vs `simple`)
+    - Test fixtures use abbreviated scenario names (e.g., `bas` vs `basic`; legacy modules may use `smp` vs `simple`)
     - Test fixtures include project identifier (`dpc`) in resource names
     - All test resources must support parallel execution
 
 3.  **Define Clear Outputs for Validation**: Each fixture must expose the key attributes of the created resources as outputs. The Go tests will read these outputs to get the names and IDs needed for validation with the Azure SDK.
     ```hcl
-    # in fixtures/simple/outputs.tf
+    # in fixtures/basic/outputs.tf
     output "storage_account_id" {
       description = "The ID of the created storage account."
       value       = module.storage_account.id
@@ -141,7 +143,7 @@ The `Makefile` provides convenient targets for common operations, ensuring that 
 | `make test` | Runs all Go tests in parallel. The default command for a full test run. |
 | `make test-single TEST_NAME=<TestFunctionName>` | Runs a single, specific test function. Useful for debugging. |
 | `make test-basic` | Runs only the `TestBasicStorageAccount` test. |
-| `make test-security` | Runs only the `TestStorageAccountSecurity` test. |
+| `make test-secure` | Runs only the security-focused test (e.g., `TestStorageAccountSecurity` or `TestSecure<Module>`). |
 | `make benchmark` | Runs all performance benchmarks. |
 | `make test-coverage` | Runs tests and generates an HTML code coverage report (`coverage.html`). |
 | `make test-junit` | Runs tests and generates a JUnit XML report (`test-results.xml`) for CI/CD integration. |

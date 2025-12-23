@@ -11,10 +11,12 @@ This is the primary file for testing the module's core functionality. It should 
 
 ### Key Characteristics
 
--   **One Test Function per Fixture**: Each major fixture (e.g., `simple`, `complete`, `security`, `network`) should have its own `Test...` function.
+-   **One Test Function per Fixture**: Each major fixture (e.g., `basic`, `complete`, `secure`, `network`) should have its own `Test...` function.
 -   **Parallel Execution**: All test functions in this file must run in parallel using `t.Parallel()`.
 -   **Use of `test-structure`**: Each test must follow the `setup -> deploy -> validate -> cleanup` pattern using `test_structure` to ensure robustness.
 -   **Validation via Helpers**: The `validate` stage should call specific validation functions from `test_helpers.go` rather than containing raw Azure SDK calls.
+
+> Note: Legacy modules may still use `simple`/`security` fixture names. New modules should use `basic`/`secure`.
 
 ### Example: Basic Scenario Test
 
@@ -24,7 +26,7 @@ func TestBasicStorageAccount(t *testing.T) {
 	t.Parallel()
 
 	// 1. Setup: Copy the fixture to a temp folder
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/simple")
+testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/basic")
 	
 	// 2. Defer Cleanup
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -121,7 +123,7 @@ func TestStorageAccountLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/simple")
+testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
 	defer terraform.Destroy(t, terraformOptions)
@@ -159,12 +161,12 @@ This file contains Go benchmarks and tests that validate performance and deploym
 
 ```go
 // in performance_test.go
-func BenchmarkStorageAccountCreationSimple(b *testing.B) {
+func BenchmarkStorageAccountCreationBasic(b *testing.B) {
 	b.ReportAllocs()
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer() // Pause timer for setup
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_storage_account/tests/fixtures/simple")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_storage_account/tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		b.StartTimer() // Resume timer for the operation
 
