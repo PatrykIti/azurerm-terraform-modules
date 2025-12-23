@@ -77,6 +77,10 @@ variable "diagnostic_settings" {
   - jesli `log_categories` / `metric_categories` sa podane -> **maja priorytet**,
   - jesli nie -> oblicz na podstawie `areas`,
   - jesli brak `areas` -> domyslnie `areas = ["all"]`.
+- **Brak kategorii po filtracji**:
+  - ustawienie jest **pomijane** (resource nie powstaje),
+  - zapisujemy informacje o pominietych wpisach (np. `local.diagnostic_settings_skipped`),
+  - jesli mozliwe, dodac `output diagnostic_settings_skipped` z lista pominietych konfiguracji.
 - **Limit Azure**: max 5 diagnostic settings na resource (walidacja `length(var.diagnostic_settings) <= 5`).
 
 ---
@@ -93,24 +97,26 @@ data "azurerm_monitor_diagnostic_categories" "aks" {
 
 ### Dostepne obszary (do wyboru w `areas`)
 
-- `all` (wszystkie logi + metryki)
-- `api_plane`
-- `audit`
-- `controller_manager`
-- `scheduler`
-- `autoscaler`
-- `guard`
-- `csi`
-- `cloud_controller`
-- `metrics`
+- `all` -> wszystkie logi + metryki
+- `api_plane` -> `kube-apiserver`
+- `audit` -> `kube-audit`, `kube-audit-admin`
+- `controller_manager` -> `kube-controller-manager`
+- `scheduler` -> `kube-scheduler`
+- `autoscaler` -> `cluster-autoscaler`
+- `guard` -> `guard`
+- `cloud_controller` -> `cloud-controller-manager` (jesli dostepne)
+- `csi` -> wszystkie kategorie z prefixem `csi-`
+- `metrics` -> `AllMetrics` (jesli dostepne)
 
 ### Mapping (przykladowy, filtrowany do realnie dostepnych kategorii)
 
 ```hcl
 locals {
+  # Wszystkie dostepne kategorie logow i metryk z Azure (dynamiczne per region/wersja)
   aks_diag_log_categories    = data.azurerm_monitor_diagnostic_categories.aks.log_category_types
   aks_diag_metric_categories = data.azurerm_monitor_diagnostic_categories.aks.metrics
 
+  # Bazowe mapowanie obszar -> kategorie (podstawa do filtrowania)
   aks_area_log_map_raw = {
     api_plane          = ["kube-apiserver"]
     audit              = ["kube-audit", "kube-audit-admin"]
@@ -121,12 +127,14 @@ locals {
     cloud_controller   = ["cloud-controller-manager"]
   }
 
+  # Mapowanie obszar -> kategorie logow, przefiltrowane tylko do faktycznie dostepnych
   aks_area_log_map = merge(
     { all = local.aks_diag_log_categories },
     { csi = [for c in local.aks_diag_log_categories : c if startswith(c, "csi-")] },
     { for k, v in local.aks_area_log_map_raw : k => [for c in v : c if contains(local.aks_diag_log_categories, c)] }
   )
 
+  # Mapowanie obszar -> kategorie metryk (wszystkie metryki to zwykle AllMetrics)
   aks_area_metric_map = {
     all     = local.aks_diag_metric_categories
     metrics = local.aks_diag_metric_categories
@@ -142,7 +150,8 @@ locals {
 
 ```hcl
 locals {
-  diagnostic_settings_effective = [
+  # Wejscie po rozwinieciu areas -> log/metric categories (bez filtrowania pustych)
+  diagnostic_settings_resolved = [
     for ds in var.diagnostic_settings : merge(ds, {
       areas = coalesce(ds.areas, ["all"])
       log_categories = ds.log_categories != null
@@ -152,6 +161,23 @@ locals {
         ? ds.metric_categories
         : distinct(flatten([for area in coalesce(ds.areas, ["all"]) : lookup(local.aks_area_metric_map, area, [])]))
     })
+  ]
+
+  # Tylko konfiguracje, ktore po filtracji maja cokolwiek do wyslania
+  diagnostic_settings_effective = [
+    for ds in local.diagnostic_settings_resolved : ds
+    if length(ds.log_categories) + length(ds.metric_categories) > 0
+  ]
+
+  # Konfiguracje pominiete (zero kategorii po filtracji)
+  diagnostic_settings_skipped = [
+    for ds in local.diagnostic_settings_resolved : {
+      name              = ds.name
+      areas             = ds.areas
+      log_categories    = ds.log_categories
+      metric_categories = ds.metric_categories
+    }
+    if length(ds.log_categories) + length(ds.metric_categories) == 0
   ]
 }
 
@@ -184,7 +210,17 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
 
 **Uwagi:**
 - Resource name: **`monitor_diagnostic_settings`** (bez prefiksu azurerm).
-- Jezeli po filtracji kategorie sa puste (log + metric) -> fail lub pominiecie (do decyzji implementacyjnej).
+- Jezeli po filtracji kategorie sa puste (log + metric) -> **pominiecie** + lista w `local.diagnostic_settings_skipped`.
+- Jesli mozliwe, dodac output informacyjny (np. `diagnostic_settings_skipped`).
+
+### Output (informacyjny)
+
+```hcl
+output "diagnostic_settings_skipped" {
+  description = "Konfiguracje diagnostic settings pominiete z powodu braku kategorii po filtracji."
+  value       = local.diagnostic_settings_skipped
+}
+```
 
 ---
 
@@ -228,6 +264,7 @@ Opcjonalnie:
    - Ustawic fixture / unit test (np. `tests/unit/diagnostic_settings.tftest.hcl`)
    - Scenariusz: `diagnostic_settings=[]` -> brak resource
    - Scenariusz: 1 ustawienie z `areas=["all"]` i LA -> resource istnieje
+   - Scenariusz: obszar nieobslugiwany (brak kategorii) -> brak resource + wpis w `diagnostic_settings_skipped`
 
 ---
 
@@ -237,6 +274,7 @@ Opcjonalnie:
 - `diagnostic_settings` z 1+ wpisami -> powstaje odpowiadajaca liczba resources.  
 - `areas=["all"]` obejmuje wszystkie dostepne kategorie logow i metryk.  
 - Walidacje blokujace bledne konfiguracje (brak destynacji, brak eventhub_name).  
+- Ustawienia bez zadnych kategorii po filtracji sa pominiete i raportowane.  
 - README jasno opisuje sposob uzycia + ograniczenia.
 
 ---
