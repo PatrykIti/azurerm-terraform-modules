@@ -171,7 +171,7 @@ resource "kubernetes_manifest" "secret_store" {
   for_each = local.eso_secret_store_for_each
 
   manifest = {
-    apiVersion = "external-secrets.io/v1beta1"
+    apiVersion = "external-secrets.io/v1"
     kind       = each.value.kind
     metadata = merge(
       {
@@ -226,7 +226,7 @@ resource "kubernetes_manifest" "external_secret" {
   for_each = local.eso_external_secrets
 
   manifest = {
-    apiVersion = "external-secrets.io/v1beta1"
+    apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"
     metadata = merge(
       {

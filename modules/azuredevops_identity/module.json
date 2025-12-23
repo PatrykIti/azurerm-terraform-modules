@@ -1,0 +1,7 @@
+{
+  "name": "azuredevops_identity",
+  "title": "Azure DevOps Identity",
+  "commit_scope": "azuredevops-identity",
+  "tag_prefix": "ADOI",
+  "description": "Azure Azure DevOps Identity Terraform module with enterprise-grade features"
+}
