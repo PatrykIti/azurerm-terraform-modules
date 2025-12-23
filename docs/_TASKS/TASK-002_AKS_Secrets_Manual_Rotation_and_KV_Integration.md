@@ -943,15 +943,13 @@ Uwagi implementacyjne:
 
 ## Proponowana implementacja (sub-taski)
 
-### TASK-002-0: Aktualizacja generatora szkieletów modułów (pre-work)
+### TASK-002-0: Wykorzystanie zaktualizowanego generatora (pre-work)
 
-W repo jest generator: `scripts/create-new-module.sh` + templates w `scripts/templates/`.
+Generator został już zaktualizowany w **TASK-003** (standard repo, `module.json`/`.releaserc.js`, pin AzureRM `4.57.0`).
 
-Cel: dopiąć spójność wersji i uprościć tworzenie modułów “kubernetesowych”.
-
-- [ ] Zaktualizować generator do standardu repo: używać `module.json` + `.releaserc.js` (zamiast `module-config.yml`), oraz poprawić instrukcje w dokumentacji/CONTRIBUTING jeśli nadal wskazują `module-config.yml`.
-- [ ] Ujednolicić provider pin w `scripts/templates/versions.tf` do AzureRM `4.57.0` (repo przechodzi na ten baseline).
-- [ ] (Opcjonalnie) dodać w `scripts/create-new-module.sh` tryb/flagę dla modułów “kubernetesowych”, aby nie generował `private-endpoint` i pozwalał zadeklarować własne przykłady (np. `manual`, `csi`, `eso`).
+- [ ] Użyć `scripts/create-new-module.sh` z nowymi template’ami do wygenerowania szkieletu modułu.
+- [ ] Nie wprowadzać dodatkowych zmian w generatorze w ramach TASK-002.
+- [ ] Dokumentacja generatora: `docs/_TASKS/TASK-003_Module_Scaffold_Fix.md` → sekcja **Specyfikacja CLI (flagi i skladnia)** oraz `docs/PROMPT_FOR_MODULE_CREATION.md` → sekcja **Use scaffolding script**.
 
 ### TASK-002-1: Skeleton modułu + README
 
