@@ -1,100 +1,66 @@
-# Azure Azure DevOps Identity Module - Initial Release
-resource "azurerm_azuredevops_identity" "main" {
-  name                = var.name
-  resource_group_name = var.resource_group_name
-  location            = var.location
+# Azure DevOps Identity
 
-  # TODO: Add specific configuration for this resource type
-  # Example configuration based on common Azure resource patterns:
-
-  # Basic configuration
-  # account_tier             = var.account_tier
-  # account_replication_type = var.account_replication_type
-
-  # Security settings
-  # https_traffic_only_enabled = var.security_settings.https_traffic_only_enabled
-  # min_tls_version           = var.security_settings.min_tls_version
-  # public_network_access_enabled = var.security_settings.public_network_access_enabled
-
-  tags = var.tags
+locals {
+  group_descriptors = { for key, group in azuredevops_group.group : key => group.descriptor }
+  group_ids         = { for key, group in azuredevops_group.group : key => group.group_id }
 }
 
-# Network Rules (if applicable)
-resource "azurerm_azuredevops_identity_network_rules" "main" {
-  count = var.network_rules != null ? 1 : 0
+resource "azuredevops_group" "group" {
+  for_each = var.groups
 
-  # TODO: Configure network rules based on resource type
-  # storage_account_id = azurerm_azuredevops_identity.main.id
-
-  default_action             = var.network_rules.default_action
-  bypass                     = var.network_rules.bypass
-  ip_rules                   = var.network_rules.ip_rules
-  virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
+  scope        = each.value.scope
+  origin_id    = each.value.origin_id
+  origin       = each.value.origin
+  mail         = each.value.mail
+  display_name = each.value.display_name
+  description  = each.value.description
 }
 
-# Private Endpoints
-resource "azurerm_private_endpoint" "main" {
-  count = length(var.private_endpoints)
+resource "azuredevops_group_membership" "group_membership" {
+  for_each = { for index, membership in var.group_memberships : index => membership }
 
-  name                = var.private_endpoints[count.index].name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  subnet_id           = var.private_endpoints[count.index].subnet_id
-
-  private_service_connection {
-    name                           = coalesce(var.private_endpoints[count.index].private_service_connection_name, "${var.private_endpoints[count.index].name}-psc")
-    private_connection_resource_id = azurerm_azuredevops_identity.main.id
-    subresource_names              = var.private_endpoints[count.index].subresource_names
-    is_manual_connection           = var.private_endpoints[count.index].is_manual_connection
-    request_message                = var.private_endpoints[count.index].request_message
-  }
-
-  dynamic "private_dns_zone_group" {
-    for_each = length(var.private_endpoints[count.index].private_dns_zone_ids) > 0 ? [1] : []
-    content {
-      name                 = "${var.private_endpoints[count.index].name}-dns-zone-group"
-      private_dns_zone_ids = var.private_endpoints[count.index].private_dns_zone_ids
-    }
-  }
-
-  tags = merge(var.tags, var.private_endpoints[count.index].tags)
+  group = each.value.group_descriptor != null ? each.value.group_descriptor : local.group_descriptors[each.value.group_key]
+  members = concat(
+    try(each.value.member_descriptors, []),
+    [for key in try(each.value.member_group_keys, []) : local.group_descriptors[key]]
+  )
+  mode = each.value.mode
 }
 
-# Diagnostic Settings
-resource "azurerm_monitor_diagnostic_setting" "main" {
-  count = var.diagnostic_settings.enabled ? 1 : 0
+resource "azuredevops_group_entitlement" "group_entitlement" {
+  for_each = { for index, entitlement in var.group_entitlements : index => entitlement }
 
-  name                           = "${var.name}-diagnostics"
-  target_resource_id             = azurerm_azuredevops_identity.main.id
-  log_analytics_workspace_id     = var.diagnostic_settings.log_analytics_workspace_id
-  storage_account_id             = var.diagnostic_settings.storage_account_id
-  eventhub_authorization_rule_id = var.diagnostic_settings.eventhub_auth_rule_id
+  display_name         = each.value.display_name
+  origin               = each.value.origin
+  origin_id            = each.value.origin_id
+  account_license_type = each.value.account_license_type
+  licensing_source     = each.value.licensing_source
+}
 
-  # TODO: Configure specific log categories for this resource type
-  # Example log categories (update based on actual resource):
-  # enabled_log {
-  #   category = "StorageRead"
-  #   retention_policy {
-  #     enabled = true
-  #     days    = var.diagnostic_settings.logs.retention_days
-  #   }
-  # }
+resource "azuredevops_user_entitlement" "user_entitlement" {
+  for_each = { for index, entitlement in var.user_entitlements : index => entitlement }
 
-  # enabled_log {
-  #   category = "StorageWrite"
-  #   retention_policy {
-  #     enabled = true
-  #     days    = var.diagnostic_settings.logs.retention_days
-  #   }
-  # }
+  principal_name       = each.value.principal_name
+  origin               = each.value.origin
+  origin_id            = each.value.origin_id
+  account_license_type = each.value.account_license_type
+  licensing_source     = each.value.licensing_source
+}
 
-  metric {
-    category = "AllMetrics"
-    enabled  = var.diagnostic_settings.metrics.enabled
+resource "azuredevops_service_principal_entitlement" "service_principal_entitlement" {
+  for_each = { for index, entitlement in var.service_principal_entitlements : index => entitlement }
 
-    retention_policy {
-      enabled = true
-      days    = var.diagnostic_settings.metrics.retention_days
-    }
-  }
+  origin_id            = each.value.origin_id
+  origin               = each.value.origin
+  account_license_type = each.value.account_license_type
+  licensing_source     = each.value.licensing_source
+}
+
+resource "azuredevops_securityrole_assignment" "securityrole_assignment" {
+  for_each = { for index, assignment in var.securityrole_assignments : index => assignment }
+
+  scope       = each.value.scope
+  resource_id = each.value.resource_id
+  identity_id = each.value.identity_id != null ? each.value.identity_id : local.group_ids[each.value.identity_group_key]
+  role_name   = each.value.role_name
 }

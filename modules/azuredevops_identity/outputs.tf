@@ -1,74 +1,44 @@
-output "id" {
-  description = "The ID of the Azure DevOps Identity"
-  value       = try(azurerm_azuredevops_identity.main.id, null)
+output "group_ids" {
+  description = "Map of group IDs keyed by group key."
+  value       = { for key, group in azuredevops_group.group : key => group.group_id }
 }
 
-output "name" {
-  description = "The name of the Azure DevOps Identity"
-  value       = try(azurerm_azuredevops_identity.main.name, null)
+output "group_descriptors" {
+  description = "Map of group descriptors keyed by group key."
+  value       = { for key, group in azuredevops_group.group : key => group.descriptor }
 }
 
-output "location" {
-  description = "The primary location of the azuredevops_identity"
-  value       = try(azurerm_azuredevops_identity.main.location, null)
+output "group_entitlement_ids" {
+  description = "Map of group entitlement IDs keyed by index."
+  value       = { for key, entitlement in azuredevops_group_entitlement.group_entitlement : key => entitlement.id }
 }
 
-output "resource_group_name" {
-  description = "The name of the resource group containing the Azure DevOps Identity"
-  value       = try(azurerm_azuredevops_identity.main.resource_group_name, null)
+output "group_entitlement_descriptors" {
+  description = "Map of group entitlement descriptors keyed by index."
+  value       = { for key, entitlement in azuredevops_group_entitlement.group_entitlement : key => entitlement.descriptor }
 }
 
-# TODO: Add specific outputs based on the resource type
-# Example outputs for common Azure resources:
-
-# output "primary_endpoint" {
-#   description = "The endpoint URL for the primary location"
-#   value       = try(azurerm_azuredevops_identity.main.primary_endpoint, null)
-# }
-
-# output "secondary_endpoint" {
-#   description = "The endpoint URL for the secondary location"
-#   value       = try(azurerm_azuredevops_identity.main.secondary_endpoint, null)
-# }
-
-# output "primary_access_key" {
-#   description = "The primary access key for the azuredevops_identity"
-#   value       = try(azurerm_azuredevops_identity.main.primary_access_key, null)
-#   sensitive   = true
-# }
-
-# output "secondary_access_key" {
-#   description = "The secondary access key for the azuredevops_identity"
-#   value       = try(azurerm_azuredevops_identity.main.secondary_access_key, null)
-#   sensitive   = true
-# }
-
-# output "connection_string" {
-#   description = "The connection string for the azuredevops_identity"
-#   value       = try(azurerm_azuredevops_identity.main.primary_connection_string, null)
-#   sensitive   = true
-# }
-
-# Private Endpoint Outputs
-output "private_endpoints" {
-  description = "Information about the created private endpoints"
-  value = {
-    for idx, pe in azurerm_private_endpoint.main : pe.name => {
-      id                 = pe.id
-      name               = pe.name
-      private_ip_address = pe.private_service_connection[0].private_ip_address
-      fqdn               = try(pe.custom_dns_configs[0].fqdn, null)
-    }
-  }
+output "user_entitlement_ids" {
+  description = "Map of user entitlement IDs keyed by index."
+  value       = { for key, entitlement in azuredevops_user_entitlement.user_entitlement : key => entitlement.id }
 }
 
-# Network Rules Output
-output "network_rules" {
-  description = "The network rules configuration applied to the azuredevops_identity"
-  value = var.network_rules != null ? {
-    default_action             = var.network_rules.default_action
-    bypass                     = var.network_rules.bypass
-    ip_rules                   = var.network_rules.ip_rules
-    virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
-  } : null
+output "user_entitlement_descriptors" {
+  description = "Map of user entitlement descriptors keyed by index."
+  value       = { for key, entitlement in azuredevops_user_entitlement.user_entitlement : key => entitlement.descriptor }
+}
+
+output "service_principal_entitlement_ids" {
+  description = "Map of service principal entitlement IDs keyed by index."
+  value       = { for key, entitlement in azuredevops_service_principal_entitlement.service_principal_entitlement : key => entitlement.id }
+}
+
+output "service_principal_entitlement_descriptors" {
+  description = "Map of service principal entitlement descriptors keyed by index."
+  value       = { for key, entitlement in azuredevops_service_principal_entitlement.service_principal_entitlement : key => entitlement.descriptor }
+}
+
+output "group_membership_ids" {
+  description = "Map of group membership IDs keyed by index."
+  value       = { for key, membership in azuredevops_group_membership.group_membership : key => membership.id }
 }

@@ -1,135 +1,240 @@
-# Core Azure DevOps Identity Variables
-variable "name" {
-  description = "The name of the azuredevops_identity. Must be globally unique."
-  type        = string
+# -----------------------------------------------------------------------------
+# Groups
+# -----------------------------------------------------------------------------
+
+variable "groups" {
+  description = "Map of Azure DevOps groups to manage."
+  type = map(object({
+    scope        = optional(string)
+    origin_id    = optional(string)
+    origin       = optional(string)
+    mail         = optional(string)
+    display_name = optional(string)
+    description  = optional(string)
+  }))
+  default = {}
 
   validation {
-    condition     = can(regex("^[a-z0-9]{3,24}$", var.name))
-    error_message = "Azure DevOps Identity name must be between 3 and 24 characters long and use numbers and lower-case letters only."
+    condition = alltrue([
+      for group in values(var.groups) : (
+        (group.origin_id != null && group.mail == null && group.display_name == null && group.scope == null) ||
+        (group.mail != null && group.origin_id == null && group.display_name == null && group.scope == null) ||
+        (group.origin_id == null && group.mail == null && group.display_name != null)
+      )
+    ])
+    error_message = "Each group must set display_name (optionally with scope) or set origin_id or mail (without scope or display_name)."
   }
 }
 
-variable "resource_group_name" {
-  description = "The name of the resource group in which to create the azuredevops_identity."
-  type        = string
-}
+# -----------------------------------------------------------------------------
+# Group Memberships
+# -----------------------------------------------------------------------------
 
-variable "location" {
-  description = "The Azure Region where the Azure DevOps Identity should exist."
-  type        = string
-}
-
-# TODO: Add specific configuration variables for this resource type
-# Example variables based on common Azure resource patterns:
-
-# variable "account_tier" {
-#   description = "Defines the Tier to use for this resource. Valid options are Standard and Premium."
-#   type        = string
-#   default     = "Standard"
-#
-#   validation {
-#     condition     = contains(["Standard", "Premium"], var.account_tier)
-#     error_message = "Account tier must be either 'Standard' or 'Premium'."
-#   }
-# }
-
-# variable "account_replication_type" {
-#   description = "Defines the type of replication to use for this resource."
-#   type        = string
-#   default     = "ZRS"
-#
-#   validation {
-#     condition     = contains(["LRS", "GRS", "RAGRS", "ZRS", "GZRS", "RAGZRS"], var.account_replication_type)
-#     error_message = "Valid replication types are LRS, GRS, RAGRS, ZRS, GZRS, RAGZRS."
-#   }
-# }
-
-# Security Configuration
-variable "security_settings" {
-  description = "Security configuration for the azuredevops_identity."
-  type = object({
-    https_traffic_only_enabled      = optional(bool, true)
-    min_tls_version                 = optional(string, "TLS1_2")
-    public_network_access_enabled   = optional(bool, false)
-    shared_access_key_enabled       = optional(bool, false)
-    allow_nested_items_to_be_public = optional(bool, false)
-  })
-  default = {
-    https_traffic_only_enabled      = true
-    min_tls_version                 = "TLS1_2"
-    public_network_access_enabled   = false
-    shared_access_key_enabled       = false
-    allow_nested_items_to_be_public = false
-  }
-
-  validation {
-    condition     = contains(["TLS1_0", "TLS1_1", "TLS1_2"], var.security_settings.min_tls_version)
-    error_message = "The min_tls_version must be one of: TLS1_0, TLS1_1, TLS1_2."
-  }
-}
-
-# Network Rules
-variable "network_rules" {
-  description = "Network rules configuration for the azuredevops_identity."
-  type = object({
-    default_action             = optional(string, "Deny")
-    bypass                     = optional(list(string), ["AzureServices"])
-    ip_rules                   = optional(list(string), [])
-    virtual_network_subnet_ids = optional(list(string), [])
-  })
-  default = null
-
-  validation {
-    condition     = var.network_rules == null || contains(["Allow", "Deny"], var.network_rules.default_action)
-    error_message = "The default_action must be either 'Allow' or 'Deny'."
-  }
-}
-
-# Private Endpoints
-variable "private_endpoints" {
-  description = "List of private endpoints to create for the azuredevops_identity."
+variable "group_memberships" {
+  description = "List of group membership assignments."
   type = list(object({
-    name                            = string
-    subnet_id                       = string
-    subresource_names               = optional(list(string), ["azuredevops_identity"])
-    private_dns_zone_ids            = optional(list(string), [])
-    private_service_connection_name = optional(string)
-    is_manual_connection            = optional(bool, false)
-    request_message                 = optional(string)
-    tags                            = optional(map(string), {})
+    group_descriptor  = optional(string)
+    group_key         = optional(string)
+    member_descriptors = optional(list(string), [])
+    member_group_keys  = optional(list(string), [])
+    mode              = optional(string)
   }))
   default = []
-}
 
-# Diagnostic Settings
-variable "diagnostic_settings" {
-  description = "Diagnostic settings configuration for audit logging."
-  type = object({
-    enabled                    = optional(bool, false)
-    log_analytics_workspace_id = optional(string)
-    storage_account_id         = optional(string)
-    eventhub_auth_rule_id      = optional(string)
-    logs = optional(object({
-      # TODO: Add specific log categories for this resource type
-      # Example log categories (update based on actual resource):
-      # storage_read     = optional(bool, true)
-      # storage_write    = optional(bool, true)
-      # storage_delete   = optional(bool, true)
-      retention_days = optional(number, 7)
-    }), {})
-    metrics = optional(object({
-      enabled        = optional(bool, true)
-      retention_days = optional(number, 7)
-    }), {})
-  })
-  default = {
-    enabled = false
+  validation {
+    condition = alltrue([
+      for membership in var.group_memberships : (
+        (membership.group_descriptor != null) != (membership.group_key != null)
+      )
+    ])
+    error_message = "Each group_membership must set exactly one of group_descriptor or group_key."
+  }
+
+  validation {
+    condition = alltrue([
+      for membership in var.group_memberships : (
+        membership.mode == null || contains(["add", "overwrite"], membership.mode)
+      )
+    ])
+    error_message = "group_memberships.mode must be one of: add, overwrite."
   }
 }
 
-# Tags
-variable "tags" {
-  description = "A mapping of tags to assign to the resource."
-  type        = map(string)
-  default     = {}
+# -----------------------------------------------------------------------------
+# Group Entitlements
+# -----------------------------------------------------------------------------
+
+variable "group_entitlements" {
+  description = "List of group entitlements to manage."
+  type = list(object({
+    display_name        = optional(string)
+    origin              = optional(string)
+    origin_id           = optional(string)
+    account_license_type = optional(string, "express")
+    licensing_source    = optional(string, "account")
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.group_entitlements : (
+        (entitlement.display_name != null && entitlement.origin_id == null && entitlement.origin == null) ||
+        (entitlement.display_name == null && entitlement.origin_id != null && entitlement.origin != null)
+      )
+    ])
+    error_message = "Each group_entitlement must set display_name or origin+origin_id, but not both."
+  }
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.group_entitlements : contains([
+        "advanced",
+        "earlyAdopter",
+        "express",
+        "none",
+        "professional",
+        "stakeholder",
+        "basic"
+      ], entitlement.account_license_type)
+    ])
+    error_message = "group_entitlements.account_license_type must be a valid Azure DevOps license type."
+  }
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.group_entitlements : contains([
+        "account",
+        "auto",
+        "msdn",
+        "none",
+        "profile",
+        "trial"
+      ], entitlement.licensing_source)
+    ])
+    error_message = "group_entitlements.licensing_source must be a valid licensing source."
+  }
+}
+
+# -----------------------------------------------------------------------------
+# User Entitlements
+# -----------------------------------------------------------------------------
+
+variable "user_entitlements" {
+  description = "List of user entitlements to manage."
+  type = list(object({
+    principal_name      = optional(string)
+    origin_id           = optional(string)
+    origin              = optional(string)
+    account_license_type = optional(string, "express")
+    licensing_source    = optional(string, "account")
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.user_entitlements : (
+        (entitlement.principal_name != null && entitlement.origin_id == null && entitlement.origin == null) ||
+        (entitlement.principal_name == null && entitlement.origin_id != null && entitlement.origin != null)
+      )
+    ])
+    error_message = "Each user_entitlement must set principal_name or origin+origin_id, but not both."
+  }
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.user_entitlements : contains([
+        "advanced",
+        "earlyAdopter",
+        "express",
+        "none",
+        "professional",
+        "stakeholder",
+        "basic"
+      ], entitlement.account_license_type)
+    ])
+    error_message = "user_entitlements.account_license_type must be a valid Azure DevOps license type."
+  }
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.user_entitlements : contains([
+        "account",
+        "auto",
+        "msdn",
+        "none",
+        "profile",
+        "trial"
+      ], entitlement.licensing_source)
+    ])
+    error_message = "user_entitlements.licensing_source must be a valid licensing source."
+  }
+}
+
+# -----------------------------------------------------------------------------
+# Service Principal Entitlements
+# -----------------------------------------------------------------------------
+
+variable "service_principal_entitlements" {
+  description = "List of service principal entitlements to manage."
+  type = list(object({
+    origin_id            = string
+    origin               = optional(string)
+    account_license_type = optional(string, "express")
+    licensing_source     = optional(string, "account")
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.service_principal_entitlements : contains([
+        "advanced",
+        "earlyAdopter",
+        "express",
+        "none",
+        "professional",
+        "stakeholder",
+        "basic"
+      ], entitlement.account_license_type)
+    ])
+    error_message = "service_principal_entitlements.account_license_type must be a valid Azure DevOps license type."
+  }
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.service_principal_entitlements : contains([
+        "account",
+        "auto",
+        "msdn",
+        "none",
+        "profile",
+        "trial"
+      ], entitlement.licensing_source)
+    ])
+    error_message = "service_principal_entitlements.licensing_source must be a valid licensing source."
+  }
+}
+
+# -----------------------------------------------------------------------------
+# Security Role Assignments
+# -----------------------------------------------------------------------------
+
+variable "securityrole_assignments" {
+  description = "List of security role assignments to manage."
+  type = list(object({
+    scope             = string
+    resource_id       = string
+    role_name         = string
+    identity_id       = optional(string)
+    identity_group_key = optional(string)
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for assignment in var.securityrole_assignments : (
+        (assignment.identity_id != null) != (assignment.identity_group_key != null)
+      )
+    ])
+    error_message = "Each securityrole_assignment must set exactly one of identity_id or identity_group_key."
+  }
 }
