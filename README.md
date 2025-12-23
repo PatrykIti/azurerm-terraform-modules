@@ -27,7 +27,7 @@ This repository is a comprehensive collection of production-ready Terraform modu
 ```
 azurerm-terraform-modules/
 ├── modules/                     # Individual Terraform modules
-│   └── azurerm_<resource>/     # Module for specific Azure resource
+│   └── <provider>_<resource>/  # Module for specific provider resource
 │       ├── main.tf             # Main resource definitions
 │       ├── variables.tf        # Input variables
 │       ├── outputs.tf          # Output values
@@ -44,6 +44,7 @@ azurerm-terraform-modules/
 │   └── references/            # Development reference docs
 └── .taskmaster/               # TaskMaster configuration
 ```
+Modules use provider prefixes: `azurerm_` for AzureRM and `azuredevops_` for Azure DevOps.
 
 ### Module Architecture
 
