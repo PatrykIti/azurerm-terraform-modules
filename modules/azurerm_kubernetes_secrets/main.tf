@@ -44,7 +44,24 @@ locals {
     var.namespace
   ) : null
 
-  eso_external_secrets = local.is_eso ? { for external_secret in var.eso.external_secrets : external_secret.name => external_secret } : {}
+  eso_secret_store_for_each = local.is_eso ? {
+    "store" = {
+      kind           = var.eso.secret_store.kind
+      name           = var.eso.secret_store.name
+      tenant_id      = var.eso.secret_store.tenant_id
+      key_vault_url  = try(var.eso.secret_store.key_vault_url, null)
+      key_vault_name = try(var.eso.secret_store.key_vault_name, null)
+      auth = {
+        type              = var.eso.secret_store.auth.type
+        workload_identity = try(var.eso.secret_store.auth.workload_identity, null)
+        managed_identity  = try(var.eso.secret_store.auth.managed_identity, null)
+      }
+    }
+  } : {}
+
+  eso_external_secrets = local.is_eso ? nonsensitive({
+    for external_secret in var.eso.external_secrets : external_secret.name => external_secret
+  }) : {}
 }
 
 # -----------------------------------------------------------------------------
@@ -151,7 +168,7 @@ resource "kubernetes_secret_v1" "eso_service_principal" {
 }
 
 resource "kubernetes_manifest" "secret_store" {
-  for_each = local.is_eso ? { "store" = var.eso.secret_store } : {}
+  for_each = local.eso_secret_store_for_each
 
   manifest = {
     apiVersion = "external-secrets.io/v1beta1"
