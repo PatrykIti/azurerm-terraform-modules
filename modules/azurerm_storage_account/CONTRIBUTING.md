@@ -62,7 +62,7 @@ This module is integrated with the repository's automated workflows:
    - Documentation verification
 
 2. **Documentation**:
-   - README.md is auto-generated from terraform-docs
+   - README.md is auto-generated from terraform-docs (use `make docs` or `./generate-docs.sh`)
    - Updates are automated via `module-docs.yml`
 
 3. **Testing**:
@@ -189,7 +189,7 @@ Before submitting a PR for this module:
 - [ ] Considered ZRS limitations for lifecycle rules
 - [ ] Security defaults maintained (HTTPS only, TLS 1.2)
 - [ ] Outputs use `try()` for conditional resources
-- [ ] README.md regenerated with terraform-docs
+- [ ] README.md regenerated with terraform-docs (`make docs` or `./generate-docs.sh`)
 
 ## 🏷️ Release Process
 

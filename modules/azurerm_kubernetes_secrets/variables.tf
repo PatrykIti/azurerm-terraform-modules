@@ -203,6 +203,10 @@ variable "eso" {
           client_id     = string
           client_secret = string
           tenant_id     = string
+          secret_keys = optional(object({
+            client_id     = optional(string, "clientId")
+            client_secret = optional(string, "clientSecret")
+          }))
         }))
         managed_identity = optional(object({
           client_id   = optional(string)
@@ -272,6 +276,17 @@ variable "eso" {
       )
     )
     error_message = "managed_identity requires client_id or resource_id."
+  }
+
+  validation {
+    condition = var.eso == null || (
+      var.eso.secret_store.auth.type != "service_principal" || (
+        trim(try(var.eso.secret_store.auth.service_principal.secret_keys.client_id, "clientId")) != "" &&
+        trim(try(var.eso.secret_store.auth.service_principal.secret_keys.client_secret, "clientSecret")) != "" &&
+        try(var.eso.secret_store.auth.service_principal.secret_keys.client_id, "clientId") != try(var.eso.secret_store.auth.service_principal.secret_keys.client_secret, "clientSecret")
+      )
+    )
+    error_message = "service_principal.secret_keys must define non-empty, distinct key names."
   }
 
   validation {

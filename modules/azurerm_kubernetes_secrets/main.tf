@@ -25,11 +25,15 @@ locals {
     ]
   }) : null
 
-  eso_store                       = local.is_eso ? var.eso.secret_store : null
-  eso_vault_url                   = local.is_eso ? coalesce(var.eso.secret_store.key_vault_url, "https://${var.eso.secret_store.key_vault_name}.vault.azure.net") : null
-  eso_auth_type                   = local.is_eso ? var.eso.secret_store.auth.type : null
-  eso_auth_type_map               = { workload_identity = "WorkloadIdentity", service_principal = "ServicePrincipal", managed_identity = "ManagedIdentity" }
-  eso_service_principal_secret    = local.is_eso && local.eso_auth_type == "service_principal" ? "${var.name}-eso-sp" : null
+  eso_store                    = local.is_eso ? var.eso.secret_store : null
+  eso_vault_url                = local.is_eso ? coalesce(var.eso.secret_store.key_vault_url, "https://${var.eso.secret_store.key_vault_name}.vault.azure.net") : null
+  eso_auth_type                = local.is_eso ? var.eso.secret_store.auth.type : null
+  eso_auth_type_map            = { workload_identity = "WorkloadIdentity", service_principal = "ServicePrincipal", managed_identity = "ManagedIdentity" }
+  eso_service_principal_secret = local.is_eso && local.eso_auth_type == "service_principal" ? "${var.name}-eso-sp" : null
+  eso_service_principal_keys = local.is_eso && local.eso_auth_type == "service_principal" ? {
+    client_id     = try(var.eso.secret_store.auth.service_principal.secret_keys.client_id, "clientId")
+    client_secret = try(var.eso.secret_store.auth.service_principal.secret_keys.client_secret, "clientSecret")
+  } : null
   eso_workload_identity_client_id = local.is_eso && local.eso_auth_type == "workload_identity" ? try(var.eso.secret_store.auth.workload_identity.client_id, null) : null
   eso_managed_identity_id = local.is_eso && local.eso_auth_type == "managed_identity" ? coalesce(
     try(var.eso.secret_store.auth.managed_identity.client_id, null),
@@ -141,8 +145,8 @@ resource "kubernetes_secret_v1" "eso_service_principal" {
   type = "Opaque"
 
   data = {
-    clientId     = base64encode(var.eso.secret_store.auth.service_principal.client_id)
-    clientSecret = base64encode(var.eso.secret_store.auth.service_principal.client_secret)
+    (local.eso_service_principal_keys.client_id)     = base64encode(var.eso.secret_store.auth.service_principal.client_id)
+    (local.eso_service_principal_keys.client_secret) = base64encode(var.eso.secret_store.auth.service_principal.client_secret)
   }
 }
 
@@ -185,11 +189,11 @@ resource "kubernetes_manifest" "secret_store" {
             authSecretRef = {
               clientId = {
                 name = local.eso_service_principal_secret
-                key  = "clientId"
+                key  = local.eso_service_principal_keys.client_id
               }
               clientSecret = {
                 name = local.eso_service_principal_secret
-                key  = "clientSecret"
+                key  = local.eso_service_principal_keys.client_secret
               }
             }
           } : {}

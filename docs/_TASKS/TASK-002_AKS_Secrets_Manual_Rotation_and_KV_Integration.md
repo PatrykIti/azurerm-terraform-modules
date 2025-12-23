@@ -635,6 +635,20 @@ module "kubernetes_secrets" {
 }
 ```
 
+Opcjonalnie można nadpisać nazwy kluczy w Sekrecie K8s (np. `username`/`password`), nadal pozostając przy auth typu **service_principal**:
+
+```hcl
+service_principal = {
+  client_id     = var.eso_sp_client_id
+  client_secret = var.eso_sp_client_secret
+  tenant_id     = data.azurerm_client_config.current.tenant_id
+  secret_keys = {
+    client_id     = "username"
+    client_secret = "password"
+  }
+}
+```
+
 **Managed Identity (node-assigned / kubelet identity):**
 
 Założenia: identity jest przypięta do node pool (kubelet identity) i ma RBAC do KV.
