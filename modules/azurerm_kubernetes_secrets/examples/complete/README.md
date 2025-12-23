@@ -16,6 +16,10 @@ This example demonstrates the **CSI** strategy using `SecretProviderClass` with 
 
 ```bash
 terraform init
+# Stage 1: create AKS first (kubernetes_manifest requires a live cluster)
+terraform apply -target=module.kubernetes_cluster
+
+# Stage 2: apply the SecretProviderClass and remaining resources
 terraform apply
 ```
 

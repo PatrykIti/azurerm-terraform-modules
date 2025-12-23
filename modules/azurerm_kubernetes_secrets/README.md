@@ -25,6 +25,11 @@ This module provides a unified, user-friendly API for managing Kubernetes secret
 - **manual** writes secret values to Terraform state — use a secure backend and strict RBAC.
 - **csi/eso** keep secrets out of state, but rely on runtime components in the cluster.
 
+## CSI/ESO Planning Note
+
+`kubernetes_manifest` requires a live cluster (and CRDs) at plan time. For brand-new AKS clusters,
+apply in two stages: create the cluster first, then apply this module once CSI/ESO is installed.
+
 ## Usage
 
 ### Manual (KV → TF → K8s Secret)

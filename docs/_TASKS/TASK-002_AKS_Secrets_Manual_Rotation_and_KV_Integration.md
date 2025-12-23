@@ -164,6 +164,7 @@ W przykładach pokazujemy **pełną ścieżkę**: AKS outputs → konfiguracja a
 
 - KV RBAC vs Access Policies: jeśli używasz `enable_rbac_authorization = true`, musisz dodać role RBAC (`Key Vault Secrets User`); w przeciwnym razie Access Policies.
 - `kubernetes_manifest`: wymaga CRD w klastrze (ESO/CSI); bez CRD plan przejdzie, apply może się wywalić.
+- `kubernetes_manifest`: wymaga dostępu do działającego API już na etapie planu; dla nowych klastrów potrzebny jest **2‑etapowy apply** (najpierw AKS, potem sekrety).
 - `manual`: wartości sekretów trafiają do state; `sensitive = true` w outputach i brak logowania planów.
 - `string_data` vs `data`: `string_data` przyjmuje plaintext i K8s sam base64-uje; `data` wymaga już base64.
 - CSI sync: opcjonalny sync do K8s Secret może mieć opóźnienia; rollouty zależne od `secretObjects`.

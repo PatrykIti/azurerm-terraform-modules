@@ -16,6 +16,10 @@ This example demonstrates the **ESO** strategy with Workload Identity.
 
 ```bash
 terraform init
+# Stage 1: create AKS first (kubernetes_manifest requires a live cluster)
+terraform apply -target=module.kubernetes_cluster
+
+# Install ESO in the cluster, then apply the SecretStore/ExternalSecret
 terraform apply
 ```
 

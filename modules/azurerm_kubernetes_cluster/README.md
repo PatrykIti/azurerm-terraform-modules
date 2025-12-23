@@ -157,6 +157,10 @@ module "kubernetes_cluster" {
 }
 ```
 
+Notes:
+- Azure allows a maximum of 5 diagnostic settings per AKS resource.
+- Entries that resolve to no available categories are skipped and reported in `diagnostic_settings_skipped`.
+
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
