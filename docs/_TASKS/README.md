@@ -3,7 +3,7 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 1 task
+- **To Do:** 2 tasks
 - **In Progress:** 0
 - **Done:** 2 tasks
 
@@ -14,6 +14,7 @@ Task board for module work. Update statuses in markdown files.
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
+| [TASK-004](./TASK-004_AKS_Diagnostic_Settings.md) | **AKS diagnostic settings – multi-stream i obszary** | High | Medium | `modules/azurerm_kubernetes_cluster/` |
 
 ---
 
