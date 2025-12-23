@@ -40,6 +40,9 @@ Naprawic generator (`scripts/create-new-module.sh` + `scripts/templates/`), tak 
 7) **Outdated instrukcje**  
    Skrypt sugeruje reczne zmiany w workflow, a `docs/MODULE_GUIDE/09-cicd-integration.md` mowi o automatycznej detekcji.
 
+8) **Bezpieczenstwo nadpisania**  
+   Generator powinien fail-fast, jesli katalog modulu juz istnieje (bez nadpisywania plikow Terraforma).
+
 ---
 
 ## Weryfikacja ponowna (po spisaniu)
@@ -82,6 +85,7 @@ Potwierdzone po ponownym sprawdzeniu:
    - **Opis:** lista przykladow do wygenerowania (tylko katalog `examples/` + odpowiadajace fixtures).
    - **Dozwolone wartosci:** `basic`, `complete`, `secure`, `private-endpoint`
    - **Domyslnie:** `basic,complete,secure`
+   - **Wymagane minimum:** `basic`, `complete`, `secure` (bez nich generator ma zwrocic blad albo je automatycznie dopisac z ostrzezeniem; decyzja implementacyjna)
    - **Walidacja:** blad gdy pojawi sie nieznana wartosc lub pusty element listy.
    - **Zachowanie:** generator tworzy tylko wskazane foldery `examples/*` oraz kopiuje je do `tests/fixtures/*`.
 
@@ -111,6 +115,18 @@ Potwierdzone po ponownym sprawdzeniu:
 - Flagi powinny byc parsowane przed walidacja liczby argumentow pozycyjnych.
 - Skrypt odrzuca `--examples` z nieznanymi wartosciami (fail-fast).
 - `tests/fixtures/network` i `tests/fixtures/negative` tworzone zawsze (baseline AKS).
+
+### Edge cases i walidacja
+
+- `--examples=` (pusta wartosc) => blad i help.
+- `--examples=,basic` / trailing comma => blad i help.
+- Duplikaty w CSV => dozwolone, ale deduplikujemy (zachowac pierwsze wystapienie).
+- Wielkosc liter: tylko lowercase (np. `Basic` -> blad).
+- `--examples` bez `basic`/`complete`/`secure` => blad albo auto-dopisanie z warning (do ustalenia; preferowane auto-dopisanie, zeby testy nie wybuchly).
+- `--with-private-endpoint` + `--examples` bez `private-endpoint` => dopisz.
+- `--with-private-endpoint` + `--examples=...private-endpoint...` => brak zmian.
+- Brak `--examples` i brak `--with-private-endpoint` => domyslne `basic,complete,secure`.
+- Modul docelowy juz istnieje (`modules/<module_name>`) => blad i exit (bez zmian na dysku).
 
 ---
 
@@ -199,6 +215,8 @@ Potwierdzone po ponownym sprawdzeniu:
 - [ ] Dodac check: `find` + diff listy plikow (ignoruj `.terraform`, `.tmp`, `go.sum` itd.)
 - [ ] Uruchomic generator w testowym katalogu i porownac z AKS
 - [ ] Zaktualizowac README generatora (jesli istnieje) o kroki weryfikacji
+- [ ] Zaktualizowac `scripts/validate-structure.sh` (basic/complete zamiast simple, private-endpoint jako opcjonalny)
+- [ ] Dodac test manualny: uruchomienie generatora na istniejacym module ma zwrocic blad i nie zmienic plikow
 
 ---
 
@@ -208,6 +226,8 @@ Potwierdzone po ponownym sprawdzeniu:
 - Testy kompiluja sie (brak bledow Go z powodu spacji w nazwach).
 - Lista plikow w nowym module jest zgodna z AKS (poza uzgodnionymi wyjatkami).
 - Skrypt nie komunikuje przestarzalych instrukcji o workflow.
+- `scripts/validate-structure.sh` przechodzi dla nowo wygenerowanego modulu.
+- Uruchomienie generatora na istniejacym module nie nadpisuje plikow i zwraca blad.
 
 ---
 
