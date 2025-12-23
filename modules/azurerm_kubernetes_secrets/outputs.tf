@@ -27,10 +27,10 @@ output "secret_provider_class_name" {
 
 output "secret_store_name" {
   description = "Name of the SecretStore/ClusterSecretStore (ESO strategy)."
-  value       = var.strategy == "eso" ? try(var.eso.secret_store.name, null) : null
+  value       = var.strategy == "eso" ? nonsensitive(try(var.eso.secret_store.name, null)) : null
 }
 
 output "external_secret_names" {
   description = "Names of ExternalSecret resources (ESO strategy)."
-  value       = var.strategy == "eso" ? [for external_secret in var.eso.external_secrets : external_secret.name] : []
+  value       = var.strategy == "eso" ? nonsensitive([for external_secret in var.eso.external_secrets : external_secret.name]) : []
 }
