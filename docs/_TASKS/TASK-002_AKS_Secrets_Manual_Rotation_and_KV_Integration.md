@@ -132,6 +132,25 @@ Analogicznie dla fixtures (jak w `modules/azurerm_kubernetes_cluster/tests/fixtu
 - `name` (string) – nazwa “obiektu” (np. Secret / SecretProviderClass / ExternalSecret)
 - `labels` / `annotations` (map)
 
+---
+
+## Konwencje wejść (czytelność dla użytkowników)
+
+W większości miejsc, gdzie potrzebujemy iteracji po wielu elementach, preferujemy:
+
+- **`list(object(...))`** zamiast `map(object(...))` (wejściowo)
+- wewnętrznie w module: konwersję na mapę pod `for_each` przez wzorzec:
+  - `{ for x in var.xs : x.name => x }`
+
+### Dlaczego takie podejście
+
+- **Czytelniejsze dla użytkowników modułu:** dla wielu osób (zwłaszcza uczących się TF) lista obiektów jest bardziej intuicyjna niż zagnieżdżone mapy.
+- **Spójny schemat pracy:** użytkownik dodaje kolejny element jako “kolejny obiekt” (kopiuj/wklej), a moduł sam mapuje to do stabilnego klucza.
+- **Lepsza ergonomia w PR-ach:** diffs w listach są często bardziej zrozumiałe (widać dodany/usunięty obiekt), a kluczem w module jest jawne `name`.
+- **Stabilne `for_each`:** mapowanie po `name` zapewnia deterministyczne klucze zasobów i mniejsze ryzyko “recreate” przy przestawianiu kolejności listy.
+
+Wymóg: `name` musi być unikalne w obrębie listy → moduł powinien mieć walidację unikalności.
+
 ### `strategy = "manual"` (KV → TF → K8s Secret)
 
 - `key_vault_id` (string)
