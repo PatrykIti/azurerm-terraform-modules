@@ -5,7 +5,7 @@
 **Category:** Tooling / Scaffolding  
 **Estimated Effort:** Medium  
 **Dependencies:** —  
-**Status:** ⏳ **To Do**
+**Status:** ✅ **Done** (2025-12-23)
 
 ---
 

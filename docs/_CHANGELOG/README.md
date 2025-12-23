@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [002](./002-2025-12-23-module-scaffold-fix.md) | 2025-12-23 | Generator scaffoldu – naprawa i zgodnosc z AKS | Fix / Enhancement |
 | [001](./001-2025-12-23-aks-kubernetes-cluster-module-fixes.md) | 2025-12-23 | AKS module fixes (identity/SP UX, node pools, provider bump) | Fix / Enhancement |
 
 ---
