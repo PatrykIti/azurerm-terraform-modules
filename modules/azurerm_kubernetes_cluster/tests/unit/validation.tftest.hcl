@@ -7,6 +7,23 @@ mock_provider "azurerm" {
       name = "test-aks"
     }
   }
+
+  mock_resource "azurerm_monitor_diagnostic_setting" {}
+
+  mock_data "azurerm_monitor_diagnostic_categories" {
+    defaults = {
+      log_category_types = [
+        "kube-apiserver",
+        "kube-audit",
+        "kube-audit-admin",
+        "kube-scheduler",
+        "cluster-autoscaler",
+        "guard",
+        "cloud-controller-manager"
+      ]
+      metrics = ["AllMetrics"]
+    }
+  }
 }
 
 variables {
