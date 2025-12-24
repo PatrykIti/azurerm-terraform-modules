@@ -5,7 +5,7 @@
 **Category:** AKS / Documentation  
 **Estimated Effort:** Small  
 **Dependencies:** TASK-001, TASK-004 (resource addresses and diagnostics)  
-**Status:** To Do
+**Status:** Done (2025-12-23)
 
 ---
 

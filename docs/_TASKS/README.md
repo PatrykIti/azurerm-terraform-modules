@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 11 tasks
+- **To Do:** 10 tasks
 - **In Progress:** 0
-- **Done:** 8 tasks
+- **Done:** 9 tasks
 
 ---
 
@@ -14,7 +14,6 @@ Task board for module work. Update statuses in markdown files.
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
-| [TASK-005](./TASK-005_AKS_Import_Documentation.md) | **AKS import (Terraform import blocks) – dokumentacja** | Medium | Small | `modules/azurerm_kubernetes_cluster/docs/IMPORT.md` + README link |
 | [TASK-ADO-006](./TASK-ADO-006_AzureDevOps_Repository_Module.md) | **Azure DevOps Repository module** | High | Large | `modules/azuredevops_repository/` |
 | [TASK-ADO-007](./TASK-ADO-007_AzureDevOps_Pipelines_Module.md) | **Azure DevOps Pipelines module** | High | Large | `modules/azuredevops_pipelines/` |
 | [TASK-ADO-008](./TASK-ADO-008_AzureDevOps_Environments_Module.md) | **Azure DevOps Environments module** | Medium | Large | `modules/azuredevops_environments/` |
@@ -40,6 +39,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-001](./TASK-001_AKS_Module_Fixes.md) | **AKS module – walidacje, SP/MI UX, docs i bump wersji** | High | Medium | `modules/azurerm_kubernetes_cluster/` |
 | [TASK-003](./TASK-003_Module_Scaffold_Fix.md) | **Generator scaffoldu – naprawa i zgodnosc z AKS** | High | Medium | `scripts/create-new-module.sh` + `scripts/templates/` |
 | [TASK-004](./TASK-004_AKS_Diagnostic_Settings.md) | **AKS diagnostic settings – multi-stream i obszary** | High | Medium | `modules/azurerm_kubernetes_cluster/` |
+| [TASK-005](./TASK-005_AKS_Import_Documentation.md) | **AKS import (Terraform import blocks) – dokumentacja** | Medium | Small | `modules/azurerm_kubernetes_cluster/docs/IMPORT.md` + README link |
 | [TASK-ADO-001](./TASK-ADO-001_AzureDevOps_Project_Module.md) | **Azure DevOps Project module** | High | Large | `modules/azuredevops_project/` |
 | [TASK-ADO-002](./TASK-ADO-002_AzureDevOps_Identity_Module.md) | **Azure DevOps Identity module** | High | Large | `modules/azuredevops_identity/` |
 | [TASK-ADO-003](./TASK-ADO-003_AzureDevOps_Team_Module.md) | **Azure DevOps Team module** | Medium | Medium | `modules/azuredevops_team/` |

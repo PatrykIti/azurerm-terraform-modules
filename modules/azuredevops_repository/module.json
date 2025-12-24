@@ -1,0 +1,7 @@
+{
+  "name": "azuredevops_repository",
+  "title": "Azure DevOps Repository",
+  "commit_scope": "azuredevops-repository",
+  "tag_prefix": "ADOR",
+  "description": "Azure Azure DevOps Repository Terraform module with enterprise-grade features"
+}

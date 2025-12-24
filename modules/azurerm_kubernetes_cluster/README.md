@@ -336,6 +336,7 @@ Common issues and solutions:
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [IMPORT.md](docs/IMPORT.md) - Import existing AKS using Terraform import blocks
 - [Module Documentation](docs/) - Additional guides and best practices
 
 ## External Resources
