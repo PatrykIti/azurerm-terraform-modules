@@ -19,12 +19,12 @@ modules/<provider>_<resource>/
   module.json, .releaserc.js, .terraform-docs.yml, Makefile, generate-docs.sh
   docs/IMPORT.md
   examples/{basic,complete,secure}/(.terraform-docs.yml, main.tf, variables.tf, outputs.tf, README.md)
-  tests/{fixtures,unit}/ + Go terratest files + tests/Makefile + tests/tooling scripts
+  tests/{fixtures,unit}/ + Go terratest files + tests/Makefile + tests/tooling scripts + test_outputs/
 ```
 
 ## Terraform Implementation Rules
 
-- `versions.tf`: pin Terraform and providers (repo standard uses `azurerm` pin).
+- `versions.tf`: pin Terraform and providers (repo standard uses `azurerm` 4.57.0); add other providers only when used by the module.
 - `variables.tf`: every variable needs description + type; prefer `object()` and `list(object)` for structured inputs; add validation blocks.
 - `main.tf`: use `locals` for shared values; dynamic blocks for optional features; `for_each` over `list(object)` for child resources; use `lifecycle` preconditions for cross-field rules.
 - `outputs.tf`: include descriptions; mark sensitive outputs; use `try()` for safety.
@@ -42,10 +42,9 @@ modules/<provider>_<resource>/
 
 ## Examples Expectations
 
-- Must include `basic`, `complete`, `secure` examples (plus optional extras like `private-endpoint`).
+- Must include `basic`, `complete`, `secure` examples; optional feature-specific examples follow AKS patterns (e.g., `diagnostic-settings`, `multi-node-pool`, `workload-identity`).
 - Self-contained: create their own RG and dependencies where feasible.
 - Naming: examples use fixed names; only Go E2E tests use dynamic/random suffixes.
-- Optional examples follow AKS patterns (e.g., `diagnostic-settings`, `multi-node-pool`, `workload-identity`).
 
 ## Testing Expectations
 
