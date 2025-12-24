@@ -15,10 +15,10 @@ module "azuredevops_serviceendpoint" {
 
   serviceendpoint_azurerm = [
     {
-      service_endpoint_name = "${var.azurerm_endpoint_name_prefix}-${random_string.suffix.result}"
-      azurerm_spn_tenantid   = var.azurerm_spn_tenantid
-      serviceprincipalid     = var.azurerm_spn_client_id
-      serviceprincipalkey    = var.azurerm_spn_client_secret
+      service_endpoint_name     = "${var.azurerm_endpoint_name_prefix}-${random_string.suffix.result}"
+      azurerm_spn_tenantid      = var.azurerm_spn_tenantid
+      serviceprincipalid        = var.azurerm_spn_client_id
+      serviceprincipalkey       = var.azurerm_spn_client_secret
       azurerm_subscription_id   = var.azurerm_subscription_id
       azurerm_subscription_name = var.azurerm_subscription_name
       description               = "Managed by Terraform"

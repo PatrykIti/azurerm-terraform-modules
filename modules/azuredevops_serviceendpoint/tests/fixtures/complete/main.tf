@@ -1,42 +1,27 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 module "azuredevops_serviceendpoint" {
-  source = "../../"
+  source = "../.."
 
   project_id = var.project_id
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
-      initialization = {
-        init_type = "Clean"
-      }
-    }
-  }
-
-  branches = [
+  serviceendpoint_generic = [
     {
-      repository_key = "main"
-      name           = "develop"
-      ref_branch     = "refs/heads/master"
+      service_endpoint_name = "${var.generic_endpoint_name_prefix}"
+      server_url            = var.generic_endpoint_url
+      username              = var.generic_endpoint_username
+      password              = var.generic_endpoint_password
+      description           = "Managed by Terraform"
     }
   ]
 
-  files = [
+  serviceendpoint_incomingwebhook = [
     {
-      repository_key      = "main"
-      file                = "README.md"
-      content             = "# Repository\n\nManaged by Terraform."
-      commit_message      = "Add README"
-      overwrite_on_create = true
+      service_endpoint_name = "${var.incoming_webhook_name_prefix}"
+      webhook_name          = "example_webhook"
+      secret                = var.incoming_webhook_secret
+      http_header           = "X-Hub-Signature"
+      description           = "Managed by Terraform"
     }
   ]
 }

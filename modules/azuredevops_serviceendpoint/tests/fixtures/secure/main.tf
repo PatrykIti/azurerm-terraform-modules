@@ -1,42 +1,31 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
+data "azuredevops_group" "project_collection_admins" {
+  name = "Project Collection Administrators"
 }
 
 module "azuredevops_serviceendpoint" {
-  source = "../../"
+  source = "../.."
 
   project_id = var.project_id
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
-      initialization = {
-        init_type = "Clean"
-      }
-    }
-  }
-
-  branch_policy_min_reviewers = [
+  serviceendpoint_generic = [
     {
-      reviewer_count = 2
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
+      service_endpoint_name = "${var.generic_endpoint_name_prefix}"
+      server_url            = var.generic_endpoint_url
+      username              = var.generic_endpoint_username
+      password              = var.generic_endpoint_password
+      description           = "Managed by Terraform"
     }
   ]
 
-  repository_policy_reserved_names = [
+  serviceendpoint_permissions = [
     {
-      repository_keys = ["main"]
+      principal = data.azuredevops_group.project_collection_admins.id
+      permissions = {
+        Use        = "Allow"
+        Administer = "Deny"
+      }
     }
   ]
 }

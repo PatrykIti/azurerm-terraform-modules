@@ -1,26 +1,18 @@
 # Secure Azure DevOps Service Endpoints Example
 
-This example demonstrates a maximum-security Azure DevOps Service Endpoints configuration suitable for highly sensitive data and regulated environments.
+This example demonstrates a security-focused service endpoint configuration with restricted permissions.
 
 ## Features
 
-- Maximum security configuration with all security features enabled
-- Network isolation and private endpoints
-- Advanced threat protection
-- Comprehensive audit logging and monitoring
-- Encryption at rest and in transit
-- Compliance-ready configuration
+- Generic service endpoint with least-privilege permissions
 
 ## Key Configuration
 
-This example implements defense-in-depth security principles with multiple layers of protection suitable for highly regulated industries and sensitive workloads.
+This example focuses on limiting who can administer service connections.
 
 ## Security Considerations
 
-- All public access is disabled by default
-- Network access is restricted to specific IP ranges
-- All data is encrypted at rest and in transit
-- Audit logging captures all access and modifications
+- Restrict service endpoint permissions to approved groups
 
 ## Usage
 

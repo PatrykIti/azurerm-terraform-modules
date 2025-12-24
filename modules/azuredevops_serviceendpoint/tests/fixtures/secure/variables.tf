@@ -1,10 +1,24 @@
 variable "project_id" {
-  description = "Azure DevOps project ID."
-  type        = string
+  type = string
 }
 
-variable "repo_name_prefix" {
-  description = "Prefix for the repository name."
-  type        = string
-  default     = "ado-repo-secure-fixture"
+variable "generic_endpoint_name_prefix" {
+  type    = string
+  default = "ado-generic-secure"
+}
+
+variable "generic_endpoint_url" {
+  type    = string
+  default = "https://example.endpoint.local"
+}
+
+variable "generic_endpoint_username" {
+  type    = string
+  default = "example-user"
+}
+
+variable "generic_endpoint_password" {
+  type      = string
+  default   = "example-password"
+  sensitive = true
 }

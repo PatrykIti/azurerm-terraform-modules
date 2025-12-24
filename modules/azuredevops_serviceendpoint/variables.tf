@@ -96,14 +96,14 @@ variable "serviceendpoint_azure_service_bus" {
 variable "serviceendpoint_azurecr" {
   description = "List of Azure Container Registry service endpoints."
   type = list(object({
-    service_endpoint_name                = string
-    resource_group                       = string
-    azurecr_spn_tenantid                  = string
-    azurecr_name                          = string
-    azurecr_subscription_id               = string
-    azurecr_subscription_name             = string
+    service_endpoint_name                  = string
+    resource_group                         = string
+    azurecr_spn_tenantid                   = string
+    azurecr_name                           = string
+    azurecr_subscription_id                = string
+    azurecr_subscription_name              = string
     service_endpoint_authentication_scheme = optional(string)
-    description                           = optional(string)
+    description                            = optional(string)
     credentials = optional(object({
       serviceprincipalid = string
     }))
@@ -134,27 +134,28 @@ variable "serviceendpoint_azuredevops" {
 variable "serviceendpoint_azurerm" {
   description = "List of Azure Resource Manager service endpoints."
   type = list(object({
-    service_endpoint_name                = string
-    azurerm_spn_tenantid                  = string
-    serviceprincipalid                   = string
-    serviceprincipalkey                  = optional(string)
-    serviceprincipalcertificate          = optional(string)
+    service_endpoint_name                  = string
+    azurerm_spn_tenantid                   = string
+    serviceprincipalid                     = string
+    serviceprincipalkey                    = optional(string)
+    serviceprincipalcertificate            = optional(string)
     service_endpoint_authentication_scheme = optional(string)
-    azurerm_management_group_id          = optional(string)
-    azurerm_management_group_name        = optional(string)
-    azurerm_subscription_id              = optional(string)
-    azurerm_subscription_name            = optional(string)
-    environment                           = optional(string)
-    server_url                            = optional(string)
-    resource_group                        = optional(string)
-    validate                              = optional(bool)
-    description                           = optional(string)
+    azurerm_management_group_id            = optional(string)
+    azurerm_management_group_name          = optional(string)
+    azurerm_subscription_id                = optional(string)
+    azurerm_subscription_name              = optional(string)
+    environment                            = optional(string)
+    server_url                             = optional(string)
+    resource_group                         = optional(string)
+    validate                               = optional(bool)
+    description                            = optional(string)
     credentials = optional(object({
-      serviceprincipalid = string
+      serviceprincipalid          = string
+      serviceprincipalkey         = optional(string)
+      serviceprincipalcertificate = optional(string)
     }))
     features = optional(object({
-      active_directory_service_endpoint_resource_id = optional(string)
-      validate                      = optional(bool)
+      validate = optional(bool)
     }))
   }))
   default = []
@@ -271,13 +272,13 @@ variable "serviceendpoint_dockerregistry" {
 variable "serviceendpoint_dynamics_lifecycle_services" {
   description = "List of Dynamics Lifecycle Services service endpoints."
   type = list(object({
-    service_endpoint_name             = string
-    authorization_endpoint            = string
-    lifecycle_services_api_endpoint   = string
-    client_id                         = string
-    username                          = string
-    password                          = string
-    description                       = optional(string)
+    service_endpoint_name           = string
+    authorization_endpoint          = string
+    lifecycle_services_api_endpoint = string
+    client_id                       = string
+    username                        = string
+    password                        = string
+    description                     = optional(string)
   }))
   default = []
 }
@@ -309,7 +310,7 @@ variable "serviceendpoint_gcp_terraform" {
     service_endpoint_name = string
     private_key           = string
     token_uri             = string
-    gcp_project_id         = string
+    gcp_project_id        = string
     client_email          = optional(string)
     scope                 = optional(string)
     description           = optional(string)
@@ -340,12 +341,12 @@ variable "serviceendpoint_generic" {
 variable "serviceendpoint_generic_git" {
   description = "List of generic Git service endpoints."
   type = list(object({
-    service_endpoint_name = string
-    repository_url        = string
-    username              = optional(string)
-    password              = optional(string)
+    service_endpoint_name   = string
+    repository_url          = string
+    username                = optional(string)
+    password                = optional(string)
     enable_pipelines_access = optional(bool)
-    description           = optional(string)
+    description             = optional(string)
   }))
   default = []
 }
@@ -357,14 +358,14 @@ variable "serviceendpoint_generic_git" {
 variable "serviceendpoint_generic_v2" {
   description = "List of generic v2 service endpoints."
   type = list(object({
-    name                 = string
-    type                 = string
-    server_url           = string
-    authorization_scheme = string
-    shared_project_ids   = optional(list(string))
-    description          = optional(string)
+    name                     = string
+    type                     = string
+    server_url               = string
+    authorization_scheme     = string
+    shared_project_ids       = optional(list(string))
+    description              = optional(string)
     authorization_parameters = optional(map(string))
-    parameters           = optional(map(string))
+    parameters               = optional(map(string))
   }))
   default = []
 }
@@ -384,7 +385,7 @@ variable "serviceendpoint_github" {
     auth_personal = optional(object({
       personal_access_token = string
     }))
-    personal_access_token = optional(string)
+    personal_access_token  = optional(string)
     oauth_configuration_id = optional(string)
   }))
   default = []
@@ -406,7 +407,7 @@ variable "serviceendpoint_github_enterprise" {
     auth_oauth = optional(object({
       oauth_configuration_id = string
     }))
-    personal_access_token = optional(string)
+    personal_access_token  = optional(string)
     oauth_configuration_id = optional(string)
   }))
   default = []
@@ -451,12 +452,12 @@ variable "serviceendpoint_incomingwebhook" {
 variable "serviceendpoint_jenkins" {
   description = "List of Jenkins service endpoints."
   type = list(object({
-    service_endpoint_name = string
-    url                   = string
-    username              = string
-    password              = string
+    service_endpoint_name  = string
+    url                    = string
+    username               = string
+    password               = string
     accept_untrusted_certs = optional(bool)
-    description           = optional(string)
+    description            = optional(string)
   }))
   default = []
 }
@@ -572,8 +573,8 @@ variable "serviceendpoint_kubernetes" {
       cluster_context        = optional(string)
     }))
     service_account = optional(object({
-      token                 = string
-      ca_cert               = string
+      token                  = string
+      ca_cert                = string
       accept_untrusted_certs = optional(bool)
     }))
   }))
@@ -674,11 +675,11 @@ variable "serviceendpoint_octopusdeploy" {
 variable "serviceendpoint_openshift" {
   description = "List of OpenShift service endpoints."
   type = list(object({
-    service_endpoint_name = string
-    server_url            = optional(string)
-    accept_untrusted_certs = optional(bool)
+    service_endpoint_name      = string
+    server_url                 = optional(string)
+    accept_untrusted_certs     = optional(bool)
     certificate_authority_file = optional(string)
-    description           = optional(string)
+    description                = optional(string)
     auth_basic = optional(object({
       username = string
       password = string
@@ -743,18 +744,18 @@ variable "serviceendpoint_servicefabric" {
     cluster_endpoint      = string
     description           = optional(string)
     certificate = optional(object({
-      server_certificate_lookup     = string
-      server_certificate_thumbprint = optional(string)
+      server_certificate_lookup      = string
+      server_certificate_thumbprint  = optional(string)
       server_certificate_common_name = optional(string)
-      client_certificate            = string
-      client_certificate_password   = optional(string)
+      client_certificate             = string
+      client_certificate_password    = optional(string)
     }))
     azure_active_directory = optional(object({
-      server_certificate_lookup     = string
-      server_certificate_thumbprint = optional(string)
+      server_certificate_lookup      = string
+      server_certificate_thumbprint  = optional(string)
       server_certificate_common_name = optional(string)
-      username                      = string
-      password                      = string
+      username                       = string
+      password                       = string
     }))
     none = optional(object({
       unsecured   = optional(bool)

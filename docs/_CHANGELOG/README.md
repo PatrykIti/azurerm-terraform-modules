@@ -6,6 +6,9 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [012](./012-2025-12-24-azuredevops-serviceendpoint-module.md) | 2025-12-24 | Azure DevOps Service Endpoints module | Feature |
+| [011](./011-2025-12-24-azuredevops-environments-module.md) | 2025-12-24 | Azure DevOps Environments module | Feature |
+| [010](./010-2025-12-24-azuredevops-pipelines-module.md) | 2025-12-24 | Azure DevOps Pipelines module | Feature |
 | [009](./009-2025-12-24-network-modules-baseline-sync.md) | 2025-12-24 | Network modules baseline sync (AKS alignment) | Fix / Maintenance |
 | [008](./008-2025-12-24-azuredevops-repository-module.md) | 2025-12-24 | Azure DevOps Repository module | Feature |
 | [007](./007-2025-12-24-azuredevops-extension-module.md) | 2025-12-24 | Azure DevOps Extension module | Feature |

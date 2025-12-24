@@ -27,27 +27,27 @@ resource "azuredevops_environment_resource_kubernetes" "kubernetes_resource" {
 resource "azuredevops_check_approval" "check_approval" {
   for_each = { for index, check in var.check_approvals : index => check }
 
-  project_id           = var.project_id
-  target_resource_id   = check.value.target_resource_id != null ? check.value.target_resource_id : try(local.environment_ids[check.value.target_environment_key], null)
-  target_resource_type = check.value.target_resource_type
-  approvers            = check.value.approvers
-  instructions         = check.value.instructions
+  project_id                 = var.project_id
+  target_resource_id         = check.value.target_resource_id != null ? check.value.target_resource_id : try(local.environment_ids[check.value.target_environment_key], null)
+  target_resource_type       = check.value.target_resource_type
+  approvers                  = check.value.approvers
+  instructions               = check.value.instructions
   minimum_required_approvers = check.value.minimum_required_approvers
-  requester_can_approve = check.value.requester_can_approve
-  timeout              = check.value.timeout
+  requester_can_approve      = check.value.requester_can_approve
+  timeout                    = check.value.timeout
 }
 
 resource "azuredevops_check_branch_control" "check_branch_control" {
   for_each = { for index, check in var.check_branch_controls : index => check }
 
-  project_id           = var.project_id
-  display_name         = check.value.display_name
-  target_resource_id   = check.value.target_resource_id != null ? check.value.target_resource_id : try(local.environment_ids[check.value.target_environment_key], null)
-  target_resource_type = check.value.target_resource_type
-  allowed_branches     = check.value.allowed_branches
-  verify_branch_protection = check.value.verify_branch_protection
+  project_id                       = var.project_id
+  display_name                     = check.value.display_name
+  target_resource_id               = check.value.target_resource_id != null ? check.value.target_resource_id : try(local.environment_ids[check.value.target_environment_key], null)
+  target_resource_type             = check.value.target_resource_type
+  allowed_branches                 = check.value.allowed_branches
+  verify_branch_protection         = check.value.verify_branch_protection
   ignore_unknown_protection_status = check.value.ignore_unknown_protection_status
-  timeout              = check.value.timeout
+  timeout                          = check.value.timeout
 }
 
 resource "azuredevops_check_business_hours" "check_business_hours" {

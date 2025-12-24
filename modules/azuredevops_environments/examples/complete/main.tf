@@ -19,7 +19,7 @@ resource "azuredevops_serviceendpoint_kubernetes" "example" {
   authorization_type    = "Kubeconfig"
 
   kubeconfig {
-    kube_config = <<EOT
+    kube_config            = <<EOT
 apiVersion: v1
 clusters:
 - cluster:
@@ -60,11 +60,11 @@ module "azuredevops_environments" {
 
   kubernetes_resources = [
     {
-      environment_key    = "prod"
+      environment_key     = "prod"
       service_endpoint_id = azuredevops_serviceendpoint_kubernetes.example.id
-      name               = "${var.environment_name_prefix}-k8s-${random_string.suffix.result}"
-      namespace          = "default"
-      cluster_name       = "example-aks"
+      name                = "${var.environment_name_prefix}-k8s-${random_string.suffix.result}"
+      namespace           = "default"
+      cluster_name        = "example-aks"
     }
   ]
 

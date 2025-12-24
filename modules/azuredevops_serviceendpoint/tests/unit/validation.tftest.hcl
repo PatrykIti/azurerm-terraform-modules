@@ -12,7 +12,7 @@ run "invalid_permissions" {
   variables {
     serviceendpoint_permissions = [
       {
-        principal   = ""
+        principal = ""
         permissions = {
           Use = "Allow"
         }

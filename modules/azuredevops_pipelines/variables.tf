@@ -39,11 +39,11 @@ variable "build_folders" {
 variable "build_definitions" {
   description = "Map of build definitions to manage."
   type = map(object({
-    name                   = optional(string)
-    path                   = optional(string)
-    agent_pool_name        = optional(string)
-    agent_specification    = optional(string)
-    queue_status           = optional(string)
+    name                    = optional(string)
+    path                    = optional(string)
+    agent_pool_name         = optional(string)
+    agent_specification     = optional(string)
+    queue_status            = optional(string)
     job_authorization_scope = optional(string)
 
     repository = object({
@@ -64,13 +64,13 @@ variable "build_definitions" {
           include = list(string)
           exclude = optional(list(string), [])
         })
-        batch                         = optional(bool)
-        path_filter                   = optional(object({
+        batch = optional(bool)
+        path_filter = optional(object({
           include = optional(list(string))
           exclude = optional(list(string))
         }))
         max_concurrent_builds_per_branch = optional(number)
-        polling_interval              = optional(number)
+        polling_interval                 = optional(number)
       }))
     }))
 
@@ -130,23 +130,23 @@ variable "build_definitions" {
     }))
 
     jobs = optional(list(object({
-      name                           = string
-      ref_name                       = string
-      condition                      = string
-      job_timeout_in_minutes         = optional(number)
-      job_cancel_timeout_in_minutes  = optional(number)
-      job_authorization_scope        = optional(string)
+      name                             = string
+      ref_name                         = string
+      condition                        = string
+      job_timeout_in_minutes           = optional(number)
+      job_cancel_timeout_in_minutes    = optional(number)
+      job_authorization_scope          = optional(string)
       allow_scripts_auth_access_option = optional(bool)
       dependencies = optional(list(object({
         scope = string
       })))
       target = object({
-        type     = string
-        demands  = optional(list(string))
+        type    = string
+        demands = optional(list(string))
         execution_options = object({
-          type             = string
-          multipliers      = optional(list(string))
-          max_concurrency  = optional(number)
+          type              = string
+          multipliers       = optional(list(string))
+          max_concurrency   = optional(number)
           continue_on_error = optional(bool)
         })
       })
@@ -329,11 +329,11 @@ variable "pipeline_authorizations" {
 variable "resource_authorizations" {
   description = "List of resource authorizations to manage."
   type = list(object({
-    resource_id         = string
-    authorized          = bool
-    definition_id       = optional(string)
+    resource_id          = string
+    authorized           = bool
+    definition_id        = optional(string)
     build_definition_key = optional(string)
-    type                = optional(string)
+    type                 = optional(string)
   }))
   default = []
 

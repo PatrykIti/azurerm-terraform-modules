@@ -52,7 +52,7 @@ module "azuredevops_serviceendpoint" {
 
   serviceendpoint_permissions = [
     {
-      principal   = data.azuredevops_group.project_collection_admins.id
+      principal = data.azuredevops_group.project_collection_admins.id
       permissions = {
         Use        = "Allow"
         Administer = "Deny"

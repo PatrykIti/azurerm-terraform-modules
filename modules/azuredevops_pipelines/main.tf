@@ -15,13 +15,13 @@ resource "azuredevops_build_folder" "build_folder" {
 resource "azuredevops_build_definition" "build_definition" {
   for_each = var.build_definitions
 
-  project_id               = var.project_id
-  name                     = coalesce(each.value.name, each.key)
-  path                     = each.value.path
-  agent_pool_name          = each.value.agent_pool_name
-  agent_specification      = each.value.agent_specification
-  queue_status             = each.value.queue_status == null ? null : lower(each.value.queue_status)
-  job_authorization_scope  = each.value.job_authorization_scope
+  project_id              = var.project_id
+  name                    = coalesce(each.value.name, each.key)
+  path                    = each.value.path
+  agent_pool_name         = each.value.agent_pool_name
+  agent_specification     = each.value.agent_specification
+  queue_status            = each.value.queue_status == null ? null : lower(each.value.queue_status)
+  job_authorization_scope = each.value.job_authorization_scope
 
   repository {
     repo_id               = each.value.repository.repo_id
@@ -47,9 +47,9 @@ resource "azuredevops_build_definition" "build_definition" {
             exclude = try(override.value.branch_filter.exclude, null)
           }
 
-          batch                         = try(override.value.batch, null)
+          batch                            = try(override.value.batch, null)
           max_concurrent_builds_per_branch = try(override.value.max_concurrent_builds_per_branch, null)
-          polling_interval              = try(override.value.polling_interval, null)
+          polling_interval                 = try(override.value.polling_interval, null)
 
           dynamic "path_filter" {
             for_each = override.value.path_filter == null ? [] : [override.value.path_filter]
@@ -152,12 +152,12 @@ resource "azuredevops_build_definition" "build_definition" {
   dynamic "jobs" {
     for_each = each.value.jobs == null ? [] : each.value.jobs
     content {
-      name                          = jobs.value.name
-      ref_name                      = jobs.value.ref_name
-      condition                     = jobs.value.condition
-      job_timeout_in_minutes        = try(jobs.value.job_timeout_in_minutes, null)
-      job_cancel_timeout_in_minutes = try(jobs.value.job_cancel_timeout_in_minutes, null)
-      job_authorization_scope       = try(jobs.value.job_authorization_scope, null)
+      name                             = jobs.value.name
+      ref_name                         = jobs.value.ref_name
+      condition                        = jobs.value.condition
+      job_timeout_in_minutes           = try(jobs.value.job_timeout_in_minutes, null)
+      job_cancel_timeout_in_minutes    = try(jobs.value.job_cancel_timeout_in_minutes, null)
+      job_authorization_scope          = try(jobs.value.job_authorization_scope, null)
       allow_scripts_auth_access_option = try(jobs.value.allow_scripts_auth_access_option, null)
 
       dynamic "dependencies" {
@@ -185,10 +185,10 @@ resource "azuredevops_build_definition" "build_definition" {
 resource "azuredevops_build_definition_permissions" "build_definition_permissions" {
   for_each = { for index, permission in var.build_definition_permissions : index => permission }
 
-  project_id = var.project_id
-  principal  = each.value.principal
+  project_id  = var.project_id
+  principal   = each.value.principal
   permissions = each.value.permissions
-  replace    = each.value.replace
+  replace     = each.value.replace
 
   build_definition_id = coalesce(
     each.value.build_definition_id,
@@ -209,11 +209,11 @@ resource "azuredevops_build_folder_permissions" "build_folder_permissions" {
 resource "azuredevops_pipeline_authorization" "pipeline_authorization" {
   for_each = { for index, authorization in var.pipeline_authorizations : index => authorization }
 
-  project_id         = var.project_id
-  resource_id        = each.value.resource_id
-  type               = each.value.type
+  project_id          = var.project_id
+  resource_id         = each.value.resource_id
+  type                = each.value.type
   pipeline_project_id = each.value.pipeline_project_id
-  pipeline_id = each.value.pipeline_id != null ? each.value.pipeline_id : try(local.build_definition_ids[each.value.pipeline_key], null)
+  pipeline_id         = each.value.pipeline_id != null ? each.value.pipeline_id : try(local.build_definition_ids[each.value.pipeline_key], null)
 }
 
 resource "azuredevops_resource_authorization" "resource_authorization" {

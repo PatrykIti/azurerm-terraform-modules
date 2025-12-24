@@ -1,19 +1,9 @@
-output "repository_ids" {
-  description = "Map of repository IDs keyed by repository key."
-  value       = module.azuredevops_serviceendpoint.repository_ids
+output "generic_endpoint_ids" {
+  description = "Generic service endpoint IDs created by the module."
+  value       = module.azuredevops_serviceendpoint.serviceendpoint_ids.generic
 }
 
-output "repository_urls" {
-  description = "Map of repository web URLs keyed by repository key."
-  value       = module.azuredevops_serviceendpoint.repository_urls
-}
-
-output "branch_ids" {
-  description = "Map of branch IDs keyed by index."
-  value       = module.azuredevops_serviceendpoint.branch_ids
-}
-
-output "policy_ids" {
-  description = "Map of policy IDs grouped by policy type."
-  value       = module.azuredevops_serviceendpoint.policy_ids
+output "incomingwebhook_endpoint_ids" {
+  description = "Incoming webhook service endpoint IDs created by the module."
+  value       = module.azuredevops_serviceendpoint.serviceendpoint_ids.incomingwebhook
 }

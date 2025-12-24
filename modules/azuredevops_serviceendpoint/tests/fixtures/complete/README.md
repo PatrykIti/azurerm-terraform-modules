@@ -1,19 +1,16 @@
 # Complete Azure DevOps Service Endpoints Example
 
-This example demonstrates a comprehensive deployment of Azure DevOps Service Endpoints with all available features and configurations.
+This example demonstrates multiple service endpoint types in one module instance.
 
 ## Features
 
-- Full azuredevops_serviceendpoint configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
+- Generic service endpoint
+- Incoming webhook service endpoint
+- Variable-driven configuration for tests
 
 ## Key Configuration
 
-This comprehensive example showcases all available features of the azuredevops_serviceendpoint module, demonstrating enterprise-grade capabilities suitable for production environments.
+This example showcases multiple service endpoint types and outputs.
 
 ## Usage
 

@@ -79,12 +79,12 @@ resource "azuredevops_serviceendpoint_azurecr" "azurecr" {
   project_id                             = var.project_id
   service_endpoint_name                  = each.value.service_endpoint_name
   resource_group                         = each.value.resource_group
-  azurecr_spn_tenantid                    = each.value.azurecr_spn_tenantid
-  azurecr_name                            = each.value.azurecr_name
-  azurecr_subscription_id                 = each.value.azurecr_subscription_id
-  azurecr_subscription_name               = each.value.azurecr_subscription_name
-  service_endpoint_authentication_scheme  = each.value.service_endpoint_authentication_scheme
-  description                             = each.value.description
+  azurecr_spn_tenantid                   = each.value.azurecr_spn_tenantid
+  azurecr_name                           = each.value.azurecr_name
+  azurecr_subscription_id                = each.value.azurecr_subscription_id
+  azurecr_subscription_name              = each.value.azurecr_subscription_name
+  service_endpoint_authentication_scheme = each.value.service_endpoint_authentication_scheme
+  description                            = each.value.description
 
   dynamic "credentials" {
     for_each = each.value.credentials == null ? [] : [each.value.credentials]
@@ -110,32 +110,33 @@ resource "azuredevops_serviceendpoint_azurerm" "azurerm" {
 
   project_id                             = var.project_id
   service_endpoint_name                  = each.value.service_endpoint_name
-  azurerm_spn_tenantid                    = each.value.azurerm_spn_tenantid
-  serviceprincipalid                      = each.value.serviceprincipalid
-  serviceprincipalkey                     = each.value.serviceprincipalkey
-  serviceprincipalcertificate             = each.value.serviceprincipalcertificate
-  service_endpoint_authentication_scheme  = each.value.service_endpoint_authentication_scheme
-  azurerm_management_group_id             = each.value.azurerm_management_group_id
-  azurerm_management_group_name           = each.value.azurerm_management_group_name
-  azurerm_subscription_id                 = each.value.azurerm_subscription_id
-  azurerm_subscription_name               = each.value.azurerm_subscription_name
-  environment                             = each.value.environment
-  server_url                              = each.value.server_url
-  resource_group                          = each.value.resource_group
-  validate                                = each.value.validate
-  description                             = each.value.description
+  azurerm_spn_tenantid                   = each.value.azurerm_spn_tenantid
+  serviceprincipalid                     = each.value.serviceprincipalid
+  serviceprincipalkey                    = each.value.serviceprincipalkey
+  serviceprincipalcertificate            = each.value.serviceprincipalcertificate
+  service_endpoint_authentication_scheme = each.value.service_endpoint_authentication_scheme
+  azurerm_management_group_id            = each.value.azurerm_management_group_id
+  azurerm_management_group_name          = each.value.azurerm_management_group_name
+  azurerm_subscription_id                = each.value.azurerm_subscription_id
+  azurerm_subscription_name              = each.value.azurerm_subscription_name
+  environment                            = each.value.environment
+  server_url                             = each.value.server_url
+  resource_group                         = each.value.resource_group
+  validate                               = each.value.validate
+  description                            = each.value.description
 
   dynamic "credentials" {
     for_each = each.value.credentials == null ? [] : [each.value.credentials]
     content {
-      serviceprincipalid = credentials.value.serviceprincipalid
+      serviceprincipalid          = credentials.value.serviceprincipalid
+      serviceprincipalkey         = credentials.value.serviceprincipalkey
+      serviceprincipalcertificate = credentials.value.serviceprincipalcertificate
     }
   }
 
   dynamic "features" {
     for_each = each.value.features == null ? [] : [each.value.features]
     content {
-      active_directory_service_endpoint_resource_id = features.value.active_directory_service_endpoint_resource_id
       validate = features.value.validate
     }
   }
@@ -218,14 +219,14 @@ resource "azuredevops_serviceendpoint_dockerregistry" "dockerregistry" {
 resource "azuredevops_serviceendpoint_dynamics_lifecycle_services" "dynamics_lifecycle_services" {
   for_each = { for index, endpoint in var.serviceendpoint_dynamics_lifecycle_services : index => endpoint }
 
-  project_id                          = var.project_id
-  service_endpoint_name               = each.value.service_endpoint_name
-  authorization_endpoint              = each.value.authorization_endpoint
-  lifecycle_services_api_endpoint     = each.value.lifecycle_services_api_endpoint
-  client_id                           = each.value.client_id
-  username                            = each.value.username
-  password                            = each.value.password
-  description                         = each.value.description
+  project_id                      = var.project_id
+  service_endpoint_name           = each.value.service_endpoint_name
+  authorization_endpoint          = each.value.authorization_endpoint
+  lifecycle_services_api_endpoint = each.value.lifecycle_services_api_endpoint
+  client_id                       = each.value.client_id
+  username                        = each.value.username
+  password                        = each.value.password
+  description                     = each.value.description
 }
 
 resource "azuredevops_serviceendpoint_externaltfs" "externaltfs" {
@@ -280,24 +281,24 @@ resource "azuredevops_serviceendpoint_generic_git" "generic_git" {
 resource "azuredevops_serviceendpoint_generic_v2" "generic_v2" {
   for_each = { for index, endpoint in var.serviceendpoint_generic_v2 : index => endpoint }
 
-  project_id             = var.project_id
-  name                   = each.value.name
-  type                   = each.value.type
-  server_url             = each.value.server_url
-  authorization_scheme   = each.value.authorization_scheme
-  shared_project_ids     = each.value.shared_project_ids
-  description            = each.value.description
+  project_id               = var.project_id
+  name                     = each.value.name
+  type                     = each.value.type
+  server_url               = each.value.server_url
+  authorization_scheme     = each.value.authorization_scheme
+  shared_project_ids       = each.value.shared_project_ids
+  description              = each.value.description
   authorization_parameters = each.value.authorization_parameters
-  parameters             = each.value.parameters
+  parameters               = each.value.parameters
 }
 
 resource "azuredevops_serviceendpoint_github" "github" {
   for_each = { for index, endpoint in var.serviceendpoint_github : index => endpoint }
 
-  project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  description           = each.value.description
-  personal_access_token = each.value.personal_access_token
+  project_id             = var.project_id
+  service_endpoint_name  = each.value.service_endpoint_name
+  description            = each.value.description
+  personal_access_token  = each.value.personal_access_token
   oauth_configuration_id = each.value.oauth_configuration_id
 
   dynamic "auth_oauth" {
@@ -318,11 +319,11 @@ resource "azuredevops_serviceendpoint_github" "github" {
 resource "azuredevops_serviceendpoint_github_enterprise" "github_enterprise" {
   for_each = { for index, endpoint in var.serviceendpoint_github_enterprise : index => endpoint }
 
-  project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  description           = each.value.description
-  url                   = each.value.url
-  personal_access_token = each.value.personal_access_token
+  project_id             = var.project_id
+  service_endpoint_name  = each.value.service_endpoint_name
+  description            = each.value.description
+  url                    = each.value.url
+  personal_access_token  = each.value.personal_access_token
   oauth_configuration_id = each.value.oauth_configuration_id
 
   dynamic "auth_personal" {
@@ -505,8 +506,8 @@ resource "azuredevops_serviceendpoint_kubernetes" "kubernetes" {
   dynamic "service_account" {
     for_each = each.value.service_account == null ? [] : [each.value.service_account]
     content {
-      token                 = service_account.value.token
-      ca_cert               = service_account.value.ca_cert
+      token                  = service_account.value.token
+      ca_cert                = service_account.value.ca_cert
       accept_untrusted_certs = service_account.value.accept_untrusted_certs
     }
   }

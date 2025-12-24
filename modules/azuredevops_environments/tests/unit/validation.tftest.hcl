@@ -12,11 +12,11 @@ run "invalid_environment_selector" {
   variables {
     kubernetes_resources = [
       {
-        environment_id    = "00000000-0000-0000-0000-000000000000"
-        environment_key   = "dev"
+        environment_id      = "00000000-0000-0000-0000-000000000000"
+        environment_key     = "dev"
         service_endpoint_id = "00000000-0000-0000-0000-000000000000"
-        name              = "dev-k8s"
-        namespace         = "default"
+        name                = "dev-k8s"
+        namespace           = "default"
       }
     ]
   }

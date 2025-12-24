@@ -3,14 +3,14 @@
 mock_provider "azuredevops" {
   mock_resource "azuredevops_serviceendpoint_generic" {
     defaults = {
-      id = "endpoint-0001"
+      id                    = "endpoint-0001"
       service_endpoint_name = "generic-endpoint"
     }
   }
 
   mock_resource "azuredevops_serviceendpoint_incomingwebhook" {
     defaults = {
-      id = "endpoint-0002"
+      id                    = "endpoint-0002"
       service_endpoint_name = "webhook-endpoint"
     }
   }
