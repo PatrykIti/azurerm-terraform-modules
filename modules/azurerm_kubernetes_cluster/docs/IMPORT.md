@@ -173,6 +173,49 @@ If the plan is clean, you can **remove the import block** (`import.tf`).
 
 ---
 
+### Examples from terraform plan (diffs)
+
+Example 1 - `dns_prefix` mismatch:
+
+```text
+  ~ dns_prefix = "aks-prod" -> "aks-prod-west"
+```
+
+Fix: set `dns_prefix` in your inputs to the existing value from Azure.
+
+Example 2 - autoscaling vs fixed node count:
+
+```text
+  ~ auto_scaling_enabled = false -> true
+  - node_count           = 2
+  + min_count            = 2
+  + max_count            = 5
+```
+
+Fix: if the cluster uses autoscaling, set `auto_scaling_enabled = true` and provide `min_count`/`max_count`.
+
+Example 3 - network profile mismatch:
+
+```text
+  ~ service_cidr   = "172.16.0.0/16" -> "10.240.0.0/16"
+  ~ dns_service_ip = "172.16.0.10"   -> "10.240.0.10"
+```
+
+Fix: read `networkProfile` from `az aks show` and align your inputs.
+
+Example 4 - tags drift:
+
+```text
+  ~ tags = {
+      + "Environment" = "Prod"
+      + "ManagedBy"   = "Terraform"
+    }
+```
+
+Fix: match `tags` to the existing AKS tags, or remove `tags` from inputs if you do not want to manage them.
+
+---
+
 ## Notes / common pitfalls
 
 - Import blocks run **only on apply**. `plan` alone does not import.
