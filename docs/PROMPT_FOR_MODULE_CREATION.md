@@ -1,9 +1,9 @@
 # MODULE CREATION TASK – {{ module name}}
 
-You are tasked with creating a new Terraform module named `{{ module name}}` according to the latest AzureRM provider version **4.36.0**. Follow strictly the internal module development standards defined in `@AGENTS.md`. Use the helper script `@scripts/create-new-module.sh` to generate the initial structure.
+You are tasked with creating a new Terraform module named `{{ module name}}` according to the latest AzureRM provider version **4.57.0**. Follow strictly the internal module development standards defined in `@AGENTS.md`. Use the helper script `@scripts/create-new-module.sh` to generate the initial structure.
 First you need to check script and what will be created as a module template.
 
-## 🗂️ WORKTREE SETUP – CLAUDE MULTI-AGENT FLOW
+## 🗂️ WORKTREE SETUP – MULTI-AGENT FLOW
 
 To isolate agent work, each Claude agent should use a separate **Git worktree**, with its own branch and workspace
 
@@ -56,7 +56,7 @@ Most of the files for module documentation have place holders which should be re
 ---
 
 ### 2. 📚 Schema exploration
-- Research the full structure and capabilities of `azurerm_{{ module name}}` resource block using AzureRM provider version 4.36.0:
+- Research the full structure and capabilities of `azurerm_{{ module name}}` resource block using AzureRM provider version 4.57.0:
   - Official Terraform Registry
   - Azure provider changelog (breaking changes, deprecations, defaults)
 - Document optional and required arguments

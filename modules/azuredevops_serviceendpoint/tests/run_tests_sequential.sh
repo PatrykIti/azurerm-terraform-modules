@@ -56,11 +56,11 @@ EOF_JSON
 
 # List of tests to run
 tests=(
-    "TestBasicAzuredevopsRepository"
-    "TestCompleteAzuredevopsRepository"
-    "TestSecureAzuredevopsRepository"
-    "TestAzuredevopsRepositoryValidationRules"
-    "TestAzuredevopsRepositoryFullIntegration"
+    "TestBasicAzuredevopsServiceendpoint"
+    "TestCompleteAzuredevopsServiceendpoint"
+    "TestSecureAzuredevopsServiceendpoint"
+    "TestAzuredevopsServiceendpointValidationRules"
+    "TestAzuredevopsServiceendpointFullIntegration"
 )
 
 echo "Starting sequential test execution for azuredevops_serviceendpoint"

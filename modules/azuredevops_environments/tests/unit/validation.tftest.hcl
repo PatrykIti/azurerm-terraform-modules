@@ -6,20 +6,22 @@ variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 }
 
-run "invalid_branch_selector" {
+run "invalid_environment_selector" {
   command = plan
 
   variables {
-    branches = [
+    kubernetes_resources = [
       {
-        repository_id  = "00000000-0000-0000-0000-000000000000"
-        repository_key = "main"
-        name           = "invalid"
+        environment_id    = "00000000-0000-0000-0000-000000000000"
+        environment_key   = "dev"
+        service_endpoint_id = "00000000-0000-0000-0000-000000000000"
+        name              = "dev-k8s"
+        namespace         = "default"
       }
     ]
   }
 
   expect_failures = [
-    var.branches,
+    var.kubernetes_resources,
   ]
 }

@@ -8,35 +8,72 @@ resource "random_string" "suffix" {
   special = false
 }
 
+data "azuredevops_group" "project_collection_admins" {
+  name = "Project Collection Administrators"
+}
+
+resource "azuredevops_serviceendpoint_kubernetes" "example" {
+  project_id            = var.project_id
+  service_endpoint_name = "${var.environment_name_prefix}-k8s-${random_string.suffix.result}"
+  apiserver_url         = var.kubernetes_api_url
+  authorization_type    = "Kubeconfig"
+
+  kubeconfig {
+    kube_config = <<EOT
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority: fake-ca-file
+    server: https://1.2.3.4
+  name: development
+contexts:
+- context:
+    cluster: development
+    namespace: default
+    user: developer
+  name: dev-default
+current-context: dev-default
+kind: Config
+preferences: {}
+users:
+- name: developer
+  user:
+    client-certificate: fake-cert-file
+    client-key: fake-key-file
+EOT
+    accept_untrusted_certs = true
+    cluster_context        = "dev-default"
+  }
+}
+
 module "azuredevops_environments" {
-  source = "../../"
+  source = "../.."
 
   project_id = var.project_id
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
-      initialization = {
-        init_type = "Clean"
-      }
+  environments = {
+    complete = {
+      name        = "${var.environment_name_prefix}-${random_string.suffix.result}"
+      description = "Complete environment"
     }
   }
 
-  branches = [
+  kubernetes_resources = [
     {
-      repository_key = "main"
-      name           = "develop"
-      ref_branch     = "refs/heads/master"
+      environment_key    = "complete"
+      service_endpoint_id = azuredevops_serviceendpoint_kubernetes.example.id
+      name               = "${var.environment_name_prefix}-k8s-${random_string.suffix.result}"
+      namespace          = "default"
+      cluster_name       = "example-aks"
     }
   ]
 
-  files = [
+  check_approvals = [
     {
-      repository_key      = "main"
-      file                = "README.md"
-      content             = "# Repository\n\nManaged by Terraform."
-      commit_message      = "Add README"
-      overwrite_on_create = true
+      target_environment_key = "complete"
+      target_resource_type   = "environment"
+      approvers              = [data.azuredevops_group.project_collection_admins.id]
+      requester_can_approve  = false
     }
   ]
 }

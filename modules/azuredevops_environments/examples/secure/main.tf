@@ -8,56 +8,36 @@ resource "random_string" "suffix" {
   special = false
 }
 
+data "azuredevops_group" "project_collection_admins" {
+  name = "Project Collection Administrators"
+}
+
 module "azuredevops_environments" {
   source = "../../"
 
   project_id = var.project_id
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
-      initialization = {
-        init_type = "Clean"
-      }
+  environments = {
+    secure = {
+      name        = "${var.environment_name_prefix}-${random_string.suffix.result}"
+      description = "Secure environment"
     }
   }
 
-  branch_policy_min_reviewers = [
+  check_approvals = [
     {
-      reviewer_count = var.reviewer_count
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
+      target_environment_key = "secure"
+      target_resource_type   = "environment"
+      approvers              = [data.azuredevops_group.project_collection_admins.id]
+      requester_can_approve  = false
     }
   ]
 
-  branch_policy_status_check = [
+  check_exclusive_locks = [
     {
-      name         = var.status_check_name
-      genre        = var.status_check_genre
-      display_name = "Security Status Check"
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
-    }
-  ]
-
-  repository_policy_check_credentials = [
-    {
-      repository_keys = ["main"]
-    }
-  ]
-
-  repository_policy_case_enforcement = [
-    {
-      enforce_consistent_case = true
-      repository_keys         = ["main"]
+      target_environment_key = "secure"
+      target_resource_type   = "environment"
+      timeout                = 43200
     }
   ]
 }

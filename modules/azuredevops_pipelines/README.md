@@ -36,9 +36,9 @@ module "azuredevops_pipelines" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - This example demonstrates creating a Git repository with an initial README file.
-- [Complete](examples/complete) - This example demonstrates creating a repository with branches, permissions, and a selection of branch/repository policies.
-- [Secure](examples/secure) - This example demonstrates a repository with stricter review and status policies.
+- [Basic](examples/basic) - This example demonstrates creating a basic YAML pipeline backed by a Git repository.
+- [Complete](examples/complete) - This example demonstrates creating multiple YAML pipelines with folders and authorizations.
+- [Secure](examples/secure) - This example demonstrates a pipeline with restricted permissions and explicit authorizations.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->

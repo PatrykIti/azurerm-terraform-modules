@@ -13,7 +13,7 @@ import (
 )
 
 // Test basic azuredevops_serviceendpoint creation
-func TestBasicAzuredevopsRepository(t *testing.T) {
+func TestBasicAzuredevopsServiceendpoint(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
@@ -31,14 +31,14 @@ func TestBasicAzuredevopsRepository(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		repositoryIDs := terraform.OutputMap(t, terraformOptions, "repository_ids")
+		genericEndpointIDs := terraform.OutputMap(t, terraformOptions, "generic_endpoint_ids")
 
-		assert.NotEmpty(t, repositoryIDs)
+		assert.NotEmpty(t, genericEndpointIDs)
 	})
 }
 
 // Test complete azuredevops_serviceendpoint configuration
-func TestCompleteAzuredevopsRepository(t *testing.T) {
+func TestCompleteAzuredevopsServiceendpoint(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
@@ -56,16 +56,16 @@ func TestCompleteAzuredevopsRepository(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		repositoryIDs := terraform.OutputMap(t, terraformOptions, "repository_ids")
-		branchIDs := terraform.OutputMap(t, terraformOptions, "branch_ids")
+		genericEndpointIDs := terraform.OutputMap(t, terraformOptions, "generic_endpoint_ids")
+		webhookEndpointIDs := terraform.OutputMap(t, terraformOptions, "incomingwebhook_endpoint_ids")
 
-		assert.NotEmpty(t, repositoryIDs)
-		assert.NotEmpty(t, branchIDs)
+		assert.NotEmpty(t, genericEndpointIDs)
+		assert.NotEmpty(t, webhookEndpointIDs)
 	})
 }
 
 // Test secure azuredevops_serviceendpoint configuration
-func TestSecureAzuredevopsRepository(t *testing.T) {
+func TestSecureAzuredevopsServiceendpoint(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
@@ -83,14 +83,14 @@ func TestSecureAzuredevopsRepository(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		repositoryIDs := terraform.OutputMap(t, terraformOptions, "repository_ids")
+		genericEndpointIDs := terraform.OutputMap(t, terraformOptions, "generic_endpoint_ids")
 
-		assert.NotEmpty(t, repositoryIDs)
+		assert.NotEmpty(t, genericEndpointIDs)
 	})
 }
 
 // Negative test cases for validation rules
-func TestAzuredevopsRepositoryValidationRules(t *testing.T) {
+func TestAzuredevopsServiceendpointValidationRules(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
@@ -102,7 +102,7 @@ func TestAzuredevopsRepositoryValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "repository_id or repository_key")
+	assert.Contains(t, err.Error(), "serviceendpoint_permissions.principal")
 }
 
 // Helper function to get terraform options
@@ -114,8 +114,9 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
-			"project_id":       getProjectID(t),
-			"repo_name_prefix": fmt.Sprintf("ado-repo-%s", uniqueID),
+			"project_id":                    getProjectID(t),
+			"generic_endpoint_name_prefix":  fmt.Sprintf("ado-endpoint-%s", uniqueID),
+			"incoming_webhook_name_prefix":  fmt.Sprintf("ado-webhook-%s", uniqueID),
 		},
 		NoColor: true,
 		RetryableTerraformErrors: map[string]string{

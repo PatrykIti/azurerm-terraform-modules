@@ -5,488 +5,844 @@
 variable "project_id" {
   description = "Azure DevOps project ID."
   type        = string
+
+  validation {
+    condition     = length(trimspace(var.project_id)) > 0
+    error_message = "project_id must be a non-empty string."
+  }
 }
 
 # -----------------------------------------------------------------------------
-# Repositories
+# ArgoCD
 # -----------------------------------------------------------------------------
 
-variable "repositories" {
-  description = "Map of Git repositories to manage."
-  type = map(object({
-    name                 = optional(string)
-    default_branch       = optional(string)
-    parent_repository_id = optional(string)
-    disabled             = optional(bool)
-    initialization = object({
-      init_type             = string
-      source_type           = optional(string)
-      source_url            = optional(string)
-      service_connection_id = optional(string)
-      username              = optional(string)
-      password              = optional(string)
+variable "serviceendpoint_argocd" {
+  description = "List of ArgoCD service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    url                   = string
+    description           = optional(string)
+    authentication_token = optional(object({
+      token = string
+    }))
+    authentication_basic = optional(object({
+      username = string
+      password = string
+    }))
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Artifactory
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_artifactory" {
+  description = "List of Artifactory service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    url                   = string
+    description           = optional(string)
+    authentication_token = optional(object({
+      token = string
+    }))
+    authentication_basic = optional(object({
+      username = string
+      password = string
+    }))
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# AWS
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_aws" {
+  description = "List of AWS service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    access_key_id         = optional(string)
+    secret_access_key     = optional(string)
+    session_token         = optional(string)
+    role_to_assume        = optional(string)
+    role_session_name     = optional(string)
+    external_id           = optional(string)
+    description           = optional(string)
+    use_oidc              = optional(bool)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Azure Service Bus
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_azure_service_bus" {
+  description = "List of Azure Service Bus service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    queue_name            = string
+    connection_string     = string
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Azure Container Registry
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_azurecr" {
+  description = "List of Azure Container Registry service endpoints."
+  type = list(object({
+    service_endpoint_name                = string
+    resource_group                       = string
+    azurecr_spn_tenantid                  = string
+    azurecr_name                          = string
+    azurecr_subscription_id               = string
+    azurecr_subscription_name             = string
+    service_endpoint_authentication_scheme = optional(string)
+    description                           = optional(string)
+    credentials = optional(object({
+      serviceprincipalid = string
+    }))
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Azure DevOps
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_azuredevops" {
+  description = "List of Azure DevOps service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    org_url               = string
+    release_api_url       = string
+    personal_access_token = string
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Azure Resource Manager
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_azurerm" {
+  description = "List of Azure Resource Manager service endpoints."
+  type = list(object({
+    service_endpoint_name                = string
+    azurerm_spn_tenantid                  = string
+    serviceprincipalid                   = string
+    serviceprincipalkey                  = optional(string)
+    serviceprincipalcertificate          = optional(string)
+    service_endpoint_authentication_scheme = optional(string)
+    azurerm_management_group_id          = optional(string)
+    azurerm_management_group_name        = optional(string)
+    azurerm_subscription_id              = optional(string)
+    azurerm_subscription_name            = optional(string)
+    environment                           = optional(string)
+    server_url                            = optional(string)
+    resource_group                        = optional(string)
+    validate                              = optional(bool)
+    description                           = optional(string)
+    credentials = optional(object({
+      serviceprincipalid = string
+    }))
+    features = optional(object({
+      active_directory_service_endpoint_resource_id = optional(string)
+      validate                      = optional(bool)
+    }))
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Bitbucket
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_bitbucket" {
+  description = "List of Bitbucket service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    username              = string
+    password              = string
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Black Duck
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_black_duck" {
+  description = "List of Black Duck service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    server_url            = string
+    api_token             = string
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Checkmarx One
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_checkmarx_one" {
+  description = "List of Checkmarx One service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    server_url            = string
+    authorization_url     = optional(string)
+    api_key               = optional(string)
+    client_id             = optional(string)
+    client_secret         = optional(string)
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Checkmarx SAST
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_checkmarx_sast" {
+  description = "List of Checkmarx SAST service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    server_url            = string
+    username              = string
+    password              = string
+    team                  = optional(string)
+    preset                = optional(string)
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Checkmarx SCA
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_checkmarx_sca" {
+  description = "List of Checkmarx SCA service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    access_control_url    = string
+    server_url            = string
+    web_app_url           = string
+    account               = string
+    username              = string
+    password              = string
+    team                  = optional(string)
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Docker Registry
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_dockerregistry" {
+  description = "List of Docker registry service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    description           = optional(string)
+    docker_registry       = optional(string)
+    docker_username       = optional(string)
+    docker_email          = optional(string)
+    docker_password       = optional(string)
+    registry_type         = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Dynamics Lifecycle Services
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_dynamics_lifecycle_services" {
+  description = "List of Dynamics Lifecycle Services service endpoints."
+  type = list(object({
+    service_endpoint_name             = string
+    authorization_endpoint            = string
+    lifecycle_services_api_endpoint   = string
+    client_id                         = string
+    username                          = string
+    password                          = string
+    description                       = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# External TFS
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_externaltfs" {
+  description = "List of external TFS service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    connection_url        = string
+    description           = optional(string)
+    auth_personal = object({
+      personal_access_token = string
     })
   }))
-  default = {}
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : (
-        repo.name == null || length(trimspace(repo.name)) > 0
-      )
-    ])
-    error_message = "repositories.name must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : contains([
-        "Uninitialized",
-        "Clean",
-        "Import",
-      ], repo.initialization.init_type)
-    ])
-    error_message = "repositories.initialization.init_type must be Uninitialized, Clean, or Import."
-  }
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : (
-        repo.initialization.source_type == null || repo.initialization.source_type == "Git"
-      )
-    ])
-    error_message = "repositories.initialization.source_type must be Git when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : !(
-        repo.initialization.service_connection_id != null &&
-        (repo.initialization.username != null || repo.initialization.password != null)
-      )
-    ])
-    error_message = "repositories.initialization.service_connection_id conflicts with username/password."
-  }
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : (
-        (repo.initialization.username == null && repo.initialization.password == null) ||
-        (repo.initialization.username != null && repo.initialization.password != null)
-      )
-    ])
-    error_message = "repositories.initialization.username and password must be set together."
-  }
-}
-
-# -----------------------------------------------------------------------------
-# Branches
-# -----------------------------------------------------------------------------
-
-variable "branches" {
-  description = "List of Git repository branches to manage."
-  type = list(object({
-    repository_id  = optional(string)
-    repository_key = optional(string)
-    name           = string
-    ref_branch     = optional(string)
-    ref_tag        = optional(string)
-    ref_commit_id  = optional(string)
-  }))
   default = []
-
-  validation {
-    condition = alltrue([
-      for branch in var.branches : (
-        (branch.repository_id != null) != (branch.repository_key != null)
-      )
-    ])
-    error_message = "branches must set exactly one of repository_id or repository_key."
-  }
-
-  validation {
-    condition = alltrue([
-      for branch in var.branches : length(trimspace(branch.name)) > 0
-    ])
-    error_message = "branches.name must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for branch in var.branches : (
-        length(compact([
-          branch.ref_branch,
-          branch.ref_tag,
-          branch.ref_commit_id,
-        ])) <= 1
-      )
-    ])
-    error_message = "branches may set only one of ref_branch, ref_tag, or ref_commit_id."
-  }
 }
 
 # -----------------------------------------------------------------------------
-# Files
+# GCP Terraform
 # -----------------------------------------------------------------------------
 
-variable "files" {
-  description = "List of Git repository files to manage."
+variable "serviceendpoint_gcp_terraform" {
+  description = "List of GCP Terraform service endpoints."
   type = list(object({
-    repository_id       = optional(string)
-    repository_key      = optional(string)
-    file                = string
-    content             = string
-    branch              = optional(string)
-    commit_message      = optional(string)
-    overwrite_on_create = optional(bool)
-    author_name         = optional(string)
-    author_email        = optional(string)
-    committer_name      = optional(string)
-    committer_email     = optional(string)
-  }))
-  default = []
-
-  validation {
-    condition = alltrue([
-      for file in var.files : (
-        (file.repository_id != null) != (file.repository_key != null)
-      )
-    ])
-    error_message = "files must set exactly one of repository_id or repository_key."
-  }
-
-  validation {
-    condition = alltrue([
-      for file in var.files : length(trimspace(file.file)) > 0
-    ])
-    error_message = "files.file must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for file in var.files : length(file.content) > 0
-    ])
-    error_message = "files.content must be a non-empty string."
-  }
-}
-
-# -----------------------------------------------------------------------------
-# Git Permissions
-# -----------------------------------------------------------------------------
-
-variable "git_permissions" {
-  description = "List of Git permissions to assign."
-  type = list(object({
-    repository_id  = optional(string)
-    repository_key = optional(string)
-    branch_name    = optional(string)
-    principal      = string
-    permissions    = map(string)
-    replace        = optional(bool)
-  }))
-  default = []
-
-  validation {
-    condition = alltrue([
-      for perm in var.git_permissions : (
-        perm.repository_id == null || perm.repository_key == null
-      )
-    ])
-    error_message = "git_permissions cannot set both repository_id and repository_key."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.git_permissions : length(trimspace(perm.principal)) > 0
-    ])
-    error_message = "git_permissions.principal must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.git_permissions : (
-        perm.branch_name == null || perm.repository_id != null || perm.repository_key != null
-      )
-    ])
-    error_message = "git_permissions.branch_name requires repository_id or repository_key."
-  }
-}
-
-# -----------------------------------------------------------------------------
-# Branch Policies - Auto Reviewers
-# -----------------------------------------------------------------------------
-
-variable "branch_policy_auto_reviewers" {
-  description = "List of auto reviewer branch policies."
-  type = list(object({
-    enabled                     = optional(bool)
-    blocking                    = optional(bool)
-    auto_reviewer_ids           = list(string)
-    path_filters                = optional(list(string))
-    submitter_can_vote          = optional(bool)
-    message                     = optional(string)
-    minimum_number_of_reviewers = optional(number)
-    scope = list(object({
-      repository_id  = optional(string)
-      repository_key = optional(string)
-      repository_ref = optional(string)
-      match_type     = optional(string)
-    }))
-  }))
-  default = []
-
-  validation {
-    condition = alltrue([
-      for policy in var.branch_policy_auto_reviewers : length(policy.auto_reviewer_ids) > 0
-    ])
-    error_message = "branch_policy_auto_reviewers.auto_reviewer_ids must not be empty."
-  }
-}
-
-# -----------------------------------------------------------------------------
-# Branch Policies - Build Validation
-# -----------------------------------------------------------------------------
-
-variable "branch_policy_build_validation" {
-  description = "List of build validation branch policies."
-  type = list(object({
-    enabled                     = optional(bool)
-    blocking                    = optional(bool)
-    build_definition_id         = string
-    display_name                = string
-    manual_queue_only           = optional(bool)
-    queue_on_source_update_only = optional(bool)
-    valid_duration              = optional(number)
-    filename_patterns           = optional(list(string))
-    scope = list(object({
-      repository_id  = optional(string)
-      repository_key = optional(string)
-      repository_ref = optional(string)
-      match_type     = optional(string)
-    }))
+    service_endpoint_name = string
+    private_key           = string
+    token_uri             = string
+    gcp_project_id         = string
+    client_email          = optional(string)
+    scope                 = optional(string)
+    description           = optional(string)
   }))
   default = []
 }
 
 # -----------------------------------------------------------------------------
-# Branch Policies - Comment Resolution
+# Generic
 # -----------------------------------------------------------------------------
 
-variable "branch_policy_comment_resolution" {
-  description = "List of comment resolution branch policies."
+variable "serviceendpoint_generic" {
+  description = "List of generic service endpoints."
   type = list(object({
-    enabled  = optional(bool)
-    blocking = optional(bool)
-    scope = list(object({
-      repository_id  = optional(string)
-      repository_key = optional(string)
-      repository_ref = optional(string)
-      match_type     = optional(string)
-    }))
+    service_endpoint_name = string
+    server_url            = string
+    username              = optional(string)
+    password              = optional(string)
+    description           = optional(string)
   }))
   default = []
 }
 
 # -----------------------------------------------------------------------------
-# Branch Policies - Merge Types
+# Generic Git
 # -----------------------------------------------------------------------------
 
-variable "branch_policy_merge_types" {
-  description = "List of merge types branch policies."
+variable "serviceendpoint_generic_git" {
+  description = "List of generic Git service endpoints."
   type = list(object({
-    enabled                       = optional(bool)
-    blocking                      = optional(bool)
-    allow_squash                  = optional(bool)
-    allow_rebase_and_fast_forward = optional(bool)
-    allow_basic_no_fast_forward   = optional(bool)
-    allow_rebase_with_merge       = optional(bool)
-    scope = list(object({
-      repository_id  = optional(string)
-      repository_key = optional(string)
-      repository_ref = optional(string)
-      match_type     = optional(string)
-    }))
+    service_endpoint_name = string
+    repository_url        = string
+    username              = optional(string)
+    password              = optional(string)
+    enable_pipelines_access = optional(bool)
+    description           = optional(string)
   }))
   default = []
 }
 
 # -----------------------------------------------------------------------------
-# Branch Policies - Minimum Reviewers
+# Generic V2
 # -----------------------------------------------------------------------------
 
-variable "branch_policy_min_reviewers" {
-  description = "List of minimum reviewers branch policies."
+variable "serviceendpoint_generic_v2" {
+  description = "List of generic v2 service endpoints."
   type = list(object({
-    enabled                                = optional(bool)
-    blocking                               = optional(bool)
-    reviewer_count                         = number
-    submitter_can_vote                     = optional(bool)
-    last_pusher_cannot_approve             = optional(bool)
-    allow_completion_with_rejects_or_waits = optional(bool)
-    on_push_reset_approved_votes           = optional(bool)
-    on_push_reset_all_votes                = optional(bool)
-    on_last_iteration_require_vote         = optional(bool)
-    scope = list(object({
-      repository_id  = optional(string)
-      repository_key = optional(string)
-      repository_ref = optional(string)
-      match_type     = optional(string)
-    }))
-  }))
-  default = []
-}
-
-# -----------------------------------------------------------------------------
-# Branch Policies - Status Check
-# -----------------------------------------------------------------------------
-
-variable "branch_policy_status_check" {
-  description = "List of status check branch policies."
-  type = list(object({
-    enabled              = optional(bool)
-    blocking             = optional(bool)
     name                 = string
-    genre                = optional(string)
-    author_id            = optional(string)
-    invalidate_on_update = optional(bool)
-    applicability        = optional(string)
-    filename_patterns    = optional(list(string))
-    display_name         = optional(string)
-    scope = list(object({
-      repository_id  = optional(string)
-      repository_key = optional(string)
-      repository_ref = optional(string)
-      match_type     = optional(string)
+    type                 = string
+    server_url           = string
+    authorization_scheme = string
+    shared_project_ids   = optional(list(string))
+    description          = optional(string)
+    authorization_parameters = optional(map(string))
+    parameters           = optional(map(string))
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# GitHub
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_github" {
+  description = "List of GitHub service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    description           = optional(string)
+    auth_oauth = optional(object({
+      oauth_configuration_id = string
+    }))
+    auth_personal = optional(object({
+      personal_access_token = string
+    }))
+    personal_access_token = optional(string)
+    oauth_configuration_id = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# GitHub Enterprise
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_github_enterprise" {
+  description = "List of GitHub Enterprise service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    description           = optional(string)
+    url                   = optional(string)
+    auth_personal = optional(object({
+      personal_access_token = string
+    }))
+    auth_oauth = optional(object({
+      oauth_configuration_id = string
+    }))
+    personal_access_token = optional(string)
+    oauth_configuration_id = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# GitLab
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_gitlab" {
+  description = "List of GitLab service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    url                   = string
+    username              = string
+    api_token             = string
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Incoming Webhook
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_incomingwebhook" {
+  description = "List of incoming webhook service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    webhook_name          = string
+    description           = optional(string)
+    http_header           = optional(string)
+    secret                = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Jenkins
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_jenkins" {
+  description = "List of Jenkins service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    url                   = string
+    username              = string
+    password              = string
+    accept_untrusted_certs = optional(bool)
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# JFrog Artifactory V2
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_jfrog_artifactory_v2" {
+  description = "List of JFrog Artifactory v2 service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    url                   = string
+    description           = optional(string)
+    authentication_token = optional(object({
+      token = string
+    }))
+    authentication_basic = optional(object({
+      username = string
+      password = string
     }))
   }))
   default = []
 }
 
 # -----------------------------------------------------------------------------
-# Branch Policies - Work Item Linking
+# JFrog Distribution V2
 # -----------------------------------------------------------------------------
 
-variable "branch_policy_work_item_linking" {
-  description = "List of work item linking branch policies."
+variable "serviceendpoint_jfrog_distribution_v2" {
+  description = "List of JFrog Distribution v2 service endpoints."
   type = list(object({
-    enabled  = optional(bool)
-    blocking = optional(bool)
-    scope = list(object({
-      repository_id  = optional(string)
-      repository_key = optional(string)
-      repository_ref = optional(string)
-      match_type     = optional(string)
+    service_endpoint_name = string
+    url                   = string
+    description           = optional(string)
+    authentication_token = optional(object({
+      token = string
+    }))
+    authentication_basic = optional(object({
+      username = string
+      password = string
     }))
   }))
   default = []
 }
 
 # -----------------------------------------------------------------------------
-# Repository Policies - Author Email Pattern
+# JFrog Platform V2
 # -----------------------------------------------------------------------------
 
-variable "repository_policy_author_email_pattern" {
-  description = "List of author email pattern repository policies."
+variable "serviceendpoint_jfrog_platform_v2" {
+  description = "List of JFrog Platform v2 service endpoints."
   type = list(object({
-    enabled               = optional(bool)
-    blocking              = optional(bool)
-    author_email_patterns = list(string)
-    repository_ids        = optional(list(string))
-    repository_keys       = optional(list(string))
+    service_endpoint_name = string
+    url                   = string
+    description           = optional(string)
+    authentication_token = optional(object({
+      token = string
+    }))
+    authentication_basic = optional(object({
+      username = string
+      password = string
+    }))
   }))
   default = []
 }
 
 # -----------------------------------------------------------------------------
-# Repository Policies - Case Enforcement
+# JFrog Xray V2
 # -----------------------------------------------------------------------------
 
-variable "repository_policy_case_enforcement" {
-  description = "List of case enforcement repository policies."
+variable "serviceendpoint_jfrog_xray_v2" {
+  description = "List of JFrog Xray v2 service endpoints."
   type = list(object({
-    enabled                 = optional(bool)
-    blocking                = optional(bool)
-    enforce_consistent_case = bool
-    repository_ids          = optional(list(string))
-    repository_keys         = optional(list(string))
+    service_endpoint_name = string
+    url                   = string
+    description           = optional(string)
+    authentication_token = optional(object({
+      token = string
+    }))
+    authentication_basic = optional(object({
+      username = string
+      password = string
+    }))
   }))
   default = []
 }
 
 # -----------------------------------------------------------------------------
-# Repository Policies - Check Credentials
+# Kubernetes
 # -----------------------------------------------------------------------------
 
-variable "repository_policy_check_credentials" {
-  description = "List of check credentials repository policies."
+variable "serviceendpoint_kubernetes" {
+  description = "List of Kubernetes service endpoints."
   type = list(object({
-    enabled         = optional(bool)
-    blocking        = optional(bool)
-    repository_ids  = optional(list(string))
-    repository_keys = optional(list(string))
+    service_endpoint_name = string
+    apiserver_url         = string
+    authorization_type    = string
+    description           = optional(string)
+    azure_subscription = optional(object({
+      azure_environment = optional(string)
+      cluster_name      = string
+      subscription_id   = string
+      subscription_name = string
+      tenant_id         = string
+      resourcegroup_id  = string
+      namespace         = optional(string)
+      cluster_admin     = optional(bool)
+    }))
+    kubeconfig = optional(object({
+      kube_config            = string
+      accept_untrusted_certs = optional(bool)
+      cluster_context        = optional(string)
+    }))
+    service_account = optional(object({
+      token                 = string
+      ca_cert               = string
+      accept_untrusted_certs = optional(bool)
+    }))
   }))
   default = []
 }
 
 # -----------------------------------------------------------------------------
-# Repository Policies - File Path Pattern
+# Maven
 # -----------------------------------------------------------------------------
 
-variable "repository_policy_file_path_pattern" {
-  description = "List of file path pattern repository policies."
+variable "serviceendpoint_maven" {
+  description = "List of Maven service endpoints."
   type = list(object({
-    enabled           = optional(bool)
-    blocking          = optional(bool)
-    filepath_patterns = list(string)
-    repository_ids    = optional(list(string))
-    repository_keys   = optional(list(string))
+    service_endpoint_name = string
+    url                   = string
+    repository_id         = string
+    description           = optional(string)
+    authentication_token = optional(object({
+      token = string
+    }))
+    authentication_basic = optional(object({
+      username = string
+      password = string
+    }))
   }))
   default = []
 }
 
 # -----------------------------------------------------------------------------
-# Repository Policies - Max File Size
+# Nexus
 # -----------------------------------------------------------------------------
 
-variable "repository_policy_max_file_size" {
-  description = "List of max file size repository policies."
+variable "serviceendpoint_nexus" {
+  description = "List of Nexus service endpoints."
   type = list(object({
-    enabled         = optional(bool)
-    blocking        = optional(bool)
-    max_file_size   = number
-    repository_ids  = optional(list(string))
-    repository_keys = optional(list(string))
+    service_endpoint_name = string
+    url                   = string
+    username              = string
+    password              = string
+    description           = optional(string)
   }))
   default = []
 }
 
 # -----------------------------------------------------------------------------
-# Repository Policies - Max Path Length
+# npm
 # -----------------------------------------------------------------------------
 
-variable "repository_policy_max_path_length" {
-  description = "List of max path length repository policies."
+variable "serviceendpoint_npm" {
+  description = "List of npm service endpoints."
   type = list(object({
-    enabled         = optional(bool)
-    blocking        = optional(bool)
-    max_path_length = number
-    repository_ids  = optional(list(string))
-    repository_keys = optional(list(string))
+    service_endpoint_name = string
+    url                   = string
+    access_token          = string
+    description           = optional(string)
   }))
   default = []
 }
 
 # -----------------------------------------------------------------------------
-# Repository Policies - Reserved Names
+# NuGet
 # -----------------------------------------------------------------------------
 
-variable "repository_policy_reserved_names" {
-  description = "List of reserved names repository policies."
+variable "serviceendpoint_nuget" {
+  description = "List of NuGet service endpoints."
   type = list(object({
-    enabled         = optional(bool)
-    blocking        = optional(bool)
-    repository_ids  = optional(list(string))
-    repository_keys = optional(list(string))
+    service_endpoint_name = string
+    feed_url              = string
+    api_key               = optional(string)
+    personal_access_token = optional(string)
+    username              = optional(string)
+    password              = optional(string)
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Octopus Deploy
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_octopusdeploy" {
+  description = "List of Octopus Deploy service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    url                   = string
+    api_key               = string
+    ignore_ssl_error      = optional(bool)
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# OpenShift
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_openshift" {
+  description = "List of OpenShift service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    server_url            = optional(string)
+    accept_untrusted_certs = optional(bool)
+    certificate_authority_file = optional(string)
+    description           = optional(string)
+    auth_basic = optional(object({
+      username = string
+      password = string
+    }))
+    auth_token = optional(object({
+      token = string
+    }))
+    auth_none = optional(object({
+      kube_config = optional(string)
+    }))
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Service Endpoint Permissions
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_permissions" {
+  description = "List of service endpoint permissions to assign."
+  type = list(object({
+    principal          = string
+    permissions        = map(string)
+    serviceendpoint_id = optional(string)
+    replace            = optional(bool, true)
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for permission in var.serviceendpoint_permissions : length(trimspace(permission.principal)) > 0
+    ])
+    error_message = "serviceendpoint_permissions.principal must be a non-empty string."
+  }
+}
+
+# -----------------------------------------------------------------------------
+# Run Pipeline
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_runpipeline" {
+  description = "List of run pipeline service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    organization_name     = string
+    description           = optional(string)
+    auth_personal = object({
+      personal_access_token = string
+    })
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Service Fabric
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_servicefabric" {
+  description = "List of Service Fabric service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    cluster_endpoint      = string
+    description           = optional(string)
+    certificate = optional(object({
+      server_certificate_lookup     = string
+      server_certificate_thumbprint = optional(string)
+      server_certificate_common_name = optional(string)
+      client_certificate            = string
+      client_certificate_password   = optional(string)
+    }))
+    azure_active_directory = optional(object({
+      server_certificate_lookup     = string
+      server_certificate_thumbprint = optional(string)
+      server_certificate_common_name = optional(string)
+      username                      = string
+      password                      = string
+    }))
+    none = optional(object({
+      unsecured   = optional(bool)
+      cluster_spn = optional(string)
+    }))
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Snyk
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_snyk" {
+  description = "List of Snyk service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    server_url            = string
+    api_token             = string
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# SonarCloud
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_sonarcloud" {
+  description = "List of SonarCloud service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    token                 = string
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# SonarQube
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_sonarqube" {
+  description = "List of SonarQube service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    url                   = string
+    token                 = string
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# SSH
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_ssh" {
+  description = "List of SSH service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    host                  = string
+    username              = string
+    port                  = optional(number)
+    password              = optional(string)
+    private_key           = optional(string)
+    description           = optional(string)
+  }))
+  default = []
+}
+
+# -----------------------------------------------------------------------------
+# Visual Studio Marketplace
+# -----------------------------------------------------------------------------
+
+variable "serviceendpoint_visualstudiomarketplace" {
+  description = "List of Visual Studio Marketplace service endpoints."
+  type = list(object({
+    service_endpoint_name = string
+    url                   = string
+    description           = optional(string)
+    authentication_token = optional(object({
+      token = string
+    }))
+    authentication_basic = optional(object({
+      username = string
+      password = string
+    }))
   }))
   default = []
 }

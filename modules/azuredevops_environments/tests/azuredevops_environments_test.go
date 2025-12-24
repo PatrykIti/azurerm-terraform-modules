@@ -13,7 +13,7 @@ import (
 )
 
 // Test basic azuredevops_environments creation
-func TestBasicAzuredevopsRepository(t *testing.T) {
+func TestBasicAzuredevopsEnvironments(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
@@ -31,14 +31,14 @@ func TestBasicAzuredevopsRepository(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		repositoryIDs := terraform.OutputMap(t, terraformOptions, "repository_ids")
+		environmentIDs := terraform.OutputMap(t, terraformOptions, "environment_ids")
 
-		assert.NotEmpty(t, repositoryIDs)
+		assert.NotEmpty(t, environmentIDs)
 	})
 }
 
 // Test complete azuredevops_environments configuration
-func TestCompleteAzuredevopsRepository(t *testing.T) {
+func TestCompleteAzuredevopsEnvironments(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
@@ -56,16 +56,16 @@ func TestCompleteAzuredevopsRepository(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		repositoryIDs := terraform.OutputMap(t, terraformOptions, "repository_ids")
-		branchIDs := terraform.OutputMap(t, terraformOptions, "branch_ids")
+		environmentIDs := terraform.OutputMap(t, terraformOptions, "environment_ids")
+		kubernetesResourceIDs := terraform.OutputMap(t, terraformOptions, "kubernetes_resource_ids")
 
-		assert.NotEmpty(t, repositoryIDs)
-		assert.NotEmpty(t, branchIDs)
+		assert.NotEmpty(t, environmentIDs)
+		assert.NotEmpty(t, kubernetesResourceIDs)
 	})
 }
 
 // Test secure azuredevops_environments configuration
-func TestSecureAzuredevopsRepository(t *testing.T) {
+func TestSecureAzuredevopsEnvironments(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
@@ -83,14 +83,14 @@ func TestSecureAzuredevopsRepository(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		repositoryIDs := terraform.OutputMap(t, terraformOptions, "repository_ids")
+		environmentIDs := terraform.OutputMap(t, terraformOptions, "environment_ids")
 
-		assert.NotEmpty(t, repositoryIDs)
+		assert.NotEmpty(t, environmentIDs)
 	})
 }
 
 // Negative test cases for validation rules
-func TestAzuredevopsRepositoryValidationRules(t *testing.T) {
+func TestAzuredevopsEnvironmentsValidationRules(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
@@ -102,7 +102,7 @@ func TestAzuredevopsRepositoryValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "repository_id or repository_key")
+	assert.Contains(t, err.Error(), "target_resource_id or target_environment_key")
 }
 
 // Helper function to get terraform options
@@ -114,8 +114,8 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
-			"project_id":       getProjectID(t),
-			"repo_name_prefix": fmt.Sprintf("ado-repo-%s", uniqueID),
+			"project_id":             getProjectID(t),
+			"environment_name_prefix": fmt.Sprintf("ado-env-%s", uniqueID),
 		},
 		NoColor: true,
 		RetryableTerraformErrors: map[string]string{

@@ -6,17 +6,17 @@ run "defaults_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_git_repository.repo) == 0
-    error_message = "No repositories should be created by default."
+    condition     = length(azuredevops_environment.environment) == 0
+    error_message = "No environments should be created by default."
   }
 
   assert {
-    condition     = length(azuredevops_git_repository_branch.branch) == 0
-    error_message = "No branches should be created by default."
+    condition     = length(azuredevops_environment_resource_kubernetes.kubernetes_resource) == 0
+    error_message = "No Kubernetes resources should be created by default."
   }
 
   assert {
-    condition     = length(azuredevops_git_repository_file.file) == 0
-    error_message = "No files should be created by default."
+    condition     = length(azuredevops_check_approval.check_approval) == 0
+    error_message = "No checks should be created by default."
   }
 }

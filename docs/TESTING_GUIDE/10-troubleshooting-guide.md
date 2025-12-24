@@ -32,12 +32,12 @@ This guide provides solutions to common issues encountered while running Terrate
 
 **Error Message Example:**
 - `Error: A resource with the specified name already exists.`
-- `Error: StorageAccountAlreadyTaken: The storage account named '...' is already taken.`
+- `Error: A resource with the specified name already exists.`
 
 **Solution:**
 
 1.  **Run Cleanup**: The tests are designed to use a `random_suffix` to prevent this, but interrupted test runs can leave orphaned resources. Run `make clean` to delete local temporary files.
-2.  **Manual Azure Cleanup**: If the conflict is with a resource in Azure that was not properly deleted, you may need to manually delete the resource or the entire test resource group from the Azure portal. Test resource groups are typically named `rg-test-<random_suffix>`.
+2.  **Manual Azure Cleanup**: If the conflict is with a resource in Azure that was not properly deleted, you may need to manually delete the resource or the entire test resource group from the Azure portal. Test resource groups are typically named `rg-dpc-<scenario>-<random_suffix>`.
 
 ### 3. Test Timeouts
 
@@ -69,8 +69,8 @@ This guide provides solutions to common issues encountered while running Terrate
 To focus on a specific failing test, use the `test-single` target in the `Makefile`. This is much faster than running the entire suite.
 
 ```bash
-# Run only the TestStorageAccountPrivateEndpoint test
-make test-single TEST_NAME=TestStorageAccountPrivateEndpoint
+# Run only the TestSecureKubernetesCluster test
+make test-single TEST_NAME=TestSecureKubernetesCluster
 ```
 
 ### Disabling Parallel Execution
@@ -105,7 +105,7 @@ require.NoError(t, err)
 By default, all tests use a `defer` block to run `terraform destroy`. To inspect the created resources in Azure after a test run, you can temporarily comment out the `defer` block in the relevant Go test function.
 
 ```go
-func TestBasicStorageAccount(t *testing.T) {
+func TestBasicKubernetesCluster(t *testing.T) {
     // ...
     
     // Temporarily comment out the cleanup stage for debugging

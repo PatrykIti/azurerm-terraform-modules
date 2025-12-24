@@ -8,7 +8,7 @@ Current version: **vUnreleased**
 
 ## Description
 
-Azure DevOps repository module for managing Git repositories and policies.
+Azure DevOps service endpoints module for managing service connections and permissions.
 
 ## Usage
 
@@ -20,23 +20,23 @@ module "azuredevops_serviceendpoint" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  repositories = {
-    main = {
-      name = "example-repo"
-      initialization = {
-        init_type = "Clean"
-      }
+  serviceendpoint_generic = [
+    {
+      service_endpoint_name = "example-generic"
+      server_url            = "https://example.endpoint.local"
+      username              = "example-user"
+      password              = "example-password"
     }
-  }
+  ]
 }
 ```
 
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - This example demonstrates creating a Git repository with an initial README file.
-- [Complete](examples/complete) - This example demonstrates creating a repository with branches, permissions, and a selection of branch/repository policies.
-- [Secure](examples/secure) - This example demonstrates a repository with stricter review and status policies.
+- [Basic](examples/basic) - This example demonstrates creating AzureRM and Docker registry service endpoints.
+- [Complete](examples/complete) - This example demonstrates multiple service endpoint types with shared permissions.
+- [Secure](examples/secure) - This example demonstrates a minimal service endpoint with restrictive permissions.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->

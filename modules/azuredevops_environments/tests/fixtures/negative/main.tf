@@ -1,16 +1,18 @@
-# Negative test cases - should fail validation
 provider "azuredevops" {}
 
 module "azuredevops_environments" {
-  source = "../../../"
+  source = "../.."
 
-  project_id = "00000000-0000-0000-0000-000000000000"
+  project_id = var.project_id
 
-  branches = [
+  environments = {
+    dev = {}
+  }
+
+  check_approvals = [
     {
-      repository_id  = "00000000-0000-0000-0000-000000000000"
-      repository_key = "main"
-      name           = "invalid-branch"
+      target_resource_type = "environment"
+      approvers            = ["00000000-0000-0000-0000-000000000000"]
     }
   ]
 }

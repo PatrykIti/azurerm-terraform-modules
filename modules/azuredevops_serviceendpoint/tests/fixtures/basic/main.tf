@@ -1,34 +1,17 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 module "azuredevops_serviceendpoint" {
-  source = "../../"
+  source = "../.."
 
   project_id = var.project_id
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
-      initialization = {
-        init_type = "Clean"
-      }
-    }
-  }
-
-  files = [
+  serviceendpoint_generic = [
     {
-      repository_key      = "main"
-      file                = "README.md"
-      content             = "# Repository\n\nManaged by Terraform."
-      commit_message      = "Add README"
-      overwrite_on_create = true
+      service_endpoint_name = "${var.generic_endpoint_name_prefix}"
+      server_url            = var.generic_endpoint_url
+      username              = var.generic_endpoint_username
+      password              = var.generic_endpoint_password
+      description           = "Managed by Terraform"
     }
   ]
 }

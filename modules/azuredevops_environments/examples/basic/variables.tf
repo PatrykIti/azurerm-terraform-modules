@@ -3,8 +3,8 @@ variable "project_id" {
   type        = string
 }
 
-variable "repo_name_prefix" {
-  description = "Prefix for the repository name."
+variable "environment_name_prefix" {
+  description = "Prefix for the environment name."
   type        = string
-  default     = "ado-repo-basic"
+  default     = "ado-env"
 }

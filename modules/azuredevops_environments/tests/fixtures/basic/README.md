@@ -1,21 +1,18 @@
 # Basic Azure DevOps Environments Example
 
-This example demonstrates a basic Azure DevOps Environments configuration using secure defaults and minimal setup.
+This example demonstrates a basic Azure DevOps environment with minimal configuration.
 
 ## Features
 
-- Creates a basic azuredevops_environments with standard configuration
-- Uses secure defaults following Azure best practices
-- Creates a dedicated resource group
+- Creates a single environment
 - Demonstrates basic module usage patterns
 - Uses variables for configuration flexibility
 
 ## Key Configuration
 
-This example uses secure defaults and demonstrates:
-- Basic resource creation with minimal configuration
-- Using variables for easy configuration customization
-- Following security best practices by default
+This example demonstrates:
+- Basic environment creation
+- Variable-driven naming
 
 ## Usage
 

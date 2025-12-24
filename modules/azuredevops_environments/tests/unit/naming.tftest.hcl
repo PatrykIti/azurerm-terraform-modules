@@ -1,29 +1,25 @@
-# Test repository naming defaults
+# Test environment naming defaults
 
 mock_provider "azuredevops" {}
 
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  repositories = {
-    core = {
-      initialization = {
-        init_type = "Clean"
-      }
-    }
+  environments = {
+    core = {}
   }
 }
 
-run "repository_plan" {
+run "environment_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_git_repository.repo) == 1
-    error_message = "repositories should create one repo."
+    condition     = length(azuredevops_environment.environment) == 1
+    error_message = "environments should create one environment."
   }
 
   assert {
-    condition     = azuredevops_git_repository.repo["core"].name == "core"
-    error_message = "Repository name should default to the map key."
+    condition     = azuredevops_environment.environment["core"].name == "core"
+    error_message = "Environment name should default to the map key."
   }
 }

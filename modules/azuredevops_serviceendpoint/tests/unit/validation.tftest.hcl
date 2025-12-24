@@ -6,20 +6,21 @@ variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 }
 
-run "invalid_branch_selector" {
+run "invalid_permissions" {
   command = plan
 
   variables {
-    branches = [
+    serviceendpoint_permissions = [
       {
-        repository_id  = "00000000-0000-0000-0000-000000000000"
-        repository_key = "main"
-        name           = "invalid"
+        principal   = ""
+        permissions = {
+          Use = "Allow"
+        }
       }
     ]
   }
 
   expect_failures = [
-    var.branches,
+    var.serviceendpoint_permissions,
   ]
 }

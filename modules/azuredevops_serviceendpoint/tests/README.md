@@ -7,7 +7,7 @@ This directory contains automated tests for the Azure DevOps Service Endpoints T
 1. **Go**: Version 1.21 or later
 2. **Terraform**: Version 1.12.2 or later
 3. **Azure DevOps Organization**: Access with a Personal Access Token (PAT)
-4. **Azure DevOps Project**: Project ID for repository creation
+4. **Azure DevOps Project**: Project ID for service endpoint creation
 
 ## Environment Variables
 
@@ -48,7 +48,7 @@ make test-integration
 ### Run Specific Test
 
 ```bash
-go test -v -run TestBasicAzuredevopsRepository -timeout 30m
+go test -v -run TestBasicAzuredevopsServiceendpoint -timeout 30m
 ```
 
 ## Test Structure
@@ -63,9 +63,9 @@ go test -v -run TestBasicAzuredevopsRepository -timeout 30m
 
 The `fixtures/` directory contains Terraform configurations for different test scenarios:
 
-- `fixtures/basic/` - Basic repository with README file
-- `fixtures/complete/` - Repository with branches and permissions
-- `fixtures/secure/` - Repository with stricter policy configuration
+- `fixtures/basic/` - Basic generic service endpoint
+- `fixtures/complete/` - Generic and webhook service endpoints
+- `fixtures/secure/` - Service endpoints with restricted permissions
 - `fixtures/negative/` - Negative test cases
 
 ## Debugging Tests
@@ -73,7 +73,7 @@ The `fixtures/` directory contains Terraform configurations for different test s
 ### Verbose Output
 
 ```bash
-go test -v -run TestBasicAzuredevopsRepository
+go test -v -run TestBasicAzuredevopsServiceendpoint
 ```
 
 ### Keep Resources After Test Failure
@@ -82,7 +82,7 @@ Set the `SKIP_TEARDOWN` environment variable:
 
 ```bash
 export SKIP_TEARDOWN=true
-go test -v -run TestBasicAzuredevopsRepository
+go test -v -run TestBasicAzuredevopsServiceendpoint
 ```
 
 ### Debug Terraform
@@ -91,7 +91,7 @@ Enable Terraform debug logging:
 
 ```bash
 export TF_LOG=DEBUG
-go test -v -run TestBasicAzuredevopsRepository
+go test -v -run TestBasicAzuredevopsServiceendpoint
 ```
 
 ## Continuous Integration
@@ -115,7 +115,7 @@ When adding new tests:
 
 1. **Authentication Errors**: Verify Azure DevOps PAT and organization URL
 2. **Project ID Missing**: Ensure AZDO_PROJECT_ID points to an existing project
-3. **Resource Conflicts**: Ensure unique repository naming
+3. **Resource Conflicts**: Ensure unique service endpoint naming
 4. **Timeout Issues**: Increase test timeouts for larger orgs
 
 ### Getting Help

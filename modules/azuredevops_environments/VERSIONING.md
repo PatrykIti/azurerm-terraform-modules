@@ -31,7 +31,7 @@ Triggered by:
 - Commits with `!` after the type (e.g., `feat!:`, `fix!:`)
 
 ```bash
-feat(azuredevops-repository)!: change default behavior
+feat(azuredevops-environments)!: change default behavior
 
 BREAKING CHANGE: The default configuration has changed.
 Users must now explicitly set...
@@ -42,8 +42,8 @@ Triggered by:
 - Commits with type `feat:`
 
 ```bash
-feat(azuredevops-repository): add support for new Azure feature
-feat(azuredevops-repository): implement additional configuration options
+feat(azuredevops-environments): add support for new Azure feature
+feat(azuredevops-environments): implement additional configuration options
 ```
 
 ### Patch Version (Bug Fixes)
@@ -51,9 +51,9 @@ Triggered by:
 - Commits with types: `fix:`, `perf:`, `revert:`, `refactor:`, `docs:`
 
 ```bash
-fix(azuredevops-repository): correct validation for resource names
-perf(azuredevops-repository): optimize resource creation logic
-docs(azuredevops-repository): update README with new examples
+fix(azuredevops-environments): correct validation for resource names
+perf(azuredevops-environments): optimize resource creation logic
+docs(azuredevops-environments): update README with new examples
 ```
 
 ### No Version (Ignored)
@@ -61,15 +61,15 @@ These commits don't trigger releases:
 - `chore:`, `style:`, `test:`, `build:`, `ci:`
 
 ```bash
-chore(azuredevops-repository): update .gitignore
-test(azuredevops-repository): add unit tests for validation
+chore(azuredevops-environments): update .gitignore
+test(azuredevops-environments): add unit tests for validation
 ```
 
 ## Automated Release Process
 
 ### Prerequisites
 - All commits follow [Conventional Commits](https://www.conventionalcommits.org/) format
-- Commits include module scope: `feat(azuredevops-repository): description`
+- Commits include module scope: `feat(azuredevops-environments): description`
 - PR is merged to main branch
 
 ### Release Workflow
@@ -143,8 +143,8 @@ module "azuredevops_environments" {
 ### Always Include Module Scope
 ```bash
 # ✅ CORRECT - Will trigger release for this module
-feat(azuredevops-repository): add new functionality
-fix(azuredevops-repository): resolve validation issue
+feat(azuredevops-environments): add new functionality
+fix(azuredevops-environments): resolve validation issue
 
 # ❌ WRONG - Will be ignored by this module's release
 feat: add new functionality
@@ -154,7 +154,7 @@ fix: resolve validation issue
 ### Writing Good Commit Messages
 ```bash
 # Feature with detailed description
-feat(azuredevops-repository): add support for private endpoints
+feat(azuredevops-environments): add support for private endpoints
 
 Implements private endpoint configuration for enhanced security.
 Supports multiple endpoints per resource.
@@ -162,7 +162,7 @@ Supports multiple endpoints per resource.
 Closes #156
 
 # Breaking change with migration guide
-feat(azuredevops-repository)!: restructure input variables
+feat(azuredevops-environments)!: restructure input variables
 
 BREAKING CHANGE: The input variable structure has changed.
 

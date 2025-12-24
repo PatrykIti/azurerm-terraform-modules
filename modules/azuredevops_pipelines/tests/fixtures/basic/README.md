@@ -1,21 +1,18 @@
 # Basic Azure DevOps Pipelines Example
 
-This example demonstrates a basic Azure DevOps Pipelines configuration using secure defaults and minimal setup.
+This example demonstrates a basic Azure DevOps pipeline configuration using minimal setup.
 
 ## Features
 
-- Creates a basic azuredevops_pipelines with standard configuration
-- Uses secure defaults following Azure best practices
-- Creates a dedicated resource group
+- Creates a Git repository and a YAML build definition
 - Demonstrates basic module usage patterns
 - Uses variables for configuration flexibility
 
 ## Key Configuration
 
-This example uses secure defaults and demonstrates:
-- Basic resource creation with minimal configuration
-- Using variables for easy configuration customization
-- Following security best practices by default
+This example demonstrates:
+- Minimal build definition configuration
+- Variable-driven naming for repeatable tests
 
 ## Usage
 

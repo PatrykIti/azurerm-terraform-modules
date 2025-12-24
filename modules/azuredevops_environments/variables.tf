@@ -5,488 +5,272 @@
 variable "project_id" {
   description = "Azure DevOps project ID."
   type        = string
+
+  validation {
+    condition     = length(trimspace(var.project_id)) > 0
+    error_message = "project_id must be a non-empty string."
+  }
 }
 
 # -----------------------------------------------------------------------------
-# Repositories
+# Environments
 # -----------------------------------------------------------------------------
 
-variable "repositories" {
-  description = "Map of Git repositories to manage."
+variable "environments" {
+  description = "Map of environments to manage."
   type = map(object({
-    name                 = optional(string)
-    default_branch       = optional(string)
-    parent_repository_id = optional(string)
-    disabled             = optional(bool)
-    initialization = object({
-      init_type             = string
-      source_type           = optional(string)
-      source_url            = optional(string)
-      service_connection_id = optional(string)
-      username              = optional(string)
-      password              = optional(string)
-    })
+    name        = optional(string)
+    description = optional(string)
   }))
   default = {}
 
   validation {
     condition = alltrue([
-      for repo in values(var.repositories) : (
-        repo.name == null || length(trimspace(repo.name)) > 0
+      for env in values(var.environments) : (
+        env.name == null || length(trimspace(env.name)) > 0
       )
     ])
-    error_message = "repositories.name must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : contains([
-        "Uninitialized",
-        "Clean",
-        "Import",
-      ], repo.initialization.init_type)
-    ])
-    error_message = "repositories.initialization.init_type must be Uninitialized, Clean, or Import."
-  }
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : (
-        repo.initialization.source_type == null || repo.initialization.source_type == "Git"
-      )
-    ])
-    error_message = "repositories.initialization.source_type must be Git when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : !(
-        repo.initialization.service_connection_id != null &&
-        (repo.initialization.username != null || repo.initialization.password != null)
-      )
-    ])
-    error_message = "repositories.initialization.service_connection_id conflicts with username/password."
-  }
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : (
-        (repo.initialization.username == null && repo.initialization.password == null) ||
-        (repo.initialization.username != null && repo.initialization.password != null)
-      )
-    ])
-    error_message = "repositories.initialization.username and password must be set together."
+    error_message = "environments.name must be a non-empty string when provided."
   }
 }
 
 # -----------------------------------------------------------------------------
-# Branches
+# Kubernetes Resources
 # -----------------------------------------------------------------------------
 
-variable "branches" {
-  description = "List of Git repository branches to manage."
+variable "kubernetes_resources" {
+  description = "List of Kubernetes resources to attach to environments."
   type = list(object({
-    repository_id  = optional(string)
-    repository_key = optional(string)
-    name           = string
-    ref_branch     = optional(string)
-    ref_tag        = optional(string)
-    ref_commit_id  = optional(string)
+    environment_id   = optional(string)
+    environment_key  = optional(string)
+    service_endpoint_id = string
+    name             = string
+    namespace        = string
+    cluster_name     = optional(string)
+    tags             = optional(list(string))
   }))
   default = []
 
   validation {
     condition = alltrue([
-      for branch in var.branches : (
-        (branch.repository_id != null) != (branch.repository_key != null)
+      for resource in var.kubernetes_resources : (
+        (resource.environment_id != null) != (resource.environment_key != null)
       )
     ])
-    error_message = "branches must set exactly one of repository_id or repository_key."
+    error_message = "kubernetes_resources must set exactly one of environment_id or environment_key."
   }
 
   validation {
     condition = alltrue([
-      for branch in var.branches : length(trimspace(branch.name)) > 0
+      for resource in var.kubernetes_resources : length(trimspace(resource.name)) > 0
     ])
-    error_message = "branches.name must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for branch in var.branches : (
-        length(compact([
-          branch.ref_branch,
-          branch.ref_tag,
-          branch.ref_commit_id,
-        ])) <= 1
-      )
-    ])
-    error_message = "branches may set only one of ref_branch, ref_tag, or ref_commit_id."
+    error_message = "kubernetes_resources.name must be a non-empty string."
   }
 }
 
 # -----------------------------------------------------------------------------
-# Files
+# Approval Checks
 # -----------------------------------------------------------------------------
 
-variable "files" {
-  description = "List of Git repository files to manage."
+variable "check_approvals" {
+  description = "List of approval checks to configure."
   type = list(object({
-    repository_id       = optional(string)
-    repository_key      = optional(string)
-    file                = string
-    content             = string
-    branch              = optional(string)
-    commit_message      = optional(string)
-    overwrite_on_create = optional(bool)
-    author_name         = optional(string)
-    author_email        = optional(string)
-    committer_name      = optional(string)
-    committer_email     = optional(string)
+    target_resource_id   = optional(string)
+    target_environment_key = optional(string)
+    target_resource_type = string
+    approvers            = list(string)
+    instructions         = optional(string)
+    minimum_required_approvers = optional(number)
+    requester_can_approve = optional(bool)
+    timeout              = optional(number)
   }))
   default = []
 
   validation {
     condition = alltrue([
-      for file in var.files : (
-        (file.repository_id != null) != (file.repository_key != null)
+      for check in var.check_approvals : (
+        check.target_resource_id != null || check.target_environment_key != null
       )
     ])
-    error_message = "files must set exactly one of repository_id or repository_key."
+    error_message = "check_approvals must set target_resource_id or target_environment_key."
   }
 
   validation {
     condition = alltrue([
-      for file in var.files : length(trimspace(file.file)) > 0
+      for check in var.check_approvals : length(check.approvers) > 0
     ])
-    error_message = "files.file must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for file in var.files : length(file.content) > 0
-    ])
-    error_message = "files.content must be a non-empty string."
+    error_message = "check_approvals.approvers must contain at least one entry."
   }
 }
 
 # -----------------------------------------------------------------------------
-# Git Permissions
+# Branch Control Checks
 # -----------------------------------------------------------------------------
 
-variable "git_permissions" {
-  description = "List of Git permissions to assign."
+variable "check_branch_controls" {
+  description = "List of branch control checks to configure."
   type = list(object({
-    repository_id  = optional(string)
-    repository_key = optional(string)
-    branch_name    = optional(string)
-    principal      = string
-    permissions    = map(string)
-    replace        = optional(bool)
+    display_name         = string
+    target_resource_id   = optional(string)
+    target_environment_key = optional(string)
+    target_resource_type = string
+    allowed_branches     = optional(string)
+    verify_branch_protection = optional(bool)
+    ignore_unknown_protection_status = optional(bool)
+    timeout              = optional(number)
   }))
   default = []
 
   validation {
     condition = alltrue([
-      for perm in var.git_permissions : (
-        perm.repository_id == null || perm.repository_key == null
-      )
+      for check in var.check_branch_controls : length(trimspace(check.display_name)) > 0
     ])
-    error_message = "git_permissions cannot set both repository_id and repository_key."
+    error_message = "check_branch_controls.display_name must be a non-empty string."
   }
 
   validation {
     condition = alltrue([
-      for perm in var.git_permissions : length(trimspace(perm.principal)) > 0
-    ])
-    error_message = "git_permissions.principal must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.git_permissions : (
-        perm.branch_name == null || perm.repository_id != null || perm.repository_key != null
+      for check in var.check_branch_controls : (
+        check.target_resource_id != null || check.target_environment_key != null
       )
     ])
-    error_message = "git_permissions.branch_name requires repository_id or repository_key."
+    error_message = "check_branch_controls must set target_resource_id or target_environment_key."
   }
 }
 
 # -----------------------------------------------------------------------------
-# Branch Policies - Auto Reviewers
+# Business Hours Checks
 # -----------------------------------------------------------------------------
 
-variable "branch_policy_auto_reviewers" {
-  description = "List of auto reviewer branch policies."
+variable "check_business_hours" {
+  description = "List of business hours checks to configure."
   type = list(object({
-    enabled                     = optional(bool)
-    blocking                    = optional(bool)
-    auto_reviewer_ids           = list(string)
-    path_filters                = optional(list(string))
-    submitter_can_vote          = optional(bool)
-    message                     = optional(string)
-    minimum_number_of_reviewers = optional(number)
-    scope = list(object({
-      repository_id  = optional(string)
-      repository_key = optional(string)
-      repository_ref = optional(string)
-      match_type     = optional(string)
+    display_name         = string
+    target_resource_id   = optional(string)
+    target_environment_key = optional(string)
+    target_resource_type = string
+    start_time           = string
+    end_time             = string
+    time_zone            = string
+    monday               = optional(bool)
+    tuesday              = optional(bool)
+    wednesday            = optional(bool)
+    thursday             = optional(bool)
+    friday               = optional(bool)
+    saturday             = optional(bool)
+    sunday               = optional(bool)
+    timeout              = optional(number)
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for check in var.check_business_hours : length(trimspace(check.display_name)) > 0
+    ])
+    error_message = "check_business_hours.display_name must be a non-empty string."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_business_hours : (
+        check.target_resource_id != null || check.target_environment_key != null
+      )
+    ])
+    error_message = "check_business_hours must set target_resource_id or target_environment_key."
+  }
+}
+
+# -----------------------------------------------------------------------------
+# Exclusive Lock Checks
+# -----------------------------------------------------------------------------
+
+variable "check_exclusive_locks" {
+  description = "List of exclusive lock checks to configure."
+  type = list(object({
+    target_resource_id   = optional(string)
+    target_environment_key = optional(string)
+    target_resource_type = string
+    timeout              = optional(number)
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for check in var.check_exclusive_locks : (
+        check.target_resource_id != null || check.target_environment_key != null
+      )
+    ])
+    error_message = "check_exclusive_locks must set target_resource_id or target_environment_key."
+  }
+}
+
+# -----------------------------------------------------------------------------
+# Required Template Checks
+# -----------------------------------------------------------------------------
+
+variable "check_required_templates" {
+  description = "List of required template checks to configure."
+  type = list(object({
+    target_resource_id   = optional(string)
+    target_environment_key = optional(string)
+    target_resource_type = string
+    required_templates   = list(object({
+      template_path   = string
+      repository_name = string
+      repository_ref  = string
+      repository_type = optional(string)
     }))
   }))
   default = []
 
   validation {
     condition = alltrue([
-      for policy in var.branch_policy_auto_reviewers : length(policy.auto_reviewer_ids) > 0
+      for check in var.check_required_templates : (
+        check.target_resource_id != null || check.target_environment_key != null
+      )
     ])
-    error_message = "branch_policy_auto_reviewers.auto_reviewer_ids must not be empty."
+    error_message = "check_required_templates must set target_resource_id or target_environment_key."
   }
 }
 
 # -----------------------------------------------------------------------------
-# Branch Policies - Build Validation
+# REST API Checks
 # -----------------------------------------------------------------------------
 
-variable "branch_policy_build_validation" {
-  description = "List of build validation branch policies."
+variable "check_rest_apis" {
+  description = "List of REST API checks to configure."
   type = list(object({
-    enabled                     = optional(bool)
-    blocking                    = optional(bool)
-    build_definition_id         = string
-    display_name                = string
-    manual_queue_only           = optional(bool)
-    queue_on_source_update_only = optional(bool)
-    valid_duration              = optional(number)
-    filename_patterns           = optional(list(string))
-    scope = list(object({
-      repository_id  = optional(string)
-      repository_key = optional(string)
-      repository_ref = optional(string)
-      match_type     = optional(string)
-    }))
+    display_name                  = string
+    target_resource_id            = optional(string)
+    target_environment_key        = optional(string)
+    target_resource_type          = string
+    connected_service_name_selector = string
+    connected_service_name        = string
+    method                        = string
+    body                          = optional(string)
+    headers                       = optional(string)
+    retry_interval                = optional(number)
+    success_criteria              = optional(string)
+    url_suffix                    = optional(string)
+    variable_group_name           = optional(string)
+    completion_event              = optional(string)
+    timeout                       = optional(string)
   }))
   default = []
-}
 
-# -----------------------------------------------------------------------------
-# Branch Policies - Comment Resolution
-# -----------------------------------------------------------------------------
+  validation {
+    condition = alltrue([
+      for check in var.check_rest_apis : length(trimspace(check.display_name)) > 0
+    ])
+    error_message = "check_rest_apis.display_name must be a non-empty string."
+  }
 
-variable "branch_policy_comment_resolution" {
-  description = "List of comment resolution branch policies."
-  type = list(object({
-    enabled  = optional(bool)
-    blocking = optional(bool)
-    scope = list(object({
-      repository_id  = optional(string)
-      repository_key = optional(string)
-      repository_ref = optional(string)
-      match_type     = optional(string)
-    }))
-  }))
-  default = []
-}
-
-# -----------------------------------------------------------------------------
-# Branch Policies - Merge Types
-# -----------------------------------------------------------------------------
-
-variable "branch_policy_merge_types" {
-  description = "List of merge types branch policies."
-  type = list(object({
-    enabled                       = optional(bool)
-    blocking                      = optional(bool)
-    allow_squash                  = optional(bool)
-    allow_rebase_and_fast_forward = optional(bool)
-    allow_basic_no_fast_forward   = optional(bool)
-    allow_rebase_with_merge       = optional(bool)
-    scope = list(object({
-      repository_id  = optional(string)
-      repository_key = optional(string)
-      repository_ref = optional(string)
-      match_type     = optional(string)
-    }))
-  }))
-  default = []
-}
-
-# -----------------------------------------------------------------------------
-# Branch Policies - Minimum Reviewers
-# -----------------------------------------------------------------------------
-
-variable "branch_policy_min_reviewers" {
-  description = "List of minimum reviewers branch policies."
-  type = list(object({
-    enabled                                = optional(bool)
-    blocking                               = optional(bool)
-    reviewer_count                         = number
-    submitter_can_vote                     = optional(bool)
-    last_pusher_cannot_approve             = optional(bool)
-    allow_completion_with_rejects_or_waits = optional(bool)
-    on_push_reset_approved_votes           = optional(bool)
-    on_push_reset_all_votes                = optional(bool)
-    on_last_iteration_require_vote         = optional(bool)
-    scope = list(object({
-      repository_id  = optional(string)
-      repository_key = optional(string)
-      repository_ref = optional(string)
-      match_type     = optional(string)
-    }))
-  }))
-  default = []
-}
-
-# -----------------------------------------------------------------------------
-# Branch Policies - Status Check
-# -----------------------------------------------------------------------------
-
-variable "branch_policy_status_check" {
-  description = "List of status check branch policies."
-  type = list(object({
-    enabled              = optional(bool)
-    blocking             = optional(bool)
-    name                 = string
-    genre                = optional(string)
-    author_id            = optional(string)
-    invalidate_on_update = optional(bool)
-    applicability        = optional(string)
-    filename_patterns    = optional(list(string))
-    display_name         = optional(string)
-    scope = list(object({
-      repository_id  = optional(string)
-      repository_key = optional(string)
-      repository_ref = optional(string)
-      match_type     = optional(string)
-    }))
-  }))
-  default = []
-}
-
-# -----------------------------------------------------------------------------
-# Branch Policies - Work Item Linking
-# -----------------------------------------------------------------------------
-
-variable "branch_policy_work_item_linking" {
-  description = "List of work item linking branch policies."
-  type = list(object({
-    enabled  = optional(bool)
-    blocking = optional(bool)
-    scope = list(object({
-      repository_id  = optional(string)
-      repository_key = optional(string)
-      repository_ref = optional(string)
-      match_type     = optional(string)
-    }))
-  }))
-  default = []
-}
-
-# -----------------------------------------------------------------------------
-# Repository Policies - Author Email Pattern
-# -----------------------------------------------------------------------------
-
-variable "repository_policy_author_email_pattern" {
-  description = "List of author email pattern repository policies."
-  type = list(object({
-    enabled               = optional(bool)
-    blocking              = optional(bool)
-    author_email_patterns = list(string)
-    repository_ids        = optional(list(string))
-    repository_keys       = optional(list(string))
-  }))
-  default = []
-}
-
-# -----------------------------------------------------------------------------
-# Repository Policies - Case Enforcement
-# -----------------------------------------------------------------------------
-
-variable "repository_policy_case_enforcement" {
-  description = "List of case enforcement repository policies."
-  type = list(object({
-    enabled                 = optional(bool)
-    blocking                = optional(bool)
-    enforce_consistent_case = bool
-    repository_ids          = optional(list(string))
-    repository_keys         = optional(list(string))
-  }))
-  default = []
-}
-
-# -----------------------------------------------------------------------------
-# Repository Policies - Check Credentials
-# -----------------------------------------------------------------------------
-
-variable "repository_policy_check_credentials" {
-  description = "List of check credentials repository policies."
-  type = list(object({
-    enabled         = optional(bool)
-    blocking        = optional(bool)
-    repository_ids  = optional(list(string))
-    repository_keys = optional(list(string))
-  }))
-  default = []
-}
-
-# -----------------------------------------------------------------------------
-# Repository Policies - File Path Pattern
-# -----------------------------------------------------------------------------
-
-variable "repository_policy_file_path_pattern" {
-  description = "List of file path pattern repository policies."
-  type = list(object({
-    enabled           = optional(bool)
-    blocking          = optional(bool)
-    filepath_patterns = list(string)
-    repository_ids    = optional(list(string))
-    repository_keys   = optional(list(string))
-  }))
-  default = []
-}
-
-# -----------------------------------------------------------------------------
-# Repository Policies - Max File Size
-# -----------------------------------------------------------------------------
-
-variable "repository_policy_max_file_size" {
-  description = "List of max file size repository policies."
-  type = list(object({
-    enabled         = optional(bool)
-    blocking        = optional(bool)
-    max_file_size   = number
-    repository_ids  = optional(list(string))
-    repository_keys = optional(list(string))
-  }))
-  default = []
-}
-
-# -----------------------------------------------------------------------------
-# Repository Policies - Max Path Length
-# -----------------------------------------------------------------------------
-
-variable "repository_policy_max_path_length" {
-  description = "List of max path length repository policies."
-  type = list(object({
-    enabled         = optional(bool)
-    blocking        = optional(bool)
-    max_path_length = number
-    repository_ids  = optional(list(string))
-    repository_keys = optional(list(string))
-  }))
-  default = []
-}
-
-# -----------------------------------------------------------------------------
-# Repository Policies - Reserved Names
-# -----------------------------------------------------------------------------
-
-variable "repository_policy_reserved_names" {
-  description = "List of reserved names repository policies."
-  type = list(object({
-    enabled         = optional(bool)
-    blocking        = optional(bool)
-    repository_ids  = optional(list(string))
-    repository_keys = optional(list(string))
-  }))
-  default = []
+  validation {
+    condition = alltrue([
+      for check in var.check_rest_apis : (
+        check.target_resource_id != null || check.target_environment_key != null
+      )
+    ])
+    error_message = "check_rest_apis must set target_resource_id or target_environment_key."
+  }
 }

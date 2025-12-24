@@ -3,8 +3,68 @@ variable "project_id" {
   type        = string
 }
 
-variable "repo_name_prefix" {
-  description = "Prefix for the repository name."
+variable "azurerm_endpoint_name_prefix" {
+  description = "Prefix for the AzureRM service endpoint name."
   type        = string
-  default     = "ado-repo-basic"
+  default     = "ado-azurerm"
+}
+
+variable "azurerm_spn_tenantid" {
+  description = "Tenant ID for the AzureRM service principal."
+  type        = string
+}
+
+variable "azurerm_spn_client_id" {
+  description = "Client ID for the AzureRM service principal."
+  type        = string
+}
+
+variable "azurerm_spn_client_secret" {
+  description = "Client secret for the AzureRM service principal."
+  type        = string
+  sensitive   = true
+}
+
+variable "azurerm_subscription_id" {
+  description = "Azure subscription ID."
+  type        = string
+}
+
+variable "azurerm_subscription_name" {
+  description = "Azure subscription name."
+  type        = string
+}
+
+variable "docker_endpoint_name_prefix" {
+  description = "Prefix for the Docker registry service endpoint name."
+  type        = string
+  default     = "ado-docker"
+}
+
+variable "docker_registry" {
+  description = "Docker registry URL."
+  type        = string
+  default     = "https://index.docker.io/v1/"
+}
+
+variable "docker_username" {
+  description = "Docker registry username."
+  type        = string
+}
+
+variable "docker_email" {
+  description = "Docker registry email."
+  type        = string
+}
+
+variable "docker_password" {
+  description = "Docker registry password."
+  type        = string
+  sensitive   = true
+}
+
+variable "docker_registry_type" {
+  description = "Docker registry type."
+  type        = string
+  default     = "DockerHub"
 }

@@ -25,7 +25,7 @@ By participating in this project, you agree to abide by our Code of Conduct, whi
 3. Make your changes following our guidelines
 4. Write or update tests as needed
 5. Update documentation
-6. Commit using conventional commits: `feat(azuredevops-repository): add new feature`
+6. Commit using conventional commits: `feat(azuredevops-serviceendpoint): add new feature`
 7. Push to your fork and submit a pull request
 
 ## Development Guidelines
@@ -43,9 +43,9 @@ By participating in this project, you agree to abide by our Code of Conduct, whi
 We use [Conventional Commits](https://www.conventionalcommits.org/) with module scope:
 
 ```bash
-feat(azuredevops-repository): add support for new feature
-fix(azuredevops-repository): correct validation logic
-docs(azuredevops-repository): update README examples
+feat(azuredevops-serviceendpoint): add support for new feature
+fix(azuredevops-serviceendpoint): correct validation logic
+docs(azuredevops-serviceendpoint): update README examples
 ```
 
 Types:

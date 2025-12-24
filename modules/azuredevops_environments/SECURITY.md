@@ -2,21 +2,19 @@
 
 ## Overview
 
-This document describes security considerations for Azure DevOps Git repositories managed with Terraform.
+This document describes security considerations for Azure DevOps environments and checks managed with Terraform.
 
 ## Security Features
 
-### 1. Branch Protections
-- Require minimum reviewers and status checks on protected branches.
-- Enforce work item linking and comment resolution.
+### 1. Environment Checks
+- Require approvals before deployments.
+- Enforce branch control and business hours to restrict release windows.
 
-### 2. Repository Policies
-- Enforce author email patterns and reserved names.
-- Limit file size and path length to reduce risk.
+### 2. Exclusive Locks
+- Use exclusive lock checks to prevent concurrent deployments.
 
-### 3. Permissions
-- Use least privilege for repository and branch permissions.
-- Assign permissions to groups rather than individual users.
+### 3. Required Templates
+- Enforce pipeline templates to standardize deployments.
 
 ## Security Configuration Example
 
@@ -26,42 +24,18 @@ module "azuredevops_environments" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  repositories = {
-    main = {
-      name = "secure-repo"
-      initialization = {
-        init_type = "Clean"
-      }
+  environments = {
+    prod = {
+      description = "Production environment"
     }
   }
 
-  branch_policy_min_reviewers = [
+  check_approvals = [
     {
-      reviewer_count = 2
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
-    }
-  ]
-
-  branch_policy_status_check = [
-    {
-      name = "security-check"
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
-    }
-  ]
-
-  repository_policy_check_credentials = [
-    {
-      repository_keys = ["main"]
+      target_environment_key = "prod"
+      target_resource_type   = "environment"
+      approvers              = ["00000000-0000-0000-0000-000000000000"]
+      requester_can_approve  = false
     }
   ]
 }
@@ -69,21 +43,21 @@ module "azuredevops_environments" {
 
 ## Security Hardening Checklist
 
-- [ ] Protect default branches with reviewers and status checks.
-- [ ] Restrict repository permissions to approved groups.
-- [ ] Enable repository policies for credentials and path controls.
-- [ ] Regularly audit repository policy compliance.
+- [ ] Require approvals for production environments.
+- [ ] Use exclusive locks to prevent parallel deployments.
+- [ ] Restrict deployments to approved branches.
+- [ ] Define business hours for sensitive environments.
 
 ## Common Security Mistakes to Avoid
 
-1. **Allowing direct pushes to protected branches**
-2. **Granting broad permissions to individual users**
-3. **Skipping build validation or status checks**
+1. **Skipping approvals for production environments**
+2. **Allowing deployments outside approved hours**
+3. **Leaving environments without explicit checks**
 
 ## Additional Resources
 
-- [Azure DevOps Branch Policies](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies?view=azure-devops)
-- [Azure DevOps Permissions and Access Levels](https://learn.microsoft.com/en-us/azure/devops/organizations/security/permissions?view=azure-devops)
+- [Approvals and Checks](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals?view=azure-devops)
+- [Environments](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/environments?view=azure-devops)
 
 ---
 

@@ -3,30 +3,14 @@ variable "project_id" {
   type        = string
 }
 
-variable "repo_name_prefix" {
-  description = "Prefix for the repository name."
+variable "environment_name_prefix" {
+  description = "Prefix for the environment name."
   type        = string
-  default     = "ado-repo-complete"
+  default     = "ado-env"
 }
 
-variable "principal_descriptor" {
-  description = "Descriptor of the group used for git permissions."
+variable "kubernetes_api_url" {
+  description = "Kubernetes API server URL."
   type        = string
-}
-
-variable "build_definition_id" {
-  description = "Build definition ID for build validation policy."
-  type        = string
-}
-
-variable "reviewer_count" {
-  description = "Minimum number of reviewers required."
-  type        = number
-  default     = 2
-}
-
-variable "author_email_patterns" {
-  description = "Allowed author email patterns for commits."
-  type        = list(string)
-  default     = ["*@example.com"]
+  default     = "https://example.kubernetes.local"
 }

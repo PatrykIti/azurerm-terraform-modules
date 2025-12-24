@@ -1,29 +1,25 @@
-# Test repository naming defaults
+# Test basic service endpoint creation
 
 mock_provider "azuredevops" {}
 
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  repositories = {
-    core = {
-      initialization = {
-        init_type = "Clean"
-      }
+  serviceendpoint_generic = [
+    {
+      service_endpoint_name = "generic-endpoint"
+      server_url            = "https://example.endpoint.local"
+      username              = "user"
+      password              = "pass"
     }
-  }
+  ]
 }
 
-run "repository_plan" {
+run "serviceendpoint_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_git_repository.repo) == 1
-    error_message = "repositories should create one repo."
-  }
-
-  assert {
-    condition     = azuredevops_git_repository.repo["core"].name == "core"
-    error_message = "Repository name should default to the map key."
+    condition     = length(azuredevops_serviceendpoint_generic.generic) == 1
+    error_message = "serviceendpoint_generic should create one endpoint."
   }
 }

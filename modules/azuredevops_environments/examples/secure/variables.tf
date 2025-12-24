@@ -3,25 +3,8 @@ variable "project_id" {
   type        = string
 }
 
-variable "repo_name_prefix" {
-  description = "Prefix for the repository name."
+variable "environment_name_prefix" {
+  description = "Prefix for the environment name."
   type        = string
-  default     = "ado-repo-secure"
-}
-
-variable "reviewer_count" {
-  description = "Minimum number of reviewers required."
-  type        = number
-  default     = 2
-}
-
-variable "status_check_name" {
-  description = "Status check name to enforce."
-  type        = string
-}
-
-variable "status_check_genre" {
-  description = "Optional status check genre."
-  type        = string
-  default     = null
+  default     = "ado-env-secure"
 }

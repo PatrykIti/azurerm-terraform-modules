@@ -1,14 +1,11 @@
 # Complete Azure DevOps Service Endpoints Example
 
-This example demonstrates creating a repository with branches, permissions, and a selection of branch/repository policies.
+This example demonstrates multiple service endpoint types with shared permissions.
 
 ## Features
 
-- Repository with clean initialization
-- Additional branch created from default branch
-- Git permissions for a group principal
-- Branch policies (minimum reviewers, build validation)
-- Repository policies (author email pattern, reserved names)
+- GitHub, AWS, and Kubernetes service connections
+- Root-level service endpoint permissions
 
 ## Usage
 

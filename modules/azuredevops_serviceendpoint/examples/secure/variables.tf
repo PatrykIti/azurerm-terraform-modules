@@ -3,25 +3,26 @@ variable "project_id" {
   type        = string
 }
 
-variable "repo_name_prefix" {
-  description = "Prefix for the repository name."
+variable "generic_endpoint_name_prefix" {
+  description = "Prefix for the generic service endpoint name."
   type        = string
-  default     = "ado-repo-secure"
+  default     = "ado-generic"
 }
 
-variable "reviewer_count" {
-  description = "Minimum number of reviewers required."
-  type        = number
-  default     = 2
+variable "generic_endpoint_url" {
+  description = "Generic service endpoint URL."
+  type        = string
+  default     = "https://example.endpoint.local"
 }
 
-variable "status_check_name" {
-  description = "Status check name to enforce."
+variable "generic_endpoint_username" {
+  description = "Generic service endpoint username."
   type        = string
+  default     = "example-user"
 }
 
-variable "status_check_genre" {
-  description = "Optional status check genre."
+variable "generic_endpoint_password" {
+  description = "Generic service endpoint password."
   type        = string
-  default     = null
+  sensitive   = true
 }

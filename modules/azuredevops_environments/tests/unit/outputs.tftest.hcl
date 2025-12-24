@@ -1,22 +1,21 @@
 # Test outputs for Azure DevOps Environments
 
 mock_provider "azuredevops" {
-  mock_resource "azuredevops_git_repository" {
+  mock_resource "azuredevops_environment" {
     defaults = {
-      id      = "repo-0001"
-      web_url = "https://dev.azure.com/org/project/_git/repo"
+      id = "env-0001"
     }
   }
 
-  mock_resource "azuredevops_git_repository_branch" {
+  mock_resource "azuredevops_environment_resource_kubernetes" {
     defaults = {
-      id = "repo-0001:main"
+      id = "k8s-0001"
     }
   }
 
-  mock_resource "azuredevops_branch_policy_min_reviewers" {
+  mock_resource "azuredevops_check_approval" {
     defaults = {
-      id = "policy-0001"
+      id = "check-0001"
     }
   }
 }
@@ -24,31 +23,26 @@ mock_provider "azuredevops" {
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  repositories = {
-    main = {
-      initialization = {
-        init_type = "Clean"
-      }
+  environments = {
+    dev = {
+      description = "Dev environment"
     }
   }
 
-  branches = [
+  kubernetes_resources = [
     {
-      repository_key = "main"
-      name           = "main"
-      ref_branch     = "refs/heads/master"
+      environment_key   = "dev"
+      service_endpoint_id = "00000000-0000-0000-0000-000000000000"
+      name              = "dev-k8s"
+      namespace         = "default"
     }
   ]
 
-  branch_policy_min_reviewers = [
+  check_approvals = [
     {
-      reviewer_count = 1
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
+      target_environment_key = "dev"
+      target_resource_type   = "environment"
+      approvers              = ["00000000-0000-0000-0000-000000000000"]
     }
   ]
 }
@@ -57,22 +51,17 @@ run "outputs_plan" {
   command = plan
 
   assert {
-    condition     = length(keys(output.repository_ids)) == 1
-    error_message = "repository_ids should include configured repositories."
+    condition     = length(keys(output.environment_ids)) == 1
+    error_message = "environment_ids should include configured environments."
   }
 
   assert {
-    condition     = length(keys(output.repository_urls)) == 1
-    error_message = "repository_urls should include configured repositories."
+    condition     = length(keys(output.kubernetes_resource_ids)) == 1
+    error_message = "kubernetes_resource_ids should include configured resources."
   }
 
   assert {
-    condition     = length(keys(output.branch_ids)) == 1
-    error_message = "branch_ids should include configured branches."
-  }
-
-  assert {
-    condition     = length(keys(output.policy_ids.branch_min_reviewers)) == 1
-    error_message = "policy_ids should include configured branch policies."
+    condition     = length(keys(output.check_ids.approvals)) == 1
+    error_message = "check_ids should include configured approvals."
   }
 }

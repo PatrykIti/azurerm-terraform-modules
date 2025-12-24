@@ -1,19 +1,16 @@
 # Complete Azure DevOps Pipelines Example
 
-This example demonstrates a comprehensive deployment of Azure DevOps Pipelines with all available features and configurations.
+This example demonstrates a comprehensive deployment of Azure DevOps pipelines with folders and authorizations.
 
 ## Features
 
-- Full azuredevops_pipelines configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
+- Multiple build definitions in a shared folder
+- Pipeline authorizations for a service endpoint
+- Variable-driven naming for parallel test runs
 
 ## Key Configuration
 
-This comprehensive example showcases all available features of the azuredevops_pipelines module, demonstrating enterprise-grade capabilities suitable for production environments.
+This example showcases multi-pipeline configuration with folder management and authorizations.
 
 ## Usage
 

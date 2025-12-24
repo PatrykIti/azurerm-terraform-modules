@@ -1,12 +1,11 @@
 # Secure Azure DevOps Environments Example
 
-This example demonstrates a repository with stricter review and status policies.
+This example demonstrates environment approvals and exclusive locks.
 
 ## Features
 
-- Minimum reviewers policy
-- Status check policy
-- Credential scanning and case enforcement policies
+- Approval checks for controlled deployments
+- Exclusive lock to prevent concurrent releases
 
 ## Usage
 

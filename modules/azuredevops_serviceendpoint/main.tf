@@ -1,337 +1,744 @@
-# Azure DevOps Repositories
+# Azure DevOps Service Endpoints
 
-locals {
-  repository_ids = { for key, repo in azuredevops_git_repository.repo : key => repo.id }
-}
-
-resource "azuredevops_git_repository" "repo" {
-  for_each = var.repositories
-
-  project_id           = var.project_id
-  name                 = coalesce(each.value.name, each.key)
-  default_branch       = each.value.default_branch
-  parent_repository_id = each.value.parent_repository_id
-  disabled             = each.value.disabled
-
-  initialization {
-    init_type             = each.value.initialization.init_type
-    source_type           = each.value.initialization.source_type
-    source_url            = each.value.initialization.source_url
-    service_connection_id = each.value.initialization.service_connection_id
-    username              = each.value.initialization.username
-    password              = each.value.initialization.password
-  }
-}
-
-resource "azuredevops_git_repository_branch" "branch" {
-  for_each = { for index, branch in var.branches : index => branch }
-
-  repository_id = each.value.repository_id != null ? each.value.repository_id : local.repository_ids[each.value.repository_key]
-  name          = each.value.name
-  ref_branch    = each.value.ref_branch
-  ref_tag       = each.value.ref_tag
-  ref_commit_id = each.value.ref_commit_id
-}
-
-resource "azuredevops_git_repository_file" "file" {
-  for_each = { for index, file in var.files : index => file }
-
-  repository_id       = each.value.repository_id != null ? each.value.repository_id : local.repository_ids[each.value.repository_key]
-  file                = each.value.file
-  content             = each.value.content
-  branch              = each.value.branch
-  commit_message      = each.value.commit_message
-  overwrite_on_create = each.value.overwrite_on_create
-  author_name         = each.value.author_name
-  author_email        = each.value.author_email
-  committer_name      = each.value.committer_name
-  committer_email     = each.value.committer_email
-}
-
-resource "azuredevops_git_permissions" "permissions" {
-  for_each = { for index, perm in var.git_permissions : index => perm }
-
-  project_id    = var.project_id
-  repository_id = each.value.repository_id != null ? each.value.repository_id : (each.value.repository_key != null ? local.repository_ids[each.value.repository_key] : null)
-  branch_name   = each.value.branch_name
-  principal     = each.value.principal
-  permissions   = each.value.permissions
-  replace       = each.value.replace
-}
-
-resource "azuredevops_branch_policy_auto_reviewers" "policy" {
-  for_each = { for index, policy in var.branch_policy_auto_reviewers : index => policy }
-
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-
-  settings {
-    auto_reviewer_ids           = each.value.auto_reviewer_ids
-    path_filters                = each.value.path_filters
-    submitter_can_vote          = each.value.submitter_can_vote
-    message                     = each.value.message
-    minimum_number_of_reviewers = each.value.minimum_number_of_reviewers
-
-    dynamic "scope" {
-      for_each = each.value.scope
-      content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
-        repository_ref = scope.value.repository_ref
-        match_type     = scope.value.match_type
-      }
-    }
-  }
-}
-
-resource "azuredevops_branch_policy_build_validation" "policy" {
-  for_each = { for index, policy in var.branch_policy_build_validation : index => policy }
-
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-
-  settings {
-    build_definition_id         = each.value.build_definition_id
-    display_name                = each.value.display_name
-    manual_queue_only           = each.value.manual_queue_only
-    queue_on_source_update_only = each.value.queue_on_source_update_only
-    valid_duration              = each.value.valid_duration
-    filename_patterns           = each.value.filename_patterns
-
-    dynamic "scope" {
-      for_each = each.value.scope
-      content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
-        repository_ref = scope.value.repository_ref
-        match_type     = scope.value.match_type
-      }
-    }
-  }
-}
-
-resource "azuredevops_branch_policy_comment_resolution" "policy" {
-  for_each = { for index, policy in var.branch_policy_comment_resolution : index => policy }
-
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-
-  settings {
-    dynamic "scope" {
-      for_each = each.value.scope
-      content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
-        repository_ref = scope.value.repository_ref
-        match_type     = scope.value.match_type
-      }
-    }
-  }
-}
-
-resource "azuredevops_branch_policy_merge_types" "policy" {
-  for_each = { for index, policy in var.branch_policy_merge_types : index => policy }
-
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-
-  settings {
-    allow_squash                  = each.value.allow_squash
-    allow_rebase_and_fast_forward = each.value.allow_rebase_and_fast_forward
-    allow_basic_no_fast_forward   = each.value.allow_basic_no_fast_forward
-    allow_rebase_with_merge       = each.value.allow_rebase_with_merge
-
-    dynamic "scope" {
-      for_each = each.value.scope
-      content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
-        repository_ref = scope.value.repository_ref
-        match_type     = scope.value.match_type
-      }
-    }
-  }
-}
-
-resource "azuredevops_branch_policy_min_reviewers" "policy" {
-  for_each = { for index, policy in var.branch_policy_min_reviewers : index => policy }
-
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-
-  settings {
-    reviewer_count                         = each.value.reviewer_count
-    submitter_can_vote                     = each.value.submitter_can_vote
-    last_pusher_cannot_approve             = each.value.last_pusher_cannot_approve
-    allow_completion_with_rejects_or_waits = each.value.allow_completion_with_rejects_or_waits
-    on_push_reset_approved_votes           = each.value.on_push_reset_approved_votes
-    on_push_reset_all_votes                = each.value.on_push_reset_all_votes
-    on_last_iteration_require_vote         = each.value.on_last_iteration_require_vote
-
-    dynamic "scope" {
-      for_each = each.value.scope
-      content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
-        repository_ref = scope.value.repository_ref
-        match_type     = scope.value.match_type
-      }
-    }
-  }
-}
-
-resource "azuredevops_branch_policy_status_check" "policy" {
-  for_each = { for index, policy in var.branch_policy_status_check : index => policy }
-
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-
-  settings {
-    name                 = each.value.name
-    genre                = each.value.genre
-    author_id            = each.value.author_id
-    invalidate_on_update = each.value.invalidate_on_update
-    applicability        = each.value.applicability
-    filename_patterns    = each.value.filename_patterns
-    display_name         = each.value.display_name
-
-    dynamic "scope" {
-      for_each = each.value.scope
-      content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
-        repository_ref = scope.value.repository_ref
-        match_type     = scope.value.match_type
-      }
-    }
-  }
-}
-
-resource "azuredevops_branch_policy_work_item_linking" "policy" {
-  for_each = { for index, policy in var.branch_policy_work_item_linking : index => policy }
-
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-
-  settings {
-    dynamic "scope" {
-      for_each = each.value.scope
-      content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
-        repository_ref = scope.value.repository_ref
-        match_type     = scope.value.match_type
-      }
-    }
-  }
-}
-
-resource "azuredevops_serviceendpoint_policy_author_email_pattern" "policy" {
-  for_each = { for index, policy in var.repository_policy_author_email_pattern : index => policy }
+resource "azuredevops_serviceendpoint_argocd" "argocd" {
+  for_each = { for index, endpoint in var.serviceendpoint_argocd : index => endpoint }
 
   project_id            = var.project_id
-  enabled               = each.value.enabled
-  blocking              = each.value.blocking
-  author_email_patterns = each.value.author_email_patterns
-  repository_ids = length(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-    )) > 0 ? distinct(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) : null
+  service_endpoint_name = each.value.service_endpoint_name
+  url                   = each.value.url
+  description           = each.value.description
+
+  dynamic "authentication_token" {
+    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    content {
+      token = authentication_token.value.token
+    }
+  }
+
+  dynamic "authentication_basic" {
+    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    content {
+      username = authentication_basic.value.username
+      password = authentication_basic.value.password
+    }
+  }
 }
 
-resource "azuredevops_serviceendpoint_policy_case_enforcement" "policy" {
-  for_each = { for index, policy in var.repository_policy_case_enforcement : index => policy }
+resource "azuredevops_serviceendpoint_artifactory" "artifactory" {
+  for_each = { for index, endpoint in var.serviceendpoint_artifactory : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  url                   = each.value.url
+  description           = each.value.description
+
+  dynamic "authentication_token" {
+    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    content {
+      token = authentication_token.value.token
+    }
+  }
+
+  dynamic "authentication_basic" {
+    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    content {
+      username = authentication_basic.value.username
+      password = authentication_basic.value.password
+    }
+  }
+}
+
+resource "azuredevops_serviceendpoint_aws" "aws" {
+  for_each = { for index, endpoint in var.serviceendpoint_aws : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  access_key_id         = each.value.access_key_id
+  secret_access_key     = each.value.secret_access_key
+  session_token         = each.value.session_token
+  role_to_assume        = each.value.role_to_assume
+  role_session_name     = each.value.role_session_name
+  external_id           = each.value.external_id
+  description           = each.value.description
+  use_oidc              = each.value.use_oidc
+}
+
+resource "azuredevops_serviceendpoint_azure_service_bus" "azure_service_bus" {
+  for_each = { for index, endpoint in var.serviceendpoint_azure_service_bus : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  queue_name            = each.value.queue_name
+  connection_string     = each.value.connection_string
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_azurecr" "azurecr" {
+  for_each = { for index, endpoint in var.serviceendpoint_azurecr : index => endpoint }
+
+  project_id                             = var.project_id
+  service_endpoint_name                  = each.value.service_endpoint_name
+  resource_group                         = each.value.resource_group
+  azurecr_spn_tenantid                    = each.value.azurecr_spn_tenantid
+  azurecr_name                            = each.value.azurecr_name
+  azurecr_subscription_id                 = each.value.azurecr_subscription_id
+  azurecr_subscription_name               = each.value.azurecr_subscription_name
+  service_endpoint_authentication_scheme  = each.value.service_endpoint_authentication_scheme
+  description                             = each.value.description
+
+  dynamic "credentials" {
+    for_each = each.value.credentials == null ? [] : [each.value.credentials]
+    content {
+      serviceprincipalid = credentials.value.serviceprincipalid
+    }
+  }
+}
+
+resource "azuredevops_serviceendpoint_azuredevops" "azuredevops" {
+  for_each = { for index, endpoint in var.serviceendpoint_azuredevops : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  org_url               = each.value.org_url
+  release_api_url       = each.value.release_api_url
+  personal_access_token = each.value.personal_access_token
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_azurerm" "azurerm" {
+  for_each = { for index, endpoint in var.serviceendpoint_azurerm : index => endpoint }
+
+  project_id                             = var.project_id
+  service_endpoint_name                  = each.value.service_endpoint_name
+  azurerm_spn_tenantid                    = each.value.azurerm_spn_tenantid
+  serviceprincipalid                      = each.value.serviceprincipalid
+  serviceprincipalkey                     = each.value.serviceprincipalkey
+  serviceprincipalcertificate             = each.value.serviceprincipalcertificate
+  service_endpoint_authentication_scheme  = each.value.service_endpoint_authentication_scheme
+  azurerm_management_group_id             = each.value.azurerm_management_group_id
+  azurerm_management_group_name           = each.value.azurerm_management_group_name
+  azurerm_subscription_id                 = each.value.azurerm_subscription_id
+  azurerm_subscription_name               = each.value.azurerm_subscription_name
+  environment                             = each.value.environment
+  server_url                              = each.value.server_url
+  resource_group                          = each.value.resource_group
+  validate                                = each.value.validate
+  description                             = each.value.description
+
+  dynamic "credentials" {
+    for_each = each.value.credentials == null ? [] : [each.value.credentials]
+    content {
+      serviceprincipalid = credentials.value.serviceprincipalid
+    }
+  }
+
+  dynamic "features" {
+    for_each = each.value.features == null ? [] : [each.value.features]
+    content {
+      active_directory_service_endpoint_resource_id = features.value.active_directory_service_endpoint_resource_id
+      validate = features.value.validate
+    }
+  }
+}
+
+resource "azuredevops_serviceendpoint_bitbucket" "bitbucket" {
+  for_each = { for index, endpoint in var.serviceendpoint_bitbucket : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  username              = each.value.username
+  password              = each.value.password
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_black_duck" "black_duck" {
+  for_each = { for index, endpoint in var.serviceendpoint_black_duck : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  server_url            = each.value.server_url
+  api_token             = each.value.api_token
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_checkmarx_one" "checkmarx_one" {
+  for_each = { for index, endpoint in var.serviceendpoint_checkmarx_one : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  server_url            = each.value.server_url
+  authorization_url     = each.value.authorization_url
+  api_key               = each.value.api_key
+  client_id             = each.value.client_id
+  client_secret         = each.value.client_secret
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_checkmarx_sast" "checkmarx_sast" {
+  for_each = { for index, endpoint in var.serviceendpoint_checkmarx_sast : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  server_url            = each.value.server_url
+  username              = each.value.username
+  password              = each.value.password
+  team                  = each.value.team
+  preset                = each.value.preset
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_checkmarx_sca" "checkmarx_sca" {
+  for_each = { for index, endpoint in var.serviceendpoint_checkmarx_sca : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  access_control_url    = each.value.access_control_url
+  server_url            = each.value.server_url
+  web_app_url           = each.value.web_app_url
+  account               = each.value.account
+  username              = each.value.username
+  password              = each.value.password
+  team                  = each.value.team
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_dockerregistry" "dockerregistry" {
+  for_each = { for index, endpoint in var.serviceendpoint_dockerregistry : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  description           = each.value.description
+  docker_registry       = each.value.docker_registry
+  docker_username       = each.value.docker_username
+  docker_email          = each.value.docker_email
+  docker_password       = each.value.docker_password
+  registry_type         = each.value.registry_type
+}
+
+resource "azuredevops_serviceendpoint_dynamics_lifecycle_services" "dynamics_lifecycle_services" {
+  for_each = { for index, endpoint in var.serviceendpoint_dynamics_lifecycle_services : index => endpoint }
+
+  project_id                          = var.project_id
+  service_endpoint_name               = each.value.service_endpoint_name
+  authorization_endpoint              = each.value.authorization_endpoint
+  lifecycle_services_api_endpoint     = each.value.lifecycle_services_api_endpoint
+  client_id                           = each.value.client_id
+  username                            = each.value.username
+  password                            = each.value.password
+  description                         = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_externaltfs" "externaltfs" {
+  for_each = { for index, endpoint in var.serviceendpoint_externaltfs : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  connection_url        = each.value.connection_url
+  description           = each.value.description
+
+  auth_personal {
+    personal_access_token = each.value.auth_personal.personal_access_token
+  }
+}
+
+resource "azuredevops_serviceendpoint_gcp_terraform" "gcp_terraform" {
+  for_each = { for index, endpoint in var.serviceendpoint_gcp_terraform : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  private_key           = each.value.private_key
+  token_uri             = each.value.token_uri
+  gcp_project_id        = each.value.gcp_project_id
+  client_email          = each.value.client_email
+  scope                 = each.value.scope
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_generic" "generic" {
+  for_each = { for index, endpoint in var.serviceendpoint_generic : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  server_url            = each.value.server_url
+  username              = each.value.username
+  password              = each.value.password
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_generic_git" "generic_git" {
+  for_each = { for index, endpoint in var.serviceendpoint_generic_git : index => endpoint }
 
   project_id              = var.project_id
-  enabled                 = each.value.enabled
-  blocking                = each.value.blocking
-  enforce_consistent_case = each.value.enforce_consistent_case
-  repository_ids = length(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-    )) > 0 ? distinct(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) : null
+  service_endpoint_name   = each.value.service_endpoint_name
+  repository_url          = each.value.repository_url
+  username                = each.value.username
+  password                = each.value.password
+  enable_pipelines_access = each.value.enable_pipelines_access
+  description             = each.value.description
 }
 
-resource "azuredevops_serviceendpoint_policy_check_credentials" "policy" {
-  for_each = { for index, policy in var.repository_policy_check_credentials : index => policy }
+resource "azuredevops_serviceendpoint_generic_v2" "generic_v2" {
+  for_each = { for index, endpoint in var.serviceendpoint_generic_v2 : index => endpoint }
 
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-  repository_ids = length(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-    )) > 0 ? distinct(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) : null
+  project_id             = var.project_id
+  name                   = each.value.name
+  type                   = each.value.type
+  server_url             = each.value.server_url
+  authorization_scheme   = each.value.authorization_scheme
+  shared_project_ids     = each.value.shared_project_ids
+  description            = each.value.description
+  authorization_parameters = each.value.authorization_parameters
+  parameters             = each.value.parameters
 }
 
-resource "azuredevops_serviceendpoint_policy_file_path_pattern" "policy" {
-  for_each = { for index, policy in var.repository_policy_file_path_pattern : index => policy }
+resource "azuredevops_serviceendpoint_github" "github" {
+  for_each = { for index, endpoint in var.serviceendpoint_github : index => endpoint }
 
-  project_id        = var.project_id
-  enabled           = each.value.enabled
-  blocking          = each.value.blocking
-  filepath_patterns = each.value.filepath_patterns
-  repository_ids = length(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-    )) > 0 ? distinct(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) : null
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  description           = each.value.description
+  personal_access_token = each.value.personal_access_token
+  oauth_configuration_id = each.value.oauth_configuration_id
+
+  dynamic "auth_oauth" {
+    for_each = each.value.auth_oauth == null ? [] : [each.value.auth_oauth]
+    content {
+      oauth_configuration_id = auth_oauth.value.oauth_configuration_id
+    }
+  }
+
+  dynamic "auth_personal" {
+    for_each = each.value.auth_personal == null ? [] : [each.value.auth_personal]
+    content {
+      personal_access_token = auth_personal.value.personal_access_token
+    }
+  }
 }
 
-resource "azuredevops_serviceendpoint_policy_max_file_size" "policy" {
-  for_each = { for index, policy in var.repository_policy_max_file_size : index => policy }
+resource "azuredevops_serviceendpoint_github_enterprise" "github_enterprise" {
+  for_each = { for index, endpoint in var.serviceendpoint_github_enterprise : index => endpoint }
 
-  project_id    = var.project_id
-  enabled       = each.value.enabled
-  blocking      = each.value.blocking
-  max_file_size = each.value.max_file_size
-  repository_ids = length(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-    )) > 0 ? distinct(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) : null
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  description           = each.value.description
+  url                   = each.value.url
+  personal_access_token = each.value.personal_access_token
+  oauth_configuration_id = each.value.oauth_configuration_id
+
+  dynamic "auth_personal" {
+    for_each = each.value.auth_personal == null ? [] : [each.value.auth_personal]
+    content {
+      personal_access_token = auth_personal.value.personal_access_token
+    }
+  }
+
+  dynamic "auth_oauth" {
+    for_each = each.value.auth_oauth == null ? [] : [each.value.auth_oauth]
+    content {
+      oauth_configuration_id = auth_oauth.value.oauth_configuration_id
+    }
+  }
 }
 
-resource "azuredevops_serviceendpoint_policy_max_path_length" "policy" {
-  for_each = { for index, policy in var.repository_policy_max_path_length : index => policy }
+resource "azuredevops_serviceendpoint_gitlab" "gitlab" {
+  for_each = { for index, endpoint in var.serviceendpoint_gitlab : index => endpoint }
 
-  project_id      = var.project_id
-  enabled         = each.value.enabled
-  blocking        = each.value.blocking
-  max_path_length = each.value.max_path_length
-  repository_ids = length(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-    )) > 0 ? distinct(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) : null
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  url                   = each.value.url
+  username              = each.value.username
+  api_token             = each.value.api_token
+  description           = each.value.description
 }
 
-resource "azuredevops_serviceendpoint_policy_reserved_names" "policy" {
-  for_each = { for index, policy in var.repository_policy_reserved_names : index => policy }
+resource "azuredevops_serviceendpoint_incomingwebhook" "incomingwebhook" {
+  for_each = { for index, endpoint in var.serviceendpoint_incomingwebhook : index => endpoint }
 
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-  repository_ids = length(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-    )) > 0 ? distinct(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) : null
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  webhook_name          = each.value.webhook_name
+  description           = each.value.description
+  http_header           = each.value.http_header
+  secret                = each.value.secret
+}
+
+resource "azuredevops_serviceendpoint_jenkins" "jenkins" {
+  for_each = { for index, endpoint in var.serviceendpoint_jenkins : index => endpoint }
+
+  project_id             = var.project_id
+  service_endpoint_name  = each.value.service_endpoint_name
+  url                    = each.value.url
+  username               = each.value.username
+  password               = each.value.password
+  accept_untrusted_certs = each.value.accept_untrusted_certs
+  description            = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_jfrog_artifactory_v2" "jfrog_artifactory_v2" {
+  for_each = { for index, endpoint in var.serviceendpoint_jfrog_artifactory_v2 : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  url                   = each.value.url
+  description           = each.value.description
+
+  dynamic "authentication_token" {
+    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    content {
+      token = authentication_token.value.token
+    }
+  }
+
+  dynamic "authentication_basic" {
+    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    content {
+      username = authentication_basic.value.username
+      password = authentication_basic.value.password
+    }
+  }
+}
+
+resource "azuredevops_serviceendpoint_jfrog_distribution_v2" "jfrog_distribution_v2" {
+  for_each = { for index, endpoint in var.serviceendpoint_jfrog_distribution_v2 : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  url                   = each.value.url
+  description           = each.value.description
+
+  dynamic "authentication_token" {
+    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    content {
+      token = authentication_token.value.token
+    }
+  }
+
+  dynamic "authentication_basic" {
+    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    content {
+      username = authentication_basic.value.username
+      password = authentication_basic.value.password
+    }
+  }
+}
+
+resource "azuredevops_serviceendpoint_jfrog_platform_v2" "jfrog_platform_v2" {
+  for_each = { for index, endpoint in var.serviceendpoint_jfrog_platform_v2 : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  url                   = each.value.url
+  description           = each.value.description
+
+  dynamic "authentication_token" {
+    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    content {
+      token = authentication_token.value.token
+    }
+  }
+
+  dynamic "authentication_basic" {
+    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    content {
+      username = authentication_basic.value.username
+      password = authentication_basic.value.password
+    }
+  }
+}
+
+resource "azuredevops_serviceendpoint_jfrog_xray_v2" "jfrog_xray_v2" {
+  for_each = { for index, endpoint in var.serviceendpoint_jfrog_xray_v2 : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  url                   = each.value.url
+  description           = each.value.description
+
+  dynamic "authentication_token" {
+    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    content {
+      token = authentication_token.value.token
+    }
+  }
+
+  dynamic "authentication_basic" {
+    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    content {
+      username = authentication_basic.value.username
+      password = authentication_basic.value.password
+    }
+  }
+}
+
+resource "azuredevops_serviceendpoint_kubernetes" "kubernetes" {
+  for_each = { for index, endpoint in var.serviceendpoint_kubernetes : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  apiserver_url         = each.value.apiserver_url
+  authorization_type    = each.value.authorization_type
+  description           = each.value.description
+
+  dynamic "azure_subscription" {
+    for_each = each.value.azure_subscription == null ? [] : [each.value.azure_subscription]
+    content {
+      azure_environment = azure_subscription.value.azure_environment
+      cluster_name      = azure_subscription.value.cluster_name
+      subscription_id   = azure_subscription.value.subscription_id
+      subscription_name = azure_subscription.value.subscription_name
+      tenant_id         = azure_subscription.value.tenant_id
+      resourcegroup_id  = azure_subscription.value.resourcegroup_id
+      namespace         = azure_subscription.value.namespace
+      cluster_admin     = azure_subscription.value.cluster_admin
+    }
+  }
+
+  dynamic "kubeconfig" {
+    for_each = each.value.kubeconfig == null ? [] : [each.value.kubeconfig]
+    content {
+      kube_config            = kubeconfig.value.kube_config
+      accept_untrusted_certs = kubeconfig.value.accept_untrusted_certs
+      cluster_context        = kubeconfig.value.cluster_context
+    }
+  }
+
+  dynamic "service_account" {
+    for_each = each.value.service_account == null ? [] : [each.value.service_account]
+    content {
+      token                 = service_account.value.token
+      ca_cert               = service_account.value.ca_cert
+      accept_untrusted_certs = service_account.value.accept_untrusted_certs
+    }
+  }
+}
+
+resource "azuredevops_serviceendpoint_maven" "maven" {
+  for_each = { for index, endpoint in var.serviceendpoint_maven : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  url                   = each.value.url
+  repository_id         = each.value.repository_id
+  description           = each.value.description
+
+  dynamic "authentication_token" {
+    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    content {
+      token = authentication_token.value.token
+    }
+  }
+
+  dynamic "authentication_basic" {
+    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    content {
+      username = authentication_basic.value.username
+      password = authentication_basic.value.password
+    }
+  }
+}
+
+resource "azuredevops_serviceendpoint_nexus" "nexus" {
+  for_each = { for index, endpoint in var.serviceendpoint_nexus : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  url                   = each.value.url
+  username              = each.value.username
+  password              = each.value.password
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_npm" "npm" {
+  for_each = { for index, endpoint in var.serviceendpoint_npm : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  url                   = each.value.url
+  access_token          = each.value.access_token
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_nuget" "nuget" {
+  for_each = { for index, endpoint in var.serviceendpoint_nuget : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  feed_url              = each.value.feed_url
+  api_key               = each.value.api_key
+  personal_access_token = each.value.personal_access_token
+  username              = each.value.username
+  password              = each.value.password
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_octopusdeploy" "octopusdeploy" {
+  for_each = { for index, endpoint in var.serviceendpoint_octopusdeploy : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  url                   = each.value.url
+  api_key               = each.value.api_key
+  ignore_ssl_error      = each.value.ignore_ssl_error
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_openshift" "openshift" {
+  for_each = { for index, endpoint in var.serviceendpoint_openshift : index => endpoint }
+
+  project_id                 = var.project_id
+  service_endpoint_name      = each.value.service_endpoint_name
+  server_url                 = each.value.server_url
+  accept_untrusted_certs     = each.value.accept_untrusted_certs
+  certificate_authority_file = each.value.certificate_authority_file
+  description                = each.value.description
+
+  dynamic "auth_basic" {
+    for_each = each.value.auth_basic == null ? [] : [each.value.auth_basic]
+    content {
+      username = auth_basic.value.username
+      password = auth_basic.value.password
+    }
+  }
+
+  dynamic "auth_token" {
+    for_each = each.value.auth_token == null ? [] : [each.value.auth_token]
+    content {
+      token = auth_token.value.token
+    }
+  }
+
+  dynamic "auth_none" {
+    for_each = each.value.auth_none == null ? [] : [each.value.auth_none]
+    content {
+      kube_config = auth_none.value.kube_config
+    }
+  }
+}
+
+resource "azuredevops_serviceendpoint_permissions" "permissions" {
+  for_each = { for index, permission in var.serviceendpoint_permissions : index => permission }
+
+  project_id         = var.project_id
+  principal          = each.value.principal
+  permissions        = each.value.permissions
+  serviceendpoint_id = each.value.serviceendpoint_id
+  replace            = each.value.replace
+}
+
+resource "azuredevops_serviceendpoint_runpipeline" "runpipeline" {
+  for_each = { for index, endpoint in var.serviceendpoint_runpipeline : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  organization_name     = each.value.organization_name
+  description           = each.value.description
+
+  auth_personal {
+    personal_access_token = each.value.auth_personal.personal_access_token
+  }
+}
+
+resource "azuredevops_serviceendpoint_servicefabric" "servicefabric" {
+  for_each = { for index, endpoint in var.serviceendpoint_servicefabric : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  cluster_endpoint      = each.value.cluster_endpoint
+  description           = each.value.description
+
+  dynamic "certificate" {
+    for_each = each.value.certificate == null ? [] : [each.value.certificate]
+    content {
+      server_certificate_lookup      = certificate.value.server_certificate_lookup
+      server_certificate_thumbprint  = certificate.value.server_certificate_thumbprint
+      server_certificate_common_name = certificate.value.server_certificate_common_name
+      client_certificate             = certificate.value.client_certificate
+      client_certificate_password    = certificate.value.client_certificate_password
+    }
+  }
+
+  dynamic "azure_active_directory" {
+    for_each = each.value.azure_active_directory == null ? [] : [each.value.azure_active_directory]
+    content {
+      server_certificate_lookup      = azure_active_directory.value.server_certificate_lookup
+      server_certificate_thumbprint  = azure_active_directory.value.server_certificate_thumbprint
+      server_certificate_common_name = azure_active_directory.value.server_certificate_common_name
+      username                       = azure_active_directory.value.username
+      password                       = azure_active_directory.value.password
+    }
+  }
+
+  dynamic "none" {
+    for_each = each.value.none == null ? [] : [each.value.none]
+    content {
+      unsecured   = none.value.unsecured
+      cluster_spn = none.value.cluster_spn
+    }
+  }
+}
+
+resource "azuredevops_serviceendpoint_snyk" "snyk" {
+  for_each = { for index, endpoint in var.serviceendpoint_snyk : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  server_url            = each.value.server_url
+  api_token             = each.value.api_token
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_sonarcloud" "sonarcloud" {
+  for_each = { for index, endpoint in var.serviceendpoint_sonarcloud : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  token                 = each.value.token
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_sonarqube" "sonarqube" {
+  for_each = { for index, endpoint in var.serviceendpoint_sonarqube : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  url                   = each.value.url
+  token                 = each.value.token
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_ssh" "ssh" {
+  for_each = { for index, endpoint in var.serviceendpoint_ssh : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  host                  = each.value.host
+  username              = each.value.username
+  port                  = each.value.port
+  password              = each.value.password
+  private_key           = each.value.private_key
+  description           = each.value.description
+}
+
+resource "azuredevops_serviceendpoint_visualstudiomarketplace" "visualstudiomarketplace" {
+  for_each = { for index, endpoint in var.serviceendpoint_visualstudiomarketplace : index => endpoint }
+
+  project_id            = var.project_id
+  service_endpoint_name = each.value.service_endpoint_name
+  url                   = each.value.url
+  description           = each.value.description
+
+  dynamic "authentication_token" {
+    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    content {
+      token = authentication_token.value.token
+    }
+  }
+
+  dynamic "authentication_basic" {
+    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    content {
+      username = authentication_basic.value.username
+      password = authentication_basic.value.password
+    }
+  }
 }

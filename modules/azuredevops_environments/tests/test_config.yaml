@@ -3,26 +3,26 @@
 test_suites:
   - name: "Basic Tests"
     tests:
-      - TestBasicAzuredevopsRepository
+      - TestBasicAzuredevopsEnvironments
     parallel: true
     timeout: 15m
 
   - name: "Complete Tests"
     tests:
-      - TestCompleteAzuredevopsRepository
-      - TestSecureAzuredevopsRepository
+      - TestCompleteAzuredevopsEnvironments
+      - TestSecureAzuredevopsEnvironments
     parallel: true
     timeout: 30m
 
   - name: "Validation Tests"
     tests:
-      - TestAzuredevopsRepositoryValidationRules
+      - TestAzuredevopsEnvironmentsValidationRules
     parallel: true
     timeout: 10m
 
   - name: "Integration Tests"
     tests:
-      - TestAzuredevopsRepositoryFullIntegration
+      - TestAzuredevopsEnvironmentsFullIntegration
     parallel: false
     timeout: 45m
 

@@ -1,11 +1,10 @@
 # Basic Azure DevOps Environments Example
 
-This example demonstrates creating a Git repository with an initial README file.
+This example demonstrates creating a basic Azure DevOps environment.
 
 ## Features
 
-- Single Git repository with clean initialization
-- README file committed to the default branch
+- Single environment with a description
 
 ## Usage
 

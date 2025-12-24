@@ -27,6 +27,7 @@ Following these guides is mandatory to ensure all modules are consistent, secure
 
 5.  [**Module Documentation**](./05-documentation.md)
     - `README.md`
+    - `docs/IMPORT.md`
     - `CONTRIBUTING.md`
     - `SECURITY.md`
     - `VERSIONING.md`

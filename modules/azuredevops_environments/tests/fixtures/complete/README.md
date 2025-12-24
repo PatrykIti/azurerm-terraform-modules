@@ -1,19 +1,16 @@
 # Complete Azure DevOps Environments Example
 
-This example demonstrates a comprehensive deployment of Azure DevOps Environments with all available features and configurations.
+This example demonstrates an environment with a Kubernetes resource and approval checks.
 
 ## Features
 
-- Full azuredevops_environments configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
+- Environment creation with descriptive metadata
+- Kubernetes resource attachment
+- Approval check configuration
 
 ## Key Configuration
 
-This comprehensive example showcases all available features of the azuredevops_environments module, demonstrating enterprise-grade capabilities suitable for production environments.
+This example showcases environment resources and checks suitable for production workflows.
 
 ## Usage
 

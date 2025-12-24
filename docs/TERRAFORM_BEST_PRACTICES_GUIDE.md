@@ -405,7 +405,7 @@ module "example" {
 <!-- END_TF_DOCS -->
 
 ## Requirements
-- Terraform >= 1.5.0
+- Terraform >= 1.12.2
 - AzureRM Provider >= 3.0
 
 ## Contributing

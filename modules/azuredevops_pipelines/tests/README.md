@@ -91,7 +91,7 @@ Enable Terraform debug logging:
 
 ```bash
 export TF_LOG=DEBUG
-go test -v -run TestBasicAzuredevopsRepository
+go test -v -run TestBasicAzuredevopsPipelines
 ```
 
 ## Continuous Integration

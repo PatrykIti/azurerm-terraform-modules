@@ -1,22 +1,17 @@
 # Test outputs for Azure DevOps Service Endpoints
 
 mock_provider "azuredevops" {
-  mock_resource "azuredevops_git_repository" {
+  mock_resource "azuredevops_serviceendpoint_generic" {
     defaults = {
-      id      = "repo-0001"
-      web_url = "https://dev.azure.com/org/project/_git/repo"
+      id = "endpoint-0001"
+      service_endpoint_name = "generic-endpoint"
     }
   }
 
-  mock_resource "azuredevops_git_repository_branch" {
+  mock_resource "azuredevops_serviceendpoint_incomingwebhook" {
     defaults = {
-      id = "repo-0001:main"
-    }
-  }
-
-  mock_resource "azuredevops_branch_policy_min_reviewers" {
-    defaults = {
-      id = "policy-0001"
+      id = "endpoint-0002"
+      service_endpoint_name = "webhook-endpoint"
     }
   }
 }
@@ -24,31 +19,19 @@ mock_provider "azuredevops" {
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  repositories = {
-    main = {
-      initialization = {
-        init_type = "Clean"
-      }
-    }
-  }
-
-  branches = [
+  serviceendpoint_generic = [
     {
-      repository_key = "main"
-      name           = "main"
-      ref_branch     = "refs/heads/master"
+      service_endpoint_name = "generic-endpoint"
+      server_url            = "https://example.endpoint.local"
+      username              = "user"
+      password              = "pass"
     }
   ]
 
-  branch_policy_min_reviewers = [
+  serviceendpoint_incomingwebhook = [
     {
-      reviewer_count = 1
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
+      service_endpoint_name = "webhook-endpoint"
+      webhook_name          = "example_webhook"
     }
   ]
 }
@@ -57,22 +40,12 @@ run "outputs_plan" {
   command = plan
 
   assert {
-    condition     = length(keys(output.repository_ids)) == 1
-    error_message = "repository_ids should include configured repositories."
+    condition     = length(keys(output.serviceendpoint_ids.generic)) == 1
+    error_message = "serviceendpoint_ids.generic should include configured endpoints."
   }
 
   assert {
-    condition     = length(keys(output.repository_urls)) == 1
-    error_message = "repository_urls should include configured repositories."
-  }
-
-  assert {
-    condition     = length(keys(output.branch_ids)) == 1
-    error_message = "branch_ids should include configured branches."
-  }
-
-  assert {
-    condition     = length(keys(output.policy_ids.branch_min_reviewers)) == 1
-    error_message = "policy_ids should include configured branch policies."
+    condition     = length(keys(output.serviceendpoint_ids.incomingwebhook)) == 1
+    error_message = "serviceendpoint_ids.incomingwebhook should include configured endpoints."
   }
 }

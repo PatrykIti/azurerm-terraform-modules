@@ -8,7 +8,7 @@ Current version: **vUnreleased**
 
 ## Description
 
-Azure DevOps repository module for managing Git repositories and policies.
+Azure DevOps environments module for managing environments, resources, and checks.
 
 ## Usage
 
@@ -20,12 +20,9 @@ module "azuredevops_environments" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  repositories = {
-    main = {
-      name = "example-repo"
-      initialization = {
-        init_type = "Clean"
-      }
+  environments = {
+    dev = {
+      description = "Development environment"
     }
   }
 }
@@ -34,9 +31,9 @@ module "azuredevops_environments" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - This example demonstrates creating a Git repository with an initial README file.
-- [Complete](examples/complete) - This example demonstrates creating a repository with branches, permissions, and a selection of branch/repository policies.
-- [Secure](examples/secure) - This example demonstrates a repository with stricter review and status policies.
+- [Basic](examples/basic) - This example demonstrates creating a basic Azure DevOps environment.
+- [Complete](examples/complete) - This example demonstrates an environment with a Kubernetes resource and approval checks.
+- [Secure](examples/secure) - This example demonstrates environment approvals and exclusive locks.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->

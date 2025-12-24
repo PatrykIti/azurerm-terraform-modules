@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [009](./009-2025-12-24-network-modules-baseline-sync.md) | 2025-12-24 | Network modules baseline sync (AKS alignment) | Fix / Maintenance |
 | [008](./008-2025-12-24-azuredevops-repository-module.md) | 2025-12-24 | Azure DevOps Repository module | Feature |
 | [007](./007-2025-12-24-azuredevops-extension-module.md) | 2025-12-24 | Azure DevOps Extension module | Feature |
 | [006](./006-2025-12-24-azuredevops-agent-pools-module.md) | 2025-12-24 | Azure DevOps Agent Pools module | Feature |

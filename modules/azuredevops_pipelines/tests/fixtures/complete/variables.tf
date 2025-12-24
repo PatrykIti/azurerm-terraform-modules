@@ -1,10 +1,39 @@
 variable "project_id" {
-  description = "Azure DevOps project ID."
-  type        = string
+  type = string
 }
 
 variable "repo_name_prefix" {
-  description = "Prefix for the repository name."
-  type        = string
-  default     = "ado-repo-complete-fixture"
+  type    = string
+  default = "ado-pipeline-repo"
+}
+
+variable "pipeline_name_prefix" {
+  type    = string
+  default = "ado-pipeline"
+}
+
+variable "yaml_path" {
+  type    = string
+  default = "azure-pipelines.yml"
+}
+
+variable "service_endpoint_name_prefix" {
+  type    = string
+  default = "ado-endpoint"
+}
+
+variable "service_endpoint_url" {
+  type    = string
+  default = "https://example.endpoint.local"
+}
+
+variable "service_endpoint_username" {
+  type    = string
+  default = "example-user"
+}
+
+variable "service_endpoint_password" {
+  type      = string
+  default   = "example-password"
+  sensitive = true
 }

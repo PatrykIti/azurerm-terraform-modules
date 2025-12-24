@@ -1,12 +1,10 @@
 # Secure Azure DevOps Service Endpoints Example
 
-This example demonstrates a repository with stricter review and status policies.
+This example demonstrates a minimal service endpoint with restrictive permissions.
 
 ## Features
 
-- Minimum reviewers policy
-- Status check policy
-- Credential scanning and case enforcement policies
+- Generic service endpoint with least-privilege permissions
 
 ## Usage
 

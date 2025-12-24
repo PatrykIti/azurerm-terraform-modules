@@ -8,84 +8,55 @@ resource "random_string" "suffix" {
   special = false
 }
 
+data "azuredevops_group" "project_collection_admins" {
+  name = "Project Collection Administrators"
+}
+
 module "azuredevops_serviceendpoint" {
   source = "../../"
 
   project_id = var.project_id
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
-      initialization = {
-        init_type = "Clean"
+  serviceendpoint_github = [
+    {
+      service_endpoint_name = "${var.github_endpoint_name_prefix}-${random_string.suffix.result}"
+      auth_personal = {
+        personal_access_token = var.github_personal_access_token
       }
-    }
-  }
-
-  branches = [
-    {
-      repository_key = "main"
-      name           = "develop"
-      ref_branch     = "refs/heads/master"
+      description = "Managed by Terraform"
     }
   ]
 
-  files = [
+  serviceendpoint_aws = [
     {
-      repository_key      = "main"
-      file                = "README.md"
-      content             = "# Repository\n\nManaged by Terraform."
-      commit_message      = "Add README"
-      overwrite_on_create = true
+      service_endpoint_name = "${var.aws_endpoint_name_prefix}-${random_string.suffix.result}"
+      access_key_id         = var.aws_access_key_id
+      secret_access_key     = var.aws_secret_access_key
+      description           = "Managed by Terraform"
     }
   ]
 
-  git_permissions = [
+  serviceendpoint_kubernetes = [
     {
-      repository_key = "main"
-      principal      = var.principal_descriptor
+      service_endpoint_name = "${var.kubernetes_endpoint_name_prefix}-${random_string.suffix.result}"
+      apiserver_url         = var.kubernetes_api_url
+      authorization_type    = "Kubeconfig"
+      kubeconfig = {
+        kube_config            = var.kubeconfig_content
+        accept_untrusted_certs = true
+        cluster_context        = var.kubeconfig_context
+      }
+      description = "Managed by Terraform"
+    }
+  ]
+
+  serviceendpoint_permissions = [
+    {
+      principal   = data.azuredevops_group.project_collection_admins.id
       permissions = {
-        GenericRead       = "Allow"
-        GenericContribute = "Allow"
+        Use        = "Allow"
+        Administer = "Deny"
       }
-    }
-  ]
-
-  branch_policy_min_reviewers = [
-    {
-      reviewer_count = var.reviewer_count
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
-    }
-  ]
-
-  branch_policy_build_validation = [
-    {
-      build_definition_id = var.build_definition_id
-      display_name        = "CI"
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
-    }
-  ]
-
-  repository_policy_author_email_pattern = [
-    {
-      author_email_patterns = var.author_email_patterns
-      repository_keys       = ["main"]
-    }
-  ]
-
-  repository_policy_reserved_names = [
-    {
-      repository_keys = ["main"]
     }
   ]
 }

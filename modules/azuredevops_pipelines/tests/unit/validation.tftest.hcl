@@ -6,20 +6,21 @@ variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 }
 
-run "invalid_branch_selector" {
+run "invalid_pipeline_authorization" {
   command = plan
 
   variables {
-    branches = [
+    pipeline_authorizations = [
       {
-        repository_id  = "00000000-0000-0000-0000-000000000000"
-        repository_key = "main"
-        name           = "invalid"
+        resource_id  = "00000000-0000-0000-0000-000000000000"
+        type         = "endpoint"
+        pipeline_id  = "1"
+        pipeline_key = "main"
       }
     ]
   }
 
   expect_failures = [
-    var.branches,
+    var.pipeline_authorizations,
   ]
 }

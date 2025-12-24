@@ -1,11 +1,11 @@
 # Basic Azure DevOps Service Endpoints Example
 
-This example demonstrates creating a Git repository with an initial README file.
+This example demonstrates creating AzureRM and Docker registry service endpoints.
 
 ## Features
 
-- Single Git repository with clean initialization
-- README file committed to the default branch
+- Azure Resource Manager service connection
+- Docker registry service connection
 
 ## Usage
 

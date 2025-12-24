@@ -198,37 +198,37 @@ output "kube_config_raw" {
 
 A key design decision in a module is how to structure its input variables. Our repository uses two primary patterns, each suited for different levels of module complexity.
 
-### Approach 1: Complex Objects (for High-Complexity Modules)
+### Approach 1: Grouped Objects (Default, AKS Pattern)
 
 This pattern, exemplified by the `azurerm_kubernetes_cluster` module, groups a large number of related variables into nested `object()` structures.
 
 - **When to use it**:
-  - For complex resources with hundreds of potential arguments (like AKS, Application Gateway).
+  - By default, to keep module APIs consistent with the AKS gold standard.
   - When there are distinct, logical groups of configuration (e.g., `default_node_pool`, `network_profile`, `identity`).
-  - When you need to manage multiple, complex sub-configurations.
+  - When you need to manage multiple, complex sub-configurations or repeated blocks (`list(object)`).
 
 - **Advantages**:
   - **Organized**: Keeps the `variables.tf` file clean and structured.
   - **Scalable**: Easier to add new sub-options without cluttering the top-level namespace.
 
 - **Disadvantages**:
-  - **Complexity**: Can be harder for users to understand and construct the required object structures.
-  - **Boilerplate**: Requires users to define the entire object structure even to change a single value.
+  - **Complexity**: Can be harder for users to discover options without good documentation.
+  - **Boilerplate**: Requires object construction even for small changes (mitigate with `optional()` and defaults).
 
-### Approach 2: Flat Variables (for Standard-Complexity Modules)
+### Approach 2: Flat Variables (Only for Small Modules)
 
 This pattern, exemplified by the `azurerm_storage_account` module, defines most variables as top-level, primitive types (`string`, `bool`, `number`).
 
 - **When to use it**:
-  - For modules managing a single primary resource with a manageable number of arguments (e.g., Storage Account, Key Vault, Virtual Network).
-  - When most arguments are independent of each other.
+  - Only when the module is very small and grouped objects would be overkill.
+  - When arguments are few, independent, and unlikely to grow.
 
 - **Advantages**:
   - **Simplicity**: Very easy for users to understand and provide values.
   - **Discoverability**: All options are clearly visible as individual variables.
   - **Ease of Use**: Users only need to specify the variables they want to change from the defaults.
 
-**Example (`azurerm_storage_account` `variables.tf`):**
+**Example (flat variables):**
 ```hcl
 variable "account_tier" {
   description = "Defines the Tier to use for this storage account."
@@ -249,14 +249,14 @@ variable "is_hns_enabled" {
 }
 ```
 
-### The Hybrid Approach
+### The Hybrid Approach (Optional)
 
 The `azurerm_storage_account` module also demonstrates a smart hybrid approach. While most variables are flat, a few tightly-coupled settings are grouped into small, simple objects.
 
 - **`security_settings`**: Groups a few boolean flags related to security.
 - **`blob_properties`**: Groups settings specific to the blob service.
 
-This is an excellent pattern that combines the simplicity of flat variables with the organization of small, logical object groupings.
+This can be useful in very small modules, but prefer the AKS pattern unless the module is trivial.
 
 **Example (`azurerm_storage_account` `variables.tf`):**
 ```hcl
@@ -274,12 +274,12 @@ variable "security_settings" {
 
 ### Summary and Recommendations
 
-| Criteria | Use Complex Objects (AKS Pattern) | Use Flat Variables (Storage Account Pattern) |
+| Criteria | Use Grouped Objects (AKS Pattern) | Use Flat Variables (Exception) |
 | :--- | :--- | :--- |
-| **Module Complexity** | **High** (e.g., >50-75 inputs) | **Low to Medium** (e.g., <50 inputs) |
-| **Resource Type** | Manages multiple complex, interrelated resources (AKS + Node Pools + Addons) | Manages one primary resource and its direct sub-resources |
+| **Module Complexity** | **Medium to High** (default) | **Low** (very small modules only) |
+| **Resource Type** | Multiple interrelated resources or repeated blocks | Single resource with few independent inputs |
 | **Configuration Style** | Variables are heavily grouped into logical, nested objects. | Variables are mostly flat, with small objects for tight-knit groups. |
-| **User Experience** | More structured but requires more effort from the user. | Simpler and more direct for the user. |
-| **Best For** | Orchestration modules, resources with massive APIs. | Typical resource modules. |
+| **User Experience** | Consistent API surface across modules, easier long-term maintenance. | Simpler for tiny modules, but less consistent across the repo. |
+| **Best For** | Default choice; aligns with AKS and repo standards. | Rare exceptions only. |
 
-**Recommendation**: **Default to the flat/hybrid variable pattern** seen in `azurerm_storage_account`. Only adopt the complex object pattern when the number and complexity of variables make the flat structure unwieldy.
+**Recommendation**: **Default to the AKS grouped-object pattern** and `list(object)` for repeated blocks. Use flat variables only when the module is trivially small.

@@ -1,16 +1,26 @@
-# Negative test cases - should fail validation
 provider "azuredevops" {}
 
 module "azuredevops_pipelines" {
-  source = "../../../"
+  source = "../.."
 
-  project_id = "00000000-0000-0000-0000-000000000000"
+  project_id = var.project_id
 
-  branches = [
+  build_definitions = {
+    core = {
+      repository = {
+        repo_id   = "00000000-0000-0000-0000-000000000000"
+        repo_type = "TfsGit"
+        yml_path  = "azure-pipelines.yml"
+      }
+    }
+  }
+
+  pipeline_authorizations = [
     {
-      repository_id  = "00000000-0000-0000-0000-000000000000"
-      repository_key = "main"
-      name           = "invalid-branch"
+      resource_id  = "00000000-0000-0000-0000-000000000000"
+      type         = "endpoint"
+      pipeline_id  = "1"
+      pipeline_key = "core"
     }
   ]
 }
