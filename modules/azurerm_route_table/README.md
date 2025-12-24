@@ -120,7 +120,7 @@ module "route_table" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.43.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.57.0 |
 
 ## Providers
 
@@ -136,8 +136,8 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_route.routes](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/route) | resource |
-| [azurerm_route_table.route_table](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/route_table) | resource |
+| [azurerm_route.routes](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/route) | resource |
+| [azurerm_route_table.route_table](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/route_table) | resource |
 
 ## Inputs
 

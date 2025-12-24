@@ -1,6 +1,6 @@
 module github.com/Azure/terraform-azurerm-modules/modules/azurerm_virtual_network/tests
 
-go 1.23.0
+go 1.21
 
 toolchain go1.24.4
 
