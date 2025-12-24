@@ -700,7 +700,7 @@ jobs:
           terraform test -test-directory=tests/unit
 ```
 
-### Pre-commit Hook
+### Pre-commit Hook (Optional)
 
 ```yaml
 # .pre-commit-config.yaml

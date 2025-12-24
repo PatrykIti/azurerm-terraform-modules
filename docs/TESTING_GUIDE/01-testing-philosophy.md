@@ -82,7 +82,7 @@ Our testing pyramid consists of four distinct levels, each serving a specific pu
 - `checkov` - Infrastructure security scanning
 - `tfsec` - Terraform security analysis
 
-**When**: On every commit via pre-commit hooks
+**When**: On every commit (recommended via pre-commit hooks)
 
 **Duration**: < 30 seconds
 
