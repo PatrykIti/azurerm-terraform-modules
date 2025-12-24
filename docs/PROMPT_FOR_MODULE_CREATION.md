@@ -39,8 +39,9 @@ bash @scripts/create-new-module.sh {{ module name}} (each module folder has name
 Optional flags:
 ```bash
 # customize examples list (must include basic, complete, secure)
-bash @scripts/create-new-module.sh --examples=basic,complete,secure,diagnostic-settings {{ module name}} "Display Name" XX scope "Description"
+bash @scripts/create-new-module.sh --examples=basic,complete,secure {{ module name}} "Display Name" XX scope "Description"
 ```
+Add any feature-specific examples (e.g., `diagnostic-settings`, `multi-node-pool`, `workload-identity`) manually after scaffolding.
 
 Most of the files for module documentation have place holders which should be replaced with proper name of module but most of them are for review and standard correction where the script is not correcting them.
 

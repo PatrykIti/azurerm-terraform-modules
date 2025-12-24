@@ -447,9 +447,9 @@ Optional examples:
 
 ```bash
 ./scripts/create-new-module.sh --with-private-endpoint azurerm_storage_account "Storage Account" SA storage-account "Manages storage accounts"
-./scripts/create-new-module.sh --examples=basic,complete,secure,diagnostic-settings azurerm_subnet "Subnet" SN subnet "Manages Azure subnets"
+./scripts/create-new-module.sh --examples=basic,complete,secure azurerm_subnet "Subnet" SN subnet "Manages Azure subnets"
 ```
-The examples list must always include `basic`, `complete`, and `secure`.
+The examples list must always include `basic`, `complete`, and `secure`. Add feature-specific examples manually after scaffolding.
 
 ### Step 2: Module Metadata (Release)
 
