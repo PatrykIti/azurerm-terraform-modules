@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Large
 **Dependencies:** TASK-ADO-001
-**Status:** ⏳ **To Do**
+**Status:** ✅ **Done** (2025-12-24)
 
 ---
 
@@ -39,12 +39,12 @@ Repozytoria Git + polityki branch/repo + permissions w jednym spójnym module.
 ### Inputs
 
 - project_id (string).
-- repositories (list(object)): name, initialization, default_branch, parent_repository_id, etc.
-- branches (list(object)): repository_id, name, ref_branch.
-- files (list(object)): repository_id, branch, file_path, content, commit_message.
-- git_permissions (list(object)): repository_id, principal_descriptor, permissions.
-- branch_policies (list(object) per typ): parametry dla branch_policy_*.
-- repository_policies (list(object) per typ): parametry dla repository_policy_*.
+- repositories (map(object)): name, initialization (init_type, source_type, source_url, service_connection_id, username, password), parent_repository_id, disabled, default_branch.
+- branches (list(object)): repository_id lub repository_key, name, ref_branch/ref_tag/ref_commit_id.
+- files (list(object)): repository_id lub repository_key, file, content, branch, commit_message, author/committer metadata.
+- git_permissions (list(object)): repository_id lub repository_key, branch_name, principal, permissions, replace.
+- branch_policy_* (list(object) per typ): settings + scope z repository_id lub repository_key.
+- repository_policy_* (list(object) per typ): parametry + repository_ids lub repository_keys.
 
 ### Outputs
 
@@ -55,19 +55,20 @@ Repozytoria Git + polityki branch/repo + permissions w jednym spójnym module.
 
 ### Notes
 
-- Spójny obszar: repo + policy + permissions. Rozdzielić inputy per typ polityki aby zachować walidacje.
+- Spójny obszar: repo + policy + permissions. Inputy podzielone per typ polityki.
+- Wiele obiektów wspiera `repository_key` do mapowania na repo utworzone w module.
 
 ## Examples
 
 - basic: repo z inicjalnym plikiem README.
-- complete: repo + branch policies + repo policies + permissions.
+- complete: repo + branch + permissions + wybrane polityki.
 - secure: polityki wymagające code review + status checks.
 
 ## Tests
 
 - Unit: walidacje zmiennych, typy, wymagane pola.
-- Integration: create/update/delete w realnym ADO (env: AZDO_ORG_SERVICE_URL, AZDO_PERSONAL_ACCESS_TOKEN).
-- Negative: błędne kombinacje (np. brak project_id tam gdzie wymagany).
+- Integration: create/update/delete w realnym ADO (env: AZDO_ORG_SERVICE_URL, AZDO_PERSONAL_ACCESS_TOKEN, AZDO_PROJECT_ID).
+- Negative: błędne kombinacje (np. repository_id i repository_key jednocześnie).
 
 ## Docs to Update After Completion
 

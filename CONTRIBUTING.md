@@ -106,7 +106,7 @@ See [docs/WORKFLOWS.md](docs/WORKFLOWS.md#adding-new-modules) for detailed instr
 
 ### Terraform Best Practices
 
-1. **Resource Naming**: Follow the pattern established in CLAUDE.md
+1. **Resource Naming**: Follow the pattern established in AGENTS.md
    ```hcl
    resource "azurerm_storage_account" "storage_account" {
      # NOT "this" or "main" or "storage_account"

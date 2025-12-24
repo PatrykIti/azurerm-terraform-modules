@@ -14,7 +14,7 @@ NEVER proactively create documentation files (*.md) or README files. Only create
 - Always use multiple agents (subagents) for parallel execution wherever possible
 - Assign each independent subtask to a different agent for maximum efficiency
 - Provide each agent with:
-  - This CLAUDE.md file for project context
+  - AGENTS.md file for project context
   - Specific, detailed instructions for their subtask
   - All necessary reference files and paths
   - Clear success criteria

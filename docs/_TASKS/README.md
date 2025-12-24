@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 10 tasks
+- **To Do:** 9 tasks
 - **In Progress:** 0
-- **Done:** 9 tasks
+- **Done:** 10 tasks
 
 ---
 
@@ -14,7 +14,6 @@ Task board for module work. Update statuses in markdown files.
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
-| [TASK-ADO-006](./TASK-ADO-006_AzureDevOps_Repository_Module.md) | **Azure DevOps Repository module** | High | Large | `modules/azuredevops_repository/` |
 | [TASK-ADO-007](./TASK-ADO-007_AzureDevOps_Pipelines_Module.md) | **Azure DevOps Pipelines module** | High | Large | `modules/azuredevops_pipelines/` |
 | [TASK-ADO-008](./TASK-ADO-008_AzureDevOps_Environments_Module.md) | **Azure DevOps Environments module** | Medium | Large | `modules/azuredevops_environments/` |
 | [TASK-ADO-009](./TASK-ADO-009_AzureDevOps_ServiceEndpoint_Module.md) | **Azure DevOps Service Endpoints module** | High | Large | `modules/azuredevops_serviceendpoint/` |
@@ -45,3 +44,4 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-003](./TASK-ADO-003_AzureDevOps_Team_Module.md) | **Azure DevOps Team module** | Medium | Medium | `modules/azuredevops_team/` |
 | [TASK-ADO-004](./TASK-ADO-004_AzureDevOps_Agent_Pools_Module.md) | **Azure DevOps Agent Pools module** | Medium | Medium | `modules/azuredevops_agent_pools/` |
 | [TASK-ADO-005](./TASK-ADO-005_AzureDevOps_Extension_Module.md) | **Azure DevOps Extension module** | Medium | Small | `modules/azuredevops_extension/` |
+| [TASK-ADO-006](./TASK-ADO-006_AzureDevOps_Repository_Module.md) | **Azure DevOps Repository module** | High | Large | `modules/azuredevops_repository/` |
