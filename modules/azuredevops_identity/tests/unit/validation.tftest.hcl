@@ -16,8 +16,8 @@ run "invalid_group_membership_selector" {
   variables {
     group_memberships = [
       {
-        group_descriptor  = "vssgp.invalid"
-        group_key         = "valid"
+        group_descriptor   = "vssgp.invalid"
+        group_key          = "valid"
         member_descriptors = ["vssgp.member"]
       }
     ]

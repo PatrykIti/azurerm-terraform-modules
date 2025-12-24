@@ -33,11 +33,11 @@ variable "groups" {
 variable "group_memberships" {
   description = "List of group membership assignments."
   type = list(object({
-    group_descriptor  = optional(string)
-    group_key         = optional(string)
+    group_descriptor   = optional(string)
+    group_key          = optional(string)
     member_descriptors = optional(list(string), [])
     member_group_keys  = optional(list(string), [])
-    mode              = optional(string)
+    mode               = optional(string)
   }))
   default = []
 
@@ -76,11 +76,11 @@ variable "group_memberships" {
 variable "group_entitlements" {
   description = "List of group entitlements to manage."
   type = list(object({
-    display_name        = optional(string)
-    origin              = optional(string)
-    origin_id           = optional(string)
+    display_name         = optional(string)
+    origin               = optional(string)
+    origin_id            = optional(string)
     account_license_type = optional(string, "express")
-    licensing_source    = optional(string, "account")
+    licensing_source     = optional(string, "account")
   }))
   default = []
 
@@ -131,11 +131,11 @@ variable "group_entitlements" {
 variable "user_entitlements" {
   description = "List of user entitlements to manage."
   type = list(object({
-    principal_name      = optional(string)
-    origin_id           = optional(string)
-    origin              = optional(string)
+    principal_name       = optional(string)
+    origin_id            = optional(string)
+    origin               = optional(string)
     account_license_type = optional(string, "express")
-    licensing_source    = optional(string, "account")
+    licensing_source     = optional(string, "account")
   }))
   default = []
 
@@ -230,10 +230,10 @@ variable "service_principal_entitlements" {
 variable "securityrole_assignments" {
   description = "List of security role assignments to manage."
   type = list(object({
-    scope             = string
-    resource_id       = string
-    role_name         = string
-    identity_id       = optional(string)
+    scope              = string
+    resource_id        = string
+    role_name          = string
+    identity_id        = optional(string)
     identity_group_key = optional(string)
   }))
   default = []
