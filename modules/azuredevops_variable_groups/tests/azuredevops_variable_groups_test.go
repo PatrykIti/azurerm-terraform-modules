@@ -12,12 +12,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Test basic azuredevops_repository creation
-func TestBasicAzuredevopsRepository(t *testing.T) {
+// Test basic azuredevops_variable_groups creation
+func TestBasicAzuredevopsVariableGroups(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_repository/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_variable_groups/tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -31,18 +31,18 @@ func TestBasicAzuredevopsRepository(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		repositoryIDs := terraform.OutputMap(t, terraformOptions, "repository_ids")
+		variableGroupIDs := terraform.OutputMap(t, terraformOptions, "variable_group_ids")
 
-		assert.NotEmpty(t, repositoryIDs)
+		assert.NotEmpty(t, variableGroupIDs)
 	})
 }
 
-// Test complete azuredevops_repository configuration
-func TestCompleteAzuredevopsRepository(t *testing.T) {
+// Test complete azuredevops_variable_groups configuration
+func TestCompleteAzuredevopsVariableGroups(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_repository/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_variable_groups/tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -56,20 +56,18 @@ func TestCompleteAzuredevopsRepository(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		repositoryIDs := terraform.OutputMap(t, terraformOptions, "repository_ids")
-		branchIDs := terraform.OutputMap(t, terraformOptions, "branch_ids")
+		variableGroupIDs := terraform.OutputMap(t, terraformOptions, "variable_group_ids")
 
-		assert.NotEmpty(t, repositoryIDs)
-		assert.NotEmpty(t, branchIDs)
+		assert.NotEmpty(t, variableGroupIDs)
 	})
 }
 
-// Test secure azuredevops_repository configuration
-func TestSecureAzuredevopsRepository(t *testing.T) {
+// Test secure azuredevops_variable_groups configuration
+func TestSecureAzuredevopsVariableGroups(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_repository/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_variable_groups/tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -83,18 +81,18 @@ func TestSecureAzuredevopsRepository(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		repositoryIDs := terraform.OutputMap(t, terraformOptions, "repository_ids")
+		variableGroupIDs := terraform.OutputMap(t, terraformOptions, "variable_group_ids")
 
-		assert.NotEmpty(t, repositoryIDs)
+		assert.NotEmpty(t, variableGroupIDs)
 	})
 }
 
 // Negative test cases for validation rules
-func TestAzuredevopsRepositoryValidationRules(t *testing.T) {
+func TestAzuredevopsVariableGroupsValidationRules(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_repository/tests/fixtures/negative")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_variable_groups/tests/fixtures/negative")
 	terraformOptions := &terraform.Options{
 		TerraformDir: testFolder,
 		NoColor:      true,
@@ -102,7 +100,7 @@ func TestAzuredevopsRepositoryValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "repository_id or repository_key")
+	assert.Contains(t, err.Error(), "cannot set both value and secret_value")
 }
 
 // Helper function to get terraform options
@@ -114,8 +112,8 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
-			"project_id":       getProjectID(t),
-			"repo_name_prefix": fmt.Sprintf("ado-repo-%s", uniqueID),
+			"project_id":        getProjectID(t),
+			"group_name_prefix": fmt.Sprintf("ado-vg-%s", uniqueID),
 		},
 		NoColor: true,
 		RetryableTerraformErrors: map[string]string{

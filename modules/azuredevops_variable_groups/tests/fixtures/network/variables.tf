@@ -3,8 +3,8 @@ variable "project_id" {
   type        = string
 }
 
-variable "repo_name_prefix" {
-  description = "Prefix for the repository name."
+variable "group_name_prefix" {
+  description = "Prefix for variable group names."
   type        = string
-  default     = "ado-repo-network-fixture"
+  default     = "ado-vg-network"
 }

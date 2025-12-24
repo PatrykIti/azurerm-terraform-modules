@@ -1,16 +1,23 @@
-# Negative test cases - should fail validation
 provider "azuredevops" {}
 
-module "azuredevops_repository" {
-  source = "../../../"
+module "azuredevops_variable_groups" {
+  source = "../../"
 
-  project_id = "00000000-0000-0000-0000-000000000000"
+  project_id = var.project_id
 
-  branches = [
-    {
-      repository_id  = "00000000-0000-0000-0000-000000000000"
-      repository_key = "main"
-      name           = "invalid-branch"
+  variable_groups = {
+    invalid = {
+      name         = "${var.group_name_prefix}-invalid"
+      description  = "Invalid variable group"
+      allow_access = true
+      variables = [
+        {
+          name         = "bad"
+          value        = "value"
+          secret_value = "secret"
+          is_secret    = true
+        }
+      ]
     }
-  ]
+  }
 }

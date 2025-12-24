@@ -1,42 +1,39 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
+data "azuredevops_group" "readers" {
+  project_id = var.project_id
+  name       = "Readers"
 }
 
-module "azuredevops_repository" {
+module "azuredevops_variable_groups" {
   source = "../../"
 
   project_id = var.project_id
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
-      initialization = {
-        init_type = "Clean"
-      }
-    }
-  }
-
-  branch_policy_min_reviewers = [
-    {
-      reviewer_count = 2
-      scope = [
+  variable_groups = {
+    secure = {
+      name         = "${var.group_name_prefix}-secure"
+      description  = "Restricted secrets"
+      allow_access = false
+      variables = [
         {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
+          name         = "token"
+          secret_value = "example-secret"
+          is_secret    = true
         }
       ]
     }
-  ]
+  }
 
-  repository_policy_reserved_names = [
+  variable_group_permissions = [
     {
-      repository_keys = ["main"]
+      variable_group_key = "secure"
+      principal          = data.azuredevops_group.readers.id
+      permissions = {
+        View       = "allow"
+        Use        = "allow"
+        Administer = "deny"
+      }
     }
   ]
 }

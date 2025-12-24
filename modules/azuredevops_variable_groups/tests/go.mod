@@ -1,4 +1,4 @@
-module github.com/PatrykIti/azurerm-terraform-modules/modules/azuredevops_repository/tests
+module github.com/PatrykIti/azurerm-terraform-modules/modules/azuredevops_variable_groups/tests
 
 go 1.21
 

@@ -56,14 +56,14 @@ EOF_JSON
 
 # List of tests to run
 tests=(
-    "TestBasicAzuredevopsRepository"
-    "TestCompleteAzuredevopsRepository"
-    "TestSecureAzuredevopsRepository"
-    "TestAzuredevopsRepositoryValidationRules"
-    "TestAzuredevopsRepositoryFullIntegration"
+    "TestBasicAzuredevopsVariableGroups"
+    "TestCompleteAzuredevopsVariableGroups"
+    "TestSecureAzuredevopsVariableGroups"
+    "TestAzuredevopsVariableGroupsValidationRules"
+    "TestAzuredevopsVariableGroupsFullIntegration"
 )
 
-echo "Starting parallel test execution for azuredevops_repository"
+echo "Starting parallel test execution for azuredevops_variable_groups"
 echo "Total tests to run: ${#tests[@]}"
 echo "Output directory: $OUTPUT_DIR"
 echo "=================================="

@@ -1,24 +1,21 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
-module "azuredevops_repository" {
+module "azuredevops_variable_groups" {
   source = "../../"
 
   project_id = var.project_id
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
-      initialization = {
-        init_type = "Clean"
-      }
+  variable_groups = {
+    network = {
+      name         = "${var.group_name_prefix}-network"
+      description  = "Network validation group"
+      allow_access = true
+      variables = [
+        {
+          name  = "network"
+          value = "enabled"
+        }
+      ]
     }
   }
 }

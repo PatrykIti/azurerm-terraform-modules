@@ -1,42 +1,64 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
+data "azuredevops_group" "readers" {
+  project_id = var.project_id
+  name       = "Readers"
 }
 
-module "azuredevops_repository" {
+module "azuredevops_variable_groups" {
   source = "../../"
 
   project_id = var.project_id
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
-      initialization = {
-        init_type = "Clean"
-      }
+  variable_groups = {
+    app = {
+      name         = "${var.group_name_prefix}-app"
+      description  = "Application variables"
+      allow_access = true
+      variables = [
+        {
+          name  = "environment"
+          value = "staging"
+        },
+        {
+          name  = "region"
+          value = "westeurope"
+        }
+      ]
+    }
+    secrets = {
+      name         = "${var.group_name_prefix}-secrets"
+      description  = "Secrets"
+      allow_access = false
+      variables = [
+        {
+          name         = "api_key"
+          secret_value = "example-secret"
+          is_secret    = true
+        }
+      ]
     }
   }
 
-  branches = [
+  variable_group_permissions = [
     {
-      repository_key = "main"
-      name           = "develop"
-      ref_branch     = "refs/heads/master"
+      variable_group_key = "app"
+      principal          = data.azuredevops_group.readers.id
+      permissions = {
+        View = "allow"
+        Use  = "allow"
+      }
     }
   ]
 
-  files = [
+  library_permissions = [
     {
-      repository_key      = "main"
-      file                = "README.md"
-      content             = "# Repository\n\nManaged by Terraform."
-      commit_message      = "Add README"
-      overwrite_on_create = true
+      principal = data.azuredevops_group.readers.id
+      permissions = {
+        View   = "allow"
+        Create = "allow"
+        Use    = "allow"
+      }
     }
   ]
 }
