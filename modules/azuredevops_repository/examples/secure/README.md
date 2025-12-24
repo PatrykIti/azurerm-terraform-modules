@@ -1,26 +1,12 @@
 # Secure Azure DevOps Repository Example
 
-This example demonstrates a maximum-security Azure DevOps Repository configuration suitable for highly sensitive data and regulated environments.
+This example demonstrates a repository with stricter review and status policies.
 
 ## Features
 
-- Maximum security configuration with all security features enabled
-- Network isolation and private endpoints
-- Advanced threat protection
-- Comprehensive audit logging and monitoring
-- Encryption at rest and in transit
-- Compliance-ready configuration
-
-## Key Configuration
-
-This example implements defense-in-depth security principles with multiple layers of protection suitable for highly regulated industries and sensitive workloads.
-
-## Security Considerations
-
-- All public access is disabled by default
-- Network access is restricted to specific IP ranges
-- All data is encrypted at rest and in transit
-- Audit logging captures all access and modifications
+- Minimum reviewers policy
+- Status check policy
+- Credential scanning and case enforcement policies
 
 ## Usage
 

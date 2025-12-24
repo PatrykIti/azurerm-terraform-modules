@@ -1,19 +1,14 @@
 # Complete Azure DevOps Repository Example
 
-This example demonstrates a comprehensive deployment of Azure DevOps Repository with all available features and configurations.
+This example demonstrates creating a repository with branches, permissions, and a selection of branch/repository policies.
 
 ## Features
 
-- Full azuredevops_repository configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
-
-## Key Configuration
-
-This comprehensive example showcases all available features of the azuredevops_repository module, demonstrating enterprise-grade capabilities suitable for production environments.
+- Repository with clean initialization
+- Additional branch created from default branch
+- Git permissions for a group principal
+- Branch policies (minimum reviewers, build validation)
+- Repository policies (author email pattern, reserved names)
 
 ## Usage
 
