@@ -6,27 +6,41 @@ variable "project_id" {
 variable "repo_name_prefix" {
   description = "Prefix for the repository name."
   type        = string
-  default     = "ado-repo-complete"
+  default     = "ado-pipeline-repo"
 }
 
-variable "principal_descriptor" {
-  description = "Descriptor of the group used for git permissions."
+variable "pipeline_name_prefix" {
+  description = "Prefix for the pipeline name."
   type        = string
+  default     = "ado-pipeline"
 }
 
-variable "build_definition_id" {
-  description = "Build definition ID for build validation policy."
+variable "yaml_path" {
+  description = "Path to the pipeline YAML file."
   type        = string
+  default     = "azure-pipelines.yml"
 }
 
-variable "reviewer_count" {
-  description = "Minimum number of reviewers required."
-  type        = number
-  default     = 2
+variable "service_endpoint_name_prefix" {
+  description = "Prefix for the service endpoint name."
+  type        = string
+  default     = "ado-endpoint"
 }
 
-variable "author_email_patterns" {
-  description = "Allowed author email patterns for commits."
-  type        = list(string)
-  default     = ["*@example.com"]
+variable "service_endpoint_url" {
+  description = "Service endpoint URL."
+  type        = string
+  default     = "https://example.endpoint.local"
+}
+
+variable "service_endpoint_username" {
+  description = "Service endpoint username."
+  type        = string
+  default     = "example-user"
+}
+
+variable "service_endpoint_password" {
+  description = "Service endpoint password."
+  type        = string
+  sensitive   = true
 }

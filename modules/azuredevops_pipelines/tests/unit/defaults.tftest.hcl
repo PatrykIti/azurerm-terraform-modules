@@ -6,17 +6,17 @@ run "defaults_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_git_repository.repo) == 0
-    error_message = "No repositories should be created by default."
+    condition     = length(azuredevops_build_definition.build_definition) == 0
+    error_message = "No build definitions should be created by default."
   }
 
   assert {
-    condition     = length(azuredevops_git_repository_branch.branch) == 0
-    error_message = "No branches should be created by default."
+    condition     = length(azuredevops_build_folder.build_folder) == 0
+    error_message = "No build folders should be created by default."
   }
 
   assert {
-    condition     = length(azuredevops_git_repository_file.file) == 0
-    error_message = "No files should be created by default."
+    condition     = length(azuredevops_pipeline_authorization.pipeline_authorization) == 0
+    error_message = "No pipeline authorizations should be created by default."
   }
 }

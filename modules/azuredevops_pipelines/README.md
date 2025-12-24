@@ -8,7 +8,7 @@ Current version: **vUnreleased**
 
 ## Description
 
-Azure DevOps repository module for managing Git repositories and policies.
+Azure DevOps pipelines module for managing build definitions, folders, permissions, and authorizations.
 
 ## Usage
 
@@ -20,11 +20,13 @@ module "azuredevops_pipelines" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  repositories = {
-    main = {
-      name = "example-repo"
-      initialization = {
-        init_type = "Clean"
+  build_definitions = {
+    example = {
+      name = "example-pipeline"
+      repository = {
+        repo_type = "TfsGit"
+        repo_id   = "00000000-0000-0000-0000-000000000000"
+        yml_path  = "azure-pipelines.yml"
       }
     }
   }

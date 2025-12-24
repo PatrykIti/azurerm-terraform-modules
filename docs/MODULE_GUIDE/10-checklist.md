@@ -21,6 +21,7 @@ Before submitting a pull request for a new module, please review this checklist 
 ## Documentation
 
 - [ ] `README.md` is generated and includes all required sections.
+- [ ] `docs/IMPORT.md` is present and aligned with the basic example.
 - [ ] `CONTRIBUTING.md` is present and tailored to the module.
 - [ ] `SECURITY.md` is present and details the module's security features.
 - [ ] `VERSIONING.md` is present and explains the versioning strategy.
@@ -32,6 +33,7 @@ Before submitting a pull request for a new module, please review this checklist 
 - [ ] `complete` example exists, demonstrating advanced features.
 - [ ] `secure` example exists, demonstrating a security-hardened configuration.
 - [ ] All examples are self-contained and runnable.
+- [ ] Each example includes its own `.terraform-docs.yml` (AKS pattern).
 
 ## Testing
 

@@ -1,337 +1,228 @@
-# Azure DevOps Repositories
+# Azure DevOps Pipelines
 
 locals {
-  repository_ids = { for key, repo in azuredevops_git_repository.repo : key => repo.id }
+  build_definition_ids = { for key, definition in azuredevops_build_definition.build_definition : key => definition.id }
 }
 
-resource "azuredevops_git_repository" "repo" {
-  for_each = var.repositories
+resource "azuredevops_build_folder" "build_folder" {
+  for_each = { for index, folder in var.build_folders : index => folder }
 
-  project_id           = var.project_id
-  name                 = coalesce(each.value.name, each.key)
-  default_branch       = each.value.default_branch
-  parent_repository_id = each.value.parent_repository_id
-  disabled             = each.value.disabled
+  project_id  = var.project_id
+  path        = each.value.path
+  description = each.value.description
+}
 
-  initialization {
-    init_type             = each.value.initialization.init_type
-    source_type           = each.value.initialization.source_type
-    source_url            = each.value.initialization.source_url
-    service_connection_id = each.value.initialization.service_connection_id
-    username              = each.value.initialization.username
-    password              = each.value.initialization.password
+resource "azuredevops_build_definition" "build_definition" {
+  for_each = var.build_definitions
+
+  project_id               = var.project_id
+  name                     = coalesce(each.value.name, each.key)
+  path                     = each.value.path
+  agent_pool_name          = each.value.agent_pool_name
+  agent_specification      = each.value.agent_specification
+  queue_status             = each.value.queue_status == null ? null : lower(each.value.queue_status)
+  job_authorization_scope  = each.value.job_authorization_scope
+
+  repository {
+    repo_id               = each.value.repository.repo_id
+    repo_type             = each.value.repository.repo_type
+    branch_name           = each.value.repository.branch_name
+    service_connection_id = each.value.repository.service_connection_id
+    yml_path              = each.value.repository.yml_path
+    github_enterprise_url = each.value.repository.github_enterprise_url
+    url                   = each.value.repository.url
+    report_build_status   = each.value.repository.report_build_status
   }
-}
 
-resource "azuredevops_git_repository_branch" "branch" {
-  for_each = { for index, branch in var.branches : index => branch }
+  dynamic "ci_trigger" {
+    for_each = each.value.ci_trigger == null ? [] : [each.value.ci_trigger]
+    content {
+      use_yaml = try(ci_trigger.value.use_yaml, null)
 
-  repository_id = each.value.repository_id != null ? each.value.repository_id : local.repository_ids[each.value.repository_key]
-  name          = each.value.name
-  ref_branch    = each.value.ref_branch
-  ref_tag       = each.value.ref_tag
-  ref_commit_id = each.value.ref_commit_id
-}
+      dynamic "override" {
+        for_each = ci_trigger.value.override == null ? [] : [ci_trigger.value.override]
+        content {
+          branch_filter {
+            include = override.value.branch_filter.include
+            exclude = try(override.value.branch_filter.exclude, null)
+          }
 
-resource "azuredevops_git_repository_file" "file" {
-  for_each = { for index, file in var.files : index => file }
+          batch                         = try(override.value.batch, null)
+          max_concurrent_builds_per_branch = try(override.value.max_concurrent_builds_per_branch, null)
+          polling_interval              = try(override.value.polling_interval, null)
 
-  repository_id       = each.value.repository_id != null ? each.value.repository_id : local.repository_ids[each.value.repository_key]
-  file                = each.value.file
-  content             = each.value.content
-  branch              = each.value.branch
-  commit_message      = each.value.commit_message
-  overwrite_on_create = each.value.overwrite_on_create
-  author_name         = each.value.author_name
-  author_email        = each.value.author_email
-  committer_name      = each.value.committer_name
-  committer_email     = each.value.committer_email
-}
+          dynamic "path_filter" {
+            for_each = override.value.path_filter == null ? [] : [override.value.path_filter]
+            content {
+              include = try(path_filter.value.include, null)
+              exclude = try(path_filter.value.exclude, null)
+            }
+          }
+        }
+      }
+    }
+  }
 
-resource "azuredevops_git_permissions" "permissions" {
-  for_each = { for index, perm in var.git_permissions : index => perm }
+  dynamic "pull_request_trigger" {
+    for_each = each.value.pull_request_trigger == null ? [] : [each.value.pull_request_trigger]
+    content {
+      use_yaml       = try(pull_request_trigger.value.use_yaml, null)
+      initial_branch = try(pull_request_trigger.value.initial_branch, null)
 
-  project_id    = var.project_id
-  repository_id = each.value.repository_id != null ? each.value.repository_id : (each.value.repository_key != null ? local.repository_ids[each.value.repository_key] : null)
-  branch_name   = each.value.branch_name
-  principal     = each.value.principal
-  permissions   = each.value.permissions
-  replace       = each.value.replace
-}
+      dynamic "forks" {
+        for_each = pull_request_trigger.value.forks == null ? [] : [pull_request_trigger.value.forks]
+        content {
+          enabled       = forks.value.enabled
+          share_secrets = forks.value.share_secrets
+        }
+      }
 
-resource "azuredevops_branch_policy_auto_reviewers" "policy" {
-  for_each = { for index, policy in var.branch_policy_auto_reviewers : index => policy }
+      dynamic "override" {
+        for_each = pull_request_trigger.value.override == null ? [] : [pull_request_trigger.value.override]
+        content {
+          branch_filter {
+            include = override.value.branch_filter.include
+            exclude = try(override.value.branch_filter.exclude, null)
+          }
 
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
+          auto_cancel = try(override.value.auto_cancel, null)
 
-  settings {
-    auto_reviewer_ids           = each.value.auto_reviewer_ids
-    path_filters                = each.value.path_filters
-    submitter_can_vote          = each.value.submitter_can_vote
-    message                     = each.value.message
-    minimum_number_of_reviewers = each.value.minimum_number_of_reviewers
+          dynamic "path_filter" {
+            for_each = override.value.path_filter == null ? [] : [override.value.path_filter]
+            content {
+              include = try(path_filter.value.include, null)
+              exclude = try(path_filter.value.exclude, null)
+            }
+          }
+        }
+      }
+    }
+  }
 
-    dynamic "scope" {
-      for_each = each.value.scope
-      content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
-        repository_ref = scope.value.repository_ref
-        match_type     = scope.value.match_type
+  dynamic "build_completion_trigger" {
+    for_each = each.value.build_completion_trigger == null ? [] : [each.value.build_completion_trigger]
+    content {
+      build_definition_id = coalesce(
+        build_completion_trigger.value.build_definition_id,
+        try(local.build_definition_ids[build_completion_trigger.value.build_definition_key], null)
+      )
+
+      branch_filter {
+        include = build_completion_trigger.value.branch_filter.include
+        exclude = try(build_completion_trigger.value.branch_filter.exclude, null)
+      }
+    }
+  }
+
+  dynamic "schedules" {
+    for_each = each.value.schedules == null ? [] : each.value.schedules
+    content {
+      branch_filter {
+        include = schedules.value.branch_filter.include
+        exclude = try(schedules.value.branch_filter.exclude, null)
+      }
+      days_to_build              = schedules.value.days_to_build
+      schedule_only_with_changes = try(schedules.value.schedule_only_with_changes, null)
+      start_hours                = try(schedules.value.start_hours, null)
+      start_minutes              = try(schedules.value.start_minutes, null)
+      time_zone                  = try(schedules.value.time_zone, null)
+    }
+  }
+
+  variable_groups = try(each.value.variable_groups, null)
+
+  dynamic "variable" {
+    for_each = try(each.value.variables, [])
+    content {
+      name           = variable.value.name
+      value          = try(variable.value.value, null)
+      secret_value   = try(variable.value.secret_value, null)
+      is_secret      = try(variable.value.is_secret, null)
+      allow_override = try(variable.value.allow_override, null)
+    }
+  }
+
+  dynamic "features" {
+    for_each = each.value.features == null ? [] : [each.value.features]
+    content {
+      skip_first_run = try(features.value.skip_first_run, null)
+    }
+  }
+
+  dynamic "jobs" {
+    for_each = each.value.jobs == null ? [] : each.value.jobs
+    content {
+      name                          = jobs.value.name
+      ref_name                      = jobs.value.ref_name
+      condition                     = jobs.value.condition
+      job_timeout_in_minutes        = try(jobs.value.job_timeout_in_minutes, null)
+      job_cancel_timeout_in_minutes = try(jobs.value.job_cancel_timeout_in_minutes, null)
+      job_authorization_scope       = try(jobs.value.job_authorization_scope, null)
+      allow_scripts_auth_access_option = try(jobs.value.allow_scripts_auth_access_option, null)
+
+      dynamic "dependencies" {
+        for_each = jobs.value.dependencies == null ? [] : jobs.value.dependencies
+        content {
+          scope = dependencies.value.scope
+        }
+      }
+
+      target {
+        type    = jobs.value.target.type
+        demands = try(jobs.value.target.demands, null)
+
+        execution_options {
+          type              = jobs.value.target.execution_options.type
+          multipliers       = try(jobs.value.target.execution_options.multipliers, null)
+          max_concurrency   = try(jobs.value.target.execution_options.max_concurrency, null)
+          continue_on_error = try(jobs.value.target.execution_options.continue_on_error, null)
+        }
       }
     }
   }
 }
 
-resource "azuredevops_branch_policy_build_validation" "policy" {
-  for_each = { for index, policy in var.branch_policy_build_validation : index => policy }
+resource "azuredevops_build_definition_permissions" "build_definition_permissions" {
+  for_each = { for index, permission in var.build_definition_permissions : index => permission }
 
   project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
+  principal  = each.value.principal
+  permissions = each.value.permissions
+  replace    = each.value.replace
 
-  settings {
-    build_definition_id         = each.value.build_definition_id
-    display_name                = each.value.display_name
-    manual_queue_only           = each.value.manual_queue_only
-    queue_on_source_update_only = each.value.queue_on_source_update_only
-    valid_duration              = each.value.valid_duration
-    filename_patterns           = each.value.filename_patterns
-
-    dynamic "scope" {
-      for_each = each.value.scope
-      content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
-        repository_ref = scope.value.repository_ref
-        match_type     = scope.value.match_type
-      }
-    }
-  }
+  build_definition_id = coalesce(
+    each.value.build_definition_id,
+    try(local.build_definition_ids[each.value.build_definition_key], null)
+  )
 }
 
-resource "azuredevops_branch_policy_comment_resolution" "policy" {
-  for_each = { for index, policy in var.branch_policy_comment_resolution : index => policy }
+resource "azuredevops_build_folder_permissions" "build_folder_permissions" {
+  for_each = { for index, permission in var.build_folder_permissions : index => permission }
 
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-
-  settings {
-    dynamic "scope" {
-      for_each = each.value.scope
-      content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
-        repository_ref = scope.value.repository_ref
-        match_type     = scope.value.match_type
-      }
-    }
-  }
+  project_id  = var.project_id
+  path        = each.value.path
+  principal   = each.value.principal
+  permissions = each.value.permissions
+  replace     = each.value.replace
 }
 
-resource "azuredevops_branch_policy_merge_types" "policy" {
-  for_each = { for index, policy in var.branch_policy_merge_types : index => policy }
+resource "azuredevops_pipeline_authorization" "pipeline_authorization" {
+  for_each = { for index, authorization in var.pipeline_authorizations : index => authorization }
 
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-
-  settings {
-    allow_squash                  = each.value.allow_squash
-    allow_rebase_and_fast_forward = each.value.allow_rebase_and_fast_forward
-    allow_basic_no_fast_forward   = each.value.allow_basic_no_fast_forward
-    allow_rebase_with_merge       = each.value.allow_rebase_with_merge
-
-    dynamic "scope" {
-      for_each = each.value.scope
-      content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
-        repository_ref = scope.value.repository_ref
-        match_type     = scope.value.match_type
-      }
-    }
-  }
+  project_id         = var.project_id
+  resource_id        = each.value.resource_id
+  type               = each.value.type
+  pipeline_project_id = each.value.pipeline_project_id
+  pipeline_id = each.value.pipeline_id != null ? each.value.pipeline_id : try(local.build_definition_ids[each.value.pipeline_key], null)
 }
 
-resource "azuredevops_branch_policy_min_reviewers" "policy" {
-  for_each = { for index, policy in var.branch_policy_min_reviewers : index => policy }
+resource "azuredevops_resource_authorization" "resource_authorization" {
+  for_each = { for index, authorization in var.resource_authorizations : index => authorization }
 
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
+  project_id  = var.project_id
+  resource_id = each.value.resource_id
+  authorized  = each.value.authorized
+  type        = each.value.type
 
-  settings {
-    reviewer_count                         = each.value.reviewer_count
-    submitter_can_vote                     = each.value.submitter_can_vote
-    last_pusher_cannot_approve             = each.value.last_pusher_cannot_approve
-    allow_completion_with_rejects_or_waits = each.value.allow_completion_with_rejects_or_waits
-    on_push_reset_approved_votes           = each.value.on_push_reset_approved_votes
-    on_push_reset_all_votes                = each.value.on_push_reset_all_votes
-    on_last_iteration_require_vote         = each.value.on_last_iteration_require_vote
-
-    dynamic "scope" {
-      for_each = each.value.scope
-      content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
-        repository_ref = scope.value.repository_ref
-        match_type     = scope.value.match_type
-      }
-    }
-  }
-}
-
-resource "azuredevops_branch_policy_status_check" "policy" {
-  for_each = { for index, policy in var.branch_policy_status_check : index => policy }
-
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-
-  settings {
-    name                 = each.value.name
-    genre                = each.value.genre
-    author_id            = each.value.author_id
-    invalidate_on_update = each.value.invalidate_on_update
-    applicability        = each.value.applicability
-    filename_patterns    = each.value.filename_patterns
-    display_name         = each.value.display_name
-
-    dynamic "scope" {
-      for_each = each.value.scope
-      content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
-        repository_ref = scope.value.repository_ref
-        match_type     = scope.value.match_type
-      }
-    }
-  }
-}
-
-resource "azuredevops_branch_policy_work_item_linking" "policy" {
-  for_each = { for index, policy in var.branch_policy_work_item_linking : index => policy }
-
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-
-  settings {
-    dynamic "scope" {
-      for_each = each.value.scope
-      content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
-        repository_ref = scope.value.repository_ref
-        match_type     = scope.value.match_type
-      }
-    }
-  }
-}
-
-resource "azuredevops_pipelines_policy_author_email_pattern" "policy" {
-  for_each = { for index, policy in var.repository_policy_author_email_pattern : index => policy }
-
-  project_id            = var.project_id
-  enabled               = each.value.enabled
-  blocking              = each.value.blocking
-  author_email_patterns = each.value.author_email_patterns
-  repository_ids = length(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-    )) > 0 ? distinct(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) : null
-}
-
-resource "azuredevops_pipelines_policy_case_enforcement" "policy" {
-  for_each = { for index, policy in var.repository_policy_case_enforcement : index => policy }
-
-  project_id              = var.project_id
-  enabled                 = each.value.enabled
-  blocking                = each.value.blocking
-  enforce_consistent_case = each.value.enforce_consistent_case
-  repository_ids = length(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-    )) > 0 ? distinct(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) : null
-}
-
-resource "azuredevops_pipelines_policy_check_credentials" "policy" {
-  for_each = { for index, policy in var.repository_policy_check_credentials : index => policy }
-
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-  repository_ids = length(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-    )) > 0 ? distinct(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) : null
-}
-
-resource "azuredevops_pipelines_policy_file_path_pattern" "policy" {
-  for_each = { for index, policy in var.repository_policy_file_path_pattern : index => policy }
-
-  project_id        = var.project_id
-  enabled           = each.value.enabled
-  blocking          = each.value.blocking
-  filepath_patterns = each.value.filepath_patterns
-  repository_ids = length(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-    )) > 0 ? distinct(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) : null
-}
-
-resource "azuredevops_pipelines_policy_max_file_size" "policy" {
-  for_each = { for index, policy in var.repository_policy_max_file_size : index => policy }
-
-  project_id    = var.project_id
-  enabled       = each.value.enabled
-  blocking      = each.value.blocking
-  max_file_size = each.value.max_file_size
-  repository_ids = length(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-    )) > 0 ? distinct(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) : null
-}
-
-resource "azuredevops_pipelines_policy_max_path_length" "policy" {
-  for_each = { for index, policy in var.repository_policy_max_path_length : index => policy }
-
-  project_id      = var.project_id
-  enabled         = each.value.enabled
-  blocking        = each.value.blocking
-  max_path_length = each.value.max_path_length
-  repository_ids = length(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-    )) > 0 ? distinct(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) : null
-}
-
-resource "azuredevops_pipelines_policy_reserved_names" "policy" {
-  for_each = { for index, policy in var.repository_policy_reserved_names : index => policy }
-
-  project_id = var.project_id
-  enabled    = each.value.enabled
-  blocking   = each.value.blocking
-  repository_ids = length(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-    )) > 0 ? distinct(concat(
-    try(each.value.repository_ids, []),
-    [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) : null
+  definition_id = each.value.definition_id != null ? each.value.definition_id : try(local.build_definition_ids[each.value.build_definition_key], null)
 }

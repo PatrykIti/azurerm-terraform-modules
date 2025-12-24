@@ -1,29 +1,31 @@
-# Test repository naming defaults
+# Test build definition naming defaults
 
 mock_provider "azuredevops" {}
 
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  repositories = {
+  build_definitions = {
     core = {
-      initialization = {
-        init_type = "Clean"
+      repository = {
+        repo_id   = "00000000-0000-0000-0000-000000000000"
+        repo_type = "TfsGit"
+        yml_path  = "azure-pipelines.yml"
       }
     }
   }
 }
 
-run "repository_plan" {
+run "build_definition_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_git_repository.repo) == 1
-    error_message = "repositories should create one repo."
+    condition     = length(azuredevops_build_definition.build_definition) == 1
+    error_message = "build_definitions should create one pipeline."
   }
 
   assert {
-    condition     = azuredevops_git_repository.repo["core"].name == "core"
-    error_message = "Repository name should default to the map key."
+    condition     = azuredevops_build_definition.build_definition["core"].name == "core"
+    error_message = "Build definition name should default to the map key."
   }
 }

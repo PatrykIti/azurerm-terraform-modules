@@ -1,11 +1,11 @@
 # Basic Azure DevOps Pipelines Example
 
-This example demonstrates creating a Git repository with an initial README file.
+This example demonstrates creating a basic YAML pipeline backed by a Git repository.
 
 ## Features
 
 - Single Git repository with clean initialization
-- README file committed to the default branch
+- Single build definition using `azure-pipelines.yml`
 
 ## Usage
 

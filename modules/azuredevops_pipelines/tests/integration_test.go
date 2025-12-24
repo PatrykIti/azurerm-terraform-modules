@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestAzuredevopsRepositoryFullIntegration performs a full apply on the complete fixture.
-func TestAzuredevopsRepositoryFullIntegration(t *testing.T) {
+// TestAzuredevopsPipelinesFullIntegration performs a full apply on the complete fixture.
+func TestAzuredevopsPipelinesFullIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -30,8 +30,8 @@ func TestAzuredevopsRepositoryFullIntegration(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		repositoryIDs := terraform.OutputMap(t, terraformOptions, "repository_ids")
+		buildDefinitionIDs := terraform.OutputMap(t, terraformOptions, "build_definition_ids")
 
-		assert.NotEmpty(t, repositoryIDs)
+		assert.NotEmpty(t, buildDefinitionIDs)
 	})
 }

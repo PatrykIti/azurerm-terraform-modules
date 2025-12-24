@@ -14,15 +14,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.41.0" # Pin to a specific minor version for consistency
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.0"
+      version = "4.57.0" # Pin to the repo standard (AKS)
     }
   }
 }
 ```
+Add other providers only when the module uses them directly (avoid adding providers for examples or tests).
 
 ---
 
@@ -101,14 +98,14 @@ This is where the primary resources are defined.
 
 **Best Practices:**
 - **Locals**: Use a `locals` block to compute values, merge tags, or define complex objects that are used multiple times.
-- **Resource Naming**: Use a consistent naming convention for resources within the module, e.g., `azurerm_resource_group.this`.
+- **Resource Naming**: Use descriptive, consistent names aligned with AKS, e.g., `azurerm_kubernetes_cluster.kubernetes_cluster` or `azurerm_resource_group.resource_group`.
 - **Lifecycle Preconditions**: Use `lifecycle` blocks with `precondition` checks to validate complex inter-variable dependencies that cannot be handled in `variables.tf`.
 - **Dynamic Blocks**: Use `dynamic` blocks to conditionally create nested configuration blocks within a single resource (e.g., for optional features).
 - **Sub-Resource Creation**: For creating multiple instances of a sub-resource (e.g., storage containers, extra node pools), use a `list(object)` variable and iterate over it with a `for_each` meta-argument on the resource block. This is the standard pattern for managing zero-to-many child resources.
 
 **Main Resource Template (`main.tf`):**
 ```hcl
-resource "azurerm_kubernetes_cluster" "this" {
+resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
   name                = var.name
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -147,12 +144,12 @@ variable "containers" {
 }
 
 # In main.tf
-resource "azurerm_storage_container" "this" {
+resource "azurerm_storage_container" "storage_container" {
   # Create a map from the list for for_each, using the name as the key
   for_each = { for container in var.containers : container.name => container }
 
   name                  = each.value.name
-  storage_account_name  = azurerm_storage_account.this.name # Reference to the main resource
+  storage_account_name  = azurerm_storage_account.storage_account.name # Reference to the main resource
   container_access_type = each.value.container_access_type
 }
 ```
@@ -173,25 +170,25 @@ This file defines the outputs of the module. All outputs MUST have a `descriptio
 ```hcl
 output "id" {
   description = "The ID of the created Kubernetes Cluster."
-  value       = try(azurerm_kubernetes_cluster.this.id, null)
+  value       = try(azurerm_kubernetes_cluster.kubernetes_cluster.id, null)
 }
 
 output "name" {
   description = "The name of the Kubernetes Cluster."
-  value       = try(azurerm_kubernetes_cluster.this.name, null)
+  value       = try(azurerm_kubernetes_cluster.kubernetes_cluster.name, null)
 }
 
 output "identity" {
   description = "The managed identity of the cluster."
   value = try({
-    type         = azurerm_kubernetes_cluster.this.identity[0].type
-    principal_id = azurerm_kubernetes_cluster.this.identity[0].principal_id
+    type         = azurerm_kubernetes_cluster.kubernetes_cluster.identity[0].type
+    principal_id = azurerm_kubernetes_cluster.kubernetes_cluster.identity[0].principal_id
   }, null)
 }
 
 output "kube_config_raw" {
   description = "Raw Kubernetes config to be used by kubectl. This is sensitive!"
-  value       = try(azurerm_kubernetes_cluster.this.kube_config_raw, null)
+  value       = try(azurerm_kubernetes_cluster.kubernetes_cluster.kube_config_raw, null)
   sensitive   = true
 }
 ```

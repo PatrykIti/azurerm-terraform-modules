@@ -2,21 +2,21 @@
 
 ## Overview
 
-This document describes security considerations for Azure DevOps Git repositories managed with Terraform.
+This document describes security considerations for Azure DevOps pipelines managed with Terraform.
 
 ## Security Features
 
-### 1. Branch Protections
-- Require minimum reviewers and status checks on protected branches.
-- Enforce work item linking and comment resolution.
+### 1. Pipeline Permissions
+- Grant build definition permissions only to approved groups.
+- Limit queue and edit permissions to reduce unintended changes.
 
-### 2. Repository Policies
-- Enforce author email patterns and reserved names.
-- Limit file size and path length to reduce risk.
+### 2. Pipeline Authorizations
+- Explicitly authorize pipelines to use service connections, queues, and variable groups.
+- Prefer per-pipeline authorizations over "all pipelines" access.
 
-### 3. Permissions
-- Use least privilege for repository and branch permissions.
-- Assign permissions to groups rather than individual users.
+### 3. Secret Management
+- Keep secrets in variable groups or secure files; avoid inline secret values.
+- Mark secret variables as `is_secret` when required by the pipeline.
 
 ## Security Configuration Example
 
@@ -26,42 +26,22 @@ module "azuredevops_pipelines" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  repositories = {
-    main = {
-      name = "secure-repo"
-      initialization = {
-        init_type = "Clean"
+  build_definitions = {
+    secure = {
+      name = "secure-pipeline"
+      repository = {
+        repo_type = "TfsGit"
+        repo_id   = "00000000-0000-0000-0000-000000000000"
+        yml_path  = "azure-pipelines.yml"
       }
     }
   }
 
-  branch_policy_min_reviewers = [
+  pipeline_authorizations = [
     {
-      reviewer_count = 2
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
-    }
-  ]
-
-  branch_policy_status_check = [
-    {
-      name = "security-check"
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
-    }
-  ]
-
-  repository_policy_check_credentials = [
-    {
-      repository_keys = ["main"]
+      resource_id  = "00000000-0000-0000-0000-000000000000"
+      type         = "endpoint"
+      pipeline_key = "secure"
     }
   ]
 }
@@ -69,21 +49,21 @@ module "azuredevops_pipelines" {
 
 ## Security Hardening Checklist
 
-- [ ] Protect default branches with reviewers and status checks.
-- [ ] Restrict repository permissions to approved groups.
-- [ ] Enable repository policies for credentials and path controls.
-- [ ] Regularly audit repository policy compliance.
+- [ ] Restrict build definition permissions to groups.
+- [ ] Keep service connections scoped to required pipelines only.
+- [ ] Use variable groups for secrets and protect them with checks.
+- [ ] Review pipeline authorizations regularly.
 
 ## Common Security Mistakes to Avoid
 
-1. **Allowing direct pushes to protected branches**
-2. **Granting broad permissions to individual users**
-3. **Skipping build validation or status checks**
+1. **Allowing all pipelines to access privileged service connections**
+2. **Granting edit permissions to broad groups**
+3. **Storing secrets directly in pipeline variables**
 
 ## Additional Resources
 
-- [Azure DevOps Branch Policies](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies?view=azure-devops)
-- [Azure DevOps Permissions and Access Levels](https://learn.microsoft.com/en-us/azure/devops/organizations/security/permissions?view=azure-devops)
+- [Pipeline Permissions](https://learn.microsoft.com/en-us/azure/devops/pipelines/policies/permissions?view=azure-devops)
+- [Approvals and Checks](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals?view=azure-devops)
 
 ---
 

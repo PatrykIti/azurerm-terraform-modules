@@ -8,84 +8,88 @@ resource "random_string" "suffix" {
   special = false
 }
 
+resource "azuredevops_git_repository" "example" {
+  project_id = var.project_id
+  name       = "${var.repo_name_prefix}-${random_string.suffix.result}"
+
+  initialization {
+    init_type = "Clean"
+  }
+}
+
+resource "azuredevops_serviceendpoint_generic" "example" {
+  project_id            = var.project_id
+  service_endpoint_name = "${var.service_endpoint_name_prefix}-${random_string.suffix.result}"
+  server_url            = var.service_endpoint_url
+  username              = var.service_endpoint_username
+  password              = var.service_endpoint_password
+  description           = "Managed by Terraform"
+}
+
 module "azuredevops_pipelines" {
   source = "../../"
 
   project_id = var.project_id
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
-      initialization = {
-        init_type = "Clean"
+  build_folders = [
+    {
+      path        = "\\Pipelines"
+      description = "Pipeline folder"
+    }
+  ]
+
+  build_definitions = {
+    app = {
+      name = "${var.pipeline_name_prefix}-app-${random_string.suffix.result}"
+      path = "\\Pipelines"
+      repository = {
+        repo_type = "TfsGit"
+        repo_id   = azuredevops_git_repository.example.id
+        yml_path  = var.yaml_path
+      }
+      schedules = [
+        {
+          branch_filter = {
+            include = ["main"]
+            exclude = ["experimental"]
+          }
+          days_to_build              = ["Mon", "Wed", "Fri"]
+          schedule_only_with_changes = true
+          start_hours                = 8
+          start_minutes              = 30
+          time_zone                  = "(UTC) Coordinated Universal Time"
+        }
+      ]
+      variables = [
+        {
+          name  = "ENV"
+          value = "dev"
+        }
+      ]
+    }
+    release = {
+      name = "${var.pipeline_name_prefix}-release-${random_string.suffix.result}"
+      repository = {
+        repo_type = "TfsGit"
+        repo_id   = azuredevops_git_repository.example.id
+        yml_path  = "azure-pipelines-release.yml"
+      }
+      ci_trigger = {
+        use_yaml = true
       }
     }
   }
 
-  branches = [
+  pipeline_authorizations = [
     {
-      repository_key = "main"
-      name           = "develop"
-      ref_branch     = "refs/heads/master"
-    }
-  ]
-
-  files = [
+      resource_id  = azuredevops_serviceendpoint_generic.example.id
+      type         = "endpoint"
+      pipeline_key = "app"
+    },
     {
-      repository_key      = "main"
-      file                = "README.md"
-      content             = "# Repository\n\nManaged by Terraform."
-      commit_message      = "Add README"
-      overwrite_on_create = true
-    }
-  ]
-
-  git_permissions = [
-    {
-      repository_key = "main"
-      principal      = var.principal_descriptor
-      permissions = {
-        GenericRead       = "Allow"
-        GenericContribute = "Allow"
-      }
-    }
-  ]
-
-  branch_policy_min_reviewers = [
-    {
-      reviewer_count = var.reviewer_count
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
-    }
-  ]
-
-  branch_policy_build_validation = [
-    {
-      build_definition_id = var.build_definition_id
-      display_name        = "CI"
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
-    }
-  ]
-
-  repository_policy_author_email_pattern = [
-    {
-      author_email_patterns = var.author_email_patterns
-      repository_keys       = ["main"]
-    }
-  ]
-
-  repository_policy_reserved_names = [
-    {
-      repository_keys = ["main"]
+      resource_id  = azuredevops_serviceendpoint_generic.example.id
+      type         = "endpoint"
+      pipeline_key = "release"
     }
   ]
 }

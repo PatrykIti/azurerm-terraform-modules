@@ -7,9 +7,10 @@ A consistent directory structure is essential for maintainability and ease of us
 ```
 modules/<provider>_<resource_name>/
 ├─── docs/
-│    └─── README.md
+│    └─── IMPORT.md
 ├─── examples/
 │    ├─── basic/
+│    │    ├─── .terraform-docs.yml
 │    │    ├─── main.tf
 │    │    ├─── outputs.tf
 │    │    ├─── variables.tf
@@ -18,7 +19,7 @@ modules/<provider>_<resource_name>/
 │    │    └─── ...
 │    ├─── secure/
 │    │    └─── ...
-│    └─── private-endpoint/ (optional)
+│    └─── <feature-specific>/ (optional)
 │         └─── ...
 ├─── tests/
 │    ├─── fixtures/
@@ -27,7 +28,7 @@ modules/<provider>_<resource_name>/
 │    │    ├─── secure/
 │    │    ├─── network/
 │    │    ├─── negative/
-│    │    └─── private_endpoint/ (optional)
+│    │    └─── <feature-specific>/ (optional)
 │    ├─── unit/
 │    │    ├─── defaults.tftest.hcl
 │    │    ├─── naming.tftest.hcl
@@ -36,10 +37,15 @@ modules/<provider>_<resource_name>/
 │    ├─── .gitignore
 │    ├─── go.mod
 │    ├─── go.sum
-│    ├─── kubernetes_cluster_test.go
+│    ├─── <module>_test.go
 │    ├─── integration_test.go
 │    ├─── performance_test.go
 │    ├─── test_helpers.go
+│    ├─── test_config.yaml
+│    ├─── test_env.sh
+│    ├─── run_tests_parallel.sh
+│    ├─── run_tests_sequential.sh
+│    ├─── test_outputs/
 │    └─── Makefile
 ├─── .releaserc.js
 ├─── .terraform-docs.yml
@@ -59,8 +65,8 @@ modules/<provider>_<resource_name>/
 
 ## Key Components Explained
 
-- **`docs/`**: Contains supplementary documentation, such as architecture diagrams or migration guides.
-- **`examples/`**: Contains practical, runnable examples for different use cases. Each example should have its own `README.md`. `private-endpoint` is optional and only when the resource supports it.
+- **`docs/`**: Contains supplementary documentation. The standard is `IMPORT.md` (Terraform import blocks), aligned with the AKS module.
+- **`examples/`**: Contains practical, runnable examples for different use cases. Each example should have its own `README.md` and `.terraform-docs.yml`. Feature-specific examples are optional (e.g., `diagnostic-settings`, `multi-node-pool`, `workload-identity`).
 - **`tests/`**: Contains all tests for the module.
   - **`fixtures/`**: Terraform code for different test scenarios used by Terratest.
   - **`unit/`**: Native Terraform tests (`.tftest.hcl`) for fast, resource-independent validation.

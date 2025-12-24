@@ -6,22 +6,41 @@ variable "project_id" {
 variable "repo_name_prefix" {
   description = "Prefix for the repository name."
   type        = string
-  default     = "ado-repo-secure"
+  default     = "ado-secure-repo"
 }
 
-variable "reviewer_count" {
-  description = "Minimum number of reviewers required."
-  type        = number
-  default     = 2
-}
-
-variable "status_check_name" {
-  description = "Status check name to enforce."
+variable "pipeline_name_prefix" {
+  description = "Prefix for the pipeline name."
   type        = string
+  default     = "ado-secure-pipeline"
 }
 
-variable "status_check_genre" {
-  description = "Optional status check genre."
+variable "yaml_path" {
+  description = "Path to the pipeline YAML file."
   type        = string
-  default     = null
+  default     = "azure-pipelines.yml"
+}
+
+variable "service_endpoint_name_prefix" {
+  description = "Prefix for the service endpoint name."
+  type        = string
+  default     = "ado-secure-endpoint"
+}
+
+variable "service_endpoint_url" {
+  description = "Service endpoint URL."
+  type        = string
+  default     = "https://example.endpoint.local"
+}
+
+variable "service_endpoint_username" {
+  description = "Service endpoint username."
+  type        = string
+  default     = "example-user"
+}
+
+variable "service_endpoint_password" {
+  description = "Service endpoint password."
+  type        = string
+  sensitive   = true
 }

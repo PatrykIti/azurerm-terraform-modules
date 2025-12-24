@@ -1,7 +1,7 @@
 {
   "name": "azuredevops_environments",
   "title": "Azure DevOps Environments",
-  "commit_scope": "azuredevops-repository",
-  "tag_prefix": "ADOR",
-  "description": "Azure DevOps repository module for managing Git repositories and policies"
+  "commit_scope": "azuredevops-environments",
+  "tag_prefix": "ADOE",
+  "description": "Azure DevOps environments module for managing environments, resources, and checks"
 }

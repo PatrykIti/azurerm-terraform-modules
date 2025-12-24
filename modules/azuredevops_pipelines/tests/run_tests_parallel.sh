@@ -56,11 +56,11 @@ EOF_JSON
 
 # List of tests to run
 tests=(
-    "TestBasicAzuredevopsRepository"
-    "TestCompleteAzuredevopsRepository"
-    "TestSecureAzuredevopsRepository"
-    "TestAzuredevopsRepositoryValidationRules"
-    "TestAzuredevopsRepositoryFullIntegration"
+    "TestBasicAzuredevopsPipelines"
+    "TestCompleteAzuredevopsPipelines"
+    "TestSecureAzuredevopsPipelines"
+    "TestAzuredevopsPipelinesValidationRules"
+    "TestAzuredevopsPipelinesFullIntegration"
 )
 
 echo "Starting parallel test execution for azuredevops_pipelines"

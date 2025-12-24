@@ -1,12 +1,11 @@
 # Secure Azure DevOps Pipelines Example
 
-This example demonstrates a repository with stricter review and status policies.
+This example demonstrates a pipeline with restricted permissions and explicit authorizations.
 
 ## Features
 
-- Minimum reviewers policy
-- Status check policy
-- Credential scanning and case enforcement policies
+- Build definition permissions scoped to administrators
+- Explicit service endpoint authorization
 
 ## Usage
 

@@ -1,14 +1,13 @@
 # Complete Azure DevOps Pipelines Example
 
-This example demonstrates creating a repository with branches, permissions, and a selection of branch/repository policies.
+This example demonstrates creating multiple YAML pipelines with folders and authorizations.
 
 ## Features
 
 - Repository with clean initialization
-- Additional branch created from default branch
-- Git permissions for a group principal
-- Branch policies (minimum reviewers, build validation)
-- Repository policies (author email pattern, reserved names)
+- Multiple build definitions in a shared folder
+- Scheduled trigger for a pipeline
+- Pipeline authorizations for a service endpoint
 
 ## Usage
 

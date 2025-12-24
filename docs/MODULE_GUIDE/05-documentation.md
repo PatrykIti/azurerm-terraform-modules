@@ -23,6 +23,19 @@ The `README.md` is the front page of the module. It should provide all the essen
 
 ---
 
+## `docs/IMPORT.md`
+
+This file documents how to import existing resources into the module using Terraform import blocks. The AKS module is the reference format.
+
+**Required Sections:**
+- **Prerequisites**: Terraform version, provider version, and required access.
+- **Minimal module-only configuration**: Copy/pasteable module block.
+- **Import blocks**: Exact resource addressing for the module outputs.
+- **Verification**: `plan`/`state` checks and clean-up guidance.
+- **Common errors**: Typical drift causes and fixes.
+
+---
+
 ## `CONTRIBUTING.md`
 
 This file provides guidelines for developers who want to contribute to the module. It should set expectations for code standards, commit messages, testing, and the pull request process.

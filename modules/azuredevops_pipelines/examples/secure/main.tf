@@ -8,56 +8,64 @@ resource "random_string" "suffix" {
   special = false
 }
 
+data "azuredevops_group" "project_collection_admins" {
+  name = "Project Collection Administrators"
+}
+
+resource "azuredevops_git_repository" "example" {
+  project_id = var.project_id
+  name       = "${var.repo_name_prefix}-${random_string.suffix.result}"
+
+  initialization {
+    init_type = "Clean"
+  }
+}
+
+resource "azuredevops_serviceendpoint_generic" "example" {
+  project_id            = var.project_id
+  service_endpoint_name = "${var.service_endpoint_name_prefix}-${random_string.suffix.result}"
+  server_url            = var.service_endpoint_url
+  username              = var.service_endpoint_username
+  password              = var.service_endpoint_password
+  description           = "Managed by Terraform"
+}
+
 module "azuredevops_pipelines" {
   source = "../../"
 
   project_id = var.project_id
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
-      initialization = {
-        init_type = "Clean"
+  build_definitions = {
+    secure = {
+      name = "${var.pipeline_name_prefix}-${random_string.suffix.result}"
+      repository = {
+        repo_type = "TfsGit"
+        repo_id   = azuredevops_git_repository.example.id
+        yml_path  = var.yaml_path
+      }
+      ci_trigger = {
+        use_yaml = true
       }
     }
   }
 
-  branch_policy_min_reviewers = [
+  build_definition_permissions = [
     {
-      reviewer_count = var.reviewer_count
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
+      build_definition_key = "secure"
+      principal            = data.azuredevops_group.project_collection_admins.id
+      permissions = {
+        ViewBuildDefinition = "Allow"
+        EditBuildDefinition = "Deny"
+      }
+      replace = false
     }
   ]
 
-  branch_policy_status_check = [
+  pipeline_authorizations = [
     {
-      name         = var.status_check_name
-      genre        = var.status_check_genre
-      display_name = "Security Status Check"
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
-    }
-  ]
-
-  repository_policy_check_credentials = [
-    {
-      repository_keys = ["main"]
-    }
-  ]
-
-  repository_policy_case_enforcement = [
-    {
-      enforce_consistent_case = true
-      repository_keys         = ["main"]
+      resource_id  = azuredevops_serviceendpoint_generic.example.id
+      type         = "endpoint"
+      pipeline_key = "secure"
     }
   ]
 }

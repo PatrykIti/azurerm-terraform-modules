@@ -1,22 +1,15 @@
 # Test outputs for Azure DevOps Pipelines
 
 mock_provider "azuredevops" {
-  mock_resource "azuredevops_git_repository" {
+  mock_resource "azuredevops_build_definition" {
     defaults = {
-      id      = "repo-0001"
-      web_url = "https://dev.azure.com/org/project/_git/repo"
+      id = "pipeline-0001"
     }
   }
 
-  mock_resource "azuredevops_git_repository_branch" {
+  mock_resource "azuredevops_build_folder" {
     defaults = {
-      id = "repo-0001:main"
-    }
-  }
-
-  mock_resource "azuredevops_branch_policy_min_reviewers" {
-    defaults = {
-      id = "policy-0001"
+      id = "folder-0001"
     }
   }
 }
@@ -24,55 +17,33 @@ mock_provider "azuredevops" {
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  repositories = {
+  build_folders = [
+    {
+      path = "\\Pipelines"
+    }
+  ]
+
+  build_definitions = {
     main = {
-      initialization = {
-        init_type = "Clean"
+      repository = {
+        repo_id   = "00000000-0000-0000-0000-000000000000"
+        repo_type = "TfsGit"
+        yml_path  = "azure-pipelines.yml"
       }
     }
   }
-
-  branches = [
-    {
-      repository_key = "main"
-      name           = "main"
-      ref_branch     = "refs/heads/master"
-    }
-  ]
-
-  branch_policy_min_reviewers = [
-    {
-      reviewer_count = 1
-      scope = [
-        {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
-        }
-      ]
-    }
-  ]
 }
 
 run "outputs_plan" {
   command = plan
 
   assert {
-    condition     = length(keys(output.repository_ids)) == 1
-    error_message = "repository_ids should include configured repositories."
+    condition     = length(keys(output.build_definition_ids)) == 1
+    error_message = "build_definition_ids should include configured pipelines."
   }
 
   assert {
-    condition     = length(keys(output.repository_urls)) == 1
-    error_message = "repository_urls should include configured repositories."
-  }
-
-  assert {
-    condition     = length(keys(output.branch_ids)) == 1
-    error_message = "branch_ids should include configured branches."
-  }
-
-  assert {
-    condition     = length(keys(output.policy_ids.branch_min_reviewers)) == 1
-    error_message = "policy_ids should include configured branch policies."
+    condition     = length(keys(output.build_folder_ids)) == 1
+    error_message = "build_folder_ids should include configured folders."
   }
 }
