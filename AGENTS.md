@@ -17,8 +17,9 @@ modules/<provider>_<resource>/
   main.tf, variables.tf, outputs.tf, versions.tf
   README.md, CHANGELOG.md, VERSIONING.md, CONTRIBUTING.md, SECURITY.md
   module.json, .releaserc.js, .terraform-docs.yml, Makefile, generate-docs.sh
-  examples/{basic,complete,secure}/(main.tf, variables.tf, outputs.tf, README.md)
-  tests/{fixtures,unit}/ + Go terratest files + tests/Makefile
+  docs/IMPORT.md
+  examples/{basic,complete,secure}/(.terraform-docs.yml, main.tf, variables.tf, outputs.tf, README.md)
+  tests/{fixtures,unit}/ + Go terratest files + tests/Makefile + tests/tooling scripts
 ```
 
 ## Terraform Implementation Rules
@@ -43,12 +44,14 @@ modules/<provider>_<resource>/
 
 - Must include `basic`, `complete`, `secure` examples (plus optional extras like `private-endpoint`).
 - Self-contained: create their own RG and dependencies where feasible.
-- Naming: follow repo naming patterns; basic uses fixed names, complete/secure may add random suffixes.
+- Naming: examples use fixed names; only Go E2E tests use dynamic/random suffixes.
+- Optional examples follow AKS patterns (e.g., `diagnostic-settings`, `multi-node-pool`, `workload-identity`).
 
 ## Testing Expectations
 
 - Layers: `terraform fmt/validate` + security scan, `terraform test` unit tests, Terratest integration.
-- Standard structure: `tests/unit/*.tftest.hcl` and `tests/fixtures/*` for Terratest.
+- Standard structure: `tests/unit/*.tftest.hcl`, `tests/fixtures/*`, `go.mod`, `go.sum`, `test_config.yaml`, `test_env.sh`,
+  `run_tests_parallel.sh`, `run_tests_sequential.sh`, `integration_test.go`, `performance_test.go`, and module-specific test files.
 - All tests should pass locally before PR.
 
 ## CI/CD and Releases
