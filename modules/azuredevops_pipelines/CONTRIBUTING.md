@@ -1,4 +1,4 @@
-# Contributing to azuredevops_repository Module
+# Contributing to azuredevops_pipelines Module
 
 Thank you for your interest in contributing to this Terraform module! This document provides guidelines and instructions for contributing.
 
@@ -63,7 +63,7 @@ Types:
 1. All changes must include tests
 2. Run tests locally before submitting PR:
    ```bash
-   cd modules/azuredevops_repository/tests
+   cd modules/azuredevops_pipelines/tests
    make test
    ```
 3. Ensure all tests pass

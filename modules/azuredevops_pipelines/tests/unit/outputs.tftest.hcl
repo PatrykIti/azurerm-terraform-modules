@@ -1,4 +1,4 @@
-# Test outputs for Azure DevOps Repository
+# Test outputs for Azure DevOps Pipelines
 
 mock_provider "azuredevops" {
   mock_resource "azuredevops_git_repository" {

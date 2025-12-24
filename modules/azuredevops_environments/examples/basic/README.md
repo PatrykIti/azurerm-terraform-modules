@@ -1,4 +1,4 @@
-# Basic Azure DevOps Repository Example
+# Basic Azure DevOps Environments Example
 
 This example demonstrates creating a Git repository with an initial README file.
 

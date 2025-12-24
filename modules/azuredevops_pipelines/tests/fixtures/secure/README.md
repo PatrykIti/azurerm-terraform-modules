@@ -1,6 +1,6 @@
-# Secure Azure DevOps Repository Example
+# Secure Azure DevOps Pipelines Example
 
-This example demonstrates a maximum-security Azure DevOps Repository configuration suitable for highly sensitive data and regulated environments.
+This example demonstrates a maximum-security Azure DevOps Pipelines configuration suitable for highly sensitive data and regulated environments.
 
 ## Features
 

@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial release of the azuredevops_repository module
+- Initial release of the azuredevops_pipelines module
 - Core functionality for Azure DevOps repository module for managing Git repositories and policies
 
 ### Security

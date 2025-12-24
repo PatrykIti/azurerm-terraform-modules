@@ -11,7 +11,7 @@ ADORv{major}.{minor}.{patch}
 ```
 
 Where:
-- `ADOR` = azuredevops_repository module identifier
+- `ADOR` = azuredevops_environments module identifier
 - `v` = version prefix
 - `{major}.{minor}.{patch}` = semantic version numbers (automatically determined)
 
@@ -103,13 +103,13 @@ test(azuredevops-repository): add unit tests for validation
 #### Examples Source References
 ```hcl
 # Before release (development)
-module "azuredevops_repository" {
+module "azuredevops_environments" {
   source = "../../"
 }
 
 # After release (automatically updated)
-module "azuredevops_repository" {
-  source = "github.com/org/repo//modules/azuredevops_repository?ref=ADORv1.2.0"
+module "azuredevops_environments" {
+  source = "github.com/org/repo//modules/azuredevops_environments?ref=ADORv1.2.0"
 }
 ```
 
@@ -125,8 +125,8 @@ module "azuredevops_repository" {
 
 ### Direct from GitHub (Recommended)
 ```hcl
-module "azuredevops_repository" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_repository?ref=ADORv1.0.0"
+module "azuredevops_environments" {
+  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_environments?ref=ADORv1.0.0"
   
   # Module configuration
   # ...

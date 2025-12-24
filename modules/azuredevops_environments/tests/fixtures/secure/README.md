@@ -1,6 +1,6 @@
-# Secure Azure DevOps Repository Example
+# Secure Azure DevOps Environments Example
 
-This example demonstrates a maximum-security Azure DevOps Repository configuration suitable for highly sensitive data and regulated environments.
+This example demonstrates a maximum-security Azure DevOps Environments configuration suitable for highly sensitive data and regulated environments.
 
 ## Features
 

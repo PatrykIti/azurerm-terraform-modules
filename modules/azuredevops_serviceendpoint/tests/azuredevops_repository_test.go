@@ -12,12 +12,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Test basic azuredevops_repository creation
+// Test basic azuredevops_serviceendpoint creation
 func TestBasicAzuredevopsRepository(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_repository/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_serviceendpoint/tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -37,12 +37,12 @@ func TestBasicAzuredevopsRepository(t *testing.T) {
 	})
 }
 
-// Test complete azuredevops_repository configuration
+// Test complete azuredevops_serviceendpoint configuration
 func TestCompleteAzuredevopsRepository(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_repository/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_serviceendpoint/tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -64,12 +64,12 @@ func TestCompleteAzuredevopsRepository(t *testing.T) {
 	})
 }
 
-// Test secure azuredevops_repository configuration
+// Test secure azuredevops_serviceendpoint configuration
 func TestSecureAzuredevopsRepository(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_repository/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_serviceendpoint/tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -94,7 +94,7 @@ func TestAzuredevopsRepositoryValidationRules(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_repository/tests/fixtures/negative")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_serviceendpoint/tests/fixtures/negative")
 	terraformOptions := &terraform.Options{
 		TerraformDir: testFolder,
 		NoColor:      true,

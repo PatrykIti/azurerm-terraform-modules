@@ -226,7 +226,7 @@ resource "azuredevops_branch_policy_work_item_linking" "policy" {
   }
 }
 
-resource "azuredevops_repository_policy_author_email_pattern" "policy" {
+resource "azuredevops_environments_policy_author_email_pattern" "policy" {
   for_each = { for index, policy in var.repository_policy_author_email_pattern : index => policy }
 
   project_id            = var.project_id
@@ -242,7 +242,7 @@ resource "azuredevops_repository_policy_author_email_pattern" "policy" {
   )) : null
 }
 
-resource "azuredevops_repository_policy_case_enforcement" "policy" {
+resource "azuredevops_environments_policy_case_enforcement" "policy" {
   for_each = { for index, policy in var.repository_policy_case_enforcement : index => policy }
 
   project_id              = var.project_id
@@ -258,7 +258,7 @@ resource "azuredevops_repository_policy_case_enforcement" "policy" {
   )) : null
 }
 
-resource "azuredevops_repository_policy_check_credentials" "policy" {
+resource "azuredevops_environments_policy_check_credentials" "policy" {
   for_each = { for index, policy in var.repository_policy_check_credentials : index => policy }
 
   project_id = var.project_id
@@ -273,7 +273,7 @@ resource "azuredevops_repository_policy_check_credentials" "policy" {
   )) : null
 }
 
-resource "azuredevops_repository_policy_file_path_pattern" "policy" {
+resource "azuredevops_environments_policy_file_path_pattern" "policy" {
   for_each = { for index, policy in var.repository_policy_file_path_pattern : index => policy }
 
   project_id        = var.project_id
@@ -289,7 +289,7 @@ resource "azuredevops_repository_policy_file_path_pattern" "policy" {
   )) : null
 }
 
-resource "azuredevops_repository_policy_max_file_size" "policy" {
+resource "azuredevops_environments_policy_max_file_size" "policy" {
   for_each = { for index, policy in var.repository_policy_max_file_size : index => policy }
 
   project_id    = var.project_id
@@ -305,7 +305,7 @@ resource "azuredevops_repository_policy_max_file_size" "policy" {
   )) : null
 }
 
-resource "azuredevops_repository_policy_max_path_length" "policy" {
+resource "azuredevops_environments_policy_max_path_length" "policy" {
   for_each = { for index, policy in var.repository_policy_max_path_length : index => policy }
 
   project_id      = var.project_id
@@ -321,7 +321,7 @@ resource "azuredevops_repository_policy_max_path_length" "policy" {
   )) : null
 }
 
-resource "azuredevops_repository_policy_reserved_names" "policy" {
+resource "azuredevops_environments_policy_reserved_names" "policy" {
   for_each = { for index, policy in var.repository_policy_reserved_names : index => policy }
 
   project_id = var.project_id

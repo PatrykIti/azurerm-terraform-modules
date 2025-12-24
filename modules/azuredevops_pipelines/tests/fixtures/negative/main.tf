@@ -1,7 +1,7 @@
 # Negative test cases - should fail validation
 provider "azuredevops" {}
 
-module "azuredevops_repository" {
+module "azuredevops_pipelines" {
   source = "../../../"
 
   project_id = "00000000-0000-0000-0000-000000000000"

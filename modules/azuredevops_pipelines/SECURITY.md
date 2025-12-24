@@ -1,4 +1,4 @@
-# azuredevops_repository Module Security
+# azuredevops_pipelines Module Security
 
 ## Overview
 
@@ -21,8 +21,8 @@ This document describes security considerations for Azure DevOps Git repositorie
 ## Security Configuration Example
 
 ```hcl
-module "azuredevops_repository" {
-  source = "./modules/azuredevops_repository"
+module "azuredevops_pipelines" {
+  source = "./modules/azuredevops_pipelines"
 
   project_id = "00000000-0000-0000-0000-000000000000"
 

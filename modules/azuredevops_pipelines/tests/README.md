@@ -1,6 +1,6 @@
-# Azure DevOps Repository Module Tests
+# Azure DevOps Pipelines Module Tests
 
-This directory contains automated tests for the Azure DevOps Repository Terraform module using [Terratest](https://terratest.gruntwork.io/).
+This directory contains automated tests for the Azure DevOps Pipelines Terraform module using [Terratest](https://terratest.gruntwork.io/).
 
 ## Prerequisites
 
@@ -55,7 +55,7 @@ go test -v -run TestBasicAzuredevopsRepository -timeout 30m
 
 ### Test Files
 
-- `azuredevops_repository_test.go` - Basic, complete, secure, and validation tests
+- `azuredevops_pipelines_test.go` - Basic, complete, secure, and validation tests
 - `integration_test.go` - Full apply test using the complete fixture
 - `performance_test.go` - Benchmarks are disabled by default
 

@@ -1,8 +1,8 @@
-# Azure DevOps Repository Module Documentation
+# Azure DevOps Environments Module Documentation
 
 ## Overview
 
-This directory contains additional documentation for the Azure DevOps Repository module.
+This directory contains additional documentation for the Azure DevOps Environments module.
 
 ## Contents
 

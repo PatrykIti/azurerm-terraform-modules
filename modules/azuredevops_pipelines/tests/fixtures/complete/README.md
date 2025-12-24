@@ -1,10 +1,10 @@
-# Complete Azure DevOps Repository Example
+# Complete Azure DevOps Pipelines Example
 
-This example demonstrates a comprehensive deployment of Azure DevOps Repository with all available features and configurations.
+This example demonstrates a comprehensive deployment of Azure DevOps Pipelines with all available features and configurations.
 
 ## Features
 
-- Full azuredevops_repository configuration with all features enabled
+- Full azuredevops_pipelines configuration with all features enabled
 - Advanced networking configuration
 - Diagnostic settings for monitoring and auditing
 - Complete lifecycle management
@@ -13,7 +13,7 @@ This example demonstrates a comprehensive deployment of Azure DevOps Repository 
 
 ## Key Configuration
 
-This comprehensive example showcases all available features of the azuredevops_repository module, demonstrating enterprise-grade capabilities suitable for production environments.
+This comprehensive example showcases all available features of the azuredevops_pipelines module, demonstrating enterprise-grade capabilities suitable for production environments.
 
 ## Usage
 

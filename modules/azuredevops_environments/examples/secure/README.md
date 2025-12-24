@@ -1,4 +1,4 @@
-# Secure Azure DevOps Repository Example
+# Secure Azure DevOps Environments Example
 
 This example demonstrates a repository with stricter review and status policies.
 

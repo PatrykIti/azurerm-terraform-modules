@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Generate documentation for azuredevops_repository module
+# Generate documentation for azuredevops_pipelines module
 # This script generates README.md using terraform-docs
 
 set -e
@@ -8,7 +8,7 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 MODULE_DIR="$( cd "$SCRIPT_DIR/.." && pwd )"
 
-echo "Generating documentation for azuredevops_repository module..."
+echo "Generating documentation for azuredevops_pipelines module..."
 
 # Check if terraform-docs is installed
 if ! command -v terraform-docs &> /dev/null; then

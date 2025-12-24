@@ -1,7 +1,7 @@
 {
-  "name": "azuredevops_repository",
-  "title": "Azure DevOps Repository",
-  "commit_scope": "azuredevops-repository",
-  "tag_prefix": "ADOR",
-  "description": "Azure DevOps repository module for managing Git repositories and policies"
+  "name": "azuredevops_pipelines",
+  "title": "Azure DevOps Pipelines",
+  "commit_scope": "azuredevops-pipelines",
+  "tag_prefix": "ADOPI",
+  "description": "Azure DevOps pipelines module for managing build definitions, folders, permissions, and authorizations"
 }

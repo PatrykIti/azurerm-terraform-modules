@@ -1,4 +1,4 @@
-# Test variable validation for Azure DevOps Repository
+# Test variable validation for Azure DevOps Service Endpoints
 
 mock_provider "azuredevops" {}
 

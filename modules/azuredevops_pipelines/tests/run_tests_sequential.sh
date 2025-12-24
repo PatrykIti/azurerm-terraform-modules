@@ -63,7 +63,7 @@ tests=(
     "TestAzuredevopsRepositoryFullIntegration"
 )
 
-echo "Starting sequential test execution for azuredevops_repository"
+echo "Starting sequential test execution for azuredevops_pipelines"
 echo "Total tests to run: ${#tests[@]}"
 echo "Output directory: $OUTPUT_DIR"
 echo "=================================="

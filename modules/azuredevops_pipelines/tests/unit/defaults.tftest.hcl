@@ -1,4 +1,4 @@
-# Test default settings for Azure DevOps Repository
+# Test default settings for Azure DevOps Pipelines
 
 mock_provider "azuredevops" {}
 

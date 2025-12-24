@@ -1,4 +1,4 @@
-# Terraform Azure DevOps Repository Module
+# Terraform Azure DevOps Pipelines Module
 
 ## Module Version
 
@@ -15,8 +15,8 @@ Azure DevOps repository module for managing Git repositories and policies.
 ```hcl
 provider "azuredevops" {}
 
-module "azuredevops_repository" {
-  source = "path/to/azuredevops_repository"
+module "azuredevops_pipelines" {
+  source = "path/to/azuredevops_pipelines"
 
   project_id = "00000000-0000-0000-0000-000000000000"
 

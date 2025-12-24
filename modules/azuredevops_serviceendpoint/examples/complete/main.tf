@@ -8,7 +8,7 @@ resource "random_string" "suffix" {
   special = false
 }
 
-module "azuredevops_repository" {
+module "azuredevops_serviceendpoint" {
   source = "../../"
 
   project_id = var.project_id

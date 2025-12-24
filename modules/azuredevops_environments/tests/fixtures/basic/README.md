@@ -1,10 +1,10 @@
-# Basic Azure DevOps Repository Example
+# Basic Azure DevOps Environments Example
 
-This example demonstrates a basic Azure DevOps Repository configuration using secure defaults and minimal setup.
+This example demonstrates a basic Azure DevOps Environments configuration using secure defaults and minimal setup.
 
 ## Features
 
-- Creates a basic azuredevops_repository with standard configuration
+- Creates a basic azuredevops_environments with standard configuration
 - Uses secure defaults following Azure best practices
 - Creates a dedicated resource group
 - Demonstrates basic module usage patterns

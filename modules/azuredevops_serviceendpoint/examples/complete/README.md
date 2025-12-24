@@ -1,4 +1,4 @@
-# Complete Azure DevOps Repository Example
+# Complete Azure DevOps Service Endpoints Example
 
 This example demonstrates creating a repository with branches, permissions, and a selection of branch/repository policies.
 
