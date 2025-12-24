@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Small
 **Dependencies:** —
-**Status:** ⏳ **To Do**
+**Status:** ✅ **Done** (2025-12-24)
 
 ---
 
@@ -40,8 +40,8 @@ Moduł do instalacji/zarządzania rozszerzeniami Marketplace na poziomie organiz
 ## Tests
 
 - Unit: walidacje zmiennych, typy, wymagane pola.
-- Integration: create/update/delete w realnym ADO (env: AZDO_ORG_SERVICE_URL, AZDO_PERSONAL_ACCESS_TOKEN).
-- Negative: błędne kombinacje (np. brak project_id tam gdzie wymagany).
+- Integration: create/update/delete w realnym ADO (env: AZDO_ORG_SERVICE_URL, AZDO_PERSONAL_ACCESS_TOKEN, AZDO_EXTENSION_PUBLISHER_ID, AZDO_EXTENSION_ID).
+- Negative: błędne kombinacje (np. brak publisher_id/extension_id, duplikaty).
 
 ## Docs to Update After Completion
 

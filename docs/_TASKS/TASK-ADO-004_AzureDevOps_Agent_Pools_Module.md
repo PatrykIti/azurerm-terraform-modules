@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-001
-**Status:** ⏳ **To Do**
+**Status:** ✅ **Done** (2025-12-24)
 
 ---
 
@@ -23,8 +23,8 @@ Moduł do zarządzania pulami agentów i kolejkami w projekcie oraz elastic pool
 
 ### Inputs
 
-- agent_pools (list(object)): name, auto_provision, auto_update, pool_type.
-- agent_queues (list(object)): project_id, name, agent_pool_id.
+- agent_pools (map(object)): name, auto_provision, auto_update, pool_type.
+- agent_queues (list(object)): project_id, name, agent_pool_id lub agent_pool_key.
 - elastic_pools (list(object)): name, service_endpoint_id, azure_resource_id, desired_idle, max_capacity.
 
 ### Outputs
@@ -36,18 +36,19 @@ Moduł do zarządzania pulami agentów i kolejkami w projekcie oraz elastic pool
 ### Notes
 
 - agent_queue jest project-scoped; agent_pool i elastic_pool org-level.
+- agent_queues wymaga dokładnie jednego z agent_pool_id albo agent_pool_key.
 
 ## Examples
 
 - basic: jedna pula + kolejka w projekcie.
-- complete: kilka pul + elastic pool (np. Azure VMSS).
-- secure: ograniczone uprawnienia do kolejek + minimalne capacity.
+- complete: kilka pul i kolejek + opcjonalny elastic pool.
+- secure: ograniczona automatyzacja (auto_provision/auto_update = false).
 
 ## Tests
 
 - Unit: walidacje zmiennych, typy, wymagane pola.
-- Integration: create/update/delete w realnym ADO (env: AZDO_ORG_SERVICE_URL, AZDO_PERSONAL_ACCESS_TOKEN).
-- Negative: błędne kombinacje (np. brak project_id tam gdzie wymagany).
+- Integration: create/update/delete w realnym ADO (env: AZDO_ORG_SERVICE_URL, AZDO_PERSONAL_ACCESS_TOKEN, AZDO_PROJECT_ID).
+- Negative: błędne kombinacje (np. agent_pool_id i agent_pool_key jednocześnie).
 
 ## Docs to Update After Completion
 

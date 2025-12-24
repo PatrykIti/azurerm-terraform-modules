@@ -6,6 +6,9 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [007](./007-2025-12-24-azuredevops-extension-module.md) | 2025-12-24 | Azure DevOps Extension module | Feature |
+| [006](./006-2025-12-24-azuredevops-agent-pools-module.md) | 2025-12-24 | Azure DevOps Agent Pools module | Feature |
+| [005](./005-2025-12-24-azuredevops-team-module.md) | 2025-12-24 | Azure DevOps Team module | Feature |
 | [004](./004-2025-12-23-azuredevops-identity-module.md) | 2025-12-23 | Azure DevOps Identity module | Feature |
 | [003](./003-2025-12-23-azuredevops-project-module.md) | 2025-12-23 | Azure DevOps Project module | Feature |
 | [002](./002-2025-12-23-module-scaffold-fix.md) | 2025-12-23 | Generator scaffoldu – naprawa i zgodnosc z AKS | Fix / Enhancement |

@@ -32,9 +32,9 @@ module "azuredevops_identity" {
 
   user_entitlements = var.user_principal_name != "" ? [
     {
-      principal_name      = var.user_principal_name
+      principal_name       = var.user_principal_name
       account_license_type = "stakeholder"
-      licensing_source    = "account"
+      licensing_source     = "account"
     }
   ] : []
 

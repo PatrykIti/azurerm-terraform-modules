@@ -28,5 +28,5 @@ module "azuredevops_identity" {
       member_group_keys = ["developers"]
       mode              = "add"
     }
-  }
+  ]
 }

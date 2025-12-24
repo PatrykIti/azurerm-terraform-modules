@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-001
-**Status:** ⏳ **To Do**
+**Status:** ✅ **Done** (2025-12-24)
 
 ---
 
@@ -24,14 +24,16 @@ Moduł zespołów w ramach projektu: tworzenie teamów, przypisywanie członków
 ### Inputs
 
 - project_id (string).
-- teams (list(object)): name, description, identity_id (opcjonalnie), area_path/iteration_path.
-- team_members (list(object)): team_id/team_name + member_descriptors.
-- team_administrators (list(object)): team_id/team_name + admin_descriptors.
+- teams (map(object)): name (opcjonalnie), description (opcjonalnie).
+- team_members (list(object)): team_id lub team_key + member_descriptors + mode.
+- team_administrators (list(object)): team_id lub team_key + admin_descriptors + mode.
 
 ### Outputs
 
 - team_ids
 - team_descriptors
+- team_member_ids
+- team_administrator_ids
 
 ### Notes
 
@@ -39,15 +41,15 @@ Moduł zespołów w ramach projektu: tworzenie teamów, przypisywanie członków
 
 ## Examples
 
-- basic: jeden team + członkowie.
-- complete: wiele teamów + admini + konfiguracja area/iteration.
-- secure: ograniczona liczba adminów, brak wildcard membership.
+- basic: jeden team (opcjonalnie członkowie).
+- complete: wiele teamów + członkowie + admini.
+- secure: overwrite adminów dla kontrolowanego dostępu.
 
 ## Tests
 
 - Unit: walidacje zmiennych, typy, wymagane pola.
 - Integration: create/update/delete w realnym ADO (env: AZDO_ORG_SERVICE_URL, AZDO_PERSONAL_ACCESS_TOKEN).
-- Negative: błędne kombinacje (np. brak project_id tam gdzie wymagany).
+- Negative: błędne kombinacje (np. team_id i team_key jednocześnie).
 
 ## Docs to Update After Completion
 

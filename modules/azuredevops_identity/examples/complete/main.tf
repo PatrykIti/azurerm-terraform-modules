@@ -24,17 +24,17 @@ module "azuredevops_identity" {
 
   group_memberships = [
     {
-      group_key          = "platform"
-      member_group_keys  = ["developers"]
-      mode               = "add"
+      group_key         = "platform"
+      member_group_keys = ["developers"]
+      mode              = "add"
     }
   ]
 
   user_entitlements = var.user_principal_name != "" ? [
     {
-      principal_name      = var.user_principal_name
+      principal_name       = var.user_principal_name
       account_license_type = "basic"
-      licensing_source    = "account"
+      licensing_source     = "account"
     }
   ] : []
 

@@ -13,8 +13,8 @@ module "azuredevops_identity" {
 
   group_memberships = [
     {
-      group_descriptor  = "vssgp.invalid"
-      group_key         = "bad"
+      group_descriptor   = "vssgp.invalid"
+      group_key          = "bad"
       member_descriptors = ["vssgp.invalid-member"]
     }
   ]
