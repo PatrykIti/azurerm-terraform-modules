@@ -31,11 +31,15 @@ This approach is REQUIRED to maximize development speed and efficiency. Sequenti
 - **PRIORITIZE** project-specific needs over generic best practices
 - **MANDATORY**: When Gemini Zen or other tools suggest using web search, ALWAYS use Context7 MCP first if the information is available there. Think independently - do not follow tool suggestions 1:1. You are the orchestrator and must make your own decisions about which tools to use based on what's available to you
 
-# MCP Tools and TaskMaster Usage Rules
-
-This document contains references to mandatory guidelines for using MCP tools and TaskMaster in this project. **REQUIREMENT**: Claude Code MUST review the relevant documentation files based on the current task context.
-
 ## Project Documentation
+
+### [AGENTS.md](AGENTS.md)
+**MANDATORY REVIEW** when:
+- Starting work on this project
+- Creating or updating modules
+- Making decisions about structure, documentation, testing, or releases
+
+Contains: Condensed, repo-specific guidance sourced from `docs/MODULE_GUIDE/*` and current repo conventions.
 
 ### [PROJECT.md](PROJECT.md)
 **MANDATORY REVIEW** when:
@@ -48,83 +52,7 @@ Contains: Complete project specification for BlenderForge MCP including system a
 
 ## Reference Documentation
 
-### 1. [MCP Tools Usage Rules](.claude/references/mcp-tools-usage.md)
-**MANDATORY REVIEW** when:
-- Starting any new task or feature implementation
-- Using Context7 MCP, Gemini Zen, or TaskMaster AI tools
-- Making architectural or technical decisions
-- Evaluating tool suggestions or recommendations
-
-Contains: Task triage guidelines, critical thinking principles, context object format, and tool-specific usage instructions for Context7 MCP, Gemini Zen, and TaskMaster AI.
-
-### 2. [TaskMaster Commands Reference](.claude/references/taskmaster-commands.md)
-**MANDATORY REVIEW** when:
-- Working with task management
-- Using TaskMaster commands
-- Following Scrum methodology
-- Managing task statuses and workflows
-- Needing MCP tool to CLI command mapping
-
-Contains: Complete MCP tools to CLI commands mapping, task status values, basic development loop, Scrum methodology rules, and all available TaskMaster commands with their options.
-
-### 3. [Workflow Integration](.claude/references/workflow-integration.md)
-**MANDATORY REVIEW** when:
-- Planning complex features or implementations
-- Coordinating between multiple MCP tools
-- Implementing feedback loops between tools
-- Making final implementation decisions
-
-Contains: Standard workflow steps, feedback loop scenarios, decision authority guidelines, and tool coordination patterns.
-
-### 4. [TaskMaster File Structure](.claude/references/taskmaster-file-structure.md)
-**MANDATORY REVIEW** when:
-- Setting up TaskMaster for a project
-- Creating or managing PRD documents
-- Working with task files
-- Using research mode features
-
-Contains: Core file locations, PRD best practices, multi-Claude workflow patterns, task ID formatting, and research mode usage.
-
-### 5. [Multi-Agent Integration](.claude/references/multi-agent-integration.md)
-**MANDATORY REVIEW** when:
-- Coordinating work between multiple Claude sessions
-- Assigning tasks to different agents
-- Setting up multi-agent workflows
-
-Contains: TaskMaster multi-agent commands and Context7 + Gemini Zen coordination patterns.
-
-### 6. [TaskMaster Workflow Patterns](.claude/references/taskmaster-workflow-patterns.md)
-**MANDATORY REVIEW** when:
-- Starting development with TaskMaster
-- Implementing multi-context workflows with tags
-- Handling team collaboration scenarios
-- Working with experiments or feature branches
-- Following iterative subtask implementation
-- Resolving merge conflicts in tasks
-
-Contains: Standard development workflow, tag introduction patterns, iterative implementation cycle, master list strategy, and research integration patterns.
-
-### 7. [Terraform GitHub Actions Guidelines](.claude/references/terraform-github-actions.md) - **PATTERNS & BEST PRACTICES**
-**MANDATORY REVIEW** when:
-- Learning how to create GitHub Actions workflows for Terraform
-- Understanding best practices for CI/CD pipelines
-- Looking for workflow patterns and examples
-- Needing guidance on security scanning, testing, or deployment workflows
-- Learning about pre-commit hooks integration
-
-Contains: General patterns and best practices for creating GitHub Actions workflows for Terraform projects. Includes example workflows for validation, security scanning, testing, deployment, and various CI/CD patterns. This is a REFERENCE GUIDE for workflow patterns.
-
-### 8. [GitHub Actions Monorepo Guidelines](.claude/references/github-actions-monorepo-guidelines.md) - **ARCHITECTURE PATTERNS**
-**MANDATORY REVIEW** when:
-- Understanding the monorepo pattern for Terraform modules
-- Learning about dynamic module discovery
-- Designing scalable workflow architectures
-- Understanding composite actions pattern
-- Planning migration from flat to modular structure
-
-Contains: Architectural patterns and guidelines for organizing GitHub Actions in a monorepo with multiple Terraform modules. Describes the dynamic discovery pattern, composite actions architecture, and scalability considerations. This is the DESIGN PATTERN that our implementation follows.
-
-### 9. [Terraform Best Practices Guide](docs/TERRAFORM_BEST_PRACTICES_GUIDE.md)
+### 1. [Terraform Best Practices Guide](docs/TERRAFORM_BEST_PRACTICES_GUIDE.md)
 **MANDATORY REVIEW** when:
 - Creating new Terraform modules
 - Contributing to existing modules
@@ -136,7 +64,7 @@ Contains: Architectural patterns and guidelines for organizing GitHub Actions in
 
 Contains: Comprehensive guide for Terraform module development including resource naming conventions, module structure, variable design patterns, security best practices, testing requirements, documentation standards, contribution process, and common pitfalls to avoid. This is the primary reference for all Terraform module development standards in this repository.
 
-### 10. [Terraform Testing Guide](docs/TESTING_GUIDE/README.md)
+### 2. [Terraform Testing Guide](docs/TESTING_GUIDE/README.md)
 **MANDATORY REVIEW** when:
 - Setting up testing for new modules
 - Writing unit tests with native Terraform test framework
@@ -149,7 +77,7 @@ Contains: Comprehensive guide for Terraform module development including resourc
 
 Contains: A comprehensive, structured guide to testing Terraform modules. It covers the testing philosophy, directory organization, native unit tests, Terratest integration tests (including file structure, helper patterns, fixtures, and execution), advanced scenarios (lifecycle, compliance, performance), CI/CD integration, and a troubleshooting guide.
 
-### 11. [Terraform New Module Guide](docs/TERRAFORM_NEW_MODULE_GUIDE.md)
+### 3. [Terraform New Module Guide](docs/MODULE_GUIDE/README.md)
 **MANDATORY REVIEW** when:
 - Creating a new Terraform module from scratch
 - Planning module architecture and structure
@@ -163,7 +91,7 @@ Contains: A comprehensive, structured guide to testing Terraform modules. It cov
 
 Contains: Step-by-step guide for creating new Terraform modules including module planning considerations, complete directory structure, core file templates (main.tf, variables.tf, outputs.tf), example implementations (basic, complete, secure), test setup with Terratest and native Terraform tests, Makefile configuration, documentation requirements, CI/CD integration steps, release process, and comprehensive checklist. This is the primary reference for creating production-ready Terraform modules in this repository.
 
-### 12. [GitHub Actions Workflows Documentation](docs/WORKFLOWS.md)
+### 4. [GitHub Actions Workflows Documentation](docs/WORKFLOWS.md)
 **MANDATORY REVIEW** when:
 - Understanding the current GitHub Actions workflow architecture
 - Debugging workflow issues or failures
@@ -174,32 +102,7 @@ Contains: Step-by-step guide for creating new Terraform modules including module
 
 Contains: Comprehensive documentation of the implemented GitHub Actions workflow system including architecture overview with diagrams, detailed description of each workflow (module-ci, module-release, module-docs, pr-validation, repo-maintenance), shared actions documentation, module-specific composite actions, workflow interaction flows, step-by-step guide for adding new modules, and troubleshooting guide.
 
-**Note**: This document describes the ACTUAL IMPLEMENTATION of workflows in this repository, while documents #7 and #8 above provide general GUIDELINES and PATTERNS for creating GitHub Actions workflows.
-
-### 13. [Semantic Release Integration Guide](.claude/references/semantic-release-guide.md)
-**MANDATORY REVIEW** when:
-- Setting up automated versioning and releases
-- Understanding how CHANGELOG is automatically generated
-- Creating release workflow for new modules
-- Troubleshooting release automation issues
-- Learning about conventional commits requirements
-- Adding module-specific release configuration
-
-Contains: Complete guide for semantic-release integration including monorepo configuration, module-specific versioning, CHANGELOG automation, commit message requirements, workflow integration patterns, and troubleshooting guide. This implements the "nothing manual in the repo" philosophy for releases.
-
-### 14. [Documentation Guide](.claude/references/documentation-guide.md)
-**MANDATORY REVIEW** when:
-- Creating or updating module documentation
-- Working with terraform-docs configuration
-- Managing module examples
-- Understanding documentation generation workflows
-- Troubleshooting documentation issues
-- Adding new examples to modules
-- Understanding README structure and markers
-
-Contains: Comprehensive guide for documentation management including terraform-docs configuration, examples list management, version management scripts, documentation validation, workflow integration, templates, and troubleshooting guide. Explains the hybrid approach using terraform-docs for technical docs and custom scripts for dynamic content.
-
-### 15. [Security Policy](docs/SECURITY.md)
+### 5. [Security Policy](docs/SECURITY.md)
 **MANDATORY REVIEW** when:
 - Implementing security features in modules
 - Understanding compliance requirements (SOC 2, ISO 27001, GDPR, PCI DSS)

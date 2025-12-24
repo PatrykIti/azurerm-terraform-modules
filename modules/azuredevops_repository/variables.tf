@@ -132,17 +132,17 @@ variable "branches" {
 variable "files" {
   description = "List of Git repository files to manage."
   type = list(object({
-    repository_id     = optional(string)
-    repository_key    = optional(string)
-    file              = string
-    content           = string
-    branch            = optional(string)
-    commit_message    = optional(string)
+    repository_id       = optional(string)
+    repository_key      = optional(string)
+    file                = string
+    content             = string
+    branch              = optional(string)
+    commit_message      = optional(string)
     overwrite_on_create = optional(bool)
-    author_name       = optional(string)
-    author_email      = optional(string)
-    committer_name    = optional(string)
-    committer_email   = optional(string)
+    author_name         = optional(string)
+    author_email        = optional(string)
+    committer_name      = optional(string)
+    committer_email     = optional(string)
   }))
   default = []
 
@@ -250,14 +250,14 @@ variable "branch_policy_auto_reviewers" {
 variable "branch_policy_build_validation" {
   description = "List of build validation branch policies."
   type = list(object({
-    enabled                   = optional(bool)
-    blocking                  = optional(bool)
-    build_definition_id       = string
-    display_name              = string
-    manual_queue_only         = optional(bool)
+    enabled                     = optional(bool)
+    blocking                    = optional(bool)
+    build_definition_id         = string
+    display_name                = string
+    manual_queue_only           = optional(bool)
     queue_on_source_update_only = optional(bool)
-    valid_duration            = optional(number)
-    filename_patterns         = optional(list(string))
+    valid_duration              = optional(number)
+    filename_patterns           = optional(list(string))
     scope = list(object({
       repository_id  = optional(string)
       repository_key = optional(string)
@@ -294,12 +294,12 @@ variable "branch_policy_comment_resolution" {
 variable "branch_policy_merge_types" {
   description = "List of merge types branch policies."
   type = list(object({
-    enabled                      = optional(bool)
-    blocking                     = optional(bool)
-    allow_squash                 = optional(bool)
+    enabled                       = optional(bool)
+    blocking                      = optional(bool)
+    allow_squash                  = optional(bool)
     allow_rebase_and_fast_forward = optional(bool)
-    allow_basic_no_fast_forward  = optional(bool)
-    allow_rebase_with_merge      = optional(bool)
+    allow_basic_no_fast_forward   = optional(bool)
+    allow_rebase_with_merge       = optional(bool)
     scope = list(object({
       repository_id  = optional(string)
       repository_key = optional(string)
@@ -317,15 +317,15 @@ variable "branch_policy_merge_types" {
 variable "branch_policy_min_reviewers" {
   description = "List of minimum reviewers branch policies."
   type = list(object({
-    enabled                          = optional(bool)
-    blocking                         = optional(bool)
-    reviewer_count                   = number
-    submitter_can_vote               = optional(bool)
-    last_pusher_cannot_approve       = optional(bool)
+    enabled                                = optional(bool)
+    blocking                               = optional(bool)
+    reviewer_count                         = number
+    submitter_can_vote                     = optional(bool)
+    last_pusher_cannot_approve             = optional(bool)
     allow_completion_with_rejects_or_waits = optional(bool)
-    on_push_reset_approved_votes     = optional(bool)
-    on_push_reset_all_votes          = optional(bool)
-    on_last_iteration_require_vote   = optional(bool)
+    on_push_reset_approved_votes           = optional(bool)
+    on_push_reset_all_votes                = optional(bool)
+    on_last_iteration_require_vote         = optional(bool)
     scope = list(object({
       repository_id  = optional(string)
       repository_key = optional(string)
@@ -343,15 +343,15 @@ variable "branch_policy_min_reviewers" {
 variable "branch_policy_status_check" {
   description = "List of status check branch policies."
   type = list(object({
-    enabled            = optional(bool)
-    blocking           = optional(bool)
-    name               = string
-    genre              = optional(string)
-    author_id          = optional(string)
+    enabled              = optional(bool)
+    blocking             = optional(bool)
+    name                 = string
+    genre                = optional(string)
+    author_id            = optional(string)
     invalidate_on_update = optional(bool)
-    applicability      = optional(string)
-    filename_patterns  = optional(list(string))
-    display_name       = optional(string)
+    applicability        = optional(string)
+    filename_patterns    = optional(list(string))
+    display_name         = optional(string)
     scope = list(object({
       repository_id  = optional(string)
       repository_key = optional(string)
@@ -435,11 +435,11 @@ variable "repository_policy_check_credentials" {
 variable "repository_policy_file_path_pattern" {
   description = "List of file path pattern repository policies."
   type = list(object({
-    enabled          = optional(bool)
-    blocking         = optional(bool)
+    enabled           = optional(bool)
+    blocking          = optional(bool)
     filepath_patterns = list(string)
-    repository_ids   = optional(list(string))
-    repository_keys  = optional(list(string))
+    repository_ids    = optional(list(string))
+    repository_keys   = optional(list(string))
   }))
   default = []
 }

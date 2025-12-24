@@ -1,23 +1,16 @@
 # Negative test cases - should fail validation
-provider "azurerm" {
-  features {}
-}
+provider "azuredevops" {}
 
-resource "azurerm_resource_group" "test" {
-  name     = "rg-azuredevops_repository-negative-test"
-  location = "West Europe"
-}
-
-# This should fail due to invalid name
 module "azuredevops_repository" {
   source = "../../../"
 
-  name                = "INVALID-NAME-WITH-UPPERCASE"  # Should fail validation
-  resource_group_name = azurerm_resource_group.test.name
-  location            = azurerm_resource_group.test.location
+  project_id = "00000000-0000-0000-0000-000000000000"
 
-  tags = {
-    Environment = "Test"
-    Scenario    = "Negative"
-  }
+  branches = [
+    {
+      repository_id  = "00000000-0000-0000-0000-000000000000"
+      repository_key = "main"
+      name           = "invalid-branch"
+    }
+  ]
 }

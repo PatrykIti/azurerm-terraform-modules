@@ -76,7 +76,7 @@ resource "azuredevops_branch_policy_auto_reviewers" "policy" {
     dynamic "scope" {
       for_each = each.value.scope
       content {
-        repository_id = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
+        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : (scope.value.repository_key != null ? local.repository_ids[scope.value.repository_key] : null)
         repository_ref = scope.value.repository_ref
         match_type     = scope.value.match_type
       }
@@ -92,12 +92,12 @@ resource "azuredevops_branch_policy_build_validation" "policy" {
   blocking   = each.value.blocking
 
   settings {
-    build_definition_id        = each.value.build_definition_id
-    display_name               = each.value.display_name
-    manual_queue_only          = each.value.manual_queue_only
+    build_definition_id         = each.value.build_definition_id
+    display_name                = each.value.display_name
+    manual_queue_only           = each.value.manual_queue_only
     queue_on_source_update_only = each.value.queue_on_source_update_only
-    valid_duration             = each.value.valid_duration
-    filename_patterns          = each.value.filename_patterns
+    valid_duration              = each.value.valid_duration
+    filename_patterns           = each.value.filename_patterns
 
     dynamic "scope" {
       for_each = each.value.scope
@@ -137,10 +137,10 @@ resource "azuredevops_branch_policy_merge_types" "policy" {
   blocking   = each.value.blocking
 
   settings {
-    allow_squash                 = each.value.allow_squash
+    allow_squash                  = each.value.allow_squash
     allow_rebase_and_fast_forward = each.value.allow_rebase_and_fast_forward
-    allow_basic_no_fast_forward  = each.value.allow_basic_no_fast_forward
-    allow_rebase_with_merge      = each.value.allow_rebase_with_merge
+    allow_basic_no_fast_forward   = each.value.allow_basic_no_fast_forward
+    allow_rebase_with_merge       = each.value.allow_rebase_with_merge
 
     dynamic "scope" {
       for_each = each.value.scope
@@ -161,13 +161,13 @@ resource "azuredevops_branch_policy_min_reviewers" "policy" {
   blocking   = each.value.blocking
 
   settings {
-    reviewer_count                   = each.value.reviewer_count
-    submitter_can_vote               = each.value.submitter_can_vote
-    last_pusher_cannot_approve       = each.value.last_pusher_cannot_approve
+    reviewer_count                         = each.value.reviewer_count
+    submitter_can_vote                     = each.value.submitter_can_vote
+    last_pusher_cannot_approve             = each.value.last_pusher_cannot_approve
     allow_completion_with_rejects_or_waits = each.value.allow_completion_with_rejects_or_waits
-    on_push_reset_approved_votes     = each.value.on_push_reset_approved_votes
-    on_push_reset_all_votes          = each.value.on_push_reset_all_votes
-    on_last_iteration_require_vote   = each.value.on_last_iteration_require_vote
+    on_push_reset_approved_votes           = each.value.on_push_reset_approved_votes
+    on_push_reset_all_votes                = each.value.on_push_reset_all_votes
+    on_last_iteration_require_vote         = each.value.on_last_iteration_require_vote
 
     dynamic "scope" {
       for_each = each.value.scope
@@ -188,13 +188,13 @@ resource "azuredevops_branch_policy_status_check" "policy" {
   blocking   = each.value.blocking
 
   settings {
-    name              = each.value.name
-    genre             = each.value.genre
-    author_id         = each.value.author_id
+    name                 = each.value.name
+    genre                = each.value.genre
+    author_id            = each.value.author_id
     invalidate_on_update = each.value.invalidate_on_update
-    applicability     = each.value.applicability
-    filename_patterns = each.value.filename_patterns
-    display_name      = each.value.display_name
+    applicability        = each.value.applicability
+    filename_patterns    = each.value.filename_patterns
+    display_name         = each.value.display_name
 
     dynamic "scope" {
       for_each = each.value.scope
@@ -236,7 +236,7 @@ resource "azuredevops_repository_policy_author_email_pattern" "policy" {
   repository_ids = length(concat(
     try(each.value.repository_ids, []),
     [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) > 0 ? distinct(concat(
+    )) > 0 ? distinct(concat(
     try(each.value.repository_ids, []),
     [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
   )) : null
@@ -245,14 +245,14 @@ resource "azuredevops_repository_policy_author_email_pattern" "policy" {
 resource "azuredevops_repository_policy_case_enforcement" "policy" {
   for_each = { for index, policy in var.repository_policy_case_enforcement : index => policy }
 
-  project_id               = var.project_id
-  enabled                  = each.value.enabled
-  blocking                 = each.value.blocking
-  enforce_consistent_case  = each.value.enforce_consistent_case
+  project_id              = var.project_id
+  enabled                 = each.value.enabled
+  blocking                = each.value.blocking
+  enforce_consistent_case = each.value.enforce_consistent_case
   repository_ids = length(concat(
     try(each.value.repository_ids, []),
     [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) > 0 ? distinct(concat(
+    )) > 0 ? distinct(concat(
     try(each.value.repository_ids, []),
     [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
   )) : null
@@ -267,7 +267,7 @@ resource "azuredevops_repository_policy_check_credentials" "policy" {
   repository_ids = length(concat(
     try(each.value.repository_ids, []),
     [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) > 0 ? distinct(concat(
+    )) > 0 ? distinct(concat(
     try(each.value.repository_ids, []),
     [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
   )) : null
@@ -283,7 +283,7 @@ resource "azuredevops_repository_policy_file_path_pattern" "policy" {
   repository_ids = length(concat(
     try(each.value.repository_ids, []),
     [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) > 0 ? distinct(concat(
+    )) > 0 ? distinct(concat(
     try(each.value.repository_ids, []),
     [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
   )) : null
@@ -299,7 +299,7 @@ resource "azuredevops_repository_policy_max_file_size" "policy" {
   repository_ids = length(concat(
     try(each.value.repository_ids, []),
     [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) > 0 ? distinct(concat(
+    )) > 0 ? distinct(concat(
     try(each.value.repository_ids, []),
     [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
   )) : null
@@ -315,7 +315,7 @@ resource "azuredevops_repository_policy_max_path_length" "policy" {
   repository_ids = length(concat(
     try(each.value.repository_ids, []),
     [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) > 0 ? distinct(concat(
+    )) > 0 ? distinct(concat(
     try(each.value.repository_ids, []),
     [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
   )) : null
@@ -330,7 +330,7 @@ resource "azuredevops_repository_policy_reserved_names" "policy" {
   repository_ids = length(concat(
     try(each.value.repository_ids, []),
     [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
-  )) > 0 ? distinct(concat(
+    )) > 0 ? distinct(concat(
     try(each.value.repository_ids, []),
     [for key in try(each.value.repository_keys, []) : local.repository_ids[key]]
   )) : null

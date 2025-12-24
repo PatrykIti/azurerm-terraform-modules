@@ -1,16 +1,22 @@
-# Placeholder defaults test for Azure DevOps Repository
+# Test default settings for Azure DevOps Repository
 
-variables {
-  name                = "example-azuredevops_repository"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
-}
+mock_provider "azuredevops" {}
 
 run "defaults_plan" {
   command = plan
 
   assert {
-    condition     = true
-    error_message = "Update defaults tests for Azure DevOps Repository."
+    condition     = length(azuredevops_git_repository.repo) == 0
+    error_message = "No repositories should be created by default."
+  }
+
+  assert {
+    condition     = length(azuredevops_git_repository_branch.branch) == 0
+    error_message = "No branches should be created by default."
+  }
+
+  assert {
+    condition     = length(azuredevops_git_repository_file.file) == 0
+    error_message = "No files should be created by default."
   }
 }

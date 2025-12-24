@@ -1,29 +1,24 @@
-# Network integration test fixture
-provider "azurerm" {
-  features {}
+provider "azuredevops" {}
+
+provider "random" {}
+
+resource "random_string" "suffix" {
+  length  = 6
+  upper   = false
+  special = false
 }
 
-resource "azurerm_resource_group" "test" {
-  name     = "rg-azuredevops_repository-network-test"
-  location = "West Europe"
-}
-
-# Test with network rules
 module "azuredevops_repository" {
-  source = "../../../"
+  source = "../../"
 
-  name                = "azuredevopsrepositorynetworktest"
-  resource_group_name = azurerm_resource_group.test.name
-  location            = azurerm_resource_group.test.location
+  project_id = var.project_id
 
-  network_rules = {
-    default_action = "Deny"
-    ip_rules       = ["203.0.113.0/24"]
-    bypass         = ["AzureServices"]
-  }
-
-  tags = {
-    Environment = "Test"
-    Scenario    = "Network"
+  repositories = {
+    main = {
+      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
+      initialization = {
+        init_type = "Clean"
+      }
+    }
   }
 }

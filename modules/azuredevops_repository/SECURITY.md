@@ -2,163 +2,88 @@
 
 ## Overview
 
-This document details the security features and configurations available in the azuredevops_repository Terraform module. The module implements comprehensive security controls following Azure best practices.
+This document describes security considerations for Azure DevOps Git repositories managed with Terraform.
 
 ## Security Features
 
-### 1. **Encryption**
+### 1. Branch Protections
+- Require minimum reviewers and status checks on protected branches.
+- Enforce work item linking and comment resolution.
 
-#### At Rest
-- **Default**: All data encrypted at rest using Azure-managed keys
-- **Infrastructure Encryption**: Additional layer of encryption when supported
-- **Customer-Managed Keys**: Optional BYOK support (if applicable)
+### 2. Repository Policies
+- Enforce author email patterns and reserved names.
+- Limit file size and path length to reduce risk.
 
-#### In Transit
-- **HTTPS/TLS**: All communications encrypted in transit
-- **Minimum TLS Version**: TLS 1.2 enforced by default
+### 3. Permissions
+- Use least privilege for repository and branch permissions.
+- Assign permissions to groups rather than individual users.
 
-### 2. **Access Control**
+## Security Configuration Example
 
-#### Authentication
-- **Azure AD Integration**: Preferred authentication method
-- **Managed Identity**: Support for system and user-assigned identities
-- **Key-based Access**: Disabled by default where possible
-
-#### Network Security
-- **Private Endpoints**: Support for private connectivity
-- **Network Rules**: Default deny with explicit allow rules
-- **Service Endpoints**: Virtual network integration
-
-### 3. **Monitoring and Compliance**
-
-#### Audit Logging
-- **Diagnostic Settings**: Comprehensive logging to Log Analytics
-- **Activity Tracking**: All operations logged
-- **Metrics**: Performance and security metrics collected
-
-#### Compliance
-- **Azure Policy**: Compatible with organizational policies
-- **Security Center**: Integration ready
-- **Threat Protection**: Microsoft Defender support where applicable
-
-## Security Configuration Examples
-
-### Maximum Security Configuration
 ```hcl
 module "azuredevops_repository" {
   source = "./modules/azuredevops_repository"
 
-  name                = "example-secure"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
+  project_id = "00000000-0000-0000-0000-000000000000"
 
-  # Security settings
-  enable_https_traffic_only = true
-  min_tls_version          = "TLS1_2"
-  
-  # Network isolation
-  network_rules = {
-    default_action = "Deny"
-    ip_rules       = []
-    bypass         = ["AzureServices"]
+  repositories = {
+    main = {
+      name = "secure-repo"
+      initialization = {
+        init_type = "Clean"
+      }
+    }
   }
 
-  # Private endpoint
-  private_endpoints = [{
-    name                 = "example-pe"
-    subnet_id            = azurerm_subnet.private.id
-    private_dns_zone_ids = [azurerm_private_dns_zone.example.id]
-  }]
+  branch_policy_min_reviewers = [
+    {
+      reviewer_count = 2
+      scope = [
+        {
+          repository_key = "main"
+          match_type     = "DefaultBranch"
+        }
+      ]
+    }
+  ]
 
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-  }
+  branch_policy_status_check = [
+    {
+      name = "security-check"
+      scope = [
+        {
+          repository_key = "main"
+          match_type     = "DefaultBranch"
+        }
+      ]
+    }
+  ]
 
-  tags = {
-    Environment        = "Production"
-    DataClassification = "Confidential"
-  }
+  repository_policy_check_credentials = [
+    {
+      repository_keys = ["main"]
+    }
+  ]
 }
 ```
 
 ## Security Hardening Checklist
 
-Before deploying to production:
-
-- [ ] Enable all applicable encryption features
-- [ ] Configure network isolation (private endpoints/service endpoints)
-- [ ] Disable public network access where possible
-- [ ] Enable audit logging and monitoring
-- [ ] Apply appropriate RBAC permissions
-- [ ] Configure Azure Policy compliance
-- [ ] Enable threat protection features
-- [ ] Review and apply security tags
-- [ ] Document security exceptions
+- [ ] Protect default branches with reviewers and status checks.
+- [ ] Restrict repository permissions to approved groups.
+- [ ] Enable repository policies for credentials and path controls.
+- [ ] Regularly audit repository policy compliance.
 
 ## Common Security Mistakes to Avoid
 
-1. **Leaving Public Access Enabled**
-   ```hcl
-   # ❌ AVOID
-   public_network_access_enabled = true
-   ```
-
-2. **Using Weak TLS Versions**
-   ```hcl
-   # ❌ AVOID
-   min_tls_version = "TLS1_0"
-   ```
-
-3. **Overly Permissive Network Rules**
-   ```hcl
-   # ❌ AVOID
-   network_rules = {
-     default_action = "Allow"
-   }
-   ```
-
-## Incident Response
-
-If a security incident occurs:
-
-1. **Immediate Actions**
-   - Review audit logs
-   - Check for unauthorized access
-   - Apply additional network restrictions
-
-2. **Investigation**
-   - Use Log Analytics queries
-   - Review security alerts
-   - Check configuration compliance
-
-3. **Remediation**
-   - Apply security patches
-   - Update configurations
-   - Document lessons learned
-
-## Compliance Mapping
-
-### SOC 2 Controls
-| Control | Implementation |
-|---------|---------------|
-| CC6.1 | RBAC and Azure AD |
-| CC6.6 | Encryption at rest/transit |
-| CC7.2 | Diagnostic logging |
-
-### ISO 27001 Controls
-| Control | Implementation |
-|---------|---------------|
-| A.10.1.1 | Cryptographic controls |
-| A.9.1.2 | Network access controls |
-| A.12.4.1 | Event logging |
+1. **Allowing direct pushes to protected branches**
+2. **Granting broad permissions to individual users**
+3. **Skipping build validation or status checks**
 
 ## Additional Resources
 
-- [Azure Security Best Practices](https://docs.microsoft.com/en-us/azure/security/fundamentals/best-practices-and-patterns)
-- [Azure Security Center](https://docs.microsoft.com/en-us/azure/security-center/)
-- [Azure Policy](https://docs.microsoft.com/en-us/azure/governance/policy/)
+- [Azure DevOps Branch Policies](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies?view=azure-devops)
+- [Azure DevOps Permissions and Access Levels](https://learn.microsoft.com/en-us/azure/devops/organizations/security/permissions?view=azure-devops)
 
 ---
 

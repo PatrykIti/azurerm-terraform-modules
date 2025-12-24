@@ -6,5 +6,5 @@ variable "project_id" {
 variable "repo_name_prefix" {
   description = "Prefix for the repository name."
   type        = string
-  default     = "ado-repo-secure-fixture"
+  default     = "ado-repo-network-fixture"
 }

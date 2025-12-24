@@ -1,5 +1,10 @@
-variable "location" {
-  description = "Azure region for resources"
+variable "project_id" {
+  description = "Azure DevOps project ID."
   type        = string
-  default     = "West Europe"
+}
+
+variable "repo_name_prefix" {
+  description = "Prefix for the repository name."
+  type        = string
+  default     = "ado-repo-complete-fixture"
 }

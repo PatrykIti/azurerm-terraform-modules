@@ -31,8 +31,8 @@ azurerm-terraform-modules/
 │   ├── WORKFLOWS.md              # GitHub Actions documentation
 │   ├── TERRAFORM_BEST_PRACTICES_GUIDE.md
 │   └── TERRAFORM_TESTING_GUIDE.md
-└── .claude/                       # Development guidelines
-    └── references/                # Workflow patterns and guidelines
+├── AGENTS.md                      # Condensed repo guidelines
+└── .taskmaster/                   # TaskMaster configuration
 ```
 
 ## 🚀 Getting Started

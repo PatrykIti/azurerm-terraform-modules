@@ -32,10 +32,10 @@ module "azuredevops_repository" {
 
   files = [
     {
-      repository_key   = "main"
-      file             = "README.md"
-      content          = "# Repository\n\nManaged by Terraform."
-      commit_message   = "Add README"
+      repository_key      = "main"
+      file                = "README.md"
+      content             = "# Repository\n\nManaged by Terraform."
+      commit_message      = "Add README"
       overwrite_on_create = true
     }
   ]

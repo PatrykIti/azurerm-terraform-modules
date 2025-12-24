@@ -35,13 +35,12 @@ azurerm-terraform-modules/
 │       ├── examples/           # Usage examples
 │       ├── tests/              # Unit and integration tests
 │       └── README.md          # Module documentation
+├── AGENTS.md                  # Condensed repo guidelines
 ├── docs/                       # Shared documentation
 ├── scripts/                    # Automation scripts
 ├── .github/                    # GitHub Actions workflows
 │   ├── workflows/              # CI/CD pipelines
 │   └── actions/               # Reusable composite actions
-├── .claude/                    # AI development guidelines
-│   └── references/            # Development reference docs
 └── .taskmaster/               # TaskMaster configuration
 ```
 

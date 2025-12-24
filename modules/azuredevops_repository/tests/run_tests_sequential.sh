@@ -14,23 +14,43 @@ run_test() {
     local test_name=$1
     local output_file="$OUTPUT_DIR/${test_name}.json"
     local log_file="$OUTPUT_DIR/${test_name}.log"
-    
-    echo "Running test: $test_name"
-    
-    go test -v -timeout 60m -run "^${test_name}$" . 2>&1 | tee "$log_file"
-    local exit_status=${PIPESTATUS[0]}
-    
-    cat > "$output_file" << EOF
+
+    echo "[$(date +%H:%M:%S)] Starting test: $test_name"
+
+    local start_time=$(date +%s)
+    go test -v -timeout 60m -run "^${test_name}$" . 2>&1 > "$log_file"
+    local exit_status=$?
+    local end_time=$(date +%s)
+    local duration=$((end_time - start_time))
+
+    local status="unknown"
+    if grep -q "^--- PASS:" "$log_file"; then
+        status="passed"
+    elif grep -q "^--- FAIL:" "$log_file"; then
+        status="failed"
+    elif grep -q "^--- SKIP:" "$log_file"; then
+        status="skipped"
+    fi
+
+    local error_message=""
+    if [ "$status" = "failed" ]; then
+        error_message=$(grep -A 5 "^--- FAIL:" "$log_file" | tail -n +2 | head -5 | tr '\n' ' ' | sed 's/"/\\"/g')
+    fi
+
+    cat > "$output_file" << EOF_JSON
 {
   "test_name": "$test_name",
   "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "exit_status": $exit_status,
+  "status": "$status",
+  "duration_seconds": $duration,
   "success": $([ $exit_status -eq 0 ] && echo "true" || echo "false"),
-  "log_file": "$log_file"
+  "error_message": "$error_message",
+  "log_file": "$(basename "$log_file")"
 }
-EOF
-    
-    echo "Test $test_name completed with status: $exit_status"
+EOF_JSON
+
+    echo "[$(date +%H:%M:%S)] Completed test: $test_name - Status: $status (${duration}s)"
     return $exit_status
 }
 
@@ -39,13 +59,8 @@ tests=(
     "TestBasicAzuredevopsRepository"
     "TestCompleteAzuredevopsRepository"
     "TestSecureAzuredevopsRepository"
-    "TestNetworkAzuredevopsRepository"
-    "TestAzuredevopsRepositoryPrivateEndpoint"
     "TestAzuredevopsRepositoryValidationRules"
     "TestAzuredevopsRepositoryFullIntegration"
-    "TestAzuredevopsRepositoryLifecycle"
-    "TestAzuredevopsRepositoryCreationTime"
-    "BenchmarkAzuredevopsRepositoryCreation"
 )
 
 echo "Starting sequential test execution for azuredevops_repository"
@@ -55,9 +70,8 @@ echo "=================================="
 
 for test in "${tests[@]}"; do
     run_test "$test" || true
+    echo "----------------------------------"
 done
 
-echo "=================================="
-echo "Sequential test execution completed!"
-echo "Results saved in: $OUTPUT_DIR"
+echo "All tests completed. Results saved in: $OUTPUT_DIR"
 exit 0

@@ -1,4 +1,4 @@
-# Terraform Azure Azure DevOps Repository Module
+# Terraform Azure DevOps Repository Module
 
 ## Module Version
 
@@ -8,23 +8,25 @@ Current version: **vUnreleased**
 
 ## Description
 
-Azure DevOps repository module for managing Git repositories and policies
+Azure DevOps repository module for managing Git repositories and policies.
 
 ## Usage
 
 ```hcl
+provider "azuredevops" {}
+
 module "azuredevops_repository" {
   source = "path/to/azuredevops_repository"
 
-  # Required variables
-  name                = "example-azuredevops_repository"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  project_id = "00000000-0000-0000-0000-000000000000"
 
-  # Optional configuration
-  tags = {
-    Environment = "Development"
-    Project     = "Example"
+  repositories = {
+    main = {
+      name = "example-repo"
+      initialization = {
+        init_type = "Clean"
+      }
+    }
   }
 }
 ```
@@ -32,7 +34,9 @@ module "azuredevops_repository" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-<!-- Examples list will be auto-generated here -->
+- [Basic](examples/basic) - This example demonstrates creating a Git repository with an initial README file.
+- [Complete](examples/complete) - This example demonstrates creating a repository with branches, permissions, and a selection of branch/repository policies.
+- [Secure](examples/secure) - This example demonstrates a repository with stricter review and status policies.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
