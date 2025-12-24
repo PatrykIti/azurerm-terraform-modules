@@ -159,6 +159,20 @@ If the plan is clean, you can **remove the import block** (`import.tf`).
 
 ---
 
+## Common errors and fixes
+
+- **Import does nothing**: import blocks run only on `terraform apply`. Run `plan` then `apply`.
+- **Resource not found**: wrong ID or subscription. Use `az account show` and `az aks show -g <rg> -n <aks> --query id -o tsv`.
+- **Plan shows changes after import**: inputs do not match the existing cluster. Re-check:
+  - `dns_prefix`, `identity` type, `network_profile`
+  - default node pool `vm_size`, `node_count` or `auto_scaling_enabled` + `min_count`/`max_count`
+  - `vnet_subnet_id`, tags
+- **Node count drift**: if the cluster uses autoscaling, set `auto_scaling_enabled = true` and define `min_count`/`max_count`.
+- **Permission errors**: you need at least **Contributor** on the resource group to import and manage AKS.
+- **Diagnostics/extensions drift**: those are not managed unless you configure and import them explicitly.
+
+---
+
 ## Notes / common pitfalls
 
 - Import blocks run **only on apply**. `plan` alone does not import.
