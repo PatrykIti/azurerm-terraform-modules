@@ -62,7 +62,7 @@ resource "azurerm_eventhub_authorization_rule" "example" {
 }
 
 module "network_security_group" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.3"
+  source = "../.."
 
   name                = var.nsg_name
   resource_group_name = azurerm_resource_group.example.name
