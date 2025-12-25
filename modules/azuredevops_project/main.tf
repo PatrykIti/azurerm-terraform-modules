@@ -1,31 +1,12 @@
 # Azure DevOps Project
 
-locals {
-  project_features_inline   = var.project.features != null && length(var.project.features) > 0
-  project_features_external = length(var.project_features) > 0
-}
-
 resource "azuredevops_project" "project" {
-  name               = var.project.name
-  description        = var.project.description
-  visibility         = lower(var.project.visibility)
-  version_control    = var.project.version_control
-  work_item_template = var.project.work_item_template
-  features           = var.project.features
-
-  lifecycle {
-    precondition {
-      condition     = !(local.project_features_inline && local.project_features_external)
-      error_message = "Use either project.features or project_features, not both."
-    }
-  }
-}
-
-resource "azuredevops_project_features" "project_features" {
-  count = local.project_features_external ? 1 : 0
-
-  project_id = azuredevops_project.project.id
-  features   = var.project_features
+  name               = var.name
+  description        = var.description
+  visibility         = lower(var.visibility)
+  version_control    = var.version_control
+  work_item_template = var.work_item_template
+  features           = var.features
 }
 
 resource "azuredevops_project_pipeline_settings" "project_pipeline_settings" {
@@ -49,7 +30,7 @@ resource "azuredevops_project_tags" "project_tags" {
 }
 
 resource "azuredevops_project_permissions" "project_permissions" {
-  for_each = { for index, permission in var.project_permissions : index => permission }
+  for_each = { for permission in var.project_permissions : permission.principal => permission }
 
   project_id  = azuredevops_project.project.id
   principal   = each.value.principal
@@ -58,7 +39,7 @@ resource "azuredevops_project_permissions" "project_permissions" {
 }
 
 resource "azuredevops_dashboard" "dashboard" {
-  for_each = { for index, dashboard in var.dashboards : index => dashboard }
+  for_each = { for dashboard in var.dashboards : dashboard.name => dashboard }
 
   project_id       = azuredevops_project.project.id
   name             = each.value.name

@@ -15,15 +15,13 @@ data "azuredevops_group" "project_collection_admins" {
 module "azuredevops_project" {
   source = "../../"
 
-  project = {
-    name               = "${var.project_name_prefix}-${random_string.suffix.result}"
-    description        = "Secure Azure DevOps project managed by Terraform"
-    visibility         = "private"
-    version_control    = "Git"
-    work_item_template = "Agile"
-  }
+  name               = "${var.project_name_prefix}-${random_string.suffix.result}"
+  description        = "Secure Azure DevOps project managed by Terraform"
+  visibility         = "private"
+  version_control    = "Git"
+  work_item_template = "Agile"
 
-  project_features = {
+  features = {
     boards       = "enabled"
     repositories = "enabled"
     pipelines    = "enabled"

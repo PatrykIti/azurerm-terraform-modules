@@ -1,10 +1,10 @@
 # Flow Logs Network Security Group Example
 
-This example demonstrates enabling Network Watcher flow logs with traffic analytics.
+This example demonstrates Network Watcher flow logs with traffic analytics.
 
 ## Features
 
-- **Flow Logs v2** for NSG traffic visibility
+- **Flow Logs v2** for NSG traffic visibility (optional)
 - **Retention policy** for log storage
 - **Traffic Analytics** with Log Analytics Workspace
 
@@ -15,6 +15,10 @@ terraform init
 terraform plan
 terraform apply
 ```
+
+> Flow logs are disabled by default (`enable_flow_log = false`) and require an
+> existing Network Watcher. Enable them explicitly only if your subscription
+> supports creating new NSG flow logs.
 
 ## Cleanup
 

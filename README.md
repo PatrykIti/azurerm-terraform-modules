@@ -61,6 +61,15 @@ The repository uses a sophisticated GitHub Actions architecture:
 - **Composite actions**: Reusable workflows via module-runner pattern
 - **Automated releases**: Semantic versioning with zero manual intervention
 
+## Repository Documentation
+
+- [AGENTS.md](AGENTS.md) - condensed repo standards
+- [Module Guide](docs/MODULE_GUIDE/README.md) - module structure and implementation
+- [Testing Guide](docs/TESTING_GUIDE/README.md) - unit/integration testing patterns
+- [Workflow Reference](docs/WORKFLOWS.md) - CI/CD pipelines and shared actions
+- [Terraform Best Practices](docs/TERRAFORM_BEST_PRACTICES_GUIDE.md)
+- [Security Policy](docs/SECURITY.md)
+
 ## Key Features and Capabilities
 
 ### 1. Security Features

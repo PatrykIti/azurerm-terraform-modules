@@ -44,11 +44,11 @@ output "project_tags" {
 }
 
 output "dashboard_ids" {
-  description = "Map of dashboard IDs keyed by dashboard index."
+  description = "Map of dashboard IDs keyed by dashboard name."
   value       = { for key, dashboard in azuredevops_dashboard.dashboard : key => dashboard.id }
 }
 
 output "dashboard_owner_ids" {
-  description = "Map of dashboard owner IDs keyed by dashboard index."
+  description = "Map of dashboard owner IDs keyed by dashboard name."
   value       = { for key, dashboard in azuredevops_dashboard.dashboard : key => dashboard.owner_id }
 }

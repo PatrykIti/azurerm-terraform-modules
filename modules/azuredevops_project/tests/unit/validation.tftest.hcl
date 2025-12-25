@@ -9,23 +9,19 @@ mock_provider "azuredevops" {
 }
 
 variables {
-  project = {
-    name = "ado-project-validation"
-  }
+  name = "ado-project-validation"
 }
 
 run "invalid_visibility" {
   command = plan
 
   variables {
-    project = {
-      name       = "ado-project-invalid"
-      visibility = "internal"
-    }
+    name       = "ado-project-invalid"
+    visibility = "internal"
   }
 
   expect_failures = [
-    var.project,
+    var.visibility,
   ]
 }
 
@@ -33,28 +29,40 @@ run "invalid_version_control" {
   command = plan
 
   variables {
-    project = {
-      name            = "ado-project-invalid"
-      version_control = "Subversion"
-    }
+    name            = "ado-project-invalid"
+    version_control = "Subversion"
   }
 
   expect_failures = [
-    var.project,
+    var.version_control,
   ]
 }
 
-run "invalid_project_features_value" {
+run "invalid_features_value" {
   command = plan
 
   variables {
-    project_features = {
+    features = {
       boards = "maybe"
     }
   }
 
   expect_failures = [
-    var.project_features,
+    var.features,
+  ]
+}
+
+run "invalid_features_key" {
+  command = plan
+
+  variables {
+    features = {
+      widgets = "enabled"
+    }
+  }
+
+  expect_failures = [
+    var.features,
   ]
 }
 

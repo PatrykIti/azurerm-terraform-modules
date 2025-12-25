@@ -31,5 +31,17 @@ variable "storage_account_name" {
 variable "network_watcher_name" {
   description = "Network Watcher name."
   type        = string
-  default     = "nw-nsg-flow-logs-example"
+  default     = "NetworkWatcher_westeurope"
+}
+
+variable "network_watcher_resource_group_name" {
+  description = "Network Watcher resource group name."
+  type        = string
+  default     = "NetworkWatcherRG"
+}
+
+variable "enable_flow_log" {
+  description = "Enable NSG flow logs (creation may be blocked in some regions/subscriptions due to Azure retirement)."
+  type        = bool
+  default     = false
 }

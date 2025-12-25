@@ -2,65 +2,65 @@
 # Core Project Configuration
 # -----------------------------------------------------------------------------
 
-variable "project" {
-  description = "Configuration for the Azure DevOps project."
-  type = object({
-    name               = string
-    description        = optional(string)
-    visibility         = optional(string, "private")
-    version_control    = optional(string, "Git")
-    work_item_template = optional(string, "Agile")
-    features           = optional(map(string))
-  })
+variable "name" {
+  description = "The name of the Azure DevOps project."
+  type        = string
 
   validation {
-    condition     = trim(var.project.name) != ""
-    error_message = "project.name must not be empty."
-  }
-
-  validation {
-    condition     = contains(["private", "public"], lower(var.project.visibility))
-    error_message = "project.visibility must be one of: private, public."
-  }
-
-  validation {
-    condition     = contains(["Git", "Tfvc"], var.project.version_control)
-    error_message = "project.version_control must be one of: Git, Tfvc."
-  }
-
-  validation {
-    condition = var.project.features == null || alltrue([
-      for status in values(var.project.features) : contains(["enabled", "disabled"], status)
-    ])
-    error_message = "project.features values must be one of: enabled, disabled."
-  }
-
-  validation {
-    condition = var.project.features == null || alltrue([
-      for key in keys(var.project.features) : contains([
-        "boards",
-        "repositories",
-        "pipelines",
-        "testplans",
-        "artifacts"
-      ], key)
-    ])
-    error_message = "project.features keys must be one of: boards, repositories, pipelines, testplans, artifacts."
+    condition     = trim(var.name) != ""
+    error_message = "name must not be empty."
   }
 }
 
-# -----------------------------------------------------------------------------
-# Project Features (separate resource)
-# -----------------------------------------------------------------------------
+variable "description" {
+  description = "The description of the Azure DevOps project."
+  type        = string
+  default     = null
+}
 
-variable "project_features" {
-  description = "Map of project features managed via azuredevops_project_features. Use either this or project.features, not both."
-  type        = map(string)
-  default     = {}
+variable "visibility" {
+  description = "Specifies the project visibility. Possible values are: private, public."
+  type        = string
+  default     = "private"
 
   validation {
-    condition = alltrue([
-      for key in keys(var.project_features) : contains([
+    condition     = contains(["private", "public"], lower(var.visibility))
+    error_message = "visibility must be one of: private, public."
+  }
+}
+
+variable "version_control" {
+  description = "Specifies the version control system. Possible values are: Git, Tfvc."
+  type        = string
+  default     = "Git"
+
+  validation {
+    condition     = contains(["Git", "Tfvc"], var.version_control)
+    error_message = "version_control must be one of: Git, Tfvc."
+  }
+}
+
+variable "work_item_template" {
+  description = "Specifies the work item template. Defaults to Agile."
+  type        = string
+  default     = "Agile"
+}
+
+variable "features" {
+  description = "Project feature flags for azuredevops_project.features. Set to null to leave unmanaged."
+  type        = map(string)
+  default     = null
+
+  validation {
+    condition = var.features == null || alltrue([
+      for status in values(var.features) : contains(["enabled", "disabled"], status)
+    ])
+    error_message = "features values must be one of: enabled, disabled."
+  }
+
+  validation {
+    condition = var.features == null || alltrue([
+      for key in keys(var.features) : contains([
         "boards",
         "repositories",
         "pipelines",
@@ -68,14 +68,7 @@ variable "project_features" {
         "artifacts"
       ], key)
     ])
-    error_message = "project_features keys must be one of: boards, repositories, pipelines, testplans, artifacts."
-  }
-
-  validation {
-    condition = alltrue([
-      for status in values(var.project_features) : contains(["enabled", "disabled"], status)
-    ])
-    error_message = "project_features values must be one of: enabled, disabled."
+    error_message = "features keys must be one of: boards, repositories, pipelines, testplans, artifacts."
   }
 }
 
@@ -121,6 +114,18 @@ variable "project_permissions" {
 
   validation {
     condition = alltrue([
+      for permission in var.project_permissions : trim(permission.principal) != ""
+    ])
+    error_message = "project_permissions.principal must be a non-empty string."
+  }
+
+  validation {
+    condition     = length(var.project_permissions) == length(distinct([for permission in var.project_permissions : permission.principal]))
+    error_message = "project_permissions principals must be unique."
+  }
+
+  validation {
+    condition = alltrue([
       for permission in var.project_permissions : alltrue([
         for status in values(permission.permissions) : contains(["Allow", "Deny", "NotSet"], status)
       ])
@@ -142,6 +147,18 @@ variable "dashboards" {
     refresh_interval = optional(number, 0)
   }))
   default = []
+
+  validation {
+    condition = alltrue([
+      for dashboard in var.dashboards : trim(dashboard.name) != ""
+    ])
+    error_message = "dashboards.name must be a non-empty string."
+  }
+
+  validation {
+    condition     = length(var.dashboards) == length(distinct([for dashboard in var.dashboards : dashboard.name]))
+    error_message = "dashboards.name values must be unique."
+  }
 
   validation {
     condition = alltrue([

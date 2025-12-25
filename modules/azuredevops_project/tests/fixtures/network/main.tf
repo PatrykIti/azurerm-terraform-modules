@@ -4,9 +4,7 @@ provider "azuredevops" {}
 module "azuredevops_project" {
   source = "../../../"
 
-  project = {
-    name = "ado-project-pipeline-fixture"
-  }
+  name = "ado-project-pipeline-fixture"
 
   pipeline_settings = {
     enforce_job_scope                    = true

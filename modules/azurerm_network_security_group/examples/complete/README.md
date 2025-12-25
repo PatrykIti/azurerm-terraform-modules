@@ -18,7 +18,7 @@ This example showcases:
   - Metrics enabled for NSG.
 
 - **Flow Logs & Traffic Analytics**:
-  - Version 2 flow logs for enhanced data capture.
+  - Version 2 flow logs for enhanced data capture (optional).
   - Configurable retention period (30 days in this example).
   - Log Analytics integration with 10-minute processing interval.
 
@@ -26,7 +26,7 @@ This example showcases:
   - Storage Account for flow logs and diagnostic settings.
   - Log Analytics Workspace for diagnostics and traffic analytics.
   - Event Hub for streaming diagnostic logs.
-  - Network Watcher for flow log management.
+  - Existing Network Watcher (data source) for flow log management.
   - Application Security Groups for logical grouping.
 
 ## Usage
@@ -36,6 +36,10 @@ terraform init
 terraform plan
 terraform apply
 ```
+
+> Flow logs are disabled by default (`enable_flow_log = false`). Azure no longer
+> allows creating new NSG flow logs in some subscriptions/regions. Enable them
+> explicitly only if your subscription supports it.
 
 ## Cleanup
 

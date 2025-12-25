@@ -15,15 +15,13 @@ data "azuredevops_group" "project_collection_admins" {
 module "azuredevops_project" {
   source = "../../../"
 
-  project = {
-    name               = "${var.project_name}-${random_string.suffix.result}"
-    description        = "Test complete Azure DevOps project"
-    visibility         = "private"
-    version_control    = "Git"
-    work_item_template = "Agile"
-  }
+  name               = "${var.project_name}-${random_string.suffix.result}"
+  description        = "Test complete Azure DevOps project"
+  visibility         = "private"
+  version_control    = "Git"
+  work_item_template = "Agile"
 
-  project_features = {
+  features = {
     boards       = "enabled"
     repositories = "enabled"
     pipelines    = "enabled"

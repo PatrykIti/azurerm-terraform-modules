@@ -6,7 +6,7 @@ This example demonstrates a maximum-security Network Security Group configuratio
 
 - **Zero-Trust Ruleset**: Denies all traffic by default and only allows specific, required communication paths.
 - **Application Security Groups (ASGs)**: Uses ASGs to create logical, application-based security boundaries instead of relying on IP subnets.
-- **Flow Logs & Traffic Analytics**: Enables comprehensive network monitoring and security analysis.
+- **Flow Logs & Traffic Analytics**: Optional flow logs with traffic analytics for network monitoring.
 - **Diagnostic Settings**: Sends NSG logs and metrics to Log Analytics.
 - **Service Tag Integration**: Uses service tags for secure communication with Azure services.
 
@@ -53,6 +53,10 @@ terraform init
 terraform plan
 terraform apply
 ```
+
+> Flow logs are disabled by default (`enable_flow_log = false`) and use an
+> existing Network Watcher. Enable them explicitly only if your subscription
+> supports creating new NSG flow logs.
 
 ## Cleanup
 

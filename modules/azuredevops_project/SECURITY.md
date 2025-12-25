@@ -29,15 +29,13 @@ This document describes security considerations for the Azure DevOps project mod
 module "azuredevops_project" {
   source = "./modules/azuredevops_project"
 
-  project = {
-    name               = "ado-project-secure"
-    description        = "Secure project managed by Terraform"
-    visibility         = "private"
-    version_control    = "Git"
-    work_item_template = "Agile"
-  }
+  name               = "ado-project-secure"
+  description        = "Secure project managed by Terraform"
+  visibility         = "private"
+  version_control    = "Git"
+  work_item_template = "Agile"
 
-  project_features = {
+  features = {
     boards       = "enabled"
     repositories = "enabled"
     pipelines    = "enabled"

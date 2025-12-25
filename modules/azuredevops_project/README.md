@@ -18,13 +18,11 @@ provider "azuredevops" {}
 module "azuredevops_project" {
   source = "path/to/azuredevops_project"
 
-  project = {
-    name               = "ado-project-basic-example"
-    description        = "Managed by Terraform"
-    visibility         = "private"
-    version_control    = "Git"
-    work_item_template = "Agile"
-  }
+  name               = "ado-project-basic-example"
+  description        = "Managed by Terraform"
+  visibility         = "private"
+  version_control    = "Git"
+  work_item_template = "Agile"
 
   project_tags = ["terraform", "example"]
 }
@@ -45,6 +43,7 @@ module "azuredevops_project" {
 
 ## Additional Documentation
 
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps projects into the module
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines

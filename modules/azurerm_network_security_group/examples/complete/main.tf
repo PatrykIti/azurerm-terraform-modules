@@ -48,27 +48,24 @@ resource "azurerm_eventhub_namespace" "example" {
 
 resource "azurerm_eventhub" "example" {
   name                = var.eventhub_name
-  namespace_name      = azurerm_eventhub_namespace.example.name
-  resource_group_name = azurerm_resource_group.example.name
+  namespace_id        = azurerm_eventhub_namespace.example.id
   partition_count     = 2
   message_retention   = 1
 }
 
-resource "azurerm_eventhub_authorization_rule" "example" {
+resource "azurerm_eventhub_namespace_authorization_rule" "example" {
   name                = "nsg-diagnostics"
   namespace_name      = azurerm_eventhub_namespace.example.name
-  eventhub_name       = azurerm_eventhub.example.name
   resource_group_name = azurerm_resource_group.example.name
   send                = true
   listen              = false
   manage              = false
 }
 
-# Network Watcher for flow logs
-resource "azurerm_network_watcher" "example" {
+# Network Watcher data source for flow logs
+data "azurerm_network_watcher" "example" {
   name                = var.network_watcher_name
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  resource_group_name = var.network_watcher_resource_group_name
 }
 
 # Application Security Groups for demonstration
@@ -191,16 +188,16 @@ module "network_security_group" {
       log_analytics_workspace_id     = azurerm_log_analytics_workspace.example.id
       log_analytics_destination_type = "Dedicated"
       storage_account_id             = azurerm_storage_account.flow_logs.id
-      eventhub_authorization_rule_id = azurerm_eventhub_authorization_rule.example.id
+      eventhub_authorization_rule_id = azurerm_eventhub_namespace_authorization_rule.example.id
       eventhub_name                  = azurerm_eventhub.example.name
     }
   ]
 
-  flow_log = {
+  flow_log = var.enable_flow_log ? {
     name                                = "nsg-flow-logs-complete"
     storage_account_id                  = azurerm_storage_account.flow_logs.id
-    network_watcher_name                = azurerm_network_watcher.example.name
-    network_watcher_resource_group_name = azurerm_network_watcher.example.resource_group_name
+    network_watcher_name                = data.azurerm_network_watcher.example.name
+    network_watcher_resource_group_name = data.azurerm_network_watcher.example.resource_group_name
     retention_policy = {
       enabled = true
       days    = 30
@@ -212,7 +209,7 @@ module "network_security_group" {
       workspace_resource_id = azurerm_log_analytics_workspace.example.id
       interval_in_minutes   = 10
     }
-  }
+  } : null
 
   tags = {
     Environment = "Development"

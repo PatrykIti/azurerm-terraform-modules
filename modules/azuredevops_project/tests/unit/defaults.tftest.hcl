@@ -10,9 +10,7 @@ mock_provider "azuredevops" {
 }
 
 variables {
-  project = {
-    name = "ado-project-defaults"
-  }
+  name = "ado-project-defaults"
 }
 
 run "verify_default_project_settings" {
@@ -36,11 +34,6 @@ run "verify_default_project_settings" {
 
 run "verify_optional_resources_disabled" {
   command = plan
-
-  assert {
-    condition     = length(azuredevops_project_features.project_features) == 0
-    error_message = "project_features should be disabled by default"
-  }
 
   assert {
     condition     = length(azuredevops_project_pipeline_settings.project_pipeline_settings) == 0

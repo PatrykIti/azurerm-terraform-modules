@@ -37,11 +37,10 @@ resource "azurerm_storage_account" "flow_logs" {
   min_tls_version          = "TLS1_2"
 }
 
-# Network Watcher for flow logs
-resource "azurerm_network_watcher" "example" {
+# Network Watcher data source for flow logs
+data "azurerm_network_watcher" "example" {
   name                = var.network_watcher_name
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  resource_group_name = var.network_watcher_resource_group_name
 }
 
 # Application Security Groups for a three-tier application
@@ -158,11 +157,11 @@ module "network_security_group" {
     }
   ]
 
-  flow_log = {
+  flow_log = var.enable_flow_log ? {
     name                                = "nsg-flow-logs-secure"
     storage_account_id                  = azurerm_storage_account.flow_logs.id
-    network_watcher_name                = azurerm_network_watcher.example.name
-    network_watcher_resource_group_name = azurerm_network_watcher.example.resource_group_name
+    network_watcher_name                = data.azurerm_network_watcher.example.name
+    network_watcher_resource_group_name = data.azurerm_network_watcher.example.resource_group_name
     retention_policy = {
       enabled = true
       days    = 90
@@ -174,7 +173,7 @@ module "network_security_group" {
       workspace_resource_id = azurerm_log_analytics_workspace.example.id
       interval_in_minutes   = 10
     }
-  }
+  } : null
 
   tags = {
     Environment = "Production"

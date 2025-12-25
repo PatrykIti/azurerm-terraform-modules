@@ -4,14 +4,10 @@ provider "azuredevops" {}
 module "azuredevops_project" {
   source = "../../../"
 
-  project = {
-    name = var.project_name
-    features = {
-      boards = "enabled"
-    }
-  }
+  name        = var.project_name
+  description = "Negative test for validation"
 
-  project_features = {
-    repositories = "enabled"
+  features = {
+    boards = "maybe"
   }
 }

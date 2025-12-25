@@ -16,7 +16,6 @@ Moduł startowy dla ADO. Zakłada zarządzanie projektem oraz jego kluczowymi us
 ## Scope (Provider Resources)
 
 - `azuredevops_project`
-- `azuredevops_project_features`
 - `azuredevops_project_pipeline_settings`
 - `azuredevops_project_tags`
 - `azuredevops_project_permissions`
@@ -26,8 +25,12 @@ Moduł startowy dla ADO. Zakłada zarządzanie projektem oraz jego kluczowymi us
 
 ### Inputs
 
-- project (object): name, description, visibility, version_control, work_item_template, features.
-- project_features (map): mapowanie flag z azuredevops_project_features.
+- name (string): nazwa projektu.
+- description (string): opis projektu (opcjonalnie).
+- visibility (string): private/public.
+- version_control (string): Git/Tfvc.
+- work_item_template (string): Agile/Basic/CMMI/Scrum lub custom.
+- features (map): mapowanie flag dla azuredevops_project.features.
 - pipeline_settings (object): ustawienia z azuredevops_project_pipeline_settings.
 - project_tags (list(string)): tagi projektu (azuredevops_project_tags).
 - project_permissions (list(object)): principal, permissions map, replace dla azuredevops_project_permissions.
@@ -44,7 +47,7 @@ Moduł startowy dla ADO. Zakłada zarządzanie projektem oraz jego kluczowymi us
 ### Notes
 
 - Ten moduł jest bazą dla większości pozostałych (wymagany project_id).
-- Uprawnienia projektowe trzymać w osobnej liście obiektów, bez mieszania z grupami/użytkownikami (descriptors przychodzą z modułu identity).
+- Uprawnienia projektowe są przypisywane do grup (nie pojedynczych użytkowników); członkostwa grup zarządzać przez moduł identity.
 
 ## Examples
 
@@ -56,7 +59,7 @@ Moduł startowy dla ADO. Zakłada zarządzanie projektem oraz jego kluczowymi us
 
 - Unit: walidacje zmiennych, typy, wymagane pola.
 - Integration: create/update/delete w realnym ADO (env: AZDO_ORG_SERVICE_URL, AZDO_PERSONAL_ACCESS_TOKEN).
-- Negative: błędne kombinacje (np. brak project_id tam gdzie wymagany).
+- Negative: błędne wartości (np. visibility/feature flags).
 
 ## Docs to Update After Completion
 

@@ -93,7 +93,7 @@ func TestSecureAzuredevopsProject(t *testing.T) {
 	})
 }
 
-// Validate mutual exclusivity for project.features vs project_features
+// Validate feature flag validation
 func TestAzuredevopsProjectValidationRules(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
@@ -103,7 +103,7 @@ func TestAzuredevopsProjectValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "Use either project.features or project_features")
+	assert.Contains(t, err.Error(), "features values must be one of")
 }
 
 // Helper function to get terraform options

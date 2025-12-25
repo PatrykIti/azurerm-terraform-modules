@@ -9,9 +9,7 @@ mock_provider "azuredevops" {
 }
 
 variables {
-  project = {
-    name = "ado-project-naming"
-  }
+  name = "ado-project-naming"
 }
 
 run "valid_name" {
@@ -22,12 +20,10 @@ run "empty_name_fails" {
   command = plan
 
   variables {
-    project = {
-      name = ""
-    }
+    name = ""
   }
 
   expect_failures = [
-    var.project,
+    var.name,
   ]
 }

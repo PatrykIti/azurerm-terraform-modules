@@ -11,9 +11,7 @@ mock_provider "azuredevops" {
 }
 
 variables {
-  project = {
-    name = "ado-project-outputs"
-  }
+  name = "ado-project-outputs"
 }
 
 run "outputs_plan" {
