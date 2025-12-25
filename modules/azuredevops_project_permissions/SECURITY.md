@@ -4,6 +4,10 @@
 
 This document describes security considerations for the Azure DevOps project permissions module. The module manages project-level permissions for group principals.
 
+## Secure Example
+
+See the hardened baseline in `examples/secure`, which focuses on least-privilege permissions.
+
 ## Security Features
 
 ### 1. Group-Only Assignment
@@ -61,5 +65,5 @@ module "azuredevops_project_permissions" {
 ---
 
 **Module Version**: 1.0.0  
-**Last Updated**: 2025-12-24  
+**Last Updated**: 2025-12-25  
 **Security Contact**: security@yourorganization.com

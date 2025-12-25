@@ -30,13 +30,13 @@ go mod download
 ### Run All Tests
 
 ```bash
-make test-all
+make test
 ```
 
-### Run Short Tests Only
+### Run Basic Tests Only
 
 ```bash
-make test-short
+make test-basic
 ```
 
 ### Run Integration Tests Only
@@ -77,6 +77,14 @@ Set the `SKIP_TEARDOWN` environment variable:
 ```bash
 export SKIP_TEARDOWN=true
 go test -v -run TestBasicAzuredevopsProjectPermissions
+```
+
+## Test Output Logs
+
+Each `make test*` target stores a timestamped log under `test_outputs/`:
+
+```
+test_outputs/<target>_<timestamp>.log
 ```
 
 ## Continuous Integration

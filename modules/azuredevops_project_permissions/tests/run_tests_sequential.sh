@@ -1,15 +1,8 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
 
-MODULE_NAME="azuredevops_project_permissions"
-
-echo "Starting sequential test execution for ${MODULE_NAME}"
-
-cd "$(dirname "$0")"
-
-# Load environment variables if available
+# Source environment variables if they exist
 if [ -f "./test_env.sh" ]; then
-  source "./test_env.sh"
+  source ./test_env.sh
 fi
 
 # Ensure required environment variables are set
@@ -18,16 +11,54 @@ if [[ -z "${AZDO_ORG_SERVICE_URL:-}" || -z "${AZDO_PERSONAL_ACCESS_TOKEN:-}" || 
   exit 1
 fi
 
-# Run tests sequentially
+# Create output directory for test results
+OUTPUT_DIR="test_outputs/sequential_run_$(date +%Y%m%d_%H%M%S)"
+mkdir -p "$OUTPUT_DIR"
 
-go test -v -run TestBasicAzuredevopsProjectPermissions -timeout 30m
+# Function to run a single test and save output
+run_test() {
+    local test_name=$1
+    local output_file="$OUTPUT_DIR/${test_name}.json"
+    local log_file="$OUTPUT_DIR/${test_name}.log"
 
-go test -v -run TestCompleteAzuredevopsProjectPermissions -timeout 30m
+    echo "Running test: $test_name"
 
-go test -v -run TestSecureAzuredevopsProjectPermissions -timeout 30m
+    go test -v -timeout 60m -run "^${test_name}$" . 2>&1 | tee "$log_file"
+    local exit_status=${PIPESTATUS[0]}
 
-go test -v -run TestAzuredevopsProjectPermissionsValidationRules -timeout 15m
+    cat > "$output_file" << EOF_JSON
+{
+  "test_name": "$test_name",
+  "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "exit_status": $exit_status,
+  "success": $([ $exit_status -eq 0 ] && echo "true" || echo "false"),
+  "log_file": "$(basename "$log_file")"
+}
+EOF_JSON
 
-go test -v -run TestAzuredevopsProjectPermissionsFullIntegration -timeout 60m
+    echo "Test $test_name completed with status: $exit_status"
+    return $exit_status
+}
 
-echo "Sequential test execution complete"
+# List of tests to run
+tests=(
+    "TestBasicAzuredevopsProjectPermissions"
+    "TestCompleteAzuredevopsProjectPermissions"
+    "TestSecureAzuredevopsProjectPermissions"
+    "TestAzuredevopsProjectPermissionsValidationRules"
+    "TestAzuredevopsProjectPermissionsFullIntegration"
+)
+
+echo "Starting sequential test execution for azuredevops_project_permissions"
+echo "Total tests to run: ${#tests[@]}"
+echo "Output directory: $OUTPUT_DIR"
+echo "=================================="
+
+for test in "${tests[@]}"; do
+    run_test "$test" || true
+done
+
+echo "=================================="
+echo "Sequential test execution completed!"
+echo "Results saved in: $OUTPUT_DIR"
+exit 0

@@ -31,9 +31,9 @@ variable "permissions" {
   validation {
     condition = alltrue([
       for permission in var.permissions : (
-        (permission.key == null || trim(permission.key) != "") &&
-        (permission.principal == null || trim(permission.principal) != "") &&
-        (permission.group_name == null || trim(permission.group_name) != "")
+        (permission.key == null || trimspace(permission.key) != "") &&
+        (permission.principal == null || trimspace(permission.principal) != "") &&
+        (permission.group_name == null || trimspace(permission.group_name) != "")
       )
     ])
     error_message = "permissions.key, permissions.principal, and permissions.group_name must be non-empty strings when provided."
