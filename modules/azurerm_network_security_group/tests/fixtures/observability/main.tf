@@ -28,12 +28,6 @@ resource "azurerm_storage_account" "flow_logs" {
   min_tls_version          = "TLS1_2"
 }
 
-resource "azurerm_network_watcher" "test" {
-  name                = "nw-nsg-obs-${var.random_suffix}"
-  location            = azurerm_resource_group.test.location
-  resource_group_name = azurerm_resource_group.test.name
-}
-
 module "network_security_group" {
   source = "../../.."
 
@@ -64,24 +58,6 @@ module "network_security_group" {
       storage_account_id         = azurerm_storage_account.flow_logs.id
     }
   ]
-
-  flow_log = {
-    name                                = "nsg-flow-logs-obs"
-    storage_account_id                  = azurerm_storage_account.flow_logs.id
-    network_watcher_name                = azurerm_network_watcher.test.name
-    network_watcher_resource_group_name = azurerm_network_watcher.test.resource_group_name
-    retention_policy = {
-      enabled = true
-      days    = 7
-    }
-    traffic_analytics = {
-      enabled               = true
-      workspace_id          = azurerm_log_analytics_workspace.test.workspace_id
-      workspace_region      = azurerm_log_analytics_workspace.test.location
-      workspace_resource_id = azurerm_log_analytics_workspace.test.id
-      interval_in_minutes   = 10
-    }
-  }
 
   tags = {
     Environment = "Test"

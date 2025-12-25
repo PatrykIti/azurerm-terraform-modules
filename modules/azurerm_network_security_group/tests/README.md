@@ -13,12 +13,11 @@ tests/
 │   ├── complete/            # Advanced configuration scenarios
 │   ├── secure/              # Security-hardened rule examples
 │   ├── network/             # Networking rule scenarios
-│   ├── observability/       # Diagnostics + flow logs
+│   ├── observability/       # Diagnostics
 │   └── negative/            # Intentionally invalid configurations
 ├── unit/                    # Native Terraform tests (.tftest.hcl)
 │   ├── defaults.tftest.hcl
 │   ├── diagnostic_settings.tftest.hcl
-│   ├── flow_log.tftest.hcl
 │   ├── security_rules.tftest.hcl
 │   └── validation.tftest.hcl
 ├── go.mod                   # Go module dependencies

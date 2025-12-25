@@ -47,10 +47,10 @@ resource "azurerm_eventhub_namespace" "example" {
 }
 
 resource "azurerm_eventhub" "example" {
-  name                = var.eventhub_name
-  namespace_id        = azurerm_eventhub_namespace.example.id
-  partition_count     = 2
-  message_retention   = 1
+  name              = var.eventhub_name
+  namespace_id      = azurerm_eventhub_namespace.example.id
+  partition_count   = 2
+  message_retention = 1
 }
 
 resource "azurerm_eventhub_namespace_authorization_rule" "example" {
