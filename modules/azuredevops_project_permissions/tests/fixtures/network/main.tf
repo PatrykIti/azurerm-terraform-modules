@@ -1,21 +1,19 @@
 provider "azuredevops" {}
 
-module "azuredevops_variable_groups" {
-  source = "../../"
+module "azuredevops_project_permissions" {
+  source = "../../../"
 
   project_id = var.project_id
 
-  variable_groups = {
-    network = {
-      name         = "${var.group_name_prefix}-network"
-      description  = "Network validation group"
-      allow_access = true
-      variables = [
-        {
-          name  = "network"
-          value = "enabled"
-        }
-      ]
+  permissions = [
+    {
+      key        = "project-readers"
+      group_name = "Readers"
+      scope      = "project"
+      permissions = {
+        GENERIC_READ = "Allow"
+      }
+      replace = false
     }
-  }
+  ]
 }

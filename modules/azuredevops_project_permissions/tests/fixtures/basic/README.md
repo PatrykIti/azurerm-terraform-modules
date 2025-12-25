@@ -1,3 +1,3 @@
-# Basic Variable Groups Fixture
+# Basic Fixture
 
-- Creates a basic variable group with a single variable.
+This fixture assigns permissions to a collection-level group by name.

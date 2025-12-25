@@ -8,15 +8,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestAzuredevopsVariableGroupsFullIntegration performs a full apply on the complete fixture.
-func TestAzuredevopsVariableGroupsFullIntegration(t *testing.T) {
+// TestAzuredevopsProjectPermissionsFullIntegration performs a full apply on the complete fixture.
+func TestAzuredevopsProjectPermissionsFullIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
 
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_variable_groups/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_project_permissions/tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -30,8 +30,7 @@ func TestAzuredevopsVariableGroupsFullIntegration(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		variableGroupIDs := terraform.OutputMap(t, terraformOptions, "variable_group_ids")
-
-		assert.NotEmpty(t, variableGroupIDs)
+		permissionIDs := terraform.OutputMap(t, terraformOptions, "permission_ids")
+		assert.NotEmpty(t, permissionIDs)
 	})
 }

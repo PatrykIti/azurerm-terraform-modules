@@ -1,64 +1,32 @@
 provider "azuredevops" {}
 
-data "azuredevops_group" "readers" {
-  project_id = var.project_id
-  name       = "Readers"
+data "azuredevops_group" "project_collection_admins" {
+  name = "Project Collection Administrators"
 }
 
-module "azuredevops_variable_groups" {
-  source = "../../"
+module "azuredevops_project_permissions" {
+  source = "../../../"
 
   project_id = var.project_id
 
-  variable_groups = {
-    app = {
-      name         = "${var.group_name_prefix}-app"
-      description  = "Application variables"
-      allow_access = true
-      variables = [
-        {
-          name  = "environment"
-          value = "staging"
-        },
-        {
-          name  = "region"
-          value = "westeurope"
-        }
-      ]
-    }
-    secrets = {
-      name         = "${var.group_name_prefix}-secrets"
-      description  = "Secrets"
-      allow_access = false
-      variables = [
-        {
-          name         = "api_key"
-          secret_value = "example-secret"
-          is_secret    = true
-        }
-      ]
-    }
-  }
-
-  variable_group_permissions = [
+  permissions = [
     {
-      variable_group_key = "app"
-      principal          = data.azuredevops_group.readers.id
+      key        = "project-readers"
+      group_name = "Readers"
+      scope      = "project"
       permissions = {
-        View = "allow"
-        Use  = "allow"
+        GENERIC_READ = "Allow"
       }
-    }
-  ]
-
-  library_permissions = [
+      replace = false
+    },
     {
-      principal = data.azuredevops_group.readers.id
+      key       = "collection-admins"
+      principal = data.azuredevops_group.project_collection_admins.id
       permissions = {
-        View   = "allow"
-        Create = "allow"
-        Use    = "allow"
+        GENERIC_READ  = "Allow"
+        GENERIC_WRITE = "Allow"
       }
+      replace = false
     }
   ]
 }

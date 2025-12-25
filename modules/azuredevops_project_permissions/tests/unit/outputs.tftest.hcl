@@ -1,40 +1,44 @@
-# Test outputs for Azure DevOps Variable Groups
+# Test outputs for the Azure DevOps Project Permissions module
 
 mock_provider "azuredevops" {
-  mock_resource "azuredevops_variable_group" {
+  mock_resource "azuredevops_project_permissions" {
     defaults = {
-      id   = "vg-0001"
-      name = "shared-vars"
+      id = "perm-0001"
+    }
+  }
+
+  mock_data "azuredevops_group" {
+    defaults = {
+      id = "vssgp.readers"
     }
   }
 }
 
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
-
-  variable_groups = {
-    shared = {
-      allow_access = true
-      variables = [
-        {
-          name  = "key"
-          value = "value"
-        }
-      ]
+  permissions = [
+    {
+      key        = "readers"
+      group_name = "Readers"
+      scope      = "project"
+      permissions = {
+        GENERIC_READ = "Allow"
+      }
+      replace = false
     }
-  }
+  ]
 }
 
 run "outputs_plan" {
   command = plan
 
   assert {
-    condition     = length(keys(output.variable_group_ids)) == 1
-    error_message = "variable_group_ids should include configured variable groups."
+    condition     = output.permission_ids["readers"] != null
+    error_message = "permission_ids should include configured permissions."
   }
 
   assert {
-    condition     = length(keys(output.variable_group_names)) == 1
-    error_message = "variable_group_names should include configured variable groups."
+    condition     = output.permission_principals["readers"] == "vssgp.readers"
+    error_message = "permission_principals should resolve group principals."
   }
 }

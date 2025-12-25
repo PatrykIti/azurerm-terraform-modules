@@ -1,21 +1,19 @@
 provider "azuredevops" {}
 
-module "azuredevops_variable_groups" {
-  source = "../../"
+module "azuredevops_project_permissions" {
+  source = "../../../"
 
   project_id = var.project_id
 
-  variable_groups = {
-    basic = {
-      name         = "${var.group_name_prefix}-basic"
-      description  = "Basic variable group"
-      allow_access = true
-      variables = [
-        {
-          name  = "environment"
-          value = "test"
-        }
-      ]
+  permissions = [
+    {
+      key        = "collection-admins"
+      group_name = "Project Collection Administrators"
+      scope      = "collection"
+      permissions = {
+        GENERIC_READ = "Allow"
+      }
+      replace = false
     }
-  }
+  ]
 }

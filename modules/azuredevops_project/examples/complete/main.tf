@@ -1,17 +1,9 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 module "azuredevops_project" {
   source = "../../"
 
-  name               = "${var.project_name_prefix}-${random_string.suffix.result}"
+  name               = var.project_name
   description        = "Complete Azure DevOps project managed by Terraform"
   visibility         = "private"
   version_control    = "Git"

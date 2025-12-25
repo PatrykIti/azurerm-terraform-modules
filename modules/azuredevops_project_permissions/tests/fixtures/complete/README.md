@@ -1,3 +1,3 @@
-# Complete Variable Groups Fixture
+# Complete Fixture
 
-- Creates multiple variable groups with permissions and library permissions.
+This fixture assigns permissions using both project-scope group lookup and principal override.

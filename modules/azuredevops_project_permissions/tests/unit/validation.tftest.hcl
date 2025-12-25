@@ -1,31 +1,118 @@
-# Test variable validation for Azure DevOps Variable Groups
+# Test variable validation for Azure DevOps Project Permissions
 
-mock_provider "azuredevops" {}
+mock_provider "azuredevops" {
+  mock_resource "azuredevops_project_permissions" {}
+
+  mock_data "azuredevops_group" {
+    defaults = {
+      id = "vssgp.readers"
+    }
+  }
+}
 
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 }
 
-run "invalid_variable_value" {
+run "missing_principal_and_group" {
   command = plan
 
   variables {
-    variable_groups = {
-      invalid = {
-        allow_access = true
-        variables = [
-          {
-            name         = "bad"
-            value        = "value"
-            secret_value = "secret"
-            is_secret    = true
-          }
-        ]
+    permissions = [
+      {
+        permissions = {
+          GENERIC_READ = "Allow"
+        }
       }
-    }
+    ]
   }
 
   expect_failures = [
-    var.variable_groups,
+    var.permissions,
+  ]
+}
+
+run "missing_scope" {
+  command = plan
+
+  variables {
+    permissions = [
+      {
+        group_name = "Readers"
+        permissions = {
+          GENERIC_READ = "Allow"
+        }
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.permissions,
+  ]
+}
+
+run "invalid_scope" {
+  command = plan
+
+  variables {
+    permissions = [
+      {
+        group_name = "Readers"
+        scope      = "team"
+        permissions = {
+          GENERIC_READ = "Allow"
+        }
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.permissions,
+  ]
+}
+
+run "invalid_permission_value" {
+  command = plan
+
+  variables {
+    permissions = [
+      {
+        principal = "vssgp.readers"
+        permissions = {
+          GENERIC_READ = "Maybe"
+        }
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.permissions,
+  ]
+}
+
+run "duplicate_keys" {
+  command = plan
+
+  variables {
+    permissions = [
+      {
+        key       = "dup"
+        principal = "vssgp.one"
+        permissions = {
+          GENERIC_READ = "Allow"
+        }
+      },
+      {
+        key       = "dup"
+        principal = "vssgp.two"
+        permissions = {
+          GENERIC_READ = "Allow"
+        }
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.permissions,
   ]
 }

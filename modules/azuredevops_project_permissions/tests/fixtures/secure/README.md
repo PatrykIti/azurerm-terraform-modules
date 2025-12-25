@@ -1,3 +1,3 @@
-# Secure Variable Groups Fixture
+# Secure Fixture
 
-- Creates a restricted variable group with secret values and minimal access.
+This fixture applies least-privilege permissions for a project-scoped group.

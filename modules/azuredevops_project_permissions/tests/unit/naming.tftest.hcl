@@ -1,33 +1,39 @@
-# Test variable group naming defaults
+# Test permission key behavior for the Azure DevOps Project Permissions module
 
-mock_provider "azuredevops" {}
+mock_provider "azuredevops" {
+  mock_resource "azuredevops_project_permissions" {
+    defaults = {
+      id = "perm-0001"
+    }
+  }
 
-variables {
-  project_id = "00000000-0000-0000-0000-000000000000"
-
-  variable_groups = {
-    core = {
-      allow_access = true
-      variables = [
-        {
-          name  = "key"
-          value = "value"
-        }
-      ]
+  mock_data "azuredevops_group" {
+    defaults = {
+      id = "vssgp.readers"
     }
   }
 }
 
-run "variable_group_plan" {
+variables {
+  project_id = "00000000-0000-0000-0000-000000000000"
+  permissions = [
+    {
+      key        = "readers"
+      group_name = "Readers"
+      scope      = "project"
+      permissions = {
+        GENERIC_READ = "Allow"
+      }
+      replace = false
+    }
+  ]
+}
+
+run "permission_key_set" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_variable_group.variable_group) == 1
-    error_message = "variable_groups should create one variable group."
-  }
-
-  assert {
-    condition     = azuredevops_variable_group.variable_group["core"].name == "core"
-    error_message = "Variable group name should default to the map key."
+    condition     = length(azuredevops_project_permissions.permission) == 1
+    error_message = "permissions should create one permission assignment."
   }
 }

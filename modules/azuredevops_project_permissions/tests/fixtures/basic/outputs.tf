@@ -1,4 +1,3 @@
-output "variable_group_ids" {
-  description = "Variable group IDs created in this fixture."
-  value       = module.azuredevops_variable_groups.variable_group_ids
+output "permission_ids" {
+  value = module.azuredevops_project_permissions.permission_ids
 }
