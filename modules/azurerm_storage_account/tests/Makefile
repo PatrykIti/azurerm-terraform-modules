@@ -1,10 +1,14 @@
 # Makefile for Terratest execution
 
+SHELL := /bin/bash
+
 # Variables
 TIMEOUT ?= 30m
 TEST_FILTER ?= Test
 PARALLEL ?= 8
 AZURE_LOCATION ?= northeurope
+TEST_OUTPUT_DIR ?= test_outputs
+TEST_LOG ?= $(TEST_OUTPUT_DIR)/terratest-$(shell date +%Y%m%d-%H%M%S).log
 
 # Environment check
 check-env:
@@ -24,7 +28,9 @@ deps:
 # Run all tests
 test: check-env deps
 	@echo "Running all tests..."
-	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...
+	@mkdir -p $(TEST_OUTPUT_DIR)
+	@echo "Saving output to $(TEST_LOG)"
+	@set -o pipefail; go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./... 2>&1 | tee $(TEST_LOG)
 
 # Run specific test
 test-single: check-env deps
