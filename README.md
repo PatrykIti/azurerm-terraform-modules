@@ -67,6 +67,7 @@ The repository uses a sophisticated GitHub Actions architecture:
 - [Module Guide](docs/MODULE_GUIDE/README.md) - module structure and implementation
 - [Testing Guide](docs/TESTING_GUIDE/README.md) - unit/integration testing patterns
 - [Workflow Reference](docs/WORKFLOWS.md) - CI/CD pipelines and shared actions
+- [Changelog](docs/_CHANGELOG/README.md) - repository change history
 - [Terraform Best Practices](docs/TERRAFORM_BEST_PRACTICES_GUIDE.md)
 - [Security Policy](docs/SECURITY.md)
 
