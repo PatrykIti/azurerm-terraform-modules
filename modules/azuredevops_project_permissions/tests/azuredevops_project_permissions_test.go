@@ -90,6 +90,9 @@ func TestAzuredevopsProjectPermissionsValidationRules(t *testing.T) {
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_project_permissions/tests/fixtures/negative")
 	terraformOptions := &terraform.Options{
 		TerraformDir: testFolder,
+		Vars: map[string]interface{}{
+			"project_id": getProjectID(t),
+		},
 		NoColor:      true,
 	}
 

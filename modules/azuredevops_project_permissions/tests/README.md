@@ -33,10 +33,10 @@ go mod download
 make test
 ```
 
-### Run Basic Tests Only
+### Run Short Tests Only
 
 ```bash
-make test-basic
+make test-short
 ```
 
 ### Run Integration Tests Only

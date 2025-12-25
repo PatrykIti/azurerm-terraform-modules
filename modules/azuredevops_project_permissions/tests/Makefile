@@ -33,6 +33,11 @@ test: check-env deps
 	@echo "Running all tests..."
 	$(call run_with_log,all,go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...)
 
+# Run short tests (skips integration/performance)
+test-short: check-env deps
+	@echo "Running short tests..."
+	$(call run_with_log,short,go test -v -short -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...)
+
 # Run specific test
 test-single: check-env deps
 	@echo "Running test: $(TEST_NAME)"

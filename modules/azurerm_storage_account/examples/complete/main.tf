@@ -153,7 +153,7 @@ data "azurerm_client_config" "current" {}
 
 # Complete Storage Account with all features
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.0"
+  source = "../.."
 
   name                = "stcompleteexample001"
   resource_group_name = azurerm_resource_group.example.name
@@ -435,6 +435,22 @@ module "storage_account" {
     }
   ]
 
+  # Diagnostic settings (storage account + blob service)
+  diagnostic_settings = [
+    {
+      name                       = "diag-storage"
+      scope                      = "storage_account"
+      areas                      = ["transaction", "capacity"]
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+    },
+    {
+      name                       = "diag-blob"
+      scope                      = "blob"
+      areas                      = ["read", "write", "delete", "transaction", "capacity"]
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+    }
+  ]
+
 
   tags = {
     Environment = "Production"
@@ -547,46 +563,5 @@ resource "azurerm_private_endpoint" "table" {
   tags = {
     Environment = "Development"
     Example     = "Complete"
-  }
-}
-
-# Diagnostic settings for monitoring
-resource "azurerm_monitor_diagnostic_setting" "storage_account" {
-  name                       = "${module.storage_account.name}-diag"
-  target_resource_id         = module.storage_account.id
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-
-  metric {
-    category = "Transaction"
-  }
-
-  metric {
-    category = "Capacity"
-  }
-}
-
-resource "azurerm_monitor_diagnostic_setting" "blob_service" {
-  name                       = "${module.storage_account.name}-blob-diag"
-  target_resource_id         = "${module.storage_account.id}/blobServices/default"
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-
-  enabled_log {
-    category = "StorageRead"
-  }
-
-  enabled_log {
-    category = "StorageWrite"
-  }
-
-  enabled_log {
-    category = "StorageDelete"
-  }
-
-  metric {
-    category = "Transaction"
-  }
-
-  metric {
-    category = "Capacity"
   }
 }

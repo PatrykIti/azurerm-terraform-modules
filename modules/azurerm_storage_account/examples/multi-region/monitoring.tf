@@ -247,37 +247,3 @@ resource "azurerm_log_analytics_saved_search" "storage_errors" {
 
   tags = var.tags
 }
-
-# ==============================================================================
-# Diagnostic Settings for Enhanced Monitoring
-# ==============================================================================
-
-# Additional diagnostic settings for replication metadata storage
-resource "azurerm_monitor_diagnostic_setting" "metadata_enhanced" {
-  count                      = var.enable_monitoring_alerts ? 1 : 0
-  name                       = "diag-metadata-enhanced"
-  target_resource_id         = module.replication_metadata.id
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
-
-  metric {
-    category = "Transaction"
-    enabled  = true
-  }
-
-  metric {
-    category = "Capacity"
-    enabled  = true
-  }
-
-  enabled_log {
-    category = "StorageRead"
-  }
-
-  enabled_log {
-    category = "StorageWrite"
-  }
-
-  enabled_log {
-    category = "StorageDelete"
-  }
-}

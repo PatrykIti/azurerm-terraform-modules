@@ -2,336 +2,119 @@
 
 ## Overview
 
-This document details the security features and configurations available in the Azure Storage Account Terraform module. The module implements comprehensive security controls to protect data at rest and in transit.
+This document summarizes the security posture of the Azure Storage Account module. The module applies security-by-default settings while allowing explicit opt-in for less restrictive configurations.
 
 ## Security Features
 
-### 1. **Encryption**
+### 1) Encryption
+- **Infrastructure encryption**: `encryption.infrastructure_encryption_enabled` (default: `true`)
+- **Customer-managed keys (CMK)**: `encryption.key_vault_key_id` + `encryption.user_assigned_identity_id`
+- **TLS**: `security_settings.min_tls_version` (default: `TLS1_2`)
 
-#### At Rest
-- **Infrastructure Encryption**: Enabled by default (`infrastructure_encryption_enabled = true`)
-- **Service-Managed Keys**: Automatic encryption with Microsoft-managed keys
-- **Customer-Managed Keys**: Optional support for bring-your-own-key (BYOK)
-  ```hcl
-  customer_managed_key = {
-    key_vault_key_id          = azurerm_key_vault_key.example.id
-    user_assigned_identity_id = azurerm_user_assigned_identity.example.id
-  }
-  ```
+### 2) Access Control
+- **Shared access keys disabled** by default: `security_settings.shared_access_key_enabled = false`
+- **OAuth by default** (optional): `default_to_oauth_authentication = true`
 
-#### In Transit
-- **HTTPS Only**: Enforced by default (`enable_https_traffic_only = true`)
-- **Minimum TLS Version**: TLS 1.2 by default (`min_tls_version = "TLS1_2"`)
-- **SMB Encryption**: Automatic for Azure Files
+### 3) Network Isolation
+- **Default deny** network rules (when configured): `network_rules.default_action = "Deny"`
+- **Private endpoints** for each storage service (blob/queue/file/table)
 
-### 2. **Access Control**
+### 4) Monitoring & Diagnostics
+- **Diagnostic settings** managed by the module with per-scope selection:
+  - `storage_account`, `blob`, `queue`, `file`, `table`, `dfs`
+- Categories are **filtered** against what Azure exposes in the target region/scope.
+  Entries that resolve to **no categories** are skipped and listed in `diagnostic_settings_skipped`.
 
-#### Authentication Methods
-- **Azure AD Authentication**: Recommended approach
-  ```hcl
-  azure_files_authentication = {
-    directory_type = "AADDS"  # or "AD" for on-premises AD
-  }
-  ```
-- **Shared Key**: Disabled by default (`shared_access_key_enabled = false`)
-- **SAS Tokens**: Use Azure AD when possible
+## Secure Configuration Example
 
-#### Network Security
-- **Default Deny**: Network rules deny access by default
-  ```hcl
-  network_rules = {
-    default_action = "Deny"
-    ip_rules       = ["203.0.113.0/24"]
-    bypass         = ["AzureServices"]
-  }
-  ```
-- **Private Endpoints**: Full support for all storage services
-  ```hcl
-  private_endpoints = {
-    blob = {
-      name                 = "storage-blob-pe"
-      subnet_id            = azurerm_subnet.private.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
-    }
-  }
-  ```
-
-### 3. **Data Protection**
-
-#### Soft Delete
-- **Blob Soft Delete**: 7 days retention by default
-- **Container Soft Delete**: 7 days retention by default
-- **File Share Soft Delete**: Configurable
-
-#### Versioning
-- **Blob Versioning**: Enabled by default
-- **Change Feed**: Enabled for audit trail
-
-#### Backup and Recovery
-- **Point-in-time Restore**: Available with versioning
-- **Immutable Blobs**: Support for compliance requirements
-
-### 4. **Monitoring and Compliance**
-
-#### Diagnostic Logging
-```hcl
-diagnostic_settings = {
-  name                       = "storage-diagnostics"
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-  logs = [
-    { category = "StorageRead" },
-    { category = "StorageWrite" },
-    { category = "StorageDelete" }
-  ]
-  metrics = [
-    { category = "Transaction" },
-    { category = "Capacity" }
-  ]
-}
-```
-
-#### Advanced Threat Protection
-- **Microsoft Defender for Storage**: Enabled by default
-- **Anomaly Detection**: Automatic threat detection
-- **Security Alerts**: Real-time notifications
-
-## Compliance Mapping
-
-### SOC 2 Controls
-| Control | Implementation |
-|---------|---------------|
-| CC6.1 - Logical Access | Azure AD authentication, RBAC |
-| CC6.6 - Encryption | TLS 1.2, Infrastructure encryption |
-| CC7.2 - Monitoring | Diagnostic logs, metrics |
-| A1.1 - Availability | Replication options (GRS, ZRS) |
-
-### ISO 27001 Controls
-| Control | Implementation |
-|---------|---------------|
-| A.10.1.1 - Cryptographic controls | Encryption at rest and in transit |
-| A.9.1.2 - Access to networks | Network ACLs, Private endpoints |
-| A.12.4.1 - Event logging | Comprehensive diagnostic logging |
-| A.18.1.3 - Protection of records | Immutability policies |
-
-### GDPR Requirements
-| Requirement | Implementation |
-|-------------|---------------|
-| Encryption (Art. 32) | Default encryption for all data |
-| Access logs (Art. 30) | Diagnostic logging enabled |
-| Data locality | Region-specific deployment |
-| Right to erasure | Soft delete for recovery |
-
-## Security Configuration Examples
-
-### 1. **Maximum Security Configuration**
 ```hcl
 module "storage_account" {
-  source = "./modules/storage_account"
+  source = "../.."
 
-  name                = "mystorageaccount"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
+  name                = "stsecureexample001"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
 
-  # Encryption
-  infrastructure_encryption_enabled = true
-  customer_managed_key = {
-    key_vault_key_id          = azurerm_key_vault_key.storage.id
-    user_assigned_identity_id = azurerm_user_assigned_identity.storage.id
+  security_settings = {
+    https_traffic_only_enabled      = true
+    min_tls_version                 = "TLS1_2"
+    shared_access_key_enabled       = false
+    allow_nested_items_to_be_public = false
+    public_network_access_enabled   = false
   }
 
-  # Access Control
-  shared_access_key_enabled        = false
-  allow_nested_items_to_be_public  = false
-  
-  # Network Security
+  encryption = {
+    enabled                           = true
+    infrastructure_encryption_enabled = true
+    key_vault_key_id                  = azurerm_key_vault_key.storage.id
+    user_assigned_identity_id         = azurerm_user_assigned_identity.storage.id
+  }
+
   network_rules = {
-    default_action             = "Deny"
-    ip_rules                   = []  # No public IPs
-    virtual_network_subnet_ids = [azurerm_subnet.storage.id]
-    bypass                     = ["AzureServices"]
+    bypass                     = []
+    ip_rules                   = []
+    virtual_network_subnet_ids = []
   }
 
-  # Private Endpoints for all services
-  private_endpoints = {
-    blob = {
-      name                 = "${var.name}-blob-pe"
-      subnet_id            = azurerm_subnet.private.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
+  diagnostic_settings = [
+    {
+      name                       = "diag-storage"
+      scope                      = "storage_account"
+      areas                      = ["transaction", "capacity"]
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+    },
+    {
+      name                       = "diag-blob"
+      scope                      = "blob"
+      areas                      = ["read", "write", "delete", "transaction", "capacity"]
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
     }
-    file = {
-      name                 = "${var.name}-file-pe"
-      subnet_id            = azurerm_subnet.private.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.file.id]
-    }
-    queue = {
-      name                 = "${var.name}-queue-pe"
-      subnet_id            = azurerm_subnet.private.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.queue.id]
-    }
-    table = {
-      name                 = "${var.name}-table-pe"
-      subnet_id            = azurerm_subnet.private.id
-      private_dns_zone_ids = [azurerm_private_dns_zone.table.id]
-    }
-  }
-
-  # Data Protection
-  blob_properties = {
-    versioning_enabled  = true
-    change_feed_enabled = true
-    delete_retention_policy = {
-      days = 30
-    }
-    container_delete_retention_policy = {
-      days = 30
-    }
-  }
-
-  # Monitoring
-  diagnostic_settings = {
-    name                       = "${var.name}-diag"
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-    logs = [
-      { category = "StorageRead" },
-      { category = "StorageWrite" },
-      { category = "StorageDelete" }
-    ]
-    metrics = [
-      { category = "Transaction" },
-      { category = "Capacity" }
-    ]
-  }
-
-  # Threat Protection
-  enable_advanced_threat_protection = true
-
-  tags = {
-    Environment        = "Production"
-    DataClassification = "Confidential"
-    Owner              = "security-team"
-    CostCenter         = "IT-Security"
-  }
-}
-```
-
-### 2. **Development Environment Configuration**
-```hcl
-module "storage_account_dev" {
-  source = "./modules/storage_account"
-
-  name                = "devstorageaccount"
-  resource_group_name = azurerm_resource_group.dev.name
-  location            = azurerm_resource_group.dev.location
-
-  # Still secure by default, but allow some flexibility
-  network_rules = {
-    default_action = "Deny"
-    ip_rules       = ["203.0.113.0/24"]  # Developer IPs
-    bypass         = ["AzureServices", "Logging", "Metrics"]
-  }
-
-  # Basic monitoring
-  diagnostic_settings = {
-    name                       = "${var.name}-diag"
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.dev.id
-    logs = [
-      { category = "StorageWrite" },
-      { category = "StorageDelete" }
-    ]
-    metrics = [
-      { category = "Transaction" }
-    ]
-  }
-
-  tags = {
-    Environment        = "Development"
-    DataClassification = "Internal"
-  }
+  ]
 }
 ```
 
 ## Security Hardening Checklist
 
-Before deploying to production, ensure:
-
-- [ ] Infrastructure encryption is enabled
-- [ ] Minimum TLS version is 1.2 or higher
-- [ ] Public blob access is disabled
+- [ ] HTTPS only enabled (`https_traffic_only_enabled = true`)
+- [ ] TLS 1.2 minimum
+- [ ] Shared access keys disabled
+- [ ] Public network access disabled where possible
 - [ ] Network rules default to Deny
-- [ ] Private endpoints are configured for all used services
-- [ ] Shared access keys are disabled (use Azure AD)
-- [ ] Soft delete is enabled with appropriate retention
-- [ ] Versioning is enabled for blob storage
-- [ ] Diagnostic logging covers all operations
-- [ ] Advanced threat protection is enabled
-- [ ] Customer-managed keys are configured (if required)
-- [ ] Appropriate tags are applied for compliance
-- [ ] Firewall rules are minimized
-- [ ] Regular access reviews are scheduled
+- [ ] Private endpoints configured for used services
+- [ ] CMK enabled where required
+- [ ] Diagnostic settings enabled for required scopes
+- [ ] Tags applied for compliance/ownership
 
 ## Common Security Mistakes to Avoid
 
-1. **Enabling Public Access**
+1. **Allowing public access**
    ```hcl
    # ❌ AVOID
-   allow_nested_items_to_be_public = true
-   ```
-
-2. **Using Shared Keys**
-   ```hcl
-   # ❌ AVOID
-   shared_access_key_enabled = true
-   ```
-
-3. **Allowing All Networks**
-   ```hcl
-   # ❌ AVOID
-   network_rules = {
-     default_action = "Allow"
+   security_settings = {
+     public_network_access_enabled = true
    }
    ```
 
-4. **Disabling HTTPS**
-   ```hcl
-   # ❌ NEVER DO THIS
-   enable_https_traffic_only = false
-   ```
-
-5. **Using Old TLS Versions**
+2. **Enabling shared access keys**
    ```hcl
    # ❌ AVOID
-   min_tls_version = "TLS1_0"
+   security_settings = {
+     shared_access_key_enabled = true
+   }
    ```
 
-## Incident Response
+3. **Disabling HTTPS**
+   ```hcl
+   # ❌ NEVER DO THIS
+   security_settings = {
+     https_traffic_only_enabled = false
+   }
+   ```
 
-If a security incident occurs:
-
-1. **Immediate Actions**
-   - Rotate all access keys
-   - Review diagnostic logs
-   - Check for unauthorized access
-   - Enable additional logging if needed
-
-2. **Investigation**
-   - Use Log Analytics queries to investigate
-   - Check Advanced Threat Protection alerts
-   - Review network access logs
-
-3. **Remediation**
-   - Apply additional network restrictions
-   - Implement additional monitoring
-   - Update security configurations
-
-## Additional Resources
-
-- [Azure Storage security guide](https://docs.microsoft.com/en-us/azure/storage/common/storage-security-guide)
-- [Azure Storage encryption](https://docs.microsoft.com/en-us/azure/storage/common/storage-service-encryption)
-- [Private endpoints for Azure Storage](https://docs.microsoft.com/en-us/azure/storage/common/storage-private-endpoints)
-- [Azure Storage threat protection](https://docs.microsoft.com/en-us/azure/storage/common/azure-defender-storage-configure)
-
----
-
-**Module Version**: 1.0.0
-**Last Updated**: 2024-06-30
-**Security Contact**: security@yourorganization.com
+4. **Using legacy TLS versions**
+   ```hcl
+   # ❌ AVOID
+   security_settings = {
+     min_tls_version = "TLS1_0"
+   }
+   ```

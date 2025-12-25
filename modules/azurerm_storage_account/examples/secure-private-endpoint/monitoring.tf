@@ -139,7 +139,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "kv_unknown_access" {
 
   query = <<-QUERY
     AzureDiagnostics
-    | where Resource = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.1.0"
+    | where Resource == "${azurerm_key_vault.example.name}"
     | where CallerIPAddress !in ("10.0.0.0/16") // Add your known IP ranges
     | where ResultType != "Success"
     | summarize Count = count() by CallerIPAddress, OperationName

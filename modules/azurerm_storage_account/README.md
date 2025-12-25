@@ -10,6 +10,14 @@ Current version: **1.2.2**
 
 This module creates a comprehensive Azure Storage Account with support for all enterprise features including security, monitoring, and lifecycle management.
 
+## Features
+
+- ✅ **Secure Defaults** - HTTPS only, TLS 1.2, shared keys disabled
+- ✅ **Network Isolation** - Private endpoints and restrictive network rules
+- ✅ **Encryption** - Infrastructure encryption + customer-managed keys
+- ✅ **Lifecycle Management** - Automated tiering and retention
+- ✅ **Diagnostics** - Storage account and service-level diagnostic settings
+
 ## Usage
 
 ```hcl
@@ -23,7 +31,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
 
   name                     = var.storage_account_name
   resource_group_name      = azurerm_resource_group.example.name
@@ -240,8 +248,22 @@ No modules.
 | <a name="output_tags"></a> [tags](#output\_tags) | A map of tags assigned to the storage account |
 <!-- END_TF_DOCS -->
 
+## Security Considerations
+
+This module implements secure defaults:
+
+- HTTPS-only traffic with TLS 1.2
+- Shared access keys disabled by default
+- Default-deny network rules (when configured)
+- Support for private endpoints per service
+- Diagnostic settings for storage account and services
+
+For production usage, see the [secure example](examples/secure) and [SECURITY.md](SECURITY.md).
+
 ## Additional Documentation
 
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [IMPORT.md](docs/IMPORT.md) - Import existing storage accounts using Terraform import blocks
+- [Module Documentation](docs/) - Additional guides and best practices

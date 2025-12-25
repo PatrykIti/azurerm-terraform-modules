@@ -502,21 +502,6 @@ output "static_website_id" {
   value       = module.storage_account.static_website_id
 }
 
-# Diagnostic Settings (from separate resources)
-output "diagnostic_settings" {
-  description = "Map of diagnostic settings created"
-  value = {
-    storage_account = {
-      id   = azurerm_monitor_diagnostic_setting.storage_account.id
-      name = azurerm_monitor_diagnostic_setting.storage_account.name
-    }
-    blob_service = {
-      id   = azurerm_monitor_diagnostic_setting.blob_service.id
-      name = azurerm_monitor_diagnostic_setting.blob_service.name
-    }
-  }
-}
-
 output "tags" {
   description = "Tags assigned to the storage account"
   value       = module.storage_account.tags

@@ -2,7 +2,7 @@
 
 # Run only short tests (basic functionality)
 test-short:
-	$(MAKE) -C tests test-basic
+	$(MAKE) -C tests test-short
 
 # Run only integration tests
 test-integration:
