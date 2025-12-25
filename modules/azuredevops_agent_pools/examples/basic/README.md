@@ -5,7 +5,7 @@ This example demonstrates a basic Azure DevOps Agent Pools configuration with on
 ## Features
 
 - Single agent pool with a generated name
-- Single queue attached to a project
+- Single queue attached to a project, using the module pool
 - Random suffix to avoid naming conflicts
 
 ## Key Configuration

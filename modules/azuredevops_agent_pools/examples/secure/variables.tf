@@ -8,9 +8,3 @@ variable "pool_name_prefix" {
   type        = string
   default     = "ado-agent-pool-secure"
 }
-
-variable "queue_name" {
-  description = "Name for the agent queue."
-  type        = string
-  default     = "ado-agent-queue-secure"
-}

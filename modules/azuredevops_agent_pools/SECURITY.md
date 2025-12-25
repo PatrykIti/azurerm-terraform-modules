@@ -24,19 +24,14 @@ This document describes security considerations for Azure DevOps agent pools, qu
 module "azuredevops_agent_pools" {
   source = "./modules/azuredevops_agent_pools"
 
-  agent_pools = {
-    secure = {
-      name           = "ado-secure-pool"
-      auto_provision = false
-      auto_update    = false
-    }
-  }
+  name           = "ado-secure-pool"
+  auto_provision = false
+  auto_update    = false
 
   agent_queues = [
     {
-      project_id     = "00000000-0000-0000-0000-000000000000"
-      name           = "secure-queue"
-      agent_pool_key = "secure"
+      key        = "secure"
+      project_id = "00000000-0000-0000-0000-000000000000"
     }
   ]
 }

@@ -33,17 +33,17 @@ type StorageAccountHelper struct {
 
 // NewStorageAccountHelper creates a new helper instance
 func NewStorageAccountHelper(t *testing.T) *StorageAccountHelper {
-	subscriptionID := getRequiredEnvVar(t, "AZURE_SUBSCRIPTION_ID")
-	
+	subscriptionID := getRequiredEnvVarWithFallback(t, "AZURE_SUBSCRIPTION_ID", "ARM_SUBSCRIPTION_ID")
+
 	// Create credential based on available credentials
 	var credential azcore.TokenCredential
 	var err error
-	
+
 	// Check if we have service principal credentials
-	clientID := os.Getenv("AZURE_CLIENT_ID")
-	clientSecret := os.Getenv("AZURE_CLIENT_SECRET")
-	tenantID := os.Getenv("AZURE_TENANT_ID")
-	
+	clientID := getEnvVarWithFallback("AZURE_CLIENT_ID", "ARM_CLIENT_ID")
+	clientSecret := getEnvVarWithFallback("AZURE_CLIENT_SECRET", "ARM_CLIENT_SECRET")
+	tenantID := getEnvVarWithFallback("AZURE_TENANT_ID", "ARM_TENANT_ID")
+
 	if clientID != "" && clientSecret != "" && tenantID != "" {
 		// Use service principal auth
 		credential, err = azidentity.NewClientSecretCredential(tenantID, clientID, clientSecret, nil)
@@ -61,7 +61,7 @@ func NewStorageAccountHelper(t *testing.T) *StorageAccountHelper {
 	// Create storage accounts client
 	client, err := armstorage.NewAccountsClient(subscriptionID, credential, nil)
 	require.NoError(t, err, "Failed to create storage accounts client")
-	
+
 	// Create blob services client
 	blobClient, err := armstorage.NewBlobServicesClient(subscriptionID, credential, nil)
 	require.NoError(t, err, "Failed to create blob services client")
@@ -90,12 +90,12 @@ func (h *StorageAccountHelper) ValidateStorageAccountEncryption(t *testing.T, ac
 	require.NotNil(t, account.Properties.Encryption, "Encryption should be configured")
 	require.NotNil(t, account.Properties.Encryption.KeySource, "Key source should be set")
 	require.Equal(t, armstorage.KeySourceMicrosoftStorage, *account.Properties.Encryption.KeySource, "Should use Microsoft managed keys")
-	
+
 	// Validate blob encryption
 	require.NotNil(t, account.Properties.Encryption.Services, "Encryption services should be configured")
 	require.NotNil(t, account.Properties.Encryption.Services.Blob, "Blob encryption should be configured")
 	require.True(t, *account.Properties.Encryption.Services.Blob.Enabled, "Blob encryption should be enabled")
-	
+
 	// Validate file encryption
 	require.NotNil(t, account.Properties.Encryption.Services.File, "File encryption should be configured")
 	require.True(t, *account.Properties.Encryption.Services.File.Enabled, "File encryption should be enabled")
@@ -104,30 +104,30 @@ func (h *StorageAccountHelper) ValidateStorageAccountEncryption(t *testing.T, ac
 // ValidateNetworkRules validates network access rules
 func (h *StorageAccountHelper) ValidateNetworkRules(t *testing.T, account armstorage.Account, expectedIPRules []string, expectedSubnetIDs []string) {
 	require.NotNil(t, account.Properties.NetworkRuleSet, "Network rules should be configured")
-	
+
 	// Validate IP rules
 	if len(expectedIPRules) > 0 {
 		require.Equal(t, len(expectedIPRules), len(account.Properties.NetworkRuleSet.IPRules), "IP rules count mismatch")
-		
+
 		actualIPRules := make([]string, 0)
 		for _, rule := range account.Properties.NetworkRuleSet.IPRules {
 			actualIPRules = append(actualIPRules, *rule.IPAddressOrRange)
 		}
-		
+
 		for _, expectedIP := range expectedIPRules {
 			require.Contains(t, actualIPRules, expectedIP, "Expected IP rule not found")
 		}
 	}
-	
+
 	// Validate subnet rules
 	if len(expectedSubnetIDs) > 0 {
 		require.Equal(t, len(expectedSubnetIDs), len(account.Properties.NetworkRuleSet.VirtualNetworkRules), "Subnet rules count mismatch")
-		
+
 		actualSubnetIDs := make([]string, 0)
 		for _, rule := range account.Properties.NetworkRuleSet.VirtualNetworkRules {
 			actualSubnetIDs = append(actualSubnetIDs, *rule.VirtualNetworkResourceID)
 		}
-		
+
 		for _, expectedSubnet := range expectedSubnetIDs {
 			require.Contains(t, actualSubnetIDs, expectedSubnet, "Expected subnet rule not found")
 		}
@@ -137,14 +137,14 @@ func (h *StorageAccountHelper) ValidateNetworkRules(t *testing.T, account armsto
 // WaitForStorageAccountReady waits for storage account to be fully provisioned
 func (h *StorageAccountHelper) WaitForStorageAccountReady(t *testing.T, accountName, resourceGroupName string) {
 	description := fmt.Sprintf("Waiting for storage account %s to be ready", accountName)
-	
+
 	retry.DoWithRetry(t, description, 30, 10*time.Second, func() (string, error) {
 		account := h.GetStorageAccountProperties(t, accountName, resourceGroupName)
-		
+
 		if account.Properties.ProvisioningState != nil && *account.Properties.ProvisioningState == armstorage.ProvisioningStateSucceeded {
 			return "Storage account is ready", nil
 		}
-		
+
 		provState := "unknown"
 		if account.Properties.ProvisioningState != nil {
 			provState = string(*account.Properties.ProvisioningState)
@@ -156,14 +156,14 @@ func (h *StorageAccountHelper) WaitForStorageAccountReady(t *testing.T, accountN
 // WaitForGRSSecondaryEndpoints waits for GRS secondary endpoints to be available
 func (h *StorageAccountHelper) WaitForGRSSecondaryEndpoints(t *testing.T, accountName, resourceGroupName string) {
 	description := fmt.Sprintf("Waiting for GRS secondary endpoints for storage account %s", accountName)
-	
+
 	retry.DoWithRetry(t, description, 60, 10*time.Second, func() (string, error) {
 		account := h.GetStorageAccountProperties(t, accountName, resourceGroupName)
-		
+
 		if account.Properties.SecondaryEndpoints != nil && account.Properties.SecondaryEndpoints.Blob != nil && *account.Properties.SecondaryEndpoints.Blob != "" {
 			return "GRS secondary endpoints are available", nil
 		}
-		
+
 		return "", fmt.Errorf("GRS secondary endpoints are not yet available")
 	})
 }
@@ -181,13 +181,13 @@ func ValidateDiagnosticSettings(t *testing.T, storageAccountID string) {
 func GenerateValidStorageAccountName(prefix string) string {
 	timestamp := time.Now().Unix()
 	name := fmt.Sprintf("%s%d", prefix, timestamp)
-	
+
 	// Ensure name is lowercase and within length limits
 	name = strings.ToLower(name)
 	if len(name) > 24 {
 		name = name[:24]
 	}
-	
+
 	// Remove any invalid characters
 	validName := ""
 	for _, char := range name {
@@ -195,20 +195,20 @@ func GenerateValidStorageAccountName(prefix string) string {
 			validName += string(char)
 		}
 	}
-	
+
 	return validName
 }
 
 // ValidateContainerExists checks if a container exists in the storage account
 func ValidateContainerExists(t *testing.T, accountName, resourceGroupName, containerName string) {
-	subscriptionID := getRequiredEnvVar(t, "AZURE_SUBSCRIPTION_ID")
+	subscriptionID := getRequiredEnvVarWithFallback(t, "AZURE_SUBSCRIPTION_ID", "ARM_SUBSCRIPTION_ID")
 	exists := azure.StorageBlobContainerExists(t, containerName, accountName, resourceGroupName, subscriptionID)
 	require.True(t, exists, fmt.Sprintf("Container %s should exist in storage account %s", containerName, accountName))
 }
 
 // ValidateStorageAccountExists checks if a storage account exists using Terratest
 func ValidateStorageAccountExists(t *testing.T, accountName, resourceGroupName string) {
-	subscriptionID := getRequiredEnvVar(t, "AZURE_SUBSCRIPTION_ID")
+	subscriptionID := getRequiredEnvVarWithFallback(t, "AZURE_SUBSCRIPTION_ID", "ARM_SUBSCRIPTION_ID")
 	exists := azure.StorageAccountExists(t, accountName, resourceGroupName, subscriptionID)
 	require.True(t, exists, fmt.Sprintf("Storage account %s should exist in resource group %s", accountName, resourceGroupName))
 }
@@ -245,18 +245,18 @@ func (h *StorageAccountHelper) ValidateBlobServiceProperties(t *testing.T, accou
 // CreateTestResourceGroup creates a resource group for testing
 func CreateTestResourceGroup(t *testing.T, subscriptionID, location string) string {
 	resourceGroupName := fmt.Sprintf("rg-terratest-%d", time.Now().Unix())
-	
+
 	// Note: Terratest's azure module has functions for resource groups, but they use the old SDK.
 	// Since we're using Terraform to manage resources, we'll let Terraform create the resource group.
 	logger.Logf(t, "Resource group %s should be created by Terraform", resourceGroupName)
-	
+
 	return resourceGroupName
 }
 
 // ValidateStorageAccountTags validates tags on storage account
 func ValidateStorageAccountTags(t *testing.T, account armstorage.Account, expectedTags map[string]string) {
 	require.NotNil(t, account.Tags, "Storage account should have tags")
-	
+
 	for key, expectedValue := range expectedTags {
 		actualValue, exists := account.Tags[key]
 		require.True(t, exists, fmt.Sprintf("Tag %s should exist", key))
@@ -271,33 +271,49 @@ func getRequiredEnvVar(t *testing.T, envVarName string) string {
 	return value
 }
 
+func getRequiredEnvVarWithFallback(t *testing.T, primary, fallback string) string {
+	if value := os.Getenv(primary); value != "" {
+		return value
+	}
+	value := os.Getenv(fallback)
+	require.NotEmpty(t, value, fmt.Sprintf("Required environment variable %s or %s is not set", primary, fallback))
+	return value
+}
+
+func getEnvVarWithFallback(primary, fallback string) string {
+	if value := os.Getenv(primary); value != "" {
+		return value
+	}
+	return os.Getenv(fallback)
+}
+
 // TestFixtureConfig represents configuration for test fixtures
 type TestFixtureConfig struct {
-	StorageAccountName       string
-	ResourceGroupName        string
-	Location                 string
-	AccountTier              string
-	AccountReplicationType   string
-	EnableHTTPSTrafficOnly   bool
-	MinimumTLSVersion        string
-	AllowBlobPublicAccess    bool
-	EnableInfraEncryption    bool
-	NetworkRules             *NetworkRulesConfig
-	Containers               []ContainerConfig
-	Tags                     map[string]string
+	StorageAccountName     string
+	ResourceGroupName      string
+	Location               string
+	AccountTier            string
+	AccountReplicationType string
+	EnableHTTPSTrafficOnly bool
+	MinimumTLSVersion      string
+	AllowBlobPublicAccess  bool
+	EnableInfraEncryption  bool
+	NetworkRules           *NetworkRulesConfig
+	Containers             []ContainerConfig
+	Tags                   map[string]string
 }
 
 // NetworkRulesConfig represents network rules configuration
 type NetworkRulesConfig struct {
-	IPRules       []string
-	SubnetIDs     []string
-	Bypass        string
+	IPRules   []string
+	SubnetIDs []string
+	Bypass    string
 }
 
 // ContainerConfig represents container configuration
 type ContainerConfig struct {
-	Name                  string
-	ContainerAccessType   string
+	Name                string
+	ContainerAccessType string
 }
 
 // GenerateTestFixtureHCL generates HCL configuration for test fixtures
@@ -352,7 +368,7 @@ func GenerateTestFixtureHCL(config TestFixtureConfig) string {
 		securitySettings = append(securitySettings, `    allow_nested_items_to_be_public = false`)
 	}
 	securitySettings = append(securitySettings, `    shared_access_key_enabled = true`)
-	
+
 	if len(securitySettings) > 0 {
 		hcl.WriteString(`  security_settings = {
 `)

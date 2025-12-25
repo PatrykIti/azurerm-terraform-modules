@@ -5,7 +5,7 @@ This example demonstrates a security-focused Azure DevOps Agent Pools configurat
 ## Features
 
 - Agent pool with `auto_provision` and `auto_update` disabled
-- Single queue scoped to a project
+- Single queue scoped to a project, using the module pool
 - Random suffixes to avoid naming conflicts
 
 ## Key Configuration

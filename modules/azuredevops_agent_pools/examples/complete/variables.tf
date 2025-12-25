@@ -9,12 +9,6 @@ variable "pool_name_prefix" {
   default     = "ado-agent-pool-complete"
 }
 
-variable "queue_name_prefix" {
-  description = "Prefix for the agent queue name."
-  type        = string
-  default     = "ado-agent-queue-complete"
-}
-
 variable "enable_elastic_pool" {
   description = "Whether to create an elastic pool in this example."
   type        = bool
@@ -29,6 +23,12 @@ variable "elastic_pool_name_prefix" {
 
 variable "service_endpoint_id" {
   description = "Service endpoint ID for the elastic pool (required when enable_elastic_pool is true)."
+  type        = string
+  default     = ""
+}
+
+variable "service_endpoint_scope" {
+  description = "Project ID that owns the service endpoint (required when enable_elastic_pool is true)."
   type        = string
   default     = ""
 }

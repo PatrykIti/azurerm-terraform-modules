@@ -18,11 +18,14 @@ provider "azuredevops" {}
 module "azuredevops_agent_pools" {
   source = "path/to/azuredevops_agent_pools"
 
-  agent_pools = {
-    default = {
-      name = "ado-agent-pool"
+  name = "ado-agent-pool"
+
+  agent_queues = [
+    {
+      key        = "default"
+      project_id = "00000000-0000-0000-0000-000000000000"
     }
-  }
+  ]
 }
 ```
 
@@ -30,7 +33,7 @@ module "azuredevops_agent_pools" {
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates a basic Azure DevOps Agent Pools configuration with one pool and one queue.
-- [Complete](examples/complete) - This example demonstrates a fuller Azure DevOps Agent Pools configuration with multiple pools, queues, and an optional elastic pool.
+- [Complete](examples/complete) - This example demonstrates a fuller Azure DevOps Agent Pools configuration with queues and an optional elastic pool.
 - [Secure](examples/secure) - This example demonstrates a security-focused Azure DevOps Agent Pools configuration with minimal automation.
 <!-- END_EXAMPLES -->
 
