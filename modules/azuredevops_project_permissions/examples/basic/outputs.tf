@@ -1,4 +1,7 @@
-output "variable_group_ids" {
-  description = "Variable group IDs created in this example."
-  value       = module.azuredevops_variable_groups.variable_group_ids
+output "permission_ids" {
+  value = module.azuredevops_project_permissions.permission_ids
+}
+
+output "permission_principals" {
+  value = module.azuredevops_project_permissions.permission_principals
 }

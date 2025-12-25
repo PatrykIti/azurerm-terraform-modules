@@ -3,13 +3,8 @@ variable "project_id" {
   type        = string
 }
 
-variable "principal_descriptor" {
-  description = "Principal descriptor for variable group permissions."
+variable "project_group_name" {
+  description = "Project-scoped group name to grant permissions."
   type        = string
-}
-
-variable "secret_token" {
-  description = "Secret token value."
-  type        = string
-  sensitive   = true
+  default     = "Readers"
 }

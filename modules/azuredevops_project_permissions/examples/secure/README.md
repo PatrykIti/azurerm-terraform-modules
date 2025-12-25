@@ -1,3 +1,3 @@
-# Secure Variable Groups Example
+# Secure Azure DevOps Project Permissions Example
 
-This example demonstrates a restricted variable group with secret values and minimal permissions.
+This example demonstrates least-privilege permissions for a project-scoped group.

@@ -1,3 +1,3 @@
-# Basic Variable Groups Example
+# Basic Azure DevOps Project Permissions Example
 
-This example demonstrates creating a single variable group with plain variables.
+This example assigns a minimal permission set to a collection-level group by name.

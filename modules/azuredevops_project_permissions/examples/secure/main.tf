@@ -1,34 +1,20 @@
 provider "azuredevops" {}
 
-module "azuredevops_variable_groups" {
+module "azuredevops_project_permissions" {
   source = "../../"
 
   project_id = var.project_id
 
-  variable_groups = {
-    secure = {
-      name         = "secure-vars"
-      description  = "Restricted secrets"
-      allow_access = false
-      variables = [
-        {
-          name         = "token"
-          secret_value = var.secret_token
-          is_secret    = true
-        }
-      ]
-    }
-  }
-
-  variable_group_permissions = [
+  permissions = [
     {
-      variable_group_key = "secure"
-      principal          = var.principal_descriptor
+      key        = "project-readers"
+      group_name = var.project_group_name
+      scope      = "project"
       permissions = {
-        View       = "allow"
-        Use        = "allow"
-        Administer = "deny"
+        GENERIC_READ  = "Allow"
+        GENERIC_WRITE = "NotSet"
       }
+      replace = false
     }
   ]
 }

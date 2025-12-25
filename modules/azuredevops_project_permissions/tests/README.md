@@ -1,13 +1,13 @@
-# Azure DevOps Variable Groups Module Tests
+# Azure DevOps Project Permissions Module Tests
 
-This directory contains automated tests for the Azure DevOps Variable Groups Terraform module using [Terratest](https://terratest.gruntwork.io/).
+This directory contains automated tests for the Azure DevOps Project Permissions Terraform module using [Terratest](https://terratest.gruntwork.io/).
 
 ## Prerequisites
 
 1. **Go**: Version 1.21 or later
 2. **Terraform**: Version 1.12.2 or later
 3. **Azure DevOps Organization**: Access with a Personal Access Token (PAT)
-4. **Azure DevOps Project**: Project ID for variable group creation
+4. **Azure DevOps Project**: Existing project ID for permissions
 
 ## Environment Variables
 
@@ -30,13 +30,13 @@ go mod download
 ### Run All Tests
 
 ```bash
-make test
+make test-all
 ```
 
-### Run Basic Tests Only
+### Run Short Tests Only
 
 ```bash
-make test-basic
+make test-short
 ```
 
 ### Run Integration Tests Only
@@ -45,17 +45,11 @@ make test-basic
 make test-integration
 ```
 
-### Run Specific Test
-
-```bash
-go test -v -run TestBasicAzuredevopsVariableGroups -timeout 30m
-```
-
 ## Test Structure
 
 ### Test Files
 
-- `azuredevops_variable_groups_test.go` - Basic, complete, secure, and validation tests
+- `azuredevops_project_permissions_test.go` - Basic, complete, secure, and validation tests
 - `integration_test.go` - Full apply test using the complete fixture
 - `performance_test.go` - Benchmarks are disabled by default
 
@@ -63,9 +57,9 @@ go test -v -run TestBasicAzuredevopsVariableGroups -timeout 30m
 
 The `fixtures/` directory contains Terraform configurations for different test scenarios:
 
-- `fixtures/basic/` - Basic variable group configuration
-- `fixtures/complete/` - Variable groups with permissions and library permissions
-- `fixtures/secure/` - Restricted variable group with secret values
+- `fixtures/basic/` - Basic permissions assignment
+- `fixtures/complete/` - Mixed project and collection permissions
+- `fixtures/secure/` - Least-privilege configuration
 - `fixtures/negative/` - Negative test cases
 
 ## Debugging Tests
@@ -73,7 +67,7 @@ The `fixtures/` directory contains Terraform configurations for different test s
 ### Verbose Output
 
 ```bash
-go test -v -run TestBasicAzuredevopsVariableGroups
+go test -v -run TestBasicAzuredevopsProjectPermissions
 ```
 
 ### Keep Resources After Test Failure
@@ -82,16 +76,7 @@ Set the `SKIP_TEARDOWN` environment variable:
 
 ```bash
 export SKIP_TEARDOWN=true
-go test -v -run TestBasicAzuredevopsVariableGroups
-```
-
-### Debug Terraform
-
-Enable Terraform debug logging:
-
-```bash
-export TF_LOG=DEBUG
-go test -v -run TestBasicAzuredevopsVariableGroups
+go test -v -run TestBasicAzuredevopsProjectPermissions
 ```
 
 ## Continuous Integration
@@ -108,12 +93,3 @@ When adding new tests:
 1. Follow the existing test structure and naming conventions
 2. Add appropriate fixtures in the `fixtures/` directory
 3. Keep tests idempotent and clean up resources
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Authentication Errors**: Verify Azure DevOps PAT and organization URL
-2. **Project ID Missing**: Ensure AZDO_PROJECT_ID points to an existing project
-3. **Resource Conflicts**: Ensure unique variable group naming
-4. **Timeout Issues**: Increase test timeouts for larger orgs

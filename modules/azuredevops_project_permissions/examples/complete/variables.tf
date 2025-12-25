@@ -3,24 +3,8 @@ variable "project_id" {
   type        = string
 }
 
-variable "group_name_prefix" {
-  description = "Prefix for variable group names."
+variable "project_group_name" {
+  description = "Project-scoped group name to grant permissions."
   type        = string
-  default     = "app-vars"
-}
-
-variable "secret_group_name_prefix" {
-  description = "Prefix for secret variable group names."
-  type        = string
-  default     = "secret-vars"
-}
-
-variable "principal_descriptor" {
-  description = "Principal descriptor for variable group permissions."
-  type        = string
-}
-
-variable "library_principal_descriptor" {
-  description = "Principal descriptor for library permissions."
-  type        = string
+  default     = "Readers"
 }
