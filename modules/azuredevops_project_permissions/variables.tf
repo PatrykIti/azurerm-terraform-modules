@@ -73,10 +73,10 @@ variable "permissions" {
       for permission in var.permissions :
       coalesce(permission.key, permission.group_name, permission.principal)
       if permission.key != null || permission.group_name != null || permission.principal != null
-    ]) == length(distinct([
-      for permission in var.permissions :
-      coalesce(permission.key, permission.group_name, permission.principal)
-      if permission.key != null || permission.group_name != null || permission.principal != null
+      ]) == length(distinct([
+        for permission in var.permissions :
+        coalesce(permission.key, permission.group_name, permission.principal)
+        if permission.key != null || permission.group_name != null || permission.principal != null
     ]))
     error_message = "permissions entries must have unique keys (key/group_name/principal)."
   }

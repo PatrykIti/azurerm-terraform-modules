@@ -73,8 +73,11 @@ locals {
   }
 
   diagnostic_settings_for_each = {
-    for ds in local.diagnostic_settings_resolved : ds.name => ds
-    if length(ds.log_categories) + length(ds.metric_categories) > 0
+    for ds in var.diagnostic_settings : ds.name => ds
+    if !(
+      ds.log_categories != null && length(ds.log_categories) == 0 &&
+      ds.metric_categories != null && length(ds.metric_categories) == 0
+    )
   }
 
   diagnostic_settings_skipped = [
@@ -108,11 +111,10 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
     }
   }
 
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = local.diagnostic_settings_resolved_by_name[each.key].metric_categories
     content {
-      category = metric.value
-      enabled  = true
+      category = enabled_metric.value
     }
   }
 }

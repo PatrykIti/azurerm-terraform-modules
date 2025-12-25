@@ -158,7 +158,7 @@ variable "diagnostic_settings" {
     condition = alltrue([
       for ds in var.diagnostic_settings :
       alltrue([
-        for area in(try(ds.areas, ["all"])) :
+        for area in coalescelist(try(ds.areas, null), ["all"]) :
         contains(["all", "read", "write", "delete", "transaction", "capacity", "metrics"], area)
       ])
     ])

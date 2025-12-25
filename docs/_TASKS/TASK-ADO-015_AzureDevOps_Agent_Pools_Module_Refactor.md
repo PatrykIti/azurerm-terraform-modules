@@ -13,14 +13,14 @@
 
 Refactor `modules/azuredevops_agent_pools` to align with MODULE_GUIDE/TESTING_GUIDE/TERRAFORM_BEST_PRACTICES.
 The main `azuredevops_agent_pool` resource must be a single (non-iterated) block with flat inputs.
-Collections like `azuredevops_agent_queue` and `azuredevops_elastic_pool` remain list(object) with
-stable for_each keys.
+`azuredevops_agent_queue` stays list(object) with stable for_each keys. `azuredevops_elastic_pool`
+must also be a single (non-iterated) optional block; for multiple pools use module-level for_each.
 
 ## Scope (Provider Resources)
 
 - `azuredevops_agent_pool`
 - `azuredevops_agent_queue`
-- `azuredevops_elastic_pool`
+- `azuredevops_elastic_pool` (single optional block)
 
 ## Current Gaps (Summary)
 
@@ -51,43 +51,42 @@ Flat variables for the main pool:
   - agent_pool_id (optional string)
 
 Validation rules:
-- Exactly one of `name` or `agent_pool_id` **unless** queue should use the module pool (document behavior).
-- When `agent_pool_id` omitted, module can default to `azuredevops_agent_pool.agent_pool.id`.
-- for_each key = `coalesce(key, name, agent_pool_id)` with uniqueness validation.
+- Provider rule: exactly one of `name` or `agent_pool_id` (not both).
+- Module behavior: if both are omitted, set `agent_pool_id` to the module pool ID and do not set `name`.
+- When `agent_pool_id` is specified, queue name is derived from the agent pool name (per provider behavior).
+- for_each key = `coalesce(key, name, agent_pool_id)` with uniqueness validation (no index keys).
 
-### Inputs (Elastic Pools)
+### Inputs (Elastic Pool)
 
-- elastic_pools (list(object)):
-  - key (optional string) for stable for_each
-  - name (string)
-  - service_endpoint_id (string)
-  - service_endpoint_scope (string, required by provider)
-  - azure_resource_id (string)
-  - desired_idle (number, required)
-  - max_capacity (number, required > 0)
-  - recycle_after_each_use (optional bool)
-  - time_to_live_minutes (optional number)
-  - agent_interactive_ui (optional bool)
-  - auto_provision (optional bool)
-  - auto_update (optional bool)
-  - project_id (optional string)
+Single optional object `elastic_pool` (no for_each):
+- name (string, required)
+- service_endpoint_id (string, required)
+- service_endpoint_scope (string, required)
+- azure_resource_id (string, required)
+- desired_idle (number, required)
+- max_capacity (number, required > 0)
+- recycle_after_each_use (optional bool)
+- time_to_live_minutes (optional number)
+- agent_interactive_ui (optional bool)
+- auto_provision (optional bool)
+- auto_update (optional bool)
+- project_id (optional string)
 
 Validation rules:
 - desired_idle >= 0 and <= max_capacity
 - time_to_live_minutes >= 0 (if provided)
-- unique key across elastic_pools
 
 ### Outputs
 
 - agent_pool_id (string)
 - agent_queue_ids (map, keyed by queue key/name)
-- elastic_pool_ids (map, keyed by pool key/name)
+- elastic_pool_id (string, when elastic_pool is set)
 
 ## Examples
 
 Update examples to show single pool usage:
 - basic: one pool + one queue (using module pool)
-- complete: pool + multiple queues + elastic pool
+- complete: pool + multiple queues + elastic pool (single)
 - secure: pool with auto_provision/auto_update disabled
 
 ## Tests
@@ -98,7 +97,7 @@ Update tests per TESTING_GUIDE:
   - pool_type validation
   - queue selector validation (name vs agent_pool_id)
   - elastic pool required fields (service_endpoint_scope, desired_idle)
-  - unique key validation for queues/elastic pools
+  - unique key validation for queues
 - Integration:
   - create pool + queue using module pool
   - elastic pool creation with required fields
@@ -123,9 +122,9 @@ Update tests per TESTING_GUIDE:
 
 ## Implementation Checklist
 
-- [ ] Refactor variables.tf: flatten pool inputs, update queue/elastic list(object) schemas + validations.
-- [ ] Refactor main.tf: single `azuredevops_agent_pool` block, for_each keyed by queue/elastic name or key.
-- [ ] Update outputs.tf: stable key maps and `agent_pool_id` output.
+- [ ] Refactor variables.tf: flatten pool inputs, update queue list(object) schema + validations, add optional elastic_pool object schema.
+- [ ] Refactor main.tf: single `azuredevops_agent_pool` block, for_each keyed by queue name or key, single optional `azuredevops_elastic_pool`.
+- [ ] Update outputs.tf: stable queue key maps, `agent_pool_id`, and `elastic_pool_id` output.
 - [ ] Update README + SECURITY + examples for new interface.
 - [ ] Add docs/IMPORT.md.
 - [ ] Update tests (fixtures, unit, terratest, test_config).
