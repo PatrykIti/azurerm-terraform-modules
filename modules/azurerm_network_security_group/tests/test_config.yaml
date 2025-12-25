@@ -2,24 +2,25 @@
 test_suites:
   - name: "Main Tests"
     tests:
-      - "TestNsgSimple"
-      - "TestNsgComplete"
-      - "TestNsgValidationRules"
+      - "TestBasicNetworkSecurityGroup"
+      - "TestCompleteNetworkSecurityGroup"
+      - "TestNetworkSecurityGroupValidationRules"
     parallel: true
     timeout: 20m
 
   - name: "Integration Tests"
     tests:
-      - "TestNsgLifecycle"
-      - "TestNsgCompliance"
+      - "TestNetworkSecurityGroupLifecycle"
+      - "TestSecureNetworkSecurityGroup"
+      - "TestNetworkSecurityGroupObservability"
     parallel: true
     timeout: 30m
     # These tests are skipped in -short mode (e.g., on PRs)
 
   - name: "Performance Tests"
     tests:
-      - "BenchmarkNsgCreation"
-      - "TestNsgCreationTimeSLA"
+      - "BenchmarkNetworkSecurityGroupCreation"
+      - "TestNetworkSecurityGroupCreationTime"
     parallel: false
     timeout: 45m
     benchmark: true

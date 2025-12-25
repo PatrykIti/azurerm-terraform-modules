@@ -36,12 +36,13 @@ EOF
 
 # List of tests to run
 tests=(
-    "TestSimpleNetworkSecurityGroup"
+    "TestBasicNetworkSecurityGroup"
     "TestCompleteNetworkSecurityGroup"
     "TestNetworkNetworkSecurityGroup"
     "TestSecureNetworkSecurityGroup"
     "TestNetworkSecurityGroupValidationRules"
     "TestNetworkSecurityGroupLifecycle"
+    "TestNetworkSecurityGroupObservability"
     "TestNetworkSecurityGroupCreationTime"
     "BenchmarkNetworkSecurityGroupCreation"
 )

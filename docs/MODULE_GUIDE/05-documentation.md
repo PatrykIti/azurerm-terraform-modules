@@ -25,7 +25,7 @@ The `README.md` is the front page of the module. It should provide all the essen
 
 ## `docs/IMPORT.md`
 
-This file documents how to import existing resources into the module using Terraform import blocks. The AKS module is the reference format.
+This file documents how to import existing resources into the module using Terraform import blocks. The AKS module is the reference format, but other resources may require variations that must be documented.
 
 **Required Sections:**
 - **Prerequisites**: Terraform version, provider version, and required access.

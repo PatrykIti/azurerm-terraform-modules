@@ -21,3 +21,13 @@ output "application_security_group_ids" {
     database_servers = azurerm_application_security_group.database_servers.id
   }
 }
+
+output "diagnostic_settings_ids" {
+  description = "Map of diagnostic settings names to their IDs."
+  value       = module.network_security_group.diagnostic_settings_ids
+}
+
+output "flow_log" {
+  description = "Flow log configuration for the NSG."
+  value       = module.network_security_group.flow_log
+}

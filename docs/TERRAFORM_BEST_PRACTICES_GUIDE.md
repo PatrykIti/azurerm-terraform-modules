@@ -2,7 +2,7 @@
 
 This guide outlines the best practices and standards for contributing to this open-source Terraform Azure modules repository. Following these guidelines ensures consistency, security, and maintainability across all modules.
 
-The `modules/azurerm_kubernetes_cluster` module is the **gold standard** for structure, naming, testing, and documentation. Use it as the baseline, but document and justify any deviations when a specific Azure resource (or Azure DevOps service) requires different patterns or features.
+The `modules/azurerm_kubernetes_cluster` module is the **gold standard** for structure, naming, testing, and documentation. Use it as the baseline, but document and justify any deviations when a specific Azure resource (or Azure DevOps service) requires different patterns or features. Not every resource supports the same feature set, so examples and docs may differ.
 
 ## Table of Contents
 

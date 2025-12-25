@@ -15,7 +15,7 @@ func TestNetworkSecurityGroupLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/basic")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -63,14 +63,14 @@ func TestNetworkSecurityGroupLifecycle(t *testing.T) {
 	})
 }
 
-// TestSecureNetworkSecurityGroup tests security and compliance scenarios using the 'security' fixture.
+// TestSecureNetworkSecurityGroup tests security and compliance scenarios using the 'secure' fixture.
 func TestSecureNetworkSecurityGroup(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/security")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/secure")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -105,5 +105,35 @@ func TestSecureNetworkSecurityGroup(t *testing.T) {
 			}
 		}
 		assert.True(t, denyRuleFound, "High-priority deny rule was not found.")
+	})
+}
+
+// TestNetworkSecurityGroupObservability tests diagnostic settings and flow logs.
+func TestNetworkSecurityGroupObservability(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+	t.Parallel()
+
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/observability")
+
+	defer test_structure.RunTestStage(t, "cleanup", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
+	})
+
+	test_structure.RunTestStage(t, "deploy", func() {
+		terraformOptions := getTerraformOptions(t, testFolder)
+		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
+		terraform.InitAndApply(t, terraformOptions)
+	})
+
+	test_structure.RunTestStage(t, "validate", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		diagnosticSettings := terraform.OutputMap(t, terraformOptions, "diagnostic_settings_ids")
+		flowLogID := terraform.Output(t, terraformOptions, "flow_log_id")
+
+		assert.NotEmpty(t, diagnosticSettings, "Diagnostic settings IDs should not be empty.")
+		assert.NotEmpty(t, flowLogID, "Flow log ID should not be empty.")
 	})
 }

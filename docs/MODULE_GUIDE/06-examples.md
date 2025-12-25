@@ -11,7 +11,7 @@ Examples are one of the most important parts of a module. They provide users wit
 
 ## Standard Example Scenarios
 
-Each module should, at a minimum, include the following examples. Add other use-case-specific examples as needed (e.g., `diagnostic-settings`, `multi-node-pool`, `workload-identity`).
+Each module should, at a minimum, include the following examples. Add other use-case-specific examples as needed (e.g., `diagnostic-settings`, `multi-node-pool`, `workload-identity`). The AKS module is the baseline, but examples may differ when a resource has a different feature set.
 
 ### 1. `basic`
 

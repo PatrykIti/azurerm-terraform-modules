@@ -14,12 +14,64 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "rg-nsg-complete-example"
+  name     = var.resource_group_name
   location = var.location
 }
 
+# Log Analytics workspace for diagnostics and traffic analytics
+resource "azurerm_log_analytics_workspace" "example" {
+  name                = var.log_analytics_workspace_name
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
 
-# Create Application Security Groups for demonstration
+# Storage account for flow logs and diagnostic settings
+resource "azurerm_storage_account" "flow_logs" {
+  name                     = var.storage_account_name
+  location                 = azurerm_resource_group.example.location
+  resource_group_name      = azurerm_resource_group.example.name
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  min_tls_version          = "TLS1_2"
+}
+
+# Event Hub for diagnostic settings (optional destination)
+resource "azurerm_eventhub_namespace" "example" {
+  name                = var.eventhub_namespace_name
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "Standard"
+  capacity            = 1
+}
+
+resource "azurerm_eventhub" "example" {
+  name                = var.eventhub_name
+  namespace_name      = azurerm_eventhub_namespace.example.name
+  resource_group_name = azurerm_resource_group.example.name
+  partition_count     = 2
+  message_retention   = 1
+}
+
+resource "azurerm_eventhub_authorization_rule" "example" {
+  name                = "nsg-diagnostics"
+  namespace_name      = azurerm_eventhub_namespace.example.name
+  eventhub_name       = azurerm_eventhub.example.name
+  resource_group_name = azurerm_resource_group.example.name
+  send                = true
+  listen              = false
+  manage              = false
+}
+
+# Network Watcher for flow logs
+resource "azurerm_network_watcher" "example" {
+  name                = var.network_watcher_name
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+
+# Application Security Groups for demonstration
 resource "azurerm_application_security_group" "web_servers" {
   name                = "asg-web-servers"
   location            = azurerm_resource_group.example.location
@@ -44,12 +96,11 @@ resource "azurerm_application_security_group" "database_servers" {
 
 # Main NSG module with complete configuration
 module "network_security_group" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.3"
 
   name                = "nsg-complete-example"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-
 
   # Comprehensive Security Rules
   security_rules = [
@@ -132,6 +183,36 @@ module "network_security_group" {
       description                = "Deny all other inbound traffic"
     }
   ]
+
+  diagnostic_settings = [
+    {
+      name                           = "nsg-complete-diagnostics"
+      areas                          = ["event", "rule_counter", "metrics"]
+      log_analytics_workspace_id     = azurerm_log_analytics_workspace.example.id
+      log_analytics_destination_type = "Dedicated"
+      storage_account_id             = azurerm_storage_account.flow_logs.id
+      eventhub_authorization_rule_id = azurerm_eventhub_authorization_rule.example.id
+      eventhub_name                  = azurerm_eventhub.example.name
+    }
+  ]
+
+  flow_log = {
+    name                                = "nsg-flow-logs-complete"
+    storage_account_id                  = azurerm_storage_account.flow_logs.id
+    network_watcher_name                = azurerm_network_watcher.example.name
+    network_watcher_resource_group_name = azurerm_network_watcher.example.resource_group_name
+    retention_policy = {
+      enabled = true
+      days    = 30
+    }
+    traffic_analytics = {
+      enabled               = true
+      workspace_id          = azurerm_log_analytics_workspace.example.workspace_id
+      workspace_region      = azurerm_log_analytics_workspace.example.location
+      workspace_resource_id = azurerm_log_analytics_workspace.example.id
+      interval_in_minutes   = 10
+    }
+  }
 
   tags = {
     Environment = "Development"

@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// BenchmarkNetworkSecurityGroupCreation benchmarks the creation of a simple Network Security Group.
+// BenchmarkNetworkSecurityGroupCreation benchmarks the creation of a basic Network Security Group.
 func BenchmarkNetworkSecurityGroupCreation(b *testing.B) {
 	if testing.Short() {
 		b.Skip("Skipping benchmark in short mode")
@@ -19,7 +19,7 @@ func BenchmarkNetworkSecurityGroupCreation(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_network_security_group/tests/fixtures/simple")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_network_security_group/tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 		b.StartTimer()
@@ -38,7 +38,7 @@ func TestNetworkSecurityGroupCreationTime(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -47,7 +47,7 @@ func TestNetworkSecurityGroupCreationTime(t *testing.T) {
 	terraform.InitAndApply(t, terraformOptions)
 	duration := time.Since(start)
 
-	// SLA: A simple NSG should be created in under 5 minutes.
+	// SLA: A basic NSG should be created in under 5 minutes.
 	maxDuration := 5 * time.Minute
 	require.LessOrEqual(t, duration, maxDuration, "NSG creation took %v, which is longer than the SLA of %v", duration, maxDuration)
 }

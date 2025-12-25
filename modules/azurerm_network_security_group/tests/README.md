@@ -9,12 +9,17 @@ The test organization follows the official [Testing Guide](../../../docs/TESTING
 ```
 tests/
 ├── fixtures/                # Terraform configurations for test scenarios
-│   ├── simple/              # Minimal valid configuration
-│   ├── complete/            # All features enabled (rules, flow logs, etc.)
-│   ├── security/            # Security-hardened rule examples
+│   ├── basic/               # Minimal valid configuration
+│   ├── complete/            # Advanced configuration scenarios
+│   ├── secure/              # Security-hardened rule examples
+│   ├── network/             # Networking rule scenarios
+│   ├── observability/       # Diagnostics + flow logs
 │   └── negative/            # Intentionally invalid configurations
 ├── unit/                    # Native Terraform tests (.tftest.hcl)
 │   ├── defaults.tftest.hcl
+│   ├── diagnostic_settings.tftest.hcl
+│   ├── flow_log.tftest.hcl
+│   ├── security_rules.tftest.hcl
 │   └── validation.tftest.hcl
 ├── go.mod                   # Go module dependencies
 ├── go.sum                   # Dependency checksums
@@ -52,7 +57,7 @@ make test
 
 **Run a single specific test:**
 ```bash
-make test-single TEST_NAME=TestNsgSimple
+make test-single TEST_NAME=TestBasicNetworkSecurityGroup
 ```
 
 **Run performance benchmarks:**

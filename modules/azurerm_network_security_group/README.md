@@ -17,6 +17,8 @@ This module creates and manages an Azure Network Security Group (NSG) with compr
 - ✅ **Application Security Groups** - Group VMs with similar functions
 - ✅ **Multiple Port Ranges** - Support for single or multiple port configurations
 - ✅ **CIDR and Prefix Support** - Flexible source/destination addressing
+- ✅ **Diagnostic Settings** - Send NSG logs and metrics to Log Analytics, Storage, or Event Hub
+- ✅ **Flow Logs & Traffic Analytics** - Network Watcher flow logs with optional analytics
 - ✅ **Integration Ready** - Easy attachment to subnets and network interfaces
 
 ## Prerequisites
@@ -39,7 +41,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "network_security_group" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.3"
 
   # Core configuration
   name                = "nsg-example"
@@ -73,7 +75,7 @@ module "network_security_group" {
 
 ```hcl
 module "network_security_group" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.3"
 
   # Core configuration
   name                = "nsg-production"
@@ -131,8 +133,10 @@ module "network_security_group" {
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates a basic Network Security Group configuration with simple inbound and outbound security rules.
-- [Complete](examples/complete) - This example demonstrates a comprehensive deployment of Azure Network Security Group with all available features including flow logs, traffic analytics, and complex security rule configurations.
-- [Secure](examples/secure) - This example demonstrates a maximum-security Network Security Group configuration suitable for a three-tier application (web, app, db) using a zero-trust approach.
+- [Complete](examples/complete) - This example demonstrates a comprehensive deployment with advanced rules, diagnostics, and flow logs.
+- [Secure](examples/secure) - This example demonstrates a maximum-security NSG configuration using a zero-trust approach with observability enabled.
+- [Diagnostic Settings](examples/diagnostic-settings) - This example demonstrates multi-destination diagnostic settings for NSG logs and metrics.
+- [Flow Logs](examples/flow-logs) - This example demonstrates Network Watcher flow logs with traffic analytics.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
@@ -159,13 +163,18 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_network_security_group.network_security_group](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/network_security_group) | resource |
 | [azurerm_network_security_rule.security_rules](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/network_security_rule) | resource |
+| [azurerm_network_watcher_flow_log.network_watcher_flow_log](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/network_watcher_flow_log) | resource |
+| [azurerm_monitor_diagnostic_categories.network_security_group](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/data-sources/monitor_diagnostic_categories) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Diagnostic settings for NSG logs and metrics.<br/><br/>Each item creates a separate azurerm\_monitor\_diagnostic\_setting for the NSG.<br/>Use areas to group categories (event, rule\_counter, logs, metrics) or provide explicit<br/>log\_categories / metric\_categories. At least one destination is required. | <pre>list(object({<br/>    name                           = string<br/>    areas                          = optional(list(string))<br/>    log_categories                 = optional(list(string))<br/>    metric_categories              = optional(list(string))<br/>    log_analytics_workspace_id     = optional(string)<br/>    log_analytics_destination_type = optional(string)<br/>    storage_account_id             = optional(string)<br/>    eventhub_authorization_rule_id = optional(string)<br/>    eventhub_name                  = optional(string)<br/>  }))</pre> | `[]` | no |
+| <a name="input_flow_log"></a> [flow\_log](#input\_flow\_log) | Network Watcher flow log configuration for the NSG.<br/><br/>Set to null to disable. When enabled, requires an existing Network Watcher. | <pre>object({<br/>    name                                 = optional(string)<br/>    enabled                              = optional(bool, true)<br/>    storage_account_id                   = string<br/>    network_watcher_name                 = string<br/>    network_watcher_resource_group_name  = string<br/>    version                              = optional(number, 2)<br/>    retention_policy = optional(object({<br/>      enabled = optional(bool, false)<br/>      days    = optional(number, 0)<br/>    }))<br/>    traffic_analytics = optional(object({<br/>      enabled               = optional(bool, true)<br/>      workspace_id          = string<br/>      workspace_region      = string<br/>      workspace_resource_id = string<br/>      interval_in_minutes   = optional(number, 10)<br/>    }))<br/>  })</pre> | `null` | no |
 | <a name="input_location"></a> [location](#input\_location) | The Azure Region where the Network Security Group should exist. Changing this forces a new resource to be created. | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | The name of the Network Security Group. Changing this forces a new resource to be created. | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group in which to create the Network Security Group. | `string` | n/a | yes |
@@ -176,6 +185,9 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_diagnostic_settings_ids"></a> [diagnostic\_settings\_ids](#output\_diagnostic\_settings\_ids) | Map of diagnostic settings names to their resource IDs. |
+| <a name="output_diagnostic_settings_skipped"></a> [diagnostic\_settings\_skipped](#output\_diagnostic\_settings\_skipped) | Diagnostic settings entries skipped because no categories were available after filtering. |
+| <a name="output_flow_log"></a> [flow\_log](#output\_flow\_log) | Flow log configuration for the NSG (null when disabled). |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the Network Security Group |
 | <a name="output_location"></a> [location](#output\_location) | The location of the Network Security Group |
 | <a name="output_name"></a> [name](#output\_name) | The name of the Network Security Group |
@@ -194,15 +206,16 @@ This module implements several security best practices by default:
 - **Service tags** - Use Azure service tags instead of IP ranges where possible
 - **Application Security Groups** - Group resources by function for easier management
 - **Regular reviews** - Audit rules regularly to remove unnecessary access
+- **Observability** - Use diagnostic settings and flow logs for monitoring and auditing
 
 For production deployments, see the [secure example](examples/secure) which demonstrates all security features.
 
 ## Monitoring and Compliance
 
-The module supports comprehensive monitoring through:
+The module supports monitoring and compliance through:
 
-- **Log Analytics Integration** - Centralized logging and alerting
-- **Diagnostic Settings** - Export logs to various destinations
+- **Diagnostic Settings** - Export NSG logs and metrics to Log Analytics, Storage, or Event Hub
+- **Flow Logs** - Network Watcher flow logs with optional traffic analytics
 - **Compliance Reporting** - Support for regulatory requirements
 
 ## Best Practices
@@ -229,6 +242,7 @@ Common issues and solutions:
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [docs/IMPORT.md](docs/IMPORT.md) - Importing existing NSGs into the module
 
 ## External Resources
 

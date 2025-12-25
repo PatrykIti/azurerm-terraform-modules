@@ -1,4 +1,4 @@
-# Test default settings for Azure DevOps Variable Groups
+# Test default settings for Azure DevOps Artifacts Feed
 
 mock_provider "azuredevops" {}
 
@@ -6,17 +6,17 @@ run "defaults_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_variable_group.variable_group) == 0
-    error_message = "No variable groups should be created by default."
+    condition     = length(azuredevops_feed.feed) == 0
+    error_message = "No feeds should be created by default."
   }
 
   assert {
-    condition     = length(azuredevops_variable_group_permissions.variable_group_permissions) == 0
-    error_message = "No variable group permissions should be created by default."
+    condition     = length(azuredevops_feed_permission.feed_permission) == 0
+    error_message = "No feed permissions should be created by default."
   }
 
   assert {
-    condition     = length(azuredevops_library_permissions.library_permissions) == 0
-    error_message = "No library permissions should be created by default."
+    condition     = length(azuredevops_feed_retention_policy.feed_retention_policy) == 0
+    error_message = "No feed retention policies should be created by default."
   }
 }

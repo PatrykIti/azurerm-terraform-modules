@@ -56,11 +56,11 @@ EOF_JSON
 
 # List of tests to run
 tests=(
-    "TestBasicAzuredevopsVariableGroups"
-    "TestCompleteAzuredevopsVariableGroups"
-    "TestSecureAzuredevopsVariableGroups"
-    "TestAzuredevopsVariableGroupsValidationRules"
-    "TestAzuredevopsVariableGroupsFullIntegration"
+    "TestBasicAzuredevopsArtifactsFeed"
+    "TestCompleteAzuredevopsArtifactsFeed"
+    "TestSecureAzuredevopsArtifactsFeed"
+    "TestAzuredevopsArtifactsFeedValidationRules"
+    "TestAzuredevopsArtifactsFeedFullIntegration"
 )
 
 echo "Starting sequential test execution for azuredevops_artifacts_feed"

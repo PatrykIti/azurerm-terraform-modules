@@ -1,33 +1,23 @@
-# Test variable group naming defaults
+# Test feed naming defaults
 
 mock_provider "azuredevops" {}
 
 variables {
-  project_id = "00000000-0000-0000-0000-000000000000"
-
-  variable_groups = {
-    core = {
-      allow_access = true
-      variables = [
-        {
-          name  = "key"
-          value = "value"
-        }
-      ]
-    }
+  feeds = {
+    core = {}
   }
 }
 
-run "variable_group_plan" {
+run "feed_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_variable_group.variable_group) == 1
-    error_message = "variable_groups should create one variable group."
+    condition     = length(azuredevops_feed.feed) == 1
+    error_message = "feeds should create one feed."
   }
 
   assert {
-    condition     = azuredevops_variable_group.variable_group["core"].name == "core"
-    error_message = "Variable group name should default to the map key."
+    condition     = azuredevops_feed.feed["core"].name == "core"
+    error_message = "Feed name should default to the map key."
   }
 }

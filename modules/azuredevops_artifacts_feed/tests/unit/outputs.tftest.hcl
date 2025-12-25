@@ -1,27 +1,18 @@
-# Test outputs for Azure DevOps Variable Groups
+# Test outputs for Azure DevOps Artifacts Feed
 
 mock_provider "azuredevops" {
-  mock_resource "azuredevops_variable_group" {
+  mock_resource "azuredevops_feed" {
     defaults = {
-      id   = "vg-0001"
-      name = "shared-vars"
+      id         = "feed-0001"
+      name       = "example"
+      project_id = "project-0001"
     }
   }
 }
 
 variables {
-  project_id = "00000000-0000-0000-0000-000000000000"
-
-  variable_groups = {
-    shared = {
-      allow_access = true
-      variables = [
-        {
-          name  = "key"
-          value = "value"
-        }
-      ]
-    }
+  feeds = {
+    example = {}
   }
 }
 
@@ -29,12 +20,17 @@ run "outputs_plan" {
   command = plan
 
   assert {
-    condition     = length(keys(output.variable_group_ids)) == 1
-    error_message = "variable_group_ids should include configured variable groups."
+    condition     = length(keys(output.feed_ids)) == 1
+    error_message = "feed_ids should include configured feeds."
   }
 
   assert {
-    condition     = length(keys(output.variable_group_names)) == 1
-    error_message = "variable_group_names should include configured variable groups."
+    condition     = length(keys(output.feed_names)) == 1
+    error_message = "feed_names should include configured feeds."
+  }
+
+  assert {
+    condition     = length(keys(output.feed_project_ids)) == 1
+    error_message = "feed_project_ids should include configured feeds."
   }
 }

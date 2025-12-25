@@ -161,6 +161,150 @@ variable "security_rules" {
   }
 }
 
+# Observability: Diagnostic Settings
+variable "diagnostic_settings" {
+  description = <<-EOT
+    Diagnostic settings for NSG logs and metrics.
+
+    Each item creates a separate azurerm_monitor_diagnostic_setting for the NSG.
+    Use areas to group categories (event, rule_counter, logs, metrics) or provide explicit
+    log_categories / metric_categories. At least one destination is required.
+  EOT
+
+  type = list(object({
+    name                           = string
+    areas                          = optional(list(string))
+    log_categories                 = optional(list(string))
+    metric_categories              = optional(list(string))
+    log_analytics_workspace_id     = optional(string)
+    log_analytics_destination_type = optional(string)
+    storage_account_id             = optional(string)
+    eventhub_authorization_rule_id = optional(string)
+    eventhub_name                  = optional(string)
+  }))
+
+  default = []
+
+  validation {
+    condition     = length(var.diagnostic_settings) <= 5
+    error_message = "Azure allows a maximum of 5 diagnostic settings per NSG resource."
+  }
+
+  validation {
+    condition     = length(distinct([for ds in var.diagnostic_settings : ds.name])) == length(var.diagnostic_settings)
+    error_message = "Each diagnostic_settings entry must have a unique name."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.log_analytics_workspace_id != null || ds.storage_account_id != null || ds.eventhub_authorization_rule_id != null
+    ])
+    error_message = "Each diagnostic_settings entry must specify at least one destination: log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.eventhub_authorization_rule_id == null || (ds.eventhub_name != null && ds.eventhub_name != "")
+    ])
+    error_message = "eventhub_name is required when eventhub_authorization_rule_id is set."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.log_analytics_destination_type == null || contains(["Dedicated", "AzureDiagnostics"], ds.log_analytics_destination_type)
+    ])
+    error_message = "log_analytics_destination_type must be either Dedicated or AzureDiagnostics."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([
+        for area in (ds.areas != null ? ds.areas : ["all"]) :
+        contains([
+          "all",
+          "event",
+          "rule_counter",
+          "logs",
+          "metrics"
+        ], area)
+      ])
+    ])
+    error_message = "areas may contain only: all, event, rule_counter, logs, metrics."
+  }
+}
+
+# Observability: Flow Logs (Network Watcher)
+variable "flow_log" {
+  description = <<-EOT
+    Network Watcher flow log configuration for the NSG.
+
+    Set to null to disable. When enabled, requires an existing Network Watcher.
+  EOT
+
+  type = object({
+    name                                 = optional(string)
+    enabled                              = optional(bool, true)
+    storage_account_id                   = string
+    network_watcher_name                 = string
+    network_watcher_resource_group_name  = string
+    version                              = optional(number, 2)
+    retention_policy = optional(object({
+      enabled = optional(bool, false)
+      days    = optional(number, 0)
+    }))
+    traffic_analytics = optional(object({
+      enabled               = optional(bool, true)
+      workspace_id          = string
+      workspace_region      = string
+      workspace_resource_id = string
+      interval_in_minutes   = optional(number, 10)
+    }))
+  })
+
+  default = null
+
+  validation {
+    condition = var.flow_log == null ? true : (
+      var.flow_log.storage_account_id != "" &&
+      var.flow_log.network_watcher_name != "" &&
+      var.flow_log.network_watcher_resource_group_name != ""
+    )
+    error_message = "flow_log requires storage_account_id, network_watcher_name, and network_watcher_resource_group_name."
+  }
+
+  validation {
+    condition     = var.flow_log == null ? true : (var.flow_log.name == null || var.flow_log.name != "")
+    error_message = "flow_log.name cannot be an empty string."
+  }
+
+  validation {
+    condition     = var.flow_log == null ? true : (var.flow_log.version == null || contains([1, 2], var.flow_log.version))
+    error_message = "flow_log.version must be 1 or 2."
+  }
+
+  validation {
+    condition = var.flow_log == null ? true : (var.flow_log.retention_policy == null || (
+      var.flow_log.retention_policy.days >= 0 &&
+      (var.flow_log.retention_policy.enabled == false || var.flow_log.retention_policy.days > 0)
+    ))
+    error_message = "flow_log.retention_policy.days must be >= 0; if retention is enabled, days must be > 0."
+  }
+
+  validation {
+    condition = var.flow_log == null ? true : (var.flow_log.traffic_analytics == null || (
+      var.flow_log.traffic_analytics.workspace_id != "" &&
+      var.flow_log.traffic_analytics.workspace_region != "" &&
+      var.flow_log.traffic_analytics.workspace_resource_id != "" &&
+      contains([10, 60], var.flow_log.traffic_analytics.interval_in_minutes)
+    ))
+    error_message = "flow_log.traffic_analytics requires workspace_id, workspace_region, workspace_resource_id, and interval_in_minutes of 10 or 60."
+  }
+}
+
 
 
 # Tags

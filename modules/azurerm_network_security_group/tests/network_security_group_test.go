@@ -9,11 +9,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestSimpleNetworkSecurityGroup tests the simple NSG fixture.
-func TestSimpleNetworkSecurityGroup(t *testing.T) {
+// TestBasicNetworkSecurityGroup tests the basic NSG fixture.
+func TestBasicNetworkSecurityGroup(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/basic")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)

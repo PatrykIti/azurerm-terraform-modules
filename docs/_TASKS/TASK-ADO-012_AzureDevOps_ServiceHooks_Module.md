@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-001
-**Status:** ⏳ **To Do**
+**Status:** ✅ **Done** (2025-12-24)
 
 ---
 
@@ -24,9 +24,9 @@ Service hooks (webhook, storage queue) + permissions.
 ### Inputs
 
 - project_id (string).
-- webhooks (list(object)): publisher_id, event_type, url, headers, filters.
-- storage_queue_hooks (list(object)): event_type, queue_url, sas_token, filters.
-- servicehook_permissions (list(object)): hook_id, principal_descriptor, permissions.
+- webhooks (list(object)): url, auth/headers, event-specific filters (np. git_push, build_completed, work_item_updated).
+- storage_queue_hooks (list(object)): account_name, account_key, queue_name, run_state_changed_event/stage_state_changed_event.
+- servicehook_permissions (list(object)): principal, permissions, opcjonalnie project_id.
 
 ### Outputs
 
@@ -64,11 +64,11 @@ Service hooks (webhook, storage queue) + permissions.
 
 ## Implementation Checklist
 
-- [ ] Scaffold modułu (scripts/create-new-module.sh lub manualnie) + module.json
-- [ ] versions.tf z azuredevops 1.12.2
-- [ ] variables.tf z walidacjami + domyślne bezpieczne wartości
-- [ ] main.tf (for_each dla list, dynamic blocks gdzie potrzebne)
-- [ ] outputs.tf (w tym sensitive gdzie wymagane)
-- [ ] examples/basic + complete + secure
-- [ ] tests/fixtures + unit + terratest
-- [ ] make docs + update README
+- [x] Scaffold modułu (scripts/create-new-module.sh lub manualnie) + module.json
+- [x] versions.tf z azuredevops 1.12.2
+- [x] variables.tf z walidacjami + domyślne bezpieczne wartości
+- [x] main.tf (for_each dla list, dynamic blocks gdzie potrzebne)
+- [x] outputs.tf (w tym sensitive gdzie wymagane)
+- [x] examples/basic + complete + secure
+- [x] tests/fixtures + unit + terratest
+- [x] make docs + update README

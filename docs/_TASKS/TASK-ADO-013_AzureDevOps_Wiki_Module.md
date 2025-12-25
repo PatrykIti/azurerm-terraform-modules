@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Small
 **Dependencies:** TASK-ADO-001
-**Status:** ⏳ **To Do**
+**Status:** ✅ **Done** (2025-12-24)
 
 ---
 
@@ -63,11 +63,11 @@ Zarządzanie wiki projektową i stronami wiki.
 
 ## Implementation Checklist
 
-- [ ] Scaffold modułu (scripts/create-new-module.sh lub manualnie) + module.json
-- [ ] versions.tf z azuredevops 1.12.2
-- [ ] variables.tf z walidacjami + domyślne bezpieczne wartości
-- [ ] main.tf (for_each dla list, dynamic blocks gdzie potrzebne)
-- [ ] outputs.tf (w tym sensitive gdzie wymagane)
-- [ ] examples/basic + complete + secure
-- [ ] tests/fixtures + unit + terratest
-- [ ] make docs + update README
+- [x] Scaffold modułu (scripts/create-new-module.sh lub manualnie) + module.json
+- [x] versions.tf z azuredevops 1.12.2
+- [x] variables.tf z walidacjami + domyślne bezpieczne wartości
+- [x] main.tf (for_each dla list, dynamic blocks gdzie potrzebne)
+- [x] outputs.tf (w tym sensitive gdzie wymagane)
+- [x] examples/basic + complete + secure
+- [x] tests/fixtures + unit + terratest
+- [x] make docs + update README

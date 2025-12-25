@@ -23,7 +23,7 @@ test: check-env
 	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...
 
 # Run a single, specific test function. Useful for debugging.
-# Example: make test-single TEST_NAME=TestSimpleNetworkSecurityGroup
+# Example: make test-single TEST_NAME=TestBasicNetworkSecurityGroup
 test-single: check-env
 	@echo "Running single test: $(TEST_NAME)..."
 	go test -v -timeout $(TIMEOUT) -run "^$(TEST_NAME)$$" ./...
@@ -36,27 +36,32 @@ test-unit: check-env
 # Run integration tests only
 test-integration: check-env
 	@echo "Running integration tests only..."
-	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) -run "TestNetworkSecurityGroupLifecycle|TestSecureNetworkSecurityGroup" ./...
+	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) -run "TestNetworkSecurityGroupLifecycle|TestSecureNetworkSecurityGroup|TestNetworkSecurityGroupObservability" ./...
 
-# Run test for simple fixture
-test-simple: check-env
-	@echo "Running test for simple fixture..."
-	go test -v -timeout $(TIMEOUT) -run TestSimpleNetworkSecurityGroup ./...
+# Run test for basic fixture
+test-basic: check-env
+	@echo "Running test for basic fixture..."
+	go test -v -timeout $(TIMEOUT) -run TestBasicNetworkSecurityGroup ./...
 
 # Run test for complete fixture
 test-complete: check-env
 	@echo "Running test for complete fixture..."
 	go test -v -timeout $(TIMEOUT) -run TestCompleteNetworkSecurityGroup ./...
 
-# Run test for security fixture
-test-security: check-env
-	@echo "Running test for security fixture..."
+# Run test for secure fixture
+test-secure: check-env
+	@echo "Running test for secure fixture..."
 	go test -v -timeout $(TIMEOUT) -run TestSecureNetworkSecurityGroup ./...
 
 # Run test for network fixture
 test-network: check-env
 	@echo "Running test for network fixture..."
 	go test -v -timeout $(TIMEOUT) -run TestNetworkNetworkSecurityGroup ./...
+
+# Run test for observability fixture
+test-observability: check-env
+	@echo "Running test for observability fixture..."
+	go test -v -timeout $(TIMEOUT) -run TestNetworkSecurityGroupObservability ./...
 
 # Run test for negative fixture
 test-negative: check-env
@@ -111,13 +116,14 @@ help:
 	@echo "  make test              - Run all Go tests."
 	@echo "  make test-unit         - Run unit tests only (skip integration tests)."
 	@echo "  make test-integration  - Run integration tests only (TestNetworkSecurityGroupLifecycle, TestSecureNetworkSecurityGroup)."
-	@echo "  make test-single       - Run a single test. Usage: make test-single TEST_NAME=TestSimpleNetworkSecurityGroup"
+	@echo "  make test-single       - Run a single test. Usage: make test-single TEST_NAME=TestBasicNetworkSecurityGroup"
 	@echo ""
 	@echo "Fixture-specific tests:"
-	@echo "  make test-simple       - Run test for simple fixture (TestSimpleNetworkSecurityGroup)."
+	@echo "  make test-basic        - Run test for basic fixture (TestBasicNetworkSecurityGroup)."
 	@echo "  make test-complete     - Run test for complete fixture (TestCompleteNetworkSecurityGroup)."
-	@echo "  make test-security     - Run test for security fixture (TestSecureNetworkSecurityGroup)."
+	@echo "  make test-secure       - Run test for secure fixture (TestSecureNetworkSecurityGroup)."
 	@echo "  make test-network      - Run test for network fixture (TestNetworkNetworkSecurityGroup)."
+	@echo "  make test-observability - Run test for observability fixture (TestNetworkSecurityGroupObservability)."
 	@echo "  make test-negative     - Run test for negative fixture (TestNetworkSecurityGroupValidationRules)."
 	@echo ""
 	@echo "Other targets:"
@@ -130,4 +136,4 @@ help:
 	@echo "  make ci                - Run a full CI pipeline simulation (fmt, lint, coverage, junit)."
 	@echo "  make help              - Show this help message."
 
-.PHONY: all test test-unit test-integration test-single test-simple test-complete test-security test-network test-negative benchmark test-coverage test-junit fmt lint clean ci help
+.PHONY: all test test-unit test-integration test-single test-basic test-complete test-secure test-network test-observability test-negative benchmark test-coverage test-junit fmt lint clean ci help

@@ -3,26 +3,26 @@
 test_suites:
   - name: "Basic Tests"
     tests:
-      - TestBasicAzuredevopsVariableGroups
+      - TestBasicAzuredevopsArtifactsFeed
     parallel: true
     timeout: 15m
 
   - name: "Complete Tests"
     tests:
-      - TestCompleteAzuredevopsVariableGroups
-      - TestSecureAzuredevopsVariableGroups
+      - TestCompleteAzuredevopsArtifactsFeed
+      - TestSecureAzuredevopsArtifactsFeed
     parallel: true
     timeout: 30m
 
   - name: "Validation Tests"
     tests:
-      - TestAzuredevopsVariableGroupsValidationRules
+      - TestAzuredevopsArtifactsFeedValidationRules
     parallel: true
     timeout: 10m
 
   - name: "Integration Tests"
     tests:
-      - TestAzuredevopsVariableGroupsFullIntegration
+      - TestAzuredevopsArtifactsFeedFullIntegration
     parallel: false
     timeout: 45m
 

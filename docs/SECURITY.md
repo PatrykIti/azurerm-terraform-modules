@@ -4,7 +4,7 @@
 
 This document outlines the security policies and best practices implemented across all Terraform modules in this repository. Our modules follow a "security-by-default" approach, ensuring that resources are deployed with the most secure configuration possible while maintaining functionality.
 
-The `modules/azurerm_kubernetes_cluster` module is the security documentation baseline. Use its structure and level of detail as a reference, but document and justify deviations when a specific Azure resource (or Azure DevOps service) requires different controls.
+The `modules/azurerm_kubernetes_cluster` module is the security documentation baseline. Use its structure and level of detail as a reference, but document and justify deviations when a specific Azure resource (or Azure DevOps service) requires different controls. Some services do not support all controls, so module security docs must reflect actual capabilities.
 
 ## Security Principles
 

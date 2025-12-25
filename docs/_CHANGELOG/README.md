@@ -6,6 +6,11 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [017](./017-2025-12-24-azuredevops-work-items-module.md) | 2025-12-24 | Azure DevOps Work Items module | Feature |
+| [016](./016-2025-12-24-azuredevops-wiki-module.md) | 2025-12-24 | Azure DevOps Wiki module | Feature |
+| [015](./015-2025-12-24-azuredevops-servicehooks-module.md) | 2025-12-24 | Azure DevOps Service Hooks module | Feature |
+| [014](./014-2025-12-24-azuredevops-artifacts-feed-module.md) | 2025-12-24 | Azure DevOps Artifacts Feed module | Feature |
+| [013](./013-2025-12-24-azuredevops-variable-groups-module.md) | 2025-12-24 | Azure DevOps Variable Groups module | Feature |
 | [012](./012-2025-12-24-azuredevops-serviceendpoint-module.md) | 2025-12-24 | Azure DevOps Service Endpoints module | Feature |
 | [011](./011-2025-12-24-azuredevops-environments-module.md) | 2025-12-24 | Azure DevOps Environments module | Feature |
 | [010](./010-2025-12-24-azuredevops-pipelines-module.md) | 2025-12-24 | Azure DevOps Pipelines module | Feature |
