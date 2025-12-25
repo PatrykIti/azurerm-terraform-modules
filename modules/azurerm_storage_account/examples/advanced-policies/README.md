@@ -192,7 +192,7 @@ terraform destroy
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | ../../ | n/a |
+| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | ../.. | n/a |
 
 ## Resources
 

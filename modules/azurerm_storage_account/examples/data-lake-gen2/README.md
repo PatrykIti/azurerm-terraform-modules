@@ -262,7 +262,7 @@ terraform destroy
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_data_lake_storage"></a> [data\_lake\_storage](#module\_data\_lake\_storage) | ../../ | n/a |
+| <a name="module_data_lake_storage"></a> [data\_lake\_storage](#module\_data\_lake\_storage) | ../.. | n/a |
 
 ## Resources
 
@@ -293,7 +293,10 @@ terraform destroy
 
 ## Inputs
 
-No inputs.
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_location"></a> [location](#input\_location) | The Azure region where resources will be created | `string` | `"West Europe"` | no |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group | `string` | `"rg-datalake-gen2-example"` | no |
 
 ## Outputs
 

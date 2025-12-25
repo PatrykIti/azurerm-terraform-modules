@@ -16,13 +16,11 @@ locals {
 }
 
 data "azurerm_monitor_diagnostic_categories" "storage" {
-  for_each   = { for scope in local.diagnostic_scopes : scope => local.diagnostic_scope_ids[scope] }
+  for_each    = { for scope in local.diagnostic_scopes : scope => local.diagnostic_scope_ids[scope] }
   resource_id = each.value
 }
 
 locals {
-  diagnostics_enabled = length(var.diagnostic_settings) > 0
-
   diag_log_categories_by_scope = {
     for scope, ds in data.azurerm_monitor_diagnostic_categories.storage : scope => ds.log_category_types
   }
@@ -56,16 +54,16 @@ locals {
       log_categories = ds.log_categories != null ? [
         for c in ds.log_categories : c
         if contains(lookup(local.diag_log_categories_by_scope, try(ds.scope, "storage_account"), []), c)
-      ] : distinct(flatten([
-        for area in(ds.areas != null ? ds.areas : ["all"]) :
-        lookup(lookup(local.diag_area_log_map, try(ds.scope, "storage_account"), {}), area, [])
+        ] : distinct(flatten([
+          for area in(ds.areas != null ? ds.areas : ["all"]) :
+          lookup(lookup(local.diag_area_log_map, try(ds.scope, "storage_account"), {}), area, [])
       ]))
       metric_categories = ds.metric_categories != null ? [
         for c in ds.metric_categories : c
         if contains(lookup(local.diag_metric_categories_by_scope, try(ds.scope, "storage_account"), []), c)
-      ] : distinct(flatten([
-        for area in(ds.areas != null ? ds.areas : ["all"]) :
-        lookup(lookup(local.diag_area_metric_map, try(ds.scope, "storage_account"), {}), area, [])
+        ] : distinct(flatten([
+          for area in(ds.areas != null ? ds.areas : ["all"]) :
+          lookup(lookup(local.diag_area_metric_map, try(ds.scope, "storage_account"), {}), area, [])
       ]))
     })
   ]

@@ -5,7 +5,7 @@
 **Category:** Module Cleanup / Documentation  
 **Estimated Effort:** Large  
 **Dependencies:** —  
-**Status:** 🟡 **To Do**
+**Status:** ✅ **Done** (2025-12-25)
 
 ---
 
@@ -131,11 +131,11 @@ AKS jest wzorcem, ale storage account ma inne ograniczenia (np. nazewnictwo, oso
 - Implementacja ma tworzyc *jeden* blok `azurerm_monitor_diagnostic_setting` per wpis (for_each po `name`).
 - Dla kazdego scope wyliczyc `target_resource_id`:
   - storage account: `azurerm_storage_account.storage_account.id`
-  - blob service: `${azurerm_storage_account.storage_account.id}/blobServices/default`
-  - queue service: `${azurerm_storage_account.storage_account.id}/queueServices/default`
-  - file service: `${azurerm_storage_account.storage_account.id}/fileServices/default`
-  - table service: `${azurerm_storage_account.storage_account.id}/tableServices/default` (jesli uzywane)
-  - dfs service: `${azurerm_storage_account.storage_account.id}/dfsServices/default` (jesli uzywane)
+  - blob service: `join("/", [azurerm_storage_account.storage_account.id, "blobServices", "default"])`
+  - queue service: `join("/", [azurerm_storage_account.storage_account.id, "queueServices", "default"])`
+  - file service: `join("/", [azurerm_storage_account.storage_account.id, "fileServices", "default"])`
+  - table service: `join("/", [azurerm_storage_account.storage_account.id, "tableServices", "default"])` (jesli uzywane)
+  - dfs service: `join("/", [azurerm_storage_account.storage_account.id, "dfsServices", "default"])` (jesli uzywane)
 - Pobierac dostepne kategorie per scope z data source `azurerm_monitor_diagnostic_categories`,
   a nastepnie filtrowac wymagane kategorie do tych, ktore sa realnie dostepne w regionie.
 - Jeśli po filtracji brak kategorii (log/metric) => wpis pomijany + raport w `diagnostic_settings_skipped` (jak w AKS).
@@ -146,19 +146,15 @@ variable "diagnostic_settings" {
   description = "Diagnostic settings for storage account and services. Empty list disables diagnostics."
   type = list(object({
     name                           = string
-    scope                          = string # storage_account | blob | queue | file | table | dfs
+    scope                          = optional(string, "storage_account") # storage_account | blob | queue | file | table | dfs
+    areas                          = optional(list(string))
+    log_categories                 = optional(list(string))
+    metric_categories              = optional(list(string))
     log_analytics_workspace_id     = optional(string)
+    log_analytics_destination_type = optional(string)
     storage_account_id             = optional(string)
     eventhub_authorization_rule_id = optional(string)
     eventhub_name                  = optional(string)
-    logs = optional(list(object({
-      category = string
-      enabled  = optional(bool, true)
-    })), [])
-    metrics = optional(list(object({
-      category = string
-      enabled  = optional(bool, true)
-    })), [])
   }))
   default = []
 }
@@ -170,31 +166,21 @@ diagnostic_settings = [
   {
     name                       = "diag-storage"
     scope                      = "storage_account"
+    areas                      = ["transaction", "capacity"]
     log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-    logs = [
-      { category = "StorageRead" },
-      { category = "StorageWrite" },
-      { category = "StorageDelete" }
-    ]
-    metrics = [
-      { category = "Transaction" }
-    ]
   },
   {
     name                       = "diag-blob"
     scope                      = "blob"
+    areas                      = ["read", "write", "delete", "transaction", "capacity"]
     log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-    logs = [
-      { category = "StorageRead" }
-    ]
   },
   {
     name                       = "diag-file"
     scope                      = "file"
     log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-    metrics = [
-      { category = "Transaction" }
-    ]
+    log_categories             = ["StorageRead"]
+    metric_categories          = ["Transaction"]
   }
 ]
 ```

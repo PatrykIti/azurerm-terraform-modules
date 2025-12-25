@@ -241,8 +241,8 @@ run "diagnostic_settings_missing_eventhub_name" {
     name = "validstorageaccount"
     diagnostic_settings = [
       {
-        name                       = "missing-eventhub-name"
-        scope                      = "storage_account"
+        name                           = "missing-eventhub-name"
+        scope                          = "storage_account"
         eventhub_authorization_rule_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.EventHub/namespaces/ns/authorizationRules/auth"
       }
     ]
@@ -261,9 +261,9 @@ run "diagnostic_settings_invalid_destination_type" {
     name = "validstorageaccount"
     diagnostic_settings = [
       {
-        name                       = "invalid-destination-type"
-        scope                      = "storage_account"
-        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+        name                           = "invalid-destination-type"
+        scope                          = "storage_account"
+        log_analytics_workspace_id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
         log_analytics_destination_type = "InvalidType"
       }
     ]

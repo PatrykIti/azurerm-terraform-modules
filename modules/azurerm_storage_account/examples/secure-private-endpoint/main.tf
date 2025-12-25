@@ -292,9 +292,8 @@ module "secure_storage" {
     shared_access_key_enabled         = true # Required for Terraform to manage the resource
     infrastructure_encryption_enabled = var.enable_infrastructure_encryption
     allow_nested_items_to_be_public   = false
+    public_network_access_enabled     = false
   }
-
-  # Note: public_network_access_enabled = false would be set here if the module supported it
 
   # Encryption settings
   encryption = {

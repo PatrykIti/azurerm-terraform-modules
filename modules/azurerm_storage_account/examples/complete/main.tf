@@ -171,7 +171,6 @@ module "storage_account" {
     shared_access_key_enabled         = true # Required for Terraform to manage the resource
     allow_nested_items_to_be_public   = false
     infrastructure_encryption_enabled = true
-    enable_advanced_threat_protection = true
     public_network_access_enabled     = true # Set to false in production
   }
 

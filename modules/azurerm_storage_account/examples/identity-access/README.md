@@ -260,9 +260,9 @@ The storage account's managed identity can access other services:
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_storage_combined"></a> [storage\_combined](#module\_storage\_combined) | ../../ | n/a |
-| <a name="module_storage_system_assigned"></a> [storage\_system\_assigned](#module\_storage\_system\_assigned) | ../../ | n/a |
-| <a name="module_storage_user_assigned"></a> [storage\_user\_assigned](#module\_storage\_user\_assigned) | ../../ | n/a |
+| <a name="module_storage_combined"></a> [storage\_combined](#module\_storage\_combined) | ../.. | n/a |
+| <a name="module_storage_system_assigned"></a> [storage\_system\_assigned](#module\_storage\_system\_assigned) | ../.. | n/a |
+| <a name="module_storage_user_assigned"></a> [storage\_user\_assigned](#module\_storage\_user\_assigned) | ../.. | n/a |
 
 ## Resources
 
@@ -284,7 +284,10 @@ The storage account's managed identity can access other services:
 
 ## Inputs
 
-No inputs.
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_location"></a> [location](#input\_location) | The Azure region where resources will be created | `string` | `"West Europe"` | no |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group | `string` | `"rg-storage-identity-example"` | no |
 
 ## Outputs
 

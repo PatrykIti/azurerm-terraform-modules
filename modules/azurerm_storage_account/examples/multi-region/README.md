@@ -364,10 +364,10 @@ terraform apply -var="enable_monitoring_alerts=true"
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_dr_storage"></a> [dr\_storage](#module\_dr\_storage) | ../../ | n/a |
-| <a name="module_primary_storage"></a> [primary\_storage](#module\_primary\_storage) | ../../ | n/a |
-| <a name="module_replication_metadata"></a> [replication\_metadata](#module\_replication\_metadata) | ../../ | n/a |
-| <a name="module_secondary_storage"></a> [secondary\_storage](#module\_secondary\_storage) | ../../ | n/a |
+| <a name="module_dr_storage"></a> [dr\_storage](#module\_dr\_storage) | ../.. | n/a |
+| <a name="module_primary_storage"></a> [primary\_storage](#module\_primary\_storage) | ../.. | n/a |
+| <a name="module_replication_metadata"></a> [replication\_metadata](#module\_replication\_metadata) | ../.. | n/a |
+| <a name="module_secondary_storage"></a> [secondary\_storage](#module\_secondary\_storage) | ../.. | n/a |
 
 ## Resources
 
@@ -379,7 +379,6 @@ terraform apply -var="enable_monitoring_alerts=true"
 | [azurerm_log_analytics_workspace.shared](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/log_analytics_workspace) | resource |
 | [azurerm_logic_app_standard.replication](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/logic_app_standard) | resource |
 | [azurerm_monitor_action_group.replication](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_action_group) | resource |
-| [azurerm_monitor_diagnostic_setting.metadata_enhanced](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_metric_alert.capacity_alert](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_metric_alert.primary_availability](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_metric_alert.primary_errors](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_metric_alert) | resource |

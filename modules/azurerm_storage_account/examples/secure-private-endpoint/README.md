@@ -336,7 +336,7 @@ terraform destroy
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_secure_storage"></a> [secure\_storage](#module\_secure\_storage) | ../../ | n/a |
+| <a name="module_secure_storage"></a> [secure\_storage](#module\_secure\_storage) | ../.. | n/a |
 
 ## Resources
 
@@ -353,9 +353,7 @@ terraform destroy
 | [azurerm_log_analytics_workspace.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/log_analytics_workspace) | resource |
 | [azurerm_management_lock.resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/management_lock) | resource |
 | [azurerm_monitor_action_group.security](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_action_group) | resource |
-| [azurerm_monitor_diagnostic_setting.blob_service](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_diagnostic_setting.key_vault](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
-| [azurerm_monitor_diagnostic_setting.storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_metric_alert.anomalous_access](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_metric_alert.auth_failures](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_scheduled_query_rules_alert.kv_unknown_access](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_scheduled_query_rules_alert) | resource |
