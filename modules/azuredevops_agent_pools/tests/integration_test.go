@@ -30,10 +30,10 @@ func TestAzuredevopsAgentPoolsFullIntegration(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		agentPoolIDs := terraform.OutputMap(t, terraformOptions, "agent_pool_ids")
+		agentPoolID := terraform.Output(t, terraformOptions, "agent_pool_id")
 		agentQueueIDs := terraform.OutputMap(t, terraformOptions, "agent_queue_ids")
 
-		assert.NotEmpty(t, agentPoolIDs)
+		assert.NotEmpty(t, agentPoolID)
 		assert.NotEmpty(t, agentQueueIDs)
 	})
 }

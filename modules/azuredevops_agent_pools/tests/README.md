@@ -64,7 +64,7 @@ go test -v -run TestBasicAzuredevopsAgentPools -timeout 30m
 The `fixtures/` directory contains Terraform configurations for different test scenarios:
 
 - `fixtures/basic/` - Basic module configuration
-- `fixtures/complete/` - Multiple pools and queues
+- `fixtures/complete/` - Module pool with multiple queues (including external pool)
 - `fixtures/secure/` - Security-focused configuration
 - `fixtures/network/` - Queue created with an external pool ID
 - `fixtures/negative/` - Negative test cases

@@ -1,7 +1,7 @@
 # Azure Subnet Module
 # This module creates and manages Azure Subnets with advanced features
-# Note: Network Security Group and Route Table associations should be managed
-# at the wrapper/composition level for maximum flexibility
+# Note: NSG/Route Table/NAT associations can be managed via the module or
+# externally at the wrapper/composition level when more control is needed.
 
 # Main Subnet Resource
 resource "azurerm_subnet" "subnet" {

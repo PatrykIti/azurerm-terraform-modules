@@ -15,10 +15,12 @@ resource "azuredevops_agent_pool" "external" {
 module "azuredevops_agent_pools" {
   source = "../../"
 
+  name = "${var.pool_name_prefix}-module-${random_string.suffix.result}"
+
   agent_queues = [
     {
+      key           = "external"
       project_id    = var.project_id
-      name          = "${var.queue_name_prefix}-${random_string.suffix.result}"
       agent_pool_id = azuredevops_agent_pool.external.id
     }
   ]

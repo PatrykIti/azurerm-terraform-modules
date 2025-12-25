@@ -3,15 +3,12 @@
 mock_provider "azuredevops" {}
 
 variables {
-  agent_pools = {
-    default = {}
-  }
+  name = "default-pool"
 
   agent_queues = [
     {
-      project_id     = "00000000-0000-0000-0000-000000000000"
-      name           = "ado-queue-default"
-      agent_pool_key = "default"
+      key        = "default"
+      project_id = "00000000-0000-0000-0000-000000000000"
     }
   ]
 }
@@ -20,17 +17,12 @@ run "pool_queue_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_agent_pool.pool) == 1
-    error_message = "agent_pools should create one pool."
+    condition     = azuredevops_agent_pool.agent_pool.name == "default-pool"
+    error_message = "Agent pool name should match the input."
   }
 
   assert {
-    condition     = azuredevops_agent_pool.pool["default"].name == "default"
-    error_message = "Pool name should default to the map key."
-  }
-
-  assert {
-    condition     = length(azuredevops_agent_queue.queue) == 1
+    condition     = length(azuredevops_agent_queue.agent_queue) == 1
     error_message = "agent_queues should create one queue."
   }
 }

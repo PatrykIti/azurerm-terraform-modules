@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [025](./025-2025-12-25-azuredevops-agent-pools-refactor.md) | 2025-12-25 | Azure DevOps Agent Pools module – refactor & alignment | Breaking Change / Maintenance |
 | [024](./024-2025-12-25-storage-account-module-alignment.md) | 2025-12-25 | Storage Account module – alignment (docs + diagnostics) | Feature / Maintenance |
 | [023](./023-2025-12-25-azuredevops-project-permissions-alignment.md) | 2025-12-25 | Azure DevOps Project Permissions module – alignment & verification | Maintenance / Verification |
 | [022](./022-2025-12-25-azuredevops-project-test-verification.md) | 2025-12-25 | Azure DevOps Project module test verification | Maintenance / Verification |

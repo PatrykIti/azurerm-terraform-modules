@@ -3,5 +3,11 @@
 variable "location" {
   description = "The Azure region where resources will be created"
   type        = string
-  default     = "East US"
+  default     = "West Europe"
+}
+
+variable "storage_account_name" {
+  description = "Storage account name used for the service endpoint policy example."
+  type        = string
+  default     = "stsubnetcompleteexample"
 }

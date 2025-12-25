@@ -39,7 +39,7 @@ resource "azurerm_virtual_network" "example" {
 module "subnet_container_instances" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
 
-  name                 = "subnet-container-instances"
+  name                 = "snet-container-instances"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -75,7 +75,7 @@ module "subnet_container_instances" {
 module "subnet_postgresql" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
 
-  name                 = "subnet-postgresql"
+  name                 = "snet-postgresql"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.2.0/24"]
@@ -107,7 +107,7 @@ module "subnet_postgresql" {
 module "subnet_app_service" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
 
-  name                 = "subnet-app-service"
+  name                 = "snet-app-service"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.3.0/24"]
@@ -143,7 +143,7 @@ module "subnet_app_service" {
 module "subnet_batch" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
 
-  name                 = "subnet-batch"
+  name                 = "snet-batch"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.4.0/24"]
@@ -177,7 +177,7 @@ module "subnet_batch" {
 module "subnet_regular" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
 
-  name                 = "subnet-regular"
+  name                 = "snet-regular"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.5.0/24"]

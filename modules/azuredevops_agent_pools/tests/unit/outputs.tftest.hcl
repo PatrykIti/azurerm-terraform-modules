@@ -21,45 +21,36 @@ mock_provider "azuredevops" {
 }
 
 variables {
-  agent_pools = {
-    default = {
-      name = "Default Pool"
-    }
-    build = {
-      name = "Build Pool"
-    }
-  }
+  name = "Default Pool"
 
   agent_queues = [
     {
-      project_id     = "00000000-0000-0000-0000-000000000000"
-      name           = "Default Queue"
-      agent_pool_key = "default"
+      key        = "default"
+      project_id = "00000000-0000-0000-0000-000000000000"
     },
     {
-      project_id     = "00000000-0000-0000-0000-000000000000"
-      name           = "Build Queue"
-      agent_pool_key = "build"
+      key           = "external"
+      project_id    = "00000000-0000-0000-0000-000000000000"
+      agent_pool_id = "pool-0002"
     }
   ]
 
-  elastic_pools = [
-    {
-      name                = "Elastic Pool"
-      service_endpoint_id = "service-endpoint-0001"
-      azure_resource_id   = "resource-0001"
-      desired_idle        = 1
-      max_capacity        = 2
-    }
-  ]
+  elastic_pool = {
+    name                   = "Elastic Pool"
+    service_endpoint_id    = "service-endpoint-0001"
+    service_endpoint_scope = "00000000-0000-0000-0000-000000000000"
+    azure_resource_id      = "resource-0001"
+    desired_idle           = 1
+    max_capacity           = 2
+  }
 }
 
 run "outputs_plan" {
   command = plan
 
   assert {
-    condition     = length(keys(output.agent_pool_ids)) == 2
-    error_message = "agent_pool_ids should include all configured pools."
+    condition     = output.agent_pool_id == "00000000-0000-0000-0000-000000000000"
+    error_message = "agent_pool_id should match the mock ID."
   }
 
   assert {
@@ -68,7 +59,7 @@ run "outputs_plan" {
   }
 
   assert {
-    condition     = length(keys(output.elastic_pool_ids)) == 1
-    error_message = "elastic_pool_ids should include configured elastic pools."
+    condition     = output.elastic_pool_id == "elastic-0001"
+    error_message = "elastic_pool_id should match the mock ID."
   }
 }

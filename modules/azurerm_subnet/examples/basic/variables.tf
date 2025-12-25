@@ -9,7 +9,7 @@ variable "resource_group_name" {
 variable "location" {
   description = "The Azure region where resources will be created"
   type        = string
-  default     = "East US"
+  default     = "West Europe"
 }
 
 variable "virtual_network_name" {
@@ -21,5 +21,5 @@ variable "virtual_network_name" {
 variable "subnet_name" {
   description = "The name of the Subnet"
   type        = string
-  default     = "subnet-basic-example"
+  default     = "snet-subnet-basic-example"
 }

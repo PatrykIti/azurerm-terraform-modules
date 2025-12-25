@@ -8,32 +8,26 @@ resource "random_string" "suffix" {
   special = false
 }
 
+resource "azuredevops_agent_pool" "external" {
+  name = "${var.pool_name_prefix}-external-${random_string.suffix.result}"
+}
+
 module "azuredevops_agent_pools" {
   source = "../../"
 
-  agent_pools = {
-    default = {
-      name           = "${var.pool_name_prefix}-default-${random_string.suffix.result}"
-      auto_provision = true
-      auto_update    = true
-    }
-    build = {
-      name           = "${var.pool_name_prefix}-build-${random_string.suffix.result}"
-      auto_provision = true
-      auto_update    = false
-    }
-  }
+  name           = "${var.pool_name_prefix}-default-${random_string.suffix.result}"
+  auto_provision = true
+  auto_update    = true
 
   agent_queues = [
     {
-      project_id     = var.project_id
-      name           = "${var.queue_name_prefix}-default-${random_string.suffix.result}"
-      agent_pool_key = "default"
+      key        = "default"
+      project_id = var.project_id
     },
     {
-      project_id     = var.project_id
-      name           = "${var.queue_name_prefix}-build-${random_string.suffix.result}"
-      agent_pool_key = "build"
+      key           = "external"
+      project_id    = var.project_id
+      agent_pool_id = azuredevops_agent_pool.external.id
     }
   ]
 }

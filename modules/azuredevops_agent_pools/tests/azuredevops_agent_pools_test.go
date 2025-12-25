@@ -31,15 +31,15 @@ func TestBasicAzuredevopsAgentPools(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		agentPoolIDs := terraform.OutputMap(t, terraformOptions, "agent_pool_ids")
+		agentPoolID := terraform.Output(t, terraformOptions, "agent_pool_id")
 		agentQueueIDs := terraform.OutputMap(t, terraformOptions, "agent_queue_ids")
 
-		assert.NotEmpty(t, agentPoolIDs)
+		assert.NotEmpty(t, agentPoolID)
 		assert.NotEmpty(t, agentQueueIDs)
 	})
 }
 
-// Test complete azuredevops_agent_pools with multiple pools/queues
+// Test complete azuredevops_agent_pools with multiple queues
 func TestCompleteAzuredevopsAgentPools(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
@@ -58,10 +58,10 @@ func TestCompleteAzuredevopsAgentPools(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		agentPoolIDs := terraform.OutputMap(t, terraformOptions, "agent_pool_ids")
+		agentPoolID := terraform.Output(t, terraformOptions, "agent_pool_id")
 		agentQueueIDs := terraform.OutputMap(t, terraformOptions, "agent_queue_ids")
 
-		assert.GreaterOrEqual(t, len(agentPoolIDs), 2)
+		assert.NotEmpty(t, agentPoolID)
 		assert.GreaterOrEqual(t, len(agentQueueIDs), 2)
 	})
 }
@@ -85,10 +85,10 @@ func TestSecureAzuredevopsAgentPools(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		agentPoolIDs := terraform.OutputMap(t, terraformOptions, "agent_pool_ids")
+		agentPoolID := terraform.Output(t, terraformOptions, "agent_pool_id")
 		agentQueueIDs := terraform.OutputMap(t, terraformOptions, "agent_queue_ids")
 
-		assert.NotEmpty(t, agentPoolIDs)
+		assert.NotEmpty(t, agentPoolID)
 		assert.NotEmpty(t, agentQueueIDs)
 	})
 }
@@ -131,7 +131,7 @@ func TestAzuredevopsAgentPoolsValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "agent_pool_id or agent_pool_key")
+	assert.Contains(t, err.Error(), "name or agent_pool_id")
 }
 
 // Helper function to get terraform options
@@ -145,7 +145,6 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		Vars: map[string]interface{}{
 			"project_id":        getProjectID(t),
 			"pool_name_prefix":  fmt.Sprintf("ado-agent-pool-%s", uniqueID),
-			"queue_name_prefix": fmt.Sprintf("ado-agent-queue-%s", uniqueID),
 		},
 		NoColor: true,
 		RetryableTerraformErrors: map[string]string{

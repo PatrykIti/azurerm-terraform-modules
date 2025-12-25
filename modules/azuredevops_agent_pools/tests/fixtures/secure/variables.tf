@@ -8,9 +8,3 @@ variable "pool_name_prefix" {
   type        = string
   default     = "ado-agent-pool-secure-fixture"
 }
-
-variable "queue_name_prefix" {
-  description = "Prefix for the agent queue name."
-  type        = string
-  default     = "ado-agent-queue-secure-fixture"
-}

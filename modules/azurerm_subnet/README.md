@@ -10,7 +10,7 @@ Current version: **1.0.3**
 
 This module creates and manages Azure Subnets with advanced configuration options including service endpoints, delegations, and network policies. It's designed to provide comprehensive subnet management capabilities beyond the basic subnet creation included in virtual network modules.
 
-> **Note**: Network Security Group and Route Table associations should be managed at the wrapper/composition level for maximum flexibility. See the examples for best practices on managing associations.
+> **Note**: NSG/Route Table/NAT associations can be managed via the module (`associations`) or externally at the wrapper/composition level when you need more control.
 
 ## Features
 
@@ -20,7 +20,7 @@ This module creates and manages Azure Subnets with advanced configuration option
 - **Service Endpoint Policies**: Apply policies to restrict service endpoint access
 - **Private Endpoint Support**: Configure subnets specifically for private endpoints
 - **Security-First Design**: Secure defaults with flexible overrides
-- **Flexible Architecture**: Designed to work with external NSG and Route Table associations
+- **Optional Associations**: Attach NSGs/Route Tables/NAT gateways via `associations` or external resources
 
 ## Usage
 
@@ -34,11 +34,6 @@ module "subnet" {
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
-
-  tags = {
-    Environment = "Production"
-    Project     = "MyApp"
-  }
 }
 ```
 
@@ -67,22 +62,14 @@ module "secure_subnet" {
   private_endpoint_network_policies_enabled     = true
   private_link_service_network_policies_enabled = true
 
-  tags = {
-    Environment   = "Production"
-    SecurityLevel = "High"
+  associations = {
+    network_security_group = {
+      id = azurerm_network_security_group.example.id
+    }
+    route_table = {
+      id = azurerm_route_table.example.id
+    }
   }
-}
-
-# Network Security Group Association - managed at wrapper level
-resource "azurerm_subnet_network_security_group_association" "secure" {
-  subnet_id                 = module.secure_subnet.id
-  network_security_group_id = azurerm_network_security_group.example.id
-}
-
-# Route Table Association - managed at wrapper level
-resource "azurerm_subnet_route_table_association" "secure" {
-  subnet_id      = module.secure_subnet.id
-  route_table_id = azurerm_route_table.example.id
 }
 ```
 
@@ -100,16 +87,6 @@ module "private_endpoint_subnet" {
   # Required for private endpoints
   private_endpoint_network_policies_enabled     = false
   private_link_service_network_policies_enabled = false
-
-  tags = {
-    Purpose = "PrivateEndpoints"
-  }
-}
-
-# Optional NSG association for additional security - managed at wrapper level
-resource "azurerm_subnet_network_security_group_association" "pe" {
-  subnet_id                 = module.private_endpoint_subnet.id
-  network_security_group_id = azurerm_network_security_group.pe.id
 }
 ```
 
@@ -137,10 +114,6 @@ module "delegated_subnet" {
       }
     }
   }
-
-  tags = {
-    Service = "ContainerInstances"
-  }
 }
 ```
 
@@ -151,7 +124,7 @@ module "delegated_subnet" {
 - [Complete](examples/complete) - This example demonstrates a comprehensive subnet configuration with all available features including service endpoints, network security groups, route tables, and service endpoint policies.
 - [Delegation](examples/delegation) - This example demonstrates subnet delegation to various Azure services, showing how to configure subnets that are dedicated to specific Azure service types and their required network policies.
 - [Private Endpoint](examples/private-endpoint) - This example demonstrates subnet configuration optimized for private endpoint scenarios, showing how to properly configure subnets for private endpoint connectivity to Azure services.
-- [Secure](examples/secure) - This example demonstrates a security-focused subnet configuration with enhanced security features including DDoS protection, restrictive network security groups, secure routing, and comprehensive monitoring.
+- [Secure](examples/secure) - This example demonstrates a security-focused subnet configuration with restrictive NSG rules and hardened network policies.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->

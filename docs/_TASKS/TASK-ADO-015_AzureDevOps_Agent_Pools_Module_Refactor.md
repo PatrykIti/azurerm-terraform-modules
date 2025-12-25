@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-004
-**Status:** ⏳ **To Do**
+**Status:** ✅ **Done** (2025-12-25)
 
 ---
 
@@ -122,10 +122,10 @@ Update tests per TESTING_GUIDE:
 
 ## Implementation Checklist
 
-- [ ] Refactor variables.tf: flatten pool inputs, update queue list(object) schema + validations, add optional elastic_pool object schema.
-- [ ] Refactor main.tf: single `azuredevops_agent_pool` block, for_each keyed by queue name or key, single optional `azuredevops_elastic_pool`.
-- [ ] Update outputs.tf: stable queue key maps, `agent_pool_id`, and `elastic_pool_id` output.
-- [ ] Update README + SECURITY + examples for new interface.
-- [ ] Add docs/IMPORT.md.
-- [ ] Update tests (fixtures, unit, terratest, test_config).
+- [x] Refactor variables.tf: flatten pool inputs, update queue list(object) schema + validations, add optional elastic_pool object schema.
+- [x] Refactor main.tf: single `azuredevops_agent_pool` block, for_each keyed by queue name or key, single optional `azuredevops_elastic_pool`.
+- [x] Update outputs.tf: stable queue key maps, `agent_pool_id`, and `elastic_pool_id` output.
+- [x] Update README + SECURITY + examples for new interface.
+- [x] Add docs/IMPORT.md.
+- [x] Update tests (fixtures, unit, terratest, test_config).
 - [ ] make docs + update README.

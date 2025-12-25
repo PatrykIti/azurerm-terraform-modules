@@ -75,6 +75,5 @@ location = "West Europe"
 
 ## Important Notes
 
-- The service endpoint policy includes placeholder subscription IDs that should be replaced with actual values in production
 - The virtual appliance IP address (10.0.10.4) should be updated to match your actual network topology
-- Storage account names must be globally unique - the example uses a generated name that may need adjustment
+- Storage account names must be globally unique; override `storage_account_name` if needed
