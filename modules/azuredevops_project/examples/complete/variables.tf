@@ -1,5 +1,5 @@
-variable "project_name_prefix" {
-  description = "Prefix for the Azure DevOps project name."
+variable "project_name" {
+  description = "Name of the Azure DevOps project."
   type        = string
   default     = "ado-project-complete-example"
 }

@@ -7,7 +7,6 @@ This fixture provisions a security-focused Azure DevOps project configuration fo
 - Private project visibility
 - Reduced feature set
 - Strict pipeline security settings
-- Minimal permissions assignment
 
 ## Usage
 

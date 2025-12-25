@@ -7,7 +7,6 @@ This fixture provisions a complete Azure DevOps project configuration for Terrat
 - Project features management (boards, repos, pipelines, artifacts)
 - Pipeline security settings enabled
 - Project tags and dashboards
-- Project permissions assignment
 
 ## Usage
 

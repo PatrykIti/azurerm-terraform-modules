@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes security considerations for the Azure DevOps project module. The module focuses on project-level controls: visibility, pipeline settings, feature enablement, and permissions.
+This document describes security considerations for the Azure DevOps project module. The module focuses on project-level controls: visibility, pipeline settings, feature enablement, and dashboards.
 
 ## Security Features
 
@@ -53,6 +53,8 @@ module "azuredevops_project" {
   }
 }
 ```
+
+The `examples/secure` configuration is the reference hardened setup for this module.
 
 ## Security Hardening Checklist
 

@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial release of the azuredevops_project module
-- Core functionality for Manages Azure DevOps projects, settings, tags, dashboards, and permissions
+- Core functionality for Manages Azure DevOps projects, settings, tags, and dashboards
 
 ### Security
 - All security features are enabled by default

@@ -7,7 +7,6 @@ This example demonstrates a security-focused Azure DevOps project configuration 
 - Private project visibility
 - Feature set reduced to core services
 - Strict pipeline security settings
-- Minimal permissions assignment
 
 ## Usage
 

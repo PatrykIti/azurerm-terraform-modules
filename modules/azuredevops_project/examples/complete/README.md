@@ -1,13 +1,12 @@
 # Complete Azure DevOps Project Example
 
-This example demonstrates a complete Azure DevOps project configuration with features, pipeline settings, tags, dashboards, and permissions.
+This example demonstrates a complete Azure DevOps project configuration with features, pipeline settings, tags, and dashboards.
 
 ## Features
 
 - Project features management (boards, repos, pipelines, artifacts)
 - Pipeline security settings enabled
 - Project tags and dashboards
-- Project permissions for org-level administrators
 
 ## Usage
 

@@ -1,8 +1,8 @@
-# Azure DevOps Variable Groups Module Documentation
+# Azure DevOps Project Permissions Module Documentation
 
 ## Overview
 
-This directory contains additional documentation for the Azure DevOps Variable Groups module.
+This directory contains additional documentation for the Azure DevOps Project Permissions module.
 
 ## Contents
 
