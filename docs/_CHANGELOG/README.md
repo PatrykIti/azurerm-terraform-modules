@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [023](./023-2025-12-25-azuredevops-project-permissions-alignment.md) | 2025-12-25 | Azure DevOps Project Permissions module – alignment & verification | Maintenance / Verification |
 | [022](./022-2025-12-25-azuredevops-project-test-verification.md) | 2025-12-25 | Azure DevOps Project module test verification | Maintenance / Verification |
 | [021](./021-2025-12-24-azuredevops-project-permissions-split.md) | 2025-12-24 | Azure DevOps Project module - permissions split | Breaking Change / Maintenance |
 | [020](./020-2025-12-24-azuredevops-project-permissions-module.md) | 2025-12-24 | Azure DevOps Project Permissions module | Feature |

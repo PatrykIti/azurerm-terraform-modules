@@ -30,7 +30,7 @@ variables {
 }
 
 run "outputs_plan" {
-  command = plan
+  command = apply
 
   assert {
     condition     = output.permission_ids["readers"] != null

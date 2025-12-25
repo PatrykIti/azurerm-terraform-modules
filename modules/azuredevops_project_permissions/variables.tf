@@ -52,7 +52,8 @@ variable "permissions" {
   validation {
     condition = alltrue([
       for permission in var.permissions : (
-        permission.group_name == null || contains(["project", "collection"], permission.scope)
+        permission.group_name == null ||
+        (permission.scope != null && contains(["project", "collection"], permission.scope))
       )
     ])
     error_message = "permissions.scope must be one of: project, collection (when group_name is set)."
@@ -68,8 +69,14 @@ variable "permissions" {
   }
 
   validation {
-    condition = length(var.permissions) == length(distinct([
-      for permission in var.permissions : coalesce(permission.key, permission.group_name, permission.principal)
+    condition = length([
+      for permission in var.permissions :
+      coalesce(permission.key, permission.group_name, permission.principal)
+      if permission.key != null || permission.group_name != null || permission.principal != null
+    ]) == length(distinct([
+      for permission in var.permissions :
+      coalesce(permission.key, permission.group_name, permission.principal)
+      if permission.key != null || permission.group_name != null || permission.principal != null
     ]))
     error_message = "permissions entries must have unique keys (key/group_name/principal)."
   }
