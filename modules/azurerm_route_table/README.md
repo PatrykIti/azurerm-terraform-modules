@@ -51,50 +51,7 @@ module "route_table" {
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
-# Azure Route Table Module
 
-This module creates and manages an Azure Route Table with support for custom routes.
-
-## Features
-
-- ✅ Custom route configuration with all next hop types
-- ✅ BGP route propagation control
-- ✅ Comprehensive input validation
-
-## Usage
-
-```hcl
-module "route_table" {
-  source = "../../"
-
-  name                = "rt-hub-prod-001"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-
-  bgp_route_propagation_enabled = false
-
-  routes = [
-    {
-      name                   = "to-firewall"
-      address_prefix         = "10.0.0.0/16"
-      next_hop_type          = "VirtualAppliance"
-      next_hop_in_ip_address = "10.1.0.4"
-    },
-    {
-      name           = "to-internet"
-      address_prefix = "0.0.0.0/0"
-      next_hop_type  = "Internet"
-    }
-  ]
-
-  tags = {
-    Environment = "Production"
-    ManagedBy   = "Terraform"
-  }
-}
-```
-
-Note: Subnet associations are managed outside the module for maximum flexibility.
 
 ## Requirements
 
