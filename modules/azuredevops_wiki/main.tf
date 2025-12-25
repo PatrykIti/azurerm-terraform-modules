@@ -1,5 +1,5 @@
 locals {
-  wiki_ids = { for key, wiki in azuredevops_wiki.wiki : key => wiki.id }
+  wiki_ids   = { for key, wiki in azuredevops_wiki.wiki : key => wiki.id }
   wiki_pages = { for idx, page in var.wiki_pages : idx => page }
 }
 

@@ -10,10 +10,10 @@ module "azuredevops_work_items" {
       principal = var.principal_descriptor
       path      = "/"
       permissions = {
-        GENERIC_READ  = "Allow"
-        GENERIC_WRITE = "Deny"
+        GENERIC_READ    = "Allow"
+        GENERIC_WRITE   = "Deny"
         CREATE_CHILDREN = "Deny"
-        DELETE        = "Deny"
+        DELETE          = "Deny"
       }
     }
   ]

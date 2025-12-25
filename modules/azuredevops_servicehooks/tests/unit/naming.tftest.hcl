@@ -7,7 +7,7 @@ variables {
 
   webhooks = [
     {
-      url = "https://example.com/webhook"
+      url      = "https://example.com/webhook"
       git_push = {}
     }
   ]

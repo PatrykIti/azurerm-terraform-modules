@@ -19,16 +19,16 @@ variables {
 
   webhooks = [
     {
-      url = "https://example.com/webhook"
+      url      = "https://example.com/webhook"
       git_push = {}
     }
   ]
 
   storage_queue_hooks = [
     {
-      account_name = "account"
-      account_key  = "key"
-      queue_name   = "queue"
+      account_name            = "account"
+      account_key             = "key"
+      queue_name              = "queue"
       run_state_changed_event = {}
     }
   ]

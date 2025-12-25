@@ -37,10 +37,10 @@ locals {
     for ds in var.diagnostic_settings : merge(ds, {
       areas = ds.areas != null ? ds.areas : ["all"]
       log_categories = ds.log_categories != null ? ds.log_categories : distinct(flatten([
-        for area in (ds.areas != null ? ds.areas : ["all"]) : lookup(local.nsg_area_log_map, area, [])
+        for area in(ds.areas != null ? ds.areas : ["all"]) : lookup(local.nsg_area_log_map, area, [])
       ]))
       metric_categories = ds.metric_categories != null ? ds.metric_categories : distinct(flatten([
-        for area in (ds.areas != null ? ds.areas : ["all"]) : lookup(local.nsg_area_metric_map, area, [])
+        for area in(ds.areas != null ? ds.areas : ["all"]) : lookup(local.nsg_area_metric_map, area, [])
       ]))
     })
   ]

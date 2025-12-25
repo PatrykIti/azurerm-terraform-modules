@@ -12,10 +12,10 @@ run "invalid_feed_permission" {
 
     feed_permissions = [
       {
-        feed_id            = "00000000-0000-0000-0000-000000000000"
-        feed_key           = "example"
+        feed_id             = "00000000-0000-0000-0000-000000000000"
+        feed_key            = "example"
         identity_descriptor = "vssgp.Uy0xLTktMTIzNDU2"
-        role               = "reader"
+        role                = "reader"
       }
     ]
   }

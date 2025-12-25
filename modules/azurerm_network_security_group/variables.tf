@@ -223,7 +223,7 @@ variable "diagnostic_settings" {
     condition = alltrue([
       for ds in var.diagnostic_settings :
       alltrue([
-        for area in (ds.areas != null ? ds.areas : ["all"]) :
+        for area in(ds.areas != null ? ds.areas : ["all"]) :
         contains([
           "all",
           "event",
@@ -246,12 +246,12 @@ variable "flow_log" {
   EOT
 
   type = object({
-    name                                 = optional(string)
-    enabled                              = optional(bool, true)
-    storage_account_id                   = string
-    network_watcher_name                 = string
-    network_watcher_resource_group_name  = string
-    version                              = optional(number, 2)
+    name                                = optional(string)
+    enabled                             = optional(bool, true)
+    storage_account_id                  = string
+    network_watcher_name                = string
+    network_watcher_resource_group_name = string
+    version                             = optional(number, 2)
     retention_policy = optional(object({
       enabled = optional(bool, false)
       days    = optional(number, 0)

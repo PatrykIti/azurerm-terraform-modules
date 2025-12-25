@@ -1,11 +1,11 @@
 locals {
-  work_items           = { for idx, item in var.work_items : idx => item }
-  query_folders        = { for idx, folder in var.query_folders : idx => folder }
-  queries              = { for idx, query in var.queries : idx => query }
-  query_permissions    = { for idx, perm in var.query_permissions : idx => perm }
-  area_permissions     = { for idx, perm in var.area_permissions : idx => perm }
+  work_items            = { for idx, item in var.work_items : idx => item }
+  query_folders         = { for idx, folder in var.query_folders : idx => folder }
+  queries               = { for idx, query in var.queries : idx => query }
+  query_permissions     = { for idx, perm in var.query_permissions : idx => perm }
+  area_permissions      = { for idx, perm in var.area_permissions : idx => perm }
   iteration_permissions = { for idx, perm in var.iteration_permissions : idx => perm }
-  tagging_permissions  = { for idx, perm in var.tagging_permissions : idx => perm }
+  tagging_permissions   = { for idx, perm in var.tagging_permissions : idx => perm }
 }
 
 resource "azuredevops_workitemtrackingprocess_process" "process" {

@@ -31,12 +31,12 @@ variable "feeds" {
 variable "feed_permissions" {
   description = "List of feed permissions to assign."
   type = list(object({
-    feed_id            = optional(string)
-    feed_key           = optional(string)
+    feed_id             = optional(string)
+    feed_key            = optional(string)
     identity_descriptor = string
-    role               = string
-    project_id         = optional(string)
-    display_name       = optional(string)
+    role                = string
+    project_id          = optional(string)
+    display_name        = optional(string)
   }))
   default = []
 

@@ -7,7 +7,7 @@ module "azuredevops_servicehooks" {
 
   webhooks = [
     {
-      url = var.webhook_url
+      url      = var.webhook_url
       git_push = {}
     }
   ]

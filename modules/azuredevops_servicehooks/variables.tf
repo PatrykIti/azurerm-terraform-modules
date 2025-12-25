@@ -19,11 +19,11 @@ variable "project_id" {
 variable "webhooks" {
   description = "List of webhook service hooks to manage."
   type = list(object({
-    url                     = string
-    accept_untrusted_certs  = optional(bool)
-    basic_auth_username     = optional(string)
-    basic_auth_password     = optional(string)
-    http_headers            = optional(map(string))
+    url                       = string
+    accept_untrusted_certs    = optional(bool)
+    basic_auth_username       = optional(string)
+    basic_auth_password       = optional(string)
+    http_headers              = optional(map(string))
     resource_details_to_send  = optional(string)
     messages_to_send          = optional(string)
     detailed_messages_to_send = optional(string)
@@ -37,24 +37,24 @@ variable "webhooks" {
       branch        = optional(string)
     }))
     git_pull_request_created = optional(object({
-      repository_id                = optional(string)
-      branch                       = optional(string)
-      pull_request_created_by      = optional(string)
+      repository_id                   = optional(string)
+      branch                          = optional(string)
+      pull_request_created_by         = optional(string)
       pull_request_reviewers_contains = optional(string)
     }))
     git_pull_request_merge_attempted = optional(object({
-      repository_id                = optional(string)
-      branch                       = optional(string)
-      pull_request_created_by      = optional(string)
+      repository_id                   = optional(string)
+      branch                          = optional(string)
+      pull_request_created_by         = optional(string)
       pull_request_reviewers_contains = optional(string)
-      merge_result                 = optional(string)
+      merge_result                    = optional(string)
     }))
     git_pull_request_updated = optional(object({
-      repository_id                = optional(string)
-      branch                       = optional(string)
-      pull_request_created_by      = optional(string)
+      repository_id                   = optional(string)
+      branch                          = optional(string)
+      pull_request_created_by         = optional(string)
       pull_request_reviewers_contains = optional(string)
-      notification_type            = optional(string)
+      notification_type               = optional(string)
     }))
     git_push = optional(object({
       repository_id = optional(string)
@@ -86,9 +86,9 @@ variable "webhooks" {
       path = string
     }))
     work_item_commented = optional(object({
-      work_item_type = optional(string)
-      area_path      = optional(string)
-      tag            = optional(string)
+      work_item_type  = optional(string)
+      area_path       = optional(string)
+      tag             = optional(string)
       comment_pattern = optional(string)
     }))
     work_item_created = optional(object({
@@ -164,13 +164,13 @@ variable "storage_queue_hooks" {
     ttl          = optional(number)
     visi_timeout = optional(number)
     run_state_changed_event = optional(object({
-      pipeline_id      = optional(string)
+      pipeline_id       = optional(string)
       run_result_filter = optional(string)
       run_state_filter  = optional(string)
     }))
     stage_state_changed_event = optional(object({
-      pipeline_id        = optional(string)
-      stage_name         = optional(string)
+      pipeline_id         = optional(string)
+      stage_name          = optional(string)
       stage_result_filter = optional(string)
       stage_state_filter  = optional(string)
     }))

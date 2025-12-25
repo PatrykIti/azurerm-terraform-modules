@@ -1,20 +1,20 @@
 locals {
-  webhooks = { for idx, hook in var.webhooks : idx => hook }
-  storage_queue_hooks = { for idx, hook in var.storage_queue_hooks : idx => hook }
+  webhooks                = { for idx, hook in var.webhooks : idx => hook }
+  storage_queue_hooks     = { for idx, hook in var.storage_queue_hooks : idx => hook }
   servicehook_permissions = { for idx, perm in var.servicehook_permissions : idx => perm }
 }
 
 resource "azuredevops_servicehook_webhook_tfs" "webhook" {
   for_each = local.webhooks
 
-  project_id               = var.project_id
-  url                      = each.value.url
-  accept_untrusted_certs   = try(each.value.accept_untrusted_certs, null)
-  basic_auth_username      = try(each.value.basic_auth_username, null)
-  basic_auth_password      = try(each.value.basic_auth_password, null)
-  http_headers             = try(each.value.http_headers, null)
-  resource_details_to_send = try(each.value.resource_details_to_send, null)
-  messages_to_send         = try(each.value.messages_to_send, null)
+  project_id                = var.project_id
+  url                       = each.value.url
+  accept_untrusted_certs    = try(each.value.accept_untrusted_certs, null)
+  basic_auth_username       = try(each.value.basic_auth_username, null)
+  basic_auth_password       = try(each.value.basic_auth_password, null)
+  http_headers              = try(each.value.http_headers, null)
+  resource_details_to_send  = try(each.value.resource_details_to_send, null)
+  messages_to_send          = try(each.value.messages_to_send, null)
   detailed_messages_to_send = try(each.value.detailed_messages_to_send, null)
 
   dynamic "build_completed" {

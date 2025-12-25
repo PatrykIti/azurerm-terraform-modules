@@ -21,10 +21,10 @@ module "azuredevops_artifacts_feed" {
 
   feed_permissions = [
     {
-      feed_key             = "project"
-      identity_descriptor  = data.azuredevops_group.readers.descriptor
-      role                 = "contributor"
-      project_id           = var.project_id
+      feed_key            = "project"
+      identity_descriptor = data.azuredevops_group.readers.descriptor
+      role                = "contributor"
+      project_id          = var.project_id
     }
   ]
 
