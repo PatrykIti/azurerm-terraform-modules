@@ -7,7 +7,7 @@ variable "name" {
   type        = string
 
   validation {
-    condition     = trim(var.name) != ""
+    condition     = trimspace(var.name) != ""
     error_message = "name must not be empty."
   }
 }
@@ -119,7 +119,7 @@ variable "dashboards" {
 
   validation {
     condition = alltrue([
-      for dashboard in var.dashboards : trim(dashboard.name) != ""
+      for dashboard in var.dashboards : trimspace(dashboard.name) != ""
     ])
     error_message = "dashboards.name must be a non-empty string."
   }

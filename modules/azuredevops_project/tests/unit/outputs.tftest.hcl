@@ -15,7 +15,7 @@ variables {
 }
 
 run "outputs_plan" {
-  command = plan
+  command = apply
 
   assert {
     condition     = output.project_id != null

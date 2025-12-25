@@ -134,19 +134,19 @@ Moduł startowy dla ADO. Zarządza projektem i kluczowymi ustawieniami, a uprawn
 
 ### A) Cleanup `modules/azuredevops_project` (remove permissions)
 
-- [ ] Usuń `project_permissions` input + walidacje.
-- [ ] Usuń `azuredevops_project_permissions` resource i powiązane outputs.
-- [ ] Zaktualizuj README + examples + SECURITY + docs/IMPORT (jeśli potrzebne).
-- [ ] Zaktualizuj tests (fixtures/unit/terratest) i test_config.
-- [ ] Upewnij się, że moduł jest zgodny z MODULE_GUIDE i TERRAFORM_BEST_PRACTICES.
+- [x] Usuń `project_permissions` input + walidacje.
+- [x] Usuń `azuredevops_project_permissions` resource i powiązane outputs.
+- [x] Zaktualizuj README + examples + SECURITY + docs/IMPORT (jeśli potrzebne).
+- [x] Zaktualizuj tests (fixtures/unit/terratest) i test_config.
+- [x] Upewnij się, że moduł jest zgodny z MODULE_GUIDE i TERRAFORM_BEST_PRACTICES.
 
 ### B) New module `modules/azuredevops_project_permissions` (Option 2)
 
-- [ ] Scaffold modułu (scripts/create-new-module.sh lub manualnie) + module.json
-- [ ] versions.tf z azuredevops 1.12.2
-- [ ] variables.tf z walidacjami (principal vs group_name+scope, unique keys)
-- [ ] main.tf (data azuredevops_group lookup + for_each bez indeksów)
-- [ ] outputs.tf (mapy permission_ids/principals)
-- [ ] examples/basic + complete + secure
-- [ ] tests/fixtures + unit + terratest
-- [ ] make docs + update README
+- [x] Scaffold modułu (scripts/create-new-module.sh lub manualnie) + module.json
+- [x] versions.tf z azuredevops 1.12.2
+- [x] variables.tf z walidacjami (principal vs group_name+scope, unique keys)
+- [x] main.tf (data azuredevops_group lookup + for_each bez indeksów)
+- [x] outputs.tf (mapy permission_ids/principals)
+- [x] examples/basic + complete + secure
+- [x] tests/fixtures + unit + terratest
+- [x] make docs + update README
