@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 2 tasks
+- **To Do:** 1 tasks
 - **In Progress:** 0
-- **Done:** 19 tasks
+- **Done:** 20 tasks
 
 ---
 
@@ -14,7 +14,6 @@ Task board for module work. Update statuses in markdown files.
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
-| [TASK-007](./TASK-007_Route_Table_Module_Alignment.md) | **Route Table module – alignment z guide (docs, examples, tests)** | High | Medium | `modules/azurerm_route_table/` |
 
 ---
 
@@ -47,3 +46,4 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-013](./TASK-ADO-013_AzureDevOps_Wiki_Module.md) | **Azure DevOps Wiki module** | Medium | Small | `modules/azuredevops_wiki/` |
 | [TASK-ADO-014](./TASK-ADO-014_AzureDevOps_Work_Items_Module.md) | **Azure DevOps Work Items module** | Medium | Large | `modules/azuredevops_work_items/` |
 | [TASK-006](./TASK-006_NSG_Observability_and_Documentation.md) | **NSG observability + docs alignment (diagnostic settings)** | High | Large | `modules/azurerm_network_security_group/` + repo docs |
+| [TASK-007](./TASK-007_Route_Table_Module_Alignment.md) | **Route Table module – alignment z guide (docs, examples, tests)** | High | Medium | `modules/azurerm_route_table/` |

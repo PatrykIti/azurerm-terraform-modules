@@ -8,7 +8,9 @@ Current version: **1.0.3**
 
 ## Description
 
-Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations.
+Manages Azure Route Tables with custom routes configuration and BGP route propagation settings.
+
+> **Note**: Subnet associations are intentionally managed outside this module (wrapper/composition level) to keep routing flexible across different network topologies.
 
 ## Usage
 
@@ -42,25 +44,22 @@ module "route_table" {
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates a basic deployment of an Azure Route Table with simple route configuration.
-- [Complete](examples/complete) - This example demonstrates a comprehensive deployment of Route Tables with all available features and advanced routing scenarios.
-- [Network Wrapper](examples/network-wrapper) - This example demonstrates the recommended pattern for managing route table subnet associations at the network wrapper level. This approach solves the Terraform limitation where subnet IDs are not known at plan time when creating resources from scratch.
-- [Network Wrapper Advanced](examples/network-wrapper-advanced) - This example demonstrates an advanced pattern for managing route table subnet associations using object iteration with null handling. This approach allows for dynamic subnet creation and association while avoiding the Terraform "for_each with unknown values" error.
-- [Secure](examples/secure) - This example demonstrates a maximum-security Route Table configuration suitable for highly sensitive data and regulated environments.
+- [Complete](examples/complete) - This example demonstrates a comprehensive deployment of Route Tables with advanced routing scenarios.
+- [Network Wrapper](examples/network-wrapper) - This example demonstrates a wrapper pattern for managing subnet associations outside the module.
+- [Network Wrapper Advanced](examples/network-wrapper-advanced) - This example demonstrates advanced wrapper patterns with object iteration and null handling.
+- [Secure](examples/secure) - This example demonstrates a security-hardened Route Table configuration suitable for regulated environments.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
 # Azure Route Table Module
 
-This module creates and manages an Azure Route Table with support for custom routes and subnet associations.
+This module creates and manages an Azure Route Table with support for custom routes.
 
 ## Features
 
-- ✅ Custom route configuration with next hop types
+- ✅ Custom route configuration with all next hop types
 - ✅ BGP route propagation control
-- ✅ Dynamic subnet associations
-- ✅ Support for all Azure next hop types
 - ✅ Comprehensive input validation
-- ✅ Security-first configuration
 
 ## Usage
 
@@ -72,7 +71,7 @@ module "route_table" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  disable_bgp_route_propagation = true
+  bgp_route_propagation_enabled = false
 
   routes = [
     {
@@ -88,10 +87,6 @@ module "route_table" {
     }
   ]
 
-  subnet_ids_to_associate = {
-    (azurerm_subnet.example.id) = azurerm_subnet.example.id
-  }
-
   tags = {
     Environment = "Production"
     ManagedBy   = "Terraform"
@@ -99,21 +94,7 @@ module "route_table" {
 }
 ```
 
-## Examples
-
-- [Basic](examples/basic) - Simple route table with basic routes
-- [Complete](examples/complete) - Full configuration with all features
-- [Hub-Spoke](examples/hub-spoke) - Route table for hub-spoke network topology
-- [Firewall](examples/firewall) - Route table for firewall scenarios
-
-## Examples
-
-<!-- This section is managed by automation. Do not edit manually. -->
-<!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - This example demonstrates a basic deployment of an Azure Route Table with simple route configuration.
-- [Complete](examples/complete) - This example demonstrates a comprehensive deployment of Route Tables with all available features and advanced routing scenarios.
-- [Secure](examples/secure) - This example demonstrates a maximum-security Route Table configuration suitable for highly sensitive data and regulated environments.
-<!-- END_EXAMPLES -->
+Note: Subnet associations are managed outside the module for maximum flexibility.
 
 ## Requirements
 
@@ -143,7 +124,8 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_bgp_route_propagation_enabled"></a> [bgp\_route\_propagation\_enabled](#input\_bgp\_route\_propagation\_enabled) | Enable BGP route propagation on the Route Table. Defaults to true. | `bool` | `true` | no |
+| <a name="input_bgp_route_propagation_enabled"></a> [bgp\_route\_propagation\_enabled](#input\_bgp\_route\_propagation\_enabled) | Enable BGP route propagation on the Route Table. Defaults to true. Overridden when disable\_bgp\_route\_propagation is set. | `bool` | `true` | no |
+| <a name="input_disable_bgp_route_propagation"></a> [disable\_bgp\_route\_propagation](#input\_disable\_bgp\_route\_propagation) | Disable BGP route propagation. When set, it overrides bgp\_route\_propagation\_enabled. | `bool` | `null` | no |
 | <a name="input_location"></a> [location](#input\_location) | The Azure Region where the Route Table should exist. | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | The name of the Route Table. Changing this forces a new resource to be created. | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group in which to create the Route Table. | `string` | n/a | yes |
@@ -163,8 +145,16 @@ No modules.
 | <a name="output_tags"></a> [tags](#output\_tags) | The tags assigned to the Route Table |
 <!-- END_TF_DOCS -->
 
+## Security Considerations
+
+- **Route control**: Use explicit routes to enforce traffic paths (e.g., forced tunneling through an NVA).
+- **Blackhole routes**: Use `next_hop_type = "None"` to drop known-bad destinations.
+- **BGP propagation**: Disable when you must prevent dynamic routes from overriding explicit paths.
+- **Associations**: Manage subnet associations in wrapper modules to avoid accidental coupling.
+
 ## Additional Documentation
 
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [docs/IMPORT.md](docs/IMPORT.md) - Importing existing Route Tables into the module

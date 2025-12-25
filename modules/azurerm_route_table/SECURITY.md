@@ -2,79 +2,45 @@
 
 ## Overview
 
-This document details the security features and configurations available in the azurerm_route_table Terraform module. The module implements comprehensive security controls following Azure best practices.
+This document describes the security considerations for the `azurerm_route_table` module.
+Route tables control packet paths in Azure. Incorrect routes can expose workloads or
+break isolation, so this module focuses on explicit route configuration and validation.
 
 ## Security Features
 
-### 1. **Encryption**
+- **Explicit route control** for predictable traffic paths.
+- **Forced tunneling support** via default routes to a virtual appliance.
+- **Blackhole routes** using `next_hop_type = "None"` to block destinations.
+- **BGP propagation control** to prevent dynamic routes from overriding explicit paths.
+- **Input validation** for CIDR, next hop types, and naming.
 
-#### At Rest
-- **Default**: All data encrypted at rest using Azure-managed keys
-- **Infrastructure Encryption**: Additional layer of encryption when supported
-- **Customer-Managed Keys**: Optional BYOK support (if applicable)
+## Secure Configuration Example
 
-#### In Transit
-- **HTTPS/TLS**: All communications encrypted in transit
-- **Minimum TLS Version**: TLS 1.2 enforced by default
-
-### 2. **Access Control**
-
-#### Authentication
-- **Azure AD Integration**: Preferred authentication method
-- **Managed Identity**: Support for system and user-assigned identities
-- **Key-based Access**: Disabled by default where possible
-
-#### Network Security
-- **Private Endpoints**: Support for private connectivity
-- **Network Rules**: Default deny with explicit allow rules
-- **Service Endpoints**: Virtual network integration
-
-### 3. **Monitoring and Compliance**
-
-#### Audit Logging
-- **Diagnostic Settings**: Comprehensive logging to Log Analytics
-- **Activity Tracking**: All operations logged
-- **Metrics**: Performance and security metrics collected
-
-#### Compliance
-- **Azure Policy**: Compatible with organizational policies
-- **Security Center**: Integration ready
-- **Threat Protection**: Microsoft Defender support where applicable
-
-## Security Configuration Examples
-
-### Maximum Security Configuration
 ```hcl
 module "route_table" {
   source = "./modules/azurerm_route_table"
 
-  name                = "example-secure"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
+  name                = "rt-secure-example"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
 
-  # Security settings
-  enable_https_traffic_only = true
-  min_tls_version          = "TLS1_2"
-  
-  # Network isolation
-  network_rules = {
-    default_action = "Deny"
-    ip_rules       = []
-    bypass         = ["AzureServices"]
-  }
+  # Disable BGP propagation to keep routing deterministic
+  bgp_route_propagation_enabled = false
 
-  # Private endpoint
-  private_endpoints = [{
-    name                 = "example-pe"
-    subnet_id            = azurerm_subnet.private.id
-    private_dns_zone_ids = [azurerm_private_dns_zone.example.id]
-  }]
-
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-  }
+  # Force all outbound traffic through a firewall/NVA
+  routes = [
+    {
+      name                   = "force-to-firewall"
+      address_prefix         = "0.0.0.0/0"
+      next_hop_type          = "VirtualAppliance"
+      next_hop_in_ip_address = "10.0.0.4"
+    },
+    {
+      name           = "block-bad-range"
+      address_prefix = "203.0.113.0/24"
+      next_hop_type  = "None"
+    }
+  ]
 
   tags = {
     Environment        = "Production"
@@ -85,83 +51,71 @@ module "route_table" {
 
 ## Security Hardening Checklist
 
-Before deploying to production:
-
-- [ ] Enable all applicable encryption features
-- [ ] Configure network isolation (private endpoints/service endpoints)
-- [ ] Disable public network access where possible
-- [ ] Enable audit logging and monitoring
-- [ ] Apply appropriate RBAC permissions
-- [ ] Configure Azure Policy compliance
-- [ ] Enable threat protection features
-- [ ] Review and apply security tags
-- [ ] Document security exceptions
+- [ ] Use explicit routes for sensitive subnets.
+- [ ] Disable BGP propagation if dynamic routes could bypass security controls.
+- [ ] Force egress through a firewall/NVA where required.
+- [ ] Add blackhole routes for known-bad destinations.
+- [ ] Review routes regularly and remove obsolete entries.
 
 ## Common Security Mistakes to Avoid
 
-1. **Leaving Public Access Enabled**
+1. **Unexpected Internet egress**
    ```hcl
    # ❌ AVOID
-   public_network_access_enabled = true
+   routes = [
+     {
+       name           = "to-internet"
+       address_prefix = "0.0.0.0/0"
+       next_hop_type  = "Internet"
+     }
+   ]
    ```
 
-2. **Using Weak TLS Versions**
+2. **Virtual appliance without IP**
    ```hcl
    # ❌ AVOID
-   min_tls_version = "TLS1_0"
+   next_hop_type = "VirtualAppliance"
+   # missing next_hop_in_ip_address
    ```
 
-3. **Overly Permissive Network Rules**
-   ```hcl
-   # ❌ AVOID
-   network_rules = {
-     default_action = "Allow"
-   }
-   ```
+3. **Overlapping or conflicting routes**
+   - Ensure routes do not unintentionally override each other.
 
 ## Incident Response
 
-If a security incident occurs:
-
 1. **Immediate Actions**
-   - Review audit logs
-   - Check for unauthorized access
-   - Apply additional network restrictions
+   - Review current routes for unexpected paths.
+   - Disable BGP propagation if dynamic routes appear.
 
 2. **Investigation**
-   - Use Log Analytics queries
-   - Review security alerts
-   - Check configuration compliance
+   - Compare current route tables to approved baselines.
+   - Validate next hop IPs and subnet associations.
 
 3. **Remediation**
-   - Apply security patches
-   - Update configurations
-   - Document lessons learned
+   - Restore approved routes.
+   - Add blackhole routes for malicious destinations.
 
 ## Compliance Mapping
 
 ### SOC 2 Controls
 | Control | Implementation |
 |---------|---------------|
-| CC6.1 | RBAC and Azure AD |
-| CC6.6 | Encryption at rest/transit |
-| CC7.2 | Diagnostic logging |
+| CC6.1 | Network routing control via explicit routes |
+| CC7.2 | Change control through Terraform state |
 
 ### ISO 27001 Controls
 | Control | Implementation |
 |---------|---------------|
-| A.10.1.1 | Cryptographic controls |
-| A.9.1.2 | Network access controls |
-| A.12.4.1 | Event logging |
+| A.9.1.2 | Network access controls via routing rules |
+| A.12.1.2 | Change management via IaC |
 
 ## Additional Resources
 
-- [Azure Security Best Practices](https://docs.microsoft.com/en-us/azure/security/fundamentals/best-practices-and-patterns)
-- [Azure Security Center](https://docs.microsoft.com/en-us/azure/security-center/)
-- [Azure Policy](https://docs.microsoft.com/en-us/azure/governance/policy/)
+- [Azure Route Tables Overview](https://learn.microsoft.com/azure/virtual-network/virtual-networks-udr-overview)
+- [Route Table Best Practices](https://learn.microsoft.com/azure/virtual-network/virtual-network-route-table)
 
 ---
 
-**Module Version**: 1.0.0  
-**Last Updated**: 2025-07-16  
+**Module Version**: 1.0.3  
+**Last Updated**: 2025-12-25  
 **Security Contact**: security@yourorganization.com

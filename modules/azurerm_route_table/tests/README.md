@@ -1,179 +1,91 @@
 # Route Table Module Tests
 
-This directory contains automated tests for the Route Table Terraform module using [Terratest](https://terratest.gruntwork.io/).
+This directory contains automated tests for the Route Table Terraform module,
+aligned with the repository [Testing Guide](../../../docs/TESTING_GUIDE/README.md).
 
 ## Prerequisites
 
-1. **Go**: Version 1.21 or later
-2. **Terraform**: Version 1.3.0 or later
+1. **Go**: Version 1.21 or later (see `go.mod`)
+2. **Terraform**: Version 1.12.2 or later
 3. **Azure CLI**: Authenticated with appropriate permissions
-4. **Azure Service Principal**: With Contributor access to the test subscription
+4. **Azure Service Principal**: Contributor access to the test subscription
 
 ## Environment Variables
 
-Set the following environment variables before running tests:
+The test helpers use standard Azure credentials. You can set either `AZURE_*`
+or `ARM_*`. Terraform uses `ARM_*`.
 
 ```bash
-export ARM_SUBSCRIPTION_ID="your-subscription-id"
-export ARM_TENANT_ID="your-tenant-id"
-export ARM_CLIENT_ID="your-client-id"
-export ARM_CLIENT_SECRET="your-client-secret"
-export ARM_LOCATION="northeurope"  # Optional, defaults to North Europe
+export AZURE_CLIENT_ID="your-client-id"
+export AZURE_CLIENT_SECRET="your-client-secret"
+export AZURE_SUBSCRIPTION_ID="your-subscription-id"
+export AZURE_TENANT_ID="your-tenant-id"
+
+# Map to ARM_ variables for Terraform
+export ARM_CLIENT_ID="${AZURE_CLIENT_ID}"
+export ARM_CLIENT_SECRET="${AZURE_CLIENT_SECRET}"
+export ARM_SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID}"
+export ARM_TENANT_ID="${AZURE_TENANT_ID}"
+
+# Optional
+export ARM_LOCATION="northeurope"
 ```
 
 ## Running Tests
 
-### Install Dependencies
+All commands should be executed from within this `tests` directory.
 
+**Install dependencies:**
 ```bash
-go mod download
+make deps
 ```
 
-### Run All Tests
-
+**Run all tests:**
 ```bash
-make test-all
+make test
 ```
 
-### Run Short Tests Only
-
+**Run specific suites:**
 ```bash
-make test-short
-```
-
-### Run Integration Tests Only
-
-```bash
+make test-basic
+make test-complete
+make test-secure
+make test-network
+make test-validation
 make test-integration
+make test-performance
 ```
 
-### Run Specific Test
-
+**Run a single test:**
 ```bash
-go test -v -run TestBasicRouteTable -timeout 30m
+make test-single TEST_NAME=TestBasicRouteTable
 ```
 
-### Run Tests in Parallel
-
+**Benchmarks:**
 ```bash
-./run_tests_parallel.sh
-```
-
-### Run Tests Sequentially
-
-```bash
-./run_tests_sequential.sh
+make benchmark
 ```
 
 ## Test Structure
 
-### Test Files
-
-- `route_table_test.go` - Main module functionality tests
-- `integration_test.go` - Integration tests with Virtual Networks and Subnets
-- `performance_test.go` - Performance benchmarks and timing tests
-- `test_helpers.go` - Common test utilities and helpers
-- `test_config.yaml` - Test configuration and scenarios
-
-### Test Fixtures
-
-The `fixtures/` directory contains Terraform configurations for different test scenarios:
-
-- `fixtures/basic/` - Basic route table configuration with minimal routes
-- `fixtures/complete/` - Complete feature demonstration with multiple routes
-- `fixtures/secure/` - Security-focused configuration with firewall routes
-- `fixtures/network/` - Network integration tests with subnet associations
-- `fixtures/negative/` - Negative test cases for validation rules
-
-## Test Scenarios
-
-### Basic Tests (`-short` flag)
-
-- Route table creation and destruction
-- Basic route configuration validation
-- Output verification
-- Resource naming validation
-- Default route behavior
-
-### Integration Tests
-
-- Route table association with subnets
-- Multiple route updates and lifecycle management
-- Integration with Virtual Networks
-- Route propagation settings
-- Next hop type validations
-
-### Performance Tests
-
-- Route table creation time benchmarks
-- Concurrent route table deployments
-- Large number of routes handling
-- Update performance testing
-
-## Test Configuration
-
-Tests are configured via `test_config.yaml`. Key configuration options:
-
-- **Environments**: Different Azure regions and configurations
-- **Scenarios**: Test case definitions and timeouts
-- **Performance**: Load testing parameters
-- **Integration**: Cross-service testing settings
-
-## Debugging Tests
-
-### Verbose Output
-
-```bash
-go test -v -run TestModuleBasic
 ```
-
-### Keep Resources After Test Failure
-
-Set the `SKIP_TEARDOWN` environment variable:
-
-```bash
-export SKIP_TEARDOWN=true
-go test -v -run TestModuleBasic
+tests/
+├── fixtures/                # Terraform configurations for test scenarios
+│   ├── basic/
+│   ├── complete/
+│   ├── secure/
+│   ├── network/
+│   └── negative/
+├── unit/                    # Native Terraform tests (.tftest.hcl)
+├── route_table_test.go      # Main module tests
+├── integration_test.go      # Lifecycle and integration tests
+├── performance_test.go      # Performance tests
+├── test_helpers.go          # Helper utilities
+└── Makefile                 # Test runner
 ```
-
-### Debug Terraform
-
-Enable Terraform debug logging:
-
-```bash
-export TF_LOG=DEBUG
-go test -v -run TestModuleBasic
-```
-
-## Continuous Integration
-
-Tests are automatically run in CI/CD pipelines:
-
-- **Pull Requests**: Short tests only
-- **Main Branch**: All tests including integration
-- **Releases**: Full test suite including performance tests
-
-## Contributing
-
-When adding new tests:
-
-1. Follow the existing test structure and naming conventions
-2. Add appropriate fixtures in the `fixtures/` directory
-3. Update `test_config.yaml` if adding new scenarios
-4. Ensure tests are idempotent and clean up resources
-5. Add documentation for any new test scenarios
 
 ## Troubleshooting
 
-### Common Issues
-
-1. **Authentication Errors**: Verify Azure credentials and permissions
-2. **Resource Conflicts**: Ensure unique resource naming
-3. **Timeout Issues**: Increase test timeouts for complex scenarios
-4. **Quota Limits**: Check Azure subscription quotas
-
-### Getting Help
-
-- Check the [Terratest documentation](https://terratest.gruntwork.io/)
-- Review Azure provider documentation
-- Check module-specific troubleshooting in the main README
+- **Auth errors**: verify `ARM_*` or `AZURE_*` variables and RBAC.
+- **Resource conflicts**: ensure unique resource names in fixtures.
+- **Timeouts**: increase `TIMEOUT` in `Makefile` or via env.
