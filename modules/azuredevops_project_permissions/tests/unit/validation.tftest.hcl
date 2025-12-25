@@ -14,6 +14,18 @@ variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 }
 
+run "empty_project_id" {
+  command = plan
+
+  variables {
+    project_id = ""
+  }
+
+  expect_failures = [
+    var.project_id,
+  ]
+}
+
 run "missing_principal_and_group" {
   command = plan
 

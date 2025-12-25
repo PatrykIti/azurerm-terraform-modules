@@ -5,6 +5,11 @@
 variable "project_id" {
   description = "Azure DevOps project ID."
   type        = string
+
+  validation {
+    condition     = length(trimspace(var.project_id)) > 0
+    error_message = "project_id must be a non-empty string."
+  }
 }
 
 # -----------------------------------------------------------------------------

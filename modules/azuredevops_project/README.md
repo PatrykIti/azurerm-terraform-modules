@@ -8,7 +8,7 @@ Current version: **vUnreleased**
 
 ## Description
 
-Manages Azure DevOps projects, settings, tags, and dashboards.
+Manages Azure DevOps projects, settings, tags, and dashboards. Project permissions are handled by the `azuredevops_project_permissions` module.
 
 ## Usage
 
