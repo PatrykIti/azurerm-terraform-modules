@@ -18,7 +18,7 @@ resource "azurerm_resource_group" "example" {
   location = var.location
 }
 
-# Log Analytics workspace for diagnostics and traffic analytics
+# Log Analytics workspace for diagnostics
 resource "azurerm_log_analytics_workspace" "example" {
   name                = var.log_analytics_workspace_name
   location            = azurerm_resource_group.example.location
@@ -27,7 +27,7 @@ resource "azurerm_log_analytics_workspace" "example" {
   retention_in_days   = 30
 }
 
-# Storage account for flow logs and diagnostic settings
+# Storage account for diagnostic settings
 resource "azurerm_storage_account" "flow_logs" {
   name                     = var.storage_account_name
   location                 = azurerm_resource_group.example.location
@@ -60,12 +60,6 @@ resource "azurerm_eventhub_namespace_authorization_rule" "example" {
   send                = true
   listen              = false
   manage              = false
-}
-
-# Network Watcher data source for flow logs
-data "azurerm_network_watcher" "example" {
-  name                = var.network_watcher_name
-  resource_group_name = var.network_watcher_resource_group_name
 }
 
 # Application Security Groups for demonstration
@@ -192,24 +186,6 @@ module "network_security_group" {
       eventhub_name                  = azurerm_eventhub.example.name
     }
   ]
-
-  flow_log = var.enable_flow_log ? {
-    name                                = "nsg-flow-logs-complete"
-    storage_account_id                  = azurerm_storage_account.flow_logs.id
-    network_watcher_name                = data.azurerm_network_watcher.example.name
-    network_watcher_resource_group_name = data.azurerm_network_watcher.example.resource_group_name
-    retention_policy = {
-      enabled = true
-      days    = 30
-    }
-    traffic_analytics = {
-      enabled               = true
-      workspace_id          = azurerm_log_analytics_workspace.example.workspace_id
-      workspace_region      = azurerm_log_analytics_workspace.example.location
-      workspace_resource_id = azurerm_log_analytics_workspace.example.id
-      interval_in_minutes   = 10
-    }
-  } : null
 
   tags = {
     Environment = "Development"

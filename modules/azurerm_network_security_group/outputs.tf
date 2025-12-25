@@ -68,12 +68,3 @@ output "diagnostic_settings_skipped" {
   description = "Diagnostic settings entries skipped because no categories were available after filtering."
   value       = local.diagnostic_settings_skipped
 }
-
-output "flow_log" {
-  description = "Flow log configuration for the NSG (null when disabled)."
-  value = try({
-    id      = azurerm_network_watcher_flow_log.network_watcher_flow_log[0].id
-    name    = azurerm_network_watcher_flow_log.network_watcher_flow_log[0].name
-    enabled = azurerm_network_watcher_flow_log.network_watcher_flow_log[0].enabled
-  }, null)
-}
