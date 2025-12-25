@@ -37,8 +37,63 @@ module "azuredevops_project" {
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
-<!-- This file will be automatically populated by terraform-docs -->
-<!-- Do not edit manually - use terraform-docs to generate -->
+
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
+| <a name="requirement_azuredevops"></a> [azuredevops](#requirement\_azuredevops) | 1.12.2 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azuredevops"></a> [azuredevops](#provider\_azuredevops) | 1.12.2 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azuredevops_dashboard.dashboard](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/dashboard) | resource |
+| [azuredevops_project.project](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/project) | resource |
+| [azuredevops_project_pipeline_settings.project_pipeline_settings](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/project_pipeline_settings) | resource |
+| [azuredevops_project_tags.project_tags](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/project_tags) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_dashboards"></a> [dashboards](#input\_dashboards) | List of dashboards to create in the project. | <pre>list(object({<br/>    name             = string<br/>    description      = optional(string)<br/>    team_id          = optional(string)<br/>    refresh_interval = optional(number, 0)<br/>  }))</pre> | `[]` | no |
+| <a name="input_description"></a> [description](#input\_description) | The description of the Azure DevOps project. | `string` | `null` | no |
+| <a name="input_features"></a> [features](#input\_features) | Project feature flags for azuredevops\_project.features. Set to null to leave unmanaged. | `map(string)` | `null` | no |
+| <a name="input_name"></a> [name](#input\_name) | The name of the Azure DevOps project. | `string` | n/a | yes |
+| <a name="input_pipeline_settings"></a> [pipeline\_settings](#input\_pipeline\_settings) | Pipeline settings for the project. When null, settings are not managed. | <pre>object({<br/>    enforce_job_scope                    = optional(bool)<br/>    enforce_referenced_repo_scoped_token = optional(bool)<br/>    enforce_settable_var                 = optional(bool)<br/>    publish_pipeline_metadata            = optional(bool)<br/>    status_badges_are_private            = optional(bool)<br/>    enforce_job_scope_for_release        = optional(bool)<br/>  })</pre> | `null` | no |
+| <a name="input_project_tags"></a> [project\_tags](#input\_project\_tags) | List of tags to assign to the project. | `list(string)` | `[]` | no |
+| <a name="input_version_control"></a> [version\_control](#input\_version\_control) | Specifies the version control system. Possible values are: Git, Tfvc. | `string` | `"Git"` | no |
+| <a name="input_visibility"></a> [visibility](#input\_visibility) | Specifies the project visibility. Possible values are: private, public. | `string` | `"private"` | no |
+| <a name="input_work_item_template"></a> [work\_item\_template](#input\_work\_item\_template) | Specifies the work item template. Defaults to Agile. | `string` | `"Agile"` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_dashboard_ids"></a> [dashboard\_ids](#output\_dashboard\_ids) | Map of dashboard IDs keyed by dashboard name. |
+| <a name="output_dashboard_owner_ids"></a> [dashboard\_owner\_ids](#output\_dashboard\_owner\_ids) | Map of dashboard owner IDs keyed by dashboard name. |
+| <a name="output_project_description"></a> [project\_description](#output\_project\_description) | The description of the Azure DevOps project. |
+| <a name="output_project_id"></a> [project\_id](#output\_project\_id) | The ID of the Azure DevOps project. |
+| <a name="output_project_name"></a> [project\_name](#output\_project\_name) | The name of the Azure DevOps project. |
+| <a name="output_project_pipeline_settings_id"></a> [project\_pipeline\_settings\_id](#output\_project\_pipeline\_settings\_id) | The ID returned by azuredevops\_project\_pipeline\_settings when managed. |
+| <a name="output_project_process_template_id"></a> [project\_process\_template\_id](#output\_project\_process\_template\_id) | The process template ID used by the project. |
+| <a name="output_project_tags"></a> [project\_tags](#output\_project\_tags) | Tags assigned to the project (when managed). |
+| <a name="output_project_version_control"></a> [project\_version\_control](#output\_project\_version\_control) | The version control system used by the project. |
+| <a name="output_project_visibility"></a> [project\_visibility](#output\_project\_visibility) | The visibility of the Azure DevOps project. |
+| <a name="output_project_work_item_template"></a> [project\_work\_item\_template](#output\_project\_work\_item\_template) | The work item template used by the project. |
 <!-- END_TF_DOCS -->
 
 ## Additional Documentation
