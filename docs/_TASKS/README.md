@@ -3,7 +3,7 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 2 tasks
+- **To Do:** 3 tasks
 - **In Progress:** 0
 - **Done:** 21 tasks
 
@@ -15,6 +15,7 @@ Task board for module work. Update statuses in markdown files.
 |----|-------|----------|--------|-------|
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
 | [TASK-008](./TASK-008_Storage_Account_Module_Alignment.md) | **Storage Account module – alignment z guide (docs, examples, tests)** | High | Large | `modules/azurerm_storage_account/` |
+| [TASK-ADO-015](./TASK-ADO-015_AzureDevOps_Agent_Pools_Module_Refactor.md) | **Azure DevOps Agent Pools module refactor** | High | Medium | `modules/azuredevops_agent_pools/` |
 
 ---
 
