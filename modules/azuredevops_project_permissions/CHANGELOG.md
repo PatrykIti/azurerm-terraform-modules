@@ -8,12 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial release of the azuredevops_variable_groups module
-- Core functionality for Azure DevOps variable groups and library permissions
+- Initial release of the azuredevops_project_permissions module
+- Core functionality for managing project permissions for group principals
 
 ### Security
-- Sensitive variable inputs are treated as secrets
-- Follows Azure security best practices
+- Supports least-privilege defaults through explicit permission maps
 
 ---
 

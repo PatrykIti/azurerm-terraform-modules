@@ -1,186 +1,57 @@
-# Module Versioning Guide
+# Module Versioning
 
-This module uses **semantic-release** for fully automated version management based on conventional commits.
+This module follows Semantic Versioning (SemVer) using the repository's `semantic-release` pipeline.
 
 ## Version Format
 
-This module follows a custom semantic versioning format:
+`ADOPPv{major}.{minor}.{patch}`
 
-```
-ADOVGv{major}.{minor}.{patch}
-```
+- `ADOPP` = azuredevops_project_permissions module identifier
+- `major` = breaking changes
+- `minor` = new features, backward compatible
+- `patch` = bug fixes and docs
 
-Where:
-- `ADOVG` = azuredevops_variable_groups module identifier
-- `v` = version prefix
-- `{major}.{minor}.{patch}` = semantic version numbers (automatically determined)
+## Examples
 
-### Examples:
-- `ADOVGv1.0.0` - First stable release
-- `ADOVGv1.1.0` - Minor feature addition (from `feat:` commits)
-- `ADOVGv1.0.1` - Bug fix (from `fix:` commits)
-- `ADOVGv2.0.0` - Breaking change (from `BREAKING CHANGE:` commits)
+- `ADOPPv1.0.0` - First stable release
+- `ADOPPv1.1.0` - Minor feature addition (from `feat:` commits)
+- `ADOPPv1.0.1` - Bug fix (from `fix:` commits)
+- `ADOPPv2.0.0` - Breaking change (from `BREAKING CHANGE:` commits)
 
 ## Automated Version Determination
 
-Version bumps are **automatically determined** by semantic-release based on commit messages:
+`semantic-release` uses commit messages to determine the next version:
 
-### Major Version (Breaking Changes)
-Triggered by:
-- Commits with `BREAKING CHANGE:` in the footer
-- Commits with `!` after the type (e.g., `feat!:`, `fix!:`)
-
-```bash
-feat(azuredevops-variable-groups)!: change default behavior
-
-BREAKING CHANGE: The default configuration has changed.
-Users must now explicitly set...
-```
-
-### Minor Version (New Features)
-Triggered by:
-- Commits with type `feat:`
-
-```bash
-feat(azuredevops-variable-groups): add support for new Azure feature
-feat(azuredevops-variable-groups): implement additional configuration options
-```
-
-### Patch Version (Bug Fixes)
-Triggered by:
-- Commits with types: `fix:`, `perf:`, `revert:`, `refactor:`, `docs:`
-
-```bash
-fix(azuredevops-variable-groups): correct validation for resource names
-perf(azuredevops-variable-groups): optimize resource creation logic
-docs(azuredevops-variable-groups): update README with new examples
-```
-
-### No Version (Ignored)
-These commits don't trigger releases:
-- `chore:`, `style:`, `test:`, `build:`, `ci:`
-
-```bash
-chore(azuredevops-variable-groups): update .gitignore
-test(azuredevops-variable-groups): add unit tests for validation
-```
+- `feat(azuredevops-project-permissions): ...` → minor bump
+- `fix(azuredevops-project-permissions): ...` → patch bump
+- `BREAKING CHANGE:` → major bump
 
 ## Automated Release Process
 
-### Prerequisites
-- All commits follow [Conventional Commits](https://www.conventionalcommits.org/) format
-- Commits include module scope: `feat(azuredevops-variable-groups): description`
-- PR is merged to main branch
+On merge to `main`, the release workflow:
 
-### Release Workflow
+1. Runs tests and validation
+2. Determines version based on commits
+3. Creates git tag (e.g., `ADOPPv1.2.0`)
+4. Publishes release notes
 
-1. **Merge PR to main** with conventional commits
-2. **Trigger Release Workflow** (manual via GitHub Actions)
-3. **Semantic-release automatically**:
-   - Analyzes commits since last release
-   - Determines version bump type
-   - Updates CHANGELOG.md
-   - Updates module version in configs
-   - Updates examples to use new version tag
-   - Creates git tag (e.g., `ADOVGv1.2.0`)
-   - Publishes GitHub release
-   - Commits all changes
+## How to Use Module Versions
 
-### What Gets Updated Automatically
+Reference a specific version tag in Terraform:
 
-#### CHANGELOG.md
-```markdown
-## [1.2.0] - 2024-01-15
-
-### 🚀 Features
-- Add support for new Azure feature (#123)
-- Implement additional configuration options (#124)
-
-### 🐛 Bug Fixes
-- Correct validation for resource names (#125)
-```
-
-#### Examples Source References
 ```hcl
-# Before release (development)
-module "azuredevops_variable_groups" {
-  source = "../../"
-}
-
-# After release (automatically updated)
-module "azuredevops_variable_groups" {
-  source = "github.com/org/repo//modules/azuredevops_variable_groups?ref=ADOVGv1.2.0"
+module "azuredevops_project_permissions" {
+  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_project_permissions?ref=ADOPPv1.0.0"
 }
 ```
 
-## Version Compatibility Matrix
+## Compatibility
 
-| Module Version | Terraform Version | AzureRM Provider | Azure API Version |
-|----------------|-------------------|------------------|-------------------|
-| ADOVGv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
+| Module Version | Terraform Version | Azure DevOps Provider |
+|---------------|-------------------|-----------------------|
+| ADOPPv1.0.x   | >= 1.12.2         | 1.12.2                |
 
-**Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
+## Best Practices
 
-## Module Versioning in Usage
-
-### Direct from GitHub (Recommended)
-```hcl
-module "azuredevops_variable_groups" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_variable_groups?ref=ADOVGv1.0.0"
-  
-  # Module configuration
-  # ...
-}
-```
-
-### Version Selection Strategy
-- **Production**: Always use specific version tags (e.g., `ref=ADOVGv1.2.3`)
-- **Development**: Can use branch references (e.g., `ref=feature/my-feature`)
-- **Testing**: Can use commit SHA (e.g., `ref=a1b2c3d4`)
-
-## Best Practices for Commits
-
-### Always Include Module Scope
-```bash
-# ✅ CORRECT - Will trigger release for this module
-feat(azuredevops-variable-groups): add new functionality
-fix(azuredevops-variable-groups): resolve validation issue
-
-# ❌ WRONG - Will be ignored by this module's release
-feat: add new functionality
-fix: resolve validation issue
-```
-
-### Writing Good Commit Messages
-```bash
-# Feature with detailed description
-feat(azuredevops-variable-groups): add support for private endpoints
-
-Implements private endpoint configuration for enhanced security.
-Supports multiple endpoints per resource.
-
-Closes #156
-
-# Breaking change with migration guide
-feat(azuredevops-variable-groups)!: restructure input variables
-
-BREAKING CHANGE: The input variable structure has changed.
-
-Migration guide:
-Before:
-  example_var = ["value1", "value2"]
-
-After:
-  example_var = {
-    items = ["value1", "value2"]
-  }
-```
-
-## Release Automation Benefits
-
-1. **Zero Manual Work**: No manual version decisions or tag creation
-2. **Consistent Releases**: Every release follows the same process
-3. **Automatic Documentation**: CHANGELOG always up-to-date
-4. **Clear History**: Commit messages directly map to changelog entries
-5. **Reduced Errors**: No human mistakes in versioning
-6. **Faster Releases**: Release anytime by triggering the workflow
+- Always use a fixed `ref=` in production.
+- Use `feat`/`fix` scopes matching the module's `commit_scope`.

@@ -1,9 +1,12 @@
-output "variable_group_ids" {
-  description = "Map of variable group IDs keyed by variable group key."
-  value       = { for key, group in azuredevops_variable_group.variable_group : key => group.id }
+output "permission_ids" {
+  description = "Map of permission assignment IDs keyed by permission key."
+  value       = { for key, permission in azuredevops_project_permissions.permission : key => permission.id }
 }
 
-output "variable_group_names" {
-  description = "Map of variable group names keyed by variable group key."
-  value       = { for key, group in azuredevops_variable_group.variable_group : key => group.name }
+output "permission_principals" {
+  description = "Map of resolved principals keyed by permission key."
+  value = {
+    for key, permission in local.permissions_by_key :
+    key => coalesce(permission.principal, try(data.azuredevops_group.permission_group[key].id, null))
+  }
 }

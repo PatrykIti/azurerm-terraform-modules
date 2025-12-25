@@ -26,3 +26,7 @@
 - `examples/secure`: `terraform init`, `terraform apply -auto-approve`, `terraform destroy -auto-approve` (`enable_flow_log=false`, `NetworkWatcherRG/NetworkWatcher_westeurope`)
 - `examples/diagnostic-settings`: `terraform init`, `terraform apply -auto-approve`, `terraform destroy -auto-approve`
 - `examples/flow-logs`: `terraform init`, `terraform apply -auto-approve`, `terraform destroy -auto-approve` (`enable_flow_log=false`, flow log creation retired after 2025-06-30)
+
+## Follow-up
+
+- Flow log support was removed later due to Azure deprecation (see `docs/_CHANGELOG/019-2025-12-25-nsg-flow-logs-removal.md`).

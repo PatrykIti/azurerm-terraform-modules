@@ -1,4 +1,4 @@
-# Terraform Azure DevOps Variable Groups Module
+# Terraform Azure DevOps Project Permissions Module
 
 ## Module Version
 
@@ -8,40 +8,38 @@ Current version: **vUnreleased**
 
 ## Description
 
-Azure DevOps variable groups module for managing variables and library permissions.
+Manages Azure DevOps project permissions for group principals, with optional lookup by group name.
 
 ## Usage
 
 ```hcl
 provider "azuredevops" {}
 
-module "azuredevops_variable_groups" {
-  source = "path/to/azuredevops_variable_groups"
+module "azuredevops_project_permissions" {
+  source = "path/to/azuredevops_project_permissions"
 
-  project_id = "00000000-0000-0000-0000-000000000000"
+  project_id = var.project_id
 
-  variable_groups = {
-    shared = {
-      name         = "shared-vars"
-      description  = "Shared variables"
-      allow_access = true
-      variables = [
-        {
-          name  = "environment"
-          value = "dev"
-        }
-      ]
+  permissions = [
+    {
+      key        = "collection-admins"
+      group_name = "Project Collection Administrators"
+      scope      = "collection"
+      permissions = {
+        GENERIC_READ = "Allow"
+      }
+      replace = false
     }
-  }
+  ]
 }
 ```
 
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - This example demonstrates creating a single variable group with plain variables.
-- [Complete](examples/complete) - This example demonstrates multiple variable groups with permissions and library permissions.
-- [Secure](examples/secure) - This example demonstrates a restricted variable group with secret values and minimal permissions.
+- [Basic](examples/basic) - This example demonstrates assigning project permissions to a collection group by name.
+- [Complete](examples/complete) - This example demonstrates project-scope permissions with optional principal override.
+- [Secure](examples/secure) - This example demonstrates least-privilege permission assignments.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
@@ -51,6 +49,7 @@ module "azuredevops_variable_groups" {
 
 ## Additional Documentation
 
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing permissions (limitations)
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines

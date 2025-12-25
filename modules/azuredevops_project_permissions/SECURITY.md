@@ -1,54 +1,40 @@
-# azuredevops_variable_groups Module Security
+# azuredevops_project_permissions Module Security
 
 ## Overview
 
-This document describes security considerations for Azure DevOps variable groups managed with Terraform.
+This document describes security considerations for the Azure DevOps project permissions module. The module manages project-level permissions for group principals.
 
 ## Security Features
 
-### 1. Secret Handling
-- Mark sensitive variables with `is_secret` and provide `secret_value`.
-- Use Key Vault-backed variable groups for centralized secret storage.
+### 1. Group-Only Assignment
+- Permissions are assigned to groups, not individual users.
+- Use group membership (e.g., via the identity module) to manage user access.
 
-### 2. Access Control
-- Restrict variable group and library permissions to trusted groups.
-- Avoid granting `Administer` or `Owner` unless required.
+### 2. Least Privilege
+- Grant only required permissions for each group.
+- Prefer `NotSet` or `Deny` for sensitive permissions unless explicitly needed.
 
-### 3. Pipeline Access
-- Use `allow_access` sparingly to avoid exposing secrets to all pipelines.
+### 3. Controlled Overrides
+- Use `principal` only when the group descriptor is known and stable.
+- Prefer `group_name` + `scope` to avoid hardcoding descriptors.
 
 ## Security Configuration Example
 
 ```hcl
-module "azuredevops_variable_groups" {
-  source = "./modules/azuredevops_variable_groups"
+module "azuredevops_project_permissions" {
+  source = "./modules/azuredevops_project_permissions"
 
-  project_id = "00000000-0000-0000-0000-000000000000"
+  project_id = var.project_id
 
-  variable_groups = {
-    secure = {
-      name         = "secure-vars"
-      description  = "Secrets for production"
-      allow_access = false
-      variables = [
-        {
-          name         = "api_key"
-          secret_value = "example-secret"
-          is_secret    = true
-        }
-      ]
-    }
-  }
-
-  variable_group_permissions = [
+  permissions = [
     {
-      variable_group_key = "secure"
-      principal          = "vssgp.Uy0xLTktMTIzNDU2"
+      key        = "readers"
+      group_name = "Readers"
+      scope      = "project"
       permissions = {
-        View       = "allow"
-        Use        = "allow"
-        Administer = "deny"
+        GENERIC_READ = "Allow"
       }
+      replace = false
     }
   ]
 }
@@ -56,21 +42,21 @@ module "azuredevops_variable_groups" {
 
 ## Security Hardening Checklist
 
-- [ ] Store secrets in Key Vault or mark them as secret values.
-- [ ] Keep `allow_access` disabled unless required for all pipelines.
-- [ ] Grant variable group permissions to groups, not individual users.
-- [ ] Review permissions for `Administer` and `Owner` regularly.
+- [ ] Assign permissions only to groups, not individuals.
+- [ ] Limit write/admin permissions to a small set of groups.
+- [ ] Use `replace = false` unless you intentionally want to reset permissions.
+- [ ] Review permissions regularly and remove unused entries.
 
 ## Common Security Mistakes to Avoid
 
-1. **Storing secret values as plain variables**
-2. **Allowing access to all pipelines without review**
-3. **Assigning admin permissions to broad groups**
+1. **Assigning broad permissions to large groups**
+2. **Using hardcoded descriptors without documentation**
+3. **Replacing permissions unintentionally**
 
 ## Additional Resources
 
-- [Azure DevOps Variable Groups](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups)
-- [Azure DevOps Permissions](https://learn.microsoft.com/en-us/azure/devops/organizations/security/permissions)
+- [Azure DevOps Security Documentation](https://learn.microsoft.com/en-us/azure/devops/organizations/security/about-security-identity?view=azure-devops)
+- [Azure DevOps Permissions Reference](https://learn.microsoft.com/en-us/azure/devops/organizations/security/permissions?view=azure-devops)
 
 ---
 
