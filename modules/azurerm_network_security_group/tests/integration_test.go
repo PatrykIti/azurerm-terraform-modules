@@ -108,7 +108,7 @@ func TestSecureNetworkSecurityGroup(t *testing.T) {
 	})
 }
 
-// TestNetworkSecurityGroupObservability tests diagnostic settings and flow logs.
+// TestNetworkSecurityGroupObservability tests diagnostic settings.
 func TestNetworkSecurityGroupObservability(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
@@ -131,9 +131,7 @@ func TestNetworkSecurityGroupObservability(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 		diagnosticSettings := terraform.OutputMap(t, terraformOptions, "diagnostic_settings_ids")
-		flowLogID := terraform.Output(t, terraformOptions, "flow_log_id")
 
 		assert.NotEmpty(t, diagnosticSettings, "Diagnostic settings IDs should not be empty.")
-		assert.NotEmpty(t, flowLogID, "Flow log ID should not be empty.")
 	})
 }

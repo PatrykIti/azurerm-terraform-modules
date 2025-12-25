@@ -45,4 +45,4 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-012](./TASK-ADO-012_AzureDevOps_ServiceHooks_Module.md) | **Azure DevOps Service Hooks module** | Medium | Medium | `modules/azuredevops_servicehooks/` |
 | [TASK-ADO-013](./TASK-ADO-013_AzureDevOps_Wiki_Module.md) | **Azure DevOps Wiki module** | Medium | Small | `modules/azuredevops_wiki/` |
 | [TASK-ADO-014](./TASK-ADO-014_AzureDevOps_Work_Items_Module.md) | **Azure DevOps Work Items module** | Medium | Large | `modules/azuredevops_work_items/` |
-| [TASK-006](./TASK-006_NSG_Observability_and_Documentation.md) | **NSG observability + docs alignment (flow logs, traffic analytics, diagnostics)** | High | Large | `modules/azurerm_network_security_group/` + repo docs |
+| [TASK-006](./TASK-006_NSG_Observability_and_Documentation.md) | **NSG observability + docs alignment (diagnostic settings)** | High | Large | `modules/azurerm_network_security_group/` + repo docs |

@@ -1,0 +1,7 @@
+{
+  "name": "azuredevops_project_permissions",
+  "title": "Azure DevOps Project Permissions",
+  "commit_scope": "azuredevops-project-permissions",
+  "tag_prefix": "ADOPP",
+  "description": "Azure DevOps project permissions module for assigning group permissions"
+}

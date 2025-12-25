@@ -19,9 +19,9 @@ This document describes security considerations for the Azure DevOps project mod
 ### 3. Feature Management
 - Disable unused features (e.g., artifacts, test plans) to reduce the attack surface.
 
-### 4. Permissions
-- Assign permissions to groups, not individual users.
-- Use least privilege for project-level roles.
+### 4. Permissions (separate module)
+- Project permissions are managed via the `azuredevops_project_permissions` module.
+- Assign permissions to groups, not individual users, and apply least privilege.
 
 ## Security Configuration Example
 
@@ -60,7 +60,7 @@ module "azuredevops_project" {
 - [ ] Disable unused project features.
 - [ ] Enforce job scope and restrict pipeline tokens.
 - [ ] Keep status badges private.
-- [ ] Assign permissions to groups and review them regularly.
+- [ ] Assign permissions to groups (via the permissions module) and review them regularly.
 
 ## Common Security Mistakes to Avoid
 

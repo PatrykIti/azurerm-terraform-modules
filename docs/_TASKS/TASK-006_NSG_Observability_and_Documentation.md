@@ -7,11 +7,13 @@
 **Dependencies:** —  
 **Status:** ✅ **Done** (2025-12-24)
 
+**Update (2025-12-25):** Azure retired NSG flow logs (no new creation after 2025-07-30). Flow log support was removed from the module, examples, tests, and docs. Observability now focuses on diagnostic settings only.
+
 ---
 
 ## Cel
 
-Rozszerzyc modul `azurerm_network_security_group` o observability (flow logs, traffic analytics, diagnostic settings) oraz ujednolicic dokumentacje tak, aby jasno wskazywala, ze AKS jest wzorcem, ale inne resource'y moga sie znacznie roznic.
+Rozszerzyc modul `azurerm_network_security_group` o observability (diagnostic settings) oraz ujednolicic dokumentacje tak, aby jasno wskazywala, ze AKS jest wzorcem, ale inne resource'y moga sie znacznie roznic.
 
 ---
 
@@ -21,7 +23,7 @@ Rozszerzyc modul `azurerm_network_security_group` o observability (flow logs, tr
    Dokumentacja ma jasno mowic, ze AKS jest baseline, ale inne resource'y moga wymuszac odstepstwa. Takie odstepstwa musza byc opisane w module.
 
 2) **NSG ma wspierac observability**  
-   Jezeli NSG wspiera flow logs, traffic analytics i diagnostic settings, to te funkcje maja byc zaimplementowane w module.
+   Observability opiera sie na diagnostic settings. Flow logs zostaly wycofane przez Azure i nie sa wspierane w module.
 
 3) **Przyklady maja byc bogate**  
    Przynajmniej `basic`, `complete`, `secure` oraz dodatkowe przyklady feature-specific, tak aby uzytkownicy mieli gotowe wzorce podobnie jak w AKS.
@@ -67,33 +69,15 @@ Rozszerzyc modul `azurerm_network_security_group` o observability (flow logs, tr
 
 ---
 
-### TASK-006-3: Flow logs + Traffic Analytics dla NSG
-
-**Cel:** Dodac `azurerm_network_watcher_flow_log` z opcjonalnym `traffic_analytics`.
-
-**Wymagania:**
-- Obsuga `storage_account_id`, `network_watcher_name`, `network_watcher_resource_group_name`.
-- Konfiguracja retention (dni, enabled).
-- `traffic_analytics` z `workspace_id`, `workspace_region`, `workspace_resource_id`, `interval_in_minutes`.
-- Prosty model danych: pojedynczy blok `flow_log` (obiekt) lub lista (do ustalenia).
-- `default = null` / `default = {}` -> brak flow log.
-
-**Deliverables:**
-- `variables.tf`: nowa zmienna typu `object(...)` z walidacjami.
-- `main.tf`: resource `azurerm_network_watcher_flow_log`.
-- `outputs.tf`: output z flow log (ID i/lub konfiguracja).
-
----
-
-### TASK-006-4: Przyklady (jak najwiecej, zgodnie z AKS)
+### TASK-006-3: Przyklady (jak najwiecej, zgodnie z AKS)
 
 **Cel:** Pokazac realne uzycia modulu z observability.
 
 **Wymagania minimalne:**
 - `examples/basic` (minimal).
-- `examples/complete` (pelny set: rules + diag + flow logs + traffic analytics).
+- `examples/complete` (pelny set: rules + diag).
 - `examples/secure` (zero-trust + observability).
-- Feature-specific: np. `examples/diagnostic-settings`, `examples/flow-logs` lub `examples/observability`.
+- Feature-specific: np. `examples/diagnostic-settings` lub `examples/observability`.
 
 **Checklist:**
 - [ ] Kazdy przyklad ma `README.md`, `.terraform-docs.yml`, `main.tf`, `variables.tf`, `outputs.tf`.
@@ -109,8 +93,8 @@ Rozszerzyc modul `azurerm_network_security_group` o observability (flow logs, tr
 **Checklist:**
 - [ ] `tests/unit/diagnostic_settings.tftest.hcl` + negatywne przypadki.
 - [ ] Testy walidacji konfliktow (single vs plural, destination vs destinations).
-- [ ] Fixture dla `diagnostic-settings` i `flow-logs`.
-- [ ] Go tests sprawdzajace, ze zasoby observability powstaly (o ile dostepne).
+- [ ] Fixture dla `diagnostic-settings` / `observability`.
+- [ ] Go tests sprawdzajace, ze zasoby observability powstaly.
 - [ ] Update `tests/test_config.yaml` z poprawnymi nazwami testow.
 - [ ] Update `tests/README.md` (zgodne fixture names i komendy).
 
@@ -129,7 +113,7 @@ Rozszerzyc modul `azurerm_network_security_group` o observability (flow logs, tr
 
 ## Definition of Done
 
-- [ ] W module NSG sa zrobione flow logs, traffic analytics i diagnostic settings.
+- [ ] W module NSG sa zrobione diagnostic settings.
 - [ ] Dokumentacja repo jasno mowi o AKS jako wzorcu, ale dopuszcza roznice.
 - [ ] Przyklady zawieraja pelne scenariusze, plus feature-specific.
 - [ ] Testy obejmuja nowa funkcjonalnosc i przechodza.

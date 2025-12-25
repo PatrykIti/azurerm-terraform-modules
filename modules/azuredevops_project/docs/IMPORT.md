@@ -93,6 +93,7 @@ When the plan is clean, you can remove `import.tf`.
 
 ## Additional resources
 
+- Project permissions are managed in the separate `azuredevops_project_permissions` module.
 - `azuredevops_project_permissions` **does not support import** (provider limitation).
 - For `azuredevops_project_pipeline_settings`, `azuredevops_project_tags`, and
   `azuredevops_dashboard`, verify import support in the provider docs. If import

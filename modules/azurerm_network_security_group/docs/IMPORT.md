@@ -102,7 +102,7 @@ To get the **exact ID**:
 az network nsg show -g <rg> -n <nsg> --query id -o tsv
 ```
 
-### Optional imports (rules, diagnostics, flow logs)
+### Optional imports (rules, diagnostics)
 
 If you want the module to **manage existing rules**, you must:
 1) Define them in `security_rules`, and
@@ -134,19 +134,6 @@ import {
 az monitor diagnostic-settings list --resource <nsg_id> --query "[].id" -o tsv
 ```
 
-If you already have **flow logs** configured in Network Watcher:
-
-```hcl
-import {
-  to = module.network_security_group.azurerm_network_watcher_flow_log.network_watcher_flow_log[0]
-  id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Network/networkWatchers/<nw>/flowLogs/<flow_log_name>"
-}
-```
-
-```bash
-az network watcher flow-log list --location <region> --query "[].id" -o tsv
-```
-
 ---
 
 ## 3) Run the import
@@ -159,7 +146,7 @@ terraform apply
 
 Expected output in `plan`:
 - one **import** action for the NSG
-- **no other changes** (unless you plan to manage rules/diagnostics/flow logs)
+- **no other changes** (unless you plan to manage rules/diagnostics)
 
 ---
 
@@ -183,4 +170,4 @@ If the plan is clean, you can **remove the import block** (`import.tf`).
   - tags
   - location and resource group
 - **Rules not managed**: if you want rule management, define them in `security_rules` and import each rule.
-- **Diagnostics/flow logs drift**: those are not managed unless you configure and import them explicitly.
+- **Diagnostics drift**: those are not managed unless you configure and import them explicitly.

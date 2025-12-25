@@ -8,7 +8,7 @@ Current version: **vUnreleased**
 
 ## Description
 
-Manages Azure DevOps projects, settings, tags, dashboards, and permissions.
+Manages Azure DevOps projects, settings, tags, and dashboards.
 
 ## Usage
 

@@ -103,37 +103,6 @@ variable "project_tags" {
 # Project Permissions
 # -----------------------------------------------------------------------------
 
-variable "project_permissions" {
-  description = "List of project permission assignments (group principals only)."
-  type = list(object({
-    principal   = string
-    permissions = map(string)
-    replace     = optional(bool, true)
-  }))
-  default = []
-
-  validation {
-    condition = alltrue([
-      for permission in var.project_permissions : trim(permission.principal) != ""
-    ])
-    error_message = "project_permissions.principal must be a non-empty string."
-  }
-
-  validation {
-    condition     = length(var.project_permissions) == length(distinct([for permission in var.project_permissions : permission.principal]))
-    error_message = "project_permissions principals must be unique."
-  }
-
-  validation {
-    condition = alltrue([
-      for permission in var.project_permissions : alltrue([
-        for status in values(permission.permissions) : contains(["Allow", "Deny", "NotSet"], status)
-      ])
-    ])
-    error_message = "project_permissions values must be one of: Allow, Deny, NotSet."
-  }
-}
-
 # -----------------------------------------------------------------------------
 # Dashboards
 # -----------------------------------------------------------------------------

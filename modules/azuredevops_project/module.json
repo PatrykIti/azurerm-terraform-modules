@@ -3,5 +3,5 @@
   "title": "Azure DevOps Project",
   "commit_scope": "azuredevops-project",
   "tag_prefix": "ADOP",
-  "description": "Azure DevOps project module for managing project settings, tags, dashboards, and permissions"
+  "description": "Azure DevOps project module for managing project settings, tags, and dashboards"
 }

@@ -8,10 +8,6 @@ resource "random_string" "suffix" {
   special = false
 }
 
-data "azuredevops_group" "project_collection_admins" {
-  name = "Project Collection Administrators"
-}
-
 module "azuredevops_project" {
   source = "../../../"
 
@@ -40,13 +36,4 @@ module "azuredevops_project" {
 
   project_tags = ["test", "secure"]
 
-  project_permissions = [
-    {
-      principal = data.azuredevops_group.project_collection_admins.id
-      permissions = {
-        GENERIC_READ = "Allow"
-      }
-      replace = false
-    }
-  ]
 }

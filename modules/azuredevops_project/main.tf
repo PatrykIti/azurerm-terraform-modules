@@ -29,15 +29,6 @@ resource "azuredevops_project_tags" "project_tags" {
   tags       = var.project_tags
 }
 
-resource "azuredevops_project_permissions" "project_permissions" {
-  for_each = { for permission in var.project_permissions : permission.principal => permission }
-
-  project_id  = azuredevops_project.project.id
-  principal   = each.value.principal
-  permissions = each.value.permissions
-  replace     = each.value.replace
-}
-
 resource "azuredevops_dashboard" "dashboard" {
   for_each = { for dashboard in var.dashboards : dashboard.name => dashboard }
 

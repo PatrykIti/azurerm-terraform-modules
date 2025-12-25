@@ -19,8 +19,6 @@ observability for audit and compliance.
 ### 2. **Monitoring and Auditing**
 
 - **Diagnostic settings** for NSG logs and metrics (Log Analytics, Storage, Event Hub).
-- **Network Watcher flow logs** with optional **traffic analytics**.
-- **Retention policy** controls for flow logs.
 
 ### 3. **Governance and Compliance**
 
@@ -72,24 +70,6 @@ module "network_security_group" {
     }
   ]
 
-  flow_log = {
-    name                                 = "nsg-flow-logs"
-    storage_account_id                   = azurerm_storage_account.flow_logs.id
-    network_watcher_name                 = azurerm_network_watcher.example.name
-    network_watcher_resource_group_name  = azurerm_network_watcher.example.resource_group_name
-    retention_policy = {
-      enabled = true
-      days    = 30
-    }
-    traffic_analytics = {
-      enabled               = true
-      workspace_id          = azurerm_log_analytics_workspace.example.workspace_id
-      workspace_region      = azurerm_log_analytics_workspace.example.location
-      workspace_resource_id = azurerm_log_analytics_workspace.example.id
-      interval_in_minutes   = 10
-    }
-  }
-
   tags = {
     Environment        = "Production"
     DataClassification = "Confidential"
@@ -106,7 +86,6 @@ Before deploying to production:
 - [ ] Prefer **service tags** over raw IP ranges.
 - [ ] Group workloads with **ASGs** where possible.
 - [ ] Enable **diagnostic settings** for logs and metrics.
-- [ ] Enable **flow logs** with a retention policy.
 - [ ] Review and document all rule exceptions.
 - [ ] Apply tags for ownership and compliance tracking.
 
@@ -130,7 +109,6 @@ Before deploying to production:
    ```hcl
    # ❌ AVOID
    diagnostic_settings = []
-   flow_log            = null
    ```
 
 ## Incident Response
@@ -140,11 +118,10 @@ If a security incident occurs:
 1. **Immediate Actions**
    - Review NSG rules and audit logs
    - Block suspicious IP ranges
-   - Increase logging verbosity (diagnostic settings + flow logs)
+   - Increase logging verbosity (diagnostic settings)
 
 2. **Investigation**
    - Use Log Analytics queries
-   - Correlate flow logs with security alerts
    - Validate rule changes and recent deployments
 
 3. **Remediation**
@@ -158,7 +135,7 @@ If a security incident occurs:
 | Control | Implementation |
 |---------|---------------|
 | CC6.1 | NSG rules + RBAC |
-| CC7.2 | Diagnostic settings + flow logs |
+| CC7.2 | Diagnostic settings |
 
 ### ISO 27001 Controls
 | Control | Implementation |
@@ -169,11 +146,10 @@ If a security incident occurs:
 ## Additional Resources
 
 - [Azure NSG Overview](https://learn.microsoft.com/azure/virtual-network/network-security-groups-overview)
-- [NSG Flow Logs](https://learn.microsoft.com/azure/network-watcher/network-watcher-nsg-flow-logging-overview)
 - [Diagnostic Settings](https://learn.microsoft.com/azure/azure-monitor/essentials/diagnostic-settings)
 
 ---
 
 **Module Version**: 1.0.3  
-**Last Updated**: 2025-12-24  
+**Last Updated**: 2025-12-25  
 **Security Contact**: security@yourorganization.com

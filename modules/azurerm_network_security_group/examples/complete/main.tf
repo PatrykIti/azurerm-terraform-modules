@@ -28,7 +28,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 }
 
 # Storage account for diagnostic settings
-resource "azurerm_storage_account" "flow_logs" {
+resource "azurerm_storage_account" "diagnostics" {
   name                     = var.storage_account_name
   location                 = azurerm_resource_group.example.location
   resource_group_name      = azurerm_resource_group.example.name
@@ -181,7 +181,7 @@ module "network_security_group" {
       areas                          = ["event", "rule_counter", "metrics"]
       log_analytics_workspace_id     = azurerm_log_analytics_workspace.example.id
       log_analytics_destination_type = "Dedicated"
-      storage_account_id             = azurerm_storage_account.flow_logs.id
+      storage_account_id             = azurerm_storage_account.diagnostics.id
       eventhub_authorization_rule_id = azurerm_eventhub_namespace_authorization_rule.example.id
       eventhub_name                  = azurerm_eventhub.example.name
     }
