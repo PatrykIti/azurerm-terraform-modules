@@ -7,6 +7,7 @@ module "azuredevops_work_items" {
 
   work_items = [
     {
+      key   = "network-item"
       title = "${var.work_item_title_prefix}-network"
       type  = "Issue"
       state = "Active"

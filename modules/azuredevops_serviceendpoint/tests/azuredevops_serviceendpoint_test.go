@@ -102,7 +102,7 @@ func TestAzuredevopsServiceendpointValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "serviceendpoint_permissions.principal")
+	assert.Contains(t, err.Error(), "serviceendpoint_permissions must set serviceendpoint_id")
 }
 
 // Helper function to get terraform options

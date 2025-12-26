@@ -7,6 +7,7 @@ module "azuredevops_serviceendpoint" {
 
   serviceendpoint_generic = [
     {
+      key                   = "generic-basic"
       service_endpoint_name = "${var.generic_endpoint_name_prefix}"
       server_url            = var.generic_endpoint_url
       username              = var.generic_endpoint_username

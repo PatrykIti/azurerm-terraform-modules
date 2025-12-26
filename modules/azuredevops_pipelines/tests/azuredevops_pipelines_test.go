@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -102,7 +101,7 @@ func TestAzuredevopsPipelinesValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "pipeline_id and pipeline_key")
+	assert.Contains(t, err.Error(), "pipeline_authorizations must set exactly one of pipeline_id or pipeline_key")
 }
 
 // Helper function to get terraform options
@@ -114,10 +113,8 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
-			"project_id":                 getProjectID(t),
-			"repo_name_prefix":           fmt.Sprintf("ado-repo-%s", uniqueID),
-			"pipeline_name_prefix":       fmt.Sprintf("ado-pipeline-%s", uniqueID),
-			"service_endpoint_name_prefix": fmt.Sprintf("ado-endpoint-%s", uniqueID),
+			"project_id":    getProjectID(t),
+			"random_suffix": uniqueID,
 		},
 		NoColor: true,
 		RetryableTerraformErrors: map[string]string{

@@ -1,6 +1,13 @@
 # Test default settings for Azure DevOps Identity
 
-mock_provider "azuredevops" {}
+mock_provider "azuredevops" {
+  mock_resource "azuredevops_group" {
+    defaults = {
+      group_id   = "00000000-0000-0000-0000-000000000000"
+      descriptor = "vssgp.mock"
+    }
+  }
+}
 
 run "defaults_plan" {
   command = plan
@@ -33,5 +40,30 @@ run "defaults_plan" {
   assert {
     condition     = length(azuredevops_securityrole_assignment.securityrole_assignment) == 0
     error_message = "No security role assignments should be created by default."
+  }
+}
+
+run "default_membership_mode" {
+  command = plan
+
+  variables {
+    groups = {
+      admins = {
+        display_name = "Admins"
+      }
+    }
+
+    group_memberships = [
+      {
+        key               = "default-mode"
+        group_key         = "admins"
+        member_descriptors = ["vssgp.member"]
+      }
+    ]
+  }
+
+  assert {
+    condition     = azuredevops_group_membership.group_membership["default-mode"].mode == "add"
+    error_message = "group_memberships.mode should default to add."
   }
 }

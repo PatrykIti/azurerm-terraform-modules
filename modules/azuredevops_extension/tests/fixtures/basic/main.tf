@@ -3,5 +3,7 @@ provider "azuredevops" {}
 module "azuredevops_extension" {
   source = "../../"
 
-  extensions = var.extensions
+  publisher_id = var.publisher_id
+  extension_id = var.extension_id
+  version      = var.version
 }

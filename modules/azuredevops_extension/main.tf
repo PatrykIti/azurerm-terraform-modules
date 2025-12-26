@@ -1,16 +1,7 @@
-# Azure DevOps Extensions
-
-locals {
-  extensions_by_key = {
-    for extension in var.extensions :
-    "${extension.publisher_id}/${extension.extension_id}" => extension
-  }
-}
+# Azure DevOps Extension
 
 resource "azuredevops_extension" "extension" {
-  for_each = local.extensions_by_key
-
-  publisher_id = each.value.publisher_id
-  extension_id = each.value.extension_id
-  version      = each.value.version
+  publisher_id = var.publisher_id
+  extension_id = var.extension_id
+  version      = var.version
 }

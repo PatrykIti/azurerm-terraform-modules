@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 11 tasks
+- **To Do:** 1 tasks
 - **In Progress:** 0
-- **Done:** 23 tasks
+- **Done:** 34 tasks
 
 ---
 
@@ -14,16 +14,6 @@ Task board for module work. Update statuses in markdown files.
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
-| [TASK-ADO-018](./TASK-ADO-018_AzureDevOps_Identity_Module_Refactor.md) | **Azure DevOps Identity module refactor** | High | Medium | `modules/azuredevops_identity/` |
-| [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | `modules/azuredevops_artifacts_feed/` |
-| [TASK-ADO-020](./TASK-ADO-020_AzureDevOps_Extension_Module_Refactor.md) | **Azure DevOps Extension module refactor** | Medium | Small | `modules/azuredevops_extension/` |
-| [TASK-ADO-021](./TASK-ADO-021_AzureDevOps_Pipelines_Module_Refactor.md) | **Azure DevOps Pipelines module refactor** | High | Medium | `modules/azuredevops_pipelines/` |
-| [TASK-ADO-022](./TASK-ADO-022_AzureDevOps_ServiceEndpoint_Module_Refactor.md) | **Azure DevOps Service Endpoint module refactor** | High | Large | `modules/azuredevops_serviceendpoint/` |
-| [TASK-ADO-023](./TASK-ADO-023_AzureDevOps_Repository_Module_Refactor.md) | **Azure DevOps Repository module refactor** | High | Large | `modules/azuredevops_repository/` |
-| [TASK-ADO-024](./TASK-ADO-024_AzureDevOps_ServiceHooks_Module_Refactor.md) | **Azure DevOps Service Hooks module refactor** | Medium | Medium | `modules/azuredevops_servicehooks/` |
-| [TASK-ADO-025](./TASK-ADO-025_AzureDevOps_Variable_Groups_Module_Refactor.md) | **Azure DevOps Variable Groups module refactor** | Medium | Medium | `modules/azuredevops_variable_groups/` |
-| [TASK-ADO-026](./TASK-ADO-026_AzureDevOps_Work_Items_Module_Refactor.md) | **Azure DevOps Work Items module refactor** | High | Medium | `modules/azuredevops_work_items/` |
-| [TASK-ADO-027](./TASK-ADO-027_AzureDevOps_Team_Module_Refactor.md) | **Azure DevOps Team module refactor** | Medium | Medium | `modules/azuredevops_team/` |
 
 ---
 
@@ -37,6 +27,9 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-ADO-027](./TASK-ADO-027_AzureDevOps_Team_Module_Refactor.md) | **Azure DevOps Team module refactor** | Medium | Medium | `modules/azuredevops_team/` |
+| [TASK-ADO-024](./TASK-ADO-024_AzureDevOps_ServiceHooks_Module_Refactor.md) | **Azure DevOps Service Hooks module refactor** | Medium | Medium | `modules/azuredevops_servicehooks/` |
+| [TASK-ADO-022](./TASK-ADO-022_AzureDevOps_ServiceEndpoint_Module_Refactor.md) | **Azure DevOps Service Endpoint module refactor** | High | Large | `modules/azuredevops_serviceendpoint/` |
 | [TASK-001](./TASK-001_AKS_Module_Fixes.md) | **AKS module – walidacje, SP/MI UX, docs i bump wersji** | High | Medium | `modules/azurerm_kubernetes_cluster/` |
 | [TASK-003](./TASK-003_Module_Scaffold_Fix.md) | **Generator scaffoldu – naprawa i zgodnosc z AKS** | High | Medium | `scripts/create-new-module.sh` + `scripts/templates/` |
 | [TASK-004](./TASK-004_AKS_Diagnostic_Settings.md) | **AKS diagnostic settings – multi-stream i obszary** | High | Medium | `modules/azurerm_kubernetes_cluster/` |
@@ -57,6 +50,14 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-014](./TASK-ADO-014_AzureDevOps_Work_Items_Module.md) | **Azure DevOps Work Items module** | Medium | Large | `modules/azuredevops_work_items/` |
 | [TASK-ADO-015](./TASK-ADO-015_AzureDevOps_Agent_Pools_Module_Refactor.md) | **Azure DevOps Agent Pools module refactor** | High | Medium | `modules/azuredevops_agent_pools/` |
 | [TASK-ADO-016](./TASK-ADO-016_AzureDevOps_Project_Permissions_Verification.md) | **Azure DevOps Project Permissions module – verification & alignment** | Medium | Small | `modules/azuredevops_project_permissions/` |
+| [TASK-ADO-017](./TASK-ADO-017_AzureDevOps_Environments_Module_Refactor.md) | **Azure DevOps Environments module refactor** | High | Medium | `modules/azuredevops_environments/` |
+| [TASK-ADO-021](./TASK-ADO-021_AzureDevOps_Pipelines_Module_Refactor.md) | **Azure DevOps Pipelines module refactor** | High | Medium | `modules/azuredevops_pipelines/` |
+| [TASK-ADO-023](./TASK-ADO-023_AzureDevOps_Repository_Module_Refactor.md) | **Azure DevOps Repository module refactor** | High | Large | `modules/azuredevops_repository/` |
+| [TASK-ADO-025](./TASK-ADO-025_AzureDevOps_Variable_Groups_Module_Refactor.md) | **Azure DevOps Variable Groups module refactor** | Medium | Medium | `modules/azuredevops_variable_groups/` |
+| [TASK-ADO-026](./TASK-ADO-026_AzureDevOps_Work_Items_Module_Refactor.md) | **Azure DevOps Work Items module refactor** | High | Medium | `modules/azuredevops_work_items/` |
+| [TASK-ADO-018](./TASK-ADO-018_AzureDevOps_Identity_Module_Refactor.md) | **Azure DevOps Identity module refactor** | High | Medium | `modules/azuredevops_identity/` |
+| [TASK-ADO-020](./TASK-ADO-020_AzureDevOps_Extension_Module_Refactor.md) | **Azure DevOps Extension module refactor** | Medium | Small | `modules/azuredevops_extension/` |
+| [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | `modules/azuredevops_artifacts_feed/` |
 | [TASK-006](./TASK-006_NSG_Observability_and_Documentation.md) | **NSG observability + docs alignment (diagnostic settings)** | High | Large | `modules/azurerm_network_security_group/` + repo docs |
 | [TASK-007](./TASK-007_Route_Table_Module_Alignment.md) | **Route Table module – alignment z guide (docs, examples, tests)** | High | Medium | `modules/azurerm_route_table/` |
 | [TASK-008](./TASK-008_Storage_Account_Module_Alignment.md) | **Storage Account module – alignment z guide (docs, examples, tests)** | High | Large | `modules/azurerm_storage_account/` |

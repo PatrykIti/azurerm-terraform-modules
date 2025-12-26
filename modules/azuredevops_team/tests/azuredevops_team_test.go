@@ -63,6 +63,8 @@ func TestCompleteAzuredevopsTeam(t *testing.T) {
 
 		assert.GreaterOrEqual(t, len(teamIDs), 2)
 		assert.NotEmpty(t, teamMemberIDs)
+		_, ok := teamMemberIDs["platform-members"]
+		assert.True(t, ok)
 	})
 }
 
@@ -90,6 +92,8 @@ func TestSecureAzuredevopsTeam(t *testing.T) {
 
 		assert.NotEmpty(t, teamIDs)
 		assert.NotEmpty(t, adminIDs)
+		_, ok := adminIDs["security-admins"]
+		assert.True(t, ok)
 	})
 }
 

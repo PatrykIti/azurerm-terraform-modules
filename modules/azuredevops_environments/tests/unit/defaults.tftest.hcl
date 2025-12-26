@@ -2,12 +2,17 @@
 
 mock_provider "azuredevops" {}
 
+variables {
+  project_id = "00000000-0000-0000-0000-000000000000"
+  name       = "ado-env-defaults"
+}
+
 run "defaults_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_environment.environment) == 0
-    error_message = "No environments should be created by default."
+    condition     = azuredevops_environment.environment.name == var.name
+    error_message = "Environment name should match the provided name."
   }
 
   assert {

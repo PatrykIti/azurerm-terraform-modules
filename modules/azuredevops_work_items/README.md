@@ -29,6 +29,7 @@ module "azuredevops_work_items" {
 
   work_items = [
     {
+      key   = "example-item"
       title = "Example Work Item"
       type  = "Issue"
       state = "Active"
@@ -46,12 +47,69 @@ module "azuredevops_work_items" {
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
-<!-- This file will be automatically populated by terraform-docs -->
-<!-- Do not edit manually - use terraform-docs to generate -->
+
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
+| <a name="requirement_azuredevops"></a> [azuredevops](#requirement\_azuredevops) | 1.12.2 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azuredevops"></a> [azuredevops](#provider\_azuredevops) | 1.12.2 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azuredevops_area_permissions.area_permissions](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/area_permissions) | resource |
+| [azuredevops_iteration_permissions.iteration_permissions](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/iteration_permissions) | resource |
+| [azuredevops_tagging_permissions.tagging_permissions](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/tagging_permissions) | resource |
+| [azuredevops_workitem.work_item](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/workitem) | resource |
+| [azuredevops_workitemquery.query](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/workitemquery) | resource |
+| [azuredevops_workitemquery_folder.query_folder](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/workitemquery_folder) | resource |
+| [azuredevops_workitemquery_permissions.query_permissions](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/workitemquery_permissions) | resource |
+| [azuredevops_workitemtrackingprocess_process.process](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/workitemtrackingprocess_process) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_area_permissions"></a> [area\_permissions](#input\_area\_permissions) | List of area permissions to assign. | <pre>list(object({<br/>    key         = optional(string)<br/>    project_id  = optional(string)<br/>    path        = string<br/>    principal   = string<br/>    permissions = map(string)<br/>    replace     = optional(bool, true)<br/>  }))</pre> | `[]` | no |
+| <a name="input_iteration_permissions"></a> [iteration\_permissions](#input\_iteration\_permissions) | List of iteration permissions to assign. | <pre>list(object({<br/>    key         = optional(string)<br/>    project_id  = optional(string)<br/>    path        = string<br/>    principal   = string<br/>    permissions = map(string)<br/>    replace     = optional(bool, true)<br/>  }))</pre> | `[]` | no |
+| <a name="input_processes"></a> [processes](#input\_processes) | Map of work item processes to manage. | <pre>map(object({<br/>    name                   = optional(string)<br/>    parent_process_type_id = string<br/>    description            = optional(string)<br/>    is_default             = optional(bool)<br/>    is_enabled             = optional(bool)<br/>    reference_name         = optional(string)<br/>  }))</pre> | `{}` | no |
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Default Azure DevOps project ID for project-scoped resources. | `string` | `null` | no |
+| <a name="input_queries"></a> [queries](#input\_queries) | List of work item queries to manage. | <pre>list(object({<br/>    key        = optional(string)<br/>    project_id = optional(string)<br/>    name       = string<br/>    wiql       = string<br/>    area       = optional(string)<br/>    parent_id  = optional(number)<br/>    parent_key = optional(string)<br/>  }))</pre> | `[]` | no |
+| <a name="input_query_folders"></a> [query\_folders](#input\_query\_folders) | List of work item query folders to manage. | <pre>list(object({<br/>    key        = optional(string)<br/>    project_id = optional(string)<br/>    name       = string<br/>    area       = optional(string)<br/>    parent_id  = optional(number)<br/>    parent_key = optional(string)<br/>  }))</pre> | `[]` | no |
+| <a name="input_query_permissions"></a> [query\_permissions](#input\_query\_permissions) | List of query permissions to assign. | <pre>list(object({<br/>    key         = optional(string)<br/>    project_id  = optional(string)<br/>    path        = optional(string)<br/>    query_key   = optional(string)<br/>    folder_key  = optional(string)<br/>    principal   = string<br/>    permissions = map(string)<br/>    replace     = optional(bool, true)<br/>  }))</pre> | `[]` | no |
+| <a name="input_tagging_permissions"></a> [tagging\_permissions](#input\_tagging\_permissions) | List of tagging permissions to assign. | <pre>list(object({<br/>    key         = optional(string)<br/>    project_id  = optional(string)<br/>    principal   = string<br/>    permissions = map(string)<br/>    replace     = optional(bool, true)<br/>  }))</pre> | `[]` | no |
+| <a name="input_work_items"></a> [work\_items](#input\_work\_items) | List of work items to manage. | <pre>list(object({<br/>    key            = optional(string)<br/>    project_id     = optional(string)<br/>    title          = string<br/>    type           = string<br/>    state          = optional(string)<br/>    tags           = optional(list(string))<br/>    area_path      = optional(string)<br/>    iteration_path = optional(string)<br/>    parent_id      = optional(number)<br/>    parent_key     = optional(string)<br/>    custom_fields  = optional(map(string))<br/>  }))</pre> | `[]` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_area_permission_ids"></a> [area\_permission\_ids](#output\_area\_permission\_ids) | Map of area permission IDs keyed by permission key. |
+| <a name="output_iteration_permission_ids"></a> [iteration\_permission\_ids](#output\_iteration\_permission\_ids) | Map of iteration permission IDs keyed by permission key. |
+| <a name="output_process_ids"></a> [process\_ids](#output\_process\_ids) | Map of process IDs keyed by process key. |
+| <a name="output_query_folder_ids"></a> [query\_folder\_ids](#output\_query\_folder\_ids) | Map of query folder IDs keyed by folder key. |
+| <a name="output_query_ids"></a> [query\_ids](#output\_query\_ids) | Map of query IDs keyed by query key. |
+| <a name="output_query_permission_ids"></a> [query\_permission\_ids](#output\_query\_permission\_ids) | Map of query permission IDs keyed by permission key. |
+| <a name="output_tagging_permission_ids"></a> [tagging\_permission\_ids](#output\_tagging\_permission\_ids) | Map of tagging permission IDs keyed by permission key. |
+| <a name="output_work_item_ids"></a> [work\_item\_ids](#output\_work\_item\_ids) | Map of work item IDs keyed by work item key. |
 <!-- END_TF_DOCS -->
 
 ## Additional Documentation
 
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing work items, queries, and permissions into the module
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines

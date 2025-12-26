@@ -16,12 +16,13 @@ func TestBasicAzuredevopsExtension(t *testing.T) {
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_extension/tests/fixtures/basic")
+	vars := getExtensionVarsFromEnv()
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(testFolder))
+		terraform.Destroy(t, getTerraformOptions(testFolder, vars))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(testFolder)
+		terraformOptions := getTerraformOptions(testFolder, vars)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
@@ -29,9 +30,9 @@ func TestBasicAzuredevopsExtension(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		extensionIDs := terraform.OutputMap(t, terraformOptions, "extension_ids")
+		extensionID := terraform.Output(t, terraformOptions, "extension_id")
 
-		assert.NotEmpty(t, extensionIDs)
+		assert.NotEmpty(t, extensionID)
 	})
 }
 
@@ -41,12 +42,15 @@ func TestCompleteAzuredevopsExtension(t *testing.T) {
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_extension/tests/fixtures/complete")
+	vars := map[string]interface{}{
+		"extensions": getExtensionsFromEnv(),
+	}
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(testFolder))
+		terraform.Destroy(t, getTerraformOptions(testFolder, vars))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(testFolder)
+		terraformOptions := getTerraformOptions(testFolder, vars)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
@@ -67,12 +71,15 @@ func TestSecureAzuredevopsExtension(t *testing.T) {
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_extension/tests/fixtures/secure")
+	vars := map[string]interface{}{
+		"approved_extensions": getExtensionsFromEnv(),
+	}
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(testFolder))
+		terraform.Destroy(t, getTerraformOptions(testFolder, vars))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(testFolder)
+		terraformOptions := getTerraformOptions(testFolder, vars)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
@@ -99,16 +106,14 @@ func TestAzuredevopsExtensionValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "publisher_id and extension_id")
+	assert.Contains(t, err.Error(), "publisher_id must be a non-empty string")
 }
 
 // Helper function to get terraform options
-func getTerraformOptions(terraformDir string) *terraform.Options {
+func getTerraformOptions(terraformDir string, vars map[string]interface{}) *terraform.Options {
 	return &terraform.Options{
 		TerraformDir: terraformDir,
-		Vars: map[string]interface{}{
-			"extensions": getExtensionsFromEnv(),
-		},
+		Vars:         vars,
 		NoColor: true,
 		RetryableTerraformErrors: map[string]string{
 			".*timeout.*":         "Timeout error - retrying",

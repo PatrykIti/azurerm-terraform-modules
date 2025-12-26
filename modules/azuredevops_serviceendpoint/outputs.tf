@@ -1,6 +1,6 @@
 output "serviceendpoint_ids" {
   description = "Map of service endpoint IDs grouped by type."
-  value = {
+  value = try({
     argocd                      = { for key, endpoint in azuredevops_serviceendpoint_argocd.argocd : key => endpoint.id }
     artifactory                 = { for key, endpoint in azuredevops_serviceendpoint_artifactory.artifactory : key => endpoint.id }
     aws                         = { for key, endpoint in azuredevops_serviceendpoint_aws.aws : key => endpoint.id }
@@ -44,12 +44,12 @@ output "serviceendpoint_ids" {
     ssh                         = { for key, endpoint in azuredevops_serviceendpoint_ssh.ssh : key => endpoint.id }
     visualstudiomarketplace     = { for key, endpoint in azuredevops_serviceendpoint_visualstudiomarketplace.visualstudiomarketplace : key => endpoint.id }
     permissions                 = { for key, permission in azuredevops_serviceendpoint_permissions.permissions : key => permission.id }
-  }
+  }, {})
 }
 
 output "serviceendpoint_names" {
   description = "Map of service endpoint names grouped by type."
-  value = {
+  value = try({
     argocd                      = { for key, endpoint in azuredevops_serviceendpoint_argocd.argocd : key => endpoint.service_endpoint_name }
     artifactory                 = { for key, endpoint in azuredevops_serviceendpoint_artifactory.artifactory : key => endpoint.service_endpoint_name }
     aws                         = { for key, endpoint in azuredevops_serviceendpoint_aws.aws : key => endpoint.service_endpoint_name }
@@ -92,5 +92,5 @@ output "serviceendpoint_names" {
     sonarqube                   = { for key, endpoint in azuredevops_serviceendpoint_sonarqube.sonarqube : key => endpoint.service_endpoint_name }
     ssh                         = { for key, endpoint in azuredevops_serviceendpoint_ssh.ssh : key => endpoint.service_endpoint_name }
     visualstudiomarketplace     = { for key, endpoint in azuredevops_serviceendpoint_visualstudiomarketplace.visualstudiomarketplace : key => endpoint.service_endpoint_name }
-  }
+  }, {})
 }

@@ -4,14 +4,12 @@ module "azuredevops_environments" {
   source = "../.."
 
   project_id = var.project_id
-
-  environments = {
-    dev = {}
-  }
+  name       = var.environment_name
 
   check_approvals = [
     {
-      target_resource_type = "environment"
+      key                  = "invalid-check"
+      target_resource_type = "invalid"
       approvers            = ["00000000-0000-0000-0000-000000000000"]
     }
   ]

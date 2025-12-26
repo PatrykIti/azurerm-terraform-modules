@@ -9,6 +9,6 @@ output "team_descriptors" {
 }
 
 output "team_administrator_ids" {
-  description = "Map of team administrator assignment IDs keyed by index."
+  description = "Map of team administrator assignment IDs keyed by admin key."
   value       = module.azuredevops_team.team_administrator_ids
 }

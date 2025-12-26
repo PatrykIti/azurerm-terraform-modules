@@ -1,39 +1,34 @@
 # -----------------------------------------------------------------------------
-# Extensions
+# Extension
 # -----------------------------------------------------------------------------
 
-variable "extensions" {
-  description = "List of Azure DevOps Marketplace extensions to install."
-  type = list(object({
-    publisher_id = string
-    extension_id = string
-    version      = optional(string)
-  }))
-  default = []
+variable "publisher_id" {
+  description = "Publisher ID of the extension."
+  type        = string
 
   validation {
-    condition = alltrue([
-      for extension in var.extensions : (
-        length(trimspace(extension.publisher_id)) > 0 &&
-        length(trimspace(extension.extension_id)) > 0
-      )
-    ])
-    error_message = "extensions entries must include non-empty publisher_id and extension_id."
+    condition     = length(trimspace(var.publisher_id)) > 0
+    error_message = "publisher_id must be a non-empty string."
   }
+}
+
+variable "extension_id" {
+  description = "Extension ID from the Marketplace."
+  type        = string
 
   validation {
-    condition = alltrue([
-      for extension in var.extensions : (
-        extension.version == null || length(trimspace(extension.version)) > 0
-      )
-    ])
-    error_message = "extensions.version must be a non-empty string when provided."
+    condition     = length(trimspace(var.extension_id)) > 0
+    error_message = "extension_id must be a non-empty string."
   }
+}
+
+variable "version" {
+  description = "Optional extension version to pin."
+  type        = string
+  default     = null
 
   validation {
-    condition = length(var.extensions) == length(distinct([
-      for extension in var.extensions : "${extension.publisher_id}/${extension.extension_id}"
-    ]))
-    error_message = "extensions entries must be unique by publisher_id and extension_id."
+    condition     = var.version == null || length(trimspace(var.version)) > 0
+    error_message = "version must be a non-empty string when provided."
   }
 }

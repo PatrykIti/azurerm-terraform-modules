@@ -3,12 +3,6 @@ variable "project_id" {
   type        = string
 }
 
-variable "repo_name_prefix" {
-  description = "Prefix for the repository name."
-  type        = string
-  default     = "ado-repo-complete"
-}
-
 variable "principal_descriptor" {
   description = "Descriptor of the group used for git permissions."
   type        = string

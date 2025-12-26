@@ -100,7 +100,7 @@ func TestAzuredevopsArtifactsFeedValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "feed_id or feed_key")
+	assert.Contains(t, err.Error(), "feed_permissions.feed_key must reference a key in feeds")
 }
 
 // Helper function to get terraform options

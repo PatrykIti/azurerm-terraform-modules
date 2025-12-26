@@ -1,6 +1,6 @@
-output "environment_ids" {
-  description = "Environment IDs created by the module."
-  value       = module.azuredevops_environments.environment_ids
+output "environment_id" {
+  description = "Environment ID created by the module."
+  value       = module.azuredevops_environments.environment_id
 }
 
 output "check_ids" {

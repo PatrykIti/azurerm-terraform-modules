@@ -8,7 +8,7 @@ Current version: **vUnreleased**
 
 ## Description
 
-Azure DevOps variable groups module for managing variables and library permissions.
+Azure DevOps variable groups module for managing variables, permissions, and optional Key Vault integration.
 
 ## Usage
 
@@ -19,20 +19,17 @@ module "azuredevops_variable_groups" {
   source = "path/to/azuredevops_variable_groups"
 
   project_id = "00000000-0000-0000-0000-000000000000"
+  name       = "shared-vars"
 
-  variable_groups = {
-    shared = {
-      name         = "shared-vars"
-      description  = "Shared variables"
-      allow_access = true
-      variables = [
-        {
-          name  = "environment"
-          value = "dev"
-        }
-      ]
+  description  = "Shared variables"
+  allow_access = true
+
+  variables = [
+    {
+      name  = "environment"
+      value = "dev"
     }
-  }
+  ]
 }
 ```
 
@@ -40,7 +37,7 @@ module "azuredevops_variable_groups" {
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates creating a single variable group with plain variables.
-- [Complete](examples/complete) - This example demonstrates multiple variable groups with permissions and library permissions.
+- [Complete](examples/complete) - This example demonstrates a variable group with Key Vault integration and permissions.
 - [Secure](examples/secure) - This example demonstrates a restricted variable group with secret values and minimal permissions.
 <!-- END_EXAMPLES -->
 
@@ -51,6 +48,7 @@ module "azuredevops_variable_groups" {
 
 ## Additional Documentation
 
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing variable groups and permissions into the module
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines

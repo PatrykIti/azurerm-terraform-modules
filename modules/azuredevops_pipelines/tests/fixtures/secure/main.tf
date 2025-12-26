@@ -1,12 +1,14 @@
-provider "azuredevops" {}
-
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
+terraform {
+  required_version = ">= 1.12.2"
+  required_providers {
+    azuredevops = {
+      source  = "microsoft/azuredevops"
+      version = "1.12.2"
+    }
+  }
 }
+
+provider "azuredevops" {}
 
 data "azuredevops_group" "project_collection_admins" {
   name = "Project Collection Administrators"
@@ -14,7 +16,7 @@ data "azuredevops_group" "project_collection_admins" {
 
 resource "azuredevops_git_repository" "example" {
   project_id = var.project_id
-  name       = "${var.repo_name_prefix}-${random_string.suffix.result}"
+  name       = "repo-ado-sec-${var.random_suffix}"
 
   initialization {
     init_type = "Clean"
@@ -23,7 +25,7 @@ resource "azuredevops_git_repository" "example" {
 
 resource "azuredevops_serviceendpoint_generic" "example" {
   project_id            = var.project_id
-  service_endpoint_name = "${var.service_endpoint_name_prefix}-${random_string.suffix.result}"
+  service_endpoint_name = "se-ado-sec-${var.random_suffix}"
   server_url            = var.service_endpoint_url
   username              = var.service_endpoint_username
   password              = var.service_endpoint_password
@@ -31,13 +33,13 @@ resource "azuredevops_serviceendpoint_generic" "example" {
 }
 
 module "azuredevops_pipelines" {
-  source = "../.."
+  source = "../../.."
 
   project_id = var.project_id
 
   build_definitions = {
     secure = {
-      name = "${var.pipeline_name_prefix}-${random_string.suffix.result}"
+      name = "pip-ado-sec-${var.random_suffix}"
       repository = {
         repo_type = "TfsGit"
         repo_id   = azuredevops_git_repository.example.id
@@ -48,6 +50,7 @@ module "azuredevops_pipelines" {
 
   build_definition_permissions = [
     {
+      key                  = "secure-admins"
       build_definition_key = "secure"
       principal            = data.azuredevops_group.project_collection_admins.id
       permissions = {
@@ -60,6 +63,7 @@ module "azuredevops_pipelines" {
 
   pipeline_authorizations = [
     {
+      key          = "secure-endpoint"
       resource_id  = azuredevops_serviceendpoint_generic.example.id
       type         = "endpoint"
       pipeline_key = "secure"

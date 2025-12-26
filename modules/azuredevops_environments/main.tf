@@ -1,22 +1,55 @@
 # Azure DevOps Environments
 
 locals {
-  environment_ids = { for key, env in azuredevops_environment.environment : key => env.id }
+  environment_id = azuredevops_environment.environment.id
+
+  kubernetes_resources_by_key = {
+    for resource in var.kubernetes_resources :
+    coalesce(resource.key, resource.name) => resource
+  }
+
+  check_approvals_by_key = {
+    for check in var.check_approvals :
+    coalesce(check.key, check.target_resource_id) => check
+  }
+
+  check_branch_controls_by_key = {
+    for check in var.check_branch_controls :
+    coalesce(check.key, check.display_name, check.target_resource_id) => check
+  }
+
+  check_business_hours_by_key = {
+    for check in var.check_business_hours :
+    coalesce(check.key, check.display_name, check.target_resource_id) => check
+  }
+
+  check_exclusive_locks_by_key = {
+    for check in var.check_exclusive_locks :
+    coalesce(check.key, check.target_resource_id) => check
+  }
+
+  check_required_templates_by_key = {
+    for check in var.check_required_templates :
+    coalesce(check.key, check.target_resource_id) => check
+  }
+
+  check_rest_apis_by_key = {
+    for check in var.check_rest_apis :
+    coalesce(check.key, check.display_name, check.target_resource_id) => check
+  }
 }
 
 resource "azuredevops_environment" "environment" {
-  for_each = var.environments
-
   project_id  = var.project_id
-  name        = coalesce(each.value.name, each.key)
-  description = each.value.description
+  name        = var.name
+  description = var.description
 }
 
 resource "azuredevops_environment_resource_kubernetes" "kubernetes_resource" {
-  for_each = { for index, resource in var.kubernetes_resources : index => resource }
+  for_each = local.kubernetes_resources_by_key
 
   project_id          = var.project_id
-  environment_id      = each.value.environment_id != null ? each.value.environment_id : try(local.environment_ids[each.value.environment_key], null)
+  environment_id      = coalesce(each.value.environment_id, local.environment_id)
   service_endpoint_id = each.value.service_endpoint_id
   name                = each.value.name
   namespace           = each.value.namespace
@@ -25,69 +58,69 @@ resource "azuredevops_environment_resource_kubernetes" "kubernetes_resource" {
 }
 
 resource "azuredevops_check_approval" "check_approval" {
-  for_each = { for index, check in var.check_approvals : index => check }
+  for_each = local.check_approvals_by_key
 
   project_id                 = var.project_id
-  target_resource_id         = check.value.target_resource_id != null ? check.value.target_resource_id : try(local.environment_ids[check.value.target_environment_key], null)
-  target_resource_type       = check.value.target_resource_type
-  approvers                  = check.value.approvers
-  instructions               = check.value.instructions
-  minimum_required_approvers = check.value.minimum_required_approvers
-  requester_can_approve      = check.value.requester_can_approve
-  timeout                    = check.value.timeout
+  target_resource_id         = coalesce(each.value.target_resource_id, local.environment_id)
+  target_resource_type       = coalesce(each.value.target_resource_type, "environment")
+  approvers                  = each.value.approvers
+  instructions               = each.value.instructions
+  minimum_required_approvers = each.value.minimum_required_approvers
+  requester_can_approve      = each.value.requester_can_approve
+  timeout                    = each.value.timeout
 }
 
 resource "azuredevops_check_branch_control" "check_branch_control" {
-  for_each = { for index, check in var.check_branch_controls : index => check }
+  for_each = local.check_branch_controls_by_key
 
   project_id                       = var.project_id
-  display_name                     = check.value.display_name
-  target_resource_id               = check.value.target_resource_id != null ? check.value.target_resource_id : try(local.environment_ids[check.value.target_environment_key], null)
-  target_resource_type             = check.value.target_resource_type
-  allowed_branches                 = check.value.allowed_branches
-  verify_branch_protection         = check.value.verify_branch_protection
-  ignore_unknown_protection_status = check.value.ignore_unknown_protection_status
-  timeout                          = check.value.timeout
+  display_name                     = each.value.display_name
+  target_resource_id               = coalesce(each.value.target_resource_id, local.environment_id)
+  target_resource_type             = coalesce(each.value.target_resource_type, "environment")
+  allowed_branches                 = each.value.allowed_branches
+  verify_branch_protection         = each.value.verify_branch_protection
+  ignore_unknown_protection_status = each.value.ignore_unknown_protection_status
+  timeout                          = each.value.timeout
 }
 
 resource "azuredevops_check_business_hours" "check_business_hours" {
-  for_each = { for index, check in var.check_business_hours : index => check }
+  for_each = local.check_business_hours_by_key
 
   project_id           = var.project_id
-  display_name         = check.value.display_name
-  target_resource_id   = check.value.target_resource_id != null ? check.value.target_resource_id : try(local.environment_ids[check.value.target_environment_key], null)
-  target_resource_type = check.value.target_resource_type
-  start_time           = check.value.start_time
-  end_time             = check.value.end_time
-  time_zone            = check.value.time_zone
-  monday               = check.value.monday
-  tuesday              = check.value.tuesday
-  wednesday            = check.value.wednesday
-  thursday             = check.value.thursday
-  friday               = check.value.friday
-  saturday             = check.value.saturday
-  sunday               = check.value.sunday
-  timeout              = check.value.timeout
+  display_name         = each.value.display_name
+  target_resource_id   = coalesce(each.value.target_resource_id, local.environment_id)
+  target_resource_type = coalesce(each.value.target_resource_type, "environment")
+  start_time           = each.value.start_time
+  end_time             = each.value.end_time
+  time_zone            = each.value.time_zone
+  monday               = each.value.monday
+  tuesday              = each.value.tuesday
+  wednesday            = each.value.wednesday
+  thursday             = each.value.thursday
+  friday               = each.value.friday
+  saturday             = each.value.saturday
+  sunday               = each.value.sunday
+  timeout              = each.value.timeout
 }
 
 resource "azuredevops_check_exclusive_lock" "check_exclusive_lock" {
-  for_each = { for index, check in var.check_exclusive_locks : index => check }
+  for_each = local.check_exclusive_locks_by_key
 
   project_id           = var.project_id
-  target_resource_id   = check.value.target_resource_id != null ? check.value.target_resource_id : try(local.environment_ids[check.value.target_environment_key], null)
-  target_resource_type = check.value.target_resource_type
-  timeout              = check.value.timeout
+  target_resource_id   = coalesce(each.value.target_resource_id, local.environment_id)
+  target_resource_type = coalesce(each.value.target_resource_type, "environment")
+  timeout              = each.value.timeout
 }
 
 resource "azuredevops_check_required_template" "check_required_template" {
-  for_each = { for index, check in var.check_required_templates : index => check }
+  for_each = local.check_required_templates_by_key
 
   project_id           = var.project_id
-  target_resource_id   = check.value.target_resource_id != null ? check.value.target_resource_id : try(local.environment_ids[check.value.target_environment_key], null)
-  target_resource_type = check.value.target_resource_type
+  target_resource_id   = coalesce(each.value.target_resource_id, local.environment_id)
+  target_resource_type = coalesce(each.value.target_resource_type, "environment")
 
   dynamic "required_template" {
-    for_each = check.value.required_templates
+    for_each = each.value.required_templates
     content {
       template_path   = required_template.value.template_path
       repository_name = required_template.value.repository_name
@@ -98,21 +131,21 @@ resource "azuredevops_check_required_template" "check_required_template" {
 }
 
 resource "azuredevops_check_rest_api" "check_rest_api" {
-  for_each = { for index, check in var.check_rest_apis : index => check }
+  for_each = local.check_rest_apis_by_key
 
   project_id                      = var.project_id
-  target_resource_id              = check.value.target_resource_id != null ? check.value.target_resource_id : try(local.environment_ids[check.value.target_environment_key], null)
-  target_resource_type            = check.value.target_resource_type
-  display_name                    = check.value.display_name
-  connected_service_name_selector = check.value.connected_service_name_selector
-  connected_service_name          = check.value.connected_service_name
-  method                          = check.value.method
-  body                            = check.value.body
-  headers                         = check.value.headers
-  retry_interval                  = check.value.retry_interval
-  success_criteria                = check.value.success_criteria
-  url_suffix                      = check.value.url_suffix
-  variable_group_name             = check.value.variable_group_name
-  completion_event                = check.value.completion_event
-  timeout                         = check.value.timeout
+  target_resource_id              = coalesce(each.value.target_resource_id, local.environment_id)
+  target_resource_type            = coalesce(each.value.target_resource_type, "environment")
+  display_name                    = each.value.display_name
+  connected_service_name_selector = each.value.connected_service_name_selector
+  connected_service_name          = each.value.connected_service_name
+  method                          = each.value.method
+  body                            = each.value.body
+  headers                         = each.value.headers
+  retry_interval                  = each.value.retry_interval
+  success_criteria                = each.value.success_criteria
+  url_suffix                      = each.value.url_suffix
+  variable_group_name             = each.value.variable_group_name
+  completion_event                = each.value.completion_event
+  timeout                         = each.value.timeout
 }

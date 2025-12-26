@@ -11,30 +11,26 @@ mock_provider "azuredevops" {
 
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
+  name       = "shared-vars"
 
-  variable_groups = {
-    shared = {
-      allow_access = true
-      variables = [
-        {
-          name  = "key"
-          value = "value"
-        }
-      ]
+  variables = [
+    {
+      name  = "key"
+      value = "value"
     }
-  }
+  ]
 }
 
 run "outputs_plan" {
   command = plan
 
   assert {
-    condition     = length(keys(output.variable_group_ids)) == 1
-    error_message = "variable_group_ids should include configured variable groups."
+    condition     = output.variable_group_id == "vg-0001"
+    error_message = "variable_group_id should reflect the created variable group ID."
   }
 
   assert {
-    condition     = length(keys(output.variable_group_names)) == 1
-    error_message = "variable_group_names should include configured variable groups."
+    condition     = output.variable_group_name == "shared-vars"
+    error_message = "variable_group_name should reflect the created variable group name."
   }
 }

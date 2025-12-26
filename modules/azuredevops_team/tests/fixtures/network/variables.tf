@@ -12,10 +12,11 @@ variable "team_name" {
 variable "team_administrators" {
   description = "Optional team administrator assignments."
   type = list(object({
+    key               = optional(string)
     team_id           = optional(string)
     team_key          = optional(string)
     admin_descriptors = list(string)
-    mode              = optional(string)
+    mode              = optional(string, "add")
   }))
   default = []
 }

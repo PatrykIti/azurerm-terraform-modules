@@ -10,8 +10,9 @@ module "azuredevops_artifacts_feed" {
 
   feeds = {
     project = {
-      name       = "${var.feed_name_prefix}-complete"
-      project_id = var.project_id
+      name        = "${var.feed_name_prefix}-complete"
+      project_id  = var.project_id
+      description = "Complete fixture feed."
       features = {
         permanent_delete = false
         restore          = false
@@ -21,17 +22,17 @@ module "azuredevops_artifacts_feed" {
 
   feed_permissions = [
     {
+      key                 = "project-contributor"
       feed_key            = "project"
       identity_descriptor = data.azuredevops_group.readers.descriptor
       role                = "contributor"
-      project_id          = var.project_id
     }
   ]
 
   feed_retention_policies = [
     {
+      key                                       = "project-retention"
       feed_key                                  = "project"
-      project_id                                = var.project_id
       count_limit                               = 20
       days_to_keep_recently_downloaded_packages = 30
     }

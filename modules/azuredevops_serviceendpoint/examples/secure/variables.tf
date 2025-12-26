@@ -3,10 +3,10 @@ variable "project_id" {
   type        = string
 }
 
-variable "generic_endpoint_name_prefix" {
-  description = "Prefix for the generic service endpoint name."
+variable "generic_endpoint_name" {
+  description = "Generic service endpoint name."
   type        = string
-  default     = "ado-generic"
+  default     = "ado-generic-secure"
 }
 
 variable "generic_endpoint_url" {

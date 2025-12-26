@@ -7,6 +7,7 @@ variables {
 
   serviceendpoint_generic = [
     {
+      key                   = "generic-key"
       service_endpoint_name = "generic-endpoint"
       server_url            = "https://example.endpoint.local"
       username              = "user"

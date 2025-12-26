@@ -24,26 +24,22 @@ module "azuredevops_variable_groups" {
   source = "./modules/azuredevops_variable_groups"
 
   project_id = "00000000-0000-0000-0000-000000000000"
+  name       = "secure-vars"
 
-  variable_groups = {
-    secure = {
-      name         = "secure-vars"
-      description  = "Secrets for production"
-      allow_access = false
-      variables = [
-        {
-          name         = "api_key"
-          secret_value = "example-secret"
-          is_secret    = true
-        }
-      ]
+  description  = "Secrets for production"
+  allow_access = false
+
+  variables = [
+    {
+      name         = "api_key"
+      secret_value = "example-secret"
+      is_secret    = true
     }
-  }
+  ]
 
   variable_group_permissions = [
     {
-      variable_group_key = "secure"
-      principal          = "vssgp.Uy0xLTktMTIzNDU2"
+      principal = "vssgp.Uy0xLTktMTIzNDU2"
       permissions = {
         View       = "allow"
         Use        = "allow"
@@ -75,5 +71,5 @@ module "azuredevops_variable_groups" {
 ---
 
 **Module Version**: 1.0.0  
-**Last Updated**: 2025-12-24  
+**Last Updated**: 2025-12-25  
 **Security Contact**: security@yourorganization.com

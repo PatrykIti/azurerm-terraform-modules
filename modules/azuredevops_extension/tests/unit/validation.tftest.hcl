@@ -2,40 +2,42 @@
 
 mock_provider "azuredevops" {}
 
-run "missing_extension_fields" {
+run "empty_publisher_id" {
   command = plan
 
   variables {
-    extensions = [
-      {
-        publisher_id = ""
-        extension_id = "extension-one"
-      }
-    ]
+    publisher_id = ""
+    extension_id = "extension-one"
   }
 
   expect_failures = [
-    var.extensions,
+    var.publisher_id,
   ]
 }
 
-run "duplicate_extensions" {
+run "empty_extension_id" {
   command = plan
 
   variables {
-    extensions = [
-      {
-        publisher_id = "publisher-one"
-        extension_id = "extension-one"
-      },
-      {
-        publisher_id = "publisher-one"
-        extension_id = "extension-one"
-      }
-    ]
+    publisher_id = "publisher-one"
+    extension_id = ""
   }
 
   expect_failures = [
-    var.extensions,
+    var.extension_id,
+  ]
+}
+
+run "empty_version" {
+  command = plan
+
+  variables {
+    publisher_id = "publisher-one"
+    extension_id = "extension-one"
+    version      = " "
+  }
+
+  expect_failures = [
+    var.version,
   ]
 }

@@ -12,6 +12,21 @@ module "azuredevops_work_items" {
 
   area_permissions = [
     {
+      key       = "area-readers-root"
+      principal = data.azuredevops_group.readers.id
+      path      = "/"
+      permissions = {
+        GENERIC_READ    = "Allow"
+        GENERIC_WRITE   = "Deny"
+        CREATE_CHILDREN = "Deny"
+        DELETE          = "Deny"
+      }
+    }
+  ]
+
+  iteration_permissions = [
+    {
+      key       = "iteration-readers-root"
       principal = data.azuredevops_group.readers.id
       path      = "/"
       permissions = {
@@ -25,6 +40,7 @@ module "azuredevops_work_items" {
 
   tagging_permissions = [
     {
+      key       = "tagging-readers"
       principal = data.azuredevops_group.readers.id
       permissions = {
         Enumerate = "allow"
@@ -37,6 +53,7 @@ module "azuredevops_work_items" {
 
   work_items = [
     {
+      key   = "secure-item"
       title = "Secure Work Item"
       type  = "Issue"
       state = "Active"

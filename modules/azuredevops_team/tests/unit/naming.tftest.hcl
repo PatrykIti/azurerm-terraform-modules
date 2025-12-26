@@ -20,6 +20,7 @@ variables {
 
   team_administrators = [
     {
+      key               = "admins-admins"
       team_key          = "admins"
       admin_descriptors = ["vssgp.admin"]
       mode              = "add"
@@ -31,7 +32,7 @@ run "team_administrator_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_team_administrators.team_administrators) == 1
-    error_message = "team_administrators should create an administrator assignment."
+    condition     = contains(keys(azuredevops_team_administrators.team_administrators), "admins-admins")
+    error_message = "team_administrators should use the configured admin key."
   }
 }

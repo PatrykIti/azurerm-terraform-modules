@@ -1,5 +1,10 @@
 provider "azuredevops" {}
 
+data "azuredevops_group" "readers" {
+  project_id = var.project_id
+  name       = "Readers"
+}
+
 module "azuredevops_work_items" {
   source = "../../"
 
@@ -7,6 +12,7 @@ module "azuredevops_work_items" {
 
   query_folders = [
     {
+      key  = "team"
       name = "Team"
       area = "Shared Queries"
     }
@@ -14,9 +20,10 @@ module "azuredevops_work_items" {
 
   queries = [
     {
-      name = "Active Issues"
-      area = "Shared Queries"
-      wiql = <<-WIQL
+      key        = "active-issues"
+      name       = "Active Issues"
+      parent_key = "team"
+      wiql       = <<-WIQL
         SELECT [System.Id], [System.Title]
         FROM WorkItems
         WHERE [System.WorkItemType] = 'Issue'
@@ -25,11 +32,33 @@ module "azuredevops_work_items" {
     }
   ]
 
+  query_permissions = [
+    {
+      key       = "active-issues-readers"
+      query_key = "active-issues"
+      principal = data.azuredevops_group.readers.id
+      permissions = {
+        Read              = "Allow"
+        Contribute        = "Deny"
+        ManagePermissions = "Deny"
+        Delete            = "Deny"
+      }
+    }
+  ]
+
   work_items = [
     {
-      title = "${var.work_item_title_prefix}-complete"
+      key   = "parent-item"
+      title = "${var.work_item_title_prefix}-parent"
       type  = "Issue"
       state = "Active"
+    },
+    {
+      key        = "child-item"
+      title      = "${var.work_item_title_prefix}-child"
+      type       = "Issue"
+      state      = "Active"
+      parent_key = "parent-item"
     }
   ]
 }

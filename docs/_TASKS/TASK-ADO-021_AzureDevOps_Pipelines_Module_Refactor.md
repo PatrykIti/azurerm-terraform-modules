@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-007
-**Status:** 🟡 **To Do**
+**Status:** ✅ **Done** (2025-12-25)
 
 ---
 
@@ -168,10 +168,10 @@ Update tests per TESTING_GUIDE:
 
 ## Implementation Checklist
 
-- [ ] Refactor variables.tf: add `key` fields + validations for list inputs.
-- [ ] Refactor main.tf: normalized maps + stable for_each keys + preconditions.
-- [ ] Update outputs.tf: stable build folder map.
-- [ ] Add `docs/IMPORT.md`.
-- [ ] Update examples (fixed names, new key usage).
-- [ ] Update tests (fixtures, unit, terratest, test_config, Makefile/scripts).
-- [ ] make docs + update README.
+- [x] Refactor variables.tf: add `key` fields + validations for list inputs.
+- [x] Refactor main.tf: normalized maps + stable for_each keys + preconditions.
+- [x] Update outputs.tf: stable build folder map.
+- [x] Add `docs/IMPORT.md`.
+- [x] Update examples (fixed names, new key usage).
+- [x] Update tests (fixtures, unit, terratest, test_config, Makefile/scripts).
+- [x] make docs + update README.

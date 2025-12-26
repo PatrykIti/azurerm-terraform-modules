@@ -24,6 +24,7 @@ module "azuredevops_identity" {
 
   group_memberships = [
     {
+      key               = "platform-membership"
       group_key         = "platform"
       member_group_keys = ["developers"]
       mode              = "add"
@@ -32,6 +33,7 @@ module "azuredevops_identity" {
 
   user_entitlements = var.user_principal_name != "" ? [
     {
+      key                  = "user-entitlement"
       principal_name       = var.user_principal_name
       account_license_type = "basic"
       licensing_source     = "account"
@@ -40,6 +42,7 @@ module "azuredevops_identity" {
 
   group_entitlements = var.aad_group_display_name != "" ? [
     {
+      key                  = "group-entitlement"
       display_name         = var.aad_group_display_name
       account_license_type = "basic"
       licensing_source     = "account"
@@ -48,6 +51,7 @@ module "azuredevops_identity" {
 
   service_principal_entitlements = var.service_principal_origin_id != "" ? [
     {
+      key                  = "service-principal-entitlement"
       origin_id            = var.service_principal_origin_id
       origin               = "aad"
       account_license_type = "basic"
@@ -55,5 +59,13 @@ module "azuredevops_identity" {
     }
   ] : []
 
-  securityrole_assignments = var.security_role_assignments
+  securityrole_assignments = var.security_role_assignment_resource_id != "" ? [
+    {
+      key                = "platform-reader"
+      scope              = var.security_role_assignment_scope
+      resource_id        = var.security_role_assignment_resource_id
+      role_name          = var.security_role_assignment_role_name
+      identity_group_key = "platform"
+    }
+  ] : []
 }

@@ -1,16 +1,18 @@
-provider "azuredevops" {}
-
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
+terraform {
+  required_version = ">= 1.12.2"
+  required_providers {
+    azuredevops = {
+      source  = "microsoft/azuredevops"
+      version = "1.12.2"
+    }
+  }
 }
+
+provider "azuredevops" {}
 
 resource "azuredevops_git_repository" "example" {
   project_id = var.project_id
-  name       = "${var.repo_name_prefix}-${random_string.suffix.result}"
+  name       = "repo-ado-net-${var.random_suffix}"
 
   initialization {
     init_type = "Clean"
@@ -18,13 +20,13 @@ resource "azuredevops_git_repository" "example" {
 }
 
 module "azuredevops_pipelines" {
-  source = "../.."
+  source = "../../.."
 
   project_id = var.project_id
 
   build_definitions = {
     network = {
-      name = "${var.pipeline_name_prefix}-${random_string.suffix.result}"
+      name = "pip-ado-net-${var.random_suffix}"
       repository = {
         repo_type = "TfsGit"
         repo_id   = azuredevops_git_repository.example.id

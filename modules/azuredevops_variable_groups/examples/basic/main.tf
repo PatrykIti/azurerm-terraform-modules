@@ -4,22 +4,19 @@ module "azuredevops_variable_groups" {
   source = "../../"
 
   project_id = var.project_id
+  name       = "shared-vars"
 
-  variable_groups = {
-    shared = {
-      name         = "shared-vars"
-      description  = "Basic variable group"
-      allow_access = true
-      variables = [
-        {
-          name  = "environment"
-          value = "dev"
-        },
-        {
-          name  = "region"
-          value = "westeurope"
-        }
-      ]
+  description  = "Basic variable group"
+  allow_access = true
+
+  variables = [
+    {
+      name  = "environment"
+      value = "dev"
+    },
+    {
+      name  = "region"
+      value = "westeurope"
     }
-  }
+  ]
 }

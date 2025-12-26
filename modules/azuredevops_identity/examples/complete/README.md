@@ -7,11 +7,11 @@ This example demonstrates groups, memberships, and optional entitlements.
 - Creates multiple Azure DevOps groups
 - Adds group-to-group memberships
 - Supports optional entitlements for users, groups, and service principals
-- Accepts optional security role assignments via variables
+- Includes an optional security role assignment example with a stable key
 
 ## Key Configuration
 
-Provide optional entitlement and role assignment variables to enable additional access management.
+Provide optional entitlement variables and set `security_role_assignment_resource_id` to enable the sample role assignment.
 
 ## Usage
 

@@ -4,6 +4,6 @@ output "build_definition_ids" {
 }
 
 output "build_folder_ids" {
-  description = "Map of build folder IDs keyed by index."
+  description = "Map of build folder IDs keyed by folder key or path."
   value       = { for key, folder in azuredevops_build_folder.build_folder : key => folder.id }
 }

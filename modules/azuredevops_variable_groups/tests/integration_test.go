@@ -30,8 +30,8 @@ func TestAzuredevopsVariableGroupsFullIntegration(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		variableGroupIDs := terraform.OutputMap(t, terraformOptions, "variable_group_ids")
+		variableGroupID := terraform.Output(t, terraformOptions, "variable_group_id")
 
-		assert.NotEmpty(t, variableGroupIDs)
+		assert.NotEmpty(t, variableGroupID)
 	})
 }

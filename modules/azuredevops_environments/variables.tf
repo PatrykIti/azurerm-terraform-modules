@@ -12,25 +12,24 @@ variable "project_id" {
   }
 }
 
-# -----------------------------------------------------------------------------
-# Environments
-# -----------------------------------------------------------------------------
-
-variable "environments" {
-  description = "Map of environments to manage."
-  type = map(object({
-    name        = optional(string)
-    description = optional(string)
-  }))
-  default = {}
+variable "name" {
+  description = "Name of the Azure DevOps environment."
+  type        = string
 
   validation {
-    condition = alltrue([
-      for env in values(var.environments) : (
-        env.name == null || length(trimspace(env.name)) > 0
-      )
-    ])
-    error_message = "environments.name must be a non-empty string when provided."
+    condition     = length(trimspace(var.name)) > 0
+    error_message = "name must be a non-empty string."
+  }
+}
+
+variable "description" {
+  description = "Optional description for the Azure DevOps environment."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.description == null || length(trimspace(var.description)) > 0
+    error_message = "description must be a non-empty string when provided."
   }
 }
 
@@ -39,10 +38,10 @@ variable "environments" {
 # -----------------------------------------------------------------------------
 
 variable "kubernetes_resources" {
-  description = "List of Kubernetes resources to attach to environments."
+  description = "List of Kubernetes resources to attach to the environment."
   type = list(object({
+    key                 = optional(string)
     environment_id      = optional(string)
-    environment_key     = optional(string)
     service_endpoint_id = string
     name                = string
     namespace           = string
@@ -54,10 +53,26 @@ variable "kubernetes_resources" {
   validation {
     condition = alltrue([
       for resource in var.kubernetes_resources : (
-        (resource.environment_id != null) != (resource.environment_key != null)
+        resource.key == null || length(trimspace(resource.key)) > 0
       )
     ])
-    error_message = "kubernetes_resources must set exactly one of environment_id or environment_key."
+    error_message = "kubernetes_resources.key must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for resource in var.kubernetes_resources : (
+        resource.environment_id == null || length(trimspace(resource.environment_id)) > 0
+      )
+    ])
+    error_message = "kubernetes_resources.environment_id must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for resource in var.kubernetes_resources : length(trimspace(resource.service_endpoint_id)) > 0
+    ])
+    error_message = "kubernetes_resources.service_endpoint_id must be a non-empty string."
   }
 
   validation {
@@ -65,6 +80,21 @@ variable "kubernetes_resources" {
       for resource in var.kubernetes_resources : length(trimspace(resource.name)) > 0
     ])
     error_message = "kubernetes_resources.name must be a non-empty string."
+  }
+
+  validation {
+    condition = alltrue([
+      for resource in var.kubernetes_resources : length(trimspace(resource.namespace)) > 0
+    ])
+    error_message = "kubernetes_resources.namespace must be a non-empty string."
+  }
+
+  validation {
+    condition = length(distinct([
+      for resource in var.kubernetes_resources :
+      coalesce(resource.key, resource.name)
+    ])) == length(var.kubernetes_resources)
+    error_message = "kubernetes_resources keys must be unique; set key when names would collide."
   }
 }
 
@@ -75,24 +105,50 @@ variable "kubernetes_resources" {
 variable "check_approvals" {
   description = "List of approval checks to configure."
   type = list(object({
-    target_resource_id         = optional(string)
-    target_environment_key     = optional(string)
-    target_resource_type       = string
-    approvers                  = list(string)
-    instructions               = optional(string)
+    key                       = optional(string)
+    target_resource_id        = optional(string)
+    target_resource_type      = optional(string)
+    approvers                 = list(string)
+    instructions              = optional(string)
     minimum_required_approvers = optional(number)
-    requester_can_approve      = optional(bool)
-    timeout                    = optional(number)
+    requester_can_approve     = optional(bool)
+    timeout                   = optional(number)
   }))
   default = []
 
   validation {
     condition = alltrue([
       for check in var.check_approvals : (
-        check.target_resource_id != null || check.target_environment_key != null
+        check.key == null || length(trimspace(check.key)) > 0
       )
     ])
-    error_message = "check_approvals must set target_resource_id or target_environment_key."
+    error_message = "check_approvals.key must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_approvals : (
+        check.target_resource_id == null || length(trimspace(check.target_resource_id)) > 0
+      )
+    ])
+    error_message = "check_approvals.target_resource_id must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_approvals :
+      check.target_resource_type == null || contains(["environment", "environmentResource"], check.target_resource_type)
+    ])
+    error_message = "check_approvals.target_resource_type must be one of: environment, environmentResource."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_approvals : (
+        check.key != null || check.target_resource_id != null
+      )
+    ])
+    error_message = "check_approvals must set key or target_resource_id."
   }
 
   validation {
@@ -100,6 +156,24 @@ variable "check_approvals" {
       for check in var.check_approvals : length(check.approvers) > 0
     ])
     error_message = "check_approvals.approvers must contain at least one entry."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_approvals : (
+        check.minimum_required_approvers == null ||
+        (check.minimum_required_approvers >= 1 && check.minimum_required_approvers <= length(check.approvers))
+      )
+    ])
+    error_message = "check_approvals.minimum_required_approvers must be between 1 and the number of approvers."
+  }
+
+  validation {
+    condition = length(distinct([
+      for check in var.check_approvals :
+      coalesce(check.key, check.target_resource_id)
+    ])) == length(var.check_approvals)
+    error_message = "check_approvals keys must be unique; set key when target_resource_id would collide."
   }
 }
 
@@ -110,16 +184,25 @@ variable "check_approvals" {
 variable "check_branch_controls" {
   description = "List of branch control checks to configure."
   type = list(object({
+    key                              = optional(string)
     display_name                     = string
     target_resource_id               = optional(string)
-    target_environment_key           = optional(string)
-    target_resource_type             = string
+    target_resource_type             = optional(string)
     allowed_branches                 = optional(string)
     verify_branch_protection         = optional(bool)
     ignore_unknown_protection_status = optional(bool)
     timeout                          = optional(number)
   }))
   default = []
+
+  validation {
+    condition = alltrue([
+      for check in var.check_branch_controls : (
+        check.key == null || length(trimspace(check.key)) > 0
+      )
+    ])
+    error_message = "check_branch_controls.key must be a non-empty string when provided."
+  }
 
   validation {
     condition = alltrue([
@@ -131,10 +214,26 @@ variable "check_branch_controls" {
   validation {
     condition = alltrue([
       for check in var.check_branch_controls : (
-        check.target_resource_id != null || check.target_environment_key != null
+        check.target_resource_id == null || length(trimspace(check.target_resource_id)) > 0
       )
     ])
-    error_message = "check_branch_controls must set target_resource_id or target_environment_key."
+    error_message = "check_branch_controls.target_resource_id must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_branch_controls :
+      check.target_resource_type == null || contains(["environment", "environmentResource"], check.target_resource_type)
+    ])
+    error_message = "check_branch_controls.target_resource_type must be one of: environment, environmentResource."
+  }
+
+  validation {
+    condition = length(distinct([
+      for check in var.check_branch_controls :
+      coalesce(check.key, check.display_name, check.target_resource_id)
+    ])) == length(var.check_branch_controls)
+    error_message = "check_branch_controls keys must be unique; set key when display_name would collide."
   }
 }
 
@@ -145,23 +244,32 @@ variable "check_branch_controls" {
 variable "check_business_hours" {
   description = "List of business hours checks to configure."
   type = list(object({
-    display_name           = string
-    target_resource_id     = optional(string)
-    target_environment_key = optional(string)
-    target_resource_type   = string
-    start_time             = string
-    end_time               = string
-    time_zone              = string
-    monday                 = optional(bool)
-    tuesday                = optional(bool)
-    wednesday              = optional(bool)
-    thursday               = optional(bool)
-    friday                 = optional(bool)
-    saturday               = optional(bool)
-    sunday                 = optional(bool)
-    timeout                = optional(number)
+    key                  = optional(string)
+    display_name         = string
+    target_resource_id   = optional(string)
+    target_resource_type = optional(string)
+    start_time           = string
+    end_time             = string
+    time_zone            = string
+    monday               = optional(bool)
+    tuesday              = optional(bool)
+    wednesday            = optional(bool)
+    thursday             = optional(bool)
+    friday               = optional(bool)
+    saturday             = optional(bool)
+    sunday               = optional(bool)
+    timeout              = optional(number)
   }))
   default = []
+
+  validation {
+    condition = alltrue([
+      for check in var.check_business_hours : (
+        check.key == null || length(trimspace(check.key)) > 0
+      )
+    ])
+    error_message = "check_business_hours.key must be a non-empty string when provided."
+  }
 
   validation {
     condition = alltrue([
@@ -173,10 +281,26 @@ variable "check_business_hours" {
   validation {
     condition = alltrue([
       for check in var.check_business_hours : (
-        check.target_resource_id != null || check.target_environment_key != null
+        check.target_resource_id == null || length(trimspace(check.target_resource_id)) > 0
       )
     ])
-    error_message = "check_business_hours must set target_resource_id or target_environment_key."
+    error_message = "check_business_hours.target_resource_id must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_business_hours :
+      check.target_resource_type == null || contains(["environment", "environmentResource"], check.target_resource_type)
+    ])
+    error_message = "check_business_hours.target_resource_type must be one of: environment, environmentResource."
+  }
+
+  validation {
+    condition = length(distinct([
+      for check in var.check_business_hours :
+      coalesce(check.key, check.display_name, check.target_resource_id)
+    ])) == length(var.check_business_hours)
+    error_message = "check_business_hours keys must be unique; set key when display_name would collide."
   }
 }
 
@@ -187,20 +311,54 @@ variable "check_business_hours" {
 variable "check_exclusive_locks" {
   description = "List of exclusive lock checks to configure."
   type = list(object({
-    target_resource_id     = optional(string)
-    target_environment_key = optional(string)
-    target_resource_type   = string
-    timeout                = optional(number)
+    key                  = optional(string)
+    target_resource_id   = optional(string)
+    target_resource_type = optional(string)
+    timeout              = optional(number)
   }))
   default = []
 
   validation {
     condition = alltrue([
       for check in var.check_exclusive_locks : (
-        check.target_resource_id != null || check.target_environment_key != null
+        check.key == null || length(trimspace(check.key)) > 0
       )
     ])
-    error_message = "check_exclusive_locks must set target_resource_id or target_environment_key."
+    error_message = "check_exclusive_locks.key must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_exclusive_locks : (
+        check.target_resource_id == null || length(trimspace(check.target_resource_id)) > 0
+      )
+    ])
+    error_message = "check_exclusive_locks.target_resource_id must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_exclusive_locks :
+      check.target_resource_type == null || contains(["environment", "environmentResource"], check.target_resource_type)
+    ])
+    error_message = "check_exclusive_locks.target_resource_type must be one of: environment, environmentResource."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_exclusive_locks : (
+        check.key != null || check.target_resource_id != null
+      )
+    ])
+    error_message = "check_exclusive_locks must set key or target_resource_id."
+  }
+
+  validation {
+    condition = length(distinct([
+      for check in var.check_exclusive_locks :
+      coalesce(check.key, check.target_resource_id)
+    ])) == length(var.check_exclusive_locks)
+    error_message = "check_exclusive_locks keys must be unique; set key when target_resource_id would collide."
   }
 }
 
@@ -211,9 +369,9 @@ variable "check_exclusive_locks" {
 variable "check_required_templates" {
   description = "List of required template checks to configure."
   type = list(object({
-    target_resource_id     = optional(string)
-    target_environment_key = optional(string)
-    target_resource_type   = string
+    key                  = optional(string)
+    target_resource_id   = optional(string)
+    target_resource_type = optional(string)
     required_templates = list(object({
       template_path   = string
       repository_name = string
@@ -226,10 +384,65 @@ variable "check_required_templates" {
   validation {
     condition = alltrue([
       for check in var.check_required_templates : (
-        check.target_resource_id != null || check.target_environment_key != null
+        check.key == null || length(trimspace(check.key)) > 0
       )
     ])
-    error_message = "check_required_templates must set target_resource_id or target_environment_key."
+    error_message = "check_required_templates.key must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_required_templates : (
+        check.target_resource_id == null || length(trimspace(check.target_resource_id)) > 0
+      )
+    ])
+    error_message = "check_required_templates.target_resource_id must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_required_templates :
+      check.target_resource_type == null || contains(["environment", "environmentResource"], check.target_resource_type)
+    ])
+    error_message = "check_required_templates.target_resource_type must be one of: environment, environmentResource."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_required_templates : (
+        check.key != null || check.target_resource_id != null
+      )
+    ])
+    error_message = "check_required_templates must set key or target_resource_id."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_required_templates : length(check.required_templates) > 0
+    ])
+    error_message = "check_required_templates.required_templates must contain at least one entry."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_required_templates : alltrue([
+        for template in check.required_templates : (
+          length(trimspace(template.template_path)) > 0 &&
+          length(trimspace(template.repository_name)) > 0 &&
+          length(trimspace(template.repository_ref)) > 0 &&
+          (template.repository_type == null || length(trimspace(template.repository_type)) > 0)
+        )
+      ])
+    ])
+    error_message = "check_required_templates.required_templates must include non-empty template_path, repository_name, and repository_ref."
+  }
+
+  validation {
+    condition = length(distinct([
+      for check in var.check_required_templates :
+      coalesce(check.key, check.target_resource_id)
+    ])) == length(var.check_required_templates)
+    error_message = "check_required_templates keys must be unique; set key when target_resource_id would collide."
   }
 }
 
@@ -240,23 +453,32 @@ variable "check_required_templates" {
 variable "check_rest_apis" {
   description = "List of REST API checks to configure."
   type = list(object({
-    display_name                    = string
-    target_resource_id              = optional(string)
-    target_environment_key          = optional(string)
-    target_resource_type            = string
+    key                            = optional(string)
+    display_name                   = string
+    target_resource_id             = optional(string)
+    target_resource_type           = optional(string)
     connected_service_name_selector = string
-    connected_service_name          = string
-    method                          = string
-    body                            = optional(string)
-    headers                         = optional(string)
-    retry_interval                  = optional(number)
-    success_criteria                = optional(string)
-    url_suffix                      = optional(string)
-    variable_group_name             = optional(string)
-    completion_event                = optional(string)
-    timeout                         = optional(string)
+    connected_service_name         = string
+    method                         = string
+    body                           = optional(string)
+    headers                        = optional(string)
+    retry_interval                 = optional(number)
+    success_criteria               = optional(string)
+    url_suffix                     = optional(string)
+    variable_group_name            = optional(string)
+    completion_event               = optional(string)
+    timeout                        = optional(string)
   }))
   default = []
+
+  validation {
+    condition = alltrue([
+      for check in var.check_rest_apis : (
+        check.key == null || length(trimspace(check.key)) > 0
+      )
+    ])
+    error_message = "check_rest_apis.key must be a non-empty string when provided."
+  }
 
   validation {
     condition = alltrue([
@@ -268,9 +490,25 @@ variable "check_rest_apis" {
   validation {
     condition = alltrue([
       for check in var.check_rest_apis : (
-        check.target_resource_id != null || check.target_environment_key != null
+        check.target_resource_id == null || length(trimspace(check.target_resource_id)) > 0
       )
     ])
-    error_message = "check_rest_apis must set target_resource_id or target_environment_key."
+    error_message = "check_rest_apis.target_resource_id must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_rest_apis :
+      check.target_resource_type == null || contains(["environment", "environmentResource"], check.target_resource_type)
+    ])
+    error_message = "check_rest_apis.target_resource_type must be one of: environment, environmentResource."
+  }
+
+  validation {
+    condition = length(distinct([
+      for check in var.check_rest_apis :
+      coalesce(check.key, check.display_name, check.target_resource_id)
+    ])) == length(var.check_rest_apis)
+    error_message = "check_rest_apis keys must be unique; set key when display_name would collide."
   }
 }

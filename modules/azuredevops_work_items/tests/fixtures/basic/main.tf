@@ -7,6 +7,7 @@ module "azuredevops_work_items" {
 
   work_items = [
     {
+      key   = "basic-item"
       title = "${var.work_item_title_prefix}-basic"
       type  = "Issue"
       state = "Active"

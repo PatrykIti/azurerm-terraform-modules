@@ -4,10 +4,6 @@ provider "azuredevops" {}
 module "azuredevops_extension" {
   source = "../../../"
 
-  extensions = [
-    {
-      publisher_id = ""
-      extension_id = "invalid-extension"
-    }
-  ]
+  publisher_id = ""
+  extension_id = "invalid-extension"
 }

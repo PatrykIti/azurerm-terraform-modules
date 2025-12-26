@@ -6,6 +6,7 @@ This directory contains additional documentation for the Azure DevOps Pipelines 
 
 ## Contents
 
+- [IMPORT.md](IMPORT.md) - Importing existing pipelines and folders
 - Architecture diagrams (coming soon)
 - Best practices guide (coming soon)
 - Troubleshooting guide (coming soon)

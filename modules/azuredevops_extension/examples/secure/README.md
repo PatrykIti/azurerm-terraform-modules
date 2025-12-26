@@ -10,6 +10,7 @@ This example demonstrates installing only approved Azure DevOps Marketplace exte
 ## Key Configuration
 
 Maintain `approved_extensions` as your vetted list of Marketplace extensions.
+The module uses `for_each` to install only approved entries.
 
 ## Usage
 

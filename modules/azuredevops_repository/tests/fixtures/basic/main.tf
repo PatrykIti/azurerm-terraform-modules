@@ -1,13 +1,5 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 module "azuredevops_repository" {
   source = "../../"
 
@@ -15,7 +7,7 @@ module "azuredevops_repository" {
 
   repositories = {
     main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
+      name = "${var.repo_name_prefix}-basic"
       initialization = {
         init_type = "Clean"
       }
@@ -24,6 +16,7 @@ module "azuredevops_repository" {
 
   files = [
     {
+      key                 = "readme"
       repository_key      = "main"
       file                = "README.md"
       content             = "# Repository\n\nManaged by Terraform."

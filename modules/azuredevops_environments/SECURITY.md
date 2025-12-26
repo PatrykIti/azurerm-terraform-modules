@@ -22,20 +22,16 @@ This document describes security considerations for Azure DevOps environments an
 module "azuredevops_environments" {
   source = "./modules/azuredevops_environments"
 
-  project_id = "00000000-0000-0000-0000-000000000000"
-
-  environments = {
-    prod = {
-      description = "Production environment"
-    }
-  }
+  project_id  = "00000000-0000-0000-0000-000000000000"
+  name        = "ado-env-prod"
+  description = "Production environment"
 
   check_approvals = [
     {
-      target_environment_key = "prod"
-      target_resource_type   = "environment"
-      approvers              = ["00000000-0000-0000-0000-000000000000"]
-      requester_can_approve  = false
+      key                  = "prod-approval"
+      target_resource_type = "environment"
+      approvers            = ["00000000-0000-0000-0000-000000000000"]
+      requester_can_approve = false
     }
   ]
 }

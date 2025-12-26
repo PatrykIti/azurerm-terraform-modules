@@ -19,6 +19,7 @@ variables {
 
   build_folders = [
     {
+      key  = "pipelines"
       path = "\\Pipelines"
     }
   ]
@@ -43,7 +44,7 @@ run "outputs_plan" {
   }
 
   assert {
-    condition     = length(keys(output.build_folder_ids)) == 1
-    error_message = "build_folder_ids should include configured folders."
+    condition     = contains(keys(output.build_folder_ids), "pipelines")
+    error_message = "build_folder_ids should be keyed by the folder key."
   }
 }

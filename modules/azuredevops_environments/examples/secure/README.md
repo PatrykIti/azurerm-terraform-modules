@@ -1,11 +1,12 @@
 # Secure Azure DevOps Environments Example
 
-This example demonstrates environment approvals and exclusive locks.
+This example demonstrates environment approvals, exclusive locks, and business hours.
 
 ## Features
 
 - Approval checks for controlled deployments
 - Exclusive lock to prevent concurrent releases
+- Business hours gating for release windows
 
 ## Usage
 

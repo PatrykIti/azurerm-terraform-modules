@@ -9,24 +9,15 @@ mock_provider "azuredevops" {
 }
 
 variables {
-  extensions = [
-    {
-      publisher_id = "publisher-one"
-      extension_id = "extension-one"
-    },
-    {
-      publisher_id = "publisher-two"
-      extension_id = "extension-two"
-      version      = "1.2.3"
-    }
-  ]
+  publisher_id = "publisher-one"
+  extension_id = "extension-one"
 }
 
 run "outputs_plan" {
   command = plan
 
   assert {
-    condition     = length(keys(output.extension_ids)) == 2
-    error_message = "extension_ids should include all configured extensions."
+    condition     = output.extension_id == "extension-0001"
+    error_message = "extension_id should be exposed as a string output."
   }
 }

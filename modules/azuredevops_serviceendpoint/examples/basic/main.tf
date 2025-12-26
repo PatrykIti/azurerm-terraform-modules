@@ -1,13 +1,5 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 module "azuredevops_serviceendpoint" {
   source = "../../"
 
@@ -15,7 +7,8 @@ module "azuredevops_serviceendpoint" {
 
   serviceendpoint_azurerm = [
     {
-      service_endpoint_name     = "${var.azurerm_endpoint_name_prefix}-${random_string.suffix.result}"
+      key                       = "azurerm-basic"
+      service_endpoint_name     = var.azurerm_endpoint_name
       azurerm_spn_tenantid      = var.azurerm_spn_tenantid
       serviceprincipalid        = var.azurerm_spn_client_id
       serviceprincipalkey       = var.azurerm_spn_client_secret
@@ -27,7 +20,8 @@ module "azuredevops_serviceendpoint" {
 
   serviceendpoint_dockerregistry = [
     {
-      service_endpoint_name = "${var.docker_endpoint_name_prefix}-${random_string.suffix.result}"
+      key                   = "docker-basic"
+      service_endpoint_name = var.docker_endpoint_name
       docker_registry       = var.docker_registry
       docker_username       = var.docker_username
       docker_email          = var.docker_email

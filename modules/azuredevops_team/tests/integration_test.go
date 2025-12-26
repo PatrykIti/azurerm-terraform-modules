@@ -35,5 +35,7 @@ func TestAzuredevopsTeamFullIntegration(t *testing.T) {
 
 		assert.NotEmpty(t, teamIDs)
 		assert.NotEmpty(t, teamMemberIDs)
+		_, ok := teamMemberIDs["platform-members"]
+		assert.True(t, ok)
 	})
 }

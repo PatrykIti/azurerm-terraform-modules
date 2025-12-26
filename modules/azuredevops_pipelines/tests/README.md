@@ -33,6 +33,12 @@ go mod download
 make test
 ```
 
+### Run Short Tests Only
+
+```bash
+make test-short
+```
+
 ### Run Basic Tests Only
 
 ```bash
@@ -66,6 +72,7 @@ The `fixtures/` directory contains Terraform configurations for different test s
 - `fixtures/basic/` - Basic pipeline with a YAML build definition
 - `fixtures/complete/` - Multiple pipelines with folders and authorizations
 - `fixtures/secure/` - Pipeline with restricted permissions and authorizations
+- `fixtures/network/` - Optional networking-related scenario coverage
 - `fixtures/negative/` - Negative test cases
 
 ## Debugging Tests
@@ -92,6 +99,14 @@ Enable Terraform debug logging:
 ```bash
 export TF_LOG=DEBUG
 go test -v -run TestBasicAzuredevopsPipelines
+```
+
+## Test Output Logs
+
+Each `make test*` target stores a timestamped log under `test_outputs/`:
+
+```
+test_outputs/<target>_<timestamp>.log
 ```
 
 ## Continuous Integration

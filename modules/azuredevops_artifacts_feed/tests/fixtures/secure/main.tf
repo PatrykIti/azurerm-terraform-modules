@@ -10,24 +10,25 @@ module "azuredevops_artifacts_feed" {
 
   feeds = {
     secure = {
-      name       = "${var.feed_name_prefix}-secure"
-      project_id = var.project_id
+      name        = "${var.feed_name_prefix}-secure"
+      project_id  = var.project_id
+      description = "Secure fixture feed."
     }
   }
 
   feed_permissions = [
     {
+      key                 = "secure-reader"
       feed_key            = "secure"
       identity_descriptor = data.azuredevops_group.readers.descriptor
       role                = "reader"
-      project_id          = var.project_id
     }
   ]
 
   feed_retention_policies = [
     {
+      key                                       = "secure-retention"
       feed_key                                  = "secure"
-      project_id                                = var.project_id
       count_limit                               = 10
       days_to_keep_recently_downloaded_packages = 14
     }

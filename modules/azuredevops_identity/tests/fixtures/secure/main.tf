@@ -24,6 +24,7 @@ module "azuredevops_identity" {
 
   group_memberships = [
     {
+      key               = "security-membership"
       group_key         = "security"
       member_group_keys = ["operators"]
       mode              = "overwrite"

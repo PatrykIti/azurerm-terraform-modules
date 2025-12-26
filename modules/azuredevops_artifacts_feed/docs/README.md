@@ -10,6 +10,7 @@ This directory contains additional documentation for the Azure DevOps Artifacts 
 - Best practices guide (coming soon)
 - Troubleshooting guide (coming soon)
 - Migration guides (coming soon)
+- [IMPORT.md](IMPORT.md) - Import existing Azure DevOps artifacts feeds into the module
 
 ## Contributing
 

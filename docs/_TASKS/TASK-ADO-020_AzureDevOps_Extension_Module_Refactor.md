@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Small
 **Dependencies:** TASK-ADO-005
-**Status:** ⏳ **To Do**
+**Status:** ✅ **Done**
 
 ---
 
@@ -82,10 +82,10 @@ Update tests per TESTING_GUIDE:
 
 ## Implementation Checklist
 
-- [ ] Refactor variables.tf: replace `extensions` list with flat inputs + validations.
-- [ ] Refactor main.tf: single `azuredevops_extension` resource block.
-- [ ] Update outputs.tf: replace `extension_ids` map with `extension_id`.
-- [ ] Update examples/fixtures/tests to new interface (module-level `for_each`).
-- [ ] Add docs/IMPORT.md.
-- [ ] Update README + regenerate docs + update examples list.
-- [ ] Update tests (fixtures, unit, terratest, test_config).
+- [x] Refactor variables.tf: replace `extensions` list with flat inputs + validations.
+- [x] Refactor main.tf: single `azuredevops_extension` resource block.
+- [x] Update outputs.tf: replace `extension_ids` map with `extension_id`.
+- [x] Update examples/fixtures/tests to new interface (module-level `for_each`).
+- [x] Add docs/IMPORT.md.
+- [x] Update README + regenerate docs + update examples list.
+- [x] Update tests (fixtures, unit, terratest, test_config).

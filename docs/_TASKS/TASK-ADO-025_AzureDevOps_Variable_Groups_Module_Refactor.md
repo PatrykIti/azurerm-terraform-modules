@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-010
-**Status:** 🟡 **To Do**
+**Status:** ✅ **Done** (2025-12-25)
 
 ---
 
@@ -137,10 +137,10 @@ Update tests per TESTING_GUIDE:
 
 ## Implementation Checklist
 
-- [ ] Refactor variables.tf: replace `variable_groups` map with flat inputs; add validations and optional key fields.
-- [ ] Refactor main.tf: single `azuredevops_variable_group`; optional `key_vault`; stable for_each for permissions.
-- [ ] Update outputs.tf: `variable_group_id` and `variable_group_name` outputs.
-- [ ] Add `docs/IMPORT.md`.
-- [ ] Update examples (fixed names, single group usage).
-- [ ] Update tests (fixtures, unit, terratest, test_config).
-- [ ] make docs + update README.
+- [x] Refactor variables.tf: replace `variable_groups` map with flat inputs; add validations and optional key fields.
+- [x] Refactor main.tf: single `azuredevops_variable_group`; optional `key_vault`; stable for_each for permissions.
+- [x] Update outputs.tf: `variable_group_id` and `variable_group_name` outputs.
+- [x] Add `docs/IMPORT.md`.
+- [x] Update examples (fixed names, single group usage).
+- [x] Update tests (fixtures, unit, terratest, test_config).
+- [x] make docs + update README.

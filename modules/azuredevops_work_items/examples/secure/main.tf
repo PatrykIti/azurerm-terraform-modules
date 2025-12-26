@@ -7,6 +7,7 @@ module "azuredevops_work_items" {
 
   area_permissions = [
     {
+      key       = "area-readers-root"
       principal = var.principal_descriptor
       path      = "/"
       permissions = {
@@ -20,6 +21,7 @@ module "azuredevops_work_items" {
 
   iteration_permissions = [
     {
+      key       = "iteration-readers-root"
       principal = var.principal_descriptor
       path      = "/"
       permissions = {
@@ -33,6 +35,7 @@ module "azuredevops_work_items" {
 
   tagging_permissions = [
     {
+      key       = "tagging-readers"
       principal = var.principal_descriptor
       permissions = {
         Enumerate = "allow"

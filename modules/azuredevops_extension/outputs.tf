@@ -1,4 +1,4 @@
-output "extension_ids" {
-  description = "Map of extension IDs keyed by publisher/extension."
-  value       = { for key, extension in azuredevops_extension.extension : key => extension.id }
+output "extension_id" {
+  description = "The ID of the Azure DevOps extension."
+  value       = try(azuredevops_extension.extension.id, null)
 }

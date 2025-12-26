@@ -1,13 +1,5 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 module "azuredevops_repository" {
   source = "../../"
 
@@ -15,7 +7,7 @@ module "azuredevops_repository" {
 
   repositories = {
     main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
+      name = "ado-repo-complete"
       initialization = {
         init_type = "Clean"
       }
@@ -24,6 +16,7 @@ module "azuredevops_repository" {
 
   branches = [
     {
+      key            = "develop"
       repository_key = "main"
       name           = "develop"
       ref_branch     = "refs/heads/master"
@@ -32,6 +25,7 @@ module "azuredevops_repository" {
 
   files = [
     {
+      key                 = "readme"
       repository_key      = "main"
       file                = "README.md"
       content             = "# Repository\n\nManaged by Terraform."
@@ -42,6 +36,7 @@ module "azuredevops_repository" {
 
   git_permissions = [
     {
+      key            = "main-contributors"
       repository_key = "main"
       principal      = var.principal_descriptor
       permissions = {
@@ -53,6 +48,7 @@ module "azuredevops_repository" {
 
   branch_policy_min_reviewers = [
     {
+      key            = "min-reviewers-main"
       reviewer_count = var.reviewer_count
       scope = [
         {
@@ -65,6 +61,7 @@ module "azuredevops_repository" {
 
   branch_policy_build_validation = [
     {
+      key                 = "build-validation-main"
       build_definition_id = var.build_definition_id
       display_name        = "CI"
       scope = [
@@ -78,6 +75,7 @@ module "azuredevops_repository" {
 
   repository_policy_author_email_pattern = [
     {
+      key                   = "author-email-main"
       author_email_patterns = var.author_email_patterns
       repository_keys       = ["main"]
     }
@@ -85,6 +83,7 @@ module "azuredevops_repository" {
 
   repository_policy_reserved_names = [
     {
+      key             = "reserved-names-main"
       repository_keys = ["main"]
     }
   ]

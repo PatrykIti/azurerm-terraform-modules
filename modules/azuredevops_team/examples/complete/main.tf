@@ -1,13 +1,5 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 data "azuredevops_group" "project_collection_admins" {
   name = "Project Collection Administrators"
 }
@@ -23,33 +15,33 @@ module "azuredevops_team" {
 
   teams = {
     platform = {
-      name        = "${var.team_name_prefix}-platform-${random_string.suffix.result}"
+      name        = "${var.team_name_prefix}-platform"
       description = "Platform engineering team"
     }
     product = {
-      name        = "${var.team_name_prefix}-product-${random_string.suffix.result}"
+      name        = "${var.team_name_prefix}-product"
       description = "Product delivery team"
     }
   }
 
   team_members = [
     {
+      key                = "platform-members"
       team_key           = "platform"
       member_descriptors = [data.azuredevops_group.project_collection_valid_users.descriptor]
-      mode               = "add"
     },
     {
+      key                = "product-members"
       team_key           = "product"
       member_descriptors = [data.azuredevops_group.project_collection_valid_users.descriptor]
-      mode               = "add"
     }
   ]
 
   team_administrators = [
     {
+      key               = "platform-admins"
       team_key          = "platform"
       admin_descriptors = [data.azuredevops_group.project_collection_admins.descriptor]
-      mode              = "add"
     }
   ]
 }

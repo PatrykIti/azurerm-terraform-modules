@@ -1,6 +1,7 @@
 package test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -23,6 +24,9 @@ func TestAzuredevopsIdentityFullIntegration(t *testing.T) {
 
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(t, testFolder)
+		if userPrincipal := os.Getenv("AZDO_TEST_USER_PRINCIPAL_NAME"); userPrincipal != "" {
+			terraformOptions.Vars["user_principal_name"] = userPrincipal
+		}
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
@@ -35,5 +39,11 @@ func TestAzuredevopsIdentityFullIntegration(t *testing.T) {
 
 		assert.NotEmpty(t, groupIDs)
 		assert.NotEmpty(t, groupMemberships)
+		assert.Contains(t, groupMemberships, "platform-membership")
+
+		if userPrincipal := os.Getenv("AZDO_TEST_USER_PRINCIPAL_NAME"); userPrincipal != "" {
+			userEntitlements := terraform.OutputMap(t, terraformOptions, "user_entitlement_ids")
+			assert.Contains(t, userEntitlements, "fixture-user")
+		}
 	})
 }

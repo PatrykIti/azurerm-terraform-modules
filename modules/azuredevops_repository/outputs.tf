@@ -9,12 +9,12 @@ output "repository_urls" {
 }
 
 output "branch_ids" {
-  description = "Map of branch IDs keyed by index."
+  description = "Map of branch IDs keyed by branch key."
   value       = { for key, branch in azuredevops_git_repository_branch.branch : key => branch.id }
 }
 
 output "policy_ids" {
-  description = "Map of policy IDs grouped by policy type."
+  description = "Map of policy IDs grouped by policy type and keyed by policy key."
   value = {
     branch_auto_reviewers     = { for key, policy in azuredevops_branch_policy_auto_reviewers.policy : key => policy.id }
     branch_build_validation   = { for key, policy in azuredevops_branch_policy_build_validation.policy : key => policy.id }

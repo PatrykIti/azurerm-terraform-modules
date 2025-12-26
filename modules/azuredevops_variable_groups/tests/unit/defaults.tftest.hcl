@@ -2,12 +2,24 @@
 
 mock_provider "azuredevops" {}
 
+variables {
+  project_id = "00000000-0000-0000-0000-000000000000"
+  name       = "default-group"
+
+  variables = [
+    {
+      name  = "key"
+      value = "value"
+    }
+  ]
+}
+
 run "defaults_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_variable_group.variable_group) == 0
-    error_message = "No variable groups should be created by default."
+    condition     = azuredevops_variable_group.variable_group.allow_access == false
+    error_message = "allow_access should default to false."
   }
 
   assert {

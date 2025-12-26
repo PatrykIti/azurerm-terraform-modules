@@ -15,6 +15,7 @@ module "azuredevops_work_items" {
 
   query_folders = [
     {
+      key  = "team"
       name = "Team"
       area = "Shared Queries"
     }
@@ -22,9 +23,10 @@ module "azuredevops_work_items" {
 
   queries = [
     {
-      name = "Active Issues"
-      area = "Shared Queries"
-      wiql = <<-WIQL
+      key        = "active-issues"
+      name       = "Active Issues"
+      parent_key = "team"
+      wiql       = <<-WIQL
         SELECT [System.Id], [System.Title], [System.State]
         FROM WorkItems
         WHERE [System.WorkItemType] = 'Issue'
@@ -36,6 +38,8 @@ module "azuredevops_work_items" {
 
   query_permissions = [
     {
+      key       = "active-issues-readers"
+      query_key = "active-issues"
       principal = var.principal_descriptor
       permissions = {
         Read              = "Allow"
@@ -48,6 +52,7 @@ module "azuredevops_work_items" {
 
   work_items = [
     {
+      key   = "example-item"
       title = "Example Work Item"
       type  = "Issue"
       state = "Active"

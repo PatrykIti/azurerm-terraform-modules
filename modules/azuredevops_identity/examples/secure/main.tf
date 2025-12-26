@@ -24,6 +24,7 @@ module "azuredevops_identity" {
 
   group_memberships = [
     {
+      key               = "security-membership"
       group_key         = "security"
       member_group_keys = ["operators"]
       mode              = "overwrite"
@@ -32,6 +33,7 @@ module "azuredevops_identity" {
 
   user_entitlements = var.user_principal_name != "" ? [
     {
+      key                  = "stakeholder-user"
       principal_name       = var.user_principal_name
       account_license_type = "stakeholder"
       licensing_source     = "account"
@@ -40,6 +42,7 @@ module "azuredevops_identity" {
 
   group_entitlements = var.aad_group_display_name != "" ? [
     {
+      key                  = "stakeholder-group"
       display_name         = var.aad_group_display_name
       account_license_type = "stakeholder"
       licensing_source     = "account"

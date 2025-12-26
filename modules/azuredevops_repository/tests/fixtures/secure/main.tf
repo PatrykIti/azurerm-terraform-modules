@@ -1,13 +1,5 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 module "azuredevops_repository" {
   source = "../../"
 
@@ -15,7 +7,7 @@ module "azuredevops_repository" {
 
   repositories = {
     main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
+      name = "${var.repo_name_prefix}-secure"
       initialization = {
         init_type = "Clean"
       }
@@ -24,6 +16,7 @@ module "azuredevops_repository" {
 
   branch_policy_min_reviewers = [
     {
+      key            = "min-reviewers-main"
       reviewer_count = 2
       scope = [
         {
@@ -36,6 +29,7 @@ module "azuredevops_repository" {
 
   repository_policy_reserved_names = [
     {
+      key             = "reserved-names-main"
       repository_keys = ["main"]
     }
   ]

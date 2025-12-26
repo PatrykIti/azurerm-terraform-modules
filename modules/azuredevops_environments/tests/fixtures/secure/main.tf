@@ -1,13 +1,5 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 data "azuredevops_group" "project_collection_admins" {
   name = "Project Collection Administrators"
 }
@@ -15,29 +7,24 @@ data "azuredevops_group" "project_collection_admins" {
 module "azuredevops_environments" {
   source = "../.."
 
-  project_id = var.project_id
-
-  environments = {
-    secure = {
-      name        = "${var.environment_name_prefix}-${random_string.suffix.result}"
-      description = "Secure environment"
-    }
-  }
+  project_id  = var.project_id
+  name        = var.environment_name
+  description = "Secure fixture environment"
 
   check_approvals = [
     {
-      target_environment_key = "secure"
-      target_resource_type   = "environment"
-      approvers              = [data.azuredevops_group.project_collection_admins.id]
-      requester_can_approve  = false
+      key                  = "secure-approval"
+      target_resource_type = "environment"
+      approvers            = [data.azuredevops_group.project_collection_admins.id]
+      requester_can_approve = false
     }
   ]
 
   check_exclusive_locks = [
     {
-      target_environment_key = "secure"
-      target_resource_type   = "environment"
-      timeout                = 43200
+      key                  = "secure-lock"
+      target_resource_type = "environment"
+      timeout              = 43200
     }
   ]
 }

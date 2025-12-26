@@ -5,7 +5,7 @@ This fixture demonstrates a minimal Azure DevOps team configuration for tests.
 ## Features
 
 - Creates a single Azure DevOps team
-- Uses a randomized suffix to avoid name collisions
+- Uses a configurable name prefix to avoid name collisions
 
 ## Key Configuration
 

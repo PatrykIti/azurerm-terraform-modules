@@ -8,8 +8,7 @@ module "azuredevops_repository" {
 
   branches = [
     {
-      repository_id  = "00000000-0000-0000-0000-000000000000"
-      repository_key = "main"
+      repository_key = "missing"
       name           = "invalid-branch"
     }
   ]

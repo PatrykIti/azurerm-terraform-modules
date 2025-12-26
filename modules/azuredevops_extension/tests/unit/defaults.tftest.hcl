@@ -2,11 +2,16 @@
 
 mock_provider "azuredevops" {}
 
+variables {
+  publisher_id = "publisher-defaults"
+  extension_id = "extension-defaults"
+}
+
 run "defaults_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_extension.extension) == 0
-    error_message = "No extensions should be created by default."
+    condition     = var.version == null
+    error_message = "version should default to null."
   }
 }

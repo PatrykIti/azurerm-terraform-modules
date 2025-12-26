@@ -9,7 +9,7 @@ This example demonstrates installing a single Azure DevOps Marketplace extension
 
 ## Key Configuration
 
-Provide the Marketplace `publisher_id` and `extension_id` (and optionally `extension_version`).
+Provide the Marketplace `publisher_id` and `extension_id` (and optionally `version`).
 
 ## Usage
 

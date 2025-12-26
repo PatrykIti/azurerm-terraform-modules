@@ -3,23 +3,21 @@
 mock_provider "azuredevops" {}
 
 variables {
-  project_id = "00000000-0000-0000-0000-000000000000"
-
-  environments = {
-    core = {}
-  }
+  project_id  = "00000000-0000-0000-0000-000000000000"
+  name        = "core"
+  description = "Core environment"
 }
 
 run "environment_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_environment.environment) == 1
-    error_message = "environments should create one environment."
+    condition     = azuredevops_environment.environment.name == var.name
+    error_message = "Environment name should match the provided name."
   }
 
   assert {
-    condition     = azuredevops_environment.environment["core"].name == "core"
-    error_message = "Environment name should default to the map key."
+    condition     = azuredevops_environment.environment.description == var.description
+    error_message = "Environment description should match the provided description."
   }
 }

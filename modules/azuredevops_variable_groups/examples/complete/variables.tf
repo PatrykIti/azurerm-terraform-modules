@@ -3,16 +3,9 @@ variable "project_id" {
   type        = string
 }
 
-variable "group_name_prefix" {
-  description = "Prefix for variable group names."
+variable "key_vault_service_endpoint_id" {
+  description = "Service endpoint ID for the Key Vault integration."
   type        = string
-  default     = "app-vars"
-}
-
-variable "secret_group_name_prefix" {
-  description = "Prefix for secret variable group names."
-  type        = string
-  default     = "secret-vars"
 }
 
 variable "principal_descriptor" {

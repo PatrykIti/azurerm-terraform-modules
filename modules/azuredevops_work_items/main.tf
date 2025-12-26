@@ -1,11 +1,26 @@
 locals {
-  work_items            = { for idx, item in var.work_items : idx => item }
-  query_folders         = { for idx, folder in var.query_folders : idx => folder }
-  queries               = { for idx, query in var.queries : idx => query }
-  query_permissions     = { for idx, perm in var.query_permissions : idx => perm }
-  area_permissions      = { for idx, perm in var.area_permissions : idx => perm }
-  iteration_permissions = { for idx, perm in var.iteration_permissions : idx => perm }
-  tagging_permissions   = { for idx, perm in var.tagging_permissions : idx => perm }
+  work_items_by_key = {
+    for item in var.work_items : coalesce(item.key, item.title) => item
+  }
+  query_folders_by_key = {
+    for folder in var.query_folders : coalesce(folder.key, folder.name) => folder
+  }
+  queries_by_key = {
+    for query in var.queries : coalesce(query.key, query.name) => query
+  }
+  query_permissions_by_key = {
+    for perm in var.query_permissions :
+    coalesce(perm.key, perm.principal, perm.path, perm.query_key, perm.folder_key) => perm
+  }
+  area_permissions_by_key = {
+    for perm in var.area_permissions : coalesce(perm.key, perm.principal, perm.path) => perm
+  }
+  iteration_permissions_by_key = {
+    for perm in var.iteration_permissions : coalesce(perm.key, perm.principal, perm.path) => perm
+  }
+  tagging_permissions_by_key = {
+    for perm in var.tagging_permissions : coalesce(perm.key, perm.principal) => perm
+  }
 }
 
 resource "azuredevops_workitemtrackingprocess_process" "process" {
@@ -20,7 +35,7 @@ resource "azuredevops_workitemtrackingprocess_process" "process" {
 }
 
 resource "azuredevops_workitem" "work_item" {
-  for_each = local.work_items
+  for_each = local.work_items_by_key
 
   project_id     = coalesce(each.value.project_id, var.project_id)
   title          = each.value.title
@@ -29,64 +44,72 @@ resource "azuredevops_workitem" "work_item" {
   tags           = try(each.value.tags, null)
   area_path      = try(each.value.area_path, null)
   iteration_path = try(each.value.iteration_path, null)
-  parent_id      = try(each.value.parent_id, null)
-  custom_fields  = try(each.value.custom_fields, null)
+  parent_id = each.value.parent_key != null ? tonumber(azuredevops_workitem.work_item[each.value.parent_key].id) : (
+    try(each.value.parent_id, null)
+  )
+  custom_fields = try(each.value.custom_fields, null)
 }
 
 resource "azuredevops_workitemquery_folder" "query_folder" {
-  for_each = local.query_folders
+  for_each = local.query_folders_by_key
 
   project_id = coalesce(each.value.project_id, var.project_id)
   name       = each.value.name
   area       = try(each.value.area, null)
-  parent_id  = try(each.value.parent_id, null)
+  parent_id = each.value.parent_key != null ? tonumber(azuredevops_workitemquery_folder.query_folder[each.value.parent_key].id) : (
+    try(each.value.parent_id, null)
+  )
 }
 
 resource "azuredevops_workitemquery" "query" {
-  for_each = local.queries
+  for_each = local.queries_by_key
 
   project_id = coalesce(each.value.project_id, var.project_id)
   name       = each.value.name
   wiql       = each.value.wiql
   area       = try(each.value.area, null)
-  parent_id  = try(each.value.parent_id, null)
+  parent_id = each.value.parent_key != null ? tonumber(azuredevops_workitemquery_folder.query_folder[each.value.parent_key].id) : (
+    try(each.value.parent_id, null)
+  )
 }
 
 resource "azuredevops_workitemquery_permissions" "query_permissions" {
-  for_each = local.query_permissions
+  for_each = local.query_permissions_by_key
 
-  project_id  = coalesce(each.value.project_id, var.project_id)
-  path        = try(each.value.path, null)
+  project_id = coalesce(each.value.project_id, var.project_id)
+  path = each.value.query_key != null ? azuredevops_workitemquery.query[each.value.query_key].path : (
+    each.value.folder_key != null ? azuredevops_workitemquery_folder.query_folder[each.value.folder_key].path : each.value.path
+  )
   principal   = each.value.principal
   permissions = each.value.permissions
-  replace     = try(each.value.replace, true)
+  replace     = each.value.replace
 }
 
 resource "azuredevops_area_permissions" "area_permissions" {
-  for_each = local.area_permissions
+  for_each = local.area_permissions_by_key
 
   project_id  = coalesce(each.value.project_id, var.project_id)
-  path        = try(each.value.path, null)
+  path        = each.value.path
   principal   = each.value.principal
   permissions = each.value.permissions
-  replace     = try(each.value.replace, true)
+  replace     = each.value.replace
 }
 
 resource "azuredevops_iteration_permissions" "iteration_permissions" {
-  for_each = local.iteration_permissions
+  for_each = local.iteration_permissions_by_key
 
   project_id  = coalesce(each.value.project_id, var.project_id)
-  path        = try(each.value.path, null)
+  path        = each.value.path
   principal   = each.value.principal
   permissions = each.value.permissions
-  replace     = try(each.value.replace, true)
+  replace     = each.value.replace
 }
 
 resource "azuredevops_tagging_permissions" "tagging_permissions" {
-  for_each = local.tagging_permissions
+  for_each = local.tagging_permissions_by_key
 
   project_id  = coalesce(each.value.project_id, var.project_id)
   principal   = each.value.principal
   permissions = each.value.permissions
-  replace     = try(each.value.replace, true)
+  replace     = each.value.replace
 }

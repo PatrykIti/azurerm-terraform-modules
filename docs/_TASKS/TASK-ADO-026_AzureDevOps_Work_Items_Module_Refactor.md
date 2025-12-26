@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-014
-**Status:** 🟡 **To Do**
+**Status:** ✅ **Done** (2025-12-26)
 
 ---
 
@@ -199,10 +199,10 @@ Update tests per TESTING_GUIDE:
 
 ## Implementation Checklist
 
-- [ ] Update variables.tf with `key` fields, key/reference validation, and project_id gating.
-- [ ] Refactor main.tf for stable for_each and key-based lookups.
-- [ ] Update outputs.tf with stable maps for all relevant resources.
-- [ ] Add `docs/IMPORT.md` and regenerate README (terraform-docs).
-- [ ] Update examples (basic/complete/secure) to use keys and references.
-- [ ] Update tests (fixtures, unit, terratest, test_config).
-- [ ] make docs + update examples list.
+- [x] Update variables.tf with `key` fields, key/reference validation, and project_id gating.
+- [x] Refactor main.tf for stable for_each and key-based lookups.
+- [x] Update outputs.tf with stable maps for all relevant resources.
+- [x] Add `docs/IMPORT.md` and regenerate README (terraform-docs).
+- [x] Update examples (basic/complete/secure) to use keys and references.
+- [x] Update tests (fixtures, unit, terratest, test_config).
+- [x] make docs + update examples list.

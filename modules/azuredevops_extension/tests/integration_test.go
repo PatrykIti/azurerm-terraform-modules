@@ -17,12 +17,15 @@ func TestAzuredevopsExtensionFullIntegration(t *testing.T) {
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_extension/tests/fixtures/complete")
+	vars := map[string]interface{}{
+		"extensions": getExtensionsFromEnv(),
+	}
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(testFolder))
+		terraform.Destroy(t, getTerraformOptions(testFolder, vars))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(testFolder)
+		terraformOptions := getTerraformOptions(testFolder, vars)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})

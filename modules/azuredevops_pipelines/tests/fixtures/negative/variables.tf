@@ -1,4 +1,9 @@
 variable "project_id" {
-  type    = string
-  default = "00000000-0000-0000-0000-000000000000"
+  description = "Azure DevOps project ID."
+  type        = string
+}
+
+variable "random_suffix" {
+  description = "A random suffix to ensure unique resource names."
+  type        = string
 }

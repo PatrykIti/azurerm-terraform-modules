@@ -5,6 +5,12 @@ if [ -f "./test_env.sh" ]; then
   source ./test_env.sh
 fi
 
+# Ensure required environment variables are set
+if [[ -z "${AZDO_ORG_SERVICE_URL:-}" || -z "${AZDO_PERSONAL_ACCESS_TOKEN:-}" || -z "${AZDO_PROJECT_ID:-}" ]]; then
+  echo "Missing required environment variables: AZDO_ORG_SERVICE_URL, AZDO_PERSONAL_ACCESS_TOKEN, AZDO_PROJECT_ID"
+  exit 1
+fi
+
 # Create output directory for test results
 OUTPUT_DIR="test_outputs/sequential_run_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$OUTPUT_DIR"

@@ -10,6 +10,7 @@ This example demonstrates installing multiple Azure DevOps Marketplace extension
 ## Key Configuration
 
 Update the `extensions` list with your Marketplace publisher and extension IDs.
+The module uses `for_each` to install each extension.
 
 ## Usage
 

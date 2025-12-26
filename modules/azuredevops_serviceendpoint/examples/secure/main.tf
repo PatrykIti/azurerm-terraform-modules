@@ -1,13 +1,5 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 data "azuredevops_group" "project_collection_admins" {
   name = "Project Collection Administrators"
 }
@@ -19,7 +11,8 @@ module "azuredevops_serviceendpoint" {
 
   serviceendpoint_generic = [
     {
-      service_endpoint_name = "${var.generic_endpoint_name_prefix}-${random_string.suffix.result}"
+      key                   = "generic-secure"
+      service_endpoint_name = var.generic_endpoint_name
       server_url            = var.generic_endpoint_url
       username              = var.generic_endpoint_username
       password              = var.generic_endpoint_password
@@ -34,6 +27,8 @@ module "azuredevops_serviceendpoint" {
         Use        = "Allow"
         Administer = "Deny"
       }
+      serviceendpoint_type = "generic"
+      serviceendpoint_key  = "generic-secure"
     }
   ]
 }

@@ -1,5 +1,9 @@
 provider "azuredevops" {}
 
+data "azuredevops_group" "project_collection_admins" {
+  name = "Project Collection Administrators"
+}
+
 module "azuredevops_serviceendpoint" {
   source = "../.."
 
@@ -7,6 +11,7 @@ module "azuredevops_serviceendpoint" {
 
   serviceendpoint_generic = [
     {
+      key                   = "generic-complete"
       service_endpoint_name = "${var.generic_endpoint_name_prefix}"
       server_url            = var.generic_endpoint_url
       username              = var.generic_endpoint_username
@@ -17,11 +22,24 @@ module "azuredevops_serviceendpoint" {
 
   serviceendpoint_incomingwebhook = [
     {
+      key                   = "incomingwebhook-complete"
       service_endpoint_name = "${var.incoming_webhook_name_prefix}"
       webhook_name          = "example_webhook"
       secret                = var.incoming_webhook_secret
       http_header           = "X-Hub-Signature"
       description           = "Managed by Terraform"
+    }
+  ]
+
+  serviceendpoint_permissions = [
+    {
+      principal = data.azuredevops_group.project_collection_admins.id
+      permissions = {
+        Use        = "Allow"
+        Administer = "Deny"
+      }
+      serviceendpoint_type = "generic"
+      serviceendpoint_key  = "generic-complete"
     }
   ]
 }

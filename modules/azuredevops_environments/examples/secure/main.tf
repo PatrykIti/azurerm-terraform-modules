@@ -1,13 +1,5 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 data "azuredevops_group" "project_collection_admins" {
   name = "Project Collection Administrators"
 }
@@ -15,29 +7,41 @@ data "azuredevops_group" "project_collection_admins" {
 module "azuredevops_environments" {
   source = "../../"
 
-  project_id = var.project_id
-
-  environments = {
-    secure = {
-      name        = "${var.environment_name_prefix}-${random_string.suffix.result}"
-      description = "Secure environment"
-    }
-  }
+  project_id  = var.project_id
+  name        = "ado-env-secure"
+  description = "Secure environment"
 
   check_approvals = [
     {
-      target_environment_key = "secure"
-      target_resource_type   = "environment"
-      approvers              = [data.azuredevops_group.project_collection_admins.id]
-      requester_can_approve  = false
+      key                  = "security-approval"
+      target_resource_type = "environment"
+      approvers            = [data.azuredevops_group.project_collection_admins.id]
+      requester_can_approve = false
     }
   ]
 
   check_exclusive_locks = [
     {
-      target_environment_key = "secure"
-      target_resource_type   = "environment"
-      timeout                = 43200
+      key                  = "exclusive-lock"
+      target_resource_type = "environment"
+      timeout              = 43200
+    }
+  ]
+
+  check_business_hours = [
+    {
+      display_name         = "Business hours gate"
+      target_resource_type = "environment"
+      start_time           = "08:00"
+      end_time             = "18:00"
+      time_zone            = "UTC"
+      monday               = true
+      tuesday              = true
+      wednesday            = true
+      thursday             = true
+      friday               = true
+      saturday             = false
+      sunday               = false
     }
   ]
 }

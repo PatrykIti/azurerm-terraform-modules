@@ -1,5 +1,10 @@
 provider "azuredevops" {}
 
+data "azuredevops_group" "readers" {
+  project_id = var.project_id
+  name       = "Readers"
+}
+
 module "azuredevops_servicehooks" {
   source = "../../"
 
@@ -7,12 +12,37 @@ module "azuredevops_servicehooks" {
 
   webhooks = [
     {
+      key = "build-completed"
       url = var.webhook_url
       build_completed = {
         build_status = "Succeeded"
       }
       http_headers = {
         "X-Test" = "true"
+      }
+    }
+  ]
+
+  storage_queue_hooks = [
+    {
+      key                     = "queue-run-completed"
+      account_name            = var.account_name
+      account_key             = var.account_key
+      queue_name              = var.queue_name
+      visi_timeout            = 30
+      run_state_changed_event = {}
+    }
+  ]
+
+  servicehook_permissions = [
+    {
+      key       = "readers-permissions"
+      principal = data.azuredevops_group.readers.id
+      permissions = {
+        ViewSubscriptions   = "Allow"
+        EditSubscriptions   = "Deny"
+        DeleteSubscriptions = "Deny"
+        PublishEvents       = "Deny"
       }
     }
   ]

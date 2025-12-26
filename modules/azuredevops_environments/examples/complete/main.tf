@@ -1,20 +1,12 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 data "azuredevops_group" "project_collection_admins" {
   name = "Project Collection Administrators"
 }
 
 resource "azuredevops_serviceendpoint_kubernetes" "example" {
   project_id            = var.project_id
-  service_endpoint_name = "${var.environment_name_prefix}-k8s-${random_string.suffix.result}"
+  service_endpoint_name = "ado-env-complete-k8s"
   apiserver_url         = var.kubernetes_api_url
   authorization_type    = "Kubeconfig"
 
@@ -49,31 +41,34 @@ EOT
 module "azuredevops_environments" {
   source = "../../"
 
-  project_id = var.project_id
-
-  environments = {
-    prod = {
-      name        = "${var.environment_name_prefix}-${random_string.suffix.result}"
-      description = "Production environment"
-    }
-  }
+  project_id  = var.project_id
+  name        = "ado-env-complete"
+  description = "Production environment"
 
   kubernetes_resources = [
     {
-      environment_key     = "prod"
-      service_endpoint_id = azuredevops_serviceendpoint_kubernetes.example.id
-      name                = "${var.environment_name_prefix}-k8s-${random_string.suffix.result}"
+      name                = "ado-env-complete-k8s"
       namespace           = "default"
+      service_endpoint_id = azuredevops_serviceendpoint_kubernetes.example.id
       cluster_name        = "example-aks"
     }
   ]
 
   check_approvals = [
     {
-      target_environment_key = "prod"
-      target_resource_type   = "environment"
-      approvers              = [data.azuredevops_group.project_collection_admins.id]
-      requester_can_approve  = false
+      key                  = "primary-approval"
+      target_resource_type = "environment"
+      approvers            = [data.azuredevops_group.project_collection_admins.id]
+      requester_can_approve = false
+    }
+  ]
+
+  check_branch_controls = [
+    {
+      display_name             = "Require protected branches"
+      target_resource_type     = "environment"
+      allowed_branches         = "refs/heads/main"
+      verify_branch_protection = true
     }
   ]
 }

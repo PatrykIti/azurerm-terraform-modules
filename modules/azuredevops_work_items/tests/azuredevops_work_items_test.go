@@ -34,6 +34,7 @@ func TestBasicAzuredevopsWorkItems(t *testing.T) {
 		workItemIDs := terraform.OutputMap(t, terraformOptions, "work_item_ids")
 
 		assert.NotEmpty(t, workItemIDs)
+		assert.Contains(t, workItemIDs, "basic-item")
 	})
 }
 
@@ -58,9 +59,19 @@ func TestCompleteAzuredevopsWorkItems(t *testing.T) {
 
 		workItemIDs := terraform.OutputMap(t, terraformOptions, "work_item_ids")
 		queryIDs := terraform.OutputMap(t, terraformOptions, "query_ids")
+		queryFolderIDs := terraform.OutputMap(t, terraformOptions, "query_folder_ids")
+		queryPermissionIDs := terraform.OutputMap(t, terraformOptions, "query_permission_ids")
 
 		assert.NotEmpty(t, workItemIDs)
 		assert.NotEmpty(t, queryIDs)
+		assert.NotEmpty(t, queryFolderIDs)
+		assert.NotEmpty(t, queryPermissionIDs)
+
+		assert.Contains(t, workItemIDs, "parent-item")
+		assert.Contains(t, workItemIDs, "child-item")
+		assert.Contains(t, queryIDs, "active-issues")
+		assert.Contains(t, queryFolderIDs, "team")
+		assert.Contains(t, queryPermissionIDs, "active-issues-readers")
 	})
 }
 
@@ -86,6 +97,7 @@ func TestSecureAzuredevopsWorkItems(t *testing.T) {
 		workItemIDs := terraform.OutputMap(t, terraformOptions, "work_item_ids")
 
 		assert.NotEmpty(t, workItemIDs)
+		assert.Contains(t, workItemIDs, "secure-item")
 	})
 }
 

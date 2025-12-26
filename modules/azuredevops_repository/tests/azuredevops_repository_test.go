@@ -102,7 +102,7 @@ func TestAzuredevopsRepositoryValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "repository_id or repository_key")
+	assert.Contains(t, err.Error(), "branches.repository_key must reference a key in repositories")
 }
 
 // Helper function to get terraform options

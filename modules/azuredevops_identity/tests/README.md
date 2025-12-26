@@ -17,6 +17,12 @@ export AZDO_ORG_SERVICE_URL="https://dev.azure.com/your-org"
 export AZDO_PERSONAL_ACCESS_TOKEN="your-pat"
 ```
 
+Optional entitlement test variable:
+
+```bash
+export AZDO_TEST_USER_PRINCIPAL_NAME="user@example.com"
+```
+
 ## Running Tests
 
 ### Install Dependencies

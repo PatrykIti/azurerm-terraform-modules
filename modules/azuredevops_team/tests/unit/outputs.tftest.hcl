@@ -13,6 +13,12 @@ mock_provider "azuredevops" {
       id = "team-membership-0001"
     }
   }
+
+  mock_resource "azuredevops_team_administrators" {
+    defaults = {
+      id = "team-admins-0001"
+    }
+  }
 }
 
 variables {
@@ -29,9 +35,19 @@ variables {
 
   team_members = [
     {
+      key                = "core-members"
       team_key           = "core"
       member_descriptors = ["vssgp.member"]
       mode               = "add"
+    }
+  ]
+
+  team_administrators = [
+    {
+      key               = "core-admins"
+      team_key          = "core"
+      admin_descriptors = ["vssgp.admin"]
+      mode              = "add"
     }
   ]
 }
@@ -50,7 +66,12 @@ run "outputs_plan" {
   }
 
   assert {
-    condition     = length(keys(output.team_member_ids)) == 1
-    error_message = "team_member_ids should include memberships."
+    condition     = contains(keys(output.team_member_ids), "core-members")
+    error_message = "team_member_ids should be keyed by the membership key."
+  }
+
+  assert {
+    condition     = contains(keys(output.team_administrator_ids), "core-admins")
+    error_message = "team_administrator_ids should be keyed by the admin key."
   }
 }

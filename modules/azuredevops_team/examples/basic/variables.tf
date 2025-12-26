@@ -3,8 +3,8 @@ variable "project_id" {
   type        = string
 }
 
-variable "team_name_prefix" {
-  description = "Prefix for the team name."
+variable "team_name" {
+  description = "Name of the team."
   type        = string
   default     = "ado-team-basic"
 }

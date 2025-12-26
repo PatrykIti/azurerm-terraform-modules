@@ -33,11 +33,12 @@ variable "groups" {
 variable "group_memberships" {
   description = "List of group membership assignments."
   type = list(object({
+    key                = optional(string)
     group_descriptor   = optional(string)
     group_key          = optional(string)
     member_descriptors = optional(list(string), [])
     member_group_keys  = optional(list(string), [])
-    mode               = optional(string)
+    mode               = optional(string, "add")
   }))
   default = []
 
@@ -67,6 +68,31 @@ variable "group_memberships" {
     ])
     error_message = "Each group_membership must include at least one member descriptor or member group key."
   }
+
+  validation {
+    condition = alltrue([
+      for membership in var.group_memberships : (
+        membership.group_key == null || contains(keys(var.groups), membership.group_key)
+      )
+    ])
+    error_message = "group_memberships.group_key must reference a key in groups."
+  }
+
+  validation {
+    condition = alltrue([
+      for membership in var.group_memberships : alltrue([
+        for key in try(membership.member_group_keys, []) : contains(keys(var.groups), key)
+      ])
+    ])
+    error_message = "group_memberships.member_group_keys must reference keys in groups."
+  }
+
+  validation {
+    condition = length(distinct([
+      for membership in var.group_memberships : coalesce(membership.key, membership.group_descriptor, membership.group_key)
+    ])) == length(var.group_memberships)
+    error_message = "group_memberships keys must be unique (derived from key, group_descriptor, or group_key)."
+  }
 }
 
 # -----------------------------------------------------------------------------
@@ -76,6 +102,7 @@ variable "group_memberships" {
 variable "group_entitlements" {
   description = "List of group entitlements to manage."
   type = list(object({
+    key                  = optional(string)
     display_name         = optional(string)
     origin               = optional(string)
     origin_id            = optional(string)
@@ -122,6 +149,13 @@ variable "group_entitlements" {
     ])
     error_message = "group_entitlements.licensing_source must be a valid licensing source."
   }
+
+  validation {
+    condition = length(distinct([
+      for entitlement in var.group_entitlements : coalesce(entitlement.key, entitlement.display_name, entitlement.origin_id)
+    ])) == length(var.group_entitlements)
+    error_message = "group_entitlements keys must be unique (derived from key, display_name, or origin_id)."
+  }
 }
 
 # -----------------------------------------------------------------------------
@@ -131,6 +165,7 @@ variable "group_entitlements" {
 variable "user_entitlements" {
   description = "List of user entitlements to manage."
   type = list(object({
+    key                  = optional(string)
     principal_name       = optional(string)
     origin_id            = optional(string)
     origin               = optional(string)
@@ -177,6 +212,13 @@ variable "user_entitlements" {
     ])
     error_message = "user_entitlements.licensing_source must be a valid licensing source."
   }
+
+  validation {
+    condition = length(distinct([
+      for entitlement in var.user_entitlements : coalesce(entitlement.key, entitlement.principal_name, entitlement.origin_id)
+    ])) == length(var.user_entitlements)
+    error_message = "user_entitlements keys must be unique (derived from key, principal_name, or origin_id)."
+  }
 }
 
 # -----------------------------------------------------------------------------
@@ -186,12 +228,22 @@ variable "user_entitlements" {
 variable "service_principal_entitlements" {
   description = "List of service principal entitlements to manage."
   type = list(object({
+    key                  = optional(string)
     origin_id            = string
-    origin               = optional(string)
+    origin               = optional(string, "aad")
     account_license_type = optional(string, "express")
     licensing_source     = optional(string, "account")
   }))
   default = []
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.service_principal_entitlements : (
+        entitlement.origin == null || entitlement.origin == "aad"
+      )
+    ])
+    error_message = "service_principal_entitlements.origin must be \"aad\" when set."
+  }
 
   validation {
     condition = alltrue([
@@ -221,6 +273,13 @@ variable "service_principal_entitlements" {
     ])
     error_message = "service_principal_entitlements.licensing_source must be a valid licensing source."
   }
+
+  validation {
+    condition = length(distinct([
+      for entitlement in var.service_principal_entitlements : coalesce(entitlement.key, entitlement.origin_id)
+    ])) == length(var.service_principal_entitlements)
+    error_message = "service_principal_entitlements keys must be unique (derived from key or origin_id)."
+  }
 }
 
 # -----------------------------------------------------------------------------
@@ -230,6 +289,7 @@ variable "service_principal_entitlements" {
 variable "securityrole_assignments" {
   description = "List of security role assignments to manage."
   type = list(object({
+    key                = optional(string)
     scope              = string
     resource_id        = string
     role_name          = string
@@ -245,5 +305,24 @@ variable "securityrole_assignments" {
       )
     ])
     error_message = "Each securityrole_assignment must set exactly one of identity_id or identity_group_key."
+  }
+
+  validation {
+    condition = alltrue([
+      for assignment in var.securityrole_assignments : (
+        assignment.identity_group_key == null || contains(keys(var.groups), assignment.identity_group_key)
+      )
+    ])
+    error_message = "securityrole_assignments.identity_group_key must reference a key in groups."
+  }
+
+  validation {
+    condition = length(distinct([
+      for assignment in var.securityrole_assignments : coalesce(
+        assignment.key,
+        "${assignment.scope}/${assignment.resource_id}/${assignment.role_name}/${coalesce(assignment.identity_id, assignment.identity_group_key, "unknown")}"
+      )
+    ])) == length(var.securityrole_assignments)
+    error_message = "securityrole_assignments keys must be unique (derived from key or scope/resource/role/identity)."
   }
 }

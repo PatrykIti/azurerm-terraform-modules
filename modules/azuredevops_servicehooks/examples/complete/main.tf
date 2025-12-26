@@ -7,6 +7,7 @@ module "azuredevops_servicehooks" {
 
   webhooks = [
     {
+      key = "build-completed"
       url = var.webhook_url
       build_completed = {
         definition_name = var.pipeline_name
@@ -17,6 +18,7 @@ module "azuredevops_servicehooks" {
 
   storage_queue_hooks = [
     {
+      key          = "queue-run-completed"
       account_name = var.account_name
       account_key  = var.account_key
       queue_name   = var.queue_name

@@ -1,18 +1,15 @@
 variable "project_id" {
-  type = string
+  description = "Azure DevOps project ID."
+  type        = string
 }
 
-variable "repo_name_prefix" {
-  type    = string
-  default = "ado-pipeline-repo"
-}
-
-variable "pipeline_name_prefix" {
-  type    = string
-  default = "ado-pipeline"
+variable "random_suffix" {
+  description = "A random suffix to ensure unique resource names."
+  type        = string
 }
 
 variable "yaml_path" {
-  type    = string
-  default = "azure-pipelines.yml"
+  description = "Path to the pipeline YAML file."
+  type        = string
+  default     = "azure-pipelines.yml"
 }

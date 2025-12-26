@@ -22,14 +22,20 @@ variable "service_principal_origin_id" {
   default     = ""
 }
 
-variable "security_role_assignments" {
-  description = "Optional security role assignments to apply."
-  type = list(object({
-    scope              = string
-    resource_id        = string
-    role_name          = string
-    identity_id        = optional(string)
-    identity_group_key = optional(string)
-  }))
-  default = []
+variable "security_role_assignment_resource_id" {
+  description = "Optional resource ID for a sample security role assignment."
+  type        = string
+  default     = ""
+}
+
+variable "security_role_assignment_scope" {
+  description = "Scope for the optional security role assignment."
+  type        = string
+  default     = "project"
+}
+
+variable "security_role_assignment_role_name" {
+  description = "Role name for the optional security role assignment."
+  type        = string
+  default     = "Reader"
 }

@@ -17,6 +17,19 @@ func requireADOEnv(t testing.TB) {
 	}
 }
 
+func getExtensionVarsFromEnv() map[string]interface{} {
+	vars := map[string]interface{}{
+		"publisher_id": os.Getenv("AZDO_EXTENSION_PUBLISHER_ID"),
+		"extension_id": os.Getenv("AZDO_EXTENSION_ID"),
+	}
+
+	if version := os.Getenv("AZDO_EXTENSION_VERSION"); version != "" {
+		vars["version"] = version
+	}
+
+	return vars
+}
+
 func getExtensionsFromEnv() []map[string]interface{} {
 	extensions := []map[string]interface{}{}
 

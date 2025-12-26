@@ -2,9 +2,8 @@ variable "project_id" {
   type = string
 }
 
-variable "environment_name_prefix" {
-  type    = string
-  default = "ado-env"
+variable "environment_name" {
+  type = string
 }
 
 variable "kubernetes_api_url" {

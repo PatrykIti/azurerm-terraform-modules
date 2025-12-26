@@ -24,13 +24,9 @@ This document describes security considerations for managing Azure DevOps Market
 module "azuredevops_extension" {
   source = "./modules/azuredevops_extension"
 
-  extensions = [
-    {
-      publisher_id = "approved-publisher"
-      extension_id = "approved-extension"
-      version      = "1.2.3"
-    }
-  ]
+  publisher_id = "approved-publisher"
+  extension_id = "approved-extension"
+  version      = "1.2.3"
 }
 ```
 
@@ -55,5 +51,5 @@ module "azuredevops_extension" {
 ---
 
 **Module Version**: 1.0.0  
-**Last Updated**: 2025-12-24  
+**Last Updated**: 2025-12-25  
 **Security Contact**: security@yourorganization.com

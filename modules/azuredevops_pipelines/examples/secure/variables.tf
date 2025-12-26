@@ -3,16 +3,16 @@ variable "project_id" {
   type        = string
 }
 
-variable "repo_name_prefix" {
-  description = "Prefix for the repository name."
+variable "repo_name" {
+  description = "Name of the repository."
   type        = string
-  default     = "ado-secure-repo"
+  default     = "ado-pipelines-repo-secure-example"
 }
 
-variable "pipeline_name_prefix" {
-  description = "Prefix for the pipeline name."
+variable "pipeline_name" {
+  description = "Name of the pipeline."
   type        = string
-  default     = "ado-secure-pipeline"
+  default     = "ado-pipelines-secure-example"
 }
 
 variable "yaml_path" {
@@ -21,10 +21,10 @@ variable "yaml_path" {
   default     = "azure-pipelines.yml"
 }
 
-variable "service_endpoint_name_prefix" {
-  description = "Prefix for the service endpoint name."
+variable "service_endpoint_name" {
+  description = "Name of the service endpoint."
   type        = string
-  default     = "ado-secure-endpoint"
+  default     = "ado-pipelines-endpoint-secure-example"
 }
 
 variable "service_endpoint_url" {

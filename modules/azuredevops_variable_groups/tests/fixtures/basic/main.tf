@@ -4,18 +4,15 @@ module "azuredevops_variable_groups" {
   source = "../../"
 
   project_id = var.project_id
+  name       = "${var.group_name_prefix}-basic"
 
-  variable_groups = {
-    basic = {
-      name         = "${var.group_name_prefix}-basic"
-      description  = "Basic variable group"
-      allow_access = true
-      variables = [
-        {
-          name  = "environment"
-          value = "test"
-        }
-      ]
+  description  = "Basic variable group"
+  allow_access = true
+
+  variables = [
+    {
+      name  = "environment"
+      value = "test"
     }
-  }
+  ]
 }

@@ -31,9 +31,9 @@ func TestBasicAzuredevopsVariableGroups(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		variableGroupIDs := terraform.OutputMap(t, terraformOptions, "variable_group_ids")
+		variableGroupID := terraform.Output(t, terraformOptions, "variable_group_id")
 
-		assert.NotEmpty(t, variableGroupIDs)
+		assert.NotEmpty(t, variableGroupID)
 	})
 }
 
@@ -56,9 +56,9 @@ func TestCompleteAzuredevopsVariableGroups(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		variableGroupIDs := terraform.OutputMap(t, terraformOptions, "variable_group_ids")
+		variableGroupID := terraform.Output(t, terraformOptions, "variable_group_id")
 
-		assert.NotEmpty(t, variableGroupIDs)
+		assert.NotEmpty(t, variableGroupID)
 	})
 }
 
@@ -81,9 +81,9 @@ func TestSecureAzuredevopsVariableGroups(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		variableGroupIDs := terraform.OutputMap(t, terraformOptions, "variable_group_ids")
+		variableGroupID := terraform.Output(t, terraformOptions, "variable_group_id")
 
-		assert.NotEmpty(t, variableGroupIDs)
+		assert.NotEmpty(t, variableGroupID)
 	})
 }
 
@@ -100,7 +100,7 @@ func TestAzuredevopsVariableGroupsValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "cannot set both value and secret_value")
+	assert.Contains(t, err.Error(), "variables must set exactly one of value or secret_value")
 }
 
 // Helper function to get terraform options

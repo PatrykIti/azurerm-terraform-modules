@@ -3,16 +3,16 @@ variable "project_id" {
   type        = string
 }
 
-variable "repo_name_prefix" {
-  description = "Prefix for the repository name."
+variable "repo_name" {
+  description = "Name of the repository."
   type        = string
-  default     = "ado-pipeline-repo"
+  default     = "ado-pipelines-repo-basic-example"
 }
 
-variable "pipeline_name_prefix" {
-  description = "Prefix for the pipeline name."
+variable "pipeline_name" {
+  description = "Name of the pipeline."
   type        = string
-  default     = "ado-pipeline"
+  default     = "ado-pipelines-basic-example"
 }
 
 variable "yaml_path" {

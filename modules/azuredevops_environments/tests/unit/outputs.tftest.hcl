@@ -22,16 +22,12 @@ mock_provider "azuredevops" {
 
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
-
-  environments = {
-    dev = {
-      description = "Dev environment"
-    }
-  }
+  name        = "dev"
+  description = "Dev environment"
 
   kubernetes_resources = [
     {
-      environment_key     = "dev"
+      key                 = "dev-k8s"
       service_endpoint_id = "00000000-0000-0000-0000-000000000000"
       name                = "dev-k8s"
       namespace           = "default"
@@ -40,9 +36,9 @@ variables {
 
   check_approvals = [
     {
-      target_environment_key = "dev"
-      target_resource_type   = "environment"
-      approvers              = ["00000000-0000-0000-0000-000000000000"]
+      key                  = "approval-1"
+      target_resource_type = "environment"
+      approvers            = ["00000000-0000-0000-0000-000000000000"]
     }
   ]
 }
@@ -51,8 +47,8 @@ run "outputs_plan" {
   command = plan
 
   assert {
-    condition     = length(keys(output.environment_ids)) == 1
-    error_message = "environment_ids should include configured environments."
+    condition     = output.environment_id == "env-0001"
+    error_message = "environment_id should return the environment ID."
   }
 
   assert {

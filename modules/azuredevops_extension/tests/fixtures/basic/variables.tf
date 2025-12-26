@@ -1,8 +1,15 @@
-variable "extensions" {
-  description = "List of extensions to install."
-  type = list(object({
-    publisher_id = string
-    extension_id = string
-    version      = optional(string)
-  }))
+variable "publisher_id" {
+  description = "Publisher ID of the extension."
+  type        = string
+}
+
+variable "extension_id" {
+  description = "Extension ID from the Marketplace."
+  type        = string
+}
+
+variable "version" {
+  description = "Optional extension version to pin."
+  type        = string
+  default     = null
 }

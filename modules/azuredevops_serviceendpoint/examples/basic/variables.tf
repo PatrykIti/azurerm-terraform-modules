@@ -3,10 +3,10 @@ variable "project_id" {
   type        = string
 }
 
-variable "azurerm_endpoint_name_prefix" {
-  description = "Prefix for the AzureRM service endpoint name."
+variable "azurerm_endpoint_name" {
+  description = "AzureRM service endpoint name."
   type        = string
-  default     = "ado-azurerm"
+  default     = "ado-azurerm-basic"
 }
 
 variable "azurerm_spn_tenantid" {
@@ -35,10 +35,10 @@ variable "azurerm_subscription_name" {
   type        = string
 }
 
-variable "docker_endpoint_name_prefix" {
-  description = "Prefix for the Docker registry service endpoint name."
+variable "docker_endpoint_name" {
+  description = "Docker registry service endpoint name."
   type        = string
-  default     = "ado-docker"
+  default     = "ado-docker-basic"
 }
 
 variable "docker_registry" {

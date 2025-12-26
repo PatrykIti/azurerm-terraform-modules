@@ -25,23 +25,20 @@ variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 
   repositories = {
-    main = {
-      initialization = {
-        init_type = "Clean"
-      }
-    }
+    main = {}
   }
 
   branches = [
     {
+      key            = "main-branch"
       repository_key = "main"
       name           = "main"
-      ref_branch     = "refs/heads/master"
     }
   ]
 
   branch_policy_min_reviewers = [
     {
+      key            = "min-reviewers-main"
       reviewer_count = 1
       scope = [
         {
@@ -67,12 +64,12 @@ run "outputs_plan" {
   }
 
   assert {
-    condition     = length(keys(output.branch_ids)) == 1
-    error_message = "branch_ids should include configured branches."
+    condition     = contains(keys(output.branch_ids), "main-branch")
+    error_message = "branch_ids should be keyed by branch key."
   }
 
   assert {
-    condition     = length(keys(output.policy_ids.branch_min_reviewers)) == 1
-    error_message = "policy_ids should include configured branch policies."
+    condition     = contains(keys(output.policy_ids.branch_min_reviewers), "min-reviewers-main")
+    error_message = "policy_ids should be keyed by policy key."
   }
 }

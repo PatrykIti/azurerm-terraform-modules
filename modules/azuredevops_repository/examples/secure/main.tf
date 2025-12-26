@@ -1,13 +1,5 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 module "azuredevops_repository" {
   source = "../../"
 
@@ -15,7 +7,7 @@ module "azuredevops_repository" {
 
   repositories = {
     main = {
-      name = "${var.repo_name_prefix}-${random_string.suffix.result}"
+      name = "ado-repo-secure"
       initialization = {
         init_type = "Clean"
       }
@@ -24,6 +16,7 @@ module "azuredevops_repository" {
 
   branch_policy_min_reviewers = [
     {
+      key            = "min-reviewers-main"
       reviewer_count = var.reviewer_count
       scope = [
         {
@@ -36,6 +29,7 @@ module "azuredevops_repository" {
 
   branch_policy_status_check = [
     {
+      key          = "status-check-main"
       name         = var.status_check_name
       genre        = var.status_check_genre
       display_name = "Security Status Check"
@@ -50,12 +44,14 @@ module "azuredevops_repository" {
 
   repository_policy_check_credentials = [
     {
+      key             = "check-credentials-main"
       repository_keys = ["main"]
     }
   ]
 
   repository_policy_case_enforcement = [
     {
+      key                     = "case-enforcement-main"
       enforce_consistent_case = true
       repository_keys         = ["main"]
     }

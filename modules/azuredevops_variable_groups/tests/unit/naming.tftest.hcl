@@ -1,33 +1,30 @@
-# Test variable group naming defaults
+# Test variable group naming
 
 mock_provider "azuredevops" {}
 
 variables {
-  project_id = "00000000-0000-0000-0000-000000000000"
+  project_id  = "00000000-0000-0000-0000-000000000000"
+  name        = "core-group"
+  description = "Core variables"
 
-  variable_groups = {
-    core = {
-      allow_access = true
-      variables = [
-        {
-          name  = "key"
-          value = "value"
-        }
-      ]
+  variables = [
+    {
+      name  = "key"
+      value = "value"
     }
-  }
+  ]
 }
 
 run "variable_group_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_variable_group.variable_group) == 1
-    error_message = "variable_groups should create one variable group."
+    condition     = azuredevops_variable_group.variable_group.name == "core-group"
+    error_message = "Variable group name should match the input name."
   }
 
   assert {
-    condition     = azuredevops_variable_group.variable_group["core"].name == "core"
-    error_message = "Variable group name should default to the map key."
+    condition     = azuredevops_variable_group.variable_group.description == "Core variables"
+    error_message = "Variable group description should match the input description."
   }
 }

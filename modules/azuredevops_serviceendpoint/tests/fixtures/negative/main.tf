@@ -7,7 +7,7 @@ module "azuredevops_serviceendpoint" {
 
   serviceendpoint_permissions = [
     {
-      principal = ""
+      principal = "vssgp.invalid"
       permissions = {
         Use = "Allow"
       }

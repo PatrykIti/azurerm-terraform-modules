@@ -21,6 +21,7 @@ variables {
 
   serviceendpoint_generic = [
     {
+      key                   = "generic-key"
       service_endpoint_name = "generic-endpoint"
       server_url            = "https://example.endpoint.local"
       username              = "user"
@@ -30,6 +31,7 @@ variables {
 
   serviceendpoint_incomingwebhook = [
     {
+      key                   = "webhook-key"
       service_endpoint_name = "webhook-endpoint"
       webhook_name          = "example_webhook"
     }
@@ -40,12 +42,12 @@ run "outputs_plan" {
   command = plan
 
   assert {
-    condition     = length(keys(output.serviceendpoint_ids.generic)) == 1
-    error_message = "serviceendpoint_ids.generic should include configured endpoints."
+    condition     = contains(keys(output.serviceendpoint_ids.generic), "generic-key")
+    error_message = "serviceendpoint_ids.generic should include the stable key."
   }
 
   assert {
-    condition     = length(keys(output.serviceendpoint_ids.incomingwebhook)) == 1
-    error_message = "serviceendpoint_ids.incomingwebhook should include configured endpoints."
+    condition     = contains(keys(output.serviceendpoint_ids.incomingwebhook), "webhook-key")
+    error_message = "serviceendpoint_ids.incomingwebhook should include the stable key."
   }
 }

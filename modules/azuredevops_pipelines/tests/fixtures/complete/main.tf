@@ -1,16 +1,18 @@
-provider "azuredevops" {}
-
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
+terraform {
+  required_version = ">= 1.12.2"
+  required_providers {
+    azuredevops = {
+      source  = "microsoft/azuredevops"
+      version = "1.12.2"
+    }
+  }
 }
+
+provider "azuredevops" {}
 
 resource "azuredevops_git_repository" "example" {
   project_id = var.project_id
-  name       = "${var.repo_name_prefix}-${random_string.suffix.result}"
+  name       = "repo-ado-cmp-${var.random_suffix}"
 
   initialization {
     init_type = "Clean"
@@ -19,7 +21,7 @@ resource "azuredevops_git_repository" "example" {
 
 resource "azuredevops_serviceendpoint_generic" "example" {
   project_id            = var.project_id
-  service_endpoint_name = "${var.service_endpoint_name_prefix}-${random_string.suffix.result}"
+  service_endpoint_name = "se-ado-cmp-${var.random_suffix}"
   server_url            = var.service_endpoint_url
   username              = var.service_endpoint_username
   password              = var.service_endpoint_password
@@ -27,21 +29,22 @@ resource "azuredevops_serviceendpoint_generic" "example" {
 }
 
 module "azuredevops_pipelines" {
-  source = "../.."
+  source = "../../.."
 
   project_id = var.project_id
 
   build_folders = [
     {
-      path        = "\\Pipelines"
+      path        = "\\Pipelines-${var.random_suffix}"
       description = "Pipeline folder"
+      key         = "pipelines"
     }
   ]
 
   build_definitions = {
     app = {
-      name = "${var.pipeline_name_prefix}-app-${random_string.suffix.result}"
-      path = "\\Pipelines"
+      name = "pip-ado-cmp-app-${var.random_suffix}"
+      path = "\\Pipelines-${var.random_suffix}"
       repository = {
         repo_type = "TfsGit"
         repo_id   = azuredevops_git_repository.example.id
@@ -52,7 +55,7 @@ module "azuredevops_pipelines" {
       }
     }
     release = {
-      name = "${var.pipeline_name_prefix}-release-${random_string.suffix.result}"
+      name = "pip-ado-cmp-rel-${var.random_suffix}"
       repository = {
         repo_type = "TfsGit"
         repo_id   = azuredevops_git_repository.example.id

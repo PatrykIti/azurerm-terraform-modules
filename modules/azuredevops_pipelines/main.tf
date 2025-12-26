@@ -2,10 +2,53 @@
 
 locals {
   build_definition_ids = { for key, definition in azuredevops_build_definition.build_definition : key => definition.id }
+  build_folders_by_key = {
+    for folder in var.build_folders :
+    coalesce(folder.key, folder.path) => folder
+  }
+  build_definition_permissions_by_key = {
+    for permission in var.build_definition_permissions :
+    coalesce(
+      permission.key,
+      format(
+        "%s:%s",
+        coalesce(permission.build_definition_key, permission.build_definition_id, "missing"),
+        permission.principal
+      )
+    ) => permission
+  }
+  build_folder_permissions_by_key = {
+    for permission in var.build_folder_permissions :
+    coalesce(permission.key, format("%s:%s", permission.path, permission.principal)) => permission
+  }
+  pipeline_authorizations_by_key = {
+    for authorization in var.pipeline_authorizations :
+    coalesce(
+      authorization.key,
+      format(
+        "%s:%s:%s",
+        coalesce(authorization.pipeline_id, authorization.pipeline_key, "missing"),
+        lower(authorization.type),
+        authorization.resource_id
+      )
+    ) => authorization
+  }
+  resource_authorizations_by_key = {
+    for authorization in var.resource_authorizations :
+    coalesce(
+      authorization.key,
+      format(
+        "%s:%s:%s",
+        coalesce(authorization.definition_id, authorization.build_definition_key, "missing"),
+        lower(authorization.type),
+        authorization.resource_id
+      )
+    ) => authorization
+  }
 }
 
 resource "azuredevops_build_folder" "build_folder" {
-  for_each = { for index, folder in var.build_folders : index => folder }
+  for_each = local.build_folders_by_key
 
   project_id  = var.project_id
   path        = each.value.path
@@ -180,10 +223,21 @@ resource "azuredevops_build_definition" "build_definition" {
       }
     }
   }
+
+  lifecycle {
+    precondition {
+      condition = (
+        each.value.build_completion_trigger == null ||
+        each.value.build_completion_trigger.build_definition_key == null ||
+        contains(keys(var.build_definitions), each.value.build_completion_trigger.build_definition_key)
+      )
+      error_message = "build_completion_trigger.build_definition_key must reference a key in build_definitions."
+    }
+  }
 }
 
 resource "azuredevops_build_definition_permissions" "build_definition_permissions" {
-  for_each = { for index, permission in var.build_definition_permissions : index => permission }
+  for_each = local.build_definition_permissions_by_key
 
   project_id  = var.project_id
   principal   = each.value.principal
@@ -194,10 +248,20 @@ resource "azuredevops_build_definition_permissions" "build_definition_permission
     each.value.build_definition_id,
     try(local.build_definition_ids[each.value.build_definition_key], null)
   )
+
+  lifecycle {
+    precondition {
+      condition = (
+        each.value.build_definition_key == null ||
+        contains(keys(var.build_definitions), each.value.build_definition_key)
+      )
+      error_message = "build_definition_permissions.build_definition_key must reference a key in build_definitions."
+    }
+  }
 }
 
 resource "azuredevops_build_folder_permissions" "build_folder_permissions" {
-  for_each = { for index, permission in var.build_folder_permissions : index => permission }
+  for_each = local.build_folder_permissions_by_key
 
   project_id  = var.project_id
   path        = each.value.path
@@ -207,22 +271,42 @@ resource "azuredevops_build_folder_permissions" "build_folder_permissions" {
 }
 
 resource "azuredevops_pipeline_authorization" "pipeline_authorization" {
-  for_each = { for index, authorization in var.pipeline_authorizations : index => authorization }
+  for_each = local.pipeline_authorizations_by_key
 
   project_id          = var.project_id
   resource_id         = each.value.resource_id
-  type                = each.value.type
+  type                = lower(each.value.type)
   pipeline_project_id = each.value.pipeline_project_id
-  pipeline_id         = each.value.pipeline_id != null ? each.value.pipeline_id : try(local.build_definition_ids[each.value.pipeline_key], null)
+  pipeline_id         = coalesce(each.value.pipeline_id, try(local.build_definition_ids[each.value.pipeline_key], null))
+
+  lifecycle {
+    precondition {
+      condition = (
+        each.value.pipeline_key == null ||
+        contains(keys(var.build_definitions), each.value.pipeline_key)
+      )
+      error_message = "pipeline_authorizations.pipeline_key must reference a key in build_definitions."
+    }
+  }
 }
 
 resource "azuredevops_resource_authorization" "resource_authorization" {
-  for_each = { for index, authorization in var.resource_authorizations : index => authorization }
+  for_each = local.resource_authorizations_by_key
 
   project_id  = var.project_id
   resource_id = each.value.resource_id
   authorized  = each.value.authorized
-  type        = each.value.type
+  type        = lower(each.value.type)
 
-  definition_id = each.value.definition_id != null ? each.value.definition_id : try(local.build_definition_ids[each.value.build_definition_key], null)
+  definition_id = coalesce(each.value.definition_id, try(local.build_definition_ids[each.value.build_definition_key], null))
+
+  lifecycle {
+    precondition {
+      condition = (
+        each.value.build_definition_key == null ||
+        contains(keys(var.build_definitions), each.value.build_definition_key)
+      )
+      error_message = "resource_authorizations.build_definition_key must reference a key in build_definitions."
+    }
+  }
 }

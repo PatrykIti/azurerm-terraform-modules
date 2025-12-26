@@ -6,6 +6,7 @@ This directory contains additional documentation for the Azure DevOps Variable G
 
 ## Contents
 
+- [IMPORT.md](IMPORT.md) - Import instructions for existing variable groups and permissions
 - Architecture diagrams (coming soon)
 - Best practices guide (coming soon)
 - Troubleshooting guide (coming soon)

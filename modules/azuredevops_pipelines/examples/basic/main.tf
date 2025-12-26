@@ -1,16 +1,8 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 resource "azuredevops_git_repository" "example" {
   project_id = var.project_id
-  name       = "${var.repo_name_prefix}-${random_string.suffix.result}"
+  name       = var.repo_name
 
   initialization {
     init_type = "Clean"
@@ -24,7 +16,7 @@ module "azuredevops_pipelines" {
 
   build_definitions = {
     basic = {
-      name = "${var.pipeline_name_prefix}-${random_string.suffix.result}"
+      name = var.pipeline_name
       repository = {
         repo_type = "TfsGit"
         repo_id   = azuredevops_git_repository.example.id

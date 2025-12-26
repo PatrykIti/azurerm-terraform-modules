@@ -1,9 +1,9 @@
-output "variable_group_ids" {
-  description = "Map of variable group IDs keyed by variable group key."
-  value       = { for key, group in azuredevops_variable_group.variable_group : key => group.id }
+output "variable_group_id" {
+  description = "ID of the variable group created by the module."
+  value       = try(azuredevops_variable_group.variable_group.id, null)
 }
 
-output "variable_group_names" {
-  description = "Map of variable group names keyed by variable group key."
-  value       = { for key, group in azuredevops_variable_group.variable_group : key => group.name }
+output "variable_group_name" {
+  description = "Name of the variable group created by the module."
+  value       = try(azuredevops_variable_group.variable_group.name, null)
 }

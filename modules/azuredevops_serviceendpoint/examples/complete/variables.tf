@@ -3,10 +3,10 @@ variable "project_id" {
   type        = string
 }
 
-variable "github_endpoint_name_prefix" {
-  description = "Prefix for the GitHub service endpoint name."
+variable "github_endpoint_name" {
+  description = "GitHub service endpoint name."
   type        = string
-  default     = "ado-github"
+  default     = "ado-github-complete"
 }
 
 variable "github_personal_access_token" {
@@ -15,10 +15,10 @@ variable "github_personal_access_token" {
   sensitive   = true
 }
 
-variable "aws_endpoint_name_prefix" {
-  description = "Prefix for the AWS service endpoint name."
+variable "aws_endpoint_name" {
+  description = "AWS service endpoint name."
   type        = string
-  default     = "ado-aws"
+  default     = "ado-aws-complete"
 }
 
 variable "aws_access_key_id" {
@@ -32,10 +32,10 @@ variable "aws_secret_access_key" {
   sensitive   = true
 }
 
-variable "kubernetes_endpoint_name_prefix" {
-  description = "Prefix for the Kubernetes service endpoint name."
+variable "kubernetes_endpoint_name" {
+  description = "Kubernetes service endpoint name."
   type        = string
-  default     = "ado-k8s"
+  default     = "ado-k8s-complete"
 }
 
 variable "kubernetes_api_url" {

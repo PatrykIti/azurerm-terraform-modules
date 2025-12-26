@@ -12,6 +12,7 @@ module "azuredevops_servicehooks" {
 
   webhooks = [
     {
+      key = "secure-work-item"
       url = var.webhook_url
       work_item_updated = {
         work_item_type = "Bug"
@@ -21,12 +22,13 @@ module "azuredevops_servicehooks" {
 
   servicehook_permissions = [
     {
+      key       = "readers-permissions"
       principal = data.azuredevops_group.readers.id
       permissions = {
-        ViewSubscriptions   = "allow"
-        EditSubscriptions   = "deny"
-        DeleteSubscriptions = "deny"
-        PublishEvents       = "deny"
+        ViewSubscriptions   = "Allow"
+        EditSubscriptions   = "Deny"
+        DeleteSubscriptions = "Deny"
+        PublishEvents       = "Deny"
       }
     }
   ]

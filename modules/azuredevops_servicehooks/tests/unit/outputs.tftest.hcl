@@ -12,6 +12,12 @@ mock_provider "azuredevops" {
       id = "hook-0002"
     }
   }
+
+  mock_resource "azuredevops_servicehook_permissions" {
+    defaults = {
+      id = "perm-0001"
+    }
+  }
 }
 
 variables {
@@ -19,6 +25,7 @@ variables {
 
   webhooks = [
     {
+      key      = "webhook-main"
       url      = "https://example.com/webhook"
       git_push = {}
     }
@@ -26,10 +33,21 @@ variables {
 
   storage_queue_hooks = [
     {
+      key                     = "queue-main"
       account_name            = "account"
       account_key             = "key"
       queue_name              = "queue"
       run_state_changed_event = {}
+    }
+  ]
+
+  servicehook_permissions = [
+    {
+      key       = "perm-main"
+      principal = "descriptor"
+      permissions = {
+        ViewSubscriptions = "Allow"
+      }
     }
   ]
 }
@@ -38,12 +56,27 @@ run "outputs_plan" {
   command = plan
 
   assert {
-    condition     = length(keys(output.servicehook_ids.webhook_tfs)) == 1
-    error_message = "servicehook_ids.webhook_tfs should include configured webhooks."
+    condition     = output.servicehook_ids.webhook_tfs["webhook-main"] == "hook-0001"
+    error_message = "servicehook_ids.webhook_tfs should use stable webhook keys."
   }
 
   assert {
-    condition     = length(keys(output.servicehook_ids.storage_queue_pipelines)) == 1
-    error_message = "servicehook_ids.storage_queue_pipelines should include configured storage queue hooks."
+    condition     = output.servicehook_ids.storage_queue_pipelines["queue-main"] == "hook-0002"
+    error_message = "servicehook_ids.storage_queue_pipelines should use stable storage queue keys."
+  }
+
+  assert {
+    condition     = output.webhook_ids["webhook-main"] == "hook-0001"
+    error_message = "webhook_ids should include the webhook keyed by webhook key."
+  }
+
+  assert {
+    condition     = output.storage_queue_hook_ids["queue-main"] == "hook-0002"
+    error_message = "storage_queue_hook_ids should include the queue hook keyed by hook key."
+  }
+
+  assert {
+    condition     = output.servicehook_permission_ids["perm-main"] == "perm-0001"
+    error_message = "servicehook_permission_ids should include the permission keyed by permission key."
   }
 }

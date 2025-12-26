@@ -18,6 +18,7 @@ variables {
 
   securityrole_assignments = [
     {
+      key                = "operators-reader"
       scope              = "project"
       resource_id        = "11111111-1111-1111-1111-111111111111"
       role_name          = "Reader"
@@ -32,5 +33,10 @@ run "security_role_assignment_plan" {
   assert {
     condition     = length(azuredevops_securityrole_assignment.securityrole_assignment) == 1
     error_message = "securityrole_assignments should create a role assignment."
+  }
+
+  assert {
+    condition     = can(azuredevops_securityrole_assignment.securityrole_assignment["operators-reader"])
+    error_message = "securityrole_assignments should be keyed by assignment key."
   }
 }

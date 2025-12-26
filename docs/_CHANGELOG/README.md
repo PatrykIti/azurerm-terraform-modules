@@ -6,6 +6,17 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [036](./036-2025-12-26-ado-serviceendpoint-refactor.md) | 2025-12-26 | Azure DevOps Service Endpoint module – refactor & alignment | Breaking Change / Maintenance |
+| [035](./035-2025-12-26-azuredevops-servicehooks-refactor.md) | 2025-12-26 | Azure DevOps Service Hooks module – refactor & alignment | Breaking Change / Maintenance |
+| [034](./034-2025-12-26-azuredevops-repository-refactor.md) | 2025-12-26 | Azure DevOps Repository module – refactor & alignment | Breaking Change / Maintenance |
+| [033](./033-2025-12-26-azuredevops-pipelines-refactor.md) | 2025-12-26 | Azure DevOps Pipelines module – refactor & alignment | Breaking Change / Maintenance |
+| [032](./032-2025-12-26-ado-work-items-refactor.md) | 2025-12-26 | Azure DevOps Work Items module – refactor & alignment | Breaking Change / Maintenance |
+| [031](./031-2025-12-26-azuredevops-environments-refactor.md) | 2025-12-26 | Azure DevOps Environments module – refactor & alignment | Breaking Change / Maintenance |
+| [030](./030-2025-12-26-azuredevops-team-refactor.md) | 2025-12-26 | Azure DevOps Team module – refactor & alignment | Breaking Change / Maintenance |
+| [029](./029-2025-12-25-azuredevops-variable-groups-refactor.md) | 2025-12-25 | Azure DevOps Variable Groups module – refactor & alignment | Breaking Change / Maintenance |
+| [028](./028-2025-12-26-azuredevops-identity-refactor.md) | 2025-12-26 | Azure DevOps Identity module refactor | Breaking Change / Maintenance |
+| [027](./027-2025-12-25-azuredevops-extension-refactor.md) | 2025-12-25 | Azure DevOps Extension module – refactor & alignment | Breaking Change / Maintenance |
+| [026](./026-2025-12-25-azuredevops-artifacts-feed-refactor.md) | 2025-12-25 | Azure DevOps Artifacts Feed module – refactor & alignment | Breaking Change / Maintenance |
 | [025](./025-2025-12-25-azuredevops-agent-pools-refactor.md) | 2025-12-25 | Azure DevOps Agent Pools module – refactor & alignment | Breaking Change / Maintenance |
 | [024](./024-2025-12-25-storage-account-module-alignment.md) | 2025-12-25 | Storage Account module – alignment (docs + diagnostics) | Feature / Maintenance |
 | [023](./023-2025-12-25-azuredevops-project-permissions-alignment.md) | 2025-12-25 | Azure DevOps Project Permissions module – alignment & verification | Maintenance / Verification |

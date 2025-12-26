@@ -3,12 +3,6 @@ variable "project_id" {
   type        = string
 }
 
-variable "repo_name_prefix" {
-  description = "Prefix for the repository name."
-  type        = string
-  default     = "ado-repo-secure"
-}
-
 variable "reviewer_count" {
   description = "Minimum number of reviewers required."
   type        = number

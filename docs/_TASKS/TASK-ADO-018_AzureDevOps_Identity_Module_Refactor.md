@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-002
-**Status:** 🟡 **To Do**
+**Status:** ✅ **Done** (2025-12-26)
 
 ---
 
@@ -164,9 +164,9 @@ Update tests per TESTING_GUIDE:
 
 ## Implementation Checklist
 
-- [ ] Update `variables.tf`: add `key` fields, add group reference validations, add default mode.
-- [ ] Update `main.tf`: add locals for key normalization, use stable `for_each` keys.
-- [ ] Update `outputs.tf`: stable key maps, add `securityrole_assignment_ids`.
-- [ ] Add `docs/IMPORT.md` and update module README/examples.
-- [ ] Update tests (fixtures, unit, terratest, test_config).
-- [ ] Run docs generation and update README.
+- [x] Update `variables.tf`: add `key` fields, add group reference validations, add default mode.
+- [x] Update `main.tf`: add locals for key normalization, use stable `for_each` keys.
+- [x] Update `outputs.tf`: stable key maps, add `securityrole_assignment_ids`.
+- [x] Add `docs/IMPORT.md` and update module README/examples.
+- [x] Update tests (fixtures, unit, terratest, test_config).
+- [x] Run docs generation and update README.

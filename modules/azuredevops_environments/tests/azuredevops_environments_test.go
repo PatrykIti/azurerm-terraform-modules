@@ -31,9 +31,9 @@ func TestBasicAzuredevopsEnvironments(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		environmentIDs := terraform.OutputMap(t, terraformOptions, "environment_ids")
+		environmentID := terraform.Output(t, terraformOptions, "environment_id")
 
-		assert.NotEmpty(t, environmentIDs)
+		assert.NotEmpty(t, environmentID)
 	})
 }
 
@@ -56,10 +56,10 @@ func TestCompleteAzuredevopsEnvironments(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		environmentIDs := terraform.OutputMap(t, terraformOptions, "environment_ids")
+		environmentID := terraform.Output(t, terraformOptions, "environment_id")
 		kubernetesResourceIDs := terraform.OutputMap(t, terraformOptions, "kubernetes_resource_ids")
 
-		assert.NotEmpty(t, environmentIDs)
+		assert.NotEmpty(t, environmentID)
 		assert.NotEmpty(t, kubernetesResourceIDs)
 	})
 }
@@ -83,9 +83,9 @@ func TestSecureAzuredevopsEnvironments(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		environmentIDs := terraform.OutputMap(t, terraformOptions, "environment_ids")
+		environmentID := terraform.Output(t, terraformOptions, "environment_id")
 
-		assert.NotEmpty(t, environmentIDs)
+		assert.NotEmpty(t, environmentID)
 	})
 }
 
@@ -102,7 +102,7 @@ func TestAzuredevopsEnvironmentsValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "target_resource_id or target_environment_key")
+	assert.Contains(t, err.Error(), "check_approvals.target_resource_type must be one of")
 }
 
 // Helper function to get terraform options
@@ -114,8 +114,8 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
-			"project_id":             getProjectID(t),
-			"environment_name_prefix": fmt.Sprintf("ado-env-%s", uniqueID),
+			"project_id":       getProjectID(t),
+			"environment_name": fmt.Sprintf("ado-env-%s", uniqueID),
 		},
 		NoColor: true,
 		RetryableTerraformErrors: map[string]string{

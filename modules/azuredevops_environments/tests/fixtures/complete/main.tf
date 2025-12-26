@@ -1,20 +1,12 @@
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 data "azuredevops_group" "project_collection_admins" {
   name = "Project Collection Administrators"
 }
 
 resource "azuredevops_serviceendpoint_kubernetes" "example" {
   project_id            = var.project_id
-  service_endpoint_name = "${var.environment_name_prefix}-k8s-${random_string.suffix.result}"
+  service_endpoint_name = "${var.environment_name}-k8s"
   apiserver_url         = var.kubernetes_api_url
   authorization_type    = "Kubeconfig"
 
@@ -49,31 +41,25 @@ EOT
 module "azuredevops_environments" {
   source = "../.."
 
-  project_id = var.project_id
-
-  environments = {
-    complete = {
-      name        = "${var.environment_name_prefix}-${random_string.suffix.result}"
-      description = "Complete environment"
-    }
-  }
+  project_id  = var.project_id
+  name        = var.environment_name
+  description = "Complete fixture environment"
 
   kubernetes_resources = [
     {
-      environment_key     = "complete"
-      service_endpoint_id = azuredevops_serviceendpoint_kubernetes.example.id
-      name                = "${var.environment_name_prefix}-k8s-${random_string.suffix.result}"
+      name                = "${var.environment_name}-k8s"
       namespace           = "default"
+      service_endpoint_id = azuredevops_serviceendpoint_kubernetes.example.id
       cluster_name        = "example-aks"
     }
   ]
 
   check_approvals = [
     {
-      target_environment_key = "complete"
-      target_resource_type   = "environment"
-      approvers              = [data.azuredevops_group.project_collection_admins.id]
-      requester_can_approve  = false
+      key                  = "integration-approval"
+      target_resource_type = "environment"
+      approvers            = [data.azuredevops_group.project_collection_admins.id]
+      requester_can_approve = false
     }
   ]
 }

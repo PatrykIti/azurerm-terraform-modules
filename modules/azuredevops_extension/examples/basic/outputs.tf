@@ -1,4 +1,4 @@
-output "extension_ids" {
-  description = "Map of extension IDs keyed by publisher/extension."
-  value       = module.azuredevops_extension.extension_ids
+output "extension_id" {
+  description = "ID of the installed Azure DevOps extension."
+  value       = module.azuredevops_extension.extension_id
 }
