@@ -1,3 +1,13 @@
+terraform {
+  required_version = ">= 1.12.2"
+  required_providers {
+    azuredevops = {
+      source  = "microsoft/azuredevops"
+      version = "1.12.2"
+    }
+  }
+}
+
 provider "azuredevops" {}
 
 provider "random" {}
@@ -13,7 +23,7 @@ resource "azuredevops_agent_pool" "external" {
 }
 
 module "azuredevops_agent_pools" {
-  source = "../../"
+  source = "../../../"
 
   name = "${var.pool_name_prefix}-module-${random_string.suffix.result}"
 
