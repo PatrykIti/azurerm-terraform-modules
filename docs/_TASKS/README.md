@@ -3,7 +3,7 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 1 task
+- **To Do:** 4 tasks
 - **In Progress:** 0
 - **Done:** 23 tasks
 
@@ -14,6 +14,9 @@ Task board for module work. Update statuses in markdown files.
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
+| [TASK-ADO-016](./TASK-ADO-016_AzureDevOps_Identity_Module_Refactor.md) | **Azure DevOps Identity module refactor** | High | Medium | `modules/azuredevops_identity/` |
+| [TASK-ADO-017](./TASK-ADO-017_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | `modules/azuredevops_artifacts_feed/` |
+| [TASK-ADO-018](./TASK-ADO-018_AzureDevOps_Extension_Module_Refactor.md) | **Azure DevOps Extension module refactor** | Medium | Small | `modules/azuredevops_extension/` |
 
 ---
 

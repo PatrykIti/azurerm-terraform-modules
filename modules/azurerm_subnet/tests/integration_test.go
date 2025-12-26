@@ -277,6 +277,7 @@ func TestSubnetValidationIntegration(t *testing.T) {
 			terraformOptions := &terraform.Options{
 				TerraformDir: testFolder,
 				NoColor:      true,
+				Upgrade:      true,
 			}
 
 			// Attempt to plan/apply - should fail for negative tests

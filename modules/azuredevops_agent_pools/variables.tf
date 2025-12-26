@@ -45,6 +45,7 @@ variable "agent_queues" {
     - When name is provided, agent_pool_id must be null (queue resolved by name).
     - When agent_pool_id is provided, name must be null (queue name derived from the pool).
     - When both are null, the module uses the created agent pool ID.
+    - When auto_provision is true, do not omit both name and agent_pool_id.
   EOT
   type = list(object({
     key           = optional(string)
@@ -98,6 +99,16 @@ variable "agent_queues" {
       )
     ])) == length(var.agent_queues)
     error_message = "agent_queues keys must be unique; set key when name/agent_pool_id/project_id would collide."
+  }
+
+  validation {
+    condition = !var.auto_provision || alltrue([
+      for agent_queue in var.agent_queues : !(
+        agent_queue.agent_pool_id == null &&
+        (agent_queue.name == null || trimspace(agent_queue.name) == trimspace(var.name))
+      )
+    ])
+    error_message = "When auto_provision is true, agent_queues must set name or agent_pool_id and cannot target the module pool name."
   }
 }
 

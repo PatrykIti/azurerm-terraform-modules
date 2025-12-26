@@ -202,6 +202,7 @@ func TestSubnetValidationRules(t *testing.T) {
 			terraformOptions := &terraform.Options{
 				TerraformDir: testFolder,
 				NoColor:      true,
+				Upgrade:      true,
 			}
 
 			// Initialize terraform

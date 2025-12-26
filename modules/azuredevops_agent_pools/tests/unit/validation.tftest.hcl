@@ -72,6 +72,24 @@ run "duplicate_queue_keys" {
   ]
 }
 
+run "invalid_auto_provision_queue" {
+  command = plan
+
+  variables {
+    auto_provision = true
+
+    agent_queues = [
+      {
+        project_id = "00000000-0000-0000-0000-000000000000"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.agent_queues,
+  ]
+}
+
 run "invalid_elastic_pool_capacity" {
   command = plan
 

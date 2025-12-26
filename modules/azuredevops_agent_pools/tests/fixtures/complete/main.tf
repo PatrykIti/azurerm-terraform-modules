@@ -26,7 +26,7 @@ module "azuredevops_agent_pools" {
   source = "../../../"
 
   name           = "${var.pool_name_prefix}-default-${random_string.suffix.result}"
-  auto_provision = true
+  auto_provision = false
   auto_update    = true
 
   agent_queues = [
