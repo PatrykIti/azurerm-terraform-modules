@@ -41,7 +41,6 @@ azurerm-terraform-modules/
 ├── .github/                    # GitHub Actions workflows
 │   ├── workflows/              # CI/CD pipelines
 │   └── actions/               # Reusable composite actions
-└── .taskmaster/               # TaskMaster configuration
 ```
 Modules use provider prefixes: `azurerm_` for AzureRM and `azuredevops_` for Azure DevOps.
 
@@ -148,7 +147,6 @@ The repository uses a sophisticated GitHub Actions architecture:
 - **Security-first module design**
 
 ### 4. Agile/Scrum Elements
-- **TaskMaster integration for sprint planning**
 - **Iterative module development**
 - **Continuous improvement**
 - **Regular releases**

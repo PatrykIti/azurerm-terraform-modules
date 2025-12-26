@@ -3,7 +3,7 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 4 tasks
+- **To Do:** 5 tasks
 - **In Progress:** 0
 - **Done:** 23 tasks
 
@@ -17,6 +17,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-018](./TASK-ADO-018_AzureDevOps_Identity_Module_Refactor.md) | **Azure DevOps Identity module refactor** | High | Medium | `modules/azuredevops_identity/` |
 | [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | `modules/azuredevops_artifacts_feed/` |
 | [TASK-ADO-020](./TASK-ADO-020_AzureDevOps_Extension_Module_Refactor.md) | **Azure DevOps Extension module refactor** | Medium | Small | `modules/azuredevops_extension/` |
+| [TASK-ADO-021](./TASK-ADO-021_AzureDevOps_Pipelines_Module_Refactor.md) | **Azure DevOps Pipelines module refactor** | High | Medium | `modules/azuredevops_pipelines/` |
 
 ---
 
