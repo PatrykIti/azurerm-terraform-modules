@@ -253,6 +253,7 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 			"location":      "northeurope",
 		},
 		NoColor: true,
+		Upgrade: true,
 		// Retry configuration
 		RetryableTerraformErrors: map[string]string{
 			".*timeout.*":               "Timeout error - retrying",

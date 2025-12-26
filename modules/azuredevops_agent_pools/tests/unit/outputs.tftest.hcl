@@ -3,7 +3,7 @@
 mock_provider "azuredevops" {
   mock_resource "azuredevops_agent_pool" {
     defaults = {
-      id = "00000000-0000-0000-0000-000000000000"
+      id = "1"
     }
   }
 
@@ -45,11 +45,11 @@ variables {
   }
 }
 
-run "outputs_plan" {
-  command = plan
+run "outputs_apply" {
+  command = apply
 
   assert {
-    condition     = output.agent_pool_id == "00000000-0000-0000-0000-000000000000"
+    condition     = output.agent_pool_id == "1"
     error_message = "agent_pool_id should match the mock ID."
   }
 

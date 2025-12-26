@@ -1,9 +1,19 @@
 # Makefile for Terratest execution
+SHELL := /bin/bash
 
 # Variables
 TIMEOUT ?= 30m
 TEST_FILTER ?= Test
 PARALLEL ?= 8
+LOG_DIR ?= test_outputs
+LOG_TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)
+TF_CLI_ARGS_init ?= -upgrade
+
+define run_with_log
+	@mkdir -p $(LOG_DIR)
+	@echo "Saving test output to $(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"
+	@bash -c 'set -o pipefail; TF_CLI_ARGS_init="$(TF_CLI_ARGS_init)" $(2) 2>&1 | tee "$(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"'
+endef
 
 # Environment check
 check-env:
@@ -22,60 +32,62 @@ deps:
 # Run all tests
 test: check-env deps
 	@echo "Running all tests..."
-	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...
+	$(call run_with_log,all,go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...)
 
 # Run specific test
 test-single: check-env deps
 	@echo "Running test: $(TEST_NAME)"
-	go test -v -timeout $(TIMEOUT) -run $(TEST_NAME) ./...
+	$(call run_with_log,single,go test -v -timeout $(TIMEOUT) -run $(TEST_NAME) ./...)
 
 # Run basic tests only
 test-basic: check-env deps
 	@echo "Running basic tests..."
-	go test -v -timeout 15m -run TestBasicAzuredevopsAgentPools ./...
+	$(call run_with_log,basic,go test -v -timeout 15m -run TestBasicAzuredevopsAgentPools ./...)
 
 # Run complete tests
 test-complete: check-env deps
 	@echo "Running complete tests..."
-	go test -v -timeout 30m -run TestCompleteAzuredevopsAgentPools ./...
+	$(call run_with_log,complete,go test -v -timeout 30m -run TestCompleteAzuredevopsAgentPools ./...)
 
 # Run security tests
 test-secure: check-env deps
 	@echo "Running security tests..."
-	go test -v -timeout 30m -run TestSecureAzuredevopsAgentPools ./...
+	$(call run_with_log,secure,go test -v -timeout 30m -run TestSecureAzuredevopsAgentPools ./...)
 
 # Run validation tests
 test-validation: check-env deps
 	@echo "Running validation tests..."
-	go test -v -timeout 10m -run TestAzuredevopsAgentPoolsValidationRules ./...
+	$(call run_with_log,validation,go test -v -timeout 10m -run TestAzuredevopsAgentPoolsValidationRules ./...)
 
 # Run integration tests
 test-integration: check-env deps
 	@echo "Running integration tests..."
-	go test -v -timeout 45m -run TestAzuredevopsAgentPoolsFullIntegration ./...
+	$(call run_with_log,integration,go test -v -timeout 45m -run TestAzuredevopsAgentPoolsFullIntegration ./...)
 
 # Run benchmarks
 benchmark: check-env deps
 	@echo "Running benchmarks..."
-	go test -v -run=^$$ -bench=. -benchtime=1x ./...
+	$(call run_with_log,bench,go test -v -run=^$$ -bench=. -benchtime=1x ./...)
 
 # Run tests with coverage
 test-coverage: check-env deps
 	@echo "Running tests with coverage..."
-	go test -v -timeout $(TIMEOUT) -coverprofile=coverage.out -covermode=atomic ./...
+	$(call run_with_log,coverage,go test -v -timeout $(TIMEOUT) -coverprofile=coverage.out -covermode=atomic ./...)
 	go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report generated: coverage.html"
 
 # Run tests with race detection
 test-race: check-env deps
 	@echo "Running tests with race detection..."
-	go test -v -timeout $(TIMEOUT) -race ./...
+	$(call run_with_log,race,go test -v -timeout $(TIMEOUT) -race ./...)
 
 # Generate JUnit report
 test-junit: check-env deps
 	@echo "Running tests with JUnit output..."
 	go install github.com/jstemmer/go-junit-report/v2@latest
-	go test -v -timeout $(TIMEOUT) ./... 2>&1 | go-junit-report -set-exit-code > test-results.xml
+	@mkdir -p $(LOG_DIR)
+	@echo "Saving test output to $(LOG_DIR)/junit_$(LOG_TIMESTAMP).log"
+	@bash -c 'set -o pipefail; TF_CLI_ARGS_init="$(TF_CLI_ARGS_init)" go test -v -timeout $(TIMEOUT) ./... 2>&1 | tee "$(LOG_DIR)/junit_$(LOG_TIMESTAMP).log" | go-junit-report -set-exit-code > test-results.xml'
 
 # Clean test artifacts
 clean:
