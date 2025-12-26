@@ -1,48 +1,94 @@
-# Azure Subnet Module Tests
+# Subnet Module Tests
 
-This directory contains test files for the Azure Subnet module.
+This directory contains automated tests for the Subnet Terraform module using native Terraform tests and [Terratest](https://terratest.gruntwork.io/).
+
+## Prerequisites
+
+1. **Go**: Version 1.21 or later
+2. **Terraform**: Version 1.12.2 or later
+3. **Azure CLI**: Authenticated with appropriate permissions
+4. **Azure Service Principal**: Contributor access to the test subscription
+
+## Environment Variables
+
+Set the following environment variables before running Terratest:
+
+```bash
+export ARM_SUBSCRIPTION_ID="your-subscription-id"
+export ARM_TENANT_ID="your-tenant-id"
+export ARM_CLIENT_ID="your-client-id"
+export ARM_CLIENT_SECRET="your-client-secret"
+export ARM_LOCATION="West Europe" # Optional, defaults to West Europe
+```
+
+## Running Tests
+
+### Native Terraform Unit Tests
+
+Run from the module root:
+
+```bash
+terraform test -test-directory=tests/unit
+```
+
+### Terratest (Go)
+
+```bash
+cd tests
+make test
+```
+
+Useful targets:
+
+```bash
+make test-basic
+make test-complete
+make test-secure
+make test-network
+make test-private-endpoint
+make test-validation
+make test-integration
+make test-single TEST_NAME=TestSubnetSecurity
+```
 
 ## Test Structure
 
-### Native Terraform Tests
+### Test Files
 
-The module uses native Terraform test framework (`.tftest.hcl` files) for unit testing. Due to Terraform 1.11.x limitations, test files are located at the module root directory rather than in subdirectories.
+- `subnet_test.go` - Core module tests
+- `integration_test.go` - Cross-feature integration tests
+- `performance_test.go` - Performance and benchmark tests
+- `test_helpers.go` - Shared helpers and utilities
+- `test_config.yaml` - Test configuration
 
-Test files at module root:
-- `basic.tftest.hcl` - Basic subnet creation and default values
-- `associations.tftest.hcl` - NSG and Route Table associations
-- `network_policies.tftest.hcl` - Private endpoint and private link service policies
-- `service_endpoints.tftest.hcl` - Service endpoints, policies, and delegations
-- `validation.tftest.hcl` - Input validation tests
+### Fixtures
 
-### Running Tests
+The `fixtures/` directory contains Terraform configurations for test scenarios:
 
-From the module directory:
+- `fixtures/basic/` - Basic module configuration
+- `fixtures/complete/` - Feature-complete configuration
+- `fixtures/secure/` - Security-focused configuration
+- `fixtures/network/` - Network integration tests
+- `fixtures/private_endpoint/` - Private endpoint scenario
+- `fixtures/negative/` - Negative validation cases
+
+## Test Output Logs
+
+For structured logs, use the helper scripts:
 
 ```bash
-# Initialize the module
-terraform init
-
-# Run all tests
-terraform test
-
-# Run a specific test file
-terraform test -filter=basic.tftest.hcl
+./run_tests_parallel.sh
+./run_tests_sequential.sh
 ```
 
-### Test Coverage
+Logs and summaries are written under `test_outputs/`.
 
-The tests cover:
-1. **Basic functionality** - Subnet creation with required parameters
-2. **Default values** - Verification of secure defaults
-3. **Associations** - NSG and Route Table association logic
-4. **Network policies** - Private endpoint and private link service policies
-5. **Service endpoints** - Endpoint configuration and policies
-6. **Delegations** - Subnet delegation to Azure services
-7. **Input validation** - Parameter validation rules
-8. **Outputs** - All module outputs
+## Cleanup
 
-### Integration Tests
+```bash
+make clean
+```
 
-Integration tests using Terratest are planned for future implementation in the `integration/` directory.
-EOF < /dev/null
+## CI Notes
+
+The `make test-junit` target generates a JUnit XML report (`test-results.xml`) for CI usage.

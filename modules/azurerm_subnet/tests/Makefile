@@ -42,10 +42,12 @@ test-complete: check-env deps
 	go test -v -timeout 30m -run TestCompleteSubnet ./...
 
 # Run security tests
-test-security: check-env deps
+test-secure: check-env deps
 	@echo "Running security tests..."
 	go test -v -timeout 30m -run TestSubnetSecurity ./...
 	go test -v -timeout 30m -run TestSubnetSecurityConfiguration ./...
+
+test-security: test-secure
 
 # Run network tests
 test-network: check-env deps

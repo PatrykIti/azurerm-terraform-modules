@@ -161,7 +161,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_address_prefixes"></a> [address\_prefixes](#input\_address\_prefixes) | The address prefixes to use for the subnet. This is a list of IPv4 or IPv6 address ranges. | `list(string)` | n/a | yes |
-| <a name="input_associations"></a> [associations](#input\_associations) | List of parameters to associate other resources to Subnet:<br/>  nat\_gateway\_id - ID of NAT gateway to associate with<br/>  network\_security\_group\_id - D of network security group to associate with<br/>  route\_table\_id - ID of route table to associate with | <pre>object({<br/>    nat_gateway = optional(object({<br/>      id = string<br/>    }), null)<br/>    network_security_group = optional(object({<br/>      id = string<br/>    }), null)<br/>    route_table = optional(object({<br/>      id = string<br/>    }), null)<br/>  })</pre> | `null` | no |
+| <a name="input_associations"></a> [associations](#input\_associations) | Optional associations for the subnet:<br/>  nat\_gateway - ID of NAT gateway to associate with<br/>  network\_security\_group - ID of network security group to associate with<br/>  route\_table - ID of route table to associate with | <pre>object({<br/>    nat_gateway = optional(object({<br/>      id = string<br/>    }), null)<br/>    network_security_group = optional(object({<br/>      id = string<br/>    }), null)<br/>    route_table = optional(object({<br/>      id = string<br/>    }), null)<br/>  })</pre> | `null` | no |
 | <a name="input_delegations"></a> [delegations](#input\_delegations) | One or more delegation blocks for the subnet. | <pre>map(object({<br/>    name = string<br/>    service_delegation = object({<br/>      name    = string<br/>      actions = optional(list(string), [])<br/>    })<br/>  }))</pre> | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the subnet. Changing this forces a new resource to be created. | `string` | n/a | yes |
 | <a name="input_private_endpoint_network_policies_enabled"></a> [private\_endpoint\_network\_policies\_enabled](#input\_private\_endpoint\_network\_policies\_enabled) | Enable or Disable network policies for the private endpoint on the subnet. Setting this to true will Enable the policy and setting this to false will Disable the policy. Defaults to true. | `bool` | `true` | no |
@@ -189,37 +189,15 @@ No modules.
 
 ## Security Considerations
 
-This module implements several security best practices:
+This module implements several security best practices by default:
 
-### Network Policies
-- **Private Endpoint Network Policies**: Enabled by default for additional security
-- **Private Link Service Network Policies**: Enabled by default
-- Must be explicitly disabled for subnets hosting private endpoints
+- **Private endpoint policies enabled** by default; disable only for subnets hosting private endpoints.
+- **Private link service policies enabled** by default; disable only when required by private link services.
+- **Service endpoints** can be restricted to required services, with optional service endpoint policies.
+- **Optional associations** to NSGs and route tables for traffic control and routing.
+- **Delegations** allow scoped access by isolating service-specific workloads.
 
-### Service Endpoints
-- Provides secure connectivity to Azure services without internet exposure
-- Supports service endpoint policies for additional access control
-- Recommend using specific service endpoints based on actual requirements
-
-### Network Security
-- Supports NSG association for inbound/outbound traffic control
-- Supports Route Table association for custom routing rules
-- Examples demonstrate security-hardened configurations
-
-### Best Practices
-1. Always associate an NSG with production subnets
-2. Use service endpoints instead of public endpoints when possible
-3. Apply service endpoint policies to restrict access to specific resources
-4. Use separate subnets for different workload types
-5. Enable network policies unless hosting private endpoints
-
-## Compliance
-
-This module supports the following compliance standards:
-- **SOC 2 Type II**: Network isolation and access controls
-- **ISO 27001:2022**: Information security management
-- **PCI DSS v4.0**: Network segmentation for payment card data
-- **GDPR**: Data protection through network isolation
+For production deployments, see the [secure example](examples/secure) and [SECURITY.md](SECURITY.md).
 
 ## Known Issues and Limitations
 
@@ -241,3 +219,4 @@ This module is licensed under the MIT License. See the [LICENSE](../../LICENSE.m
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [docs/](docs/) - Additional module documentation

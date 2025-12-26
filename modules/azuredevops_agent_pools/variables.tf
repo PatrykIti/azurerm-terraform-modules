@@ -48,9 +48,9 @@ variable "agent_queues" {
   EOT
   type = list(object({
     key           = optional(string)
-    project_id     = string
-    name           = optional(string)
-    agent_pool_id  = optional(string)
+    project_id    = string
+    name          = optional(string)
+    agent_pool_id = optional(string)
   }))
   default = []
 
@@ -111,42 +111,42 @@ variable "elastic_pool" {
   default = null
 
   validation {
-    condition = var.elastic_pool == null || length(trimspace(var.elastic_pool.name)) > 0
+    condition     = var.elastic_pool == null || length(trimspace(var.elastic_pool.name)) > 0
     error_message = "elastic_pool.name must be a non-empty string when provided."
   }
 
   validation {
-    condition = var.elastic_pool == null || length(trimspace(var.elastic_pool.service_endpoint_id)) > 0
+    condition     = var.elastic_pool == null || length(trimspace(var.elastic_pool.service_endpoint_id)) > 0
     error_message = "elastic_pool.service_endpoint_id must be a non-empty string when provided."
   }
 
   validation {
-    condition = var.elastic_pool == null || length(trimspace(var.elastic_pool.service_endpoint_scope)) > 0
+    condition     = var.elastic_pool == null || length(trimspace(var.elastic_pool.service_endpoint_scope)) > 0
     error_message = "elastic_pool.service_endpoint_scope must be a non-empty string when provided."
   }
 
   validation {
-    condition = var.elastic_pool == null || length(trimspace(var.elastic_pool.azure_resource_id)) > 0
+    condition     = var.elastic_pool == null || length(trimspace(var.elastic_pool.azure_resource_id)) > 0
     error_message = "elastic_pool.azure_resource_id must be a non-empty string when provided."
   }
 
   validation {
-    condition = var.elastic_pool == null || var.elastic_pool.max_capacity > 0
+    condition     = var.elastic_pool == null || var.elastic_pool.max_capacity > 0
     error_message = "elastic_pool.max_capacity must be greater than 0."
   }
 
   validation {
-    condition = var.elastic_pool == null || var.elastic_pool.desired_idle >= 0
+    condition     = var.elastic_pool == null || var.elastic_pool.desired_idle >= 0
     error_message = "elastic_pool.desired_idle must be 0 or greater."
   }
 
   validation {
-    condition = var.elastic_pool == null || var.elastic_pool.desired_idle <= var.elastic_pool.max_capacity
+    condition     = var.elastic_pool == null || var.elastic_pool.desired_idle <= var.elastic_pool.max_capacity
     error_message = "elastic_pool.desired_idle cannot exceed max_capacity."
   }
 
   validation {
-    condition = var.elastic_pool == null || var.elastic_pool.time_to_live_minutes == null || var.elastic_pool.time_to_live_minutes >= 0
+    condition     = var.elastic_pool == null || var.elastic_pool.time_to_live_minutes == null || var.elastic_pool.time_to_live_minutes >= 0
     error_message = "elastic_pool.time_to_live_minutes must be 0 or greater when provided."
   }
 }
