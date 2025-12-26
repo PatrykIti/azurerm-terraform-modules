@@ -105,10 +105,10 @@ variable "agent_queues" {
     condition = !var.auto_provision || alltrue([
       for agent_queue in var.agent_queues : !(
         agent_queue.agent_pool_id == null &&
-        (agent_queue.name == null || trimspace(agent_queue.name) == trimspace(var.name))
+        agent_queue.name == null
       )
     ])
-    error_message = "When auto_provision is true, agent_queues must set name or agent_pool_id and cannot target the module pool name."
+    error_message = "When auto_provision is true, agent_queues must set name or agent_pool_id."
   }
 }
 
