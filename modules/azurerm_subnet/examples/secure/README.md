@@ -8,6 +8,15 @@ This example demonstrates a security-focused subnet configuration with restricti
 - Service endpoints for Azure services.
 - Network policies enabled for private endpoints and private link services.
 
+## Architecture
+
+```
+Resource Group
+├── Virtual Network (10.0.0.0/16)
+│   └── Subnet (10.0.1.0/24)
+└── Network Security Group
+```
+
 ## Usage
 
 1. Initialize Terraform:

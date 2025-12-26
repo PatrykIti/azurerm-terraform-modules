@@ -1,58 +1,47 @@
 # Basic Subnet Example
 
-This example demonstrates the minimal configuration required to create a subnet within an Azure Virtual Network.
+This example demonstrates a basic subnet deployment using secure defaults.
 
-## What this example creates
+## Features
 
-- Resource Group
-- Virtual Network with a single address space
-- Subnet with basic configuration and default network policies
+- Resource group, virtual network, and subnet creation.
+- Default network policy settings.
+- Simple address prefix assignment.
 
-## Use Case
+## Architecture
 
-This example is perfect for:
-- Simple subnet deployment scenarios
-- Learning how to use the subnet module
-- Development and testing environments
-- Basic network segmentation needs
-
-## Features Demonstrated
-
-- Basic subnet creation
-- Default network policy configuration
-- Integration with existing Virtual Network
-- Simple address prefix assignment
+```
+Resource Group
+└── Virtual Network (10.0.0.0/16)
+    └── Subnet (10.0.1.0/24)
+```
 
 ## Usage
 
+1. Initialize Terraform:
+   ```bash
+   terraform init
+   ```
+2. Review and apply:
+   ```bash
+   terraform plan
+   terraform apply
+   ```
+
+## Cleanup
+
 ```bash
-# Initialize Terraform
-terraform init
-
-# Plan the deployment
-terraform plan
-
-# Apply the configuration
-terraform apply
-
-# Clean up when done
 terraform destroy
 ```
-
-## Configuration
-
-The example uses the following default values:
-- Virtual Network: `10.0.0.0/16`
-- Subnet: `10.0.1.0/24`
-- Location: `East US`
-
-You can customize these values by providing your own `terraform.tfvars` file or by overriding the variables when running `terraform apply`.
 
 ## Example terraform.tfvars
 
 ```hcl
-location              = "West Europe"
-resource_group_name   = "my-subnet-rg"
-virtual_network_name  = "my-vnet"
-subnet_name          = "my-subnet"
+location             = "West Europe"
+resource_group_name  = "rg-subnet-basic-example"
+virtual_network_name = "vnet-subnet-basic-example"
+subnet_name          = "snet-subnet-basic-example"
 ```
+
+<!-- BEGIN_TF_DOCS -->
+<!-- END_TF_DOCS -->

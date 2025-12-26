@@ -24,6 +24,6 @@ output "resource_group_name" {
 }
 
 output "private_endpoint_id" {
-  description = "The ID of the private endpoint (placeholder - actual private endpoint not created in this fixture)"
-  value       = "private-endpoint-not-created-in-this-fixture"
+  description = "The ID of the private endpoint"
+  value       = azurerm_private_endpoint.example.id
 }

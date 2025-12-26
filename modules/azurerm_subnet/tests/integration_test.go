@@ -98,7 +98,7 @@ func validateNetworkFeatures(t *testing.T, testFolder string) {
 	// Network validations would go here
 }
 
-// validateOperationalFeatures validates operational features like monitoring
+// validateOperationalFeatures validates basic operational signals from outputs
 func validateOperationalFeatures(t *testing.T, testFolder string) {
 	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 	
@@ -111,7 +111,7 @@ func validateOperationalFeatures(t *testing.T, testFolder string) {
 	assert.NotEmpty(t, resourceGroupName)
 	assert.NotEmpty(t, resourceID)
 	
-	// Validate diagnostic settings format
+	// Validate resource ID format
 	assert.Contains(t, resourceID, "/providers/Microsoft.")
 	
 	// TODO: Add subnet specific operational validations when helper is implemented
@@ -235,7 +235,7 @@ func TestSubnetSecurityConfiguration(t *testing.T) {
 		
 		// TODO: Add SDK-based security validations when helper is implemented
 		// helper := NewSubnetHelper(t)
-		// Validate encryption, TLS, access controls, etc.
+		// Validate network policies, associations, and service endpoints.
 	})
 }
 
@@ -357,7 +357,7 @@ func TestSubnetCompliance(t *testing.T) {
 	
 	// TODO: Add more compliance checks when helper is implemented
 	// helper := NewSubnetHelper(t)
-	// Validate tags, encryption, network policies, etc.
+	// Validate tags, network policies, and association requirements.
 }
 
 // BenchmarkSubnetIntegrationCreation benchmarks resource creation performance

@@ -1,18 +1,24 @@
+terraform {
+  required_version = ">= 1.12.2"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "4.57.0"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
 }
 
-# Get current client configuration
-data "azurerm_client_config" "current" {}
-
 resource "azurerm_resource_group" "example" {
-  name     = "rg-subnet-pe-${var.random_suffix}"
+  name     = "rg-subnet-private-endpoint-${var.random_suffix}"
   location = var.location
 }
 
-# Virtual Network for private endpoint
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-subnet-pe-${var.random_suffix}"
+  name                = "vnet-subnet-private-endpoint-${var.random_suffix}"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
@@ -23,7 +29,6 @@ resource "azurerm_virtual_network" "example" {
   }
 }
 
-# Storage Account for private endpoint demo
 resource "azurerm_storage_account" "example" {
   name                     = "stsubpe${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.example.name
@@ -31,7 +36,6 @@ resource "azurerm_storage_account" "example" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
 
-  # Disable public access to force private endpoint usage
   public_network_access_enabled = false
 
   tags = {
@@ -40,20 +44,31 @@ resource "azurerm_storage_account" "example" {
   }
 }
 
-# Subnet optimized for private endpoints
 module "subnet" {
   source = "../../../"
 
-  name                 = "subnet-pe-${var.random_suffix}"
+  name                 = "snet-subnet-private-endpoint-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
 
-  # Disable network policies for private endpoints (required for private endpoints)
   private_endpoint_network_policies_enabled     = false
   private_link_service_network_policies_enabled = true
 
-  # No service endpoints needed when using private endpoints
   service_endpoints           = []
   service_endpoint_policy_ids = []
+}
+
+resource "azurerm_private_endpoint" "example" {
+  name                = "pe-subnet-private-endpoint-${var.random_suffix}"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  subnet_id           = module.subnet.id
+
+  private_service_connection {
+    name                           = "psc-subnet-private-endpoint-${var.random_suffix}"
+    private_connection_resource_id = azurerm_storage_account.example.id
+    subresource_names              = ["blob"]
+    is_manual_connection           = false
+  }
 }
