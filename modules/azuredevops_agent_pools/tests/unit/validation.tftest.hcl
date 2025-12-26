@@ -26,7 +26,7 @@ run "invalid_queue_selector" {
       {
         project_id    = "00000000-0000-0000-0000-000000000000"
         name          = "Invalid Queue"
-        agent_pool_id = "00000000-0000-0000-0000-000000000000"
+        agent_pool_id = 1
       }
     ]
   }
@@ -78,7 +78,7 @@ run "invalid_elastic_pool_capacity" {
   variables {
     elastic_pool = {
       name                   = "Elastic Pool"
-      service_endpoint_id    = "service-endpoint-0001"
+      service_endpoint_id    = "00000000-0000-0000-0000-000000000001"
       service_endpoint_scope = "00000000-0000-0000-0000-000000000000"
       azure_resource_id      = "resource-0001"
       desired_idle           = 1
@@ -97,7 +97,7 @@ run "invalid_elastic_pool_desired_idle" {
   variables {
     elastic_pool = {
       name                   = "Elastic Pool"
-      service_endpoint_id    = "service-endpoint-0001"
+      service_endpoint_id    = "00000000-0000-0000-0000-000000000001"
       service_endpoint_scope = "00000000-0000-0000-0000-000000000000"
       azure_resource_id      = "resource-0001"
       desired_idle           = 3

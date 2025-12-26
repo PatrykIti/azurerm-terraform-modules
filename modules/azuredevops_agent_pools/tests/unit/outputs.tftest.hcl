@@ -31,13 +31,13 @@ variables {
     {
       key           = "external"
       project_id    = "00000000-0000-0000-0000-000000000000"
-      agent_pool_id = "pool-0002"
+      agent_pool_id = 2
     }
   ]
 
   elastic_pool = {
     name                   = "Elastic Pool"
-    service_endpoint_id    = "service-endpoint-0001"
+    service_endpoint_id    = "00000000-0000-0000-0000-000000000001"
     service_endpoint_scope = "00000000-0000-0000-0000-000000000000"
     azure_resource_id      = "resource-0001"
     desired_idle           = 1

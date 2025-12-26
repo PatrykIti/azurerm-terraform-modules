@@ -38,34 +38,25 @@ func BenchmarkSubnetCreationSimple(b *testing.B) {
 func BenchmarkSubnetCreationWithFeatures(b *testing.B) {
 	b.ReportAllocs()
 
-	// Define different feature configurations to benchmark
 	featureConfigs := []struct {
-		name   string
-		config map[string]interface{}
+		name                              string
+		serviceEndpoints                  []string
+		enforcePrivateEndpointPolicyState bool
 	}{
 		{
-			name:   "Basic",
-			config: map[string]interface{}{},
+			name:                              "DefaultEndpoints",
+			serviceEndpoints:                  []string{},
+			enforcePrivateEndpointPolicyState: true,
 		},
 		{
-			name: "WithSecurity",
-			config: map[string]interface{}{
-				"enable_advanced_security": true,
-			},
+			name:                              "CustomEndpoints",
+			serviceEndpoints:                  []string{"Microsoft.Storage", "Microsoft.KeyVault"},
+			enforcePrivateEndpointPolicyState: true,
 		},
 		{
-			name: "WithMonitoring",
-			config: map[string]interface{}{
-				"enable_monitoring": true,
-			},
-		},
-		{
-			name: "Complete",
-			config: map[string]interface{}{
-				"enable_advanced_security": true,
-				"enable_monitoring":        true,
-				"enable_backup":            true,
-			},
+			name:                              "PrivateEndpointPoliciesDisabled",
+			serviceEndpoints:                  []string{"Microsoft.Storage"},
+			enforcePrivateEndpointPolicyState: false,
 		},
 	}
 
@@ -73,14 +64,12 @@ func BenchmarkSubnetCreationWithFeatures(b *testing.B) {
 		b.Run(fc.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_subnet/tests/fixtures/basic")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_subnet/tests/fixtures/complete")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
-				// Apply feature configuration
-				for k, v := range fc.config {
-					terraformOptions.Vars[k] = v
-				}
-				
+				terraformOptions.Vars["service_endpoints"] = fc.serviceEndpoints
+				terraformOptions.Vars["enforce_private_link_endpoint_network_policies"] = fc.enforcePrivateEndpointPolicyState
+
 				// Override the random_suffix for benchmarking
 				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 				b.StartTimer()
@@ -103,20 +92,33 @@ func BenchmarkSubnetCreationWithFeatures(b *testing.B) {
 func BenchmarkSubnetCreationWithScale(b *testing.B) {
 	b.ReportAllocs()
 
-	// Define different scale configurations
-	scaleCounts := []int{1, 5, 10, 20}
+	endpointConfigs := []struct {
+		name      string
+		endpoints []string
+	}{
+		{
+			name:      "Endpoints_1",
+			endpoints: []string{"Microsoft.Storage"},
+		},
+		{
+			name:      "Endpoints_2",
+			endpoints: []string{"Microsoft.Storage", "Microsoft.KeyVault"},
+		},
+		{
+			name:      "Endpoints_3",
+			endpoints: []string{"Microsoft.Storage", "Microsoft.KeyVault", "Microsoft.Sql"},
+		},
+	}
 
-	for _, count := range scaleCounts {
-		b.Run(fmt.Sprintf("Scale_%d", count), func(b *testing.B) {
+	for _, config := range endpointConfigs {
+		b.Run(config.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_subnet/tests/fixtures/basic")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_subnet/tests/fixtures/complete")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
-				// Configure scale parameters based on resource type
-				// This is a placeholder - adjust based on actual resource scaling capabilities
-				terraformOptions.Vars["instance_count"] = count
-				
+				terraformOptions.Vars["service_endpoints"] = config.endpoints
+
 				// Override the random_suffix for benchmarking
 				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 				b.StartTimer()
@@ -130,7 +132,7 @@ func BenchmarkSubnetCreationWithScale(b *testing.B) {
 				b.StartTimer()
 
 				b.ReportMetric(float64(creationTime.Milliseconds()), "creation_ms")
-				b.ReportMetric(float64(count), "scale_count")
+				b.ReportMetric(float64(len(config.endpoints)), "endpoint_count")
 			}
 		})
 	}

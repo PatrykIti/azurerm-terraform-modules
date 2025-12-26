@@ -3,7 +3,12 @@
 locals {
   agent_queues_by_key = {
     for agent_queue in var.agent_queues :
-    coalesce(agent_queue.key, agent_queue.name, agent_queue.agent_pool_id, agent_queue.project_id) => agent_queue
+    coalesce(
+      agent_queue.key,
+      agent_queue.name,
+      agent_queue.agent_pool_id == null ? null : tostring(agent_queue.agent_pool_id),
+      agent_queue.project_id
+    ) => agent_queue
   }
 }
 
@@ -19,7 +24,7 @@ resource "azuredevops_agent_queue" "agent_queue" {
 
   project_id    = each.value.project_id
   name          = each.value.name
-  agent_pool_id = each.value.name != null ? null : coalesce(each.value.agent_pool_id, azuredevops_agent_pool.agent_pool.id)
+  agent_pool_id = each.value.name != null ? null : coalesce(each.value.agent_pool_id, tonumber(azuredevops_agent_pool.agent_pool.id))
 }
 
 resource "azuredevops_elastic_pool" "elastic_pool" {

@@ -69,11 +69,11 @@ func TestCompleteSubnet(t *testing.T) {
 		// Get outputs
 		resourceID := terraform.Output(t, terraformOptions, "subnet_id")
 		resourceName := terraform.Output(t, terraformOptions, "subnet_name")
-		
+
 		// Validate complete configuration
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, resourceName)
-		
+
 		// Add additional validations for complete configuration
 		// This should test all optional features and advanced settings
 	})
@@ -103,7 +103,7 @@ func TestSubnetSecurity(t *testing.T) {
 		// Validate security settings
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, resourceName)
-		
+
 		// Add security-specific validations
 		// Validate encryption, TLS settings, access controls, etc.
 	})
@@ -128,10 +128,10 @@ func TestSubnetNetworkRules(t *testing.T) {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
 		resourceID := terraform.Output(t, terraformOptions, "subnet_id")
-		
+
 		// Validate network rules
 		assert.NotEmpty(t, resourceID)
-		
+
 		// Add network-specific validations
 		// Validate IP rules, subnet restrictions, private endpoints, etc.
 	})
@@ -157,19 +157,13 @@ func TestSubnetPrivateEndpoint(t *testing.T) {
 
 		resourceID := terraform.Output(t, terraformOptions, "subnet_id")
 		subnetName := terraform.Output(t, terraformOptions, "subnet_name")
-		
-		// Try to get private_endpoint_id if it exists
-		privateEndpointID, err := terraform.OutputE(t, terraformOptions, "private_endpoint_id")
+		privateEndpointID := terraform.Output(t, terraformOptions, "private_endpoint_id")
 
 		// Validate subnet was created
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, subnetName)
-		
-		// If private endpoint ID exists and is not a placeholder, validate it
-		if err == nil && privateEndpointID != "" && !strings.Contains(privateEndpointID, "not-created-in-this-fixture") {
-			assert.NotEmpty(t, privateEndpointID)
-		}
-		
+		assert.NotEmpty(t, privateEndpointID)
+
 		// Validate subnet is configured for private endpoints
 		// Add additional private endpoint validations
 	})
@@ -203,7 +197,7 @@ func TestSubnetValidationRules(t *testing.T) {
 			t.Parallel()
 
 			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fmt.Sprintf("azurerm_subnet/tests/fixtures/%s", tc.fixtureFile))
-			
+
 			// Use minimal terraform options for negative tests (no variables)
 			terraformOptions := &terraform.Options{
 				TerraformDir: testFolder,
@@ -212,7 +206,7 @@ func TestSubnetValidationRules(t *testing.T) {
 
 			// Initialize terraform
 			terraform.Init(t, terraformOptions)
-			
+
 			// This should fail during validation
 			_, err := terraform.ValidateE(t, terraformOptions)
 			require.Error(t, err)
@@ -239,7 +233,7 @@ func BenchmarkSubnetCreation(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		// Generate unique name for each iteration
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
-		
+
 		terraform.InitAndApply(b, terraformOptions)
 		terraform.Destroy(b, terraformOptions)
 	}
@@ -251,7 +245,7 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	timestamp := time.Now().UnixNano() % 1000 // Last 3 digits for more variation
 	baseID := strings.ToLower(random.UniqueId())
 	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
-	
+
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
@@ -261,10 +255,10 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		NoColor: true,
 		// Retry configuration
 		RetryableTerraformErrors: map[string]string{
-			".*timeout.*":                    "Timeout error - retrying",
-			".*ResourceGroupNotFound.*":      "Resource group not found - retrying",
-			".*AlreadyExists.*":              "Resource already exists - retrying",
-			".*TooManyRequests.*":            "Too many requests - retrying",
+			".*timeout.*":               "Timeout error - retrying",
+			".*ResourceGroupNotFound.*": "Resource group not found - retrying",
+			".*AlreadyExists.*":         "Resource already exists - retrying",
+			".*TooManyRequests.*":       "Too many requests - retrying",
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,

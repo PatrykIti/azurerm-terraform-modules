@@ -50,7 +50,7 @@ variable "agent_queues" {
     key           = optional(string)
     project_id    = string
     name          = optional(string)
-    agent_pool_id = optional(string)
+    agent_pool_id = optional(number)
   }))
   default = []
 
@@ -65,11 +65,19 @@ variable "agent_queues" {
     condition = alltrue([
       for agent_queue in var.agent_queues : (
         (agent_queue.name == null || length(trimspace(agent_queue.name)) > 0) &&
-        (agent_queue.agent_pool_id == null || length(trimspace(agent_queue.agent_pool_id)) > 0) &&
         (agent_queue.key == null || length(trimspace(agent_queue.key)) > 0)
       )
     ])
-    error_message = "agent_queues key/name/agent_pool_id must be non-empty strings when provided."
+    error_message = "agent_queues key/name must be non-empty strings when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for agent_queue in var.agent_queues : (
+        agent_queue.agent_pool_id == null || agent_queue.agent_pool_id > 0
+      )
+    ])
+    error_message = "agent_queues.agent_pool_id must be greater than 0 when provided."
   }
 
   validation {
@@ -82,7 +90,12 @@ variable "agent_queues" {
   validation {
     condition = length(distinct([
       for agent_queue in var.agent_queues :
-      coalesce(agent_queue.key, agent_queue.name, agent_queue.agent_pool_id, agent_queue.project_id)
+      coalesce(
+        agent_queue.key,
+        agent_queue.name,
+        agent_queue.agent_pool_id == null ? null : tostring(agent_queue.agent_pool_id),
+        agent_queue.project_id
+      )
     ])) == length(var.agent_queues)
     error_message = "agent_queues keys must be unique; set key when name/agent_pool_id/project_id would collide."
   }
