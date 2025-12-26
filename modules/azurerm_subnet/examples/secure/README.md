@@ -35,6 +35,16 @@ Resource Group
 terraform destroy
 ```
 
+## Example terraform.tfvars
+
+```hcl
+location                    = "West Europe"
+resource_group_name         = "rg-subnet-secure-example"
+virtual_network_name        = "vnet-subnet-secure-example"
+subnet_name                 = "snet-subnet-secure-example"
+network_security_group_name = "nsg-subnet-secure-example"
+```
+
 <!-- BEGIN_TF_DOCS -->
 <!-- This section will be populated by terraform-docs if configured -->
 <!-- END_TF_DOCS -->

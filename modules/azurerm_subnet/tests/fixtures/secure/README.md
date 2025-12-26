@@ -1,40 +1,16 @@
-# Secure Subnet Example
+# Secure Subnet Fixture
 
-This example demonstrates a maximum-security Subnet configuration suitable for highly sensitive data and regulated environments.
+This fixture validates a security-focused subnet configuration for integration tests.
 
-## Features
+## Coverage
 
-- Maximum security configuration with all security features enabled
-- Network isolation and private endpoints
-- Advanced threat protection
-- Comprehensive audit logging and monitoring
-- Encryption at rest and in transit
-- Compliance-ready configuration
-
-## Key Configuration
-
-This example implements defense-in-depth security principles with multiple layers of protection suitable for highly regulated industries and sensitive workloads.
-
-## Security Considerations
-
-- All public access is disabled by default
-- Network access is restricted to specific IP ranges
-- All data is encrypted at rest and in transit
-- Audit logging captures all access and modifications
+- Service endpoints for sensitive services.
+- Network policies enabled.
+- NSG association via module `associations`.
 
 ## Usage
 
-```bash
-terraform init
-terraform plan
-terraform apply
-```
-
-## Cleanup
-
-```bash
-terraform destroy
-```
+This fixture is executed by Terratest and is not intended for manual use.
 
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->

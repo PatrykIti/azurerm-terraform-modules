@@ -1,69 +1,60 @@
-.PHONY: test test-unit test-integration test-all test-basic test-complete test-secure test-network test-private-endpoint test-validation test-performance test-parallel test-sequential docs clean validate
+.PHONY: all test test-short test-unit test-all test-basic test-complete test-secure test-network test-private-endpoint test-validation test-performance test-parallel test-sequential test-integration docs clean validate security check help
 
-# Variables
-TIMEOUT ?= 30m
-PARALLEL_TESTS ?= 4
+# Default target
+all: check test-short
+
+# Run all tests (unit + integration)
+test: test-unit
+	@echo "Running all Terratest suites..."
+	cd tests && make test
+
+test-all: test
+
+# Run only short/basic tests
+test-short: test-unit
+	@echo "Running short Terratest suites..."
+	cd tests && make test-basic
 
 # Run native Terraform unit tests
 test-unit:
 	@echo "Running native Terraform tests..."
-	terraform init
-	terraform test
+	terraform test -test-directory=tests/unit
 
-# Individual Terratest tests
+# Convenience wrappers for Terratest targets
 test-basic:
-	@echo "Running basic subnet test..."
-	cd tests && go test -v -timeout $(TIMEOUT) -run TestBasicSubnet .
+	cd tests && make test-basic
 
 test-complete:
-	@echo "Running complete subnet test..."
-	cd tests && go test -v -timeout $(TIMEOUT) -run TestCompleteSubnet .
+	cd tests && make test-complete
 
 test-secure:
-	@echo "Running security subnet test..."
-	cd tests && go test -v -timeout $(TIMEOUT) -run TestSubnetSecurity .
+	cd tests && make test-secure
 
 test-network:
-	@echo "Running network rules test..."
-	cd tests && go test -v -timeout $(TIMEOUT) -run TestSubnetNetworkRules .
+	cd tests && make test-network
 
 test-private-endpoint:
-	@echo "Running private endpoint test..."
-	cd tests && go test -v -timeout $(TIMEOUT) -run TestSubnetPrivateEndpoint .
+	cd tests && make test-private-endpoint
 
 test-validation:
-	@echo "Running validation tests..."
-	cd tests && go test -v -timeout $(TIMEOUT) -run TestSubnetValidationRules .
+	cd tests && make test-validation
 
 test-performance:
-	@echo "Running performance benchmarks..."
-	cd tests && go test -bench=. -benchtime=10s -run=^BenchmarkSubnetCreation$ .
+	cd tests && make test-performance
 
-# Run integration tests (all feature tests)
-test-integration:
-	@echo "Running all integration tests..."
-	cd tests && go test -v -timeout $(TIMEOUT) -run TestSubnetFullIntegration .
-
-# Run tests in parallel
 test-parallel:
-	@echo "Running tests in parallel (max $(PARALLEL_TESTS) concurrent)..."
-	cd tests && go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL_TESTS) .
+	cd tests && make test-parallel
 
-# Run tests sequentially
 test-sequential:
-	@echo "Running tests sequentially..."
-	cd tests && go test -v -timeout $(TIMEOUT) -parallel 1 .
+	cd tests && make test-sequential
 
-# Run all tests
-test-all: test-unit test-basic test-complete test-secure test-network test-private-endpoint test-validation test-integration
-
-# Default test target (unit tests only)
-test: test-unit
+test-integration:
+	cd tests && make test-integration
 
 # Generate documentation
 docs:
 	@echo "Generating documentation..."
-	terraform-docs markdown table --output-file README.md --output-mode inject .
+	./generate-docs.sh
 	@echo "Documentation updated in README.md"
 
 # Clean up test artifacts
@@ -72,6 +63,7 @@ clean:
 	find . -name "*.tfstate*" -type f -delete
 	find . -name ".terraform" -type d -exec rm -rf {} +
 	find . -name "terraform.tfstate.d" -type d -exec rm -rf {} +
+	cd tests && make clean
 	@echo "Cleanup complete"
 
 # Validate Terraform configuration
@@ -98,13 +90,13 @@ check: validate security
 # Show help
 help:
 	@echo "Available targets:"
-	@echo "  make test           - Run short tests (default)"
-	@echo "  make test-short     - Run only basic functionality tests"
-	@echo "  make test-integration - Run integration tests"
-	@echo "  make test-all       - Run all tests"
-	@echo "  make docs           - Generate/update documentation"
-	@echo "  make clean          - Clean up test artifacts"
-	@echo "  make validate       - Validate Terraform configuration"
-	@echo "  make security       - Run security scans"
-	@echo "  make check          - Run validation and security scans"
-	@echo "  make help           - Show this help message"
+	@echo "  make all                - Run checks and short tests"
+	@echo "  make test               - Run all tests"
+	@echo "  make test-short         - Run only short/basic tests"
+	@echo "  make test-unit          - Run Terraform unit tests"
+	@echo "  make docs               - Generate/update documentation"
+	@echo "  make clean              - Clean up test artifacts"
+	@echo "  make validate           - Validate Terraform configuration"
+	@echo "  make security           - Run security scans"
+	@echo "  make check              - Run validation and security scans"
+	@echo "  make help               - Show this help message"

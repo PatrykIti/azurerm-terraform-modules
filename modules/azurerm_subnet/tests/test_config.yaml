@@ -5,7 +5,7 @@ test_suites:
       - TestBasicSubnet
     parallel: true
     timeout: 15m
-    
+
   - name: "Complete Feature Tests"
     tests:
       - TestCompleteSubnet
@@ -14,27 +14,35 @@ test_suites:
       - TestSubnetPrivateEndpoint
     parallel: true
     timeout: 30m
-    
+
   - name: "Validation Tests"
     tests:
       - TestSubnetValidationRules
     parallel: true
     timeout: 10m
-    
+
   - name: "Integration Tests"
     tests:
       - TestSubnetFullIntegration
+      - TestSubnetWithNetworkRules
+      - TestSubnetPrivateEndpointIntegration
+      - TestSubnetSecurityConfiguration
+      - TestSubnetValidationIntegration
       - TestSubnetLifecycle
       - TestSubnetCompliance
-      - TestSubnetMonitoring
     parallel: false
     timeout: 45m
-    
+
   - name: "Performance Tests"
     tests:
-      - BenchmarkSubnetCreation
+      - BenchmarkSubnetCreationSimple
+      - BenchmarkSubnetCreationWithFeatures
+      - BenchmarkSubnetCreationWithScale
+      - BenchmarkSubnetParallelCreation
       - TestSubnetCreationTime
       - TestSubnetScaling
+      - TestSubnetUpdatePerformance
+      - TestSubnetDestroyPerformance
     parallel: false
     timeout: 60m
     benchmark: true
@@ -42,15 +50,15 @@ test_suites:
 # Test environment requirements
 environment:
   required_vars:
-    - AZURE_SUBSCRIPTION_ID
-    - AZURE_TENANT_ID
-    - AZURE_CLIENT_ID
-    - AZURE_CLIENT_SECRET
-  
+    - ARM_SUBSCRIPTION_ID
+    - ARM_TENANT_ID
+    - ARM_CLIENT_ID
+    - ARM_CLIENT_SECRET
+
   azure_regions:
     - northeurope
     - westeurope
-  
+
   resource_limits:
     max_concurrent_resources: 10
     max_resource_groups: 5
@@ -62,14 +70,14 @@ coverage:
   exclude_patterns:
     - "test_helpers.go"
     - "*_test.go"
-  
+
 # Test report settings
 reporting:
   format: junit
   output_dir: test_outputs/
   include_logs: true
   include_metrics: true
-  
+
 # Retry configuration
 retry:
   max_attempts: 3
@@ -92,27 +100,27 @@ stages:
       - "lint"
       - "validate-fixtures"
       - "security"
-      
+
   - name: "unit"
     description: "Run unit and validation tests"
     test_suites:
       - "Basic Tests"
       - "Validation Tests"
     fail_fast: true
-    
+
   - name: "integration"
     description: "Run integration tests"
     test_suites:
       - "Complete Feature Tests"
       - "Integration Tests"
     fail_fast: false
-    
+
   - name: "performance"
     description: "Run performance benchmarks"
     test_suites:
       - "Performance Tests"
     condition: "branch == 'main' || tag"
-    
+
 # Matrix testing configuration
 matrix:
   azure_regions:
@@ -120,15 +128,13 @@ matrix:
     - westeurope
     - eastus
     - westus2
-    
+
   terraform_versions:
-    - "1.5.x"
-    - "1.6.x"
-    - "1.7.x"
-    
+    - "1.12.x"
+
   go_versions:
-    - "1.20"
     - "1.21"
+    - "1.22"
 
 # Notifications
 notifications:
@@ -138,7 +144,7 @@ notifications:
     channels:
       success: "#ci-success"
       failure: "#ci-failures"
-      
+
   email:
     enabled: false
     recipients:
