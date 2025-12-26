@@ -17,13 +17,13 @@ provider "azurerm" {
 
 # Create a resource group for this example
 resource "azurerm_resource_group" "example" {
-  name     = "rg-subnet-pe-example"
+  name     = var.resource_group_name
   location = var.location
 }
 
 # Create a Virtual Network for the subnet
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-subnet-pe-example"
+  name                = var.virtual_network_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   address_space       = ["10.0.0.0/16"]
@@ -33,7 +33,7 @@ resource "azurerm_virtual_network" "example" {
 module "subnet" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
 
-  name                 = "snet-subnet-pe-example"
+  name                 = var.subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -53,13 +53,13 @@ resource "azurerm_storage_account" "example" {
 
 # Private endpoint for the storage account
 resource "azurerm_private_endpoint" "example" {
-  name                = "pe-subnet-pe-example"
+  name                = var.private_endpoint_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   subnet_id           = module.subnet.id
 
   private_service_connection {
-    name                           = "psc-storage"
+    name                           = "psc-subnet-private-endpoint-example"
     private_connection_resource_id = azurerm_storage_account.example.id
     subresource_names              = ["blob"]
     is_manual_connection           = false

@@ -17,13 +17,13 @@ provider "azurerm" {
 
 # Create a resource group for this example
 resource "azurerm_resource_group" "example" {
-  name     = "rg-subnet-complete-example"
+  name     = var.resource_group_name
   location = var.location
 }
 
 # Create a Virtual Network for the subnet
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-subnet-complete-example"
+  name                = var.virtual_network_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   address_space       = ["10.0.0.0/16"]
@@ -37,7 +37,7 @@ resource "azurerm_virtual_network" "example" {
 
 # Create Network Security Group
 resource "azurerm_network_security_group" "example" {
-  name                = "nsg-subnet-complete-example"
+  name                = var.network_security_group_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -75,7 +75,7 @@ resource "azurerm_network_security_group" "example" {
 
 # Create Route Table
 resource "azurerm_route_table" "example" {
-  name                = "rt-subnet-complete-example"
+  name                = var.route_table_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -109,7 +109,7 @@ resource "azurerm_storage_account" "example" {
 
 # Create Service Endpoint Policy
 resource "azurerm_subnet_service_endpoint_storage_policy" "example" {
-  name                = "sep-storage-example"
+  name                = var.service_endpoint_policy_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
@@ -131,7 +131,7 @@ resource "azurerm_subnet_service_endpoint_storage_policy" "example" {
 module "subnet" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
 
-  name                 = "snet-subnet-complete-example"
+  name                 = var.subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24", "10.0.2.0/24"]
