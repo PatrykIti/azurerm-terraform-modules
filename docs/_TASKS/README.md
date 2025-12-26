@@ -3,7 +3,7 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 5 tasks
+- **To Do:** 11 tasks
 - **In Progress:** 0
 - **Done:** 23 tasks
 
@@ -18,6 +18,12 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | `modules/azuredevops_artifacts_feed/` |
 | [TASK-ADO-020](./TASK-ADO-020_AzureDevOps_Extension_Module_Refactor.md) | **Azure DevOps Extension module refactor** | Medium | Small | `modules/azuredevops_extension/` |
 | [TASK-ADO-021](./TASK-ADO-021_AzureDevOps_Pipelines_Module_Refactor.md) | **Azure DevOps Pipelines module refactor** | High | Medium | `modules/azuredevops_pipelines/` |
+| [TASK-ADO-022](./TASK-ADO-022_AzureDevOps_ServiceEndpoint_Module_Refactor.md) | **Azure DevOps Service Endpoint module refactor** | High | Large | `modules/azuredevops_serviceendpoint/` |
+| [TASK-ADO-023](./TASK-ADO-023_AzureDevOps_Repository_Module_Refactor.md) | **Azure DevOps Repository module refactor** | High | Large | `modules/azuredevops_repository/` |
+| [TASK-ADO-024](./TASK-ADO-024_AzureDevOps_ServiceHooks_Module_Refactor.md) | **Azure DevOps Service Hooks module refactor** | Medium | Medium | `modules/azuredevops_servicehooks/` |
+| [TASK-ADO-025](./TASK-ADO-025_AzureDevOps_Variable_Groups_Module_Refactor.md) | **Azure DevOps Variable Groups module refactor** | Medium | Medium | `modules/azuredevops_variable_groups/` |
+| [TASK-ADO-026](./TASK-ADO-026_AzureDevOps_Work_Items_Module_Refactor.md) | **Azure DevOps Work Items module refactor** | High | Medium | `modules/azuredevops_work_items/` |
+| [TASK-ADO-027](./TASK-ADO-027_AzureDevOps_Team_Module_Refactor.md) | **Azure DevOps Team module refactor** | Medium | Medium | `modules/azuredevops_team/` |
 
 ---
 
