@@ -10,6 +10,15 @@ terraform {
 
 provider "azuredevops" {}
 
+resource "azuredevops_git_repository" "wiki_repo" {
+  project_id = var.project_id
+  name       = "${var.wiki_name_prefix}-secure-wiki"
+
+  initialization {
+    init_type = "Clean"
+  }
+}
+
 module "azuredevops_wiki" {
   source = "../../../"
 
@@ -17,8 +26,10 @@ module "azuredevops_wiki" {
 
   wikis = {
     secure = {
-      name = "${var.wiki_name_prefix}-secure"
-      type = "projectWiki"
+      name          = "${var.wiki_name_prefix}-secure"
+      type          = "codeWiki"
+      repository_id = azuredevops_git_repository.wiki_repo.id
+      mapped_path   = "/"
     }
   }
 

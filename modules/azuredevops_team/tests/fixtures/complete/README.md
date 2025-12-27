@@ -6,6 +6,7 @@ This fixture demonstrates multiple teams with memberships and administrators.
 
 - Creates multiple Azure DevOps teams
 - Applies member and administrator assignments
+- Uses the project-level "Readers" group for members to keep membership scope small
 
 ## Key Configuration
 

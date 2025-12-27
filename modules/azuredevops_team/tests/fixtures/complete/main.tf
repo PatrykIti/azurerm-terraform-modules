@@ -14,8 +14,9 @@ data "azuredevops_group" "project_collection_admins" {
   name = "Project Collection Administrators"
 }
 
-data "azuredevops_group" "project_collection_valid_users" {
-  name = "Project Collection Valid Users"
+data "azuredevops_group" "project_readers" {
+  project_id = var.project_id
+  name       = "Readers"
 }
 
 module "azuredevops_team" {
@@ -38,7 +39,7 @@ module "azuredevops_team" {
     {
       key                = "platform-members"
       team_key           = "platform"
-      member_descriptors = [data.azuredevops_group.project_collection_valid_users.descriptor]
+      member_descriptors = [data.azuredevops_group.project_readers.descriptor]
     }
   ]
 
