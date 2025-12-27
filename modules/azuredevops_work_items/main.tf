@@ -89,7 +89,7 @@ resource "azuredevops_workitemquery_folder" "query_folder_child" {
   project_id = coalesce(each.value.project_id, var.project_id)
   name       = each.value.name
   area       = try(each.value.area, null)
-  parent_id  = tonumber(azuredevops_workitemquery_folder.query_folder[each.value.parent_key].id)
+  parent_id  = azuredevops_workitemquery_folder.query_folder[each.value.parent_key].id
 }
 
 locals {
@@ -138,7 +138,7 @@ resource "azuredevops_workitemquery" "query" {
   name       = each.value.name
   wiql       = each.value.wiql
   area       = try(each.value.area, null)
-  parent_id = each.value.parent_key != null ? tonumber(local.query_folder_ids[each.value.parent_key]) : (
+  parent_id = each.value.parent_key != null ? local.query_folder_ids[each.value.parent_key] : (
     try(each.value.parent_id, null)
   )
 }

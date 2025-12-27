@@ -161,7 +161,7 @@ variable "query_folders" {
     project_id = optional(string)
     name       = string
     area       = optional(string)
-    parent_id  = optional(number)
+    parent_id  = optional(string)
     parent_key = optional(string)
   }))
   default = []
@@ -195,10 +195,10 @@ variable "query_folders" {
   validation {
     condition = alltrue([
       for folder in var.query_folders : (
-        folder.parent_id == null || folder.parent_id > 0
+        folder.parent_id == null || length(trimspace(folder.parent_id)) > 0
       )
     ])
-    error_message = "query_folders.parent_id must be a positive number when provided."
+    error_message = "query_folders.parent_id must be a non-empty string when provided."
   }
 
   validation {
@@ -262,7 +262,7 @@ variable "queries" {
     name       = string
     wiql       = string
     area       = optional(string)
-    parent_id  = optional(number)
+    parent_id  = optional(string)
     parent_key = optional(string)
   }))
   default = []
@@ -303,10 +303,10 @@ variable "queries" {
   validation {
     condition = alltrue([
       for query in var.queries : (
-        query.parent_id == null || query.parent_id > 0
+        query.parent_id == null || length(trimspace(query.parent_id)) > 0
       )
     ])
-    error_message = "queries.parent_id must be a positive number when provided."
+    error_message = "queries.parent_id must be a non-empty string when provided."
   }
 
   validation {

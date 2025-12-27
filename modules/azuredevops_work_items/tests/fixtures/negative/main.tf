@@ -19,7 +19,7 @@ module "azuredevops_work_items" {
     {
       name      = "Invalid"
       area      = "Shared Queries"
-      parent_id = 1
+      parent_id = "00000000-0000-0000-0000-000000000001"
     }
   ]
 }
