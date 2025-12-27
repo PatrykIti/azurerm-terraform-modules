@@ -47,6 +47,11 @@ locals {
   }
 }
 
+moved {
+  from = azuredevops_resource_authorization.resource_authorization
+  to   = azuredevops_pipeline_authorization.resource_authorization
+}
+
 resource "azuredevops_build_folder" "build_folder" {
   for_each = local.build_folders_by_key
 
@@ -277,15 +282,14 @@ resource "azuredevops_pipeline_authorization" "pipeline_authorization" {
   }
 }
 
-resource "azuredevops_resource_authorization" "resource_authorization" {
+resource "azuredevops_pipeline_authorization" "resource_authorization" {
   for_each = local.resource_authorizations_by_key
 
   project_id  = var.project_id
   resource_id = each.value.resource_id
-  authorized  = each.value.authorized
   type        = lower(each.value.type)
 
-  definition_id = coalesce(each.value.definition_id, try(local.build_definition_ids[each.value.build_definition_key], null))
+  pipeline_id = coalesce(each.value.definition_id, try(local.build_definition_ids[each.value.build_definition_key], null))
 
   lifecycle {
     precondition {

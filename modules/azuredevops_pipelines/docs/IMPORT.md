@@ -95,8 +95,9 @@ documentation for `azuredevops_build_folder`.
 ## 4) Permissions and authorizations (optional)
 
 If you manage `build_definition_permissions`, `build_folder_permissions`,
-`pipeline_authorizations`, or `resource_authorizations`, set a stable `key`
-for each item so the import address remains consistent:
+`pipeline_authorizations`, or legacy `resource_authorizations` (mapped to
+`azuredevops_pipeline_authorization`), set a stable `key` for each item so the
+import address remains consistent:
 
 ```hcl
 import {

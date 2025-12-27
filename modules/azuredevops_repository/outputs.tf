@@ -25,7 +25,6 @@ output "policy_ids" {
     branch_work_item_linking  = { for key, policy in azuredevops_branch_policy_work_item_linking.policy : key => policy.id }
     repo_author_email_pattern = { for key, policy in azuredevops_repository_policy_author_email_pattern.policy : key => policy.id }
     repo_case_enforcement     = { for key, policy in azuredevops_repository_policy_case_enforcement.policy : key => policy.id }
-    repo_check_credentials    = { for key, policy in azuredevops_repository_policy_check_credentials.policy : key => policy.id }
     repo_file_path_pattern    = { for key, policy in azuredevops_repository_policy_file_path_pattern.policy : key => policy.id }
     repo_max_file_size        = { for key, policy in azuredevops_repository_policy_max_file_size.policy : key => policy.id }
     repo_max_path_length      = { for key, policy in azuredevops_repository_policy_max_path_length.policy : key => policy.id }

@@ -59,7 +59,7 @@ module "azuredevops_repository" {
     }
   ]
 
-  repository_policy_check_credentials = [
+  repository_policy_reserved_names = [
     {
       repository_keys = ["main"]
     }
@@ -67,11 +67,14 @@ module "azuredevops_repository" {
 }
 ```
 
+Note: Azure DevOps has deprecated the "Check credentials" repository policy,
+so this module does not manage it.
+
 ## Security Hardening Checklist
 
 - [ ] Protect default branches with reviewers and status checks.
 - [ ] Restrict repository permissions to approved groups.
-- [ ] Enable repository policies for credentials and path controls.
+- [ ] Enable repository policies for reserved names and path controls.
 - [ ] Regularly audit repository policy compliance.
 
 ## Common Security Mistakes to Avoid

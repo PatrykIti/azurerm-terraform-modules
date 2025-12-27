@@ -125,6 +125,25 @@ run "invalid_resource_authorization_type" {
   ]
 }
 
+run "invalid_resource_authorization_authorized_false" {
+  command = plan
+
+  variables {
+    resource_authorizations = [
+      {
+        resource_id   = "00000000-0000-0000-0000-000000000000"
+        authorized    = false
+        type          = "endpoint"
+        definition_id = "123"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.resource_authorizations,
+  ]
+}
+
 run "invalid_resource_authorization_unknown_key" {
   command = plan
 

@@ -70,7 +70,7 @@ No modules.
 | [azuredevops_build_folder.build_folder](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/build_folder) | resource |
 | [azuredevops_build_folder_permissions.build_folder_permissions](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/build_folder_permissions) | resource |
 | [azuredevops_pipeline_authorization.pipeline_authorization](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/pipeline_authorization) | resource |
-| [azuredevops_resource_authorization.resource_authorization](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/resource_authorization) | resource |
+| [azuredevops_pipeline_authorization.resource_authorization](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/pipeline_authorization) | resource |
 
 ## Inputs
 
@@ -82,7 +82,7 @@ No modules.
 | <a name="input_build_folders"></a> [build\_folders](#input\_build\_folders) | List of build folders to manage. | <pre>list(object({<br/>    key         = optional(string)<br/>    path        = string<br/>    description = optional(string)<br/>  }))</pre> | `[]` | no |
 | <a name="input_pipeline_authorizations"></a> [pipeline\_authorizations](#input\_pipeline\_authorizations) | List of pipeline authorizations to manage. | <pre>list(object({<br/>    key                 = optional(string)<br/>    resource_id         = string<br/>    type                = string<br/>    pipeline_id         = optional(string)<br/>    pipeline_key        = optional(string)<br/>    pipeline_project_id = optional(string)<br/>  }))</pre> | `[]` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Azure DevOps project ID. | `string` | n/a | yes |
-| <a name="input_resource_authorizations"></a> [resource\_authorizations](#input\_resource\_authorizations) | List of resource authorizations to manage. | <pre>list(object({<br/>    key                  = optional(string)<br/>    resource_id          = string<br/>    authorized           = bool<br/>    definition_id        = optional(string)<br/>    build_definition_key = optional(string)<br/>    type                 = string<br/>  }))</pre> | `[]` | no |
+| <a name="input_resource_authorizations"></a> [resource\_authorizations](#input\_resource\_authorizations) | Legacy list of resource authorizations to manage. Prefer pipeline\_authorizations; this input is mapped to azuredevops\_pipeline\_authorization. | <pre>list(object({<br/>    key                  = optional(string)<br/>    resource_id          = string<br/>    authorized           = bool<br/>    definition_id        = optional(string)<br/>    build_definition_key = optional(string)<br/>    type                 = string<br/>  }))</pre> | `[]` | no |
 
 ## Outputs
 

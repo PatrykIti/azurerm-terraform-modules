@@ -1271,65 +1271,6 @@ variable "repository_policy_case_enforcement" {
 }
 
 # -----------------------------------------------------------------------------
-# Repository Policies - Check Credentials
-# -----------------------------------------------------------------------------
-
-variable "repository_policy_check_credentials" {
-  description = "List of check credentials repository policies."
-  type = list(object({
-    key             = optional(string)
-    enabled         = optional(bool)
-    blocking        = optional(bool)
-    repository_ids  = optional(list(string))
-    repository_keys = optional(list(string))
-  }))
-  default = []
-
-  validation {
-    condition = alltrue([
-      for policy in var.repository_policy_check_credentials : (
-        policy.key == null || length(trimspace(policy.key)) > 0
-      )
-    ])
-    error_message = "repository_policy_check_credentials.key must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for policy in var.repository_policy_check_credentials : (
-        length(coalesce(policy.repository_ids, [])) + length(coalesce(policy.repository_keys, [])) > 0
-      )
-    ])
-    error_message = "repository_policy_check_credentials requires repository_ids or repository_keys."
-  }
-
-  validation {
-    condition = alltrue([
-      for policy in var.repository_policy_check_credentials : alltrue([
-        for key in coalesce(policy.repository_keys, []) : contains(keys(var.repositories), key)
-      ])
-    ])
-    error_message = "repository_policy_check_credentials.repository_keys must reference keys in repositories."
-  }
-
-  validation {
-    condition = length(distinct([
-      for policy in var.repository_policy_check_credentials : coalesce(
-        policy.key,
-        format(
-          "check_credentials:%s",
-          join(",", sort(concat(
-            [for id in coalesce(policy.repository_ids, []) : "id:${id}"],
-            [for key in coalesce(policy.repository_keys, []) : "key:${key}"]
-          )))
-        )
-      )
-    ])) == length(var.repository_policy_check_credentials)
-    error_message = "repository_policy_check_credentials keys must be unique; set key when repository targets would collide."
-  }
-}
-
-# -----------------------------------------------------------------------------
 # Repository Policies - File Path Pattern
 # -----------------------------------------------------------------------------
 

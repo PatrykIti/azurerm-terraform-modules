@@ -6,7 +6,7 @@ This example demonstrates a repository with stricter review and status policies.
 
 - Minimum reviewers policy
 - Status check policy
-- Credential scanning and case enforcement policies
+- Reserved names and case enforcement policies
 
 ## Usage
 

@@ -6,7 +6,6 @@ output "serviceendpoint_ids" {
     aws                         = { for key, endpoint in azuredevops_serviceendpoint_aws.aws : key => endpoint.id }
     azure_service_bus           = { for key, endpoint in azuredevops_serviceendpoint_azure_service_bus.azure_service_bus : key => endpoint.id }
     azurecr                     = { for key, endpoint in azuredevops_serviceendpoint_azurecr.azurecr : key => endpoint.id }
-    azuredevops                 = { for key, endpoint in azuredevops_serviceendpoint_azuredevops.azuredevops : key => endpoint.id }
     azurerm                     = { for key, endpoint in azuredevops_serviceendpoint_azurerm.azurerm : key => endpoint.id }
     bitbucket                   = { for key, endpoint in azuredevops_serviceendpoint_bitbucket.bitbucket : key => endpoint.id }
     black_duck                  = { for key, endpoint in azuredevops_serviceendpoint_black_duck.black_duck : key => endpoint.id }
@@ -55,7 +54,6 @@ output "serviceendpoint_names" {
     aws                         = { for key, endpoint in azuredevops_serviceendpoint_aws.aws : key => endpoint.service_endpoint_name }
     azure_service_bus           = { for key, endpoint in azuredevops_serviceendpoint_azure_service_bus.azure_service_bus : key => endpoint.service_endpoint_name }
     azurecr                     = { for key, endpoint in azuredevops_serviceendpoint_azurecr.azurecr : key => endpoint.service_endpoint_name }
-    azuredevops                 = { for key, endpoint in azuredevops_serviceendpoint_azuredevops.azuredevops : key => endpoint.service_endpoint_name }
     azurerm                     = { for key, endpoint in azuredevops_serviceendpoint_azurerm.azurerm : key => endpoint.service_endpoint_name }
     bitbucket                   = { for key, endpoint in azuredevops_serviceendpoint_bitbucket.bitbucket : key => endpoint.service_endpoint_name }
     black_duck                  = { for key, endpoint in azuredevops_serviceendpoint_black_duck.black_duck : key => endpoint.service_endpoint_name }

@@ -433,7 +433,7 @@ variable "pipeline_authorizations" {
 # -----------------------------------------------------------------------------
 
 variable "resource_authorizations" {
-  description = "List of resource authorizations to manage."
+  description = "Legacy list of resource authorizations to manage. Prefer pipeline_authorizations; this input is mapped to azuredevops_pipeline_authorization."
   type = list(object({
     key                  = optional(string)
     resource_id          = string
@@ -476,6 +476,13 @@ variable "resource_authorizations" {
       )
     ])
     error_message = "resource_authorizations.type must be endpoint, queue, or variablegroup."
+  }
+
+  validation {
+    condition = alltrue([
+      for authorization in var.resource_authorizations : authorization.authorized
+    ])
+    error_message = "resource_authorizations.authorized must be true; use pipeline_authorizations to grant access."
   }
 
   validation {

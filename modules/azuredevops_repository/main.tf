@@ -195,24 +195,6 @@ locals {
     })
   }
 
-  repository_policy_check_credentials_by_key = {
-    for policy in var.repository_policy_check_credentials : coalesce(
-      policy.key,
-      format(
-        "check_credentials:%s",
-        join(",", sort(concat(
-          [for id in coalesce(policy.repository_ids, []) : "id:${id}"],
-          [for key in coalesce(policy.repository_keys, []) : "key:${key}"]
-        )))
-      )
-      ) => merge(policy, {
-        repository_ids = distinct(compact(concat(
-          coalesce(policy.repository_ids, []),
-          [for key in coalesce(policy.repository_keys, []) : lookup(local.repository_ids, key, null)]
-        )))
-    })
-  }
-
   repository_policy_file_path_pattern_by_key = {
     for policy in var.repository_policy_file_path_pattern : coalesce(
       policy.key,
@@ -626,24 +608,6 @@ resource "azuredevops_repository_policy_case_enforcement" "policy" {
         for key in coalesce(each.value.repository_keys, []) : contains(keys(var.repositories), key)
       ])
       error_message = "repository_policy_case_enforcement.repository_keys must reference keys in repositories."
-    }
-  }
-}
-
-resource "azuredevops_repository_policy_check_credentials" "policy" {
-  for_each = local.repository_policy_check_credentials_by_key
-
-  project_id     = var.project_id
-  enabled        = each.value.enabled
-  blocking       = each.value.blocking
-  repository_ids = each.value.repository_ids
-
-  lifecycle {
-    precondition {
-      condition = alltrue([
-        for key in coalesce(each.value.repository_keys, []) : contains(keys(var.repositories), key)
-      ])
-      error_message = "repository_policy_check_credentials.repository_keys must reference keys in repositories."
     }
   }
 }

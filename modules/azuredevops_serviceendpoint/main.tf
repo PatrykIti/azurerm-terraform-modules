@@ -21,10 +21,6 @@ locals {
     for endpoint in var.serviceendpoint_azurecr :
     coalesce(endpoint.key, endpoint.service_endpoint_name) => endpoint
   }
-  serviceendpoint_azuredevops = {
-    for endpoint in var.serviceendpoint_azuredevops :
-    coalesce(endpoint.key, endpoint.service_endpoint_name) => endpoint
-  }
   serviceendpoint_azurerm = {
     for endpoint in var.serviceendpoint_azurerm :
     coalesce(endpoint.key, endpoint.service_endpoint_name) => endpoint
@@ -185,23 +181,211 @@ locals {
   }
 }
 
+locals {
+  serviceendpoint_argocd_for_each = {
+    for key in keys(local.serviceendpoint_argocd) : nonsensitive(key) => true
+  }
+  serviceendpoint_artifactory_for_each = {
+    for key in keys(local.serviceendpoint_artifactory) : nonsensitive(key) => true
+  }
+  serviceendpoint_aws_for_each = {
+    for key in keys(local.serviceendpoint_aws) : nonsensitive(key) => true
+  }
+  serviceendpoint_azure_service_bus_for_each = {
+    for key in keys(local.serviceendpoint_azure_service_bus) : nonsensitive(key) => true
+  }
+  serviceendpoint_azurecr_for_each = {
+    for key in keys(local.serviceendpoint_azurecr) : nonsensitive(key) => true
+  }
+  serviceendpoint_azurerm_for_each = {
+    for key in keys(local.serviceendpoint_azurerm) : nonsensitive(key) => true
+  }
+  serviceendpoint_bitbucket_for_each = {
+    for key in keys(local.serviceendpoint_bitbucket) : nonsensitive(key) => true
+  }
+  serviceendpoint_black_duck_for_each = {
+    for key in keys(local.serviceendpoint_black_duck) : nonsensitive(key) => true
+  }
+  serviceendpoint_checkmarx_one_for_each = {
+    for key in keys(local.serviceendpoint_checkmarx_one) : nonsensitive(key) => true
+  }
+  serviceendpoint_checkmarx_sast_for_each = {
+    for key in keys(local.serviceendpoint_checkmarx_sast) : nonsensitive(key) => true
+  }
+  serviceendpoint_checkmarx_sca_for_each = {
+    for key in keys(local.serviceendpoint_checkmarx_sca) : nonsensitive(key) => true
+  }
+  serviceendpoint_dockerregistry_for_each = {
+    for key in keys(local.serviceendpoint_dockerregistry) : nonsensitive(key) => true
+  }
+  serviceendpoint_dynamics_lifecycle_services_for_each = {
+    for key in keys(local.serviceendpoint_dynamics_lifecycle_services) : nonsensitive(key) => true
+  }
+  serviceendpoint_externaltfs_for_each = {
+    for key in keys(local.serviceendpoint_externaltfs) : nonsensitive(key) => true
+  }
+  serviceendpoint_gcp_terraform_for_each = {
+    for key in keys(local.serviceendpoint_gcp_terraform) : nonsensitive(key) => true
+  }
+  serviceendpoint_generic_for_each = {
+    for key in keys(local.serviceendpoint_generic) : nonsensitive(key) => true
+  }
+  serviceendpoint_generic_git_for_each = {
+    for key in keys(local.serviceendpoint_generic_git) : nonsensitive(key) => true
+  }
+  serviceendpoint_generic_v2_for_each = {
+    for key in keys(local.serviceendpoint_generic_v2) : nonsensitive(key) => true
+  }
+  serviceendpoint_github_for_each = {
+    for key in keys(local.serviceendpoint_github) : nonsensitive(key) => true
+  }
+  serviceendpoint_github_enterprise_for_each = {
+    for key in keys(local.serviceendpoint_github_enterprise) : nonsensitive(key) => true
+  }
+  serviceendpoint_gitlab_for_each = {
+    for key in keys(local.serviceendpoint_gitlab) : nonsensitive(key) => true
+  }
+  serviceendpoint_incomingwebhook_for_each = {
+    for key in keys(local.serviceendpoint_incomingwebhook) : nonsensitive(key) => true
+  }
+  serviceendpoint_jenkins_for_each = {
+    for key in keys(local.serviceendpoint_jenkins) : nonsensitive(key) => true
+  }
+  serviceendpoint_jfrog_artifactory_v2_for_each = {
+    for key in keys(local.serviceendpoint_jfrog_artifactory_v2) : nonsensitive(key) => true
+  }
+  serviceendpoint_jfrog_distribution_v2_for_each = {
+    for key in keys(local.serviceendpoint_jfrog_distribution_v2) : nonsensitive(key) => true
+  }
+  serviceendpoint_jfrog_platform_v2_for_each = {
+    for key in keys(local.serviceendpoint_jfrog_platform_v2) : nonsensitive(key) => true
+  }
+  serviceendpoint_jfrog_xray_v2_for_each = {
+    for key in keys(local.serviceendpoint_jfrog_xray_v2) : nonsensitive(key) => true
+  }
+  serviceendpoint_kubernetes_for_each = {
+    for key in keys(local.serviceendpoint_kubernetes) : nonsensitive(key) => true
+  }
+  serviceendpoint_maven_for_each = {
+    for key in keys(local.serviceendpoint_maven) : nonsensitive(key) => true
+  }
+  serviceendpoint_nexus_for_each = {
+    for key in keys(local.serviceendpoint_nexus) : nonsensitive(key) => true
+  }
+  serviceendpoint_npm_for_each = {
+    for key in keys(local.serviceendpoint_npm) : nonsensitive(key) => true
+  }
+  serviceendpoint_nuget_for_each = {
+    for key in keys(local.serviceendpoint_nuget) : nonsensitive(key) => true
+  }
+  serviceendpoint_octopusdeploy_for_each = {
+    for key in keys(local.serviceendpoint_octopusdeploy) : nonsensitive(key) => true
+  }
+  serviceendpoint_openshift_for_each = {
+    for key in keys(local.serviceendpoint_openshift) : nonsensitive(key) => true
+  }
+  serviceendpoint_runpipeline_for_each = {
+    for key in keys(local.serviceendpoint_runpipeline) : nonsensitive(key) => true
+  }
+  serviceendpoint_servicefabric_for_each = {
+    for key in keys(local.serviceendpoint_servicefabric) : nonsensitive(key) => true
+  }
+  serviceendpoint_snyk_for_each = {
+    for key in keys(local.serviceendpoint_snyk) : nonsensitive(key) => true
+  }
+  serviceendpoint_sonarcloud_for_each = {
+    for key in keys(local.serviceendpoint_sonarcloud) : nonsensitive(key) => true
+  }
+  serviceendpoint_sonarqube_for_each = {
+    for key in keys(local.serviceendpoint_sonarqube) : nonsensitive(key) => true
+  }
+  serviceendpoint_ssh_for_each = {
+    for key in keys(local.serviceendpoint_ssh) : nonsensitive(key) => true
+  }
+  serviceendpoint_visualstudiomarketplace_for_each = {
+    for key in keys(local.serviceendpoint_visualstudiomarketplace) : nonsensitive(key) => true
+  }
+  serviceendpoint_azurerm_credentials = {
+    for key, endpoint in local.serviceendpoint_azurerm :
+    key => {
+      serviceprincipalid = coalesce(
+        try(endpoint.credentials.serviceprincipalid, null),
+        endpoint.serviceprincipalid,
+        null
+      )
+      serviceprincipalkey = coalesce(
+        try(endpoint.credentials.serviceprincipalkey, null),
+        endpoint.serviceprincipalkey,
+        null
+      )
+      serviceprincipalcertificate = coalesce(
+        try(endpoint.credentials.serviceprincipalcertificate, null),
+        endpoint.serviceprincipalcertificate,
+        null
+      )
+    }
+  }
+  serviceendpoint_azurerm_features = {
+    for key, endpoint in local.serviceendpoint_azurerm :
+    key => {
+      validate = coalesce(
+        try(endpoint.features.validate, null),
+        endpoint.validate,
+        null
+      )
+    }
+  }
+  serviceendpoint_github_auth_personal = {
+    for key, endpoint in local.serviceendpoint_github :
+    key => (
+      endpoint.auth_personal != null ? endpoint.auth_personal :
+      endpoint.personal_access_token != null ? { personal_access_token = endpoint.personal_access_token } :
+      null
+    )
+  }
+  serviceendpoint_github_auth_oauth = {
+    for key, endpoint in local.serviceendpoint_github :
+    key => (
+      endpoint.auth_oauth != null ? endpoint.auth_oauth :
+      endpoint.oauth_configuration_id != null ? { oauth_configuration_id = endpoint.oauth_configuration_id } :
+      null
+    )
+  }
+  serviceendpoint_github_enterprise_auth_personal = {
+    for key, endpoint in local.serviceendpoint_github_enterprise :
+    key => (
+      endpoint.auth_personal != null ? endpoint.auth_personal :
+      endpoint.personal_access_token != null ? { personal_access_token = endpoint.personal_access_token } :
+      null
+    )
+  }
+  serviceendpoint_github_enterprise_auth_oauth = {
+    for key, endpoint in local.serviceendpoint_github_enterprise :
+    key => (
+      endpoint.auth_oauth != null ? endpoint.auth_oauth :
+      endpoint.oauth_configuration_id != null ? { oauth_configuration_id = endpoint.oauth_configuration_id } :
+      null
+    )
+  }
+}
+
 resource "azuredevops_serviceendpoint_argocd" "argocd" {
-  for_each = local.serviceendpoint_argocd
+  for_each = local.serviceendpoint_argocd_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  url                   = each.value.url
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_argocd[each.key].service_endpoint_name
+  url                   = local.serviceendpoint_argocd[each.key].url
+  description           = local.serviceendpoint_argocd[each.key].description
 
   dynamic "authentication_token" {
-    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    for_each = local.serviceendpoint_argocd[each.key].authentication_token == null ? [] : [local.serviceendpoint_argocd[each.key].authentication_token]
     content {
       token = authentication_token.value.token
     }
   }
 
   dynamic "authentication_basic" {
-    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    for_each = local.serviceendpoint_argocd[each.key].authentication_basic == null ? [] : [local.serviceendpoint_argocd[each.key].authentication_basic]
     content {
       username = authentication_basic.value.username
       password = authentication_basic.value.password
@@ -211,13 +395,13 @@ resource "azuredevops_serviceendpoint_argocd" "argocd" {
   lifecycle {
     precondition {
       condition = (
-        (each.value.authentication_token != null) != (each.value.authentication_basic != null)
+        (local.serviceendpoint_argocd[each.key].authentication_token != null) != (local.serviceendpoint_argocd[each.key].authentication_basic != null)
       ) && (
-        each.value.authentication_token == null || length(trimspace(each.value.authentication_token.token)) > 0
+        local.serviceendpoint_argocd[each.key].authentication_token == null || length(trimspace(local.serviceendpoint_argocd[each.key].authentication_token.token)) > 0
       ) && (
-        each.value.authentication_basic == null || (
-          length(trimspace(each.value.authentication_basic.username)) > 0 &&
-          length(trimspace(each.value.authentication_basic.password)) > 0
+        local.serviceendpoint_argocd[each.key].authentication_basic == null || (
+          length(trimspace(local.serviceendpoint_argocd[each.key].authentication_basic.username)) > 0 &&
+          length(trimspace(local.serviceendpoint_argocd[each.key].authentication_basic.password)) > 0
         )
       )
       error_message = "serviceendpoint_argocd requires exactly one authentication method with non-empty credentials."
@@ -226,22 +410,22 @@ resource "azuredevops_serviceendpoint_argocd" "argocd" {
 }
 
 resource "azuredevops_serviceendpoint_artifactory" "artifactory" {
-  for_each = local.serviceendpoint_artifactory
+  for_each = local.serviceendpoint_artifactory_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  url                   = each.value.url
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_artifactory[each.key].service_endpoint_name
+  url                   = local.serviceendpoint_artifactory[each.key].url
+  description           = local.serviceendpoint_artifactory[each.key].description
 
   dynamic "authentication_token" {
-    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    for_each = local.serviceendpoint_artifactory[each.key].authentication_token == null ? [] : [local.serviceendpoint_artifactory[each.key].authentication_token]
     content {
       token = authentication_token.value.token
     }
   }
 
   dynamic "authentication_basic" {
-    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    for_each = local.serviceendpoint_artifactory[each.key].authentication_basic == null ? [] : [local.serviceendpoint_artifactory[each.key].authentication_basic]
     content {
       username = authentication_basic.value.username
       password = authentication_basic.value.password
@@ -251,13 +435,13 @@ resource "azuredevops_serviceendpoint_artifactory" "artifactory" {
   lifecycle {
     precondition {
       condition = (
-        (each.value.authentication_token != null) != (each.value.authentication_basic != null)
+        (local.serviceendpoint_artifactory[each.key].authentication_token != null) != (local.serviceendpoint_artifactory[each.key].authentication_basic != null)
       ) && (
-        each.value.authentication_token == null || length(trimspace(each.value.authentication_token.token)) > 0
+        local.serviceendpoint_artifactory[each.key].authentication_token == null || length(trimspace(local.serviceendpoint_artifactory[each.key].authentication_token.token)) > 0
       ) && (
-        each.value.authentication_basic == null || (
-          length(trimspace(each.value.authentication_basic.username)) > 0 &&
-          length(trimspace(each.value.authentication_basic.password)) > 0
+        local.serviceendpoint_artifactory[each.key].authentication_basic == null || (
+          length(trimspace(local.serviceendpoint_artifactory[each.key].authentication_basic.username)) > 0 &&
+          length(trimspace(local.serviceendpoint_artifactory[each.key].authentication_basic.password)) > 0
         )
       )
       error_message = "serviceendpoint_artifactory requires exactly one authentication method with non-empty credentials."
@@ -266,32 +450,32 @@ resource "azuredevops_serviceendpoint_artifactory" "artifactory" {
 }
 
 resource "azuredevops_serviceendpoint_aws" "aws" {
-  for_each = local.serviceendpoint_aws
+  for_each = local.serviceendpoint_aws_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  access_key_id         = each.value.access_key_id
-  secret_access_key     = each.value.secret_access_key
-  session_token         = each.value.session_token
-  role_to_assume        = each.value.role_to_assume
-  role_session_name     = each.value.role_session_name
-  external_id           = each.value.external_id
-  description           = each.value.description
-  use_oidc              = each.value.use_oidc
+  service_endpoint_name = local.serviceendpoint_aws[each.key].service_endpoint_name
+  access_key_id         = local.serviceendpoint_aws[each.key].access_key_id
+  secret_access_key     = local.serviceendpoint_aws[each.key].secret_access_key
+  session_token         = local.serviceendpoint_aws[each.key].session_token
+  role_to_assume        = local.serviceendpoint_aws[each.key].role_to_assume
+  role_session_name     = local.serviceendpoint_aws[each.key].role_session_name
+  external_id           = local.serviceendpoint_aws[each.key].external_id
+  description           = local.serviceendpoint_aws[each.key].description
+  use_oidc              = local.serviceendpoint_aws[each.key].use_oidc
 
   lifecycle {
     precondition {
       condition = (
-        each.value.use_oidc == true
+        local.serviceendpoint_aws[each.key].use_oidc == true
         ? (
-          each.value.access_key_id == null &&
-          each.value.secret_access_key == null &&
-          length(trimspace(coalesce(each.value.role_to_assume, ""))) > 0 &&
-          length(trimspace(coalesce(each.value.role_session_name, ""))) > 0
+          local.serviceendpoint_aws[each.key].access_key_id == null &&
+          local.serviceendpoint_aws[each.key].secret_access_key == null &&
+          length(trimspace(coalesce(local.serviceendpoint_aws[each.key].role_to_assume, ""))) > 0 &&
+          length(trimspace(coalesce(local.serviceendpoint_aws[each.key].role_session_name, ""))) > 0
         )
         : (
-          length(trimspace(coalesce(each.value.access_key_id, ""))) > 0 &&
-          length(trimspace(coalesce(each.value.secret_access_key, ""))) > 0
+          length(trimspace(coalesce(local.serviceendpoint_aws[each.key].access_key_id, ""))) > 0 &&
+          length(trimspace(coalesce(local.serviceendpoint_aws[each.key].secret_access_key, ""))) > 0
         )
       )
       error_message = "serviceendpoint_aws requires access_key_id/secret_access_key or OIDC with role_to_assume and role_session_name, but not both."
@@ -300,69 +484,58 @@ resource "azuredevops_serviceendpoint_aws" "aws" {
 }
 
 resource "azuredevops_serviceendpoint_azure_service_bus" "azure_service_bus" {
-  for_each = local.serviceendpoint_azure_service_bus
+  for_each = local.serviceendpoint_azure_service_bus_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  queue_name            = each.value.queue_name
-  connection_string     = each.value.connection_string
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_azure_service_bus[each.key].service_endpoint_name
+  queue_name            = local.serviceendpoint_azure_service_bus[each.key].queue_name
+  connection_string     = local.serviceendpoint_azure_service_bus[each.key].connection_string
+  description           = local.serviceendpoint_azure_service_bus[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_azurecr" "azurecr" {
-  for_each = local.serviceendpoint_azurecr
+  for_each = local.serviceendpoint_azurecr_for_each
 
   project_id                             = var.project_id
-  service_endpoint_name                  = each.value.service_endpoint_name
-  resource_group                         = each.value.resource_group
-  azurecr_spn_tenantid                   = each.value.azurecr_spn_tenantid
-  azurecr_name                           = each.value.azurecr_name
-  azurecr_subscription_id                = each.value.azurecr_subscription_id
-  azurecr_subscription_name              = each.value.azurecr_subscription_name
-  service_endpoint_authentication_scheme = each.value.service_endpoint_authentication_scheme
-  description                            = each.value.description
+  service_endpoint_name                  = local.serviceendpoint_azurecr[each.key].service_endpoint_name
+  resource_group                         = local.serviceendpoint_azurecr[each.key].resource_group
+  azurecr_spn_tenantid                   = local.serviceendpoint_azurecr[each.key].azurecr_spn_tenantid
+  azurecr_name                           = local.serviceendpoint_azurecr[each.key].azurecr_name
+  azurecr_subscription_id                = local.serviceendpoint_azurecr[each.key].azurecr_subscription_id
+  azurecr_subscription_name              = local.serviceendpoint_azurecr[each.key].azurecr_subscription_name
+  service_endpoint_authentication_scheme = local.serviceendpoint_azurecr[each.key].service_endpoint_authentication_scheme
+  description                            = local.serviceendpoint_azurecr[each.key].description
 
   dynamic "credentials" {
-    for_each = each.value.credentials == null ? [] : [each.value.credentials]
+    for_each = local.serviceendpoint_azurecr[each.key].credentials == null ? [] : [local.serviceendpoint_azurecr[each.key].credentials]
     content {
       serviceprincipalid = credentials.value.serviceprincipalid
     }
   }
 }
 
-resource "azuredevops_serviceendpoint_azuredevops" "azuredevops" {
-  for_each = local.serviceendpoint_azuredevops
-
-  project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  org_url               = each.value.org_url
-  release_api_url       = each.value.release_api_url
-  personal_access_token = each.value.personal_access_token
-  description           = each.value.description
-}
-
 resource "azuredevops_serviceendpoint_azurerm" "azurerm" {
-  for_each = local.serviceendpoint_azurerm
+  for_each = local.serviceendpoint_azurerm_for_each
 
   project_id                             = var.project_id
-  service_endpoint_name                  = each.value.service_endpoint_name
-  azurerm_spn_tenantid                   = each.value.azurerm_spn_tenantid
-  serviceprincipalid                     = each.value.serviceprincipalid
-  serviceprincipalkey                    = each.value.serviceprincipalkey
-  serviceprincipalcertificate            = each.value.serviceprincipalcertificate
-  service_endpoint_authentication_scheme = each.value.service_endpoint_authentication_scheme
-  azurerm_management_group_id            = each.value.azurerm_management_group_id
-  azurerm_management_group_name          = each.value.azurerm_management_group_name
-  azurerm_subscription_id                = each.value.azurerm_subscription_id
-  azurerm_subscription_name              = each.value.azurerm_subscription_name
-  environment                            = each.value.environment
-  server_url                             = each.value.server_url
-  resource_group                         = each.value.resource_group
-  validate                               = each.value.validate
-  description                            = each.value.description
+  service_endpoint_name                  = local.serviceendpoint_azurerm[each.key].service_endpoint_name
+  azurerm_spn_tenantid                   = local.serviceendpoint_azurerm[each.key].azurerm_spn_tenantid
+  service_endpoint_authentication_scheme = local.serviceendpoint_azurerm[each.key].service_endpoint_authentication_scheme
+  azurerm_management_group_id            = local.serviceendpoint_azurerm[each.key].azurerm_management_group_id
+  azurerm_management_group_name          = local.serviceendpoint_azurerm[each.key].azurerm_management_group_name
+  azurerm_subscription_id                = local.serviceendpoint_azurerm[each.key].azurerm_subscription_id
+  azurerm_subscription_name              = local.serviceendpoint_azurerm[each.key].azurerm_subscription_name
+  environment                            = local.serviceendpoint_azurerm[each.key].environment
+  server_url                             = local.serviceendpoint_azurerm[each.key].server_url
+  resource_group                         = local.serviceendpoint_azurerm[each.key].resource_group
+  description                            = local.serviceendpoint_azurerm[each.key].description
 
   dynamic "credentials" {
-    for_each = each.value.credentials == null ? [] : [each.value.credentials]
+    for_each = (
+      local.serviceendpoint_azurerm_credentials[each.key].serviceprincipalid == null &&
+      local.serviceendpoint_azurerm_credentials[each.key].serviceprincipalkey == null &&
+      local.serviceendpoint_azurerm_credentials[each.key].serviceprincipalcertificate == null
+    ) ? [] : [local.serviceendpoint_azurerm_credentials[each.key]]
     content {
       serviceprincipalid          = credentials.value.serviceprincipalid
       serviceprincipalkey         = credentials.value.serviceprincipalkey
@@ -371,7 +544,7 @@ resource "azuredevops_serviceendpoint_azurerm" "azurerm" {
   }
 
   dynamic "features" {
-    for_each = each.value.features == null ? [] : [each.value.features]
+    for_each = local.serviceendpoint_azurerm_features[each.key].validate == null ? [] : [local.serviceendpoint_azurerm_features[each.key]]
     content {
       validate = features.value.validate
     }
@@ -379,18 +552,22 @@ resource "azuredevops_serviceendpoint_azurerm" "azurerm" {
 
   lifecycle {
     precondition {
+      condition = length(trimspace(coalesce(local.serviceendpoint_azurerm_credentials[each.key].serviceprincipalid, ""))) > 0
+      error_message = "serviceendpoint_azurerm requires a non-empty service principal ID."
+    }
+    precondition {
       condition = !(
-        coalesce(each.value.serviceprincipalkey, try(each.value.credentials.serviceprincipalkey, null)) != null &&
-        coalesce(each.value.serviceprincipalcertificate, try(each.value.credentials.serviceprincipalcertificate, null)) != null
+        local.serviceendpoint_azurerm_credentials[each.key].serviceprincipalkey != null &&
+        local.serviceendpoint_azurerm_credentials[each.key].serviceprincipalcertificate != null
       )
       error_message = "serviceendpoint_azurerm cannot set both serviceprincipalkey and serviceprincipalcertificate."
     }
     precondition {
       condition = (
-        each.value.service_endpoint_authentication_scheme == "WorkloadIdentityFederation"
+        local.serviceendpoint_azurerm[each.key].service_endpoint_authentication_scheme == "WorkloadIdentityFederation"
         ? (
-          coalesce(each.value.serviceprincipalkey, try(each.value.credentials.serviceprincipalkey, null)) == null &&
-          coalesce(each.value.serviceprincipalcertificate, try(each.value.credentials.serviceprincipalcertificate, null)) == null
+          local.serviceendpoint_azurerm_credentials[each.key].serviceprincipalkey == null &&
+          local.serviceendpoint_azurerm_credentials[each.key].serviceprincipalcertificate == null
         )
         : true
       )
@@ -398,11 +575,11 @@ resource "azuredevops_serviceendpoint_azurerm" "azurerm" {
     }
     precondition {
       condition = (
-        each.value.service_endpoint_authentication_scheme == "WorkloadIdentityFederation"
+        local.serviceendpoint_azurerm[each.key].service_endpoint_authentication_scheme == "WorkloadIdentityFederation"
         ? true
         : (
-          coalesce(each.value.serviceprincipalkey, try(each.value.credentials.serviceprincipalkey, null)) != null ||
-          coalesce(each.value.serviceprincipalcertificate, try(each.value.credentials.serviceprincipalcertificate, null)) != null
+          local.serviceendpoint_azurerm_credentials[each.key].serviceprincipalkey != null ||
+          local.serviceendpoint_azurerm_credentials[each.key].serviceprincipalcertificate != null
         )
       )
       error_message = "serviceendpoint_azurerm requires a service principal key or certificate unless workload identity is selected."
@@ -411,173 +588,171 @@ resource "azuredevops_serviceendpoint_azurerm" "azurerm" {
 }
 
 resource "azuredevops_serviceendpoint_bitbucket" "bitbucket" {
-  for_each = local.serviceendpoint_bitbucket
+  for_each = local.serviceendpoint_bitbucket_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  username              = each.value.username
-  password              = each.value.password
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_bitbucket[each.key].service_endpoint_name
+  username              = local.serviceendpoint_bitbucket[each.key].username
+  password              = local.serviceendpoint_bitbucket[each.key].password
+  description           = local.serviceendpoint_bitbucket[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_black_duck" "black_duck" {
-  for_each = local.serviceendpoint_black_duck
+  for_each = local.serviceendpoint_black_duck_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  server_url            = each.value.server_url
-  api_token             = each.value.api_token
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_black_duck[each.key].service_endpoint_name
+  server_url            = local.serviceendpoint_black_duck[each.key].server_url
+  api_token             = local.serviceendpoint_black_duck[each.key].api_token
+  description           = local.serviceendpoint_black_duck[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_checkmarx_one" "checkmarx_one" {
-  for_each = local.serviceendpoint_checkmarx_one
+  for_each = local.serviceendpoint_checkmarx_one_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  server_url            = each.value.server_url
-  authorization_url     = each.value.authorization_url
-  api_key               = each.value.api_key
-  client_id             = each.value.client_id
-  client_secret         = each.value.client_secret
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_checkmarx_one[each.key].service_endpoint_name
+  server_url            = local.serviceendpoint_checkmarx_one[each.key].server_url
+  authorization_url     = local.serviceendpoint_checkmarx_one[each.key].authorization_url
+  api_key               = local.serviceendpoint_checkmarx_one[each.key].api_key
+  client_id             = local.serviceendpoint_checkmarx_one[each.key].client_id
+  client_secret         = local.serviceendpoint_checkmarx_one[each.key].client_secret
+  description           = local.serviceendpoint_checkmarx_one[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_checkmarx_sast" "checkmarx_sast" {
-  for_each = local.serviceendpoint_checkmarx_sast
+  for_each = local.serviceendpoint_checkmarx_sast_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  server_url            = each.value.server_url
-  username              = each.value.username
-  password              = each.value.password
-  team                  = each.value.team
-  preset                = each.value.preset
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_checkmarx_sast[each.key].service_endpoint_name
+  server_url            = local.serviceendpoint_checkmarx_sast[each.key].server_url
+  username              = local.serviceendpoint_checkmarx_sast[each.key].username
+  password              = local.serviceendpoint_checkmarx_sast[each.key].password
+  team                  = local.serviceendpoint_checkmarx_sast[each.key].team
+  preset                = local.serviceendpoint_checkmarx_sast[each.key].preset
+  description           = local.serviceendpoint_checkmarx_sast[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_checkmarx_sca" "checkmarx_sca" {
-  for_each = local.serviceendpoint_checkmarx_sca
+  for_each = local.serviceendpoint_checkmarx_sca_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  access_control_url    = each.value.access_control_url
-  server_url            = each.value.server_url
-  web_app_url           = each.value.web_app_url
-  account               = each.value.account
-  username              = each.value.username
-  password              = each.value.password
-  team                  = each.value.team
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_checkmarx_sca[each.key].service_endpoint_name
+  access_control_url    = local.serviceendpoint_checkmarx_sca[each.key].access_control_url
+  server_url            = local.serviceendpoint_checkmarx_sca[each.key].server_url
+  web_app_url           = local.serviceendpoint_checkmarx_sca[each.key].web_app_url
+  account               = local.serviceendpoint_checkmarx_sca[each.key].account
+  username              = local.serviceendpoint_checkmarx_sca[each.key].username
+  password              = local.serviceendpoint_checkmarx_sca[each.key].password
+  team                  = local.serviceendpoint_checkmarx_sca[each.key].team
+  description           = local.serviceendpoint_checkmarx_sca[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_dockerregistry" "dockerregistry" {
-  for_each = local.serviceendpoint_dockerregistry
+  for_each = local.serviceendpoint_dockerregistry_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  description           = each.value.description
-  docker_registry       = each.value.docker_registry
-  docker_username       = each.value.docker_username
-  docker_email          = each.value.docker_email
-  docker_password       = each.value.docker_password
-  registry_type         = each.value.registry_type
+  service_endpoint_name = local.serviceendpoint_dockerregistry[each.key].service_endpoint_name
+  description           = local.serviceendpoint_dockerregistry[each.key].description
+  docker_registry       = local.serviceendpoint_dockerregistry[each.key].docker_registry
+  docker_username       = local.serviceendpoint_dockerregistry[each.key].docker_username
+  docker_email          = local.serviceendpoint_dockerregistry[each.key].docker_email
+  docker_password       = local.serviceendpoint_dockerregistry[each.key].docker_password
+  registry_type         = local.serviceendpoint_dockerregistry[each.key].registry_type
 }
 
 resource "azuredevops_serviceendpoint_dynamics_lifecycle_services" "dynamics_lifecycle_services" {
-  for_each = local.serviceendpoint_dynamics_lifecycle_services
+  for_each = local.serviceendpoint_dynamics_lifecycle_services_for_each
 
   project_id                      = var.project_id
-  service_endpoint_name           = each.value.service_endpoint_name
-  authorization_endpoint          = each.value.authorization_endpoint
-  lifecycle_services_api_endpoint = each.value.lifecycle_services_api_endpoint
-  client_id                       = each.value.client_id
-  username                        = each.value.username
-  password                        = each.value.password
-  description                     = each.value.description
+  service_endpoint_name           = local.serviceendpoint_dynamics_lifecycle_services[each.key].service_endpoint_name
+  authorization_endpoint          = local.serviceendpoint_dynamics_lifecycle_services[each.key].authorization_endpoint
+  lifecycle_services_api_endpoint = local.serviceendpoint_dynamics_lifecycle_services[each.key].lifecycle_services_api_endpoint
+  client_id                       = local.serviceendpoint_dynamics_lifecycle_services[each.key].client_id
+  username                        = local.serviceendpoint_dynamics_lifecycle_services[each.key].username
+  password                        = local.serviceendpoint_dynamics_lifecycle_services[each.key].password
+  description                     = local.serviceendpoint_dynamics_lifecycle_services[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_externaltfs" "externaltfs" {
-  for_each = local.serviceendpoint_externaltfs
+  for_each = local.serviceendpoint_externaltfs_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  connection_url        = each.value.connection_url
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_externaltfs[each.key].service_endpoint_name
+  connection_url        = local.serviceendpoint_externaltfs[each.key].connection_url
+  description           = local.serviceendpoint_externaltfs[each.key].description
 
   auth_personal {
-    personal_access_token = each.value.auth_personal.personal_access_token
+    personal_access_token = local.serviceendpoint_externaltfs[each.key].auth_personal.personal_access_token
   }
 }
 
 resource "azuredevops_serviceendpoint_gcp_terraform" "gcp_terraform" {
-  for_each = local.serviceendpoint_gcp_terraform
+  for_each = local.serviceendpoint_gcp_terraform_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  private_key           = each.value.private_key
-  token_uri             = each.value.token_uri
-  gcp_project_id        = each.value.gcp_project_id
-  client_email          = each.value.client_email
-  scope                 = each.value.scope
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_gcp_terraform[each.key].service_endpoint_name
+  private_key           = local.serviceendpoint_gcp_terraform[each.key].private_key
+  token_uri             = local.serviceendpoint_gcp_terraform[each.key].token_uri
+  gcp_project_id        = local.serviceendpoint_gcp_terraform[each.key].gcp_project_id
+  client_email          = local.serviceendpoint_gcp_terraform[each.key].client_email
+  scope                 = local.serviceendpoint_gcp_terraform[each.key].scope
+  description           = local.serviceendpoint_gcp_terraform[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_generic" "generic" {
-  for_each = local.serviceendpoint_generic
+  for_each = local.serviceendpoint_generic_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  server_url            = each.value.server_url
-  username              = each.value.username
-  password              = each.value.password
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_generic[each.key].service_endpoint_name
+  server_url            = local.serviceendpoint_generic[each.key].server_url
+  username              = local.serviceendpoint_generic[each.key].username
+  password              = local.serviceendpoint_generic[each.key].password
+  description           = local.serviceendpoint_generic[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_generic_git" "generic_git" {
-  for_each = local.serviceendpoint_generic_git
+  for_each = local.serviceendpoint_generic_git_for_each
 
   project_id              = var.project_id
-  service_endpoint_name   = each.value.service_endpoint_name
-  repository_url          = each.value.repository_url
-  username                = each.value.username
-  password                = each.value.password
-  enable_pipelines_access = each.value.enable_pipelines_access
-  description             = each.value.description
+  service_endpoint_name   = local.serviceendpoint_generic_git[each.key].service_endpoint_name
+  repository_url          = local.serviceendpoint_generic_git[each.key].repository_url
+  username                = local.serviceendpoint_generic_git[each.key].username
+  password                = local.serviceendpoint_generic_git[each.key].password
+  enable_pipelines_access = local.serviceendpoint_generic_git[each.key].enable_pipelines_access
+  description             = local.serviceendpoint_generic_git[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_generic_v2" "generic_v2" {
-  for_each = local.serviceendpoint_generic_v2
+  for_each = local.serviceendpoint_generic_v2_for_each
 
   project_id               = var.project_id
-  name                     = each.value.name
-  type                     = each.value.type
-  server_url               = each.value.server_url
-  authorization_scheme     = each.value.authorization_scheme
-  shared_project_ids       = each.value.shared_project_ids
-  description              = each.value.description
-  authorization_parameters = each.value.authorization_parameters
-  parameters               = each.value.parameters
+  name                     = local.serviceendpoint_generic_v2[each.key].name
+  type                     = local.serviceendpoint_generic_v2[each.key].type
+  server_url               = local.serviceendpoint_generic_v2[each.key].server_url
+  authorization_scheme     = local.serviceendpoint_generic_v2[each.key].authorization_scheme
+  shared_project_ids       = local.serviceendpoint_generic_v2[each.key].shared_project_ids
+  description              = local.serviceendpoint_generic_v2[each.key].description
+  authorization_parameters = local.serviceendpoint_generic_v2[each.key].authorization_parameters
+  parameters               = local.serviceendpoint_generic_v2[each.key].parameters
 }
 
 resource "azuredevops_serviceendpoint_github" "github" {
-  for_each = local.serviceendpoint_github
+  for_each = local.serviceendpoint_github_for_each
 
   project_id             = var.project_id
-  service_endpoint_name  = each.value.service_endpoint_name
-  description            = each.value.description
-  personal_access_token  = each.value.personal_access_token
-  oauth_configuration_id = each.value.oauth_configuration_id
+  service_endpoint_name  = local.serviceendpoint_github[each.key].service_endpoint_name
+  description            = local.serviceendpoint_github[each.key].description
 
   dynamic "auth_oauth" {
-    for_each = each.value.auth_oauth == null ? [] : [each.value.auth_oauth]
+    for_each = local.serviceendpoint_github_auth_oauth[each.key] == null ? [] : [local.serviceendpoint_github_auth_oauth[each.key]]
     content {
       oauth_configuration_id = auth_oauth.value.oauth_configuration_id
     }
   }
 
   dynamic "auth_personal" {
-    for_each = each.value.auth_personal == null ? [] : [each.value.auth_personal]
+    for_each = local.serviceendpoint_github_auth_personal[each.key] == null ? [] : [local.serviceendpoint_github_auth_personal[each.key]]
     content {
       personal_access_token = auth_personal.value.personal_access_token
     }
@@ -586,8 +761,8 @@ resource "azuredevops_serviceendpoint_github" "github" {
   lifecycle {
     precondition {
       condition = (
-        (each.value.auth_personal != null || each.value.personal_access_token != null) !=
-        (each.value.auth_oauth != null || each.value.oauth_configuration_id != null)
+        (local.serviceendpoint_github_auth_personal[each.key] != null) !=
+        (local.serviceendpoint_github_auth_oauth[each.key] != null)
       )
       error_message = "serviceendpoint_github requires exactly one of personal access token or OAuth configuration."
     }
@@ -595,24 +770,22 @@ resource "azuredevops_serviceendpoint_github" "github" {
 }
 
 resource "azuredevops_serviceendpoint_github_enterprise" "github_enterprise" {
-  for_each = local.serviceendpoint_github_enterprise
+  for_each = local.serviceendpoint_github_enterprise_for_each
 
   project_id             = var.project_id
-  service_endpoint_name  = each.value.service_endpoint_name
-  description            = each.value.description
-  url                    = each.value.url
-  personal_access_token  = each.value.personal_access_token
-  oauth_configuration_id = each.value.oauth_configuration_id
+  service_endpoint_name  = local.serviceendpoint_github_enterprise[each.key].service_endpoint_name
+  description            = local.serviceendpoint_github_enterprise[each.key].description
+  url                    = local.serviceendpoint_github_enterprise[each.key].url
 
   dynamic "auth_personal" {
-    for_each = each.value.auth_personal == null ? [] : [each.value.auth_personal]
+    for_each = local.serviceendpoint_github_enterprise_auth_personal[each.key] == null ? [] : [local.serviceendpoint_github_enterprise_auth_personal[each.key]]
     content {
       personal_access_token = auth_personal.value.personal_access_token
     }
   }
 
   dynamic "auth_oauth" {
-    for_each = each.value.auth_oauth == null ? [] : [each.value.auth_oauth]
+    for_each = local.serviceendpoint_github_enterprise_auth_oauth[each.key] == null ? [] : [local.serviceendpoint_github_enterprise_auth_oauth[each.key]]
     content {
       oauth_configuration_id = auth_oauth.value.oauth_configuration_id
     }
@@ -621,8 +794,8 @@ resource "azuredevops_serviceendpoint_github_enterprise" "github_enterprise" {
   lifecycle {
     precondition {
       condition = (
-        (each.value.auth_personal != null || each.value.personal_access_token != null) !=
-        (each.value.auth_oauth != null || each.value.oauth_configuration_id != null)
+        (local.serviceendpoint_github_enterprise_auth_personal[each.key] != null) !=
+        (local.serviceendpoint_github_enterprise_auth_oauth[each.key] != null)
       )
       error_message = "serviceendpoint_github_enterprise requires exactly one of personal access token or OAuth configuration."
     }
@@ -630,56 +803,56 @@ resource "azuredevops_serviceendpoint_github_enterprise" "github_enterprise" {
 }
 
 resource "azuredevops_serviceendpoint_gitlab" "gitlab" {
-  for_each = local.serviceendpoint_gitlab
+  for_each = local.serviceendpoint_gitlab_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  url                   = each.value.url
-  username              = each.value.username
-  api_token             = each.value.api_token
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_gitlab[each.key].service_endpoint_name
+  url                   = local.serviceendpoint_gitlab[each.key].url
+  username              = local.serviceendpoint_gitlab[each.key].username
+  api_token             = local.serviceendpoint_gitlab[each.key].api_token
+  description           = local.serviceendpoint_gitlab[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_incomingwebhook" "incomingwebhook" {
-  for_each = local.serviceendpoint_incomingwebhook
+  for_each = local.serviceendpoint_incomingwebhook_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  webhook_name          = each.value.webhook_name
-  description           = each.value.description
-  http_header           = each.value.http_header
-  secret                = each.value.secret
+  service_endpoint_name = local.serviceendpoint_incomingwebhook[each.key].service_endpoint_name
+  webhook_name          = local.serviceendpoint_incomingwebhook[each.key].webhook_name
+  description           = local.serviceendpoint_incomingwebhook[each.key].description
+  http_header           = local.serviceendpoint_incomingwebhook[each.key].http_header
+  secret                = local.serviceendpoint_incomingwebhook[each.key].secret
 }
 
 resource "azuredevops_serviceendpoint_jenkins" "jenkins" {
-  for_each = local.serviceendpoint_jenkins
+  for_each = local.serviceendpoint_jenkins_for_each
 
   project_id             = var.project_id
-  service_endpoint_name  = each.value.service_endpoint_name
-  url                    = each.value.url
-  username               = each.value.username
-  password               = each.value.password
-  accept_untrusted_certs = each.value.accept_untrusted_certs
-  description            = each.value.description
+  service_endpoint_name  = local.serviceendpoint_jenkins[each.key].service_endpoint_name
+  url                    = local.serviceendpoint_jenkins[each.key].url
+  username               = local.serviceendpoint_jenkins[each.key].username
+  password               = local.serviceendpoint_jenkins[each.key].password
+  accept_untrusted_certs = local.serviceendpoint_jenkins[each.key].accept_untrusted_certs
+  description            = local.serviceendpoint_jenkins[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_jfrog_artifactory_v2" "jfrog_artifactory_v2" {
-  for_each = local.serviceendpoint_jfrog_artifactory_v2
+  for_each = local.serviceendpoint_jfrog_artifactory_v2_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  url                   = each.value.url
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_jfrog_artifactory_v2[each.key].service_endpoint_name
+  url                   = local.serviceendpoint_jfrog_artifactory_v2[each.key].url
+  description           = local.serviceendpoint_jfrog_artifactory_v2[each.key].description
 
   dynamic "authentication_token" {
-    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    for_each = local.serviceendpoint_jfrog_artifactory_v2[each.key].authentication_token == null ? [] : [local.serviceendpoint_jfrog_artifactory_v2[each.key].authentication_token]
     content {
       token = authentication_token.value.token
     }
   }
 
   dynamic "authentication_basic" {
-    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    for_each = local.serviceendpoint_jfrog_artifactory_v2[each.key].authentication_basic == null ? [] : [local.serviceendpoint_jfrog_artifactory_v2[each.key].authentication_basic]
     content {
       username = authentication_basic.value.username
       password = authentication_basic.value.password
@@ -689,13 +862,13 @@ resource "azuredevops_serviceendpoint_jfrog_artifactory_v2" "jfrog_artifactory_v
   lifecycle {
     precondition {
       condition = (
-        (each.value.authentication_token != null) != (each.value.authentication_basic != null)
+        (local.serviceendpoint_jfrog_artifactory_v2[each.key].authentication_token != null) != (local.serviceendpoint_jfrog_artifactory_v2[each.key].authentication_basic != null)
       ) && (
-        each.value.authentication_token == null || length(trimspace(each.value.authentication_token.token)) > 0
+        local.serviceendpoint_jfrog_artifactory_v2[each.key].authentication_token == null || length(trimspace(local.serviceendpoint_jfrog_artifactory_v2[each.key].authentication_token.token)) > 0
       ) && (
-        each.value.authentication_basic == null || (
-          length(trimspace(each.value.authentication_basic.username)) > 0 &&
-          length(trimspace(each.value.authentication_basic.password)) > 0
+        local.serviceendpoint_jfrog_artifactory_v2[each.key].authentication_basic == null || (
+          length(trimspace(local.serviceendpoint_jfrog_artifactory_v2[each.key].authentication_basic.username)) > 0 &&
+          length(trimspace(local.serviceendpoint_jfrog_artifactory_v2[each.key].authentication_basic.password)) > 0
         )
       )
       error_message = "serviceendpoint_jfrog_artifactory_v2 requires exactly one authentication method with non-empty credentials."
@@ -704,22 +877,22 @@ resource "azuredevops_serviceendpoint_jfrog_artifactory_v2" "jfrog_artifactory_v
 }
 
 resource "azuredevops_serviceendpoint_jfrog_distribution_v2" "jfrog_distribution_v2" {
-  for_each = local.serviceendpoint_jfrog_distribution_v2
+  for_each = local.serviceendpoint_jfrog_distribution_v2_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  url                   = each.value.url
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_jfrog_distribution_v2[each.key].service_endpoint_name
+  url                   = local.serviceendpoint_jfrog_distribution_v2[each.key].url
+  description           = local.serviceendpoint_jfrog_distribution_v2[each.key].description
 
   dynamic "authentication_token" {
-    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    for_each = local.serviceendpoint_jfrog_distribution_v2[each.key].authentication_token == null ? [] : [local.serviceendpoint_jfrog_distribution_v2[each.key].authentication_token]
     content {
       token = authentication_token.value.token
     }
   }
 
   dynamic "authentication_basic" {
-    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    for_each = local.serviceendpoint_jfrog_distribution_v2[each.key].authentication_basic == null ? [] : [local.serviceendpoint_jfrog_distribution_v2[each.key].authentication_basic]
     content {
       username = authentication_basic.value.username
       password = authentication_basic.value.password
@@ -729,13 +902,13 @@ resource "azuredevops_serviceendpoint_jfrog_distribution_v2" "jfrog_distribution
   lifecycle {
     precondition {
       condition = (
-        (each.value.authentication_token != null) != (each.value.authentication_basic != null)
+        (local.serviceendpoint_jfrog_distribution_v2[each.key].authentication_token != null) != (local.serviceendpoint_jfrog_distribution_v2[each.key].authentication_basic != null)
       ) && (
-        each.value.authentication_token == null || length(trimspace(each.value.authentication_token.token)) > 0
+        local.serviceendpoint_jfrog_distribution_v2[each.key].authentication_token == null || length(trimspace(local.serviceendpoint_jfrog_distribution_v2[each.key].authentication_token.token)) > 0
       ) && (
-        each.value.authentication_basic == null || (
-          length(trimspace(each.value.authentication_basic.username)) > 0 &&
-          length(trimspace(each.value.authentication_basic.password)) > 0
+        local.serviceendpoint_jfrog_distribution_v2[each.key].authentication_basic == null || (
+          length(trimspace(local.serviceendpoint_jfrog_distribution_v2[each.key].authentication_basic.username)) > 0 &&
+          length(trimspace(local.serviceendpoint_jfrog_distribution_v2[each.key].authentication_basic.password)) > 0
         )
       )
       error_message = "serviceendpoint_jfrog_distribution_v2 requires exactly one authentication method with non-empty credentials."
@@ -744,22 +917,22 @@ resource "azuredevops_serviceendpoint_jfrog_distribution_v2" "jfrog_distribution
 }
 
 resource "azuredevops_serviceendpoint_jfrog_platform_v2" "jfrog_platform_v2" {
-  for_each = local.serviceendpoint_jfrog_platform_v2
+  for_each = local.serviceendpoint_jfrog_platform_v2_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  url                   = each.value.url
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_jfrog_platform_v2[each.key].service_endpoint_name
+  url                   = local.serviceendpoint_jfrog_platform_v2[each.key].url
+  description           = local.serviceendpoint_jfrog_platform_v2[each.key].description
 
   dynamic "authentication_token" {
-    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    for_each = local.serviceendpoint_jfrog_platform_v2[each.key].authentication_token == null ? [] : [local.serviceendpoint_jfrog_platform_v2[each.key].authentication_token]
     content {
       token = authentication_token.value.token
     }
   }
 
   dynamic "authentication_basic" {
-    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    for_each = local.serviceendpoint_jfrog_platform_v2[each.key].authentication_basic == null ? [] : [local.serviceendpoint_jfrog_platform_v2[each.key].authentication_basic]
     content {
       username = authentication_basic.value.username
       password = authentication_basic.value.password
@@ -769,13 +942,13 @@ resource "azuredevops_serviceendpoint_jfrog_platform_v2" "jfrog_platform_v2" {
   lifecycle {
     precondition {
       condition = (
-        (each.value.authentication_token != null) != (each.value.authentication_basic != null)
+        (local.serviceendpoint_jfrog_platform_v2[each.key].authentication_token != null) != (local.serviceendpoint_jfrog_platform_v2[each.key].authentication_basic != null)
       ) && (
-        each.value.authentication_token == null || length(trimspace(each.value.authentication_token.token)) > 0
+        local.serviceendpoint_jfrog_platform_v2[each.key].authentication_token == null || length(trimspace(local.serviceendpoint_jfrog_platform_v2[each.key].authentication_token.token)) > 0
       ) && (
-        each.value.authentication_basic == null || (
-          length(trimspace(each.value.authentication_basic.username)) > 0 &&
-          length(trimspace(each.value.authentication_basic.password)) > 0
+        local.serviceendpoint_jfrog_platform_v2[each.key].authentication_basic == null || (
+          length(trimspace(local.serviceendpoint_jfrog_platform_v2[each.key].authentication_basic.username)) > 0 &&
+          length(trimspace(local.serviceendpoint_jfrog_platform_v2[each.key].authentication_basic.password)) > 0
         )
       )
       error_message = "serviceendpoint_jfrog_platform_v2 requires exactly one authentication method with non-empty credentials."
@@ -784,22 +957,22 @@ resource "azuredevops_serviceendpoint_jfrog_platform_v2" "jfrog_platform_v2" {
 }
 
 resource "azuredevops_serviceendpoint_jfrog_xray_v2" "jfrog_xray_v2" {
-  for_each = local.serviceendpoint_jfrog_xray_v2
+  for_each = local.serviceendpoint_jfrog_xray_v2_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  url                   = each.value.url
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_jfrog_xray_v2[each.key].service_endpoint_name
+  url                   = local.serviceendpoint_jfrog_xray_v2[each.key].url
+  description           = local.serviceendpoint_jfrog_xray_v2[each.key].description
 
   dynamic "authentication_token" {
-    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    for_each = local.serviceendpoint_jfrog_xray_v2[each.key].authentication_token == null ? [] : [local.serviceendpoint_jfrog_xray_v2[each.key].authentication_token]
     content {
       token = authentication_token.value.token
     }
   }
 
   dynamic "authentication_basic" {
-    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    for_each = local.serviceendpoint_jfrog_xray_v2[each.key].authentication_basic == null ? [] : [local.serviceendpoint_jfrog_xray_v2[each.key].authentication_basic]
     content {
       username = authentication_basic.value.username
       password = authentication_basic.value.password
@@ -809,13 +982,13 @@ resource "azuredevops_serviceendpoint_jfrog_xray_v2" "jfrog_xray_v2" {
   lifecycle {
     precondition {
       condition = (
-        (each.value.authentication_token != null) != (each.value.authentication_basic != null)
+        (local.serviceendpoint_jfrog_xray_v2[each.key].authentication_token != null) != (local.serviceendpoint_jfrog_xray_v2[each.key].authentication_basic != null)
       ) && (
-        each.value.authentication_token == null || length(trimspace(each.value.authentication_token.token)) > 0
+        local.serviceendpoint_jfrog_xray_v2[each.key].authentication_token == null || length(trimspace(local.serviceendpoint_jfrog_xray_v2[each.key].authentication_token.token)) > 0
       ) && (
-        each.value.authentication_basic == null || (
-          length(trimspace(each.value.authentication_basic.username)) > 0 &&
-          length(trimspace(each.value.authentication_basic.password)) > 0
+        local.serviceendpoint_jfrog_xray_v2[each.key].authentication_basic == null || (
+          length(trimspace(local.serviceendpoint_jfrog_xray_v2[each.key].authentication_basic.username)) > 0 &&
+          length(trimspace(local.serviceendpoint_jfrog_xray_v2[each.key].authentication_basic.password)) > 0
         )
       )
       error_message = "serviceendpoint_jfrog_xray_v2 requires exactly one authentication method with non-empty credentials."
@@ -824,16 +997,16 @@ resource "azuredevops_serviceendpoint_jfrog_xray_v2" "jfrog_xray_v2" {
 }
 
 resource "azuredevops_serviceendpoint_kubernetes" "kubernetes" {
-  for_each = local.serviceendpoint_kubernetes
+  for_each = local.serviceendpoint_kubernetes_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  apiserver_url         = each.value.apiserver_url
-  authorization_type    = each.value.authorization_type
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_kubernetes[each.key].service_endpoint_name
+  apiserver_url         = local.serviceendpoint_kubernetes[each.key].apiserver_url
+  authorization_type    = local.serviceendpoint_kubernetes[each.key].authorization_type
+  description           = local.serviceendpoint_kubernetes[each.key].description
 
   dynamic "azure_subscription" {
-    for_each = each.value.azure_subscription == null ? [] : [each.value.azure_subscription]
+    for_each = local.serviceendpoint_kubernetes[each.key].azure_subscription == null ? [] : [local.serviceendpoint_kubernetes[each.key].azure_subscription]
     content {
       azure_environment = azure_subscription.value.azure_environment
       cluster_name      = azure_subscription.value.cluster_name
@@ -847,7 +1020,7 @@ resource "azuredevops_serviceendpoint_kubernetes" "kubernetes" {
   }
 
   dynamic "kubeconfig" {
-    for_each = each.value.kubeconfig == null ? [] : [each.value.kubeconfig]
+    for_each = local.serviceendpoint_kubernetes[each.key].kubeconfig == null ? [] : [local.serviceendpoint_kubernetes[each.key].kubeconfig]
     content {
       kube_config            = kubeconfig.value.kube_config
       accept_untrusted_certs = kubeconfig.value.accept_untrusted_certs
@@ -856,7 +1029,7 @@ resource "azuredevops_serviceendpoint_kubernetes" "kubernetes" {
   }
 
   dynamic "service_account" {
-    for_each = each.value.service_account == null ? [] : [each.value.service_account]
+    for_each = local.serviceendpoint_kubernetes[each.key].service_account == null ? [] : [local.serviceendpoint_kubernetes[each.key].service_account]
     content {
       token                  = service_account.value.token
       ca_cert                = service_account.value.ca_cert
@@ -866,17 +1039,17 @@ resource "azuredevops_serviceendpoint_kubernetes" "kubernetes" {
 
   lifecycle {
     precondition {
-      condition = contains(["AzureSubscription", "Kubeconfig", "ServiceAccount"], each.value.authorization_type)
+      condition = contains(["AzureSubscription", "Kubeconfig", "ServiceAccount"], local.serviceendpoint_kubernetes[each.key].authorization_type)
       error_message = "serviceendpoint_kubernetes.authorization_type must be AzureSubscription, Kubeconfig, or ServiceAccount."
     }
     precondition {
       condition = (
-        each.value.authorization_type == "AzureSubscription"
-        ? (each.value.azure_subscription != null && each.value.kubeconfig == null && each.value.service_account == null)
-        : each.value.authorization_type == "Kubeconfig"
-        ? (each.value.kubeconfig != null && each.value.azure_subscription == null && each.value.service_account == null)
-        : each.value.authorization_type == "ServiceAccount"
-        ? (each.value.service_account != null && each.value.azure_subscription == null && each.value.kubeconfig == null)
+        local.serviceendpoint_kubernetes[each.key].authorization_type == "AzureSubscription"
+        ? (local.serviceendpoint_kubernetes[each.key].azure_subscription != null && local.serviceendpoint_kubernetes[each.key].kubeconfig == null && local.serviceendpoint_kubernetes[each.key].service_account == null)
+        : local.serviceendpoint_kubernetes[each.key].authorization_type == "Kubeconfig"
+        ? (local.serviceendpoint_kubernetes[each.key].kubeconfig != null && local.serviceendpoint_kubernetes[each.key].azure_subscription == null && local.serviceendpoint_kubernetes[each.key].service_account == null)
+        : local.serviceendpoint_kubernetes[each.key].authorization_type == "ServiceAccount"
+        ? (local.serviceendpoint_kubernetes[each.key].service_account != null && local.serviceendpoint_kubernetes[each.key].azure_subscription == null && local.serviceendpoint_kubernetes[each.key].kubeconfig == null)
         : false
       )
       error_message = "serviceendpoint_kubernetes requires the authorization_type-specific block and no other auth blocks."
@@ -885,23 +1058,23 @@ resource "azuredevops_serviceendpoint_kubernetes" "kubernetes" {
 }
 
 resource "azuredevops_serviceendpoint_maven" "maven" {
-  for_each = local.serviceendpoint_maven
+  for_each = local.serviceendpoint_maven_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  url                   = each.value.url
-  repository_id         = each.value.repository_id
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_maven[each.key].service_endpoint_name
+  url                   = local.serviceendpoint_maven[each.key].url
+  repository_id         = local.serviceendpoint_maven[each.key].repository_id
+  description           = local.serviceendpoint_maven[each.key].description
 
   dynamic "authentication_token" {
-    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    for_each = local.serviceendpoint_maven[each.key].authentication_token == null ? [] : [local.serviceendpoint_maven[each.key].authentication_token]
     content {
       token = authentication_token.value.token
     }
   }
 
   dynamic "authentication_basic" {
-    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    for_each = local.serviceendpoint_maven[each.key].authentication_basic == null ? [] : [local.serviceendpoint_maven[each.key].authentication_basic]
     content {
       username = authentication_basic.value.username
       password = authentication_basic.value.password
@@ -911,13 +1084,13 @@ resource "azuredevops_serviceendpoint_maven" "maven" {
   lifecycle {
     precondition {
       condition = (
-        (each.value.authentication_token != null) != (each.value.authentication_basic != null)
+        (local.serviceendpoint_maven[each.key].authentication_token != null) != (local.serviceendpoint_maven[each.key].authentication_basic != null)
       ) && (
-        each.value.authentication_token == null || length(trimspace(each.value.authentication_token.token)) > 0
+        local.serviceendpoint_maven[each.key].authentication_token == null || length(trimspace(local.serviceendpoint_maven[each.key].authentication_token.token)) > 0
       ) && (
-        each.value.authentication_basic == null || (
-          length(trimspace(each.value.authentication_basic.username)) > 0 &&
-          length(trimspace(each.value.authentication_basic.password)) > 0
+        local.serviceendpoint_maven[each.key].authentication_basic == null || (
+          length(trimspace(local.serviceendpoint_maven[each.key].authentication_basic.username)) > 0 &&
+          length(trimspace(local.serviceendpoint_maven[each.key].authentication_basic.password)) > 0
         )
       )
       error_message = "serviceendpoint_maven requires exactly one authentication method with non-empty credentials."
@@ -926,51 +1099,51 @@ resource "azuredevops_serviceendpoint_maven" "maven" {
 }
 
 resource "azuredevops_serviceendpoint_nexus" "nexus" {
-  for_each = local.serviceendpoint_nexus
+  for_each = local.serviceendpoint_nexus_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  url                   = each.value.url
-  username              = each.value.username
-  password              = each.value.password
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_nexus[each.key].service_endpoint_name
+  url                   = local.serviceendpoint_nexus[each.key].url
+  username              = local.serviceendpoint_nexus[each.key].username
+  password              = local.serviceendpoint_nexus[each.key].password
+  description           = local.serviceendpoint_nexus[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_npm" "npm" {
-  for_each = local.serviceendpoint_npm
+  for_each = local.serviceendpoint_npm_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  url                   = each.value.url
-  access_token          = each.value.access_token
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_npm[each.key].service_endpoint_name
+  url                   = local.serviceendpoint_npm[each.key].url
+  access_token          = local.serviceendpoint_npm[each.key].access_token
+  description           = local.serviceendpoint_npm[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_nuget" "nuget" {
-  for_each = local.serviceendpoint_nuget
+  for_each = local.serviceendpoint_nuget_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  feed_url              = each.value.feed_url
-  api_key               = each.value.api_key
-  personal_access_token = each.value.personal_access_token
-  username              = each.value.username
-  password              = each.value.password
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_nuget[each.key].service_endpoint_name
+  feed_url              = local.serviceendpoint_nuget[each.key].feed_url
+  api_key               = local.serviceendpoint_nuget[each.key].api_key
+  personal_access_token = local.serviceendpoint_nuget[each.key].personal_access_token
+  username              = local.serviceendpoint_nuget[each.key].username
+  password              = local.serviceendpoint_nuget[each.key].password
+  description           = local.serviceendpoint_nuget[each.key].description
 
   lifecycle {
     precondition {
       condition = (
-        (each.value.username == null && each.value.password == null) ||
-        (each.value.username != null && each.value.password != null)
+        (local.serviceendpoint_nuget[each.key].username == null && local.serviceendpoint_nuget[each.key].password == null) ||
+        (local.serviceendpoint_nuget[each.key].username != null && local.serviceendpoint_nuget[each.key].password != null)
       )
       error_message = "serviceendpoint_nuget requires both username and password when using basic auth."
     }
     precondition {
       condition = length(compact([
-        each.value.api_key != null ? "api_key" : "",
-        each.value.personal_access_token != null ? "pat" : "",
-        (each.value.username != null || each.value.password != null) ? "basic" : "",
+        local.serviceendpoint_nuget[each.key].api_key != null ? "api_key" : "",
+        local.serviceendpoint_nuget[each.key].personal_access_token != null ? "pat" : "",
+        (local.serviceendpoint_nuget[each.key].username != null || local.serviceendpoint_nuget[each.key].password != null) ? "basic" : "",
       ])) <= 1
       error_message = "serviceendpoint_nuget allows only one authentication method (api_key, personal_access_token, or username/password)."
     }
@@ -978,28 +1151,28 @@ resource "azuredevops_serviceendpoint_nuget" "nuget" {
 }
 
 resource "azuredevops_serviceendpoint_octopusdeploy" "octopusdeploy" {
-  for_each = local.serviceendpoint_octopusdeploy
+  for_each = local.serviceendpoint_octopusdeploy_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  url                   = each.value.url
-  api_key               = each.value.api_key
-  ignore_ssl_error      = each.value.ignore_ssl_error
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_octopusdeploy[each.key].service_endpoint_name
+  url                   = local.serviceendpoint_octopusdeploy[each.key].url
+  api_key               = local.serviceendpoint_octopusdeploy[each.key].api_key
+  ignore_ssl_error      = local.serviceendpoint_octopusdeploy[each.key].ignore_ssl_error
+  description           = local.serviceendpoint_octopusdeploy[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_openshift" "openshift" {
-  for_each = local.serviceendpoint_openshift
+  for_each = local.serviceendpoint_openshift_for_each
 
   project_id                 = var.project_id
-  service_endpoint_name      = each.value.service_endpoint_name
-  server_url                 = each.value.server_url
-  accept_untrusted_certs     = each.value.accept_untrusted_certs
-  certificate_authority_file = each.value.certificate_authority_file
-  description                = each.value.description
+  service_endpoint_name      = local.serviceendpoint_openshift[each.key].service_endpoint_name
+  server_url                 = local.serviceendpoint_openshift[each.key].server_url
+  accept_untrusted_certs     = local.serviceendpoint_openshift[each.key].accept_untrusted_certs
+  certificate_authority_file = local.serviceendpoint_openshift[each.key].certificate_authority_file
+  description                = local.serviceendpoint_openshift[each.key].description
 
   dynamic "auth_basic" {
-    for_each = each.value.auth_basic == null ? [] : [each.value.auth_basic]
+    for_each = local.serviceendpoint_openshift[each.key].auth_basic == null ? [] : [local.serviceendpoint_openshift[each.key].auth_basic]
     content {
       username = auth_basic.value.username
       password = auth_basic.value.password
@@ -1007,14 +1180,14 @@ resource "azuredevops_serviceendpoint_openshift" "openshift" {
   }
 
   dynamic "auth_token" {
-    for_each = each.value.auth_token == null ? [] : [each.value.auth_token]
+    for_each = local.serviceendpoint_openshift[each.key].auth_token == null ? [] : [local.serviceendpoint_openshift[each.key].auth_token]
     content {
       token = auth_token.value.token
     }
   }
 
   dynamic "auth_none" {
-    for_each = each.value.auth_none == null ? [] : [each.value.auth_none]
+    for_each = local.serviceendpoint_openshift[each.key].auth_none == null ? [] : [local.serviceendpoint_openshift[each.key].auth_none]
     content {
       kube_config = auth_none.value.kube_config
     }
@@ -1023,9 +1196,9 @@ resource "azuredevops_serviceendpoint_openshift" "openshift" {
   lifecycle {
     precondition {
       condition = length(compact([
-        each.value.auth_basic != null ? "basic" : "",
-        each.value.auth_token != null ? "token" : "",
-        each.value.auth_none != null ? "none" : "",
+        local.serviceendpoint_openshift[each.key].auth_basic != null ? "basic" : "",
+        local.serviceendpoint_openshift[each.key].auth_token != null ? "token" : "",
+        local.serviceendpoint_openshift[each.key].auth_none != null ? "none" : "",
       ])) == 1
       error_message = "serviceendpoint_openshift requires exactly one of auth_basic, auth_token, or auth_none."
     }
@@ -1039,7 +1212,6 @@ locals {
     aws                         = { for key, endpoint in azuredevops_serviceendpoint_aws.aws : key => endpoint.id }
     azure_service_bus           = { for key, endpoint in azuredevops_serviceendpoint_azure_service_bus.azure_service_bus : key => endpoint.id }
     azurecr                     = { for key, endpoint in azuredevops_serviceendpoint_azurecr.azurecr : key => endpoint.id }
-    azuredevops                 = { for key, endpoint in azuredevops_serviceendpoint_azuredevops.azuredevops : key => endpoint.id }
     azurerm                     = { for key, endpoint in azuredevops_serviceendpoint_azurerm.azurerm : key => endpoint.id }
     bitbucket                   = { for key, endpoint in azuredevops_serviceendpoint_bitbucket.bitbucket : key => endpoint.id }
     black_duck                  = { for key, endpoint in azuredevops_serviceendpoint_black_duck.black_duck : key => endpoint.id }
@@ -1103,28 +1275,28 @@ resource "azuredevops_serviceendpoint_permissions" "permissions" {
 }
 
 resource "azuredevops_serviceendpoint_runpipeline" "runpipeline" {
-  for_each = local.serviceendpoint_runpipeline
+  for_each = local.serviceendpoint_runpipeline_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  organization_name     = each.value.organization_name
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_runpipeline[each.key].service_endpoint_name
+  organization_name     = local.serviceendpoint_runpipeline[each.key].organization_name
+  description           = local.serviceendpoint_runpipeline[each.key].description
 
   auth_personal {
-    personal_access_token = each.value.auth_personal.personal_access_token
+    personal_access_token = local.serviceendpoint_runpipeline[each.key].auth_personal.personal_access_token
   }
 }
 
 resource "azuredevops_serviceendpoint_servicefabric" "servicefabric" {
-  for_each = local.serviceendpoint_servicefabric
+  for_each = local.serviceendpoint_servicefabric_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  cluster_endpoint      = each.value.cluster_endpoint
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_servicefabric[each.key].service_endpoint_name
+  cluster_endpoint      = local.serviceendpoint_servicefabric[each.key].cluster_endpoint
+  description           = local.serviceendpoint_servicefabric[each.key].description
 
   dynamic "certificate" {
-    for_each = each.value.certificate == null ? [] : [each.value.certificate]
+    for_each = local.serviceendpoint_servicefabric[each.key].certificate == null ? [] : [local.serviceendpoint_servicefabric[each.key].certificate]
     content {
       server_certificate_lookup      = certificate.value.server_certificate_lookup
       server_certificate_thumbprint  = certificate.value.server_certificate_thumbprint
@@ -1135,7 +1307,7 @@ resource "azuredevops_serviceendpoint_servicefabric" "servicefabric" {
   }
 
   dynamic "azure_active_directory" {
-    for_each = each.value.azure_active_directory == null ? [] : [each.value.azure_active_directory]
+    for_each = local.serviceendpoint_servicefabric[each.key].azure_active_directory == null ? [] : [local.serviceendpoint_servicefabric[each.key].azure_active_directory]
     content {
       server_certificate_lookup      = azure_active_directory.value.server_certificate_lookup
       server_certificate_thumbprint  = azure_active_directory.value.server_certificate_thumbprint
@@ -1146,7 +1318,7 @@ resource "azuredevops_serviceendpoint_servicefabric" "servicefabric" {
   }
 
   dynamic "none" {
-    for_each = each.value.none == null ? [] : [each.value.none]
+    for_each = local.serviceendpoint_servicefabric[each.key].none == null ? [] : [local.serviceendpoint_servicefabric[each.key].none]
     content {
       unsecured   = none.value.unsecured
       cluster_spn = none.value.cluster_spn
@@ -1156,9 +1328,9 @@ resource "azuredevops_serviceendpoint_servicefabric" "servicefabric" {
   lifecycle {
     precondition {
       condition = length(compact([
-        each.value.certificate != null ? "certificate" : "",
-        each.value.azure_active_directory != null ? "aad" : "",
-        each.value.none != null ? "none" : "",
+        local.serviceendpoint_servicefabric[each.key].certificate != null ? "certificate" : "",
+        local.serviceendpoint_servicefabric[each.key].azure_active_directory != null ? "aad" : "",
+        local.serviceendpoint_servicefabric[each.key].none != null ? "none" : "",
       ])) == 1
       error_message = "serviceendpoint_servicefabric requires exactly one of certificate, azure_active_directory, or none."
     }
@@ -1166,71 +1338,71 @@ resource "azuredevops_serviceendpoint_servicefabric" "servicefabric" {
 }
 
 resource "azuredevops_serviceendpoint_snyk" "snyk" {
-  for_each = local.serviceendpoint_snyk
+  for_each = local.serviceendpoint_snyk_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  server_url            = each.value.server_url
-  api_token             = each.value.api_token
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_snyk[each.key].service_endpoint_name
+  server_url            = local.serviceendpoint_snyk[each.key].server_url
+  api_token             = local.serviceendpoint_snyk[each.key].api_token
+  description           = local.serviceendpoint_snyk[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_sonarcloud" "sonarcloud" {
-  for_each = local.serviceendpoint_sonarcloud
+  for_each = local.serviceendpoint_sonarcloud_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  token                 = each.value.token
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_sonarcloud[each.key].service_endpoint_name
+  token                 = local.serviceendpoint_sonarcloud[each.key].token
+  description           = local.serviceendpoint_sonarcloud[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_sonarqube" "sonarqube" {
-  for_each = local.serviceendpoint_sonarqube
+  for_each = local.serviceendpoint_sonarqube_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  url                   = each.value.url
-  token                 = each.value.token
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_sonarqube[each.key].service_endpoint_name
+  url                   = local.serviceendpoint_sonarqube[each.key].url
+  token                 = local.serviceendpoint_sonarqube[each.key].token
+  description           = local.serviceendpoint_sonarqube[each.key].description
 }
 
 resource "azuredevops_serviceendpoint_ssh" "ssh" {
-  for_each = local.serviceendpoint_ssh
+  for_each = local.serviceendpoint_ssh_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  host                  = each.value.host
-  username              = each.value.username
-  port                  = each.value.port
-  password              = each.value.password
-  private_key           = each.value.private_key
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_ssh[each.key].service_endpoint_name
+  host                  = local.serviceendpoint_ssh[each.key].host
+  username              = local.serviceendpoint_ssh[each.key].username
+  port                  = local.serviceendpoint_ssh[each.key].port
+  password              = local.serviceendpoint_ssh[each.key].password
+  private_key           = local.serviceendpoint_ssh[each.key].private_key
+  description           = local.serviceendpoint_ssh[each.key].description
 
   lifecycle {
     precondition {
-      condition     = (each.value.password != null) != (each.value.private_key != null)
+      condition     = (local.serviceendpoint_ssh[each.key].password != null) != (local.serviceendpoint_ssh[each.key].private_key != null)
       error_message = "serviceendpoint_ssh requires exactly one of password or private_key."
     }
   }
 }
 
 resource "azuredevops_serviceendpoint_visualstudiomarketplace" "visualstudiomarketplace" {
-  for_each = local.serviceendpoint_visualstudiomarketplace
+  for_each = local.serviceendpoint_visualstudiomarketplace_for_each
 
   project_id            = var.project_id
-  service_endpoint_name = each.value.service_endpoint_name
-  url                   = each.value.url
-  description           = each.value.description
+  service_endpoint_name = local.serviceendpoint_visualstudiomarketplace[each.key].service_endpoint_name
+  url                   = local.serviceendpoint_visualstudiomarketplace[each.key].url
+  description           = local.serviceendpoint_visualstudiomarketplace[each.key].description
 
   dynamic "authentication_token" {
-    for_each = each.value.authentication_token == null ? [] : [each.value.authentication_token]
+    for_each = local.serviceendpoint_visualstudiomarketplace[each.key].authentication_token == null ? [] : [local.serviceendpoint_visualstudiomarketplace[each.key].authentication_token]
     content {
       token = authentication_token.value.token
     }
   }
 
   dynamic "authentication_basic" {
-    for_each = each.value.authentication_basic == null ? [] : [each.value.authentication_basic]
+    for_each = local.serviceendpoint_visualstudiomarketplace[each.key].authentication_basic == null ? [] : [local.serviceendpoint_visualstudiomarketplace[each.key].authentication_basic]
     content {
       username = authentication_basic.value.username
       password = authentication_basic.value.password
@@ -1240,13 +1412,13 @@ resource "azuredevops_serviceendpoint_visualstudiomarketplace" "visualstudiomark
   lifecycle {
     precondition {
       condition = (
-        (each.value.authentication_token != null) != (each.value.authentication_basic != null)
+        (local.serviceendpoint_visualstudiomarketplace[each.key].authentication_token != null) != (local.serviceendpoint_visualstudiomarketplace[each.key].authentication_basic != null)
       ) && (
-        each.value.authentication_token == null || length(trimspace(each.value.authentication_token.token)) > 0
+        local.serviceendpoint_visualstudiomarketplace[each.key].authentication_token == null || length(trimspace(local.serviceendpoint_visualstudiomarketplace[each.key].authentication_token.token)) > 0
       ) && (
-        each.value.authentication_basic == null || (
-          length(trimspace(each.value.authentication_basic.username)) > 0 &&
-          length(trimspace(each.value.authentication_basic.password)) > 0
+        local.serviceendpoint_visualstudiomarketplace[each.key].authentication_basic == null || (
+          length(trimspace(local.serviceendpoint_visualstudiomarketplace[each.key].authentication_basic.username)) > 0 &&
+          length(trimspace(local.serviceendpoint_visualstudiomarketplace[each.key].authentication_basic.password)) > 0
         )
       )
       error_message = "serviceendpoint_visualstudiomarketplace requires exactly one authentication method with non-empty credentials."

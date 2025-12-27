@@ -42,9 +42,9 @@ module "azuredevops_repository" {
     }
   ]
 
-  repository_policy_check_credentials = [
+  repository_policy_reserved_names = [
     {
-      key             = "check-credentials-main"
+      key             = "reserved-names-main"
       repository_keys = ["main"]
     }
   ]

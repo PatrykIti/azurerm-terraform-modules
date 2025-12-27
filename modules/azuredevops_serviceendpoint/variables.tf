@@ -235,44 +235,6 @@ variable "serviceendpoint_azurecr" {
 }
 
 # -----------------------------------------------------------------------------
-# Azure DevOps
-# -----------------------------------------------------------------------------
-
-variable "serviceendpoint_azuredevops" {
-  description = "List of Azure DevOps service endpoints."
-  type = list(object({
-    key                   = optional(string)
-    service_endpoint_name = string
-    org_url               = string
-    release_api_url       = string
-    personal_access_token = string
-    description           = optional(string)
-  }))
-  default = []
-  sensitive = true
-
-  validation {
-    condition = alltrue([
-      for endpoint in var.serviceendpoint_azuredevops : (
-        length(trimspace(endpoint.service_endpoint_name)) > 0 &&
-        length(trimspace(endpoint.org_url)) > 0 &&
-        length(trimspace(endpoint.release_api_url)) > 0 &&
-        length(trimspace(endpoint.personal_access_token)) > 0 &&
-        (endpoint.key == null || length(trimspace(endpoint.key)) > 0)
-      )
-    ])
-    error_message = "serviceendpoint_azuredevops requires non-empty service_endpoint_name, org_url, release_api_url, and personal_access_token; key must be non-empty when provided."
-  }
-
-  validation {
-    condition = length(distinct([
-      for endpoint in var.serviceendpoint_azuredevops : coalesce(endpoint.key, endpoint.service_endpoint_name)
-    ])) == length(var.serviceendpoint_azuredevops)
-    error_message = "serviceendpoint_azuredevops keys must be unique."
-  }
-}
-
-# -----------------------------------------------------------------------------
 # Azure Resource Manager
 # -----------------------------------------------------------------------------
 
@@ -282,7 +244,7 @@ variable "serviceendpoint_azurerm" {
     key                                   = optional(string)
     service_endpoint_name                  = string
     azurerm_spn_tenantid                   = string
-    serviceprincipalid                     = string
+    serviceprincipalid                     = optional(string)
     serviceprincipalkey                    = optional(string)
     serviceprincipalcertificate            = optional(string)
     service_endpoint_authentication_scheme = optional(string)
@@ -312,8 +274,8 @@ variable "serviceendpoint_azurerm" {
       for endpoint in var.serviceendpoint_azurerm : (
         length(trimspace(endpoint.service_endpoint_name)) > 0 &&
         length(trimspace(endpoint.azurerm_spn_tenantid)) > 0 &&
-        length(trimspace(endpoint.serviceprincipalid)) > 0 &&
         (endpoint.key == null || length(trimspace(endpoint.key)) > 0) &&
+        (endpoint.serviceprincipalid == null || length(trimspace(endpoint.serviceprincipalid)) > 0) &&
         (endpoint.serviceprincipalkey == null || length(trimspace(endpoint.serviceprincipalkey)) > 0) &&
         (endpoint.serviceprincipalcertificate == null || length(trimspace(endpoint.serviceprincipalcertificate)) > 0) &&
         (
@@ -322,10 +284,14 @@ variable "serviceendpoint_azurerm" {
             (endpoint.credentials.serviceprincipalkey == null || length(trimspace(endpoint.credentials.serviceprincipalkey)) > 0) &&
             (endpoint.credentials.serviceprincipalcertificate == null || length(trimspace(endpoint.credentials.serviceprincipalcertificate)) > 0)
           )
+        ) &&
+        (
+          (endpoint.serviceprincipalid != null && length(trimspace(endpoint.serviceprincipalid)) > 0) ||
+          (endpoint.credentials != null && length(trimspace(endpoint.credentials.serviceprincipalid)) > 0)
         )
       )
     ])
-    error_message = "serviceendpoint_azurerm requires non-empty service_endpoint_name, azurerm_spn_tenantid, and serviceprincipalid; key must be non-empty when provided."
+    error_message = "serviceendpoint_azurerm requires non-empty service_endpoint_name, azurerm_spn_tenantid, and a service principal ID (top-level or credentials); key must be non-empty when provided."
   }
 
   validation {
@@ -1619,7 +1585,6 @@ variable "serviceendpoint_permissions" {
           "aws",
           "azure_service_bus",
           "azurecr",
-          "azuredevops",
           "azurerm",
           "bitbucket",
           "black_duck",
