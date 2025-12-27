@@ -4,6 +4,15 @@
 TIMEOUT ?= 30m
 TEST_FILTER ?= Test
 PARALLEL ?= 8
+LOG_DIR ?= test_outputs
+LOG_TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)
+TF_CLI_ARGS_init ?= -upgrade
+
+define run_with_log
+	@mkdir -p $(LOG_DIR)
+	@echo "Saving test output to $(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"
+	@bash -c 'set -o pipefail; TF_CLI_ARGS_init="$(TF_CLI_ARGS_init)" $(2) 2>&1 | tee "$(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"'
+endef
 
 # Environment check
 check-env:
