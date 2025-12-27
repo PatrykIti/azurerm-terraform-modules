@@ -4,7 +4,7 @@ locals {
       name         = variable.name
       value        = try(variable.value, null)
       secret_value = try(variable.secret_value, null)
-      is_secret    = coalesce(variable.is_secret, variable.secret_value != null ? true : null)
+      is_secret    = coalesce(variable.is_secret, variable.secret_value != null)
     }
   ]
 

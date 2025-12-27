@@ -6,6 +6,7 @@ mock_provider "azuredevops" {
       id   = "vg-0001"
       name = "shared-vars"
     }
+    override_during = plan
   }
 }
 
