@@ -64,8 +64,8 @@ module "azuredevops_work_items" {
   work_items = [
     {
       key   = "secure-item"
-      title = "Secure Work Item"
-      type  = "Issue"
+      title = "${var.work_item_title_prefix}-secure"
+      type  = "Task"
       state = "Active"
     }
   ]

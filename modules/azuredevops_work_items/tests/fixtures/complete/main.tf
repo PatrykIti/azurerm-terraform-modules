@@ -36,7 +36,7 @@ module "azuredevops_work_items" {
       wiql       = <<-WIQL
         SELECT [System.Id], [System.Title]
         FROM WorkItems
-        WHERE [System.WorkItemType] = 'Issue'
+        WHERE [System.WorkItemType] = 'Task'
           AND [System.State] <> 'Closed'
       WIQL
     }
@@ -60,13 +60,13 @@ module "azuredevops_work_items" {
     {
       key   = "parent-item"
       title = "${var.work_item_title_prefix}-parent"
-      type  = "Issue"
+      type  = "Task"
       state = "Active"
     },
     {
       key        = "child-item"
       title      = "${var.work_item_title_prefix}-child"
-      type       = "Issue"
+      type       = "Task"
       state      = "Active"
       parent_key = "parent-item"
     }
