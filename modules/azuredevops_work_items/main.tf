@@ -114,17 +114,17 @@ locals {
     try({ for key, folder in azuredevops_workitemquery_folder.query_folder : key => folder.path }, {}),
     try({ for key, folder in azuredevops_workitemquery_folder.query_folder_child : key => folder.path }, {})
   )
-  query_folder_paths = merge(
-    local.query_folder_paths_from_resources,
-    local.query_folder_paths_from_inputs
-  )
   query_folder_paths_by_id = merge(
     try({ for _, folder in azuredevops_workitemquery_folder.query_folder : tostring(folder.id) => folder.path }, {}),
     try({ for _, folder in azuredevops_workitemquery_folder.query_folder_child : tostring(folder.id) => folder.path }, {})
   )
   query_paths = {
     for key, query in local.queries_by_key : key => (
-      query.parent_key != null ? "${local.query_folder_paths[query.parent_key]}/${query.name}" :
+      query.parent_key != null ? (
+        lookup(local.query_folder_paths_from_inputs, query.parent_key, null) != null ?
+        "${local.query_folder_paths_from_inputs[query.parent_key]}/${query.name}" :
+        null
+      ) :
       query.area != null ? "${query.area}/${query.name}" :
       (query.parent_id != null ? try("${local.query_folder_paths_by_id[tostring(query.parent_id)]}/${query.name}", null) : null)
     )
@@ -148,7 +148,11 @@ resource "azuredevops_workitemquery_permissions" "query_permissions" {
 
   project_id = coalesce(each.value.project_id, var.project_id)
   path = each.value.query_key != null ? local.query_paths[each.value.query_key] : (
-    each.value.folder_key != null ? local.query_folder_paths[each.value.folder_key] : each.value.path
+    each.value.folder_key != null ? (
+      lookup(local.query_folder_paths_from_inputs, each.value.folder_key, null) != null ?
+      local.query_folder_paths_from_inputs[each.value.folder_key] :
+      lookup(local.query_folder_paths_from_resources, each.value.folder_key, null)
+    ) : each.value.path
   )
   principal   = each.value.principal
   permissions = each.value.permissions

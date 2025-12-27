@@ -1,3 +1,13 @@
+terraform {
+  required_version = ">= 1.12.2"
+  required_providers {
+    azuredevops = {
+      source  = "microsoft/azuredevops"
+      version = "1.12.2"
+    }
+  }
+}
+
 provider "azuredevops" {}
 
 data "azuredevops_group" "readers" {
@@ -6,7 +16,7 @@ data "azuredevops_group" "readers" {
 }
 
 module "azuredevops_artifacts_feed" {
-  source = "../../"
+  source = "../../../"
 
   feeds = {
     project = {
