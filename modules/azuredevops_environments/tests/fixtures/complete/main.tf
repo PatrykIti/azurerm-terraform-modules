@@ -69,7 +69,7 @@ module "azuredevops_environments" {
     {
       key                  = "integration-approval"
       target_resource_type = "environment"
-      approvers            = [data.azuredevops_group.project_collection_admins.id]
+      approvers            = [data.azuredevops_group.project_collection_admins.origin_id]
       requester_can_approve = false
     }
   ]

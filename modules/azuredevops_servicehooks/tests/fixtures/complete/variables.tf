@@ -18,7 +18,7 @@ variable "account_name" {
 variable "account_key" {
   description = "Azure Storage account key for the queue hook."
   type        = string
-  default     = "ZXhhbXBsZWtleQ=="
+  default     = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
   sensitive   = true
 }
 

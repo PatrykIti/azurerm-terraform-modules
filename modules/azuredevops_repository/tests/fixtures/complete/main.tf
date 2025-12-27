@@ -51,7 +51,8 @@ module "azuredevops_repository" {
       scope = [
         {
           repository_key = "main"
-          match_type     = "DefaultBranch"
+          match_type     = "Exact"
+          repository_ref = "refs/heads/master"
         }
       ]
     }

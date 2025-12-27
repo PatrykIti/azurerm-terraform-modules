@@ -15,7 +15,7 @@ data "azuredevops_group" "project_collection_admins" {
 }
 
 module "azuredevops_serviceendpoint" {
-  source = "../.."
+  source = "../../.."
 
   project_id = var.project_id
 

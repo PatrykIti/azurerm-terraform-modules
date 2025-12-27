@@ -67,11 +67,13 @@ module "azuredevops_pipelines" {
 
   pipeline_authorizations = [
     {
+      key          = "app-endpoint"
       resource_id  = azuredevops_serviceendpoint_generic.example.id
       type         = "endpoint"
       pipeline_key = "app"
     },
     {
+      key          = "release-endpoint"
       resource_id  = azuredevops_serviceendpoint_generic.example.id
       type         = "endpoint"
       pipeline_key = "release"

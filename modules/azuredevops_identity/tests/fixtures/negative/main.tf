@@ -18,7 +18,7 @@ module "azuredevops_identity" {
 
   groups = {
     bad = {
-      display_name = "ado-identity-negative"
+      display_name = "${var.group_name_prefix}-negative"
     }
   }
 

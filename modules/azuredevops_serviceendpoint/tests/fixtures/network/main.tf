@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_serviceendpoint" {
-  source = "../.."
+  source = "../../.."
 
   project_id = var.project_id
 

@@ -4,7 +4,7 @@ locals {
       name         = variable.name
       value        = try(variable.value, null)
       secret_value = try(variable.secret_value, null)
-      is_secret    = coalesce(variable.is_secret, variable.secret_value != null)
+      is_secret    = try(variable.is_secret, null)
     }
   ]
 
@@ -29,9 +29,9 @@ resource "azuredevops_variable_group" "variable_group" {
     for_each = local.variable_group_variables
     content {
       name         = variable.value.name
-      value        = variable.value.value
+      value        = variable.value.secret_value == null ? variable.value.value : null
       secret_value = variable.value.secret_value
-      is_secret    = variable.value.is_secret
+      is_secret    = variable.value.secret_value == null ? null : coalesce(variable.value.is_secret, true)
     }
   }
 
