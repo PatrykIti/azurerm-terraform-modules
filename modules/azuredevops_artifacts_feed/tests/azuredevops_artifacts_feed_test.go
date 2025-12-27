@@ -96,6 +96,7 @@ func TestAzuredevopsArtifactsFeedValidationRules(t *testing.T) {
 	terraformOptions := &terraform.Options{
 		TerraformDir: testFolder,
 		NoColor:      true,
+		Upgrade: true,
 	}
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
@@ -116,6 +117,7 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 			"feed_name_prefix": fmt.Sprintf("ado-feed-%s", uniqueID),
 		},
 		NoColor: true,
+		Upgrade: true,
 		RetryableTerraformErrors: map[string]string{
 			".*timeout.*":         "Timeout error - retrying",
 			".*TooManyRequests.*": "Too many requests - retrying",

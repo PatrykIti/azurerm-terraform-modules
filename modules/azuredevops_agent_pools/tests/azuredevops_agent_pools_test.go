@@ -127,6 +127,7 @@ func TestAzuredevopsAgentPoolsValidationRules(t *testing.T) {
 	terraformOptions := &terraform.Options{
 		TerraformDir: testFolder,
 		NoColor:      true,
+		Upgrade: true,
 	}
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
@@ -147,6 +148,7 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 			"pool_name_prefix":  fmt.Sprintf("ado-agent-pool-%s", uniqueID),
 		},
 		NoColor: true,
+		Upgrade: true,
 		RetryableTerraformErrors: map[string]string{
 			".*timeout.*":         "Timeout error - retrying",
 			".*TooManyRequests.*": "Too many requests - retrying",

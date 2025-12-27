@@ -97,9 +97,26 @@ locals {
     try({ for key, folder in azuredevops_workitemquery_folder.query_folder : key => folder.id }, {}),
     try({ for key, folder in azuredevops_workitemquery_folder.query_folder_child : key => folder.id }, {})
   )
-  query_folder_paths = merge(
+  query_folder_paths_root = {
+    for key, folder in local.query_folders_by_key :
+    key => "${folder.area}/${folder.name}"
+    if folder.area != null
+  }
+  query_folder_paths_from_inputs = merge(
+    local.query_folder_paths_root,
+    {
+      for key, folder in local.query_folders_by_key :
+      key => "${local.query_folder_paths_root[folder.parent_key]}/${folder.name}"
+      if folder.parent_key != null && contains(keys(local.query_folder_paths_root), folder.parent_key)
+    }
+  )
+  query_folder_paths_from_resources = merge(
     try({ for key, folder in azuredevops_workitemquery_folder.query_folder : key => folder.path }, {}),
     try({ for key, folder in azuredevops_workitemquery_folder.query_folder_child : key => folder.path }, {})
+  )
+  query_folder_paths = merge(
+    local.query_folder_paths_from_resources,
+    local.query_folder_paths_from_inputs
   )
   query_folder_paths_by_id = merge(
     try({ for _, folder in azuredevops_workitemquery_folder.query_folder : tostring(folder.id) => folder.path }, {}),
