@@ -29,6 +29,7 @@ module "azuredevops_wiki" {
       name          = "${var.wiki_name_prefix}-secure"
       type          = "codeWiki"
       repository_id = azuredevops_git_repository.wiki_repo.id
+      version       = "main"
       mapped_path   = "/"
     }
   }

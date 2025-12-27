@@ -15,11 +15,11 @@ provider "azuredevops" {}
 module "azuredevops_team" {
   source = "../../../"
 
-  project_id = "00000000-0000-0000-0000-000000000000"
+  project_id = var.project_id
 
   teams = {
     bad = {
-      name = "ado-team-negative"
+      name = "${var.team_name_prefix}-negative"
     }
   }
 
