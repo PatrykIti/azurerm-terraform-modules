@@ -7,6 +7,7 @@ terraform {
     }
   }
 }
+
 provider "azuredevops" {}
 
 module "azuredevops_repository" {

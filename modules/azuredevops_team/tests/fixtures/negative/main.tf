@@ -8,6 +8,7 @@ terraform {
     }
   }
 }
+
 provider "azuredevops" {}
 
 # This should fail due to conflicting team selectors

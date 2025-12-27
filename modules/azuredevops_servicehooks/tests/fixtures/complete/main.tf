@@ -7,6 +7,7 @@ terraform {
     }
   }
 }
+
 provider "azuredevops" {}
 
 data "azuredevops_group" "readers" {
