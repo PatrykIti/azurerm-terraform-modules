@@ -5,12 +5,14 @@ mock_provider "azuredevops" {
     defaults = {
       id = "process-0001"
     }
+    override_during = plan
   }
 
   mock_resource "azuredevops_workitem" {
     defaults = {
       id = "workitem-0001"
     }
+    override_during = plan
   }
 
   mock_resource "azuredevops_workitemquery_folder" {
@@ -18,6 +20,7 @@ mock_provider "azuredevops" {
       id   = "folder-0001"
       path = "Shared Queries/Team"
     }
+    override_during = plan
   }
 
   mock_resource "azuredevops_workitemquery" {
@@ -25,30 +28,35 @@ mock_provider "azuredevops" {
       id   = "query-0001"
       path = "Shared Queries/Team/Active Issues"
     }
+    override_during = plan
   }
 
   mock_resource "azuredevops_workitemquery_permissions" {
     defaults = {
       id = "query-perm-0001"
     }
+    override_during = plan
   }
 
   mock_resource "azuredevops_area_permissions" {
     defaults = {
       id = "area-perm-0001"
     }
+    override_during = plan
   }
 
   mock_resource "azuredevops_iteration_permissions" {
     defaults = {
       id = "iteration-perm-0001"
     }
+    override_during = plan
   }
 
   mock_resource "azuredevops_tagging_permissions" {
     defaults = {
       id = "tagging-perm-0001"
     }
+    override_during = plan
   }
 }
 
