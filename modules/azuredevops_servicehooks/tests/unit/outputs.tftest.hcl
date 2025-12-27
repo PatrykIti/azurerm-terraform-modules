@@ -35,7 +35,7 @@ variables {
     {
       key                     = "queue-main"
       account_name            = "account"
-      account_key             = "key"
+      account_key             = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
       queue_name              = "queue"
       run_state_changed_event = {}
     }

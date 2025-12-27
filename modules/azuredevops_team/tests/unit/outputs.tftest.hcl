@@ -6,18 +6,21 @@ mock_provider "azuredevops" {
       id         = "00000000-0000-0000-0000-000000000000"
       descriptor = "vssgp.Uy0xLTktMTIzNDU2Nzg5MA"
     }
+    override_during = plan
   }
 
   mock_resource "azuredevops_team_members" {
     defaults = {
       id = "team-membership-0001"
     }
+    override_during = plan
   }
 
   mock_resource "azuredevops_team_administrators" {
     defaults = {
       id = "team-admins-0001"
     }
+    override_during = plan
   }
 }
 
