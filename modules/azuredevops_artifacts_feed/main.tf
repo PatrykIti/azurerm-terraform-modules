@@ -32,8 +32,7 @@ resource "azuredevops_feed_permission" "feed_permission" {
   feed_id             = each.value.feed_id != null ? each.value.feed_id : local.feed_ids[each.value.feed_key]
   identity_descriptor = each.value.identity_descriptor
   role                = lower(each.value.role)
-  project_id = coalesce(
-    try(each.value.project_id, null),
+  project_id = each.value.project_id != null ? each.value.project_id : (
     each.value.feed_key != null ? try(local.feed_project_ids[each.value.feed_key], null) : null
   )
   display_name        = try(each.value.display_name, null)
@@ -45,8 +44,7 @@ resource "azuredevops_feed_retention_policy" "feed_retention_policy" {
   feed_id                                   = each.value.feed_id != null ? each.value.feed_id : local.feed_ids[each.value.feed_key]
   count_limit                               = each.value.count_limit
   days_to_keep_recently_downloaded_packages = each.value.days_to_keep_recently_downloaded_packages
-  project_id = coalesce(
-    try(each.value.project_id, null),
+  project_id = each.value.project_id != null ? each.value.project_id : (
     each.value.feed_key != null ? try(local.feed_project_ids[each.value.feed_key], null) : null
   )
 }

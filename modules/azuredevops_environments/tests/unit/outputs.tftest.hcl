@@ -3,7 +3,7 @@
 mock_provider "azuredevops" {
   mock_resource "azuredevops_environment" {
     defaults = {
-      id = "env-0001"
+      id = "1"
     }
   }
 
@@ -47,7 +47,7 @@ run "outputs_apply" {
   command = apply
 
   assert {
-    condition     = output.environment_id == "env-0001"
+    condition     = output.environment_id == "1"
     error_message = "environment_id should return the environment ID."
   }
 
