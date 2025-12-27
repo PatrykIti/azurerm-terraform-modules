@@ -16,7 +16,6 @@ resource "azuredevops_feed" "feed" {
 
   name        = coalesce(each.value.name, each.key)
   project_id  = try(each.value.project_id, null)
-  description = try(each.value.description, null)
 
   dynamic "features" {
     for_each = each.value.features != null ? [each.value.features] : []

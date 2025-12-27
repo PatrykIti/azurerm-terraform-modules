@@ -12,7 +12,6 @@ module "azuredevops_artifacts_feed" {
     secure = {
       name        = "${var.feed_name_prefix}-secure"
       project_id  = var.project_id
-      description = "Secure fixture feed."
     }
   }
 

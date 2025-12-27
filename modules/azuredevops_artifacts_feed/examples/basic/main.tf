@@ -7,7 +7,6 @@ module "azuredevops_artifacts_feed" {
     project = {
       name        = var.feed_name
       project_id  = var.project_id
-      description = "Basic artifacts feed."
     }
   }
 }

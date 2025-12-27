@@ -2,22 +2,6 @@
 
 mock_provider "azuredevops" {}
 
-run "invalid_feed_description" {
-  command = plan
-
-  variables {
-    feeds = {
-      example = {
-        description = "  "
-      }
-    }
-  }
-
-  expect_failures = [
-    var.feeds,
-  ]
-}
-
 run "invalid_feed_project_id" {
   command = plan
 

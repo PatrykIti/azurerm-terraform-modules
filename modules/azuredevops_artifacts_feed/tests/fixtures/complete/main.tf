@@ -12,7 +12,6 @@ module "azuredevops_artifacts_feed" {
     project = {
       name        = "${var.feed_name_prefix}-complete"
       project_id  = var.project_id
-      description = "Complete fixture feed."
       features = {
         permanent_delete = false
         restore          = false

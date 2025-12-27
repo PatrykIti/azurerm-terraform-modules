@@ -7,7 +7,6 @@ variable "feeds" {
   type = map(object({
     name        = optional(string)
     project_id  = optional(string)
-    description = optional(string)
     features = optional(object({
       permanent_delete = optional(bool)
       restore          = optional(bool)
@@ -31,15 +30,6 @@ variable "feeds" {
       )
     ])
     error_message = "feeds.project_id must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for feed in values(var.feeds) : (
-        feed.description == null || length(trimspace(feed.description)) > 0
-      )
-    ])
-    error_message = "feeds.description must be a non-empty string when provided."
   }
 }
 

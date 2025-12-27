@@ -40,7 +40,6 @@ module "azuredevops_artifacts_feed" {
     project = {
       name        = "existing-feed-name"
       project_id  = "00000000-0000-0000-0000-000000000000"
-      description = "Existing feed managed by Terraform"
     }
   }
 

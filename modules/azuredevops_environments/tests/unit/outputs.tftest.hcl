@@ -43,8 +43,8 @@ variables {
   ]
 }
 
-run "outputs_plan" {
-  command = plan
+run "outputs_apply" {
+  command = apply
 
   assert {
     condition     = output.environment_id == "env-0001"
