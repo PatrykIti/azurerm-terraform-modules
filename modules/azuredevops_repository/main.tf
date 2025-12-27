@@ -9,9 +9,12 @@ locals {
       disabled             = repo.disabled
       initialization = {
         init_type = coalesce(try(repo.initialization.init_type, null), "Uninitialized")
-        source_type = coalesce(
-          try(repo.initialization.source_type, null),
-          coalesce(try(repo.initialization.init_type, null), "Uninitialized") == "Import" ? "Git" : null
+        source_type = try(
+          coalesce(
+            try(repo.initialization.source_type, null),
+            coalesce(try(repo.initialization.init_type, null), "Uninitialized") == "Import" ? "Git" : null
+          ),
+          null
         )
         source_url            = try(repo.initialization.source_url, null)
         service_connection_id = try(repo.initialization.service_connection_id, null)

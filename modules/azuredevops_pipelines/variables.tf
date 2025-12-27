@@ -110,8 +110,7 @@ variable "build_definitions" {
     }))
 
     build_completion_trigger = optional(object({
-      build_definition_id  = optional(string)
-      build_definition_key = optional(string)
+      build_definition_id = string
       branch_filter = object({
         include = list(string)
         exclude = optional(list(string), [])
@@ -210,24 +209,11 @@ variable "build_definitions" {
   validation {
     condition = alltrue([
       for definition in values(var.build_definitions) : (
-        definition.build_completion_trigger == null || (
-          (definition.build_completion_trigger.build_definition_id != null) !=
-          (definition.build_completion_trigger.build_definition_key != null)
-        )
-      )
-    ])
-    error_message = "build_completion_trigger must set exactly one of build_definition_id or build_definition_key."
-  }
-
-  validation {
-    condition = alltrue([
-      for definition in values(var.build_definitions) : (
         definition.build_completion_trigger == null ||
-        definition.build_completion_trigger.build_definition_key == null ||
-        contains(keys(var.build_definitions), definition.build_completion_trigger.build_definition_key)
+        length(trimspace(definition.build_completion_trigger.build_definition_id)) > 0
       )
     ])
-    error_message = "build_completion_trigger.build_definition_key must reference a key in build_definitions."
+    error_message = "build_completion_trigger.build_definition_id must be a non-empty string."
   }
 }
 

@@ -145,10 +145,7 @@ resource "azuredevops_build_definition" "build_definition" {
   dynamic "build_completion_trigger" {
     for_each = each.value.build_completion_trigger == null ? [] : [each.value.build_completion_trigger]
     content {
-      build_definition_id = coalesce(
-        build_completion_trigger.value.build_definition_id,
-        try(local.build_definition_ids[build_completion_trigger.value.build_definition_key], null)
-      )
+      build_definition_id = build_completion_trigger.value.build_definition_id
 
       branch_filter {
         include = build_completion_trigger.value.branch_filter.include
@@ -175,7 +172,7 @@ resource "azuredevops_build_definition" "build_definition" {
   variable_groups = try(each.value.variable_groups, null)
 
   dynamic "variable" {
-    for_each = try(each.value.variables, [])
+    for_each = each.value.variables == null ? [] : each.value.variables
     content {
       name           = variable.value.name
       value          = try(variable.value.value, null)
@@ -224,16 +221,6 @@ resource "azuredevops_build_definition" "build_definition" {
     }
   }
 
-  lifecycle {
-    precondition {
-      condition = (
-        each.value.build_completion_trigger == null ||
-        each.value.build_completion_trigger.build_definition_key == null ||
-        contains(keys(var.build_definitions), each.value.build_completion_trigger.build_definition_key)
-      )
-      error_message = "build_completion_trigger.build_definition_key must reference a key in build_definitions."
-    }
-  }
 }
 
 resource "azuredevops_build_definition_permissions" "build_definition_permissions" {

@@ -420,7 +420,7 @@ run "invalid_resource_authorization_key_empty" {
   ]
 }
 
-run "invalid_build_completion_trigger_unknown_key" {
+run "invalid_build_completion_trigger_empty_id" {
   command = plan
 
   variables {
@@ -432,7 +432,7 @@ run "invalid_build_completion_trigger_unknown_key" {
           yml_path  = "azure-pipelines.yml"
         }
         build_completion_trigger = {
-          build_definition_key = "missing"
+          build_definition_id = ""
           branch_filter = {
             include = ["main"]
           }
