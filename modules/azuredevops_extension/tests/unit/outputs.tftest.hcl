@@ -14,7 +14,7 @@ variables {
 }
 
 run "outputs_plan" {
-  command = plan
+  command = apply
 
   assert {
     condition     = output.extension_id == "extension-0001"
