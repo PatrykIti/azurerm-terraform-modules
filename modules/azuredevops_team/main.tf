@@ -34,6 +34,7 @@ resource "azuredevops_team" "team" {
 resource "azuredevops_team_members" "team_members" {
   for_each = local.team_members_by_key
 
+  project_id = var.project_id
   team_id = each.value.team_id
   members = each.value.member_descriptors
   mode    = each.value.mode
@@ -42,6 +43,7 @@ resource "azuredevops_team_members" "team_members" {
 resource "azuredevops_team_administrators" "team_administrators" {
   for_each = local.team_administrators_by_key
 
+  project_id     = var.project_id
   team_id        = each.value.team_id
   administrators = each.value.admin_descriptors
   mode           = each.value.mode
