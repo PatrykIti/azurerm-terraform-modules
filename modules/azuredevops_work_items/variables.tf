@@ -52,7 +52,7 @@ variable "processes" {
 # -----------------------------------------------------------------------------
 
 variable "work_items" {
-  description = "List of work items to manage."
+  description = "List of work items to manage. parent_key must reference a top-level work item (no parent_key)."
   type = list(object({
     key            = optional(string)
     project_id     = optional(string)
@@ -123,10 +123,13 @@ variable "work_items" {
     condition = alltrue([
       for item in var.work_items : (
         item.parent_key == null ||
-        contains([for candidate in var.work_items : coalesce(candidate.key, candidate.title)], item.parent_key)
+        contains([
+          for candidate in var.work_items : coalesce(candidate.key, candidate.title)
+          if candidate.parent_key == null
+        ], item.parent_key)
       )
     ])
-    error_message = "work_items.parent_key must reference an existing work item key."
+    error_message = "work_items.parent_key must reference a top-level work item key (parent_key unset)."
   }
 
   validation {
@@ -152,7 +155,7 @@ variable "work_items" {
 # -----------------------------------------------------------------------------
 
 variable "query_folders" {
-  description = "List of work item query folders to manage."
+  description = "List of work item query folders to manage. parent_key must reference a top-level folder (no parent_key)."
   type = list(object({
     key        = optional(string)
     project_id = optional(string)
@@ -220,10 +223,13 @@ variable "query_folders" {
     condition = alltrue([
       for folder in var.query_folders : (
         folder.parent_key == null ||
-        contains([for candidate in var.query_folders : coalesce(candidate.key, candidate.name)], folder.parent_key)
+        contains([
+          for candidate in var.query_folders : coalesce(candidate.key, candidate.name)
+          if candidate.parent_key == null
+        ], folder.parent_key)
       )
     ])
-    error_message = "query_folders.parent_key must reference an existing folder key."
+    error_message = "query_folders.parent_key must reference a top-level folder key (parent_key unset)."
   }
 
   validation {

@@ -5,12 +5,18 @@ output "process_ids" {
 
 output "work_item_ids" {
   description = "Map of work item IDs keyed by work item key."
-  value       = try({ for key, item in azuredevops_workitem.work_item : key => item.id }, {})
+  value = merge(
+    try({ for key, item in azuredevops_workitem.work_item : key => item.id }, {}),
+    try({ for key, item in azuredevops_workitem.work_item_child : key => item.id }, {})
+  )
 }
 
 output "query_folder_ids" {
   description = "Map of query folder IDs keyed by folder key."
-  value       = try({ for key, folder in azuredevops_workitemquery_folder.query_folder : key => folder.id }, {})
+  value = merge(
+    try({ for key, folder in azuredevops_workitemquery_folder.query_folder : key => folder.id }, {}),
+    try({ for key, folder in azuredevops_workitemquery_folder.query_folder_child : key => folder.id }, {})
+  )
 }
 
 output "query_ids" {

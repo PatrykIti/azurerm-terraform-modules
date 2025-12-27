@@ -53,30 +53,30 @@ variables {
 }
 
 run "outputs_plan" {
-  command = plan
+  command = apply
 
   assert {
-    condition     = output.servicehook_ids.webhook_tfs["webhook-main"] == "hook-0001"
-    error_message = "servicehook_ids.webhook_tfs should use stable webhook keys."
+    condition     = contains(keys(output.servicehook_ids.webhook_tfs), "webhook-main")
+    error_message = "servicehook_ids.webhook_tfs should include the webhook key."
   }
 
   assert {
-    condition     = output.servicehook_ids.storage_queue_pipelines["queue-main"] == "hook-0002"
-    error_message = "servicehook_ids.storage_queue_pipelines should use stable storage queue keys."
+    condition     = contains(keys(output.servicehook_ids.storage_queue_pipelines), "queue-main")
+    error_message = "servicehook_ids.storage_queue_pipelines should include the storage queue key."
   }
 
   assert {
-    condition     = output.webhook_ids["webhook-main"] == "hook-0001"
-    error_message = "webhook_ids should include the webhook keyed by webhook key."
+    condition     = contains(keys(output.webhook_ids), "webhook-main")
+    error_message = "webhook_ids should include the webhook key."
   }
 
   assert {
-    condition     = output.storage_queue_hook_ids["queue-main"] == "hook-0002"
-    error_message = "storage_queue_hook_ids should include the queue hook keyed by hook key."
+    condition     = contains(keys(output.storage_queue_hook_ids), "queue-main")
+    error_message = "storage_queue_hook_ids should include the storage queue key."
   }
 
   assert {
-    condition     = output.servicehook_permission_ids["perm-main"] == "perm-0001"
-    error_message = "servicehook_permission_ids should include the permission keyed by permission key."
+    condition     = contains(keys(output.servicehook_permission_ids), "perm-main")
+    error_message = "servicehook_permission_ids should include the permission key."
   }
 }

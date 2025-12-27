@@ -91,6 +91,15 @@ import {
 
 Use the **work item ID** from Azure DevOps (numeric ID).
 
+If the work item sets `parent_key`, import it into:
+
+```hcl
+import {
+  to = module.azuredevops_work_items.azuredevops_workitem.work_item_child["example-item"]
+  id = "<work_item_id>"
+}
+```
+
 ---
 
 ## 3) Import query folders and queries
@@ -109,6 +118,15 @@ import {
 
 Use the folder/query IDs as defined by the Azure DevOps provider. Follow the
 provider docs for exact import ID formats.
+
+If a query folder sets `parent_key`, import it into:
+
+```hcl
+import {
+  to = module.azuredevops_work_items.azuredevops_workitemquery_folder.query_folder_child["team"]
+  id = "<query_folder_id>"
+}
+```
 
 ---
 

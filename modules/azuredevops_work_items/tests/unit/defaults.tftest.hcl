@@ -11,6 +11,11 @@ run "defaults_plan" {
   }
 
   assert {
+    condition     = length(azuredevops_workitem.work_item_child) == 0
+    error_message = "No child work items should be created by default."
+  }
+
+  assert {
     condition     = length(azuredevops_workitemquery.query) == 0
     error_message = "No work item queries should be created by default."
   }
@@ -18,6 +23,11 @@ run "defaults_plan" {
   assert {
     condition     = length(azuredevops_workitemquery_folder.query_folder) == 0
     error_message = "No query folders should be created by default."
+  }
+
+  assert {
+    condition     = length(azuredevops_workitemquery_folder.query_folder_child) == 0
+    error_message = "No child query folders should be created by default."
   }
 
   assert {

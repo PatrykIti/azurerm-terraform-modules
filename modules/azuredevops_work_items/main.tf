@@ -2,8 +2,20 @@ locals {
   work_items_by_key = {
     for item in var.work_items : coalesce(item.key, item.title) => item
   }
+  work_items_root = {
+    for key, item in local.work_items_by_key : key => item if item.parent_key == null
+  }
+  work_items_child = {
+    for key, item in local.work_items_by_key : key => item if item.parent_key != null
+  }
   query_folders_by_key = {
     for folder in var.query_folders : coalesce(folder.key, folder.name) => folder
+  }
+  query_folders_root = {
+    for key, folder in local.query_folders_by_key : key => folder if folder.parent_key == null
+  }
+  query_folders_child = {
+    for key, folder in local.query_folders_by_key : key => folder if folder.parent_key != null
   }
   queries_by_key = {
     for query in var.queries : coalesce(query.key, query.name) => query
@@ -35,7 +47,7 @@ resource "azuredevops_workitemtrackingprocess_process" "process" {
 }
 
 resource "azuredevops_workitem" "work_item" {
-  for_each = local.work_items_by_key
+  for_each = local.work_items_root
 
   project_id     = coalesce(each.value.project_id, var.project_id)
   title          = each.value.title
@@ -44,20 +56,50 @@ resource "azuredevops_workitem" "work_item" {
   tags           = try(each.value.tags, null)
   area_path      = try(each.value.area_path, null)
   iteration_path = try(each.value.iteration_path, null)
-  parent_id = each.value.parent_key != null ? tonumber(azuredevops_workitem.work_item[each.value.parent_key].id) : (
-    try(each.value.parent_id, null)
-  )
+  parent_id = try(each.value.parent_id, null)
   custom_fields = try(each.value.custom_fields, null)
 }
 
+resource "azuredevops_workitem" "work_item_child" {
+  for_each = local.work_items_child
+
+  project_id     = coalesce(each.value.project_id, var.project_id)
+  title          = each.value.title
+  type           = each.value.type
+  state          = try(each.value.state, null)
+  tags           = try(each.value.tags, null)
+  area_path      = try(each.value.area_path, null)
+  iteration_path = try(each.value.iteration_path, null)
+  parent_id      = tonumber(azuredevops_workitem.work_item[each.value.parent_key].id)
+  custom_fields  = try(each.value.custom_fields, null)
+}
+
 resource "azuredevops_workitemquery_folder" "query_folder" {
-  for_each = local.query_folders_by_key
+  for_each = local.query_folders_root
 
   project_id = coalesce(each.value.project_id, var.project_id)
   name       = each.value.name
   area       = try(each.value.area, null)
-  parent_id = each.value.parent_key != null ? tonumber(azuredevops_workitemquery_folder.query_folder[each.value.parent_key].id) : (
-    try(each.value.parent_id, null)
+  parent_id  = try(each.value.parent_id, null)
+}
+
+resource "azuredevops_workitemquery_folder" "query_folder_child" {
+  for_each = local.query_folders_child
+
+  project_id = coalesce(each.value.project_id, var.project_id)
+  name       = each.value.name
+  area       = try(each.value.area, null)
+  parent_id  = tonumber(azuredevops_workitemquery_folder.query_folder[each.value.parent_key].id)
+}
+
+locals {
+  query_folder_ids = merge(
+    try({ for key, folder in azuredevops_workitemquery_folder.query_folder : key => folder.id }, {}),
+    try({ for key, folder in azuredevops_workitemquery_folder.query_folder_child : key => folder.id }, {})
+  )
+  query_folder_paths = merge(
+    try({ for key, folder in azuredevops_workitemquery_folder.query_folder : key => folder.path }, {}),
+    try({ for key, folder in azuredevops_workitemquery_folder.query_folder_child : key => folder.path }, {})
   )
 }
 
@@ -68,7 +110,7 @@ resource "azuredevops_workitemquery" "query" {
   name       = each.value.name
   wiql       = each.value.wiql
   area       = try(each.value.area, null)
-  parent_id = each.value.parent_key != null ? tonumber(azuredevops_workitemquery_folder.query_folder[each.value.parent_key].id) : (
+  parent_id = each.value.parent_key != null ? tonumber(local.query_folder_ids[each.value.parent_key]) : (
     try(each.value.parent_id, null)
   )
 }
@@ -78,7 +120,7 @@ resource "azuredevops_workitemquery_permissions" "query_permissions" {
 
   project_id = coalesce(each.value.project_id, var.project_id)
   path = each.value.query_key != null ? azuredevops_workitemquery.query[each.value.query_key].path : (
-    each.value.folder_key != null ? azuredevops_workitemquery_folder.query_folder[each.value.folder_key].path : each.value.path
+    each.value.folder_key != null ? local.query_folder_paths[each.value.folder_key] : each.value.path
   )
   principal   = each.value.principal
   permissions = each.value.permissions

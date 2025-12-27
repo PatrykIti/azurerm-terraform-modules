@@ -108,6 +108,38 @@ run "invalid_parent_key_reference" {
   ]
 }
 
+run "invalid_parent_key_depth" {
+  command = plan
+
+  variables {
+    project_id = "00000000-0000-0000-0000-000000000000"
+
+    work_items = [
+      {
+        key   = "parent"
+        title = "Parent"
+        type  = "Issue"
+      },
+      {
+        key        = "child"
+        title      = "Child"
+        type       = "Issue"
+        parent_key = "parent"
+      },
+      {
+        key        = "grandchild"
+        title      = "Grandchild"
+        type       = "Issue"
+        parent_key = "child"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.work_items,
+  ]
+}
+
 run "duplicate_query_folder_keys" {
   command = plan
 
@@ -122,6 +154,36 @@ run "duplicate_query_folder_keys" {
       {
         name = "Shared"
         area = "Shared Queries"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.query_folders,
+  ]
+}
+
+run "invalid_query_folder_parent_depth" {
+  command = plan
+
+  variables {
+    project_id = "00000000-0000-0000-0000-000000000000"
+
+    query_folders = [
+      {
+        key  = "root"
+        name = "Root"
+        area = "Shared Queries"
+      },
+      {
+        key        = "child"
+        name       = "Child"
+        parent_key = "root"
+      },
+      {
+        key        = "grandchild"
+        name       = "Grandchild"
+        parent_key = "child"
       }
     ]
   }
