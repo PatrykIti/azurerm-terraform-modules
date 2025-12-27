@@ -17,7 +17,7 @@ mock_provider "azuredevops" {
 
   mock_resource "azuredevops_workitemquery_folder" {
     defaults = {
-      id   = "folder-0001"
+      id   = "1"
       path = "Shared Queries/Team"
     }
     override_during = plan

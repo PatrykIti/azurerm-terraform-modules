@@ -1,3 +1,12 @@
+terraform {
+  required_version = ">= 1.12.2"
+  required_providers {
+    azuredevops = {
+      source  = "microsoft/azuredevops"
+      version = "1.12.2"
+    }
+  }
+}
 provider "azuredevops" {}
 
 locals {
@@ -8,7 +17,7 @@ locals {
 }
 
 module "azuredevops_extension" {
-  source = "../../"
+  source = "../../../"
   for_each = local.extensions_by_key
 
   publisher_id      = each.value.publisher_id

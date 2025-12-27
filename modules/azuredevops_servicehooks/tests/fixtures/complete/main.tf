@@ -1,3 +1,12 @@
+terraform {
+  required_version = ">= 1.12.2"
+  required_providers {
+    azuredevops = {
+      source  = "microsoft/azuredevops"
+      version = "1.12.2"
+    }
+  }
+}
 provider "azuredevops" {}
 
 data "azuredevops_group" "readers" {
@@ -6,7 +15,7 @@ data "azuredevops_group" "readers" {
 }
 
 module "azuredevops_servicehooks" {
-  source = "../../"
+  source = "../../../"
 
   project_id = var.project_id
 
