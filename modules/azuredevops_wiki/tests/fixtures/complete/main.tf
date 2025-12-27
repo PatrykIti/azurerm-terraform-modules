@@ -19,6 +19,15 @@ resource "azuredevops_git_repository" "wiki_repo" {
   }
 }
 
+resource "azuredevops_git_repository_file" "wiki_seed" {
+  repository_id       = azuredevops_git_repository.wiki_repo.id
+  file                = "README.md"
+  content             = "# Wiki Repository\n\nSeed commit for wiki tests."
+  branch              = "refs/heads/master"
+  commit_message      = "Initialize wiki repository"
+  overwrite_on_create = true
+}
+
 module "azuredevops_wiki" {
   source = "../../../"
 
@@ -29,21 +38,10 @@ module "azuredevops_wiki" {
       name          = "${var.wiki_name_prefix}-complete"
       type          = "codeWiki"
       repository_id = azuredevops_git_repository.wiki_repo.id
-      version       = "main"
+      version       = "master"
       mapped_path   = "/"
     }
   }
 
-  wiki_pages = [
-    {
-      wiki_key = "code"
-      path     = "/Home"
-      content  = "Complete wiki home page"
-    },
-    {
-      wiki_key = "code"
-      path     = "/Guides"
-      content  = "Team guides"
-    }
-  ]
+  depends_on = [azuredevops_git_repository_file.wiki_seed]
 }

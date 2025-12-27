@@ -61,13 +61,11 @@ module "azuredevops_work_items" {
       key   = "parent-item"
       title = "${var.work_item_title_prefix}-parent"
       type  = "Task"
-      state = "Active"
     },
     {
       key        = "child-item"
       title      = "${var.work_item_title_prefix}-child"
       type       = "Task"
-      state      = "Active"
       parent_key = "parent-item"
     }
   ]

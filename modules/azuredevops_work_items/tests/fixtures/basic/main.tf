@@ -20,7 +20,6 @@ module "azuredevops_work_items" {
       key   = "basic-item"
       title = "${var.work_item_title_prefix}-basic"
       type  = "Task"
-      state = "Active"
     }
   ]
 }

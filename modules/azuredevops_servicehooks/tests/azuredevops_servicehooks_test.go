@@ -97,10 +97,7 @@ func TestAzuredevopsServicehooksValidationRules(t *testing.T) {
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_servicehooks/tests/fixtures/negative")
-	terraformOptions := &terraform.Options{
-		TerraformDir: testFolder,
-		NoColor:      true,
-	}
+	terraformOptions := getTerraformOptions(t, testFolder)
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)

@@ -3,7 +3,7 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 1 tasks
+- **To Do:** 2 tasks
 - **In Progress:** 0
 - **Done:** 34 tasks
 
@@ -13,6 +13,7 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-009](./TASK-009_Workflow_and_Scripts_Audit.md) | **Workflow + scripts audit (docs/examples/source updates)** | High | Medium | CI/CD + release automations |
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
 
 ---
