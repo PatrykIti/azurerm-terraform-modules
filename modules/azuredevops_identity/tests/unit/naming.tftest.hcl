@@ -36,7 +36,7 @@ run "security_role_assignment_plan" {
   }
 
   assert {
-    condition     = can(azuredevops_securityrole_assignment.securityrole_assignment["operators-reader"])
+    condition     = contains(keys(azuredevops_securityrole_assignment.securityrole_assignment), "operators-reader")
     error_message = "securityrole_assignments should be keyed by assignment key."
   }
 }
