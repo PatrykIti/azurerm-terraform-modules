@@ -39,7 +39,6 @@ resource "azuredevops_group" "group" {
 
   scope        = each.value.scope
   origin_id    = each.value.origin_id
-  origin       = each.value.origin
   mail         = each.value.mail
   display_name = each.value.display_name
   description  = each.value.description

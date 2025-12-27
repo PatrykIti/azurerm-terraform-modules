@@ -13,8 +13,15 @@ variables {
   extension_id = "extension-one"
 }
 
-run "outputs_plan" {
+run "outputs_apply" {
   command = apply
+
+  override_resource {
+    target = azuredevops_extension.extension
+    values = {
+      id = "extension-0001"
+    }
+  }
 
   assert {
     condition     = output.extension_id == "extension-0001"

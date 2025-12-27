@@ -7,7 +7,6 @@ variable "groups" {
   type = map(object({
     scope        = optional(string)
     origin_id    = optional(string)
-    origin       = optional(string)
     mail         = optional(string)
     display_name = optional(string)
     description  = optional(string)
