@@ -28,16 +28,16 @@ run "empty_extension_id" {
   ]
 }
 
-run "empty_version" {
+run "empty_extension_version" {
   command = plan
 
   variables {
-    publisher_id = "publisher-one"
-    extension_id = "extension-one"
-    version      = " "
+    publisher_id      = "publisher-one"
+    extension_id      = "extension-one"
+    extension_version = " "
   }
 
   expect_failures = [
-    var.version,
+    var.extension_version,
   ]
 }

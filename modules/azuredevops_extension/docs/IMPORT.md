@@ -39,7 +39,7 @@ module "azuredevops_extension" {
   extension_id = "existing-extension-id"
 
   # Optional version pin
-  # version = "1.2.3"
+  # extension_version = "1.2.3"
 }
 ```
 

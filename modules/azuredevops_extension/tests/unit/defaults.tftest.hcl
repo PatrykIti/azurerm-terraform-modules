@@ -11,7 +11,7 @@ run "defaults_plan" {
   command = plan
 
   assert {
-    condition     = var.version == null
-    error_message = "version should default to null."
+    condition     = var.extension_version == null
+    error_message = "extension_version should default to null."
   }
 }

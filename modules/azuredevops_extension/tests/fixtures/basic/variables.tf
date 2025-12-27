@@ -8,7 +8,7 @@ variable "extension_id" {
   type        = string
 }
 
-variable "version" {
+variable "extension_version" {
   description = "Optional extension version to pin."
   type        = string
   default     = null

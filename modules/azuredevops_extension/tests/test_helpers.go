@@ -24,7 +24,7 @@ func getExtensionVarsFromEnv() map[string]interface{} {
 	}
 
 	if version := os.Getenv("AZDO_EXTENSION_VERSION"); version != "" {
-		vars["version"] = version
+		vars["extension_version"] = version
 	}
 
 	return vars

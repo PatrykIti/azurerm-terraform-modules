@@ -19,9 +19,9 @@ provider "azuredevops" {}
 module "azuredevops_extension" {
   source = "path/to/azuredevops_extension"
 
-  publisher_id = "publisher-id"
-  extension_id = "extension-id"
-  version      = "1.2.3"
+  publisher_id      = "publisher-id"
+  extension_id      = "extension-id"
+  extension_version = "1.2.3"
 }
 ```
 

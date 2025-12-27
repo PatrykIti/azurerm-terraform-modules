@@ -22,13 +22,13 @@ variable "extension_id" {
   }
 }
 
-variable "version" {
+variable "extension_version" {
   description = "Optional extension version to pin."
   type        = string
   default     = null
 
   validation {
-    condition     = var.version == null || length(trimspace(var.version)) > 0
-    error_message = "version must be a non-empty string when provided."
+    condition     = var.extension_version == null || length(trimspace(var.extension_version)) > 0
+    error_message = "extension_version must be a non-empty string when provided."
   }
 }
