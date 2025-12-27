@@ -91,4 +91,5 @@ output "serviceendpoint_names" {
     ssh                         = { for key, endpoint in azuredevops_serviceendpoint_ssh.ssh : key => endpoint.service_endpoint_name }
     visualstudiomarketplace     = { for key, endpoint in azuredevops_serviceendpoint_visualstudiomarketplace.visualstudiomarketplace : key => endpoint.service_endpoint_name }
   }, {})
+  sensitive = true
 }

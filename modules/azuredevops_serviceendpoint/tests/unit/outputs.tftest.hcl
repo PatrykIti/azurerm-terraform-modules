@@ -38,8 +38,8 @@ variables {
   ]
 }
 
-run "outputs_plan" {
-  command = plan
+run "outputs_apply" {
+  command = apply
 
   assert {
     condition     = contains(keys(output.serviceendpoint_ids.generic), "generic-key")

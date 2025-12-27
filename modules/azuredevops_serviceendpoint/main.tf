@@ -182,129 +182,170 @@ locals {
 }
 
 locals {
-  serviceendpoint_argocd_for_each = {
-    for key in keys(local.serviceendpoint_argocd) : nonsensitive(key) => true
-  }
-  serviceendpoint_artifactory_for_each = {
-    for key in keys(local.serviceendpoint_artifactory) : nonsensitive(key) => true
-  }
-  serviceendpoint_aws_for_each = {
-    for key in keys(local.serviceendpoint_aws) : nonsensitive(key) => true
-  }
-  serviceendpoint_azure_service_bus_for_each = {
-    for key in keys(local.serviceendpoint_azure_service_bus) : nonsensitive(key) => true
-  }
-  serviceendpoint_azurecr_for_each = {
-    for key in keys(local.serviceendpoint_azurecr) : nonsensitive(key) => true
-  }
-  serviceendpoint_azurerm_for_each = {
-    for key in keys(local.serviceendpoint_azurerm) : nonsensitive(key) => true
-  }
-  serviceendpoint_bitbucket_for_each = {
-    for key in keys(local.serviceendpoint_bitbucket) : nonsensitive(key) => true
-  }
-  serviceendpoint_black_duck_for_each = {
-    for key in keys(local.serviceendpoint_black_duck) : nonsensitive(key) => true
-  }
-  serviceendpoint_checkmarx_one_for_each = {
-    for key in keys(local.serviceendpoint_checkmarx_one) : nonsensitive(key) => true
-  }
-  serviceendpoint_checkmarx_sast_for_each = {
-    for key in keys(local.serviceendpoint_checkmarx_sast) : nonsensitive(key) => true
-  }
-  serviceendpoint_checkmarx_sca_for_each = {
-    for key in keys(local.serviceendpoint_checkmarx_sca) : nonsensitive(key) => true
-  }
-  serviceendpoint_dockerregistry_for_each = {
-    for key in keys(local.serviceendpoint_dockerregistry) : nonsensitive(key) => true
-  }
-  serviceendpoint_dynamics_lifecycle_services_for_each = {
-    for key in keys(local.serviceendpoint_dynamics_lifecycle_services) : nonsensitive(key) => true
-  }
-  serviceendpoint_externaltfs_for_each = {
-    for key in keys(local.serviceendpoint_externaltfs) : nonsensitive(key) => true
-  }
-  serviceendpoint_gcp_terraform_for_each = {
-    for key in keys(local.serviceendpoint_gcp_terraform) : nonsensitive(key) => true
-  }
-  serviceendpoint_generic_for_each = {
-    for key in keys(local.serviceendpoint_generic) : nonsensitive(key) => true
-  }
-  serviceendpoint_generic_git_for_each = {
-    for key in keys(local.serviceendpoint_generic_git) : nonsensitive(key) => true
-  }
-  serviceendpoint_generic_v2_for_each = {
-    for key in keys(local.serviceendpoint_generic_v2) : nonsensitive(key) => true
-  }
-  serviceendpoint_github_for_each = {
-    for key in keys(local.serviceendpoint_github) : nonsensitive(key) => true
-  }
-  serviceendpoint_github_enterprise_for_each = {
-    for key in keys(local.serviceendpoint_github_enterprise) : nonsensitive(key) => true
-  }
-  serviceendpoint_gitlab_for_each = {
-    for key in keys(local.serviceendpoint_gitlab) : nonsensitive(key) => true
-  }
-  serviceendpoint_incomingwebhook_for_each = {
-    for key in keys(local.serviceendpoint_incomingwebhook) : nonsensitive(key) => true
-  }
-  serviceendpoint_jenkins_for_each = {
-    for key in keys(local.serviceendpoint_jenkins) : nonsensitive(key) => true
-  }
-  serviceendpoint_jfrog_artifactory_v2_for_each = {
-    for key in keys(local.serviceendpoint_jfrog_artifactory_v2) : nonsensitive(key) => true
-  }
-  serviceendpoint_jfrog_distribution_v2_for_each = {
-    for key in keys(local.serviceendpoint_jfrog_distribution_v2) : nonsensitive(key) => true
-  }
-  serviceendpoint_jfrog_platform_v2_for_each = {
-    for key in keys(local.serviceendpoint_jfrog_platform_v2) : nonsensitive(key) => true
-  }
-  serviceendpoint_jfrog_xray_v2_for_each = {
-    for key in keys(local.serviceendpoint_jfrog_xray_v2) : nonsensitive(key) => true
-  }
-  serviceendpoint_kubernetes_for_each = {
-    for key in keys(local.serviceendpoint_kubernetes) : nonsensitive(key) => true
-  }
-  serviceendpoint_maven_for_each = {
-    for key in keys(local.serviceendpoint_maven) : nonsensitive(key) => true
-  }
-  serviceendpoint_nexus_for_each = {
-    for key in keys(local.serviceendpoint_nexus) : nonsensitive(key) => true
-  }
-  serviceendpoint_npm_for_each = {
-    for key in keys(local.serviceendpoint_npm) : nonsensitive(key) => true
-  }
-  serviceendpoint_nuget_for_each = {
-    for key in keys(local.serviceendpoint_nuget) : nonsensitive(key) => true
-  }
-  serviceendpoint_octopusdeploy_for_each = {
-    for key in keys(local.serviceendpoint_octopusdeploy) : nonsensitive(key) => true
-  }
-  serviceendpoint_openshift_for_each = {
-    for key in keys(local.serviceendpoint_openshift) : nonsensitive(key) => true
-  }
-  serviceendpoint_runpipeline_for_each = {
-    for key in keys(local.serviceendpoint_runpipeline) : nonsensitive(key) => true
-  }
-  serviceendpoint_servicefabric_for_each = {
-    for key in keys(local.serviceendpoint_servicefabric) : nonsensitive(key) => true
-  }
-  serviceendpoint_snyk_for_each = {
-    for key in keys(local.serviceendpoint_snyk) : nonsensitive(key) => true
-  }
-  serviceendpoint_sonarcloud_for_each = {
-    for key in keys(local.serviceendpoint_sonarcloud) : nonsensitive(key) => true
-  }
-  serviceendpoint_sonarqube_for_each = {
-    for key in keys(local.serviceendpoint_sonarqube) : nonsensitive(key) => true
-  }
-  serviceendpoint_ssh_for_each = {
-    for key in keys(local.serviceendpoint_ssh) : nonsensitive(key) => true
-  }
-  serviceendpoint_visualstudiomarketplace_for_each = {
-    for key in keys(local.serviceendpoint_visualstudiomarketplace) : nonsensitive(key) => true
-  }
+  serviceendpoint_argocd_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_argocd :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_artifactory_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_artifactory :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_aws_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_aws :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_azure_service_bus_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_azure_service_bus :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_azurecr_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_azurecr :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_azurerm_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_azurerm :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_bitbucket_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_bitbucket :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_black_duck_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_black_duck :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_checkmarx_one_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_checkmarx_one :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_checkmarx_sast_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_checkmarx_sast :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_checkmarx_sca_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_checkmarx_sca :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_dockerregistry_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_dockerregistry :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_dynamics_lifecycle_services_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_dynamics_lifecycle_services :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_externaltfs_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_externaltfs :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_gcp_terraform_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_gcp_terraform :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_generic_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_generic :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_generic_git_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_generic_git :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_generic_v2_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_generic_v2 :
+    coalesce(endpoint.key, endpoint.name) => true
+  })
+  serviceendpoint_github_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_github :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_github_enterprise_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_github_enterprise :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_gitlab_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_gitlab :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_incomingwebhook_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_incomingwebhook :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_jenkins_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_jenkins :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_jfrog_artifactory_v2_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_jfrog_artifactory_v2 :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_jfrog_distribution_v2_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_jfrog_distribution_v2 :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_jfrog_platform_v2_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_jfrog_platform_v2 :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_jfrog_xray_v2_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_jfrog_xray_v2 :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_kubernetes_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_kubernetes :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_maven_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_maven :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_nexus_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_nexus :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_npm_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_npm :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_nuget_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_nuget :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_octopusdeploy_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_octopusdeploy :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_openshift_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_openshift :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_runpipeline_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_runpipeline :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_servicefabric_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_servicefabric :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_snyk_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_snyk :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_sonarcloud_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_sonarcloud :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_sonarqube_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_sonarqube :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_ssh_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_ssh :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
+  serviceendpoint_visualstudiomarketplace_for_each = nonsensitive({
+    for endpoint in var.serviceendpoint_visualstudiomarketplace :
+    coalesce(endpoint.key, endpoint.service_endpoint_name) => true
+  })
   serviceendpoint_azurerm_credentials = {
     for key, endpoint in local.serviceendpoint_azurerm :
     key => {
