@@ -1,165 +1,146 @@
 # Azure Terraform Modules
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.5-623CE4?logo=terraform&logoColor=white)](https://www.terraform.io/)
+[![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.12.2-623CE4?logo=terraform&logoColor=white)](https://www.terraform.io/)
 [![Azure](https://img.shields.io/badge/Azure-0078D4?logo=microsoft-azure&logoColor=white)](https://azure.microsoft.com/)
-[![AzureRM Provider](https://img.shields.io/badge/AzureRM_Provider-4.36.0-blue?logo=terraform)](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0)
+[![AzureRM Provider](https://img.shields.io/badge/AzureRM_Provider-4.57.0-blue?logo=terraform)](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0)
+[![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
-[![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=SAv1.1.0)
-[![Virtual Network](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=VNv*&label=Virtual%20Network&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=VNv1.0.1)
+[![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=SAv)
+[![Virtual Network](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=VNv*&label=Virtual%20Network&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=VNv)
 <!-- MODULE BADGES END -->
 
-A comprehensive collection of production-ready Terraform modules for Azure infrastructure, following HashiCorp best practices and enterprise security standards.
+A comprehensive collection of production-ready Terraform modules for Azure and Azure DevOps, aligned with HashiCorp best practices and security-first defaults.
 
 ## 📚 Quick Navigation
 
-- [**Development Guide**](./CLAUDE.md) - AI-assisted development guidelines and reference documentation
-- [**Terraform Best Practices**](./docs/TERRAFORM_BEST_PRACTICES_GUIDE.md) - Module development standards and conventions
-- [**Testing Guide**](./docs/TERRAFORM_TESTING_GUIDE.md) - Comprehensive testing strategies and examples
-- [**Workflows Documentation**](./docs/WORKFLOWS.md) - GitHub Actions CI/CD implementation details
-- [**Security Policy**](./docs/SECURITY.md) - Security guidelines and vulnerability reporting
+- [**Repository Standards**](./AGENTS.md) - Module layout, naming, and security-first conventions
+- [**Docs Index**](./docs/README.md) - Entry point for all documentation
+- [**Module Creation Guide**](./docs/MODULE_GUIDE/README.md) - End-to-end module scaffolding guide
+- [**Terraform Best Practices**](./docs/TERRAFORM_BEST_PRACTICES_GUIDE.md) - Implementation standards and conventions
+- [**Testing Guide**](./docs/TESTING_GUIDE/README.md) - Testing expectations and patterns
+- [**Workflows Documentation**](./docs/WORKFLOWS.md) - CI/CD pipeline details
+- [**Security Policy**](./docs/SECURITY.md) - Security guidelines and reporting
 
 ## Repository Structure
 
 ```
 azurerm-terraform-modules/
-├── modules/                             # Terraform modules
-│   ├── azurerm_kubernetes_cluster/     # AKS Kubernetes cluster module
-│   ├── azurerm_network_security_group/ # Network Security Group module
-│   ├── azurerm_route_table/            # Route Table module
-│   ├── azurerm_storage_account/        # Storage Account module
-│   ├── azurerm_subnet/                 # Subnet module
-│   └── azurerm_virtual_network/        # Virtual Network module
-├── docs/                                # Shared documentation
+├── modules/                             # Terraform modules (azurerm_* and azuredevops_*)
+│   ├── azurerm_<resource>/              # Azure Resource Manager modules
+│   └── azuredevops_<resource>/          # Azure DevOps modules
+├── docs/                                # Global documentation
+│   ├── MODULE_GUIDE/                    # Module creation guide
+│   └── TESTING_GUIDE/                   # Testing reference
 ├── scripts/                             # Automation scripts
-├── examples/                            # Cross-module examples
-├── tests/                               # Shared test utilities
-├── security-policies/                   # Custom security policies
-├── build-templates/                     # Azure Pipelines templates (coming soon)
-│   ├── versioning/                      # Versioning pipeline templates
-│   ├── documentation/                   # Documentation generation templates
-│   ├── security/                        # Security scanning templates
-│   ├── testing/                         # Testing pipeline templates
-│   └── release/                         # Release pipeline templates
-├── .github/workflows/                   # CI/CD workflows
-└── .claude/references/                  # AI development guides
+├── security-policies/                   # Security policy definitions
+├── examples/                            # Cross-module examples (if any)
+└── .github/                             # GitHub Actions workflows and templates
 ```
 
 ## 🚀 Quick Start
 
-Each module contains comprehensive documentation and examples:
+Each module includes usage documentation and ready-to-run examples:
 
 1. **Browse modules** in the [`modules/`](./modules/) directory
-2. **Read module documentation** - Each module has its own README with:
-   - Usage examples
-   - Input/output specifications
-   - Requirements and prerequisites
-3. **Check examples** - Each module includes `examples/` directory with:
-   - Simple usage
-   - Advanced configurations
-   - Security-hardened setups
-   - Multi-region deployments
+2. **Read module documentation** - Each module has its own README and `docs/IMPORT.md` where applicable
+3. **Start with examples** - Every module includes `examples/basic`, `examples/complete`, and `examples/secure`
+
+Azure DevOps modules use the `azuredevops` provider and typically require a PAT or service connection.
 
 Example module reference:
 ```hcl
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
   # See module README for configuration details
 }
 ```
 
-
 ## 📦 Available Modules
 
-### Production Ready
+### AzureRM Modules
 
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
-| [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv1.0.0) | Azure Storage Account with enterprise features |
-| [Virtual Network](./modules/azurerm_virtual_network/) | ✅ Completed | [VNv1.0.1](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=VNv1.0.0) | Virtual Network with full networking capabilities |
-| [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | v1.0.0 | Azure Kubernetes Service (AKS) cluster with enterprise features |
-| [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | v1.0.0 | Network Security Group with comprehensive rule management |
-| [Route Table](./modules/azurerm_route_table/) | ✅ Completed | v1.0.0 | Route Table with custom routing rules and BGP support |
-| [Subnet](./modules/azurerm_subnet/) | ✅ Completed | v1.0.0 | Subnet module with service endpoints and delegation support |
+| [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.4](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.4) | Azure Kubernetes Service (AKS) Terraform module for managing clusters with node pools, addons, and enterprise-grade security features |
+| [Kubernetes Secrets](./modules/azurerm_kubernetes_secrets/) | 🔧 Development | - | Azure Kubernetes Secrets Terraform module with enterprise-grade features |
+| [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.3) | Manages Azure Network Security Groups with comprehensive security rules configuration |
+| [Route Table](./modules/azurerm_route_table/) | ✅ Completed | [RTv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.0.3) | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
+| [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv1.2.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv1.2.2) | Azure Storage Account Terraform module with enterprise-grade security features |
+| [Subnet](./modules/azurerm_subnet/) | ✅ Completed | [SNv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SNv1.0.3) | Azure Subnet Terraform module for managing subnets with service endpoints, delegations, network policies, and enterprise-grade security features |
+| [Virtual Network](./modules/azurerm_virtual_network/) | ✅ Completed | [VNv1.1.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/VNv1.1.3) | Azure Virtual Network Terraform module with advanced networking features |
 
-### In Development
+### Azure DevOps Modules
 
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
-| SQL Server | 🔧 Development | - | Azure SQL Server |
-| Key Vault | 🔧 Development | - | Key management all features |
-| App Service Plan | 🔧 Development | - | App Service Plan with enterprise features |
+| [Azure DevOps Agent Pools](./modules/azuredevops_agent_pools/) | 🔧 Development | - | Azure DevOps agent pools module for managing pools, queues, and elastic pools |
+| [Azure DevOps Artifacts Feed](./modules/azuredevops_artifacts_feed/) | 🔧 Development | - | Azure DevOps artifacts feed module for managing feeds, retention, and permissions |
+| [Azure DevOps Environments](./modules/azuredevops_environments/) | 🔧 Development | - | Azure DevOps environments module for managing environments, resources, and checks |
+| [Azure DevOps Extension](./modules/azuredevops_extension/) | 🔧 Development | - | Azure DevOps extension module for managing Marketplace extensions |
+| [Azure DevOps Identity](./modules/azuredevops_identity/) | 🔧 Development | - | Azure DevOps identity module for managing groups, entitlements, memberships, and role assignments |
+| [Azure DevOps Pipelines](./modules/azuredevops_pipelines/) | 🔧 Development | - | Azure DevOps pipelines module for managing build definitions, folders, permissions, and authorizations |
+| [Azure DevOps Project](./modules/azuredevops_project/) | 🔧 Development | - | Azure DevOps project module for managing project settings, tags, and dashboards |
+| [Azure DevOps Project Permissions](./modules/azuredevops_project_permissions/) | 🔧 Development | - | Azure DevOps project permissions module for assigning group permissions |
+| [Azure DevOps Repository](./modules/azuredevops_repository/) | 🔧 Development | - | Azure DevOps repository module for managing Git repositories and policies |
+| [Azure DevOps Service Endpoints](./modules/azuredevops_serviceendpoint/) | 🔧 Development | - | Azure DevOps service endpoints module for managing service connections and permissions |
+| [Azure DevOps Service Hooks](./modules/azuredevops_servicehooks/) | 🔧 Development | - | Azure DevOps service hooks module for managing subscriptions and permissions |
+| [Azure DevOps Team](./modules/azuredevops_team/) | 🔧 Development | - | Azure DevOps team module for managing teams, members, and administrators |
+| [Azure DevOps Variable Groups](./modules/azuredevops_variable_groups/) | 🔧 Development | - | Azure DevOps variable groups module for managing variables and library permissions |
+| [Azure DevOps Wiki](./modules/azuredevops_wiki/) | 🔧 Development | - | Azure DevOps wiki module for managing wikis and pages |
+| [Azure DevOps Work Items](./modules/azuredevops_work_items/) | 🔧 Development | - | Azure DevOps work items module for managing processes, queries, and permissions |
 
-### Development Roadmap
+Versions are sourced from module changelogs and release tags. Modules without a tagged release remain in Development.
 
-- **Phase 1**: Core Infrastructure Modules ✅
-  - Storage Account with comprehensive features ✅
-  - Virtual Network with full networking capabilities ✅
-  - Subnet with service endpoints and delegation ✅
-  - Network Security Group with rule management ✅
-  - Route Table with custom routing ✅
-- **Phase 2**: Container and Orchestration ✅
-  - AKS (Azure Kubernetes Service) cluster ✅
-- **Phase 3**: Security and Data (In Progress)
-  - Key Vault module with enterprise security
-  - SQL Server with high availability
-- **Phase 4**: Application Platform (Planned)
-  - App Service Plan with enterprise features
-  - Application Gateway
-  - API Management
 ### Storage Account Module Examples
 
-The Storage Account module includes comprehensive examples demonstrating various use cases:
+The Storage Account module ships with a full example catalog:
 
 | Example | Description |
 |---------|-------------|
-| [basic](./modules/azurerm_storage_account/examples/basic/README.md) | Basic storage account with minimal configuration |
-| [secure](./modules/azurerm_storage_account/examples/secure/README.md) | Security-hardened configuration with maximum protection |
-| [secure-private-endpoint](./modules/azurerm_storage_account/examples/secure-private-endpoint/README.md) | Private endpoint configuration for network isolation |
-| [data-lake-gen2](./modules/azurerm_storage_account/examples/data-lake-gen2/README.md) | Data Lake Storage Gen2 with SFTP and NFSv3 |
-| [advanced-policies](./modules/azurerm_storage_account/examples/advanced-policies/README.md) | Advanced policies (SAS, immutability, routing) |
-| [identity-access](./modules/azurerm_storage_account/examples/identity-access/README.md) | Microsoft Entra ID authentication and RBAC |
-| [complete](./modules/azurerm_storage_account/examples/complete/README.md) | Full-featured storage account with all enterprise capabilities |
-| [multi-region](./modules/azurerm_storage_account/examples/multi-region/README.md) | Multi-region setup with disaster recovery |
+| [basic](./modules/azurerm_storage_account/examples/basic/README.md) | Minimal storage account with secure defaults |
+| [complete](./modules/azurerm_storage_account/examples/complete/README.md) | Full feature coverage |
+| [secure](./modules/azurerm_storage_account/examples/secure/README.md) | Hardened configuration |
+| [secure-private-endpoint](./modules/azurerm_storage_account/examples/secure-private-endpoint/README.md) | Private endpoints and security controls |
+| [data-lake-gen2](./modules/azurerm_storage_account/examples/data-lake-gen2/README.md) | ADLS Gen2 with SFTP/NFS |
+| [advanced-policies](./modules/azurerm_storage_account/examples/advanced-policies/README.md) | SAS/immutability/routing policies |
+| [identity-access](./modules/azurerm_storage_account/examples/identity-access/README.md) | Managed identities and keyless auth |
+| [multi-region](./modules/azurerm_storage_account/examples/multi-region/README.md) | Multi-region replication patterns |
 
+Other modules include their own example catalogs under `modules/<module>/examples`.
 
 ## Prerequisites
 
-- [Terraform](https://www.terraform.io/downloads.html) >= 1.5.0
-- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.0
-- [Go](https://golang.org/doc/install) >= 1.19 (for testing)
-- [TFLint](https://github.com/terraform-linters/tflint) >= 0.48.0 (for code quality)
-- Azure subscription with appropriate permissions
-
+- [Terraform](https://www.terraform.io/downloads.html) >= 1.12.2
+- [AzureRM Provider](https://registry.terraform.io/providers/hashicorp/azurerm) 4.57.0 (for `azurerm_*` modules)
+- [Azure DevOps Provider](https://registry.terraform.io/providers/microsoft/azuredevops) 1.12.2 (for `azuredevops_*` modules)
+- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) (for Azure authentication and examples)
+- [Go](https://golang.org/doc/install) >= 1.21 (for Terratest)
 
 ## Contributing
 
-We welcome contributions! This project is optimized for AI-assisted development with TaskMaster and MCP tools integration.
-
-For development guidelines and contribution process, see:
-- [**CLAUDE.md**](./CLAUDE.md) - AI development guidelines
-- [**Contributing Guide**](./docs/CONTRIBUTING.md) - Contribution process (when available)
-
-
+We welcome contributions! Start with the repository guidelines and contribution docs:
+- [**AGENTS.md**](./AGENTS.md) - Standards and conventions
+- [**CONTRIBUTING.md**](./CONTRIBUTING.md) - Contribution process
+- [**Module Creation Guide**](./docs/MODULE_GUIDE/README.md) - Scaffold new modules
 
 ## Versioning
 
-Each module uses [Semantic Versioning](https://semver.org/) with module-specific prefixes (e.g., `SAv1.2.3` for Storage Account v1.2.3).
+Each module uses Semantic Versioning with a module-specific tag prefix defined in `module.json` (for example: `SAv1.2.2`, `AKSv1.0.4`). Release notes live in each module's `CHANGELOG.md` and in GitHub releases.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
 ## Support
 
 - **Issues**: Report bugs via GitHub Issues
 - **Security**: See [Security Policy](./docs/SECURITY.md)
-- **Documentation**: Check module-specific README files
+- **Documentation**: Module README files and the [docs index](./docs/README.md)
 
 ---
 
 **Built with ❤️ by PatrykIti for Infrastructure Teams**
 
-*This repository follows enterprise-grade standards for infrastructure as code. For development guidelines and AI-assisted workflows, see [AGENTS.md](./AGENTS.md) or read [Documentation](./docs/README.md).*
+*This repository follows enterprise-grade standards for infrastructure as code. For development guidelines, see [AGENTS.md](./AGENTS.md) or browse the [Documentation](./docs/README.md).*
