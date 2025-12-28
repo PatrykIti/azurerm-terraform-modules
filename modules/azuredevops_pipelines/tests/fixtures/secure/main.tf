@@ -1,7 +1,7 @@
 terraform {
   required_version = ">= 1.12.2"
   required_providers {
-  
+
     azuredevops = {
       source  = "microsoft/azuredevops"
       version = "1.12.2"
@@ -38,22 +38,18 @@ module "azuredevops_pipelines" {
 
   project_id = var.project_id
 
-  build_definitions = {
-    secure = {
-      name = "pip-ado-sec-${var.random_suffix}"
-      repository = {
-        repo_type = "TfsGit"
-        repo_id   = azuredevops_git_repository.example.id
-        yml_path  = var.yaml_path
-      }
-    }
+  name = "pip-ado-sec-${var.random_suffix}"
+
+  repository = {
+    repo_type = "TfsGit"
+    repo_id   = azuredevops_git_repository.example.id
+    yml_path  = var.yaml_path
   }
 
   build_definition_permissions = [
     {
-      key                  = "secure-admins"
-      build_definition_key = "secure"
-      principal            = data.azuredevops_group.project_collection_admins.id
+      key       = "secure-admins"
+      principal = data.azuredevops_group.project_collection_admins.id
       permissions = {
         ViewBuildDefinition = "Allow"
         EditBuildDefinition = "Deny"
@@ -64,10 +60,9 @@ module "azuredevops_pipelines" {
 
   pipeline_authorizations = [
     {
-      key          = "secure-endpoint"
-      resource_id  = azuredevops_serviceendpoint_generic.example.id
-      type         = "endpoint"
-      pipeline_key = "secure"
+      key         = "secure-endpoint"
+      resource_id = azuredevops_serviceendpoint_generic.example.id
+      type        = "endpoint"
     }
   ]
 }

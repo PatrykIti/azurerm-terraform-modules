@@ -12,3 +12,8 @@ output "check_ids" {
   description = "Check IDs created by the module."
   value       = module.azuredevops_environments.check_ids
 }
+
+output "approval_check_ids" {
+  description = "Approval check IDs created by the module."
+  value       = module.azuredevops_environments.check_ids.approvals
+}

@@ -1,7 +1,6 @@
 terraform {
   required_version = ">= 1.12.2"
   required_providers {
-  
     azuredevops = {
       source  = "microsoft/azuredevops"
       version = "1.12.2"
@@ -12,20 +11,13 @@ terraform {
 # Negative test cases - should fail validation
 provider "azuredevops" {}
 
-# This should fail due to conflicting membership selectors
+# This should fail because no module group is configured and group_descriptor is missing
 module "azuredevops_identity" {
   source = "../../../"
 
-  groups = {
-    bad = {
-      display_name = "${var.group_name_prefix}-negative"
-    }
-  }
-
   group_memberships = [
     {
-      group_descriptor   = "vssgp.invalid"
-      group_key          = "bad"
+      key                = "missing-group"
       member_descriptors = ["vssgp.invalid-member"]
     }
   ]

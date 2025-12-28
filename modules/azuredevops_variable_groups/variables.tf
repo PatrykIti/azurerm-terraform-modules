@@ -127,13 +127,13 @@ variable "key_vault" {
 # -----------------------------------------------------------------------------
 
 variable "variable_group_permissions" {
-  description = "List of variable group permissions to assign."
+  description = "List of variable group permissions to assign. If variable_group_id is omitted, the module variable group is used."
   type = list(object({
     key               = optional(string)
     variable_group_id = optional(string)
     principal         = string
     permissions       = map(string)
-    replace           = optional(bool)
+    replace           = optional(bool, true)
   }))
   default = []
 
@@ -180,7 +180,7 @@ variable "library_permissions" {
     key         = optional(string)
     principal   = string
     permissions = map(string)
-    replace     = optional(bool)
+    replace     = optional(bool, true)
   }))
   default = []
 

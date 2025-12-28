@@ -17,19 +17,13 @@ data "azuredevops_group" "project_collection_admins" {
 module "azuredevops_team" {
   source = "../../../"
 
-  project_id = var.project_id
-
-  teams = {
-    security = {
-      name        = "${var.team_name_prefix}-security"
-      description = "Security review team"
-    }
-  }
+  project_id  = var.project_id
+  name        = "ado-team-sec-${var.random_suffix}"
+  description = "Security review team"
 
   team_administrators = [
     {
       key               = "security-admins"
-      team_key          = "security"
       admin_descriptors = [data.azuredevops_group.project_collection_admins.descriptor]
       mode              = "overwrite"
     }

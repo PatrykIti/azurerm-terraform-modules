@@ -47,16 +47,11 @@ run "default_membership_mode" {
   command = plan
 
   variables {
-    groups = {
-      admins = {
-        display_name = "Admins"
-      }
-    }
+    group_display_name = "Admins"
 
     group_memberships = [
       {
-        key               = "default-mode"
-        group_key         = "admins"
+        key                = "default-mode"
         member_descriptors = ["vssgp.member"]
       }
     ]

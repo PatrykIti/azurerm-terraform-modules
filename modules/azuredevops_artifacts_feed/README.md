@@ -18,12 +18,8 @@ provider "azuredevops" {}
 module "azuredevops_artifacts_feed" {
   source = "path/to/azuredevops_artifacts_feed"
 
-  feeds = {
-    project = {
-      name       = "example-feed"
-      project_id = "00000000-0000-0000-0000-000000000000"
-    }
-  }
+  name       = "example-feed"
+  project_id = "00000000-0000-0000-0000-000000000000"
 }
 ```
 
@@ -67,21 +63,27 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_feed_permissions"></a> [feed\_permissions](#input\_feed\_permissions) | List of feed permissions to assign. | <pre>list(object({<br/>    key                 = optional(string)<br/>    feed_id             = optional(string)<br/>    feed_key            = optional(string)<br/>    identity_descriptor = string<br/>    role                = string<br/>    project_id          = optional(string)<br/>    display_name        = optional(string)<br/>  }))</pre> | `[]` | no |
-| <a name="input_feed_retention_policies"></a> [feed\_retention\_policies](#input\_feed\_retention\_policies) | List of feed retention policies to manage. | <pre>list(object({<br/>    key                                       = optional(string)<br/>    feed_id                                   = optional(string)<br/>    feed_key                                  = optional(string)<br/>    count_limit                               = number<br/>    days_to_keep_recently_downloaded_packages = number<br/>    project_id                                = optional(string)<br/>  }))</pre> | `[]` | no |
-| <a name="input_feeds"></a> [feeds](#input\_feeds) | Map of feeds to manage. | <pre>map(object({<br/>    name        = optional(string)<br/>    project_id  = optional(string)<br/>    features = optional(object({<br/>      permanent_delete = optional(bool)<br/>      restore          = optional(bool)<br/>    }))<br/>  }))</pre> | `{}` | no |
+| <a name="input_description"></a> [description](#input\_description) | Description for the feed. | `string` | `null` | no |
+| <a name="input_feed_permissions"></a> [feed\_permissions](#input\_feed\_permissions) | List of feed permissions to assign. | <pre>list(object({<br/>    key                 = optional(string)<br/>    feed_id             = optional(string)<br/>    identity_descriptor = string<br/>    role                = string<br/>    project_id          = optional(string)<br/>    display_name        = optional(string)<br/>  }))</pre> | `[]` | no |
+| <a name="input_feed_retention_policies"></a> [feed\_retention\_policies](#input\_feed\_retention\_policies) | List of feed retention policies to manage. | <pre>list(object({<br/>    key                                       = optional(string)<br/>    feed_id                                   = optional(string)<br/>    count_limit                               = number<br/>    days_to_keep_recently_downloaded_packages = number<br/>    project_id                                = optional(string)<br/>  }))</pre> | `[]` | no |
+| <a name="input_features"></a> [features](#input\_features) | Feed feature flags for azuredevops\_feed.features. Set to null to leave unmanaged. | <pre>object({<br/>    permanent_delete = optional(bool)<br/>    restore          = optional(bool)<br/>  })</pre> | `null` | no |
+| <a name="input_name"></a> [name](#input\_name) | The name of the Azure DevOps feed. Required when creating the feed. | `string` | `null` | no |
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | The Azure DevOps project ID to scope the feed. Required when creating the feed. | `string` | `null` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_feed_ids"></a> [feed\_ids](#output\_feed\_ids) | Map of feed IDs keyed by feed key. |
-| <a name="output_feed_names"></a> [feed\_names](#output\_feed\_names) | Map of feed names keyed by feed key. |
-| <a name="output_feed_project_ids"></a> [feed\_project\_ids](#output\_feed\_project\_ids) | Map of feed project IDs keyed by feed key. |
+| <a name="output_feed_id"></a> [feed\_id](#output\_feed\_id) | The ID of the Azure DevOps feed. |
+| <a name="output_feed_name"></a> [feed\_name](#output\_feed\_name) | The name of the Azure DevOps feed. |
+| <a name="output_feed_permission_ids"></a> [feed\_permission\_ids](#output\_feed\_permission\_ids) | Map of feed permission IDs keyed by permission key. |
+| <a name="output_feed_project_id"></a> [feed\_project\_id](#output\_feed\_project\_id) | The project ID associated with the Azure DevOps feed. |
+| <a name="output_feed_retention_policy_ids"></a> [feed\_retention\_policy\_ids](#output\_feed\_retention\_policy\_ids) | Map of feed retention policy IDs keyed by retention policy key. |
 <!-- END_TF_DOCS -->
 
 ## Additional Documentation
 
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps feeds into the module
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines

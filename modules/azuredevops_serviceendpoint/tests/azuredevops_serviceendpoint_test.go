@@ -31,9 +31,9 @@ func TestBasicAzuredevopsServiceendpoint(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		genericEndpointIDs := terraform.OutputMap(t, terraformOptions, "generic_endpoint_ids")
+		serviceendpointID := terraform.Output(t, terraformOptions, "serviceendpoint_id")
 
-		assert.NotEmpty(t, genericEndpointIDs)
+		assert.NotEmpty(t, serviceendpointID)
 	})
 }
 
@@ -56,11 +56,13 @@ func TestCompleteAzuredevopsServiceendpoint(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		genericEndpointIDs := terraform.OutputMap(t, terraformOptions, "generic_endpoint_ids")
-		webhookEndpointIDs := terraform.OutputMap(t, terraformOptions, "incomingwebhook_endpoint_ids")
+		genericEndpointID := terraform.Output(t, terraformOptions, "generic_serviceendpoint_id")
+		webhookEndpointID := terraform.Output(t, terraformOptions, "incomingwebhook_serviceendpoint_id")
+		genericPermissions := terraform.OutputMap(t, terraformOptions, "generic_permissions")
 
-		assert.NotEmpty(t, genericEndpointIDs)
-		assert.NotEmpty(t, webhookEndpointIDs)
+		assert.NotEmpty(t, genericEndpointID)
+		assert.NotEmpty(t, webhookEndpointID)
+		assert.NotEmpty(t, genericPermissions)
 	})
 }
 
@@ -83,9 +85,11 @@ func TestSecureAzuredevopsServiceendpoint(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		genericEndpointIDs := terraform.OutputMap(t, terraformOptions, "generic_endpoint_ids")
+		serviceendpointID := terraform.Output(t, terraformOptions, "serviceendpoint_id")
+		permissions := terraform.OutputMap(t, terraformOptions, "permissions")
 
-		assert.NotEmpty(t, genericEndpointIDs)
+		assert.NotEmpty(t, serviceendpointID)
+		assert.NotEmpty(t, permissions)
 	})
 }
 
@@ -102,7 +106,7 @@ func TestAzuredevopsServiceendpointValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "serviceendpoint_permissions must set serviceendpoint_id")
+	assert.Contains(t, err.Error(), "Exactly one serviceendpoint_")
 }
 
 // Helper function to get terraform options

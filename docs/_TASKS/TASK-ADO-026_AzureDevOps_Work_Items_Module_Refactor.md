@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-014
-**Status:** 🟠 **Re-opened**
+**Status:** ✅ **Done** (2025-12-28)
 
 ---
 
@@ -206,10 +206,10 @@ Update tests per TESTING_GUIDE:
 
 ## Implementation Checklist
 
-- [ ] Update variables.tf: move `processes` to list(object), replace `work_items` list with a single work item input, add validations and project_id gating.
-- [ ] Refactor main.tf for stable for_each on list resources and defaulted IDs.
-- [ ] Update outputs.tf with `work_item_id` and stable maps for other resources.
-- [ ] Add `docs/IMPORT.md` and regenerate README (terraform-docs).
-- [ ] Update examples (basic/complete/secure) to use the new single work item interface.
-- [ ] Update tests (fixtures, unit, terratest, test_config).
-- [ ] make docs + update examples list.
+- [x] Update variables.tf: move `processes` to list(object), replace `work_items` list with a single work item input, add validations and project_id gating.
+- [x] Refactor main.tf for stable for_each on list resources and defaulted IDs.
+- [x] Update outputs.tf with `work_item_id` and stable maps for other resources.
+- [x] Add `docs/IMPORT.md` and regenerate README (terraform-docs).
+- [x] Update examples (basic/complete/secure) to use the new single work item interface.
+- [x] Update tests (fixtures, unit, terratest, test_config).
+- [x] make docs + update examples list.

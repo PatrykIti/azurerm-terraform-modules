@@ -1,35 +1,48 @@
 # Test variable validation for Azure DevOps Artifacts Feed
 
-mock_provider "azuredevops" {}
+mock_provider "azuredevops" {
+  mock_resource "azuredevops_feed" {
+    defaults = {
+      id         = "11111111-1111-1111-1111-111111111111"
+      name       = "example-feed"
+      project_id = "00000000-0000-0000-0000-000000000000"
+    }
+  }
+}
 
-run "invalid_feed_project_id" {
+run "invalid_feed_description" {
   command = plan
 
   variables {
-    feeds = {
-      example = {
-        project_id = "  "
-      }
-    }
+    name        = "example-feed"
+    project_id  = "00000000-0000-0000-0000-000000000000"
+    description = "  "
   }
 
   expect_failures = [
-    var.feeds,
+    var.description,
   ]
 }
 
-run "invalid_feed_permission_selector" {
+run "invalid_feed_name_without_project_id" {
   command = plan
 
   variables {
-    feeds = {
-      example = {}
-    }
+    name = "example-feed"
+  }
 
+  expect_failures = [
+    var.project_id,
+  ]
+}
+
+run "missing_feed_id_without_module_feed_permissions" {
+  command = plan
+
+  variables {
     feed_permissions = [
       {
-        feed_id             = "feed-0001"
-        feed_key            = "example"
+        key                 = "missing-feed"
         identity_descriptor = "vssgp.Uy0xLTktMTIzNDU2"
         role                = "reader"
       }
@@ -41,25 +54,21 @@ run "invalid_feed_permission_selector" {
   ]
 }
 
-run "invalid_feed_permission_feed_key" {
+run "missing_feed_id_without_module_feed_retention" {
   command = plan
 
   variables {
-    feeds = {
-      example = {}
-    }
-
-    feed_permissions = [
+    feed_retention_policies = [
       {
-        feed_key            = "missing"
-        identity_descriptor = "vssgp.Uy0xLTktMTIzNDU2"
-        role                = "reader"
+        key                                       = "missing-feed"
+        count_limit                               = 10
+        days_to_keep_recently_downloaded_packages = 30
       }
     ]
   }
 
   expect_failures = [
-    var.feed_permissions,
+    var.feed_retention_policies,
   ]
 }
 
@@ -67,13 +76,12 @@ run "invalid_feed_permission_role" {
   command = plan
 
   variables {
-    feeds = {
-      example = {}
-    }
+    name       = "example-feed"
+    project_id = "00000000-0000-0000-0000-000000000000"
 
     feed_permissions = [
       {
-        feed_key            = "example"
+        key                 = "invalid-role"
         identity_descriptor = "vssgp.Uy0xLTktMTIzNDU2"
         role                = "owner"
       }
@@ -89,16 +97,17 @@ run "duplicate_feed_permission_keys" {
   command = plan
 
   variables {
+    name       = "example-feed"
+    project_id = "00000000-0000-0000-0000-000000000000"
+
     feed_permissions = [
       {
         key                 = "dup"
-        feed_id             = "feed-0001"
         identity_descriptor = "vssgp.Uy0xLTktMTIzNDU2"
         role                = "reader"
       },
       {
         key                 = "dup"
-        feed_id             = "feed-0002"
         identity_descriptor = "vssgp.Uy0xLTktNjU0MzIx"
         role                = "contributor"
       }
@@ -110,44 +119,21 @@ run "duplicate_feed_permission_keys" {
   ]
 }
 
-run "invalid_retention_feed_key" {
-  command = plan
-
-  variables {
-    feeds = {
-      example = {}
-    }
-
-    feed_retention_policies = [
-      {
-        feed_key                                  = "missing"
-        count_limit                               = 10
-        days_to_keep_recently_downloaded_packages = 30
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.feed_retention_policies,
-  ]
-}
-
 run "duplicate_retention_keys" {
   command = plan
 
   variables {
+    name       = "example-feed"
+    project_id = "00000000-0000-0000-0000-000000000000"
+
     feed_retention_policies = [
       {
-        key                                       = "dup"
-        feed_id                                   = "feed-0001"
         count_limit                               = 10
         days_to_keep_recently_downloaded_packages = 30
       },
       {
-        key                                       = "dup"
-        feed_id                                   = "feed-0002"
-        count_limit                               = 5
-        days_to_keep_recently_downloaded_packages = 7
+        count_limit                               = 10
+        days_to_keep_recently_downloaded_packages = 30
       }
     ]
   }
@@ -161,9 +147,11 @@ run "invalid_retention_limits" {
   command = plan
 
   variables {
+    name       = "example-feed"
+    project_id = "00000000-0000-0000-0000-000000000000"
+
     feed_retention_policies = [
       {
-        feed_id                                   = "feed-0001"
         count_limit                               = 0
         days_to_keep_recently_downloaded_packages = 1
       }
@@ -179,9 +167,11 @@ run "invalid_retention_days" {
   command = plan
 
   variables {
+    name       = "example-feed"
+    project_id = "00000000-0000-0000-0000-000000000000"
+
     feed_retention_policies = [
       {
-        feed_id                                   = "feed-0002"
         count_limit                               = 5
         days_to_keep_recently_downloaded_packages = 0
       }
@@ -197,14 +187,12 @@ run "role_normalization" {
   command = plan
 
   variables {
-    feeds = {
-      example = {}
-    }
+    name       = "example-feed"
+    project_id = "00000000-0000-0000-0000-000000000000"
 
     feed_permissions = [
       {
         key                 = "role-test"
-        feed_key            = "example"
         identity_descriptor = "vssgp.Uy0xLTktMTIzNDU2"
         role                = "ReAdEr"
       }
@@ -214,5 +202,59 @@ run "role_normalization" {
   assert {
     condition     = azuredevops_feed_permission.feed_permission["role-test"].role == "reader"
     error_message = "feed_permissions.role should be normalized to lowercase."
+  }
+}
+
+run "feed_permission_defaults_from_module_feed" {
+  command = apply
+
+  variables {
+    name       = "example-feed"
+    project_id = "00000000-0000-0000-0000-000000000000"
+
+    feed_permissions = [
+      {
+        key                 = "default-feed"
+        identity_descriptor = "vssgp.Uy0xLTktMTIzNDU2"
+        role                = "reader"
+      }
+    ]
+  }
+
+  assert {
+    condition     = azuredevops_feed_permission.feed_permission["default-feed"].feed_id == "11111111-1111-1111-1111-111111111111"
+    error_message = "feed_permissions.feed_id should default to the module feed when omitted."
+  }
+
+  assert {
+    condition     = azuredevops_feed_permission.feed_permission["default-feed"].project_id == "00000000-0000-0000-0000-000000000000"
+    error_message = "feed_permissions.project_id should default to the module project when omitted."
+  }
+}
+
+run "feed_retention_defaults_from_module_feed" {
+  command = apply
+
+  variables {
+    name       = "example-feed"
+    project_id = "00000000-0000-0000-0000-000000000000"
+
+    feed_retention_policies = [
+      {
+        key                                       = "default-retention"
+        count_limit                               = 10
+        days_to_keep_recently_downloaded_packages = 30
+      }
+    ]
+  }
+
+  assert {
+    condition     = azuredevops_feed_retention_policy.feed_retention_policy["default-retention"].feed_id == "11111111-1111-1111-1111-111111111111"
+    error_message = "feed_retention_policies.feed_id should default to the module feed when omitted."
+  }
+
+  assert {
+    condition     = azuredevops_feed_retention_policy.feed_retention_policy["default-retention"].project_id == "00000000-0000-0000-0000-000000000000"
+    error_message = "feed_retention_policies.project_id should default to the module project when omitted."
   }
 }

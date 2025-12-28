@@ -1,4 +1,9 @@
-output "servicehook_ids" {
-  description = "Service hook IDs created in this example."
-  value       = module.azuredevops_servicehooks.servicehook_ids
+output "webhook_ids" {
+  description = "Webhook IDs created in this example, keyed by module instance."
+  value       = { for key, instance in module.azuredevops_servicehooks : key => instance.webhook_id }
+}
+
+output "storage_queue_hook_ids" {
+  description = "Storage queue hook IDs created in this example, keyed by module instance."
+  value       = { for key, instance in module.azuredevops_servicehooks : key => instance.storage_queue_hook_id }
 }

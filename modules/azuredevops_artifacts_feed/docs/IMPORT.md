@@ -36,18 +36,13 @@ provider "azuredevops" {}
 module "azuredevops_artifacts_feed" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_artifacts_feed?ref=ADOPv1.0.0"
 
-  feeds = {
-    project = {
-      name        = "existing-feed-name"
-      project_id  = "00000000-0000-0000-0000-000000000000"
-    }
-  }
+  name       = "existing-feed-name"
+  project_id = "00000000-0000-0000-0000-000000000000"
 
   # Optional: manage feed permissions
   # feed_permissions = [
   #   {
   #     key                 = "project-reader"
-  #     feed_key            = "project"
   #     identity_descriptor = "vssgp.Uy0xLTktMTIzNDU2"
   #     role                = "reader"
   #   }
@@ -57,7 +52,6 @@ module "azuredevops_artifacts_feed" {
   # feed_retention_policies = [
   #   {
   #     key                                       = "project-retention"
-  #     feed_key                                  = "project"
   #     count_limit                               = 10
   #     days_to_keep_recently_downloaded_packages = 30
   #   }
@@ -73,7 +67,7 @@ Create `import.tf`:
 
 ```hcl
 import {
-  to = module.azuredevops_artifacts_feed.azuredevops_feed.feed["project"]
+  to = module.azuredevops_artifacts_feed.azuredevops_feed.feed[0]
   id = "<feed_id>"
 }
 ```

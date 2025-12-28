@@ -23,23 +23,17 @@ mock_provider "azuredevops" {
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  webhooks = [
-    {
-      key      = "webhook-main"
-      url      = "https://example.com/webhook"
-      git_push = {}
-    }
-  ]
+  webhook = {
+    url      = "https://example.com/webhook"
+    git_push = {}
+  }
 
-  storage_queue_hooks = [
-    {
-      key                     = "queue-main"
-      account_name            = "account"
-      account_key             = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-      queue_name              = "queue"
-      run_state_changed_event = {}
-    }
-  ]
+  storage_queue_hook = {
+    account_name            = "account"
+    account_key             = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    queue_name              = "queue"
+    run_state_changed_event = {}
+  }
 
   servicehook_permissions = [
     {
@@ -56,23 +50,13 @@ run "outputs_plan" {
   command = apply
 
   assert {
-    condition     = contains(keys(output.servicehook_ids.webhook_tfs), "webhook-main")
-    error_message = "servicehook_ids.webhook_tfs should include the webhook key."
+    condition     = output.webhook_id == "hook-0001"
+    error_message = "webhook_id should return the webhook ID."
   }
 
   assert {
-    condition     = contains(keys(output.servicehook_ids.storage_queue_pipelines), "queue-main")
-    error_message = "servicehook_ids.storage_queue_pipelines should include the storage queue key."
-  }
-
-  assert {
-    condition     = contains(keys(output.webhook_ids), "webhook-main")
-    error_message = "webhook_ids should include the webhook key."
-  }
-
-  assert {
-    condition     = contains(keys(output.storage_queue_hook_ids), "queue-main")
-    error_message = "storage_queue_hook_ids should include the storage queue key."
+    condition     = output.storage_queue_hook_id == "hook-0002"
+    error_message = "storage_queue_hook_id should return the storage queue hook ID."
   }
 
   assert {

@@ -8,7 +8,7 @@ locals {
 }
 
 module "azuredevops_extension" {
-  source = "../../"
+  source   = "../../"
   for_each = local.extensions_by_key
 
   publisher_id      = each.value.publisher_id

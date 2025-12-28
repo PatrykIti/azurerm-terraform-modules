@@ -5,13 +5,14 @@ module "azuredevops_work_items" {
 
   project_id = var.project_id
 
-  processes = {
-    custom = {
+  processes = [
+    {
+      key                    = "custom"
       name                   = "custom_agile"
       parent_process_type_id = var.parent_process_type_id
       description            = "Custom agile process"
     }
-  }
+  ]
 
   query_folders = [
     {
@@ -50,13 +51,8 @@ module "azuredevops_work_items" {
     }
   ]
 
-  work_items = [
-    {
-      key   = "example-item"
-      title = "Example Work Item"
-      type  = "Issue"
-      state = "Active"
-      tags  = ["terraform"]
-    }
-  ]
+  title = "Example Work Item"
+  type  = "Issue"
+  state = "Active"
+  tags  = ["terraform"]
 }

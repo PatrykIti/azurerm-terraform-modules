@@ -1,21 +1,15 @@
 # Basic Azure DevOps Repository Example
 
-This example demonstrates a basic Azure DevOps Repository configuration using secure defaults and minimal setup.
+This example demonstrates a basic Azure DevOps repository configuration with a README file.
 
 ## Features
 
-- Creates a basic azuredevops_repository with standard configuration
-- Uses secure defaults following Azure best practices
-- Creates a dedicated resource group
-- Demonstrates basic module usage patterns
-- Uses variables for configuration flexibility
+- Creates a repository with clean initialization
+- Adds a README file to the default branch
 
 ## Key Configuration
 
-This example uses secure defaults and demonstrates:
-- Basic resource creation with minimal configuration
-- Using variables for easy configuration customization
-- Following security best practices by default
+This example keeps the configuration minimal while exercising repository creation and file management.
 
 ## Usage
 

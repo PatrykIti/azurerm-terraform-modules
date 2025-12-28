@@ -30,10 +30,12 @@ func TestAzuredevopsServicehooksFullIntegration(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		servicehookIDs := terraform.OutputMap(t, terraformOptions, "servicehook_ids")
+		webhookID := terraform.Output(t, terraformOptions, "webhook_id")
+		storageQueueHookID := terraform.Output(t, terraformOptions, "storage_queue_hook_id")
 		permissionIDs := terraform.OutputMap(t, terraformOptions, "servicehook_permission_ids")
 
-		assert.NotEmpty(t, servicehookIDs)
+		assert.NotEmpty(t, webhookID)
+		assert.NotEmpty(t, storageQueueHookID)
 		assert.NotEmpty(t, permissionIDs)
 	})
 }

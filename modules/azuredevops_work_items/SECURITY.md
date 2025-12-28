@@ -25,6 +25,9 @@ module "azuredevops_work_items" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
+  title = "Secure Work Item"
+  type  = "Issue"
+
   query_permissions = [
     {
       principal = "vssgp.Uy0xLTktMTIzNDU2"

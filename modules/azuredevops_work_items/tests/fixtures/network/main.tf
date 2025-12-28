@@ -15,11 +15,6 @@ module "azuredevops_work_items" {
 
   project_id = var.project_id
 
-  work_items = [
-    {
-      key   = "network-item"
-      title = "${var.work_item_title_prefix}-network"
-      type  = "Task"
-    }
-  ]
+  title = "${var.work_item_title_prefix}-network"
+  type  = "Task"
 }

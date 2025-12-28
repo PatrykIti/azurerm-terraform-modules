@@ -5,17 +5,14 @@ module "azuredevops_servicehooks" {
 
   project_id = var.project_id
 
-  webhooks = [
-    {
-      key = "work-item-updated"
-      url = var.webhook_url
-      work_item_updated = {
-        work_item_type = "Bug"
-        area_path      = var.area_path
-        changed_fields = "System.State"
-      }
+  webhook = {
+    url = var.webhook_url
+    work_item_updated = {
+      work_item_type = "Bug"
+      area_path      = var.area_path
+      changed_fields = "System.State"
     }
-  ]
+  }
 
   servicehook_permissions = [
     {

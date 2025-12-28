@@ -22,31 +22,20 @@ data "azuredevops_group" "project_readers" {
 module "azuredevops_team" {
   source = "../../../"
 
-  project_id = var.project_id
-
-  teams = {
-    platform = {
-      name        = "${var.team_name_prefix}-platform"
-      description = "Platform engineering team"
-    }
-    product = {
-      name        = "${var.team_name_prefix}-product"
-      description = "Product delivery team"
-    }
-  }
+  project_id  = var.project_id
+  name        = "ado-team-cmp-${var.random_suffix}"
+  description = "Platform engineering team"
 
   team_members = [
     {
-      key                = "platform-members"
-      team_key           = "platform"
+      key                = "team-members"
       member_descriptors = [data.azuredevops_group.project_readers.descriptor]
     }
   ]
 
   team_administrators = [
     {
-      key               = "platform-admins"
-      team_key          = "platform"
+      key               = "team-admins"
       admin_descriptors = [data.azuredevops_group.project_collection_admins.descriptor]
     }
   ]

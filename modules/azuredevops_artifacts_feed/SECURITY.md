@@ -23,16 +23,11 @@ This document describes security considerations for Azure DevOps Artifacts feeds
 module "azuredevops_artifacts_feed" {
   source = "./modules/azuredevops_artifacts_feed"
 
-  feeds = {
-    project = {
-      name       = "secure-feed"
-      project_id = "00000000-0000-0000-0000-000000000000"
-    }
-  }
+  name       = "secure-feed"
+  project_id = "00000000-0000-0000-0000-000000000000"
 
   feed_permissions = [
     {
-      feed_key            = "project"
       identity_descriptor = "vssgp.Uy0xLTktMTIzNDU2"
       role                = "reader"
     }
@@ -40,7 +35,6 @@ module "azuredevops_artifacts_feed" {
 
   feed_retention_policies = [
     {
-      feed_key                                  = "project"
       count_limit                               = 10
       days_to_keep_recently_downloaded_packages = 30
     }
@@ -69,5 +63,5 @@ module "azuredevops_artifacts_feed" {
 ---
 
 **Module Version**: 1.0.0  
-**Last Updated**: 2025-12-24  
+**Last Updated**: 2025-12-28  
 **Security Contact**: security@yourorganization.com

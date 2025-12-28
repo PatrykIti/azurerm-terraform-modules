@@ -26,14 +26,12 @@ module "azuredevops_servicehooks" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  webhooks = [
-    {
-      url = "https://example.com/webhook"
-      git_push = {
-        branch = "refs/heads/main"
-      }
+  webhook = {
+    url = "https://example.com/webhook"
+    git_push = {
+      branch = "refs/heads/main"
     }
-  ]
+  }
 
   servicehook_permissions = [
     {

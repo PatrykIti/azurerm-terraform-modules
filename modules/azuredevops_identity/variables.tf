@@ -1,27 +1,79 @@
 # -----------------------------------------------------------------------------
-# Groups
+# Group
 # -----------------------------------------------------------------------------
 
-variable "groups" {
-  description = "Map of Azure DevOps groups to manage."
-  type = map(object({
-    scope        = optional(string)
-    origin_id    = optional(string)
-    mail         = optional(string)
-    display_name = optional(string)
-    description  = optional(string)
-  }))
-  default = {}
+variable "group_display_name" {
+  description = "Display name for the Azure DevOps group. Required when creating a new group."
+  type        = string
+  default     = null
 
   validation {
-    condition = alltrue([
-      for group in values(var.groups) : (
-        (group.origin_id != null && group.mail == null && group.display_name == null && group.scope == null) ||
-        (group.mail != null && group.origin_id == null && group.display_name == null && group.scope == null) ||
-        (group.origin_id == null && group.mail == null && group.display_name != null)
-      )
-    ])
-    error_message = "Each group must set display_name (optionally with scope) or set origin_id or mail (without scope or display_name)."
+    condition     = var.group_display_name == null || trimspace(var.group_display_name) != ""
+    error_message = "group_display_name must be a non-empty string when set."
+  }
+
+  validation {
+    condition = (
+      (var.group_display_name == null && var.group_origin_id == null && var.group_mail == null) ||
+      (var.group_display_name != null && var.group_origin_id == null && var.group_mail == null) ||
+      (var.group_origin_id != null && var.group_display_name == null && var.group_mail == null) ||
+      (var.group_mail != null && var.group_display_name == null && var.group_origin_id == null)
+    )
+    error_message = "Set either group_display_name (optionally with group_scope/description), group_origin_id, or group_mail. group_origin_id or group_mail cannot be combined with display_name."
+  }
+}
+
+variable "group_description" {
+  description = "Description for the Azure DevOps group. Only used when creating a new group."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.group_description == null || trimspace(var.group_description) != ""
+    error_message = "group_description must be a non-empty string when set."
+  }
+
+  validation {
+    condition     = var.group_description == null || var.group_display_name != null
+    error_message = "group_description can only be set when group_display_name is provided."
+  }
+}
+
+variable "group_scope" {
+  description = "Scope for the Azure DevOps group. Only valid when creating a new group."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.group_scope == null || trimspace(var.group_scope) != ""
+    error_message = "group_scope must be a non-empty string when set."
+  }
+
+  validation {
+    condition     = var.group_scope == null || (var.group_display_name != null && var.group_origin_id == null && var.group_mail == null)
+    error_message = "group_scope can only be set when group_display_name is provided and group_origin_id/group_mail are not set."
+  }
+}
+
+variable "group_origin_id" {
+  description = "Origin ID of an external group to attach instead of creating a new group."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.group_origin_id == null || trimspace(var.group_origin_id) != ""
+    error_message = "group_origin_id must be a non-empty string when set."
+  }
+}
+
+variable "group_mail" {
+  description = "Mail address of an external group to attach instead of creating a new group."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.group_mail == null || trimspace(var.group_mail) != ""
+    error_message = "group_mail must be a non-empty string when set."
   }
 }
 
@@ -34,63 +86,70 @@ variable "group_memberships" {
   type = list(object({
     key                = optional(string)
     group_descriptor   = optional(string)
-    group_key          = optional(string)
     member_descriptors = optional(list(string), [])
-    member_group_keys  = optional(list(string), [])
     mode               = optional(string, "add")
   }))
   default = []
 
   validation {
     condition = alltrue([
-      for membership in var.group_memberships : (
-        (membership.group_descriptor != null) != (membership.group_key != null)
-      )
+      for membership in var.group_memberships :
+      membership.key == null || trimspace(membership.key) != ""
     ])
-    error_message = "Each group_membership must set exactly one of group_descriptor or group_key."
+    error_message = "group_memberships.key must be a non-empty string when set."
   }
 
   validation {
     condition = alltrue([
-      for membership in var.group_memberships : (
-        membership.mode == null || contains(["add", "overwrite"], membership.mode)
-      )
+      for membership in var.group_memberships :
+      membership.group_descriptor == null || trimspace(membership.group_descriptor) != ""
+    ])
+    error_message = "group_memberships.group_descriptor must be a non-empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for membership in var.group_memberships :
+      length(try(membership.member_descriptors, [])) > 0
+    ])
+    error_message = "Each group_membership must include at least one member descriptor."
+  }
+
+  validation {
+    condition = alltrue([
+      for membership in var.group_memberships :
+      membership.mode == null || contains(["add", "overwrite"], membership.mode)
     ])
     error_message = "group_memberships.mode must be one of: add, overwrite."
   }
 
   validation {
     condition = alltrue([
-      for membership in var.group_memberships : (
-        length(try(membership.member_descriptors, [])) + length(try(membership.member_group_keys, [])) > 0
-      )
+      for membership in var.group_memberships :
+      membership.group_descriptor != null || (var.group_display_name != null || var.group_origin_id != null || var.group_mail != null)
     ])
-    error_message = "Each group_membership must include at least one member descriptor or member group key."
+    error_message = "group_memberships.group_descriptor is required when the module group is not configured."
   }
 
   validation {
     condition = alltrue([
-      for membership in var.group_memberships : (
-        membership.group_key == null || contains(keys(var.groups), membership.group_key)
-      )
+      for membership in var.group_memberships :
+      membership.group_descriptor != null || (membership.key != null && trimspace(membership.key) != "")
     ])
-    error_message = "group_memberships.group_key must reference a key in groups."
-  }
-
-  validation {
-    condition = alltrue([
-      for membership in var.group_memberships : alltrue([
-        for key in try(membership.member_group_keys, []) : contains(keys(var.groups), key)
-      ])
-    ])
-    error_message = "group_memberships.member_group_keys must reference keys in groups."
+    error_message = "group_memberships.key is required when group_descriptor is omitted."
   }
 
   validation {
     condition = length(distinct([
-      for membership in var.group_memberships : coalesce(membership.key, membership.group_descriptor, membership.group_key)
-    ])) == length(var.group_memberships)
-    error_message = "group_memberships keys must be unique (derived from key, group_descriptor, or group_key)."
+      for membership in var.group_memberships :
+      membership.key != null ? membership.key : membership.group_descriptor
+      if membership.key != null || membership.group_descriptor != null
+      ])) == length([
+      for membership in var.group_memberships :
+      membership.key != null ? membership.key : membership.group_descriptor
+      if membership.key != null || membership.group_descriptor != null
+    ])
+    error_message = "group_memberships keys must be unique (derived from key or group_descriptor)."
   }
 }
 
@@ -109,6 +168,38 @@ variable "group_entitlements" {
     licensing_source     = optional(string, "account")
   }))
   default = []
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.group_entitlements :
+      entitlement.key == null || trimspace(entitlement.key) != ""
+    ])
+    error_message = "group_entitlements.key must be a non-empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.group_entitlements :
+      entitlement.display_name == null || trimspace(entitlement.display_name) != ""
+    ])
+    error_message = "group_entitlements.display_name must be a non-empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.group_entitlements :
+      entitlement.origin == null || trimspace(entitlement.origin) != ""
+    ])
+    error_message = "group_entitlements.origin must be a non-empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.group_entitlements :
+      entitlement.origin_id == null || trimspace(entitlement.origin_id) != ""
+    ])
+    error_message = "group_entitlements.origin_id must be a non-empty string when set."
+  }
 
   validation {
     condition = alltrue([
@@ -175,6 +266,38 @@ variable "user_entitlements" {
 
   validation {
     condition = alltrue([
+      for entitlement in var.user_entitlements :
+      entitlement.key == null || trimspace(entitlement.key) != ""
+    ])
+    error_message = "user_entitlements.key must be a non-empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.user_entitlements :
+      entitlement.principal_name == null || trimspace(entitlement.principal_name) != ""
+    ])
+    error_message = "user_entitlements.principal_name must be a non-empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.user_entitlements :
+      entitlement.origin == null || trimspace(entitlement.origin) != ""
+    ])
+    error_message = "user_entitlements.origin must be a non-empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.user_entitlements :
+      entitlement.origin_id == null || trimspace(entitlement.origin_id) != ""
+    ])
+    error_message = "user_entitlements.origin_id must be a non-empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
       for entitlement in var.user_entitlements : (
         (entitlement.principal_name != null && entitlement.origin_id == null && entitlement.origin == null) ||
         (entitlement.principal_name == null && entitlement.origin_id != null && entitlement.origin != null)
@@ -237,6 +360,22 @@ variable "service_principal_entitlements" {
 
   validation {
     condition = alltrue([
+      for entitlement in var.service_principal_entitlements :
+      entitlement.key == null || trimspace(entitlement.key) != ""
+    ])
+    error_message = "service_principal_entitlements.key must be a non-empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for entitlement in var.service_principal_entitlements :
+      trimspace(entitlement.origin_id) != ""
+    ])
+    error_message = "service_principal_entitlements.origin_id must be a non-empty string."
+  }
+
+  validation {
+    condition = alltrue([
       for entitlement in var.service_principal_entitlements : (
         entitlement.origin == null || entitlement.origin == "aad"
       )
@@ -288,40 +427,70 @@ variable "service_principal_entitlements" {
 variable "securityrole_assignments" {
   description = "List of security role assignments to manage."
   type = list(object({
-    key                = optional(string)
-    scope              = string
-    resource_id        = string
-    role_name          = string
-    identity_id        = optional(string)
-    identity_group_key = optional(string)
+    key         = optional(string)
+    scope       = string
+    resource_id = string
+    role_name   = string
+    identity_id = optional(string)
   }))
   default = []
 
   validation {
     condition = alltrue([
-      for assignment in var.securityrole_assignments : (
-        (assignment.identity_id != null) != (assignment.identity_group_key != null)
-      )
+      for assignment in var.securityrole_assignments :
+      assignment.key == null || trimspace(assignment.key) != ""
     ])
-    error_message = "Each securityrole_assignment must set exactly one of identity_id or identity_group_key."
+    error_message = "securityrole_assignments.key must be a non-empty string when set."
   }
 
   validation {
     condition = alltrue([
-      for assignment in var.securityrole_assignments : (
-        assignment.identity_group_key == null || contains(keys(var.groups), assignment.identity_group_key)
-      )
+      for assignment in var.securityrole_assignments :
+      trimspace(assignment.scope) != ""
     ])
-    error_message = "securityrole_assignments.identity_group_key must reference a key in groups."
+    error_message = "securityrole_assignments.scope must be a non-empty string."
+  }
+
+  validation {
+    condition = alltrue([
+      for assignment in var.securityrole_assignments :
+      trimspace(assignment.resource_id) != ""
+    ])
+    error_message = "securityrole_assignments.resource_id must be a non-empty string."
+  }
+
+  validation {
+    condition = alltrue([
+      for assignment in var.securityrole_assignments :
+      trimspace(assignment.role_name) != ""
+    ])
+    error_message = "securityrole_assignments.role_name must be a non-empty string."
+  }
+
+  validation {
+    condition = alltrue([
+      for assignment in var.securityrole_assignments :
+      assignment.identity_id == null || trimspace(assignment.identity_id) != ""
+    ])
+    error_message = "securityrole_assignments.identity_id must be a non-empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for assignment in var.securityrole_assignments :
+      assignment.identity_id != null || (var.group_display_name != null || var.group_origin_id != null || var.group_mail != null)
+    ])
+    error_message = "securityrole_assignments.identity_id is required when the module group is not configured."
   }
 
   validation {
     condition = length(distinct([
       for assignment in var.securityrole_assignments : coalesce(
         assignment.key,
-        "${assignment.scope}/${assignment.resource_id}/${assignment.role_name}/${coalesce(assignment.identity_id, assignment.identity_group_key, "unknown")}"
+        assignment.identity_id,
+        "${assignment.scope}/${assignment.resource_id}/${assignment.role_name}"
       )
     ])) == length(var.securityrole_assignments)
-    error_message = "securityrole_assignments keys must be unique (derived from key or scope/resource/role/identity)."
+    error_message = "securityrole_assignments keys must be unique (derived from key, identity_id, or scope/resource/role)."
   }
 }

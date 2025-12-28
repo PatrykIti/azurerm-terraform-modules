@@ -20,15 +20,12 @@ module "azuredevops_servicehooks" {
 
   project_id = var.project_id
 
-  webhooks = [
-    {
-      key = "secure-work-item"
-      url = var.webhook_url
-      work_item_updated = {
-        work_item_type = "Bug"
-      }
+  webhook = {
+    url = var.webhook_url
+    work_item_updated = {
+      work_item_type = "Bug"
     }
-  ]
+  }
 
   servicehook_permissions = [
     {

@@ -8,14 +8,14 @@ module "azuredevops_environments" {
   source = "../../"
 
   project_id  = var.project_id
-  name        = "ado-env-secure"
+  name        = "ado-env-secure-example"
   description = "Secure environment"
 
   check_approvals = [
     {
-      key                  = "security-approval"
-      target_resource_type = "environment"
-      approvers            = [data.azuredevops_group.project_collection_admins.id]
+      key                   = "security-approval"
+      target_resource_type  = "environment"
+      approvers             = [data.azuredevops_group.project_collection_admins.origin_id]
       requester_can_approve = false
     }
   ]

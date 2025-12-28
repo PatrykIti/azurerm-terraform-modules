@@ -26,14 +26,12 @@ module "azuredevops_serviceendpoint" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  serviceendpoint_generic = [
-    {
-      service_endpoint_name = "example-generic"
-      server_url            = "https://example.endpoint.local"
-      username              = "example-user"
-      password              = "example-password"
-    }
-  ]
+  serviceendpoint_generic = {
+    service_endpoint_name = "example-generic"
+    server_url            = "https://example.endpoint.local"
+    username              = "example-user"
+    password              = "example-password"
+  }
 
   serviceendpoint_permissions = [
     {
@@ -67,5 +65,5 @@ module "azuredevops_serviceendpoint" {
 ---
 
 **Module Version**: 1.0.0  
-**Last Updated**: 2025-12-24  
+**Last Updated**: 2025-12-28  
 **Security Contact**: security@yourorganization.com

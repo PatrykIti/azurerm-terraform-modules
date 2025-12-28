@@ -1,12 +1,12 @@
 # Complete Azure DevOps Service Endpoints Example
 
-This example demonstrates multiple service endpoint types in one module instance.
+This example demonstrates multiple service endpoint types created via module-level for_each.
 
 ## Features
 
 - Generic service endpoint
 - Incoming webhook service endpoint
-- Variable-driven configuration for tests
+- Permission assignment referencing the module-created endpoint
 
 ## Key Configuration
 

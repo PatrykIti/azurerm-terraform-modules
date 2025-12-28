@@ -3,76 +3,38 @@ variable "project_id" {
   type        = string
 }
 
-variable "github_endpoint_name" {
-  description = "GitHub service endpoint name."
+variable "generic_endpoint_name" {
+  description = "Generic service endpoint name."
   type        = string
-  default     = "ado-github-complete"
+  default     = "ado-generic-complete"
 }
 
-variable "github_personal_access_token" {
-  description = "GitHub personal access token."
+variable "generic_endpoint_url" {
+  description = "Generic service endpoint URL."
+  type        = string
+  default     = "https://example.endpoint.local"
+}
+
+variable "generic_endpoint_username" {
+  description = "Generic service endpoint username."
+  type        = string
+  default     = "example-user"
+}
+
+variable "generic_endpoint_password" {
+  description = "Generic service endpoint password."
   type        = string
   sensitive   = true
 }
 
-variable "aws_endpoint_name" {
-  description = "AWS service endpoint name."
+variable "incoming_webhook_endpoint_name" {
+  description = "Incoming webhook service endpoint name."
   type        = string
-  default     = "ado-aws-complete"
+  default     = "ado-incoming-webhook"
 }
 
-variable "aws_access_key_id" {
-  description = "AWS access key ID."
-  type        = string
-}
-
-variable "aws_secret_access_key" {
-  description = "AWS secret access key."
+variable "incoming_webhook_secret" {
+  description = "Incoming webhook secret."
   type        = string
   sensitive   = true
-}
-
-variable "kubernetes_endpoint_name" {
-  description = "Kubernetes service endpoint name."
-  type        = string
-  default     = "ado-k8s-complete"
-}
-
-variable "kubernetes_api_url" {
-  description = "Kubernetes API server URL."
-  type        = string
-  default     = "https://example.kubernetes.local"
-}
-
-variable "kubeconfig_content" {
-  description = "Kubeconfig content used for the Kubernetes service endpoint."
-  type        = string
-  default     = <<EOT
-apiVersion: v1
-clusters:
-- cluster:
-    certificate-authority: fake-ca-file
-    server: https://1.2.3.4
-  name: development
-contexts:
-- context:
-    cluster: development
-    namespace: default
-    user: developer
-  name: dev-default
-current-context: dev-default
-kind: Config
-preferences: {}
-users:
-- name: developer
-  user:
-    client-certificate: fake-cert-file
-    client-key: fake-key-file
-EOT
-}
-
-variable "kubeconfig_context" {
-  description = "Context name inside the kubeconfig."
-  type        = string
-  default     = "dev-default"
 }

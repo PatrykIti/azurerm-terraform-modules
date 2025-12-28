@@ -1,11 +1,11 @@
 # Basic Azure DevOps Service Endpoints Example
 
-This example demonstrates creating AzureRM and Docker registry service endpoints.
+This example demonstrates creating a single generic service endpoint.
 
 ## Features
 
-- Azure Resource Manager service connection
-- Docker registry service connection
+- Generic service connection
+- Minimal required inputs
 
 ## Usage
 

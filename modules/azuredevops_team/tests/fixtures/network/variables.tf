@@ -3,10 +3,10 @@ variable "project_id" {
   type        = string
 }
 
-variable "team_name" {
-  description = "Name of the team."
+variable "random_suffix" {
+  description = "Random suffix to ensure unique team names."
   type        = string
-  default     = "ado-team-network-fixture"
+  default     = "local"
 }
 
 variable "team_administrators" {
@@ -14,7 +14,6 @@ variable "team_administrators" {
   type = list(object({
     key               = optional(string)
     team_id           = optional(string)
-    team_key          = optional(string)
     admin_descriptors = list(string)
     mode              = optional(string, "add")
   }))

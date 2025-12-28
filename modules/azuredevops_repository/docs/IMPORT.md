@@ -37,19 +37,17 @@ module "azuredevops_repository" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_repository?ref=ADORv1.0.0"
 
   project_id = "00000000-0000-0000-0000-000000000000"
+  name       = "existing-repo-name"
 
-  repositories = {
-    main = {
-      name = "existing-repo-name"
-    }
+  initialization = {
+    init_type = "Clean"
   }
 
   # Optional: manage branches/files/permissions/policies
   # branches = [
   #   {
-  #     key            = "develop"
-  #     repository_key = "main"
-  #     name           = "develop"
+  #     key  = "develop"
+  #     name = "develop"
   #   }
   # ]
 }
@@ -63,7 +61,7 @@ Create `import.tf`:
 
 ```hcl
 import {
-  to = module.azuredevops_repository.azuredevops_git_repository.repo["main"]
+  to = module.azuredevops_repository.azuredevops_git_repository.git_repository[0]
   id = "<repository_id>"
 }
 ```
@@ -78,7 +76,7 @@ If you manage branches, ensure each branch has a stable `key` and then add:
 
 ```hcl
 import {
-  to = module.azuredevops_repository.azuredevops_git_repository_branch.branch["develop"]
+  to = module.azuredevops_repository.azuredevops_git_repository_branch.git_repository_branch["develop"]
   id = "<branch_import_id>"
 }
 ```
@@ -95,7 +93,7 @@ If you manage repository files, use stable keys:
 
 ```hcl
 import {
-  to = module.azuredevops_repository.azuredevops_git_repository_file.file["readme"]
+  to = module.azuredevops_repository.azuredevops_git_repository_file.git_repository_file["readme"]
   id = "<file_import_id>"
 }
 ```
@@ -106,7 +104,7 @@ import {
 
 ```hcl
 import {
-  to = module.azuredevops_repository.azuredevops_git_permissions.permissions["main-contributors"]
+  to = module.azuredevops_repository.azuredevops_git_permissions.git_permissions["main-contributors"]
   id = "<permissions_import_id>"
 }
 ```
@@ -117,12 +115,12 @@ import {
 
 ```hcl
 import {
-  to = module.azuredevops_repository.azuredevops_branch_policy_min_reviewers.policy["min-reviewers-main"]
+  to = module.azuredevops_repository.azuredevops_branch_policy_min_reviewers.branch_policy_min_reviewers["min-reviewers"]
   id = "<branch_policy_import_id>"
 }
 
 import {
-  to = module.azuredevops_repository.azuredevops_repository_policy_reserved_names.policy["reserved-names-main"]
+  to = module.azuredevops_repository.azuredevops_repository_policy_reserved_names.repository_policy_reserved_names["reserved-names"]
   id = "<repository_policy_import_id>"
 }
 ```

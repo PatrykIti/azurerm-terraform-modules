@@ -1,16 +1,21 @@
-output "repository_ids" {
-  description = "Map of repository IDs keyed by repository key."
-  value       = module.azuredevops_repository.repository_ids
+output "repository_id" {
+  description = "Repository ID."
+  value       = module.azuredevops_repository.repository_id
 }
 
-output "repository_urls" {
-  description = "Map of repository web URLs keyed by repository key."
-  value       = module.azuredevops_repository.repository_urls
+output "repository_url" {
+  description = "Repository URL."
+  value       = module.azuredevops_repository.repository_url
 }
 
 output "branch_ids" {
   description = "Map of branch IDs keyed by branch key."
   value       = module.azuredevops_repository.branch_ids
+}
+
+output "file_ids" {
+  description = "Map of file IDs keyed by file key."
+  value       = module.azuredevops_repository.file_ids
 }
 
 output "policy_ids" {

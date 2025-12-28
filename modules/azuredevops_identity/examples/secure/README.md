@@ -4,20 +4,13 @@ This example demonstrates a security-focused identity configuration with explici
 
 ## Features
 
-- Creates restricted groups for security and operations
-- Applies explicit group-to-group membership with overwrite mode
-- Uses stakeholder entitlements for least-privilege access
+- Creates a restricted Azure DevOps group
+- Adds explicit group membership with overwrite mode
+- Uses stakeholder entitlements for least-privilege access (optional)
 
 ## Key Configuration
 
 Use this pattern to keep access tightly controlled and reviewable.
-
-## Security Considerations
-
-- All public access is disabled by default
-- Network access is restricted to specific IP ranges
-- All data is encrypted at rest and in transit
-- Audit logging captures all access and modifications
 
 ## Usage
 

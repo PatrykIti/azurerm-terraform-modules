@@ -64,7 +64,7 @@ go test -v -run TestBasicAzuredevopsVariableGroups -timeout 30m
 The `fixtures/` directory contains Terraform configurations for different test scenarios:
 
 - `fixtures/basic/` - Basic variable group configuration
-- `fixtures/complete/` - Variable groups with permissions and library permissions
+- `fixtures/complete/` - Variable group with permissions and library permissions
 - `fixtures/secure/` - Restricted variable group with secret values
 - `fixtures/negative/` - Negative test cases
 

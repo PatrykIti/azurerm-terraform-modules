@@ -4,24 +4,23 @@ module "azuredevops_repository" {
   source = "../../"
 
   project_id = var.project_id
+  name       = "ado-repo-secure"
 
-  repositories = {
-    main = {
-      name = "ado-repo-secure"
-      initialization = {
-        init_type = "Clean"
-      }
-    }
+  initialization = {
+    init_type = "Clean"
   }
 
   branch_policy_min_reviewers = [
     {
-      key            = "min-reviewers-main"
-      reviewer_count = var.reviewer_count
+      key                            = "min-reviewers"
+      reviewer_count                 = var.reviewer_count
+      blocking                       = true
+      submitter_can_vote             = false
+      last_pusher_cannot_approve     = true
+      on_last_iteration_require_vote = true
       scope = [
         {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
+          match_type = "DefaultBranch"
         }
       ]
     }
@@ -29,31 +28,50 @@ module "azuredevops_repository" {
 
   branch_policy_status_check = [
     {
-      key          = "status-check-main"
+      key          = "status-check"
       name         = var.status_check_name
       genre        = var.status_check_genre
       display_name = "Security Status Check"
       scope = [
         {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
+          match_type = "DefaultBranch"
         }
       ]
     }
   ]
 
-  repository_policy_reserved_names = [
+  branch_policy_work_item_linking = [
     {
-      key             = "reserved-names-main"
-      repository_keys = ["main"]
+      key      = "work-item-linking"
+      enabled  = true
+      blocking = true
+      scope = [
+        {
+          match_type = "DefaultBranch"
+        }
+      ]
+    }
+  ]
+
+  repository_policy_author_email_pattern = [
+    {
+      key                   = "author-email"
+      author_email_patterns = ["*@example.com"]
     }
   ]
 
   repository_policy_case_enforcement = [
     {
-      key                     = "case-enforcement-main"
+      key                     = "case-enforcement"
       enforce_consistent_case = true
-      repository_keys         = ["main"]
+      blocking                = true
+    }
+  ]
+
+  repository_policy_reserved_names = [
+    {
+      key      = "reserved-names"
+      blocking = true
     }
   ]
 }

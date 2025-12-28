@@ -20,6 +20,9 @@ module "azuredevops_work_items" {
 
   project_id = var.project_id
 
+  title = "${var.work_item_title_prefix}-secure"
+  type  = "Task"
+
   area_permissions = [
     {
       key       = "area-readers-root"
@@ -58,14 +61,6 @@ module "azuredevops_work_items" {
         Update    = "deny"
         Delete    = "deny"
       }
-    }
-  ]
-
-  work_items = [
-    {
-      key   = "secure-item"
-      title = "${var.work_item_title_prefix}-secure"
-      type  = "Task"
     }
   ]
 }

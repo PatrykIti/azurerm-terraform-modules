@@ -5,7 +5,7 @@ This example demonstrates creating multiple YAML pipelines with folders and auth
 ## Features
 
 - Repository with clean initialization
-- Multiple build definitions in a shared folder
+- Multiple build definitions via module-level for_each in a shared folder
 - Scheduled trigger for a pipeline
 - Pipeline authorizations for a service endpoint
 

@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-008
-**Status:** 🟠 **Re-opened**
+**Status:** ✅ **Done** (2025-12-28)
 
 ---
 
@@ -129,10 +129,10 @@ Update tests per TESTING_GUIDE:
 
 ## Implementation Checklist
 
-- [ ] Refactor variables.tf: replace `environments` map with flat inputs; add optional `key` fields and validations.
-- [ ] Refactor main.tf: single `azuredevops_environment`; stable for_each for sub-resources/checks; default target IDs.
-- [ ] Update outputs.tf: stable maps and `environment_id` output.
-- [ ] Add `docs/IMPORT.md`.
-- [ ] Update examples (fixed names, remove random provider).
-- [ ] Update tests (fixtures, unit, terratest, test_config).
-- [ ] make docs + update README.
+- [x] Refactor variables.tf: replace `environments` map with flat inputs; add optional `key` fields and validations.
+- [x] Refactor main.tf: single `azuredevops_environment`; stable for_each for sub-resources/checks; default target IDs.
+- [x] Update outputs.tf: stable maps and `environment_id` output.
+- [x] Add `docs/IMPORT.md`.
+- [x] Update examples (fixed names, remove random provider).
+- [x] Update tests (fixtures, unit, terratest, test_config).
+- [x] make docs + update README.

@@ -1,7 +1,6 @@
 terraform {
   required_version = ">= 1.12.2"
   required_providers {
-  
     azuredevops = {
       source  = "microsoft/azuredevops"
       version = "1.12.2"
@@ -19,26 +18,22 @@ resource "random_string" "suffix" {
   special = false
 }
 
+resource "azuredevops_group" "member" {
+  display_name = "${var.group_name_prefix}-members-${random_string.suffix.result}"
+  description  = "Membership source group"
+}
+
 module "azuredevops_identity" {
   source = "../../../"
 
-  groups = {
-    security = {
-      display_name = "${var.group_name_prefix}-security-${random_string.suffix.result}"
-      description  = "Security reviewers"
-    }
-    operators = {
-      display_name = "${var.group_name_prefix}-operators-${random_string.suffix.result}"
-      description  = "Operations access"
-    }
-  }
+  group_display_name = "${var.group_name_prefix}-security-${random_string.suffix.result}"
+  group_description  = "Security reviewers"
 
   group_memberships = [
     {
-      key               = "security-membership"
-      group_key         = "security"
-      member_group_keys = ["operators"]
-      mode              = "overwrite"
+      key                = "security-membership"
+      member_descriptors = [azuredevops_group.member.descriptor]
+      mode               = "overwrite"
     }
   ]
 }

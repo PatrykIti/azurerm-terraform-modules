@@ -24,18 +24,13 @@ This document describes security considerations for Azure DevOps teams managed b
 module "azuredevops_team" {
   source = "./modules/azuredevops_team"
 
-  project_id = "00000000-0000-0000-0000-000000000000"
-
-  teams = {
-    platform = {
-      name        = "ado-platform"
-      description = "Platform engineering team"
-    }
-  }
+  project_id  = "00000000-0000-0000-0000-000000000000"
+  name        = "ado-platform"
+  description = "Platform engineering team"
 
   team_administrators = [
     {
-      team_key          = "platform"
+      key               = "platform-admins"
       admin_descriptors = ["vssgp.Uy0xLTktMTIzNDU2Nzg5MA"]
       mode              = "add"
     }
@@ -64,5 +59,5 @@ module "azuredevops_team" {
 ---
 
 **Module Version**: 1.0.0  
-**Last Updated**: 2025-12-23  
+**Last Updated**: 2025-12-28  
 **Security Contact**: security@yourorganization.com

@@ -15,11 +15,14 @@ module "azuredevops_work_items" {
 
   project_id = var.project_id
 
+  title = "Negative Example"
+  type  = "Task"
+
   query_folders = [
     {
       name      = "Invalid"
       area      = "Shared Queries"
-      parent_id = "00000000-0000-0000-0000-000000000001"
+      parent_id = 1
     }
   ]
 }

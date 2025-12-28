@@ -3,15 +3,14 @@
 mock_provider "azuredevops" {
   mock_resource "azuredevops_serviceendpoint_generic" {
     defaults = {
-      id                    = "endpoint-0001"
+      id                    = "11111111-1111-1111-1111-111111111111"
       service_endpoint_name = "generic-endpoint"
     }
   }
 
-  mock_resource "azuredevops_serviceendpoint_incomingwebhook" {
+  mock_resource "azuredevops_serviceendpoint_permissions" {
     defaults = {
-      id                    = "endpoint-0002"
-      service_endpoint_name = "webhook-endpoint"
+      id = "permission-0001"
     }
   }
 }
@@ -19,21 +18,19 @@ mock_provider "azuredevops" {
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  serviceendpoint_generic = [
-    {
-      key                   = "generic-key"
-      service_endpoint_name = "generic-endpoint"
-      server_url            = "https://example.endpoint.local"
-      username              = "user"
-      password              = "pass"
-    }
-  ]
+  serviceendpoint_generic = {
+    service_endpoint_name = "generic-endpoint"
+    server_url            = "https://example.endpoint.local"
+    username              = "user"
+    password              = "pass"
+  }
 
-  serviceendpoint_incomingwebhook = [
+  serviceendpoint_permissions = [
     {
-      key                   = "webhook-key"
-      service_endpoint_name = "webhook-endpoint"
-      webhook_name          = "example_webhook"
+      principal = "vssgp.valid"
+      permissions = {
+        Use = "Allow"
+      }
     }
   ]
 }
@@ -42,12 +39,17 @@ run "outputs_apply" {
   command = apply
 
   assert {
-    condition     = contains(keys(output.serviceendpoint_ids.generic), "generic-key")
-    error_message = "serviceendpoint_ids.generic should include the stable key."
+    condition     = output.serviceendpoint_id == "11111111-1111-1111-1111-111111111111"
+    error_message = "serviceendpoint_id should match the mocked ID."
   }
 
   assert {
-    condition     = contains(keys(output.serviceendpoint_ids.incomingwebhook), "webhook-key")
-    error_message = "serviceendpoint_ids.incomingwebhook should include the stable key."
+    condition     = nonsensitive(output.serviceendpoint_name) == "generic-endpoint"
+    error_message = "serviceendpoint_name should match the mocked name."
+  }
+
+  assert {
+    condition     = output.permissions["vssgp.valid"] == "permission-0001"
+    error_message = "permissions output should include the permission key."
   }
 }

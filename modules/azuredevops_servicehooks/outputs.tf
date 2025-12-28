@@ -1,19 +1,11 @@
-output "servicehook_ids" {
-  description = "Map of service hook IDs grouped by type."
-  value = {
-    webhook_tfs             = try({ for key, hook in azuredevops_servicehook_webhook_tfs.webhook : key => hook.id }, {})
-    storage_queue_pipelines = try({ for key, hook in azuredevops_servicehook_storage_queue_pipelines.storage_queue : key => hook.id }, {})
-  }
+output "webhook_id" {
+  description = "ID of the webhook service hook when configured."
+  value       = try(azuredevops_servicehook_webhook_tfs.webhook[0].id, null)
 }
 
-output "webhook_ids" {
-  description = "Map of webhook service hook IDs keyed by webhook key."
-  value       = try({ for key, hook in azuredevops_servicehook_webhook_tfs.webhook : key => hook.id }, {})
-}
-
-output "storage_queue_hook_ids" {
-  description = "Map of storage queue service hook IDs keyed by hook key."
-  value       = try({ for key, hook in azuredevops_servicehook_storage_queue_pipelines.storage_queue : key => hook.id }, {})
+output "storage_queue_hook_id" {
+  description = "ID of the storage queue service hook when configured."
+  value       = try(azuredevops_servicehook_storage_queue_pipelines.storage_queue[0].id, null)
 }
 
 output "servicehook_permission_ids" {

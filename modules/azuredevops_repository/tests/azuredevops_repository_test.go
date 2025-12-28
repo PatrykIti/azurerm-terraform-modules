@@ -31,9 +31,9 @@ func TestBasicAzuredevopsRepository(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		repositoryIDs := terraform.OutputMap(t, terraformOptions, "repository_ids")
+		repositoryID := terraform.Output(t, terraformOptions, "repository_id")
 
-		assert.NotEmpty(t, repositoryIDs)
+		assert.NotEmpty(t, repositoryID)
 	})
 }
 
@@ -56,10 +56,10 @@ func TestCompleteAzuredevopsRepository(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		repositoryIDs := terraform.OutputMap(t, terraformOptions, "repository_ids")
+		repositoryID := terraform.Output(t, terraformOptions, "repository_id")
 		branchIDs := terraform.OutputMap(t, terraformOptions, "branch_ids")
 
-		assert.NotEmpty(t, repositoryIDs)
+		assert.NotEmpty(t, repositoryID)
 		assert.NotEmpty(t, branchIDs)
 	})
 }
@@ -83,9 +83,9 @@ func TestSecureAzuredevopsRepository(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		repositoryIDs := terraform.OutputMap(t, terraformOptions, "repository_ids")
+		repositoryID := terraform.Output(t, terraformOptions, "repository_id")
 
-		assert.NotEmpty(t, repositoryIDs)
+		assert.NotEmpty(t, repositoryID)
 	})
 }
 
@@ -102,7 +102,7 @@ func TestAzuredevopsRepositoryValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "branches.repository_key must reference a key in repositories")
+	assert.Contains(t, err.Error(), "branches.repository_id is required when the module repository is not created")
 }
 
 // Helper function to get terraform options

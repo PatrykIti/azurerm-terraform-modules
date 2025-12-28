@@ -14,14 +14,9 @@ provider "azuredevops" {}
 module "azuredevops_team" {
   source = "../../../"
 
-  project_id = var.project_id
-
-  teams = {
-    audit = {
-      name        = var.team_name
-      description = "Audit team fixture"
-    }
-  }
+  project_id  = var.project_id
+  name        = "ado-team-net-${var.random_suffix}"
+  description = "Audit team fixture"
 
   team_administrators = var.team_administrators
 }

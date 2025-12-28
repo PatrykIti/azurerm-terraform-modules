@@ -19,6 +19,7 @@ module "azuredevops_variable_groups" {
 
   variable_group_permissions = [
     {
+      key       = "secure-access"
       principal = var.principal_descriptor
       permissions = {
         View       = "allow"

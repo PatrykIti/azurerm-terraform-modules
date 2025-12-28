@@ -33,5 +33,9 @@ func TestAzuredevopsVariableGroupsFullIntegration(t *testing.T) {
 		variableGroupID := terraform.Output(t, terraformOptions, "variable_group_id")
 
 		assert.NotEmpty(t, variableGroupID)
+
+		stateList := terraform.RunTerraformCommand(t, terraformOptions, "state", "list")
+		assert.Contains(t, stateList, "module.azuredevops_variable_groups.azuredevops_variable_group_permissions.variable_group_permissions[\"readers\"]")
+		assert.Contains(t, stateList, "module.azuredevops_variable_groups.azuredevops_library_permissions.library_permissions[\"readers\"]")
 	})
 }

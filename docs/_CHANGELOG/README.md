@@ -6,6 +6,17 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [048](./048-2025-12-28-azuredevops-identity-refactor-alignment.md) | 2025-12-28 | Azure DevOps Identity module refactor alignment | Breaking Change / Maintenance |
+| [047](./047-2025-12-28-ado-artifacts-feed-refactor.md) | 2025-12-28 | Azure DevOps Artifacts Feed module – refactor & alignment | Breaking Change / Maintenance |
+| [046](./046-2025-12-28-ado-repository-refactor.md) | 2025-12-28 | Azure DevOps Repository module – refactor (re-opened alignment) | Breaking Change / Maintenance |
+| [045](./045-2025-12-28-ado-serviceendpoint-refactor.md) | 2025-12-28 | Azure DevOps Service Endpoint module – refactor follow-up | Breaking Change / Maintenance |
+| [044](./044-2025-12-28-ado-environments-refactor.md) | 2025-12-28 | Azure DevOps Environments module refactor (alignment) | Fix / Maintenance |
+| [043](./043-2025-12-28-ado-pipelines-refactor.md) | 2025-12-28 | Azure DevOps Pipelines module - refactor alignment | Breaking Change / Maintenance |
+| [042](./042-2025-12-28-ado-work-items-refactor.md) | 2025-12-28 | Azure DevOps Work Items module – refactor (single work item interface) | Breaking Change / Maintenance |
+| [041](./041-2025-12-28-ado-team-refactor.md) | 2025-12-28 | Azure DevOps Team module - refactor (re-opened alignment) | Breaking Change / Maintenance |
+| [040](./040-2025-12-28-ado-servicehooks-refactor-reopened.md) | 2025-12-28 | Azure DevOps Service Hooks module refactor (reopened) | Breaking Change / Maintenance |
+| [039](./039-2025-12-28-ado-variable-groups-refactor.md) | 2025-12-28 | Azure DevOps Variable Groups module – refactor alignment (re-opened) | Maintenance / Documentation |
+| [038](./038-2025-12-28-ado-extension-refactor.md) | 2025-12-28 | Azure DevOps Extension module – refactor follow-up | Breaking Change / Maintenance |
 | [037](./037-2025-12-28-ado-refactor-tasks-reopened.md) | 2025-12-28 | Azure DevOps refactor tasks - reopened and rules updated | Maintenance / Documentation |
 | [036](./036-2025-12-26-ado-serviceendpoint-refactor.md) | 2025-12-26 | Azure DevOps Service Endpoint module – refactor & alignment | Breaking Change / Maintenance |
 | [035](./035-2025-12-26-azuredevops-servicehooks-refactor.md) | 2025-12-26 | Azure DevOps Service Hooks module – refactor & alignment | Breaking Change / Maintenance |

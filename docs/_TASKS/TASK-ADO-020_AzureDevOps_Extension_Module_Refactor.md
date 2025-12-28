@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Small
 **Dependencies:** TASK-ADO-005
-**Status:** 🟠 **Re-opened**
+**Status:** ✅ **Done** (2025-12-28)
 
 ---
 

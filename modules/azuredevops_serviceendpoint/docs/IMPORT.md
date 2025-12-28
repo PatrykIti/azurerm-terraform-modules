@@ -18,8 +18,7 @@ applies to other endpoint types (`serviceendpoint_*`).
 
 ## 1) Minimal module configuration
 
-Create `main.tf` with the module block and at least one endpoint definition.
-Use a stable `key` that will become the resource address.
+Create `main.tf` with the module block and a single endpoint definition.
 
 ```hcl
 terraform {
@@ -40,15 +39,12 @@ module "azuredevops_serviceendpoint" {
 
   project_id = var.project_id
 
-  serviceendpoint_generic = [
-    {
-      key                   = "generic-import"
-      service_endpoint_name = var.service_endpoint_name
-      server_url            = var.server_url
-      username              = var.username
-      password              = var.password
-    }
-  ]
+  serviceendpoint_generic = {
+    service_endpoint_name = var.service_endpoint_name
+    server_url            = var.server_url
+    username              = var.username
+    password              = var.password
+  }
 }
 ```
 
@@ -56,11 +52,11 @@ module "azuredevops_serviceendpoint" {
 
 ## 2) Add an import block
 
-Create `import.tf` with the import block that matches the endpoint key:
+Create `import.tf` with the import block that matches the endpoint resource address:
 
 ```hcl
 import {
-  to = module.azuredevops_serviceendpoint.azuredevops_serviceendpoint_generic.generic["generic-import"]
+  to = module.azuredevops_serviceendpoint.azuredevops_serviceendpoint_generic.generic[0]
   id = "<service-endpoint-id>"
 }
 ```
@@ -82,7 +78,5 @@ existing endpoint configuration.
 
 ## Notes
 
-- The resource address key is `coalesce(key, service_endpoint_name)` for most
-  endpoint types (generic_v2 uses `name`).
-- Permissions can be imported in the same way once you know the permission
-  resource ID and the permission key used by the module.
+- The module manages a single service endpoint per instance, so the resource address uses index `[0]`.
+- Permissions can be imported with keys matching `coalesce(key, principal)`.

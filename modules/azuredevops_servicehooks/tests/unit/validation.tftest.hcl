@@ -10,15 +10,29 @@ run "invalid_webhook_missing_event" {
   command = plan
 
   variables {
-    webhooks = [
-      {
-        url = "https://example.com/webhook"
-      }
-    ]
+    webhook = {
+      url = "https://example.com/webhook"
+    }
   }
 
   expect_failures = [
-    var.webhooks,
+    var.webhook,
+  ]
+}
+
+run "invalid_webhook_multiple_events" {
+  command = plan
+
+  variables {
+    webhook = {
+      url               = "https://example.com/webhook"
+      git_push          = {}
+      work_item_created = {}
+    }
+  }
+
+  expect_failures = [
+    var.webhook,
   ]
 }
 
@@ -26,17 +40,15 @@ run "invalid_webhook_messages" {
   command = plan
 
   variables {
-    webhooks = [
-      {
-        url              = "https://example.com/webhook"
-        git_push         = {}
-        messages_to_send = "invalid"
-      }
-    ]
+    webhook = {
+      url              = "https://example.com/webhook"
+      git_push         = {}
+      messages_to_send = "invalid"
+    }
   }
 
   expect_failures = [
-    var.webhooks,
+    var.webhook,
   ]
 }
 
@@ -44,17 +56,15 @@ run "invalid_webhook_resource_details" {
   command = plan
 
   variables {
-    webhooks = [
-      {
-        url                      = "https://example.com/webhook"
-        git_push                 = {}
-        resource_details_to_send = "verbose"
-      }
-    ]
+    webhook = {
+      url                      = "https://example.com/webhook"
+      git_push                 = {}
+      resource_details_to_send = "verbose"
+    }
   }
 
   expect_failures = [
-    var.webhooks,
+    var.webhook,
   ]
 }
 
@@ -62,41 +72,32 @@ run "invalid_tfvc_checkin_path" {
   command = plan
 
   variables {
-    webhooks = [
-      {
-        url = "https://example.com/webhook"
-        tfvc_checkin = {
-          path = " "
-        }
+    webhook = {
+      url = "https://example.com/webhook"
+      tfvc_checkin = {
+        path = " "
       }
-    ]
+    }
   }
 
   expect_failures = [
-    var.webhooks,
+    var.webhook,
   ]
 }
 
-run "duplicate_webhook_keys" {
+run "invalid_storage_queue_missing_event" {
   command = plan
 
   variables {
-    webhooks = [
-      {
-        key      = "dup"
-        url      = "https://example.com/webhook-a"
-        git_push = {}
-      },
-      {
-        key      = "dup"
-        url      = "https://example.com/webhook-b"
-        git_push = {}
-      }
-    ]
+    storage_queue_hook = {
+      account_name = "account"
+      account_key  = "key"
+      queue_name   = "queue"
+    }
   }
 
   expect_failures = [
-    var.webhooks,
+    var.storage_queue_hook,
   ]
 }
 
@@ -104,19 +105,17 @@ run "invalid_storage_queue_ttl" {
   command = plan
 
   variables {
-    storage_queue_hooks = [
-      {
-        account_name            = "account"
-        account_key             = "key"
-        queue_name              = "queue"
-        ttl                     = -1
-        run_state_changed_event = {}
-      }
-    ]
+    storage_queue_hook = {
+      account_name            = "account"
+      account_key             = "key"
+      queue_name              = "queue"
+      ttl                     = -1
+      run_state_changed_event = {}
+    }
   }
 
   expect_failures = [
-    var.storage_queue_hooks,
+    var.storage_queue_hook,
   ]
 }
 
@@ -124,44 +123,17 @@ run "invalid_storage_queue_visi_timeout" {
   command = plan
 
   variables {
-    storage_queue_hooks = [
-      {
-        account_name            = "account"
-        account_key             = "key"
-        queue_name              = "queue"
-        visi_timeout            = -5
-        run_state_changed_event = {}
-      }
-    ]
+    storage_queue_hook = {
+      account_name            = "account"
+      account_key             = "key"
+      queue_name              = "queue"
+      visi_timeout            = -5
+      run_state_changed_event = {}
+    }
   }
 
   expect_failures = [
-    var.storage_queue_hooks,
-  ]
-}
-
-run "duplicate_storage_queue_keys" {
-  command = plan
-
-  variables {
-    storage_queue_hooks = [
-      {
-        queue_name              = "queue"
-        account_name            = "account"
-        account_key             = "key"
-        run_state_changed_event = {}
-      },
-      {
-        queue_name              = "queue"
-        account_name            = "account"
-        account_key             = "key"
-        run_state_changed_event = {}
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.storage_queue_hooks,
+    var.storage_queue_hook,
   ]
 }
 

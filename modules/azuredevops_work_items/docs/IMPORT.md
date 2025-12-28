@@ -34,17 +34,12 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_work_items" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_work_items?ref=ADOPv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_work_items?ref=ADOWKv1.0.0"
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  work_items = [
-    {
-      key   = "example-item"
-      title = "Existing Work Item"
-      type  = "Issue"
-    }
-  ]
+  title = "Existing Work Item"
+  type  = "Issue"
 
   query_folders = [
     {
@@ -78,27 +73,18 @@ module "azuredevops_work_items" {
 
 ---
 
-## 2) Import work items
+## 2) Import work item
 
 Create `import.tf`:
 
 ```hcl
 import {
-  to = module.azuredevops_work_items.azuredevops_workitem.work_item["example-item"]
+  to = module.azuredevops_work_items.azuredevops_workitem.work_item
   id = "<work_item_id>"
 }
 ```
 
 Use the **work item ID** from Azure DevOps (numeric ID).
-
-If the work item sets `parent_key`, import it into:
-
-```hcl
-import {
-  to = module.azuredevops_work_items.azuredevops_workitem.work_item_child["example-item"]
-  id = "<work_item_id>"
-}
-```
 
 ---
 
@@ -118,15 +104,6 @@ import {
 
 Use the folder/query IDs as defined by the Azure DevOps provider. Follow the
 provider docs for exact import ID formats.
-
-If a query folder sets `parent_key`, import it into:
-
-```hcl
-import {
-  to = module.azuredevops_work_items.azuredevops_workitemquery_folder.query_folder_child["team"]
-  id = "<query_folder_id>"
-}
-```
 
 ---
 

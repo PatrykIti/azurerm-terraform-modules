@@ -1,10 +1,10 @@
 output "environment_id" {
-  description = "ID of the environment managed by this module."
+  description = "ID of the Azure DevOps environment managed by this module."
   value       = try(azuredevops_environment.environment.id, null)
 }
 
 output "kubernetes_resource_ids" {
-  description = "Map of Kubernetes resource IDs keyed by resource key/name."
+  description = "Map of Kubernetes resource IDs keyed by resource key or name."
   value = try({
     for key, resource in azuredevops_environment_resource_kubernetes.kubernetes_resource :
     key => resource.id
@@ -12,7 +12,7 @@ output "kubernetes_resource_ids" {
 }
 
 output "check_ids" {
-  description = "Map of check IDs grouped by check type and keyed by check key."
+  description = "Map of check IDs grouped by check type and keyed by check key or display_name."
   value = {
     approvals = try({
       for key, check in azuredevops_check_approval.check_approval :

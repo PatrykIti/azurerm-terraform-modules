@@ -35,11 +35,11 @@ func TestBasicAzuredevopsIdentity(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		groupIDs := terraform.OutputMap(t, terraformOptions, "group_ids")
-		groupDescriptors := terraform.OutputMap(t, terraformOptions, "group_descriptors")
+		groupID := terraform.Output(t, terraformOptions, "group_id")
+		groupDescriptor := terraform.Output(t, terraformOptions, "group_descriptor")
 
-		assert.NotEmpty(t, groupIDs)
-		assert.NotEmpty(t, groupDescriptors)
+		assert.NotEmpty(t, groupID)
+		assert.NotEmpty(t, groupDescriptor)
 	})
 }
 
@@ -62,10 +62,10 @@ func TestCompleteAzuredevopsIdentity(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		groupIDs := terraform.OutputMap(t, terraformOptions, "group_ids")
+		groupID := terraform.Output(t, terraformOptions, "group_id")
 		groupMemberships := terraform.OutputMap(t, terraformOptions, "group_membership_ids")
 
-		assert.GreaterOrEqual(t, len(groupIDs), 2)
+		assert.NotEmpty(t, groupID)
 		assert.NotEmpty(t, groupMemberships)
 		assert.Contains(t, groupMemberships, "platform-membership")
 
@@ -95,10 +95,10 @@ func TestSecureAzuredevopsIdentity(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		groupIDs := terraform.OutputMap(t, terraformOptions, "group_ids")
+		groupID := terraform.Output(t, terraformOptions, "group_id")
 		groupMemberships := terraform.OutputMap(t, terraformOptions, "group_membership_ids")
 
-		assert.GreaterOrEqual(t, len(groupIDs), 2)
+		assert.NotEmpty(t, groupID)
 		assert.NotEmpty(t, groupMemberships)
 		assert.Contains(t, groupMemberships, "security-membership")
 	})
@@ -114,7 +114,7 @@ func TestAzuredevopsIdentityValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "group_descriptor or group_key")
+	assert.Contains(t, err.Error(), "group_memberships.group_descriptor is required")
 }
 
 // Helper function to get terraform options

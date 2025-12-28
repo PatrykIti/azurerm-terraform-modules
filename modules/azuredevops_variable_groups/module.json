@@ -3,5 +3,5 @@
   "title": "Azure DevOps Variable Groups",
   "commit_scope": "azuredevops-variable-groups",
   "tag_prefix": "ADOVG",
-  "description": "Azure DevOps variable groups module for managing variables and library permissions"
+  "description": "Azure DevOps variable groups module for managing variables, permissions, and optional Key Vault integration"
 }

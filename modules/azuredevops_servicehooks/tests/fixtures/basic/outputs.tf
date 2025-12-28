@@ -1,4 +1,4 @@
-output "servicehook_ids" {
-  description = "Service hook IDs created in this fixture."
-  value       = module.azuredevops_servicehooks.servicehook_ids
+output "webhook_id" {
+  description = "Webhook ID created in this fixture."
+  value       = module.azuredevops_servicehooks.webhook_id
 }

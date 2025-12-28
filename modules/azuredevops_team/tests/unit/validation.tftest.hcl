@@ -1,25 +1,38 @@
 # Test variable validation for Azure DevOps Team
 
-mock_provider "azuredevops" {}
+mock_provider "azuredevops" {
+  mock_resource "azuredevops_team" {
+    defaults = {
+      id         = "00000000-0000-0000-0000-000000000000"
+      descriptor = "vssgp.Uy0xLTktMTIzNDU2Nzg5MA"
+    }
+    override_during = plan
+  }
+}
 
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
-
-  teams = {
-    valid = {
-      name = "Valid Team"
-    }
-  }
+  name       = "Core Team"
 }
 
-run "invalid_team_member_selector" {
+run "invalid_team_name" {
+  command = plan
+
+  variables {
+    name = " "
+  }
+
+  expect_failures = [
+    var.name,
+  ]
+}
+
+run "missing_team_member_key" {
   command = plan
 
   variables {
     team_members = [
       {
-        team_id            = "00000000-0000-0000-0000-000000000000"
-        team_key           = "valid"
         member_descriptors = ["vssgp.member"]
       }
     ]
@@ -30,48 +43,14 @@ run "invalid_team_member_selector" {
   ]
 }
 
-run "missing_team_member_descriptors" {
+run "empty_team_member_team_id" {
   command = plan
 
   variables {
     team_members = [
       {
-        team_key           = "valid"
-        member_descriptors = []
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.team_members,
-  ]
-}
-
-run "invalid_team_member_mode" {
-  command = plan
-
-  variables {
-    team_members = [
-      {
-        team_key           = "valid"
-        member_descriptors = ["vssgp.member"]
-        mode               = "replace"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.team_members,
-  ]
-}
-
-run "unknown_team_member_key" {
-  command = plan
-
-  variables {
-    team_members = [
-      {
-        team_key           = "missing"
+        key                = "members"
+        team_id            = " "
         member_descriptors = ["vssgp.member"]
       }
     ]
@@ -89,13 +68,29 @@ run "duplicate_team_member_keys" {
     team_members = [
       {
         key                = "duplicate"
-        team_key           = "valid"
         member_descriptors = ["vssgp.member"]
       },
       {
         key                = "duplicate"
-        team_key           = "valid"
         member_descriptors = ["vssgp.other"]
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.team_members,
+  ]
+}
+
+run "invalid_team_member_mode" {
+  command = plan
+
+  variables {
+    team_members = [
+      {
+        key                = "members"
+        member_descriptors = ["vssgp.member"]
+        mode               = "replace"
       }
     ]
   }
@@ -109,35 +104,44 @@ run "team_member_mode_default" {
   command = plan
 
   variables {
-    teams = {
-      core = {
-        name = "Core Team"
-      }
-    }
-
     team_members = [
       {
-        key                = "core-members"
-        team_key           = "core"
+        key                = "members"
         member_descriptors = ["vssgp.member"]
       }
     ]
   }
 
   assert {
-    condition     = azuredevops_team_members.team_members["core-members"].mode == "add"
+    condition     = azuredevops_team_members.team_members["members"].mode == "add"
     error_message = "team_members.mode should default to add."
   }
 }
 
-run "invalid_team_admin_selector" {
+run "team_member_team_id_default" {
+  command = plan
+
+  variables {
+    team_members = [
+      {
+        key                = "members"
+        member_descriptors = ["vssgp.member"]
+      }
+    ]
+  }
+
+  assert {
+    condition     = azuredevops_team_members.team_members["members"].team_id == azuredevops_team.team.id
+    error_message = "team_members.team_id should default to the module team ID."
+  }
+}
+
+run "missing_team_admin_key" {
   command = plan
 
   variables {
     team_administrators = [
       {
-        team_id           = "00000000-0000-0000-0000-000000000000"
-        team_key          = "valid"
         admin_descriptors = ["vssgp.admin"]
       }
     ]
@@ -148,13 +152,14 @@ run "invalid_team_admin_selector" {
   ]
 }
 
-run "unknown_team_admin_key" {
+run "empty_team_admin_team_id" {
   command = plan
 
   variables {
     team_administrators = [
       {
-        team_key          = "missing"
+        key               = "admins"
+        team_id           = " "
         admin_descriptors = ["vssgp.admin"]
       }
     ]
@@ -172,12 +177,10 @@ run "duplicate_team_admin_keys" {
     team_administrators = [
       {
         key               = "duplicate-admin"
-        team_key          = "valid"
         admin_descriptors = ["vssgp.admin"]
       },
       {
         key               = "duplicate-admin"
-        team_key          = "valid"
         admin_descriptors = ["vssgp.admin2"]
       }
     ]
@@ -188,18 +191,38 @@ run "duplicate_team_admin_keys" {
   ]
 }
 
-run "invalid_team_name" {
+run "invalid_team_admin_mode" {
   command = plan
 
   variables {
-    teams = {
-      " " = {
-        name = " "
+    team_administrators = [
+      {
+        key               = "admins"
+        admin_descriptors = ["vssgp.admin"]
+        mode              = "replace"
       }
-    }
+    ]
   }
 
   expect_failures = [
-    var.teams,
+    var.team_administrators,
   ]
+}
+
+run "team_admin_mode_default" {
+  command = plan
+
+  variables {
+    team_administrators = [
+      {
+        key               = "admins"
+        admin_descriptors = ["vssgp.admin"]
+      }
+    ]
+  }
+
+  assert {
+    condition     = azuredevops_team_administrators.team_administrators["admins"].mode == "add"
+    error_message = "team_administrators.mode should default to add."
+  }
 }

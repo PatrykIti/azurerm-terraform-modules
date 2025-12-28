@@ -1,22 +1,12 @@
-# Secure Azure DevOps Identity Example
+# Secure Azure DevOps Identity Fixture
 
-This fixture demonstrates security-focused identity configuration for tests.
+This fixture demonstrates a security-focused identity configuration with explicit memberships.
 
 ## Features
 
-- Creates restricted groups
-- Applies explicit group membership with overwrite mode
-
-## Key Configuration
-
-Use this fixture to validate overwrite membership behavior.
-
-## Security Considerations
-
-- All public access is disabled by default
-- Network access is restricted to specific IP ranges
-- All data is encrypted at rest and in transit
-- Audit logging captures all access and modifications
+- Creates a module-managed Azure DevOps group
+- Creates a secondary group used as a membership source
+- Adds membership with overwrite mode
 
 ## Usage
 

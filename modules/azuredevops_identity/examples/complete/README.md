@@ -1,13 +1,14 @@
 # Complete Azure DevOps Identity Example
 
-This example demonstrates groups, memberships, and optional entitlements.
+This example demonstrates a group, memberships, and optional entitlements.
 
 ## Features
 
-- Creates multiple Azure DevOps groups
-- Adds group-to-group memberships
+- Creates a primary Azure DevOps group managed by the module
+- Creates a secondary group used as a membership source
+- Adds group-to-group membership with a stable key
 - Supports optional entitlements for users, groups, and service principals
-- Includes an optional security role assignment example with a stable key
+- Includes an optional security role assignment example
 
 ## Key Configuration
 

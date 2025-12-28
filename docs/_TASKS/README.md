@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 12 tasks
+- **To Do:** 11 tasks
 - **In Progress:** 0
-- **Done:** 24 tasks
+- **Done:** 25 tasks
 
 ---
 
@@ -15,7 +15,6 @@ Task board for module work. Update statuses in markdown files.
 |----|-------|----------|--------|-------|
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
 | [TASK-ADO-017](./TASK-ADO-017_AzureDevOps_Environments_Module_Refactor.md) | **Azure DevOps Environments module refactor** | High | Medium | Re-opened; `modules/azuredevops_environments/` |
-| [TASK-ADO-018](./TASK-ADO-018_AzureDevOps_Identity_Module_Refactor.md) | **Azure DevOps Identity module refactor** | High | Medium | Re-opened; `modules/azuredevops_identity/` |
 | [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_artifacts_feed/` |
 | [TASK-ADO-020](./TASK-ADO-020_AzureDevOps_Extension_Module_Refactor.md) | **Azure DevOps Extension module refactor** | Medium | Small | Re-opened; `modules/azuredevops_extension/` |
 | [TASK-ADO-021](./TASK-ADO-021_AzureDevOps_Pipelines_Module_Refactor.md) | **Azure DevOps Pipelines module refactor** | High | Medium | Re-opened; `modules/azuredevops_pipelines/` |
@@ -59,6 +58,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-014](./TASK-ADO-014_AzureDevOps_Work_Items_Module.md) | **Azure DevOps Work Items module** | Medium | Large | `modules/azuredevops_work_items/` |
 | [TASK-ADO-015](./TASK-ADO-015_AzureDevOps_Agent_Pools_Module_Refactor.md) | **Azure DevOps Agent Pools module refactor** | High | Medium | `modules/azuredevops_agent_pools/` |
 | [TASK-ADO-016](./TASK-ADO-016_AzureDevOps_Project_Permissions_Verification.md) | **Azure DevOps Project Permissions module – verification & alignment** | Medium | Small | `modules/azuredevops_project_permissions/` |
+| [TASK-ADO-018](./TASK-ADO-018_AzureDevOps_Identity_Module_Refactor.md) | **Azure DevOps Identity module refactor** | High | Medium | Re-opened; `modules/azuredevops_identity/` |
 | [TASK-006](./TASK-006_NSG_Observability_and_Documentation.md) | **NSG observability + docs alignment (diagnostic settings)** | High | Large | `modules/azurerm_network_security_group/` + repo docs |
 | [TASK-007](./TASK-007_Route_Table_Module_Alignment.md) | **Route Table module – alignment z guide (docs, examples, tests)** | High | Medium | `modules/azurerm_route_table/` |
 | [TASK-008](./TASK-008_Storage_Account_Module_Alignment.md) | **Storage Account module – alignment z guide (docs, examples, tests)** | High | Large | `modules/azurerm_storage_account/` |

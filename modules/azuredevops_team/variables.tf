@@ -3,7 +3,7 @@
 # -----------------------------------------------------------------------------
 
 variable "project_id" {
-  description = "Azure DevOps project ID where teams will be created."
+  description = "Azure DevOps project ID where the team will be created."
   type        = string
 
   validation {
@@ -13,25 +13,27 @@ variable "project_id" {
 }
 
 # -----------------------------------------------------------------------------
-# Teams
+# Team
 # -----------------------------------------------------------------------------
 
-variable "teams" {
-  description = "Map of Azure DevOps teams to manage."
-  type = map(object({
-    name        = optional(string)
-    description = optional(string)
-  }))
-  default = {}
+variable "name" {
+  description = "Name of the Azure DevOps team."
+  type        = string
 
   validation {
-    condition = alltrue([
-      for team_key, team in var.teams : (
-        length(trimspace(team_key)) > 0 &&
-        (team.name == null || length(trimspace(team.name)) > 0)
-      )
-    ])
-    error_message = "teams map keys and team.name must be non-empty strings when provided."
+    condition     = length(trimspace(var.name)) > 0
+    error_message = "name must be a non-empty string."
+  }
+}
+
+variable "description" {
+  description = "Description of the Azure DevOps team."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.description == null || length(trimspace(var.description)) > 0
+    error_message = "description must be a non-empty string when provided."
   }
 }
 
@@ -44,7 +46,6 @@ variable "team_members" {
   type = list(object({
     key                = optional(string)
     team_id            = optional(string)
-    team_key           = optional(string)
     member_descriptors = list(string)
     mode               = optional(string, "add")
   }))
@@ -53,28 +54,10 @@ variable "team_members" {
   validation {
     condition = alltrue([
       for membership in var.team_members : (
-        (membership.team_id != null) != (membership.team_key != null)
-      )
-    ])
-    error_message = "Each team_members entry must set exactly one of team_id or team_key."
-  }
-
-  validation {
-    condition = alltrue([
-      for membership in var.team_members : (
         membership.team_id == null || length(trimspace(membership.team_id)) > 0
       )
     ])
     error_message = "team_members.team_id must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for membership in var.team_members : (
-        membership.team_key == null || length(trimspace(membership.team_key)) > 0
-      )
-    ])
-    error_message = "team_members.team_key must be a non-empty string when provided."
   }
 
   validation {
@@ -89,10 +72,10 @@ variable "team_members" {
   validation {
     condition = alltrue([
       for membership in var.team_members : (
-        membership.team_key == null || contains(keys(var.teams), membership.team_key)
+        membership.team_id != null || membership.key != null
       )
     ])
-    error_message = "team_members.team_key must reference a key defined in teams."
+    error_message = "team_members entries must set key when team_id is not provided."
   }
 
   validation {
@@ -116,9 +99,9 @@ variable "team_members" {
 
   validation {
     condition = length(var.team_members) == length(distinct([
-      for membership in var.team_members : try(coalesce(membership.key, membership.team_id, membership.team_key), "")
+      for membership in var.team_members : try(coalesce(membership.key, membership.team_id), "")
     ]))
-    error_message = "team_members entries must be unique by key, team_id, or team_key."
+    error_message = "team_members entries must be unique by key or team_id."
   }
 }
 
@@ -131,7 +114,6 @@ variable "team_administrators" {
   type = list(object({
     key               = optional(string)
     team_id           = optional(string)
-    team_key          = optional(string)
     admin_descriptors = list(string)
     mode              = optional(string, "add")
   }))
@@ -140,28 +122,10 @@ variable "team_administrators" {
   validation {
     condition = alltrue([
       for admin in var.team_administrators : (
-        (admin.team_id != null) != (admin.team_key != null)
-      )
-    ])
-    error_message = "Each team_administrators entry must set exactly one of team_id or team_key."
-  }
-
-  validation {
-    condition = alltrue([
-      for admin in var.team_administrators : (
         admin.team_id == null || length(trimspace(admin.team_id)) > 0
       )
     ])
     error_message = "team_administrators.team_id must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for admin in var.team_administrators : (
-        admin.team_key == null || length(trimspace(admin.team_key)) > 0
-      )
-    ])
-    error_message = "team_administrators.team_key must be a non-empty string when provided."
   }
 
   validation {
@@ -176,10 +140,10 @@ variable "team_administrators" {
   validation {
     condition = alltrue([
       for admin in var.team_administrators : (
-        admin.team_key == null || contains(keys(var.teams), admin.team_key)
+        admin.team_id != null || admin.key != null
       )
     ])
-    error_message = "team_administrators.team_key must reference a key defined in teams."
+    error_message = "team_administrators entries must set key when team_id is not provided."
   }
 
   validation {
@@ -203,8 +167,8 @@ variable "team_administrators" {
 
   validation {
     condition = length(var.team_administrators) == length(distinct([
-      for admin in var.team_administrators : try(coalesce(admin.key, admin.team_id, admin.team_key), "")
+      for admin in var.team_administrators : try(coalesce(admin.key, admin.team_id), "")
     ]))
-    error_message = "team_administrators entries must be unique by key, team_id, or team_key."
+    error_message = "team_administrators entries must be unique by key or team_id."
   }
 }

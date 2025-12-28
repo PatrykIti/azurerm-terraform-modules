@@ -3,5 +3,5 @@
   "title": "Azure DevOps Team",
   "commit_scope": "azuredevops-team",
   "tag_prefix": "ADOT",
-  "description": "Azure DevOps team module for managing teams, members, and administrators"
+  "description": "Azure DevOps team module for managing a team, members, and administrators"
 }

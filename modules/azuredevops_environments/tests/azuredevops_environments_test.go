@@ -58,9 +58,13 @@ func TestCompleteAzuredevopsEnvironments(t *testing.T) {
 
 		environmentID := terraform.Output(t, terraformOptions, "environment_id")
 		kubernetesResourceIDs := terraform.OutputMap(t, terraformOptions, "kubernetes_resource_ids")
+		approvalCheckIDs := terraform.OutputMap(t, terraformOptions, "approval_check_ids")
 
 		assert.NotEmpty(t, environmentID)
 		assert.NotEmpty(t, kubernetesResourceIDs)
+		assert.NotEmpty(t, approvalCheckIDs)
+		assert.Contains(t, approvalCheckIDs, "integration-approval")
+		assert.NotEmpty(t, approvalCheckIDs["integration-approval"])
 	})
 }
 

@@ -28,16 +28,12 @@ This document describes security considerations for managing Azure DevOps identi
 module "azuredevops_identity" {
   source = "./modules/azuredevops_identity"
 
-  groups = {
-    platform = {
-      display_name = "ADO Platform Team"
-      description  = "Platform engineering group"
-    }
-  }
+  group_display_name = "ADO Platform Team"
+  group_description  = "Platform engineering group"
 
   group_memberships = [
     {
-      group_key          = "platform"
+      key                = "platform-membership"
       member_descriptors = ["vssgp.Uy0xLTktMTIzNDU2Nzg5MA"]
       mode               = "add"
     }
@@ -45,9 +41,9 @@ module "azuredevops_identity" {
 
   user_entitlements = [
     {
-      principal_name      = "user@example.com"
+      principal_name       = "user@example.com"
       account_license_type = "basic"
-      licensing_source    = "account"
+      licensing_source     = "account"
     }
   ]
 }
@@ -76,5 +72,5 @@ module "azuredevops_identity" {
 ---
 
 **Module Version**: 1.0.0  
-**Last Updated**: 2025-12-23  
+**Last Updated**: 2025-12-28  
 **Security Contact**: security@yourorganization.com

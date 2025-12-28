@@ -14,20 +14,15 @@ module "azuredevops_repository" {
   source = "../../../"
 
   project_id = var.project_id
+  name       = "${var.repo_name_prefix}-basic"
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-basic"
-      initialization = {
-        init_type = "Clean"
-      }
-    }
+  initialization = {
+    init_type = "Clean"
   }
 
   files = [
     {
       key                 = "readme"
-      repository_key      = "main"
       file                = "README.md"
       content             = "# Repository\n\nManaged by Terraform."
       commit_message      = "Add README"

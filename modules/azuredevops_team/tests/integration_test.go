@@ -30,12 +30,15 @@ func TestAzuredevopsTeamFullIntegration(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		teamIDs := terraform.OutputMap(t, terraformOptions, "team_ids")
 		teamMemberIDs := terraform.OutputMap(t, terraformOptions, "team_member_ids")
+		teamAdministratorIDs := terraform.OutputMap(t, terraformOptions, "team_administrator_ids")
+		teamID := terraform.Output(t, terraformOptions, "team_id")
 
-		assert.NotEmpty(t, teamIDs)
+		assert.NotEmpty(t, teamID)
 		assert.NotEmpty(t, teamMemberIDs)
-		_, ok := teamMemberIDs["platform-members"]
+		_, ok := teamMemberIDs["team-members"]
+		assert.True(t, ok)
+		_, ok = teamAdministratorIDs["team-admins"]
 		assert.True(t, ok)
 	})
 }

@@ -30,8 +30,8 @@ func TestAzuredevopsArtifactsFeedFullIntegration(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		feedIDs := terraform.OutputMap(t, terraformOptions, "feed_ids")
+		feedID := terraform.Output(t, terraformOptions, "feed_id")
 
-		assert.NotEmpty(t, feedIDs)
+		assert.NotEmpty(t, feedID)
 	})
 }

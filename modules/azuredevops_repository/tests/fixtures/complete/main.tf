@@ -14,29 +14,22 @@ module "azuredevops_repository" {
   source = "../../../"
 
   project_id = var.project_id
+  name       = "${var.repo_name_prefix}-complete"
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-complete"
-      initialization = {
-        init_type = "Clean"
-      }
-    }
+  initialization = {
+    init_type = "Clean"
   }
 
   branches = [
     {
-      key            = "develop"
-      repository_key = "main"
-      name           = "develop"
-      ref_branch     = "refs/heads/master"
+      key  = "develop"
+      name = "develop"
     }
   ]
 
   files = [
     {
       key                 = "readme"
-      repository_key      = "main"
       file                = "README.md"
       content             = "# Repository\n\nManaged by Terraform."
       commit_message      = "Add README"
@@ -46,13 +39,11 @@ module "azuredevops_repository" {
 
   branch_policy_min_reviewers = [
     {
-      key            = "min-reviewers-main"
+      key            = "min-reviewers"
       reviewer_count = 1
       scope = [
         {
-          repository_key = "main"
-          match_type     = "Exact"
-          repository_ref = "refs/heads/master"
+          match_type = "DefaultBranch"
         }
       ]
     }
@@ -60,8 +51,7 @@ module "azuredevops_repository" {
 
   repository_policy_reserved_names = [
     {
-      key             = "reserved-names-main"
-      repository_keys = ["main"]
+      key = "reserved-names"
     }
   ]
 }

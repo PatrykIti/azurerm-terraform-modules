@@ -31,11 +31,11 @@ func TestBasicAzuredevopsTeam(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		teamIDs := terraform.OutputMap(t, terraformOptions, "team_ids")
-		teamDescriptors := terraform.OutputMap(t, terraformOptions, "team_descriptors")
+		teamID := terraform.Output(t, terraformOptions, "team_id")
+		teamDescriptor := terraform.Output(t, terraformOptions, "team_descriptor")
 
-		assert.NotEmpty(t, teamIDs)
-		assert.NotEmpty(t, teamDescriptors)
+		assert.NotEmpty(t, teamID)
+		assert.NotEmpty(t, teamDescriptor)
 	})
 }
 
@@ -58,12 +58,15 @@ func TestCompleteAzuredevopsTeam(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		teamIDs := terraform.OutputMap(t, terraformOptions, "team_ids")
 		teamMemberIDs := terraform.OutputMap(t, terraformOptions, "team_member_ids")
+		teamAdministratorIDs := terraform.OutputMap(t, terraformOptions, "team_administrator_ids")
+		teamID := terraform.Output(t, terraformOptions, "team_id")
 
-		assert.GreaterOrEqual(t, len(teamIDs), 2)
+		assert.NotEmpty(t, teamID)
 		assert.NotEmpty(t, teamMemberIDs)
-		_, ok := teamMemberIDs["platform-members"]
+		_, ok := teamMemberIDs["team-members"]
+		assert.True(t, ok)
+		_, ok = teamAdministratorIDs["team-admins"]
 		assert.True(t, ok)
 	})
 }
@@ -87,10 +90,10 @@ func TestSecureAzuredevopsTeam(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		teamIDs := terraform.OutputMap(t, terraformOptions, "team_ids")
 		adminIDs := terraform.OutputMap(t, terraformOptions, "team_administrator_ids")
+		teamID := terraform.Output(t, terraformOptions, "team_id")
 
-		assert.NotEmpty(t, teamIDs)
+		assert.NotEmpty(t, teamID)
 		assert.NotEmpty(t, adminIDs)
 		_, ok := adminIDs["security-admins"]
 		assert.True(t, ok)
@@ -107,7 +110,7 @@ func TestAzuredevopsTeamValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "team_id or team_key")
+	assert.Contains(t, err.Error(), "team_members entries must set key when team_id is not provided")
 }
 
 // Helper function to get terraform options
@@ -119,8 +122,8 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
-			"project_id":       getProjectID(t),
-			"team_name_prefix": fmt.Sprintf("ado-team-%s", uniqueID),
+			"project_id":    getProjectID(t),
+			"random_suffix": fmt.Sprintf("ado-%s", uniqueID),
 		},
 		NoColor: true,
 		RetryableTerraformErrors: map[string]string{

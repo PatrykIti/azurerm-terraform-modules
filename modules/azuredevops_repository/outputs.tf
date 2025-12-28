@@ -1,33 +1,43 @@
-output "repository_ids" {
-  description = "Map of repository IDs keyed by repository key."
-  value       = { for key, repo in azuredevops_git_repository.repo : key => repo.id }
+output "repository_id" {
+  description = "The ID of the repository managed by this module."
+  value       = try(azuredevops_git_repository.git_repository[0].id, null)
 }
 
-output "repository_urls" {
-  description = "Map of repository web URLs keyed by repository key."
-  value       = { for key, repo in azuredevops_git_repository.repo : key => repo.web_url }
+output "repository_url" {
+  description = "The web URL of the repository managed by this module."
+  value       = try(azuredevops_git_repository.git_repository[0].web_url, null)
 }
 
 output "branch_ids" {
   description = "Map of branch IDs keyed by branch key."
-  value       = { for key, branch in azuredevops_git_repository_branch.branch : key => branch.id }
+  value       = try({ for key, branch in azuredevops_git_repository_branch.git_repository_branch : key => branch.id }, {})
+}
+
+output "file_ids" {
+  description = "Map of file IDs keyed by file key."
+  value       = try({ for key, file in azuredevops_git_repository_file.git_repository_file : key => file.id }, {})
+}
+
+output "permission_ids" {
+  description = "Map of permission IDs keyed by permission key."
+  value       = try({ for key, permission in azuredevops_git_permissions.git_permissions : key => permission.id }, {})
 }
 
 output "policy_ids" {
   description = "Map of policy IDs grouped by policy type and keyed by policy key."
   value = {
-    branch_auto_reviewers     = { for key, policy in azuredevops_branch_policy_auto_reviewers.policy : key => policy.id }
-    branch_build_validation   = { for key, policy in azuredevops_branch_policy_build_validation.policy : key => policy.id }
-    branch_comment_resolution = { for key, policy in azuredevops_branch_policy_comment_resolution.policy : key => policy.id }
-    branch_merge_types        = { for key, policy in azuredevops_branch_policy_merge_types.policy : key => policy.id }
-    branch_min_reviewers      = { for key, policy in azuredevops_branch_policy_min_reviewers.policy : key => policy.id }
-    branch_status_check       = { for key, policy in azuredevops_branch_policy_status_check.policy : key => policy.id }
-    branch_work_item_linking  = { for key, policy in azuredevops_branch_policy_work_item_linking.policy : key => policy.id }
-    repo_author_email_pattern = { for key, policy in azuredevops_repository_policy_author_email_pattern.policy : key => policy.id }
-    repo_case_enforcement     = { for key, policy in azuredevops_repository_policy_case_enforcement.policy : key => policy.id }
-    repo_file_path_pattern    = { for key, policy in azuredevops_repository_policy_file_path_pattern.policy : key => policy.id }
-    repo_max_file_size        = { for key, policy in azuredevops_repository_policy_max_file_size.policy : key => policy.id }
-    repo_max_path_length      = { for key, policy in azuredevops_repository_policy_max_path_length.policy : key => policy.id }
-    repo_reserved_names       = { for key, policy in azuredevops_repository_policy_reserved_names.policy : key => policy.id }
+    branch_auto_reviewers     = try({ for key, policy in azuredevops_branch_policy_auto_reviewers.branch_policy_auto_reviewers : key => policy.id }, {})
+    branch_build_validation   = try({ for key, policy in azuredevops_branch_policy_build_validation.branch_policy_build_validation : key => policy.id }, {})
+    branch_comment_resolution = try({ for key, policy in azuredevops_branch_policy_comment_resolution.branch_policy_comment_resolution : key => policy.id }, {})
+    branch_merge_types        = try({ for key, policy in azuredevops_branch_policy_merge_types.branch_policy_merge_types : key => policy.id }, {})
+    branch_min_reviewers      = try({ for key, policy in azuredevops_branch_policy_min_reviewers.branch_policy_min_reviewers : key => policy.id }, {})
+    branch_status_check       = try({ for key, policy in azuredevops_branch_policy_status_check.branch_policy_status_check : key => policy.id }, {})
+    branch_work_item_linking  = try({ for key, policy in azuredevops_branch_policy_work_item_linking.branch_policy_work_item_linking : key => policy.id }, {})
+    repo_author_email_pattern = try({ for key, policy in azuredevops_repository_policy_author_email_pattern.repository_policy_author_email_pattern : key => policy.id }, {})
+    repo_case_enforcement     = try({ for key, policy in azuredevops_repository_policy_case_enforcement.repository_policy_case_enforcement : key => policy.id }, {})
+    repo_file_path_pattern    = try({ for key, policy in azuredevops_repository_policy_file_path_pattern.repository_policy_file_path_pattern : key => policy.id }, {})
+    repo_max_file_size        = try({ for key, policy in azuredevops_repository_policy_max_file_size.repository_policy_max_file_size : key => policy.id }, {})
+    repo_max_path_length      = try({ for key, policy in azuredevops_repository_policy_max_path_length.repository_policy_max_path_length : key => policy.id }, {})
+    repo_reserved_names       = try({ for key, policy in azuredevops_repository_policy_reserved_names.repository_policy_reserved_names : key => policy.id }, {})
   }
 }

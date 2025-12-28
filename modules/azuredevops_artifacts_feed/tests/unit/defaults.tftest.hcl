@@ -7,7 +7,7 @@ run "defaults_plan" {
 
   assert {
     condition     = length(azuredevops_feed.feed) == 0
-    error_message = "No feeds should be created by default."
+    error_message = "No feed should be created when name/project_id are unset."
   }
 
   assert {

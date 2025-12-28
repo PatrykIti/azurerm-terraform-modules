@@ -36,7 +36,7 @@ module "azuredevops_environments" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_environments?ref=ADORv1.0.0"
 
   project_id  = "00000000-0000-0000-0000-000000000000"
-  name        = "existing-environment-name"
+  name        = "ado-env-import-example"
   description = "Existing environment managed by Terraform"
 }
 ```
@@ -60,7 +60,29 @@ import {
 
 ---
 
-## 3) Run the import
+## 3) (Optional) Import Kubernetes resources and checks
+
+When importing child resources, use the same keys you configured in
+`kubernetes_resources` and the `check_*` lists.
+
+```hcl
+import {
+  to = module.azuredevops_environments.azuredevops_environment_resource_kubernetes.kubernetes_resource["ado-env-import-k8s"]
+  id = "<project_id>/<environment_id>/<kubernetes_resource_id>"
+}
+
+import {
+  to = module.azuredevops_environments.azuredevops_check_approval.check_approval["prod-approval"]
+  id = "<project_id>/<check_id>"
+}
+```
+
+> Note: Check resources use provider-specific composite IDs. Refer to the
+> Azure DevOps provider docs for the exact import format.
+
+---
+
+## 4) Run the import
 
 ```bash
 terraform init
@@ -74,7 +96,7 @@ Expected output:
 
 ---
 
-## 4) Verify and clean up
+## 5) Verify and clean up
 
 ```bash
 terraform plan

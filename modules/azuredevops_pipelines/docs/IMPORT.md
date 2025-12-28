@@ -37,23 +37,20 @@ module "azuredevops_pipelines" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
+  name = "existing-build-definition-name"
+
+  repository = {
+    repo_type = "TfsGit"
+    repo_id   = "00000000-0000-0000-0000-000000000000"
+    yml_path  = "azure-pipelines.yml"
+  }
+
   build_folders = [
     {
       key  = "pipelines"
       path = "\\Pipelines"
     }
   ]
-
-  build_definitions = {
-    app = {
-      name = "existing-build-definition-name"
-      repository = {
-        repo_type = "TfsGit"
-        repo_id   = "00000000-0000-0000-0000-000000000000"
-        yml_path  = "azure-pipelines.yml"
-      }
-    }
-  }
 }
 ```
 
@@ -65,7 +62,7 @@ Create `import.tf`:
 
 ```hcl
 import {
-  to = module.azuredevops_pipelines.azuredevops_build_definition.build_definition["app"]
+  to = module.azuredevops_pipelines.azuredevops_build_definition.build_definition
   id = "<build_definition_id>"
 }
 ```
@@ -97,7 +94,8 @@ documentation for `azuredevops_build_folder`.
 If you manage `build_definition_permissions`, `build_folder_permissions`,
 `pipeline_authorizations`, or legacy `resource_authorizations` (mapped to
 `azuredevops_pipeline_authorization`), set a stable `key` for each item so the
-import address remains consistent:
+import address remains consistent (default keys are derived from principal or
+`type:resource_id` pairs):
 
 ```hcl
 import {

@@ -15,11 +15,8 @@ module "azuredevops_servicehooks" {
 
   project_id = var.project_id
 
-  webhooks = [
-    {
-      key      = "network-webhook"
-      url      = var.webhook_url
-      git_push = {}
-    }
-  ]
+  webhook = {
+    url      = var.webhook_url
+    git_push = {}
+  }
 }

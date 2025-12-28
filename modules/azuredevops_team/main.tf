@@ -1,13 +1,10 @@
 # Azure DevOps Team
 
 locals {
-  team_ids         = { for key, team in azuredevops_team.team : key => team.id }
-  team_descriptors = { for key, team in azuredevops_team.team : key => team.descriptor }
-
   team_members_by_key = {
     for membership in var.team_members :
-    coalesce(membership.key, membership.team_id, membership.team_key) => {
-      team_id            = membership.team_id != null ? membership.team_id : local.team_ids[membership.team_key]
+    coalesce(membership.key, membership.team_id) => {
+      team_id            = coalesce(membership.team_id, azuredevops_team.team.id)
       member_descriptors = distinct(membership.member_descriptors)
       mode               = coalesce(membership.mode, "add")
     }
@@ -15,8 +12,8 @@ locals {
 
   team_administrators_by_key = {
     for admin in var.team_administrators :
-    coalesce(admin.key, admin.team_id, admin.team_key) => {
-      team_id           = admin.team_id != null ? admin.team_id : local.team_ids[admin.team_key]
+    coalesce(admin.key, admin.team_id) => {
+      team_id           = coalesce(admin.team_id, azuredevops_team.team.id)
       admin_descriptors = distinct(admin.admin_descriptors)
       mode              = coalesce(admin.mode, "add")
     }
@@ -24,20 +21,25 @@ locals {
 }
 
 resource "azuredevops_team" "team" {
-  for_each = var.teams
-
   project_id  = var.project_id
-  name        = coalesce(each.value.name, each.key)
-  description = each.value.description
+  name        = var.name
+  description = var.description
 }
 
 resource "azuredevops_team_members" "team_members" {
   for_each = local.team_members_by_key
 
   project_id = var.project_id
-  team_id = each.value.team_id
-  members = each.value.member_descriptors
-  mode    = each.value.mode
+  team_id    = each.value.team_id
+  members    = each.value.member_descriptors
+  mode       = each.value.mode
+
+  lifecycle {
+    precondition {
+      condition     = length(local.team_members_by_key) == length(var.team_members)
+      error_message = "team_members entries must be unique by key or team_id."
+    }
+  }
 }
 
 resource "azuredevops_team_administrators" "team_administrators" {
@@ -47,4 +49,11 @@ resource "azuredevops_team_administrators" "team_administrators" {
   team_id        = each.value.team_id
   administrators = each.value.admin_descriptors
   mode           = each.value.mode
+
+  lifecycle {
+    precondition {
+      condition     = length(local.team_administrators_by_key) == length(var.team_administrators)
+      error_message = "team_administrators entries must be unique by key or team_id."
+    }
+  }
 }

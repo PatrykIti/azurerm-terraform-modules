@@ -14,13 +14,9 @@ module "azuredevops_repository" {
   source = "../../../"
 
   project_id = var.project_id
+  name       = "${var.repo_name_prefix}-network"
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-network"
-      initialization = {
-        init_type = "Clean"
-      }
-    }
+  initialization = {
+    init_type = "Clean"
   }
 }

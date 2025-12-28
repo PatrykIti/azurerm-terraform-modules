@@ -11,13 +11,6 @@ This example demonstrates a security-focused team configuration.
 
 Use this example for strict admin control and access reviews.
 
-## Security Considerations
-
-- All public access is disabled by default
-- Network access is restricted to specific IP ranges
-- All data is encrypted at rest and in transit
-- Audit logging captures all access and modifications
-
 ## Usage
 
 1. Initialize Terraform:

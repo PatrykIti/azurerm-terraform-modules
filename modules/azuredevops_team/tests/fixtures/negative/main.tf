@@ -11,22 +11,16 @@ terraform {
 
 provider "azuredevops" {}
 
-# This should fail due to conflicting team selectors
+# This should fail due to missing key when team_id is omitted
 module "azuredevops_team" {
   source = "../../../"
 
-  project_id = var.project_id
-
-  teams = {
-    bad = {
-      name = "${var.team_name_prefix}-negative"
-    }
-  }
+  project_id  = var.project_id
+  name        = "ado-team-neg-${var.random_suffix}"
+  description = "Negative fixture"
 
   team_members = [
     {
-      team_id            = "00000000-0000-0000-0000-000000000000"
-      team_key           = "bad"
       member_descriptors = ["vssgp.invalid"]
     }
   ]

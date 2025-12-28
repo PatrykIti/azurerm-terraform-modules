@@ -1,7 +1,8 @@
 # Azure DevOps Environments
 
 locals {
-  environment_id = azuredevops_environment.environment.id
+  environment_id               = azuredevops_environment.environment.id
+  default_target_resource_type = "environment"
 
   kubernetes_resources_by_key = {
     for resource in var.kubernetes_resources :
@@ -62,7 +63,7 @@ resource "azuredevops_check_approval" "check_approval" {
 
   project_id                 = var.project_id
   target_resource_id         = coalesce(each.value.target_resource_id, local.environment_id)
-  target_resource_type       = coalesce(each.value.target_resource_type, "environment")
+  target_resource_type       = coalesce(each.value.target_resource_type, local.default_target_resource_type)
   approvers                  = each.value.approvers
   instructions               = each.value.instructions
   minimum_required_approvers = each.value.minimum_required_approvers
@@ -76,7 +77,7 @@ resource "azuredevops_check_branch_control" "check_branch_control" {
   project_id                       = var.project_id
   display_name                     = each.value.display_name
   target_resource_id               = coalesce(each.value.target_resource_id, local.environment_id)
-  target_resource_type             = coalesce(each.value.target_resource_type, "environment")
+  target_resource_type             = coalesce(each.value.target_resource_type, local.default_target_resource_type)
   allowed_branches                 = each.value.allowed_branches
   verify_branch_protection         = each.value.verify_branch_protection
   ignore_unknown_protection_status = each.value.ignore_unknown_protection_status
@@ -89,7 +90,7 @@ resource "azuredevops_check_business_hours" "check_business_hours" {
   project_id           = var.project_id
   display_name         = each.value.display_name
   target_resource_id   = coalesce(each.value.target_resource_id, local.environment_id)
-  target_resource_type = coalesce(each.value.target_resource_type, "environment")
+  target_resource_type = coalesce(each.value.target_resource_type, local.default_target_resource_type)
   start_time           = each.value.start_time
   end_time             = each.value.end_time
   time_zone            = each.value.time_zone
@@ -108,7 +109,7 @@ resource "azuredevops_check_exclusive_lock" "check_exclusive_lock" {
 
   project_id           = var.project_id
   target_resource_id   = coalesce(each.value.target_resource_id, local.environment_id)
-  target_resource_type = coalesce(each.value.target_resource_type, "environment")
+  target_resource_type = coalesce(each.value.target_resource_type, local.default_target_resource_type)
   timeout              = each.value.timeout
 }
 
@@ -117,7 +118,7 @@ resource "azuredevops_check_required_template" "check_required_template" {
 
   project_id           = var.project_id
   target_resource_id   = coalesce(each.value.target_resource_id, local.environment_id)
-  target_resource_type = coalesce(each.value.target_resource_type, "environment")
+  target_resource_type = coalesce(each.value.target_resource_type, local.default_target_resource_type)
 
   dynamic "required_template" {
     for_each = each.value.required_templates
@@ -135,7 +136,7 @@ resource "azuredevops_check_rest_api" "check_rest_api" {
 
   project_id                      = var.project_id
   target_resource_id              = coalesce(each.value.target_resource_id, local.environment_id)
-  target_resource_type            = coalesce(each.value.target_resource_type, "environment")
+  target_resource_type            = coalesce(each.value.target_resource_type, local.default_target_resource_type)
   display_name                    = each.value.display_name
   connected_service_name_selector = each.value.connected_service_name_selector
   connected_service_name          = each.value.connected_service_name

@@ -1,38 +1,23 @@
-# Test team administrator planning
+# Test team naming and description values
 
-mock_provider "azuredevops" {
-  mock_resource "azuredevops_team" {
-    defaults = {
-      id         = "00000000-0000-0000-0000-000000000000"
-      descriptor = "vssgp.Uy0xLTktMTIzNDU2Nzg5MA"
-    }
-  }
-}
+mock_provider "azuredevops" {}
 
 variables {
-  project_id = "00000000-0000-0000-0000-000000000000"
-
-  teams = {
-    admins = {
-      name = "Admins Team"
-    }
-  }
-
-  team_administrators = [
-    {
-      key               = "admins-admins"
-      team_key          = "admins"
-      admin_descriptors = ["vssgp.admin"]
-      mode              = "add"
-    }
-  ]
+  project_id  = "00000000-0000-0000-0000-000000000000"
+  name        = "Platform Team"
+  description = "Platform engineering team"
 }
 
-run "team_administrator_plan" {
+run "team_name_passthrough" {
   command = plan
 
   assert {
-    condition     = contains(keys(azuredevops_team_administrators.team_administrators), "admins-admins")
-    error_message = "team_administrators should use the configured admin key."
+    condition     = azuredevops_team.team.name == "Platform Team"
+    error_message = "Team name should be passed through to the resource."
+  }
+
+  assert {
+    condition     = azuredevops_team.team.description == "Platform engineering team"
+    error_message = "Team description should be passed through to the resource."
   }
 }

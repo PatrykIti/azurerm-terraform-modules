@@ -10,19 +10,14 @@ mock_provider "azuredevops" {
 }
 
 variables {
-  groups = {
-    operators = {
-      display_name = "Operators"
-    }
-  }
+  group_display_name = "Operators"
 
   securityrole_assignments = [
     {
-      key                = "operators-reader"
-      scope              = "project"
-      resource_id        = "11111111-1111-1111-1111-111111111111"
-      role_name          = "Reader"
-      identity_group_key = "operators"
+      key         = "operators-reader"
+      scope       = "project"
+      resource_id = "11111111-1111-1111-1111-111111111111"
+      role_name   = "Reader"
     }
   ]
 }

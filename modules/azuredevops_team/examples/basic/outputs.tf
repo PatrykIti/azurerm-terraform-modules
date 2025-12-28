@@ -1,9 +1,9 @@
-output "team_ids" {
-  description = "Map of team IDs keyed by team key."
-  value       = module.azuredevops_team.team_ids
+output "team_id" {
+  description = "ID of the Azure DevOps team."
+  value       = module.azuredevops_team.team_id
 }
 
-output "team_descriptors" {
-  description = "Map of team descriptors keyed by team key."
-  value       = module.azuredevops_team.team_descriptors
+output "team_descriptor" {
+  description = "Descriptor of the Azure DevOps team."
+  value       = module.azuredevops_team.team_descriptor
 }

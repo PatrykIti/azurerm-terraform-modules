@@ -4,38 +4,17 @@ mock_provider "azuredevops" {}
 
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
-
-  repositories = {
-    main = {}
-  }
+  name       = "unit-repo"
 }
 
-run "invalid_branch_selector" {
+run "missing_branch_repository_id_without_repo" {
   command = plan
 
   variables {
+    name = null
     branches = [
       {
-        repository_id  = "00000000-0000-0000-0000-000000000000"
-        repository_key = "main"
-        name           = "invalid"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.branches,
-  ]
-}
-
-run "invalid_branch_repository_key" {
-  command = plan
-
-  variables {
-    branches = [
-      {
-        repository_key = "missing"
-        name           = "invalid"
+        name = "invalid"
       }
     ]
   }
@@ -51,12 +30,10 @@ run "duplicate_branch_keys" {
   variables {
     branches = [
       {
-        repository_key = "main"
-        name           = "dev"
+        name = "dev"
       },
       {
-        repository_key = "main"
-        name           = "dev"
+        name = "dev"
       }
     ]
   }
@@ -72,14 +49,12 @@ run "duplicate_file_keys" {
   variables {
     files = [
       {
-        repository_key = "main"
-        file           = "README.md"
-        content        = "a"
+        file    = "README.md"
+        content = "a"
       },
       {
-        repository_key = "main"
-        file           = "README.md"
-        content        = "b"
+        file    = "README.md"
+        content = "b"
       }
     ]
   }
@@ -95,15 +70,13 @@ run "duplicate_git_permission_keys" {
   variables {
     git_permissions = [
       {
-        repository_key = "main"
-        principal      = "group-1"
+        principal = "group-1"
         permissions = {
           GenericRead = "Allow"
         }
       },
       {
-        repository_key = "main"
-        principal      = "group-1"
+        principal = "group-1"
         permissions = {
           GenericRead = "Allow"
         }
@@ -122,8 +95,7 @@ run "invalid_git_permission_value" {
   variables {
     git_permissions = [
       {
-        repository_key = "main"
-        principal      = "group-2"
+        principal = "group-2"
         permissions = {
           GenericRead = "Invalid"
         }
@@ -136,22 +108,36 @@ run "invalid_git_permission_value" {
   ]
 }
 
-run "invalid_repository_import" {
+run "invalid_repository_import_missing_source" {
   command = plan
 
   variables {
-    repositories = {
-      main = {
-        initialization = {
-          init_type             = "Import"
-          service_connection_id = "00000000-0000-0000-0000-000000000000"
-        }
-      }
+    initialization = {
+      init_type             = "Import"
+      service_connection_id = "00000000-0000-0000-0000-000000000000"
     }
   }
 
   expect_failures = [
-    var.repositories,
+    var.initialization,
+  ]
+}
+
+run "invalid_repository_import_credentials" {
+  command = plan
+
+  variables {
+    initialization = {
+      init_type             = "Import"
+      source_url            = "https://example.com/repo.git"
+      service_connection_id = "00000000-0000-0000-0000-000000000000"
+      username              = "user"
+      password              = "password"
+    }
+  }
+
+  expect_failures = [
+    var.initialization,
   ]
 }
 
@@ -164,8 +150,7 @@ run "invalid_min_reviewers" {
         reviewer_count = 0
         scope = [
           {
-            repository_key = "main"
-            match_type     = "DefaultBranch"
+            match_type = "DefaultBranch"
           }
         ]
       }
@@ -186,8 +171,7 @@ run "duplicate_policy_keys" {
         reviewer_count = 1
         scope = [
           {
-            repository_key = "main"
-            match_type     = "DefaultBranch"
+            match_type = "DefaultBranch"
           }
         ]
       },
@@ -195,8 +179,7 @@ run "duplicate_policy_keys" {
         reviewer_count = 2
         scope = [
           {
-            repository_key = "main"
-            match_type     = "DefaultBranch"
+            match_type = "DefaultBranch"
           }
         ]
       }
@@ -217,8 +200,28 @@ run "invalid_match_type" {
         name = "status"
         scope = [
           {
-            repository_key = "main"
-            match_type     = "Invalid"
+            match_type = "Invalid"
+          }
+        ]
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.branch_policy_status_check,
+  ]
+}
+
+run "invalid_repository_ref_requirement" {
+  command = plan
+
+  variables {
+    branch_policy_status_check = [
+      {
+        name = "status"
+        scope = [
+          {
+            match_type = "Exact"
           }
         ]
       }
@@ -236,8 +239,7 @@ run "invalid_max_file_size" {
   variables {
     repository_policy_max_file_size = [
       {
-        max_file_size   = 0
-        repository_keys = ["main"]
+        max_file_size = 0
       }
     ]
   }
@@ -251,6 +253,7 @@ run "missing_repository_targets" {
   command = plan
 
   variables {
+    name = null
     repository_policy_reserved_names = [
       {}
     ]

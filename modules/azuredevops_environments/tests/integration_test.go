@@ -31,7 +31,9 @@ func TestAzuredevopsEnvironmentsFullIntegration(t *testing.T) {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
 		environmentID := terraform.Output(t, terraformOptions, "environment_id")
+		approvalCheckIDs := terraform.OutputMap(t, terraformOptions, "approval_check_ids")
 
 		assert.NotEmpty(t, environmentID)
+		assert.NotEmpty(t, approvalCheckIDs)
 	})
 }

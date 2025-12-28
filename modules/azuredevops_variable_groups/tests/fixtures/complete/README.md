@@ -1,3 +1,3 @@
 # Complete Variable Groups Fixture
 
-- Creates multiple variable groups with permissions and library permissions.
+- Creates a variable group with permissions and library permissions.

@@ -3,12 +3,9 @@ output "process_ids" {
   value       = try({ for key, process in azuredevops_workitemtrackingprocess_process.process : key => process.id }, {})
 }
 
-output "work_item_ids" {
-  description = "Map of work item IDs keyed by work item key."
-  value = merge(
-    try({ for key, item in azuredevops_workitem.work_item : key => item.id }, {}),
-    try({ for key, item in azuredevops_workitem.work_item_child : key => item.id }, {})
-  )
+output "work_item_id" {
+  description = "The ID of the created work item."
+  value       = try(azuredevops_workitem.work_item.id, null)
 }
 
 output "query_folder_ids" {

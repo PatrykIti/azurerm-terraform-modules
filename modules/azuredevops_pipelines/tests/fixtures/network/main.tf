@@ -1,7 +1,7 @@
 terraform {
   required_version = ">= 1.12.2"
   required_providers {
-  
+
     azuredevops = {
       source  = "microsoft/azuredevops"
       version = "1.12.2"
@@ -25,14 +25,11 @@ module "azuredevops_pipelines" {
 
   project_id = var.project_id
 
-  build_definitions = {
-    network = {
-      name = "pip-ado-net-${var.random_suffix}"
-      repository = {
-        repo_type = "TfsGit"
-        repo_id   = azuredevops_git_repository.example.id
-        yml_path  = var.yaml_path
-      }
-    }
+  name = "pip-ado-net-${var.random_suffix}"
+
+  repository = {
+    repo_type = "TfsGit"
+    repo_id   = azuredevops_git_repository.example.id
+    yml_path  = var.yaml_path
   }
 }

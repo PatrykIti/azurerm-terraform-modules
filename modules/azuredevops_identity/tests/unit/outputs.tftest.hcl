@@ -13,49 +13,46 @@ mock_provider "azuredevops" {
       id = "membership-0001"
     }
   }
+
+  mock_resource "azuredevops_securityrole_assignment" {
+    defaults = {
+      id = "assignment-0001"
+    }
+  }
 }
 
 variables {
-  groups = {
-    admins = {
-      display_name = "Admins"
-    }
-    developers = {
-      display_name = "Developers"
-    }
-  }
+  group_display_name = "Admins"
 
   group_memberships = [
     {
-      key               = "admin-membership"
-      group_key         = "admins"
-      member_group_keys = ["developers"]
-      mode              = "add"
+      key                = "admin-membership"
+      member_descriptors = ["vssgp.member"]
+      mode               = "add"
     }
   ]
 
   securityrole_assignments = [
     {
-      key                = "admins-reader"
-      scope              = "project"
-      resource_id        = "11111111-1111-1111-1111-111111111111"
-      role_name          = "Reader"
-      identity_group_key = "admins"
+      key         = "admins-reader"
+      scope       = "project"
+      resource_id = "11111111-1111-1111-1111-111111111111"
+      role_name   = "Reader"
     }
   ]
 }
 
 run "outputs_plan" {
-  command = plan
+  command = apply
 
   assert {
-    condition     = length(keys(output.group_ids)) == 2
-    error_message = "group_ids should include all configured groups."
+    condition     = output.group_id != null
+    error_message = "group_id should be present when the module group is configured."
   }
 
   assert {
-    condition     = length(keys(output.group_descriptors)) == 2
-    error_message = "group_descriptors should include all configured groups."
+    condition     = output.group_descriptor != null
+    error_message = "group_descriptor should be present when the module group is configured."
   }
 
   assert {

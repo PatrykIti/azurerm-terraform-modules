@@ -26,13 +26,10 @@ module "azuredevops_repository" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  repositories = {
-    main = {
-      name = "secure-repo"
-      initialization = {
-        init_type = "Clean"
-      }
-    }
+  name = "secure-repo"
+
+  initialization = {
+    init_type = "Clean"
   }
 
   branch_policy_min_reviewers = [
@@ -40,8 +37,7 @@ module "azuredevops_repository" {
       reviewer_count = 2
       scope = [
         {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
+          match_type = "DefaultBranch"
         }
       ]
     }
@@ -52,23 +48,20 @@ module "azuredevops_repository" {
       name = "security-check"
       scope = [
         {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
+          match_type = "DefaultBranch"
         }
       ]
     }
   ]
 
   repository_policy_reserved_names = [
-    {
-      repository_keys = ["main"]
-    }
+    {}
   ]
+
 }
 ```
 
-Note: Azure DevOps has deprecated the "Check credentials" repository policy,
-so this module does not manage it.
+Note: Azure DevOps has deprecated the "Check credentials" policy, and the provider blocks new policy creation. The module no longer exposes this policy to avoid persistent deprecation warnings.
 
 ## Security Hardening Checklist
 
@@ -90,6 +83,6 @@ so this module does not manage it.
 
 ---
 
-**Module Version**: 1.0.0  
-**Last Updated**: 2025-12-24  
+**Module Version**: Unreleased  
+**Last Updated**: 2025-12-28  
 **Security Contact**: security@yourorganization.com

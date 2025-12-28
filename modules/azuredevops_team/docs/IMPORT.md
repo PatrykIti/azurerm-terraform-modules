@@ -33,22 +33,16 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_team" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_team?ref=ADOPv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_team?ref=ADOTv1.0.0"
 
-  project_id = "00000000-0000-0000-0000-000000000000"
-
-  teams = {
-    core = {
-      name        = "existing-team-name"
-      description = "Existing team managed by Terraform"
-    }
-  }
+  project_id  = "00000000-0000-0000-0000-000000000000"
+  name        = "existing-team-name"
+  description = "Existing team managed by Terraform"
 
   # Optional: manage team members
   # team_members = [
   #   {
   #     key                = "core-members"
-  #     team_key           = "core"
   #     member_descriptors = ["vssgp.Uy0xLTktMTIzNDU2"]
   #   }
   # ]
@@ -57,7 +51,6 @@ module "azuredevops_team" {
   # team_administrators = [
   #   {
   #     key               = "core-admins"
-  #     team_key          = "core"
   #     admin_descriptors = ["vssgp.Uy0xLTktMTIzNDU2"]
   #     mode              = "overwrite"
   #   }
@@ -73,7 +66,7 @@ Create `import.tf`:
 
 ```hcl
 import {
-  to = module.azuredevops_team.azuredevops_team.team["core"]
+  to = module.azuredevops_team.azuredevops_team.team
   id = "<team_id>"
 }
 ```

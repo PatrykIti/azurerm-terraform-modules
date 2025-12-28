@@ -14,17 +14,15 @@ module "azuredevops_pipelines" {
 
   project_id = var.project_id
 
-  build_definitions = {
-    basic = {
-      name = var.pipeline_name
-      repository = {
-        repo_type = "TfsGit"
-        repo_id   = azuredevops_git_repository.example.id
-        yml_path  = var.yaml_path
-      }
-      ci_trigger = {
-        use_yaml = true
-      }
-    }
+  name = var.pipeline_name
+
+  repository = {
+    repo_type = "TfsGit"
+    repo_id   = azuredevops_git_repository.example.id
+    yml_path  = var.yaml_path
+  }
+
+  ci_trigger = {
+    use_yaml = true
   }
 }

@@ -3,8 +3,8 @@ variable "project_id" {
   type        = string
 }
 
-variable "team_name_prefix" {
-  description = "Prefix for the team name."
+variable "random_suffix" {
+  description = "Random suffix to ensure unique team names."
   type        = string
-  default     = "ado-team-secure-fixture"
+  default     = "local"
 }

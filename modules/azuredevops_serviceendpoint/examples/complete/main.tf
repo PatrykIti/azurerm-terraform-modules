@@ -4,56 +4,49 @@ data "azuredevops_group" "project_collection_admins" {
   name = "Project Collection Administrators"
 }
 
+locals {
+  serviceendpoints = {
+    generic = {
+      serviceendpoint_generic = {
+        service_endpoint_name = var.generic_endpoint_name
+        server_url            = var.generic_endpoint_url
+        username              = var.generic_endpoint_username
+        password              = var.generic_endpoint_password
+        description           = "Managed by Terraform"
+      }
+      serviceendpoint_incomingwebhook = null
+      permissions = [
+        {
+          principal = data.azuredevops_group.project_collection_admins.id
+          permissions = {
+            Use        = "Allow"
+            Administer = "Deny"
+          }
+        }
+      ]
+    }
+    incomingwebhook = {
+      serviceendpoint_generic = null
+      serviceendpoint_incomingwebhook = {
+        service_endpoint_name = var.incoming_webhook_endpoint_name
+        webhook_name          = "example_webhook"
+        secret                = var.incoming_webhook_secret
+        http_header           = "X-Hub-Signature"
+        description           = "Managed by Terraform"
+      }
+      permissions = []
+    }
+  }
+}
+
 module "azuredevops_serviceendpoint" {
-  source = "../../"
+  source   = "../../"
+  for_each = local.serviceendpoints
 
   project_id = var.project_id
 
-  serviceendpoint_github = [
-    {
-      key                   = "github-complete"
-      service_endpoint_name = var.github_endpoint_name
-      auth_personal = {
-        personal_access_token = var.github_personal_access_token
-      }
-      description = "Managed by Terraform"
-    }
-  ]
+  serviceendpoint_generic         = each.value.serviceendpoint_generic
+  serviceendpoint_incomingwebhook = each.value.serviceendpoint_incomingwebhook
 
-  serviceendpoint_aws = [
-    {
-      key                   = "aws-complete"
-      service_endpoint_name = var.aws_endpoint_name
-      access_key_id         = var.aws_access_key_id
-      secret_access_key     = var.aws_secret_access_key
-      description           = "Managed by Terraform"
-    }
-  ]
-
-  serviceendpoint_kubernetes = [
-    {
-      key                   = "kubernetes-complete"
-      service_endpoint_name = var.kubernetes_endpoint_name
-      apiserver_url         = var.kubernetes_api_url
-      authorization_type    = "Kubeconfig"
-      kubeconfig = {
-        kube_config            = var.kubeconfig_content
-        accept_untrusted_certs = true
-        cluster_context        = var.kubeconfig_context
-      }
-      description = "Managed by Terraform"
-    }
-  ]
-
-  serviceendpoint_permissions = [
-    {
-      principal = data.azuredevops_group.project_collection_admins.id
-      permissions = {
-        Use        = "Allow"
-        Administer = "Deny"
-      }
-      serviceendpoint_type = "github"
-      serviceendpoint_key  = "github-complete"
-    }
-  ]
+  serviceendpoint_permissions = each.value.permissions
 }

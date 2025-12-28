@@ -1,4 +1,4 @@
-output "feed_ids" {
-  description = "Feed IDs created in this example."
-  value       = module.azuredevops_artifacts_feed.feed_ids
+output "feed_id" {
+  description = "Feed ID created in this example."
+  value       = module.azuredevops_artifacts_feed.feed_id
 }

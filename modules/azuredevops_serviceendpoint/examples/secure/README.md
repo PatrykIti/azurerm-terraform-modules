@@ -1,10 +1,11 @@
 # Secure Azure DevOps Service Endpoints Example
 
-This example demonstrates a minimal service endpoint with restrictive permissions.
+This example demonstrates a service endpoint with explicit permission assignment.
 
 ## Features
 
-- Generic service endpoint with least-privilege permissions
+- Generic service endpoint
+- Permissions referencing the module-created endpoint
 
 ## Usage
 

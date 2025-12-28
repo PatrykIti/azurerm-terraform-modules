@@ -1,32 +1,37 @@
 provider "azuredevops" {}
 
+locals {
+  repositories = {
+    app = {
+      name = "ado-repo-complete-app"
+    }
+    shared = {
+      name = "ado-repo-complete-shared"
+    }
+  }
+}
+
 module "azuredevops_repository" {
-  source = "../../"
+  for_each = local.repositories
+  source   = "../../"
 
   project_id = var.project_id
+  name       = each.value.name
 
-  repositories = {
-    main = {
-      name = "ado-repo-complete"
-      initialization = {
-        init_type = "Clean"
-      }
-    }
+  initialization = {
+    init_type = "Clean"
   }
 
   branches = [
     {
-      key            = "develop"
-      repository_key = "main"
-      name           = "develop"
-      ref_branch     = "refs/heads/master"
+      key  = "develop"
+      name = "develop"
     }
   ]
 
   files = [
     {
       key                 = "readme"
-      repository_key      = "main"
       file                = "README.md"
       content             = "# Repository\n\nManaged by Terraform."
       commit_message      = "Add README"
@@ -36,9 +41,8 @@ module "azuredevops_repository" {
 
   git_permissions = [
     {
-      key            = "main-contributors"
-      repository_key = "main"
-      principal      = var.principal_descriptor
+      key       = "contributors"
+      principal = var.principal_descriptor
       permissions = {
         GenericRead       = "Allow"
         GenericContribute = "Allow"
@@ -48,12 +52,11 @@ module "azuredevops_repository" {
 
   branch_policy_min_reviewers = [
     {
-      key            = "min-reviewers-main"
+      key            = "min-reviewers"
       reviewer_count = var.reviewer_count
       scope = [
         {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
+          match_type = "DefaultBranch"
         }
       ]
     }
@@ -61,13 +64,12 @@ module "azuredevops_repository" {
 
   branch_policy_build_validation = [
     {
-      key                 = "build-validation-main"
+      key                 = "build-validation"
       build_definition_id = var.build_definition_id
       display_name        = "CI"
       scope = [
         {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
+          match_type = "DefaultBranch"
         }
       ]
     }
@@ -75,16 +77,14 @@ module "azuredevops_repository" {
 
   repository_policy_author_email_pattern = [
     {
-      key                   = "author-email-main"
+      key                   = "author-email"
       author_email_patterns = var.author_email_patterns
-      repository_keys       = ["main"]
     }
   ]
 
   repository_policy_reserved_names = [
     {
-      key             = "reserved-names-main"
-      repository_keys = ["main"]
+      key = "reserved-names"
     }
   ]
 }

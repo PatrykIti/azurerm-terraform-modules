@@ -8,7 +8,7 @@ Current version: **vUnreleased**
 
 ## Description
 
-Azure DevOps repository module for managing Git repositories and policies.
+Azure DevOps repository module for managing a Git repository, branches, permissions, and policies.
 
 ## Usage
 
@@ -20,13 +20,10 @@ module "azuredevops_repository" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  repositories = {
-    main = {
-      name = "example-repo"
-      initialization = {
-        init_type = "Clean"
-      }
-    }
+  name = "example-repo"
+
+  initialization = {
+    init_type = "Clean"
   }
 }
 ```

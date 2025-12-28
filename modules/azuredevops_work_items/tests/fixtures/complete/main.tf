@@ -15,10 +15,13 @@ data "azuredevops_group" "readers" {
   name       = "Readers"
 }
 
-module "azuredevops_work_items" {
+module "work_item_parent" {
   source = "../../../"
 
   project_id = var.project_id
+
+  title = "${var.work_item_title_prefix}-parent"
+  type  = "Task"
 
   query_folders = [
     {
@@ -55,18 +58,14 @@ module "azuredevops_work_items" {
       }
     }
   ]
+}
 
-  work_items = [
-    {
-      key   = "parent-item"
-      title = "${var.work_item_title_prefix}-parent"
-      type  = "Task"
-    },
-    {
-      key        = "child-item"
-      title      = "${var.work_item_title_prefix}-child"
-      type       = "Task"
-      parent_key = "parent-item"
-    }
-  ]
+module "work_item_child" {
+  source = "../../../"
+
+  project_id = var.project_id
+
+  title     = "${var.work_item_title_prefix}-child"
+  type      = "Task"
+  parent_id = module.work_item_parent.work_item_id
 }

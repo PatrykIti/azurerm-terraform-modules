@@ -1,3 +1,3 @@
 # Complete Service Hooks Example
 
-This example demonstrates webhooks and storage queue hooks with pipeline filters and stable keys.
+This example demonstrates module-level for_each for webhook and storage queue hooks with pipeline filters.

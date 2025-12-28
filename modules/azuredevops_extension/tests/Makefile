@@ -3,7 +3,7 @@
 # Variables
 TIMEOUT ?= 30m
 TEST_FILTER ?= Test
-PARALLEL ?= 8
+PARALLEL ?= 1
 LOG_DIR ?= test_outputs
 LOG_TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)
 TF_CLI_ARGS_init ?= -upgrade

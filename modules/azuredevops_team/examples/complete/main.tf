@@ -8,40 +8,42 @@ data "azuredevops_group" "project_collection_valid_users" {
   name = "Project Collection Valid Users"
 }
 
-module "azuredevops_team" {
-  source = "../../"
-
-  project_id = var.project_id
-
+locals {
   teams = {
     platform = {
       name        = "${var.team_name_prefix}-platform"
       description = "Platform engineering team"
+      members     = [data.azuredevops_group.project_collection_valid_users.descriptor]
+      admins      = [data.azuredevops_group.project_collection_admins.descriptor]
     }
     product = {
       name        = "${var.team_name_prefix}-product"
       description = "Product delivery team"
+      members     = [data.azuredevops_group.project_collection_valid_users.descriptor]
+      admins      = []
     }
   }
+}
+
+module "azuredevops_team" {
+  source   = "../../"
+  for_each = local.teams
+
+  project_id  = var.project_id
+  name        = each.value.name
+  description = each.value.description
 
   team_members = [
     {
-      key                = "platform-members"
-      team_key           = "platform"
-      member_descriptors = [data.azuredevops_group.project_collection_valid_users.descriptor]
-    },
-    {
-      key                = "product-members"
-      team_key           = "product"
-      member_descriptors = [data.azuredevops_group.project_collection_valid_users.descriptor]
+      key                = "${each.key}-members"
+      member_descriptors = each.value.members
     }
   ]
 
-  team_administrators = [
+  team_administrators = length(each.value.admins) > 0 ? [
     {
-      key               = "platform-admins"
-      team_key          = "platform"
-      admin_descriptors = [data.azuredevops_group.project_collection_admins.descriptor]
+      key               = "${each.key}-admins"
+      admin_descriptors = each.value.admins
     }
-  ]
+  ] : []
 }

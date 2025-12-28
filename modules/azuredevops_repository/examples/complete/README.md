@@ -1,10 +1,10 @@
 # Complete Azure DevOps Repository Example
 
-This example demonstrates creating a repository with branches, permissions, and a selection of branch/repository policies.
+This example demonstrates managing multiple repositories (via module-level for_each) with branches, permissions, and a selection of branch/repository policies.
 
 ## Features
 
-- Repository with clean initialization
+- Two repositories with clean initialization (module-level for_each)
 - Additional branch created from default branch
 - Git permissions for a group principal
 - Branch policies (minimum reviewers, build validation)

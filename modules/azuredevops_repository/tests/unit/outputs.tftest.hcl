@@ -3,7 +3,7 @@
 mock_provider "azuredevops" {
   mock_resource "azuredevops_git_repository" {
     defaults = {
-      id      = "repo-0001"
+      id      = "00000000-0000-0000-0000-000000000001"
       web_url = "https://dev.azure.com/org/project/_git/repo"
     }
   }
@@ -23,44 +23,39 @@ mock_provider "azuredevops" {
 
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
-
-  repositories = {
-    main = {}
-  }
+  name       = "example-repo"
 
   branches = [
     {
-      key            = "main-branch"
-      repository_key = "main"
-      name           = "main"
+      key  = "main-branch"
+      name = "main"
     }
   ]
 
   branch_policy_min_reviewers = [
     {
-      key            = "min-reviewers-main"
+      key            = "min-reviewers"
       reviewer_count = 1
       scope = [
         {
-          repository_key = "main"
-          match_type     = "DefaultBranch"
+          match_type = "DefaultBranch"
         }
       ]
     }
   ]
 }
 
-run "outputs_plan" {
-  command = plan
+run "outputs_apply" {
+  command = apply
 
   assert {
-    condition     = length(keys(output.repository_ids)) == 1
-    error_message = "repository_ids should include configured repositories."
+    condition     = output.repository_id == "00000000-0000-0000-0000-000000000001"
+    error_message = "repository_id should match the mocked repository ID."
   }
 
   assert {
-    condition     = length(keys(output.repository_urls)) == 1
-    error_message = "repository_urls should include configured repositories."
+    condition     = output.repository_url == "https://dev.azure.com/org/project/_git/repo"
+    error_message = "repository_url should match the mocked repository URL."
   }
 
   assert {
@@ -69,7 +64,7 @@ run "outputs_plan" {
   }
 
   assert {
-    condition     = contains(keys(output.policy_ids.branch_min_reviewers), "min-reviewers-main")
+    condition     = contains(keys(output.policy_ids.branch_min_reviewers), "min-reviewers")
     error_message = "policy_ids should be keyed by policy key."
   }
 }

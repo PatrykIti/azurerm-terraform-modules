@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Core
+# Core Repository Configuration
 # -----------------------------------------------------------------------------
 
 variable "project_id" {
@@ -12,121 +12,122 @@ variable "project_id" {
   }
 }
 
-# -----------------------------------------------------------------------------
-# Repositories
-# -----------------------------------------------------------------------------
-
-variable "repositories" {
-  description = "Map of Git repositories to manage."
-  type = map(object({
-    name                 = optional(string)
-    default_branch       = optional(string)
-    parent_repository_id = optional(string)
-    disabled             = optional(bool)
-    initialization = optional(object({
-      init_type             = optional(string, "Uninitialized")
-      source_type           = optional(string)
-      source_url            = optional(string)
-      service_connection_id = optional(string)
-      username              = optional(string)
-      password              = optional(string)
-    }), {})
-  }))
-  default = {}
+variable "name" {
+  description = "Name of the repository to create. When null, the module will not create a repository."
+  type        = string
+  default     = null
 
   validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : (
-        repo.name == null || length(trimspace(repo.name)) > 0
+    condition     = var.name == null || length(trimspace(var.name)) > 0
+    error_message = "name must be a non-empty string when provided."
+  }
+}
+
+variable "default_branch" {
+  description = "Default branch ref for the repository (for example, refs/heads/main)."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.default_branch == null || length(trimspace(var.default_branch)) > 0
+    error_message = "default_branch must be a non-empty string when provided."
+  }
+
+  validation {
+    condition     = var.default_branch == null || startswith(var.default_branch, "refs/heads/")
+    error_message = "default_branch must start with refs/heads/."
+  }
+}
+
+variable "parent_repository_id" {
+  description = "Parent repository ID for forks."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.parent_repository_id == null || length(trimspace(var.parent_repository_id)) > 0
+    error_message = "parent_repository_id must be a non-empty string when provided."
+  }
+}
+
+variable "disabled" {
+  description = "Whether the repository is disabled."
+  type        = bool
+  default     = null
+}
+
+variable "initialization" {
+  description = <<-EOT
+    Repository initialization settings.
+    - init_type: Uninitialized, Clean, Import
+    - source_type: Git (required when init_type is Import)
+    - source_url: required when init_type is Import
+    - service_connection_id or username/password for Import auth
+  EOT
+  type = object({
+    init_type             = optional(string, "Uninitialized")
+    source_type           = optional(string)
+    source_url            = optional(string)
+    service_connection_id = optional(string)
+    username              = optional(string)
+    password              = optional(string)
+  })
+  default   = null
+  sensitive = true
+
+  validation {
+    condition = var.initialization == null || contains(
+      ["Uninitialized", "Clean", "Import"],
+      coalesce(try(var.initialization.init_type, null), "Uninitialized")
+    )
+    error_message = "initialization.init_type must be Uninitialized, Clean, or Import."
+  }
+
+  validation {
+    condition = var.initialization == null || (
+      coalesce(try(var.initialization.init_type, null), "Uninitialized") == "Import"
+      ? (try(var.initialization.source_type, null) == null || try(var.initialization.source_type, null) == "Git")
+      : try(var.initialization.source_type, null) == null
+    )
+    error_message = "initialization.source_type must be Git when init_type is Import, and null otherwise."
+  }
+
+  validation {
+    condition = var.initialization == null || (
+      coalesce(try(var.initialization.init_type, null), "Uninitialized") == "Import"
+      ? (
+        try(var.initialization.source_url, null) != null &&
+        length(trimspace(try(var.initialization.source_url, ""))) > 0
       )
-    ])
-    error_message = "repositories.name must be a non-empty string when provided."
+      : try(var.initialization.source_url, null) == null
+    )
+    error_message = "initialization.source_url is required when init_type is Import and must be null otherwise."
   }
 
   validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : (
-        repo.default_branch == null || length(trimspace(repo.default_branch)) > 0
-      )
-    ])
-    error_message = "repositories.default_branch must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : (
-        repo.default_branch == null || startswith(repo.default_branch, "refs/heads/")
-      )
-    ])
-    error_message = "repositories.default_branch must start with refs/heads/."
-  }
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : contains([
-        "Uninitialized",
-        "Clean",
-        "Import",
-      ], coalesce(try(repo.initialization.init_type, null), "Uninitialized"))
-    ])
-    error_message = "repositories.initialization.init_type must be Uninitialized, Clean, or Import."
-  }
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : (
-        try(repo.initialization.source_type, null) == null || try(repo.initialization.source_type, null) == "Git"
-      )
-    ])
-    error_message = "repositories.initialization.source_type must be Git when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : (
-        coalesce(try(repo.initialization.init_type, null), "Uninitialized") != "Import" || (
-          try(repo.initialization.source_url, null) != null && length(trimspace(try(repo.initialization.source_url, ""))) > 0
+    condition = var.initialization == null || (
+      coalesce(try(var.initialization.init_type, null), "Uninitialized") == "Import"
+      ? (
+        (
+          try(var.initialization.service_connection_id, null) != null &&
+          length(trimspace(try(var.initialization.service_connection_id, ""))) > 0 &&
+          try(var.initialization.username, null) == null &&
+          try(var.initialization.password, null) == null
+          ) || (
+          try(var.initialization.service_connection_id, null) == null &&
+          try(var.initialization.username, null) != null &&
+          length(trimspace(try(var.initialization.username, ""))) > 0 &&
+          try(var.initialization.password, null) != null &&
+          length(trimspace(try(var.initialization.password, ""))) > 0
         )
       )
-    ])
-    error_message = "repositories.initialization.source_url is required when init_type is Import."
-  }
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : (
-        coalesce(try(repo.initialization.init_type, null), "Uninitialized") != "Import" || (
-          (
-            try(repo.initialization.service_connection_id, null) != null &&
-            length(trimspace(try(repo.initialization.service_connection_id, ""))) > 0 &&
-            try(repo.initialization.username, null) == null &&
-            try(repo.initialization.password, null) == null
-            ) || (
-            try(repo.initialization.service_connection_id, null) == null &&
-            try(repo.initialization.username, null) != null &&
-            length(trimspace(try(repo.initialization.username, ""))) > 0 &&
-            try(repo.initialization.password, null) != null &&
-            length(trimspace(try(repo.initialization.password, ""))) > 0
-          )
-        )
+      : (
+        try(var.initialization.service_connection_id, null) == null &&
+        try(var.initialization.username, null) == null &&
+        try(var.initialization.password, null) == null
       )
-    ])
-    error_message = "repositories.initialization Import requires service_connection_id or username/password (exactly one)."
-  }
-
-  validation {
-    condition = alltrue([
-      for repo in values(var.repositories) : (
-        coalesce(try(repo.initialization.init_type, null), "Uninitialized") == "Import" || (
-          try(repo.initialization.source_type, null) == null &&
-          try(repo.initialization.source_url, null) == null &&
-          try(repo.initialization.service_connection_id, null) == null &&
-          try(repo.initialization.username, null) == null &&
-          try(repo.initialization.password, null) == null
-        )
-      )
-    ])
-    error_message = "repositories.initialization import fields are only allowed when init_type is Import."
+    )
+    error_message = "initialization Import requires service_connection_id or username/password (exactly one), and auth fields are only allowed when init_type is Import."
   }
 }
 
@@ -137,41 +138,34 @@ variable "repositories" {
 variable "branches" {
   description = "List of Git repository branches to manage."
   type = list(object({
-    key            = optional(string)
-    repository_id  = optional(string)
-    repository_key = optional(string)
-    name           = string
-    ref_branch     = optional(string)
-    ref_tag        = optional(string)
-    ref_commit_id  = optional(string)
+    key           = optional(string)
+    repository_id = optional(string)
+    name          = string
+    ref_branch    = optional(string)
+    ref_tag       = optional(string)
+    ref_commit_id = optional(string)
   }))
   default = []
 
   validation {
     condition = alltrue([
-      for branch in var.branches : (
-        branch.key == null || length(trimspace(branch.key)) > 0
-      )
+      for branch in var.branches : branch.key == null || length(trimspace(branch.key)) > 0
     ])
     error_message = "branches.key must be a non-empty string when provided."
   }
 
   validation {
     condition = alltrue([
-      for branch in var.branches : (
-        (branch.repository_id != null) != (branch.repository_key != null)
-      )
+      for branch in var.branches : branch.repository_id == null || length(trimspace(branch.repository_id)) > 0
     ])
-    error_message = "branches must set exactly one of repository_id or repository_key."
+    error_message = "branches.repository_id must be a non-empty string when provided."
   }
 
   validation {
-    condition = alltrue([
-      for branch in var.branches : (
-        branch.repository_key == null || contains(keys(var.repositories), branch.repository_key)
-      )
+    condition = var.name != null || alltrue([
+      for branch in var.branches : branch.repository_id != null
     ])
-    error_message = "branches.repository_key must reference a key in repositories."
+    error_message = "branches.repository_id is required when the module repository is not created."
   }
 
   validation {
@@ -179,6 +173,33 @@ variable "branches" {
       for branch in var.branches : length(trimspace(branch.name)) > 0
     ])
     error_message = "branches.name must be a non-empty string."
+  }
+
+  validation {
+    condition = alltrue([
+      for branch in var.branches : (
+        branch.ref_branch == null || length(trimspace(branch.ref_branch)) > 0
+      )
+    ])
+    error_message = "branches.ref_branch must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for branch in var.branches : (
+        branch.ref_tag == null || length(trimspace(branch.ref_tag)) > 0
+      )
+    ])
+    error_message = "branches.ref_tag must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for branch in var.branches : (
+        branch.ref_commit_id == null || length(trimspace(branch.ref_commit_id)) > 0
+      )
+    ])
+    error_message = "branches.ref_commit_id must be a non-empty string when provided."
   }
 
   validation {
@@ -196,16 +217,9 @@ variable "branches" {
 
   validation {
     condition = length(distinct([
-      for branch in var.branches : coalesce(
-        branch.key,
-        format(
-          "%s:%s",
-          coalesce(branch.repository_key, branch.repository_id, "missing"),
-          branch.name
-        )
-      )
+      for branch in var.branches : coalesce(branch.key, branch.name)
     ])) == length(var.branches)
-    error_message = "branches keys must be unique; set key when repository/name pairs would collide."
+    error_message = "branches keys must be unique; set key when branch names would collide."
   }
 }
 
@@ -218,7 +232,6 @@ variable "files" {
   type = list(object({
     key                 = optional(string)
     repository_id       = optional(string)
-    repository_key      = optional(string)
     file                = string
     content             = string
     branch              = optional(string)
@@ -233,29 +246,23 @@ variable "files" {
 
   validation {
     condition = alltrue([
-      for file in var.files : (
-        file.key == null || length(trimspace(file.key)) > 0
-      )
+      for file in var.files : file.key == null || length(trimspace(file.key)) > 0
     ])
     error_message = "files.key must be a non-empty string when provided."
   }
 
   validation {
     condition = alltrue([
-      for file in var.files : (
-        (file.repository_id != null) != (file.repository_key != null)
-      )
+      for file in var.files : file.repository_id == null || length(trimspace(file.repository_id)) > 0
     ])
-    error_message = "files must set exactly one of repository_id or repository_key."
+    error_message = "files.repository_id must be a non-empty string when provided."
   }
 
   validation {
-    condition = alltrue([
-      for file in var.files : (
-        file.repository_key == null || contains(keys(var.repositories), file.repository_key)
-      )
+    condition = var.name != null || alltrue([
+      for file in var.files : file.repository_id != null
     ])
-    error_message = "files.repository_key must reference a key in repositories."
+    error_message = "files.repository_id is required when the module repository is not created."
   }
 
   validation {
@@ -275,6 +282,15 @@ variable "files" {
   validation {
     condition = alltrue([
       for file in var.files : (
+        file.branch == null || length(trimspace(file.branch)) > 0
+      )
+    ])
+    error_message = "files.branch must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for file in var.files : (
         file.commit_message == null || length(trimspace(file.commit_message)) > 0
       )
     ])
@@ -282,18 +298,46 @@ variable "files" {
   }
 
   validation {
-    condition = length(distinct([
-      for file in var.files : coalesce(
-        file.key,
-        format(
-          "%s:%s:%s",
-          coalesce(file.repository_key, file.repository_id, "missing"),
-          file.file,
-          coalesce(file.branch, "default")
-        )
+    condition = alltrue([
+      for file in var.files : (
+        file.author_name == null || length(trimspace(file.author_name)) > 0
       )
+    ])
+    error_message = "files.author_name must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for file in var.files : (
+        file.author_email == null || length(trimspace(file.author_email)) > 0
+      )
+    ])
+    error_message = "files.author_email must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for file in var.files : (
+        file.committer_name == null || length(trimspace(file.committer_name)) > 0
+      )
+    ])
+    error_message = "files.committer_name must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for file in var.files : (
+        file.committer_email == null || length(trimspace(file.committer_email)) > 0
+      )
+    ])
+    error_message = "files.committer_email must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = length(distinct([
+      for file in var.files : coalesce(file.key, file.file)
     ])) == length(var.files)
-    error_message = "files keys must be unique; set key when repository/file/branch would collide."
+    error_message = "files keys must be unique; set key when file paths would collide."
   }
 }
 
@@ -304,41 +348,34 @@ variable "files" {
 variable "git_permissions" {
   description = "List of Git permissions to assign."
   type = list(object({
-    key            = optional(string)
-    repository_id  = optional(string)
-    repository_key = optional(string)
-    branch_name    = optional(string)
-    principal      = string
-    permissions    = map(string)
-    replace        = optional(bool, true)
+    key           = optional(string)
+    repository_id = optional(string)
+    branch_name   = optional(string)
+    principal     = string
+    permissions   = map(string)
+    replace       = optional(bool, true)
   }))
   default = []
 
   validation {
     condition = alltrue([
-      for perm in var.git_permissions : (
-        perm.key == null || length(trimspace(perm.key)) > 0
-      )
+      for perm in var.git_permissions : perm.key == null || length(trimspace(perm.key)) > 0
     ])
     error_message = "git_permissions.key must be a non-empty string when provided."
   }
 
   validation {
     condition = alltrue([
-      for perm in var.git_permissions : (
-        (perm.repository_id != null) != (perm.repository_key != null)
-      )
+      for perm in var.git_permissions : perm.repository_id == null || length(trimspace(perm.repository_id)) > 0
     ])
-    error_message = "git_permissions must set exactly one of repository_id or repository_key."
+    error_message = "git_permissions.repository_id must be a non-empty string when provided."
   }
 
   validation {
-    condition = alltrue([
-      for perm in var.git_permissions : (
-        perm.repository_key == null || contains(keys(var.repositories), perm.repository_key)
-      )
+    condition = var.name != null || alltrue([
+      for perm in var.git_permissions : perm.repository_id != null
     ])
-    error_message = "git_permissions.repository_key must reference a key in repositories."
+    error_message = "git_permissions.repository_id is required when the module repository is not created."
   }
 
   validation {
@@ -346,6 +383,22 @@ variable "git_permissions" {
       for perm in var.git_permissions : length(trimspace(perm.principal)) > 0
     ])
     error_message = "git_permissions.principal must be a non-empty string."
+  }
+
+  validation {
+    condition = alltrue([
+      for perm in var.git_permissions : (
+        perm.branch_name == null || length(trimspace(perm.branch_name)) > 0
+      )
+    ])
+    error_message = "git_permissions.branch_name must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for perm in var.git_permissions : length(perm.permissions) > 0
+    ])
+    error_message = "git_permissions.permissions must not be empty."
   }
 
   validation {
@@ -362,14 +415,13 @@ variable "git_permissions" {
       for perm in var.git_permissions : coalesce(
         perm.key,
         format(
-          "%s:%s:%s",
-          coalesce(perm.repository_key, perm.repository_id, "missing"),
+          "%s:%s",
           coalesce(perm.branch_name, "root"),
           perm.principal
         )
       )
     ])) == length(var.git_permissions)
-    error_message = "git_permissions keys must be unique; set key when repository/branch/principal would collide."
+    error_message = "git_permissions keys must be unique; set key when branch/principal would collide."
   }
 }
 
@@ -390,7 +442,6 @@ variable "branch_policy_auto_reviewers" {
     minimum_number_of_reviewers = optional(number)
     scope = list(object({
       repository_id  = optional(string)
-      repository_key = optional(string)
       repository_ref = optional(string)
       match_type     = optional(string)
     }))
@@ -415,6 +466,15 @@ variable "branch_policy_auto_reviewers" {
 
   validation {
     condition = alltrue([
+      for policy in var.branch_policy_auto_reviewers : alltrue([
+        for reviewer_id in policy.auto_reviewer_ids : length(trimspace(reviewer_id)) > 0
+      ])
+    ])
+    error_message = "branch_policy_auto_reviewers.auto_reviewer_ids must contain non-empty values."
+  }
+
+  validation {
+    condition = alltrue([
       for policy in var.branch_policy_auto_reviewers : length(policy.scope) > 0
     ])
     error_message = "branch_policy_auto_reviewers.scope must not be empty."
@@ -424,22 +484,20 @@ variable "branch_policy_auto_reviewers" {
     condition = alltrue([
       for policy in var.branch_policy_auto_reviewers : alltrue([
         for scope in policy.scope : (
-          (scope.repository_id != null) != (scope.repository_key != null)
+          scope.repository_id == null || length(trimspace(scope.repository_id)) > 0
         )
       ])
     ])
-    error_message = "branch_policy_auto_reviewers.scope must set exactly one of repository_id or repository_key."
+    error_message = "branch_policy_auto_reviewers.scope.repository_id must be a non-empty string when provided."
   }
 
   validation {
-    condition = alltrue([
+    condition = var.name != null || alltrue([
       for policy in var.branch_policy_auto_reviewers : alltrue([
-        for scope in policy.scope : (
-          scope.repository_key == null || contains(keys(var.repositories), scope.repository_key)
-        )
+        for scope in policy.scope : scope.repository_id != null
       ])
     ])
-    error_message = "branch_policy_auto_reviewers.scope.repository_key must reference a key in repositories."
+    error_message = "branch_policy_auto_reviewers.scope.repository_id is required when the module repository is not created."
   }
 
   validation {
@@ -467,20 +525,34 @@ variable "branch_policy_auto_reviewers" {
   }
 
   validation {
-    condition = length(distinct([
-      for policy in var.branch_policy_auto_reviewers : coalesce(
-        policy.key,
-        format(
-          "auto_reviewers:%s",
-          coalesce(
-            try(policy.scope[0].repository_key, null),
-            try(policy.scope[0].repository_id, null),
-            "missing"
+    condition = alltrue([
+      for policy in var.branch_policy_auto_reviewers : alltrue([
+        for scope in policy.scope : (
+          scope.repository_ref == null || length(trimspace(scope.repository_ref)) > 0
+        )
+      ])
+    ])
+    error_message = "branch_policy_auto_reviewers.scope.repository_ref must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for policy in var.branch_policy_auto_reviewers : alltrue([
+        for scope in policy.scope : (
+          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || (
+            scope.repository_id == null && scope.repository_ref == null
           )
         )
-      )
+      ])
+    ])
+    error_message = "branch_policy_auto_reviewers.scope must omit repository_id and repository_ref when match_type is DefaultBranch."
+  }
+
+  validation {
+    condition = length(distinct([
+      for policy in var.branch_policy_auto_reviewers : coalesce(policy.key, "auto_reviewers")
     ])) == length(var.branch_policy_auto_reviewers)
-    error_message = "branch_policy_auto_reviewers keys must be unique; set key when scopes would collide."
+    error_message = "branch_policy_auto_reviewers keys must be unique; set key when multiple policies are defined."
   }
 }
 
@@ -502,7 +574,6 @@ variable "branch_policy_build_validation" {
     filename_patterns           = optional(list(string))
     scope = list(object({
       repository_id  = optional(string)
-      repository_key = optional(string)
       repository_ref = optional(string)
       match_type     = optional(string)
     }))
@@ -520,11 +591,16 @@ variable "branch_policy_build_validation" {
 
   validation {
     condition = alltrue([
-      for policy in var.branch_policy_build_validation : (
-        length(trimspace(policy.build_definition_id)) > 0 && length(trimspace(policy.display_name)) > 0
-      )
+      for policy in var.branch_policy_build_validation : length(trimspace(policy.build_definition_id)) > 0
     ])
-    error_message = "branch_policy_build_validation.build_definition_id and display_name must be non-empty strings."
+    error_message = "branch_policy_build_validation.build_definition_id must be a non-empty string."
+  }
+
+  validation {
+    condition = alltrue([
+      for policy in var.branch_policy_build_validation : length(trimspace(policy.display_name)) > 0
+    ])
+    error_message = "branch_policy_build_validation.display_name must be a non-empty string."
   }
 
   validation {
@@ -547,22 +623,20 @@ variable "branch_policy_build_validation" {
     condition = alltrue([
       for policy in var.branch_policy_build_validation : alltrue([
         for scope in policy.scope : (
-          (scope.repository_id != null) != (scope.repository_key != null)
+          scope.repository_id == null || length(trimspace(scope.repository_id)) > 0
         )
       ])
     ])
-    error_message = "branch_policy_build_validation.scope must set exactly one of repository_id or repository_key."
+    error_message = "branch_policy_build_validation.scope.repository_id must be a non-empty string when provided."
   }
 
   validation {
-    condition = alltrue([
+    condition = var.name != null || alltrue([
       for policy in var.branch_policy_build_validation : alltrue([
-        for scope in policy.scope : (
-          scope.repository_key == null || contains(keys(var.repositories), scope.repository_key)
-        )
+        for scope in policy.scope : scope.repository_id != null
       ])
     ])
-    error_message = "branch_policy_build_validation.scope.repository_key must reference a key in repositories."
+    error_message = "branch_policy_build_validation.scope.repository_id is required when the module repository is not created."
   }
 
   validation {
@@ -590,20 +664,34 @@ variable "branch_policy_build_validation" {
   }
 
   validation {
-    condition = length(distinct([
-      for policy in var.branch_policy_build_validation : coalesce(
-        policy.key,
-        format(
-          "build_validation:%s",
-          coalesce(
-            try(policy.scope[0].repository_key, null),
-            try(policy.scope[0].repository_id, null),
-            "missing"
+    condition = alltrue([
+      for policy in var.branch_policy_build_validation : alltrue([
+        for scope in policy.scope : (
+          scope.repository_ref == null || length(trimspace(scope.repository_ref)) > 0
+        )
+      ])
+    ])
+    error_message = "branch_policy_build_validation.scope.repository_ref must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for policy in var.branch_policy_build_validation : alltrue([
+        for scope in policy.scope : (
+          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || (
+            scope.repository_id == null && scope.repository_ref == null
           )
         )
-      )
+      ])
+    ])
+    error_message = "branch_policy_build_validation.scope must omit repository_id and repository_ref when match_type is DefaultBranch."
+  }
+
+  validation {
+    condition = length(distinct([
+      for policy in var.branch_policy_build_validation : coalesce(policy.key, "build_validation")
     ])) == length(var.branch_policy_build_validation)
-    error_message = "branch_policy_build_validation keys must be unique; set key when scopes would collide."
+    error_message = "branch_policy_build_validation keys must be unique; set key when multiple policies are defined."
   }
 }
 
@@ -619,7 +707,6 @@ variable "branch_policy_comment_resolution" {
     blocking = optional(bool)
     scope = list(object({
       repository_id  = optional(string)
-      repository_key = optional(string)
       repository_ref = optional(string)
       match_type     = optional(string)
     }))
@@ -646,22 +733,20 @@ variable "branch_policy_comment_resolution" {
     condition = alltrue([
       for policy in var.branch_policy_comment_resolution : alltrue([
         for scope in policy.scope : (
-          (scope.repository_id != null) != (scope.repository_key != null)
+          scope.repository_id == null || length(trimspace(scope.repository_id)) > 0
         )
       ])
     ])
-    error_message = "branch_policy_comment_resolution.scope must set exactly one of repository_id or repository_key."
+    error_message = "branch_policy_comment_resolution.scope.repository_id must be a non-empty string when provided."
   }
 
   validation {
-    condition = alltrue([
+    condition = var.name != null || alltrue([
       for policy in var.branch_policy_comment_resolution : alltrue([
-        for scope in policy.scope : (
-          scope.repository_key == null || contains(keys(var.repositories), scope.repository_key)
-        )
+        for scope in policy.scope : scope.repository_id != null
       ])
     ])
-    error_message = "branch_policy_comment_resolution.scope.repository_key must reference a key in repositories."
+    error_message = "branch_policy_comment_resolution.scope.repository_id is required when the module repository is not created."
   }
 
   validation {
@@ -689,20 +774,34 @@ variable "branch_policy_comment_resolution" {
   }
 
   validation {
-    condition = length(distinct([
-      for policy in var.branch_policy_comment_resolution : coalesce(
-        policy.key,
-        format(
-          "comment_resolution:%s",
-          coalesce(
-            try(policy.scope[0].repository_key, null),
-            try(policy.scope[0].repository_id, null),
-            "missing"
+    condition = alltrue([
+      for policy in var.branch_policy_comment_resolution : alltrue([
+        for scope in policy.scope : (
+          scope.repository_ref == null || length(trimspace(scope.repository_ref)) > 0
+        )
+      ])
+    ])
+    error_message = "branch_policy_comment_resolution.scope.repository_ref must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for policy in var.branch_policy_comment_resolution : alltrue([
+        for scope in policy.scope : (
+          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || (
+            scope.repository_id == null && scope.repository_ref == null
           )
         )
-      )
+      ])
+    ])
+    error_message = "branch_policy_comment_resolution.scope must omit repository_id and repository_ref when match_type is DefaultBranch."
+  }
+
+  validation {
+    condition = length(distinct([
+      for policy in var.branch_policy_comment_resolution : coalesce(policy.key, "comment_resolution")
     ])) == length(var.branch_policy_comment_resolution)
-    error_message = "branch_policy_comment_resolution keys must be unique; set key when scopes would collide."
+    error_message = "branch_policy_comment_resolution keys must be unique; set key when multiple policies are defined."
   }
 }
 
@@ -722,7 +821,6 @@ variable "branch_policy_merge_types" {
     allow_rebase_with_merge       = optional(bool)
     scope = list(object({
       repository_id  = optional(string)
-      repository_key = optional(string)
       repository_ref = optional(string)
       match_type     = optional(string)
     }))
@@ -749,22 +847,20 @@ variable "branch_policy_merge_types" {
     condition = alltrue([
       for policy in var.branch_policy_merge_types : alltrue([
         for scope in policy.scope : (
-          (scope.repository_id != null) != (scope.repository_key != null)
+          scope.repository_id == null || length(trimspace(scope.repository_id)) > 0
         )
       ])
     ])
-    error_message = "branch_policy_merge_types.scope must set exactly one of repository_id or repository_key."
+    error_message = "branch_policy_merge_types.scope.repository_id must be a non-empty string when provided."
   }
 
   validation {
-    condition = alltrue([
+    condition = var.name != null || alltrue([
       for policy in var.branch_policy_merge_types : alltrue([
-        for scope in policy.scope : (
-          scope.repository_key == null || contains(keys(var.repositories), scope.repository_key)
-        )
+        for scope in policy.scope : scope.repository_id != null
       ])
     ])
-    error_message = "branch_policy_merge_types.scope.repository_key must reference a key in repositories."
+    error_message = "branch_policy_merge_types.scope.repository_id is required when the module repository is not created."
   }
 
   validation {
@@ -792,25 +888,39 @@ variable "branch_policy_merge_types" {
   }
 
   validation {
-    condition = length(distinct([
-      for policy in var.branch_policy_merge_types : coalesce(
-        policy.key,
-        format(
-          "merge_types:%s",
-          coalesce(
-            try(policy.scope[0].repository_key, null),
-            try(policy.scope[0].repository_id, null),
-            "missing"
+    condition = alltrue([
+      for policy in var.branch_policy_merge_types : alltrue([
+        for scope in policy.scope : (
+          scope.repository_ref == null || length(trimspace(scope.repository_ref)) > 0
+        )
+      ])
+    ])
+    error_message = "branch_policy_merge_types.scope.repository_ref must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for policy in var.branch_policy_merge_types : alltrue([
+        for scope in policy.scope : (
+          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || (
+            scope.repository_id == null && scope.repository_ref == null
           )
         )
-      )
+      ])
+    ])
+    error_message = "branch_policy_merge_types.scope must omit repository_id and repository_ref when match_type is DefaultBranch."
+  }
+
+  validation {
+    condition = length(distinct([
+      for policy in var.branch_policy_merge_types : coalesce(policy.key, "merge_types")
     ])) == length(var.branch_policy_merge_types)
-    error_message = "branch_policy_merge_types keys must be unique; set key when scopes would collide."
+    error_message = "branch_policy_merge_types keys must be unique; set key when multiple policies are defined."
   }
 }
 
 # -----------------------------------------------------------------------------
-# Branch Policies - Minimum Reviewers
+# Branch Policies - Min Reviewers
 # -----------------------------------------------------------------------------
 
 variable "branch_policy_min_reviewers" {
@@ -828,7 +938,6 @@ variable "branch_policy_min_reviewers" {
     on_last_iteration_require_vote         = optional(bool)
     scope = list(object({
       repository_id  = optional(string)
-      repository_key = optional(string)
       repository_ref = optional(string)
       match_type     = optional(string)
     }))
@@ -862,22 +971,20 @@ variable "branch_policy_min_reviewers" {
     condition = alltrue([
       for policy in var.branch_policy_min_reviewers : alltrue([
         for scope in policy.scope : (
-          (scope.repository_id != null) != (scope.repository_key != null)
+          scope.repository_id == null || length(trimspace(scope.repository_id)) > 0
         )
       ])
     ])
-    error_message = "branch_policy_min_reviewers.scope must set exactly one of repository_id or repository_key."
+    error_message = "branch_policy_min_reviewers.scope.repository_id must be a non-empty string when provided."
   }
 
   validation {
-    condition = alltrue([
+    condition = var.name != null || alltrue([
       for policy in var.branch_policy_min_reviewers : alltrue([
-        for scope in policy.scope : (
-          scope.repository_key == null || contains(keys(var.repositories), scope.repository_key)
-        )
+        for scope in policy.scope : scope.repository_id != null
       ])
     ])
-    error_message = "branch_policy_min_reviewers.scope.repository_key must reference a key in repositories."
+    error_message = "branch_policy_min_reviewers.scope.repository_id is required when the module repository is not created."
   }
 
   validation {
@@ -905,20 +1012,34 @@ variable "branch_policy_min_reviewers" {
   }
 
   validation {
-    condition = length(distinct([
-      for policy in var.branch_policy_min_reviewers : coalesce(
-        policy.key,
-        format(
-          "min_reviewers:%s",
-          coalesce(
-            try(policy.scope[0].repository_key, null),
-            try(policy.scope[0].repository_id, null),
-            "missing"
+    condition = alltrue([
+      for policy in var.branch_policy_min_reviewers : alltrue([
+        for scope in policy.scope : (
+          scope.repository_ref == null || length(trimspace(scope.repository_ref)) > 0
+        )
+      ])
+    ])
+    error_message = "branch_policy_min_reviewers.scope.repository_ref must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for policy in var.branch_policy_min_reviewers : alltrue([
+        for scope in policy.scope : (
+          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || (
+            scope.repository_id == null && scope.repository_ref == null
           )
         )
-      )
+      ])
+    ])
+    error_message = "branch_policy_min_reviewers.scope must omit repository_id and repository_ref when match_type is DefaultBranch."
+  }
+
+  validation {
+    condition = length(distinct([
+      for policy in var.branch_policy_min_reviewers : coalesce(policy.key, "min_reviewers")
     ])) == length(var.branch_policy_min_reviewers)
-    error_message = "branch_policy_min_reviewers keys must be unique; set key when scopes would collide."
+    error_message = "branch_policy_min_reviewers keys must be unique; set key when multiple policies are defined."
   }
 }
 
@@ -941,7 +1062,6 @@ variable "branch_policy_status_check" {
     display_name         = optional(string)
     scope = list(object({
       repository_id  = optional(string)
-      repository_key = optional(string)
       repository_ref = optional(string)
       match_type     = optional(string)
     }))
@@ -967,6 +1087,15 @@ variable "branch_policy_status_check" {
   validation {
     condition = alltrue([
       for policy in var.branch_policy_status_check : (
+        policy.genre == null || length(trimspace(policy.genre)) > 0
+      )
+    ])
+    error_message = "branch_policy_status_check.genre must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for policy in var.branch_policy_status_check : (
         policy.display_name == null || length(trimspace(policy.display_name)) > 0
       )
     ])
@@ -984,22 +1113,20 @@ variable "branch_policy_status_check" {
     condition = alltrue([
       for policy in var.branch_policy_status_check : alltrue([
         for scope in policy.scope : (
-          (scope.repository_id != null) != (scope.repository_key != null)
+          scope.repository_id == null || length(trimspace(scope.repository_id)) > 0
         )
       ])
     ])
-    error_message = "branch_policy_status_check.scope must set exactly one of repository_id or repository_key."
+    error_message = "branch_policy_status_check.scope.repository_id must be a non-empty string when provided."
   }
 
   validation {
-    condition = alltrue([
+    condition = var.name != null || alltrue([
       for policy in var.branch_policy_status_check : alltrue([
-        for scope in policy.scope : (
-          scope.repository_key == null || contains(keys(var.repositories), scope.repository_key)
-        )
+        for scope in policy.scope : scope.repository_id != null
       ])
     ])
-    error_message = "branch_policy_status_check.scope.repository_key must reference a key in repositories."
+    error_message = "branch_policy_status_check.scope.repository_id is required when the module repository is not created."
   }
 
   validation {
@@ -1027,20 +1154,34 @@ variable "branch_policy_status_check" {
   }
 
   validation {
-    condition = length(distinct([
-      for policy in var.branch_policy_status_check : coalesce(
-        policy.key,
-        format(
-          "status_check:%s",
-          coalesce(
-            try(policy.scope[0].repository_key, null),
-            try(policy.scope[0].repository_id, null),
-            "missing"
+    condition = alltrue([
+      for policy in var.branch_policy_status_check : alltrue([
+        for scope in policy.scope : (
+          scope.repository_ref == null || length(trimspace(scope.repository_ref)) > 0
+        )
+      ])
+    ])
+    error_message = "branch_policy_status_check.scope.repository_ref must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for policy in var.branch_policy_status_check : alltrue([
+        for scope in policy.scope : (
+          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || (
+            scope.repository_id == null && scope.repository_ref == null
           )
         )
-      )
+      ])
+    ])
+    error_message = "branch_policy_status_check.scope must omit repository_id and repository_ref when match_type is DefaultBranch."
+  }
+
+  validation {
+    condition = length(distinct([
+      for policy in var.branch_policy_status_check : coalesce(policy.key, "status_check")
     ])) == length(var.branch_policy_status_check)
-    error_message = "branch_policy_status_check keys must be unique; set key when scopes would collide."
+    error_message = "branch_policy_status_check keys must be unique; set key when multiple policies are defined."
   }
 }
 
@@ -1056,7 +1197,6 @@ variable "branch_policy_work_item_linking" {
     blocking = optional(bool)
     scope = list(object({
       repository_id  = optional(string)
-      repository_key = optional(string)
       repository_ref = optional(string)
       match_type     = optional(string)
     }))
@@ -1083,22 +1223,20 @@ variable "branch_policy_work_item_linking" {
     condition = alltrue([
       for policy in var.branch_policy_work_item_linking : alltrue([
         for scope in policy.scope : (
-          (scope.repository_id != null) != (scope.repository_key != null)
+          scope.repository_id == null || length(trimspace(scope.repository_id)) > 0
         )
       ])
     ])
-    error_message = "branch_policy_work_item_linking.scope must set exactly one of repository_id or repository_key."
+    error_message = "branch_policy_work_item_linking.scope.repository_id must be a non-empty string when provided."
   }
 
   validation {
-    condition = alltrue([
+    condition = var.name != null || alltrue([
       for policy in var.branch_policy_work_item_linking : alltrue([
-        for scope in policy.scope : (
-          scope.repository_key == null || contains(keys(var.repositories), scope.repository_key)
-        )
+        for scope in policy.scope : scope.repository_id != null
       ])
     ])
-    error_message = "branch_policy_work_item_linking.scope.repository_key must reference a key in repositories."
+    error_message = "branch_policy_work_item_linking.scope.repository_id is required when the module repository is not created."
   }
 
   validation {
@@ -1126,20 +1264,34 @@ variable "branch_policy_work_item_linking" {
   }
 
   validation {
-    condition = length(distinct([
-      for policy in var.branch_policy_work_item_linking : coalesce(
-        policy.key,
-        format(
-          "work_item_linking:%s",
-          coalesce(
-            try(policy.scope[0].repository_key, null),
-            try(policy.scope[0].repository_id, null),
-            "missing"
+    condition = alltrue([
+      for policy in var.branch_policy_work_item_linking : alltrue([
+        for scope in policy.scope : (
+          scope.repository_ref == null || length(trimspace(scope.repository_ref)) > 0
+        )
+      ])
+    ])
+    error_message = "branch_policy_work_item_linking.scope.repository_ref must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for policy in var.branch_policy_work_item_linking : alltrue([
+        for scope in policy.scope : (
+          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || (
+            scope.repository_id == null && scope.repository_ref == null
           )
         )
-      )
+      ])
+    ])
+    error_message = "branch_policy_work_item_linking.scope must omit repository_id and repository_ref when match_type is DefaultBranch."
+  }
+
+  validation {
+    condition = length(distinct([
+      for policy in var.branch_policy_work_item_linking : coalesce(policy.key, "work_item_linking")
     ])) == length(var.branch_policy_work_item_linking)
-    error_message = "branch_policy_work_item_linking keys must be unique; set key when scopes would collide."
+    error_message = "branch_policy_work_item_linking keys must be unique; set key when multiple policies are defined."
   }
 }
 
@@ -1155,7 +1307,6 @@ variable "repository_policy_author_email_pattern" {
     blocking              = optional(bool)
     author_email_patterns = list(string)
     repository_ids        = optional(list(string))
-    repository_keys       = optional(list(string))
   }))
   default = []
 
@@ -1177,36 +1328,43 @@ variable "repository_policy_author_email_pattern" {
 
   validation {
     condition = alltrue([
+      for policy in var.repository_policy_author_email_pattern : alltrue([
+        for pattern in policy.author_email_patterns : length(trimspace(pattern)) > 0
+      ])
+    ])
+    error_message = "repository_policy_author_email_pattern.author_email_patterns must contain non-empty values."
+  }
+
+  validation {
+    condition = alltrue([
       for policy in var.repository_policy_author_email_pattern : (
-        length(coalesce(policy.repository_ids, [])) + length(coalesce(policy.repository_keys, [])) > 0
+        policy.repository_ids == null || length(policy.repository_ids) > 0
       )
     ])
-    error_message = "repository_policy_author_email_pattern requires repository_ids or repository_keys."
+    error_message = "repository_policy_author_email_pattern.repository_ids must not be empty when provided."
   }
 
   validation {
     condition = alltrue([
       for policy in var.repository_policy_author_email_pattern : alltrue([
-        for key in coalesce(policy.repository_keys, []) : contains(keys(var.repositories), key)
+        for repository_id in coalesce(policy.repository_ids, []) : length(trimspace(repository_id)) > 0
       ])
     ])
-    error_message = "repository_policy_author_email_pattern.repository_keys must reference keys in repositories."
+    error_message = "repository_policy_author_email_pattern.repository_ids must contain non-empty values when provided."
+  }
+
+  validation {
+    condition = var.name != null || alltrue([
+      for policy in var.repository_policy_author_email_pattern : policy.repository_ids != null
+    ])
+    error_message = "repository_policy_author_email_pattern.repository_ids are required when the module repository is not created."
   }
 
   validation {
     condition = length(distinct([
-      for policy in var.repository_policy_author_email_pattern : coalesce(
-        policy.key,
-        format(
-          "author_email_pattern:%s",
-          join(",", sort(concat(
-            [for id in coalesce(policy.repository_ids, []) : "id:${id}"],
-            [for key in coalesce(policy.repository_keys, []) : "key:${key}"]
-          )))
-        )
-      )
+      for policy in var.repository_policy_author_email_pattern : coalesce(policy.key, "author_email_pattern")
     ])) == length(var.repository_policy_author_email_pattern)
-    error_message = "repository_policy_author_email_pattern keys must be unique; set key when repository targets would collide."
+    error_message = "repository_policy_author_email_pattern keys must be unique; set key when multiple policies are defined."
   }
 }
 
@@ -1222,7 +1380,6 @@ variable "repository_policy_case_enforcement" {
     blocking                = optional(bool)
     enforce_consistent_case = bool
     repository_ids          = optional(list(string))
-    repository_keys         = optional(list(string))
   }))
   default = []
 
@@ -1238,35 +1395,33 @@ variable "repository_policy_case_enforcement" {
   validation {
     condition = alltrue([
       for policy in var.repository_policy_case_enforcement : (
-        length(coalesce(policy.repository_ids, [])) + length(coalesce(policy.repository_keys, [])) > 0
+        policy.repository_ids == null || length(policy.repository_ids) > 0
       )
     ])
-    error_message = "repository_policy_case_enforcement requires repository_ids or repository_keys."
+    error_message = "repository_policy_case_enforcement.repository_ids must not be empty when provided."
   }
 
   validation {
     condition = alltrue([
       for policy in var.repository_policy_case_enforcement : alltrue([
-        for key in coalesce(policy.repository_keys, []) : contains(keys(var.repositories), key)
+        for repository_id in coalesce(policy.repository_ids, []) : length(trimspace(repository_id)) > 0
       ])
     ])
-    error_message = "repository_policy_case_enforcement.repository_keys must reference keys in repositories."
+    error_message = "repository_policy_case_enforcement.repository_ids must contain non-empty values when provided."
+  }
+
+  validation {
+    condition = var.name != null || alltrue([
+      for policy in var.repository_policy_case_enforcement : policy.repository_ids != null
+    ])
+    error_message = "repository_policy_case_enforcement.repository_ids are required when the module repository is not created."
   }
 
   validation {
     condition = length(distinct([
-      for policy in var.repository_policy_case_enforcement : coalesce(
-        policy.key,
-        format(
-          "case_enforcement:%s",
-          join(",", sort(concat(
-            [for id in coalesce(policy.repository_ids, []) : "id:${id}"],
-            [for key in coalesce(policy.repository_keys, []) : "key:${key}"]
-          )))
-        )
-      )
+      for policy in var.repository_policy_case_enforcement : coalesce(policy.key, "case_enforcement")
     ])) == length(var.repository_policy_case_enforcement)
-    error_message = "repository_policy_case_enforcement keys must be unique; set key when repository targets would collide."
+    error_message = "repository_policy_case_enforcement keys must be unique; set key when multiple policies are defined."
   }
 }
 
@@ -1282,7 +1437,6 @@ variable "repository_policy_file_path_pattern" {
     blocking          = optional(bool)
     filepath_patterns = list(string)
     repository_ids    = optional(list(string))
-    repository_keys   = optional(list(string))
   }))
   default = []
 
@@ -1304,36 +1458,43 @@ variable "repository_policy_file_path_pattern" {
 
   validation {
     condition = alltrue([
+      for policy in var.repository_policy_file_path_pattern : alltrue([
+        for pattern in policy.filepath_patterns : length(trimspace(pattern)) > 0
+      ])
+    ])
+    error_message = "repository_policy_file_path_pattern.filepath_patterns must contain non-empty values."
+  }
+
+  validation {
+    condition = alltrue([
       for policy in var.repository_policy_file_path_pattern : (
-        length(coalesce(policy.repository_ids, [])) + length(coalesce(policy.repository_keys, [])) > 0
+        policy.repository_ids == null || length(policy.repository_ids) > 0
       )
     ])
-    error_message = "repository_policy_file_path_pattern requires repository_ids or repository_keys."
+    error_message = "repository_policy_file_path_pattern.repository_ids must not be empty when provided."
   }
 
   validation {
     condition = alltrue([
       for policy in var.repository_policy_file_path_pattern : alltrue([
-        for key in coalesce(policy.repository_keys, []) : contains(keys(var.repositories), key)
+        for repository_id in coalesce(policy.repository_ids, []) : length(trimspace(repository_id)) > 0
       ])
     ])
-    error_message = "repository_policy_file_path_pattern.repository_keys must reference keys in repositories."
+    error_message = "repository_policy_file_path_pattern.repository_ids must contain non-empty values when provided."
+  }
+
+  validation {
+    condition = var.name != null || alltrue([
+      for policy in var.repository_policy_file_path_pattern : policy.repository_ids != null
+    ])
+    error_message = "repository_policy_file_path_pattern.repository_ids are required when the module repository is not created."
   }
 
   validation {
     condition = length(distinct([
-      for policy in var.repository_policy_file_path_pattern : coalesce(
-        policy.key,
-        format(
-          "file_path_pattern:%s",
-          join(",", sort(concat(
-            [for id in coalesce(policy.repository_ids, []) : "id:${id}"],
-            [for key in coalesce(policy.repository_keys, []) : "key:${key}"]
-          )))
-        )
-      )
+      for policy in var.repository_policy_file_path_pattern : coalesce(policy.key, "file_path_pattern")
     ])) == length(var.repository_policy_file_path_pattern)
-    error_message = "repository_policy_file_path_pattern keys must be unique; set key when repository targets would collide."
+    error_message = "repository_policy_file_path_pattern keys must be unique; set key when multiple policies are defined."
   }
 }
 
@@ -1344,12 +1505,11 @@ variable "repository_policy_file_path_pattern" {
 variable "repository_policy_max_file_size" {
   description = "List of max file size repository policies."
   type = list(object({
-    key             = optional(string)
-    enabled         = optional(bool)
-    blocking        = optional(bool)
-    max_file_size   = number
-    repository_ids  = optional(list(string))
-    repository_keys = optional(list(string))
+    key            = optional(string)
+    enabled        = optional(bool)
+    blocking       = optional(bool)
+    max_file_size  = number
+    repository_ids = optional(list(string))
   }))
   default = []
 
@@ -1372,35 +1532,33 @@ variable "repository_policy_max_file_size" {
   validation {
     condition = alltrue([
       for policy in var.repository_policy_max_file_size : (
-        length(coalesce(policy.repository_ids, [])) + length(coalesce(policy.repository_keys, [])) > 0
+        policy.repository_ids == null || length(policy.repository_ids) > 0
       )
     ])
-    error_message = "repository_policy_max_file_size requires repository_ids or repository_keys."
+    error_message = "repository_policy_max_file_size.repository_ids must not be empty when provided."
   }
 
   validation {
     condition = alltrue([
       for policy in var.repository_policy_max_file_size : alltrue([
-        for key in coalesce(policy.repository_keys, []) : contains(keys(var.repositories), key)
+        for repository_id in coalesce(policy.repository_ids, []) : length(trimspace(repository_id)) > 0
       ])
     ])
-    error_message = "repository_policy_max_file_size.repository_keys must reference keys in repositories."
+    error_message = "repository_policy_max_file_size.repository_ids must contain non-empty values when provided."
+  }
+
+  validation {
+    condition = var.name != null || alltrue([
+      for policy in var.repository_policy_max_file_size : policy.repository_ids != null
+    ])
+    error_message = "repository_policy_max_file_size.repository_ids are required when the module repository is not created."
   }
 
   validation {
     condition = length(distinct([
-      for policy in var.repository_policy_max_file_size : coalesce(
-        policy.key,
-        format(
-          "max_file_size:%s",
-          join(",", sort(concat(
-            [for id in coalesce(policy.repository_ids, []) : "id:${id}"],
-            [for key in coalesce(policy.repository_keys, []) : "key:${key}"]
-          )))
-        )
-      )
+      for policy in var.repository_policy_max_file_size : coalesce(policy.key, "max_file_size")
     ])) == length(var.repository_policy_max_file_size)
-    error_message = "repository_policy_max_file_size keys must be unique; set key when repository targets would collide."
+    error_message = "repository_policy_max_file_size keys must be unique; set key when multiple policies are defined."
   }
 }
 
@@ -1416,7 +1574,6 @@ variable "repository_policy_max_path_length" {
     blocking        = optional(bool)
     max_path_length = number
     repository_ids  = optional(list(string))
-    repository_keys = optional(list(string))
   }))
   default = []
 
@@ -1439,35 +1596,33 @@ variable "repository_policy_max_path_length" {
   validation {
     condition = alltrue([
       for policy in var.repository_policy_max_path_length : (
-        length(coalesce(policy.repository_ids, [])) + length(coalesce(policy.repository_keys, [])) > 0
+        policy.repository_ids == null || length(policy.repository_ids) > 0
       )
     ])
-    error_message = "repository_policy_max_path_length requires repository_ids or repository_keys."
+    error_message = "repository_policy_max_path_length.repository_ids must not be empty when provided."
   }
 
   validation {
     condition = alltrue([
       for policy in var.repository_policy_max_path_length : alltrue([
-        for key in coalesce(policy.repository_keys, []) : contains(keys(var.repositories), key)
+        for repository_id in coalesce(policy.repository_ids, []) : length(trimspace(repository_id)) > 0
       ])
     ])
-    error_message = "repository_policy_max_path_length.repository_keys must reference keys in repositories."
+    error_message = "repository_policy_max_path_length.repository_ids must contain non-empty values when provided."
+  }
+
+  validation {
+    condition = var.name != null || alltrue([
+      for policy in var.repository_policy_max_path_length : policy.repository_ids != null
+    ])
+    error_message = "repository_policy_max_path_length.repository_ids are required when the module repository is not created."
   }
 
   validation {
     condition = length(distinct([
-      for policy in var.repository_policy_max_path_length : coalesce(
-        policy.key,
-        format(
-          "max_path_length:%s",
-          join(",", sort(concat(
-            [for id in coalesce(policy.repository_ids, []) : "id:${id}"],
-            [for key in coalesce(policy.repository_keys, []) : "key:${key}"]
-          )))
-        )
-      )
+      for policy in var.repository_policy_max_path_length : coalesce(policy.key, "max_path_length")
     ])) == length(var.repository_policy_max_path_length)
-    error_message = "repository_policy_max_path_length keys must be unique; set key when repository targets would collide."
+    error_message = "repository_policy_max_path_length keys must be unique; set key when multiple policies are defined."
   }
 }
 
@@ -1478,11 +1633,10 @@ variable "repository_policy_max_path_length" {
 variable "repository_policy_reserved_names" {
   description = "List of reserved names repository policies."
   type = list(object({
-    key             = optional(string)
-    enabled         = optional(bool)
-    blocking        = optional(bool)
-    repository_ids  = optional(list(string))
-    repository_keys = optional(list(string))
+    key            = optional(string)
+    enabled        = optional(bool)
+    blocking       = optional(bool)
+    repository_ids = optional(list(string))
   }))
   default = []
 
@@ -1498,34 +1652,32 @@ variable "repository_policy_reserved_names" {
   validation {
     condition = alltrue([
       for policy in var.repository_policy_reserved_names : (
-        length(coalesce(policy.repository_ids, [])) + length(coalesce(policy.repository_keys, [])) > 0
+        policy.repository_ids == null || length(policy.repository_ids) > 0
       )
     ])
-    error_message = "repository_policy_reserved_names requires repository_ids or repository_keys."
+    error_message = "repository_policy_reserved_names.repository_ids must not be empty when provided."
   }
 
   validation {
     condition = alltrue([
       for policy in var.repository_policy_reserved_names : alltrue([
-        for key in coalesce(policy.repository_keys, []) : contains(keys(var.repositories), key)
+        for repository_id in coalesce(policy.repository_ids, []) : length(trimspace(repository_id)) > 0
       ])
     ])
-    error_message = "repository_policy_reserved_names.repository_keys must reference keys in repositories."
+    error_message = "repository_policy_reserved_names.repository_ids must contain non-empty values when provided."
+  }
+
+  validation {
+    condition = var.name != null || alltrue([
+      for policy in var.repository_policy_reserved_names : policy.repository_ids != null
+    ])
+    error_message = "repository_policy_reserved_names.repository_ids are required when the module repository is not created."
   }
 
   validation {
     condition = length(distinct([
-      for policy in var.repository_policy_reserved_names : coalesce(
-        policy.key,
-        format(
-          "reserved_names:%s",
-          join(",", sort(concat(
-            [for id in coalesce(policy.repository_ids, []) : "id:${id}"],
-            [for key in coalesce(policy.repository_keys, []) : "key:${key}"]
-          )))
-        )
-      )
+      for policy in var.repository_policy_reserved_names : coalesce(policy.key, "reserved_names")
     ])) == length(var.repository_policy_reserved_names)
-    error_message = "repository_policy_reserved_names keys must be unique; set key when repository targets would collide."
+    error_message = "repository_policy_reserved_names keys must be unique; set key when multiple policies are defined."
   }
 }

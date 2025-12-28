@@ -15,9 +15,7 @@ module "azuredevops_servicehooks" {
 
   project_id = var.project_id
 
-  webhooks = [
-    {
-      url = var.webhook_url
-    }
-  ]
+  webhook = {
+    url = var.webhook_url
+  }
 }

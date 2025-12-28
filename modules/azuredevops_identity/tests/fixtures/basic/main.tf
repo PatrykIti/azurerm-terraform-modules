@@ -1,7 +1,6 @@
 terraform {
   required_version = ">= 1.12.2"
   required_providers {
-  
     azuredevops = {
       source  = "microsoft/azuredevops"
       version = "1.12.2"
@@ -22,10 +21,6 @@ resource "random_string" "suffix" {
 module "azuredevops_identity" {
   source = "../../../"
 
-  groups = {
-    readers = {
-      display_name = "${var.group_name_prefix}-${random_string.suffix.result}"
-      description  = "Test readers group"
-    }
-  }
+  group_display_name = "${var.group_name_prefix}-${random_string.suffix.result}"
+  group_description  = "Test readers group"
 }

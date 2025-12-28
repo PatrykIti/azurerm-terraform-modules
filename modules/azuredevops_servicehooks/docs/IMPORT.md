@@ -18,7 +18,6 @@ into `modules/azuredevops_servicehooks` using Terraform **import blocks**.
 ## 1) Minimal module configuration
 
 Create `main.tf` with a module block and fill in **existing** settings.
-Use stable `key` values to match the import targets.
 
 ```hcl
 terraform {
@@ -39,24 +38,18 @@ module "azuredevops_servicehooks" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  webhooks = [
-    {
-      key = "git-push"
-      url = "https://example.com/webhook"
-      git_push = {}
-    }
-  ]
+  webhook = {
+    url      = "https://example.com/webhook"
+    git_push = {}
+  }
 
-  storage_queue_hooks = [
-    {
-      key          = "queue-run-completed"
-      account_name = "existing-storage-account"
-      account_key  = "existing-account-key"
-      queue_name   = "existing-queue"
-      visi_timeout = 30
-      run_state_changed_event = {}
-    }
-  ]
+  storage_queue_hook = {
+    account_name            = "existing-storage-account"
+    account_key             = "existing-account-key"
+    queue_name              = "existing-queue"
+    visi_timeout            = 30
+    run_state_changed_event = {}
+  }
 }
 ```
 
@@ -68,7 +61,7 @@ Create `import.tf` with an import block per webhook:
 
 ```hcl
 import {
-  to = module.azuredevops_servicehooks.azuredevops_servicehook_webhook_tfs.webhook["git-push"]
+  to = module.azuredevops_servicehooks.azuredevops_servicehook_webhook_tfs.webhook[0]
   id = "<service_hook_id>"
 }
 ```
@@ -82,7 +75,7 @@ Azure DevOps provider docs for the exact format.
 
 ```hcl
 import {
-  to = module.azuredevops_servicehooks.azuredevops_servicehook_storage_queue_pipelines.storage_queue["queue-run-completed"]
+  to = module.azuredevops_servicehooks.azuredevops_servicehook_storage_queue_pipelines.storage_queue[0]
   id = "<service_hook_id>"
 }
 ```

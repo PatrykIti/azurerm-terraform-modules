@@ -34,10 +34,10 @@ func TestAzuredevopsIdentityFullIntegration(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		groupIDs := terraform.OutputMap(t, terraformOptions, "group_ids")
+		groupID := terraform.Output(t, terraformOptions, "group_id")
 		groupMemberships := terraform.OutputMap(t, terraformOptions, "group_membership_ids")
 
-		assert.NotEmpty(t, groupIDs)
+		assert.NotEmpty(t, groupID)
 		assert.NotEmpty(t, groupMemberships)
 		assert.Contains(t, groupMemberships, "platform-membership")
 

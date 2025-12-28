@@ -4,38 +4,15 @@ mock_provider "azuredevops" {}
 
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
-
-  build_definitions = {
-    core = {
-      repository = {
-        repo_id   = "00000000-0000-0000-0000-000000000000"
-        repo_type = "TfsGit"
-        yml_path  = "azure-pipelines.yml"
-      }
-    }
+  name       = "pipeline-validation"
+  repository = {
+    repo_id   = "00000000-0000-0000-0000-000000000000"
+    repo_type = "TfsGit"
+    yml_path  = "azure-pipelines.yml"
   }
 }
 
-run "invalid_pipeline_authorization_both_ids" {
-  command = plan
-
-  variables {
-    pipeline_authorizations = [
-      {
-        resource_id  = "00000000-0000-0000-0000-000000000000"
-        type         = "endpoint"
-        pipeline_id  = "1"
-        pipeline_key = "core"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.pipeline_authorizations,
-  ]
-}
-
-run "invalid_pipeline_authorization_missing_id" {
+run "invalid_pipeline_authorization_pipeline_id_empty" {
   command = plan
 
   variables {
@@ -43,6 +20,7 @@ run "invalid_pipeline_authorization_missing_id" {
       {
         resource_id = "00000000-0000-0000-0000-000000000000"
         type        = "endpoint"
+        pipeline_id = ""
       }
     ]
   }
@@ -58,9 +36,8 @@ run "invalid_pipeline_authorization_type" {
   variables {
     pipeline_authorizations = [
       {
-        resource_id  = "00000000-0000-0000-0000-000000000000"
-        type         = "invalid"
-        pipeline_key = "core"
+        resource_id = "00000000-0000-0000-0000-000000000000"
+        type        = "invalid"
       }
     ]
   }
@@ -70,15 +47,14 @@ run "invalid_pipeline_authorization_type" {
   ]
 }
 
-run "invalid_pipeline_authorization_unknown_key" {
+run "invalid_pipeline_authorization_resource_id_empty" {
   command = plan
 
   variables {
     pipeline_authorizations = [
       {
-        resource_id  = "00000000-0000-0000-0000-000000000000"
-        type         = "endpoint"
-        pipeline_key = "missing"
+        resource_id = ""
+        type        = "endpoint"
       }
     ]
   }
@@ -88,15 +64,36 @@ run "invalid_pipeline_authorization_unknown_key" {
   ]
 }
 
-run "invalid_resource_authorization_missing_definition" {
+run "invalid_build_definition_permission_empty_id" {
+  command = plan
+
+  variables {
+    build_definition_permissions = [
+      {
+        build_definition_id = ""
+        principal           = "00000000-0000-0000-0000-000000000000"
+        permissions = {
+          ViewBuildDefinition = "Allow"
+        }
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.build_definition_permissions,
+  ]
+}
+
+run "invalid_resource_authorization_definition_id_empty" {
   command = plan
 
   variables {
     resource_authorizations = [
       {
-        resource_id = "00000000-0000-0000-0000-000000000000"
-        authorized  = true
-        type        = "endpoint"
+        resource_id   = "00000000-0000-0000-0000-000000000000"
+        authorized    = true
+        type          = "endpoint"
+        definition_id = ""
       }
     ]
   }
@@ -144,45 +141,6 @@ run "invalid_resource_authorization_authorized_false" {
   ]
 }
 
-run "invalid_resource_authorization_unknown_key" {
-  command = plan
-
-  variables {
-    resource_authorizations = [
-      {
-        resource_id          = "00000000-0000-0000-0000-000000000000"
-        authorized           = true
-        type                 = "endpoint"
-        build_definition_key = "missing"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.resource_authorizations,
-  ]
-}
-
-run "invalid_build_definition_permission_unknown_key" {
-  command = plan
-
-  variables {
-    build_definition_permissions = [
-      {
-        build_definition_key = "missing"
-        principal            = "00000000-0000-0000-0000-000000000000"
-        permissions = {
-          ViewBuildDefinition = "Allow"
-        }
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.build_definition_permissions,
-  ]
-}
-
 run "duplicate_build_folder_keys" {
   command = plan
 
@@ -208,15 +166,13 @@ run "duplicate_build_definition_permission_keys" {
   variables {
     build_definition_permissions = [
       {
-        build_definition_key = "core"
-        principal            = "00000000-0000-0000-0000-000000000000"
+        principal = "00000000-0000-0000-0000-000000000000"
         permissions = {
           ViewBuildDefinition = "Allow"
         }
       },
       {
-        build_definition_key = "core"
-        principal            = "00000000-0000-0000-0000-000000000000"
+        principal = "00000000-0000-0000-0000-000000000000"
         permissions = {
           ViewBuildDefinition = "Allow"
         }
@@ -262,14 +218,12 @@ run "duplicate_pipeline_authorization_keys" {
   variables {
     pipeline_authorizations = [
       {
-        resource_id  = "00000000-0000-0000-0000-000000000000"
-        type         = "endpoint"
-        pipeline_key = "core"
+        resource_id = "00000000-0000-0000-0000-000000000000"
+        type        = "endpoint"
       },
       {
-        resource_id  = "00000000-0000-0000-0000-000000000000"
-        type         = "endpoint"
-        pipeline_key = "core"
+        resource_id = "00000000-0000-0000-0000-000000000000"
+        type        = "endpoint"
       }
     ]
   }
@@ -294,7 +248,7 @@ run "duplicate_resource_authorization_keys" {
         resource_id   = "00000000-0000-0000-0000-000000000000"
         authorized    = true
         type          = "endpoint"
-        definition_id = "123"
+        definition_id = "456"
       }
     ]
   }
@@ -327,9 +281,8 @@ run "invalid_build_definition_permission_key_empty" {
   variables {
     build_definition_permissions = [
       {
-        key                  = ""
-        build_definition_key = "core"
-        principal            = "00000000-0000-0000-0000-000000000000"
+        key       = ""
+        principal = "00000000-0000-0000-0000-000000000000"
         permissions = {
           ViewBuildDefinition = "Allow"
         }
@@ -363,34 +316,15 @@ run "invalid_build_folder_permission_key_empty" {
   ]
 }
 
-run "invalid_pipeline_authorization_resource_id_empty" {
-  command = plan
-
-  variables {
-    pipeline_authorizations = [
-      {
-        resource_id  = ""
-        type         = "endpoint"
-        pipeline_key = "core"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.pipeline_authorizations,
-  ]
-}
-
 run "invalid_pipeline_authorization_key_empty" {
   command = plan
 
   variables {
     pipeline_authorizations = [
       {
-        key          = ""
-        resource_id  = "00000000-0000-0000-0000-000000000000"
-        type         = "endpoint"
-        pipeline_key = "core"
+        key         = ""
+        resource_id = "00000000-0000-0000-0000-000000000000"
+        type        = "endpoint"
       }
     ]
   }
@@ -443,24 +377,15 @@ run "invalid_build_completion_trigger_empty_id" {
   command = plan
 
   variables {
-    build_definitions = {
-      main = {
-        repository = {
-          repo_id   = "00000000-0000-0000-0000-000000000000"
-          repo_type = "TfsGit"
-          yml_path  = "azure-pipelines.yml"
-        }
-        build_completion_trigger = {
-          build_definition_id = ""
-          branch_filter = {
-            include = ["main"]
-          }
-        }
+    build_completion_trigger = {
+      build_definition_id = ""
+      branch_filter = {
+        include = ["main"]
       }
     }
   }
 
   expect_failures = [
-    var.build_definitions,
+    var.build_completion_trigger,
   ]
 }

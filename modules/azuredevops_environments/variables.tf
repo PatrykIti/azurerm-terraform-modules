@@ -92,7 +92,11 @@ variable "kubernetes_resources" {
   validation {
     condition = length(distinct([
       for resource in var.kubernetes_resources :
-      coalesce(resource.key, resource.name)
+      (
+        resource.key != null && length(trimspace(resource.key)) > 0
+        ? resource.key
+        : resource.name
+      )
     ])) == length(var.kubernetes_resources)
     error_message = "kubernetes_resources keys must be unique; set key when names would collide."
   }
@@ -105,14 +109,14 @@ variable "kubernetes_resources" {
 variable "check_approvals" {
   description = "List of approval checks to configure."
   type = list(object({
-    key                       = optional(string)
-    target_resource_id        = optional(string)
-    target_resource_type      = optional(string)
-    approvers                 = list(string)
-    instructions              = optional(string)
+    key                        = optional(string)
+    target_resource_id         = optional(string)
+    target_resource_type       = optional(string)
+    approvers                  = list(string)
+    instructions               = optional(string)
     minimum_required_approvers = optional(number)
-    requester_can_approve     = optional(bool)
-    timeout                   = optional(number)
+    requester_can_approve      = optional(bool)
+    timeout                    = optional(number)
   }))
   default = []
 
@@ -156,6 +160,15 @@ variable "check_approvals" {
       for check in var.check_approvals : length(check.approvers) > 0
     ])
     error_message = "check_approvals.approvers must contain at least one entry."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_approvals : alltrue([
+        for approver in check.approvers : length(trimspace(approver)) > 0
+      ])
+    ])
+    error_message = "check_approvals.approvers entries must be non-empty strings."
   }
 
   validation {
@@ -276,6 +289,17 @@ variable "check_business_hours" {
       for check in var.check_business_hours : length(trimspace(check.display_name)) > 0
     ])
     error_message = "check_business_hours.display_name must be a non-empty string."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_business_hours : (
+        length(trimspace(check.start_time)) > 0 &&
+        length(trimspace(check.end_time)) > 0 &&
+        length(trimspace(check.time_zone)) > 0
+      )
+    ])
+    error_message = "check_business_hours.start_time, end_time, and time_zone must be non-empty strings."
   }
 
   validation {
@@ -453,21 +477,21 @@ variable "check_required_templates" {
 variable "check_rest_apis" {
   description = "List of REST API checks to configure."
   type = list(object({
-    key                            = optional(string)
-    display_name                   = string
-    target_resource_id             = optional(string)
-    target_resource_type           = optional(string)
+    key                             = optional(string)
+    display_name                    = string
+    target_resource_id              = optional(string)
+    target_resource_type            = optional(string)
     connected_service_name_selector = string
-    connected_service_name         = string
-    method                         = string
-    body                           = optional(string)
-    headers                        = optional(string)
-    retry_interval                 = optional(number)
-    success_criteria               = optional(string)
-    url_suffix                     = optional(string)
-    variable_group_name            = optional(string)
-    completion_event               = optional(string)
-    timeout                        = optional(string)
+    connected_service_name          = string
+    method                          = string
+    body                            = optional(string)
+    headers                         = optional(string)
+    retry_interval                  = optional(number)
+    success_criteria                = optional(string)
+    url_suffix                      = optional(string)
+    variable_group_name             = optional(string)
+    completion_event                = optional(string)
+    timeout                         = optional(string)
   }))
   default = []
 
@@ -485,6 +509,17 @@ variable "check_rest_apis" {
       for check in var.check_rest_apis : length(trimspace(check.display_name)) > 0
     ])
     error_message = "check_rest_apis.display_name must be a non-empty string."
+  }
+
+  validation {
+    condition = alltrue([
+      for check in var.check_rest_apis : (
+        length(trimspace(check.connected_service_name_selector)) > 0 &&
+        length(trimspace(check.connected_service_name)) > 0 &&
+        length(trimspace(check.method)) > 0
+      )
+    ])
+    error_message = "check_rest_apis.connected_service_name_selector, connected_service_name, and method must be non-empty strings."
   }
 
   validation {

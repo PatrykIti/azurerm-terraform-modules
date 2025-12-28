@@ -26,22 +26,18 @@ module "azuredevops_pipelines" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  build_definitions = {
-    secure = {
-      name = "secure-pipeline"
-      repository = {
-        repo_type = "TfsGit"
-        repo_id   = "00000000-0000-0000-0000-000000000000"
-        yml_path  = "azure-pipelines.yml"
-      }
-    }
+  name = "secure-pipeline"
+
+  repository = {
+    repo_type = "TfsGit"
+    repo_id   = "00000000-0000-0000-0000-000000000000"
+    yml_path  = "azure-pipelines.yml"
   }
 
   pipeline_authorizations = [
     {
-      resource_id  = "00000000-0000-0000-0000-000000000000"
-      type         = "endpoint"
-      pipeline_key = "secure"
+      resource_id = "00000000-0000-0000-0000-000000000000"
+      type        = "endpoint"
     }
   ]
 }
@@ -68,5 +64,5 @@ module "azuredevops_pipelines" {
 ---
 
 **Module Version**: 1.0.0  
-**Last Updated**: 2025-12-24  
+**Last Updated**: 2025-12-28  
 **Security Contact**: security@yourorganization.com

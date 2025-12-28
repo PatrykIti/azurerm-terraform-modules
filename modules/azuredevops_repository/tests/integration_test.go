@@ -30,8 +30,8 @@ func TestAzuredevopsRepositoryFullIntegration(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		repositoryIDs := terraform.OutputMap(t, terraformOptions, "repository_ids")
+		repositoryID := terraform.Output(t, terraformOptions, "repository_id")
 
-		assert.NotEmpty(t, repositoryIDs)
+		assert.NotEmpty(t, repositoryID)
 	})
 }

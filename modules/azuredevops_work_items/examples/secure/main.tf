@@ -5,6 +5,9 @@ module "azuredevops_work_items" {
 
   project_id = var.project_id
 
+  title = "Secure Example Work Item"
+  type  = "Issue"
+
   area_permissions = [
     {
       key       = "area-readers-root"

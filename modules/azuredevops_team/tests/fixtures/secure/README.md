@@ -11,13 +11,6 @@ This fixture demonstrates a security-focused team configuration for tests.
 
 Use this fixture to validate strict admin assignment behavior.
 
-## Security Considerations
-
-- All public access is disabled by default
-- Network access is restricted to specific IP ranges
-- All data is encrypted at rest and in transit
-- Audit logging captures all access and modifications
-
 ## Usage
 
 ```bash

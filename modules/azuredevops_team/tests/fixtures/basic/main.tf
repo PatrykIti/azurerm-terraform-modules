@@ -13,12 +13,7 @@ provider "azuredevops" {}
 module "azuredevops_team" {
   source = "../../../"
 
-  project_id = var.project_id
-
-  teams = {
-    core = {
-      name        = "${var.team_name_prefix}-core"
-      description = "Test core team"
-    }
-  }
+  project_id  = var.project_id
+  name        = "ado-team-bas-${var.random_suffix}"
+  description = "Test core team"
 }

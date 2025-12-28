@@ -14,25 +14,20 @@ module "azuredevops_repository" {
   source = "../../../"
 
   project_id = var.project_id
+  name       = "${var.repo_name_prefix}-secure"
 
-  repositories = {
-    main = {
-      name = "${var.repo_name_prefix}-secure"
-      initialization = {
-        init_type = "Clean"
-      }
-    }
+  initialization = {
+    init_type = "Clean"
   }
 
   branch_policy_min_reviewers = [
     {
-      key            = "min-reviewers-main"
+      key            = "min-reviewers"
       reviewer_count = 2
+      blocking       = true
       scope = [
         {
-          repository_key = "main"
-          match_type     = "Exact"
-          repository_ref = "refs/heads/master"
+          match_type = "DefaultBranch"
         }
       ]
     }
@@ -40,8 +35,8 @@ module "azuredevops_repository" {
 
   repository_policy_reserved_names = [
     {
-      key             = "reserved-names-main"
-      repository_keys = ["main"]
+      key      = "reserved-names"
+      blocking = true
     }
   ]
 }

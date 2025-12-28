@@ -62,18 +62,14 @@ mock_provider "azuredevops" {
 
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
+  title      = "Example"
+  type       = "Issue"
 
-  processes = {
-    custom = {
-      parent_process_type_id = "adcc42ab-9882-485e-a3ed-7678f01f66bc"
-    }
-  }
-
-  work_items = [
+  processes = [
     {
-      key   = "example-item"
-      title = "Example"
-      type  = "Issue"
+      key                    = "custom"
+      name                   = "custom-agile"
+      parent_process_type_id = "adcc42ab-9882-485e-a3ed-7678f01f66bc"
     }
   ]
 
@@ -147,8 +143,8 @@ run "outputs_plan" {
   }
 
   assert {
-    condition     = contains(keys(output.work_item_ids), "example-item")
-    error_message = "work_item_ids should include the work item key."
+    condition     = output.work_item_id != null && output.work_item_id != ""
+    error_message = "work_item_id should be populated."
   }
 
   assert {

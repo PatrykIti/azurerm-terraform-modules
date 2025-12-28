@@ -6,7 +6,7 @@ variable "project_id" {
 variable "team_name" {
   description = "Name of the team."
   type        = string
-  default     = "ado-team-basic"
+  default     = "ado-team-basic-example"
 }
 
 variable "member_descriptors" {

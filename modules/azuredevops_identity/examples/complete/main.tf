@@ -18,26 +18,22 @@ resource "random_string" "suffix" {
   special = false
 }
 
+resource "azuredevops_group" "member" {
+  display_name = "${var.group_name_prefix}-members-${random_string.suffix.result}"
+  description  = "Membership source group"
+}
+
 module "azuredevops_identity" {
   source = "../../"
 
-  groups = {
-    platform = {
-      display_name = "${var.group_name_prefix}-platform-${random_string.suffix.result}"
-      description  = "Platform engineering group"
-    }
-    developers = {
-      display_name = "${var.group_name_prefix}-developers-${random_string.suffix.result}"
-      description  = "Development contributors"
-    }
-  }
+  group_display_name = "${var.group_name_prefix}-platform-${random_string.suffix.result}"
+  group_description  = "Platform engineering group"
 
   group_memberships = [
     {
-      key               = "platform-membership"
-      group_key         = "platform"
-      member_group_keys = ["developers"]
-      mode              = "add"
+      key                = "platform-membership"
+      member_descriptors = [azuredevops_group.member.descriptor]
+      mode               = "add"
     }
   ]
 
@@ -71,11 +67,10 @@ module "azuredevops_identity" {
 
   securityrole_assignments = var.security_role_assignment_resource_id != "" ? [
     {
-      key                = "platform-reader"
-      scope              = var.security_role_assignment_scope
-      resource_id        = var.security_role_assignment_resource_id
-      role_name          = var.security_role_assignment_role_name
-      identity_group_key = "platform"
+      key         = "platform-reader"
+      scope       = var.security_role_assignment_scope
+      resource_id = var.security_role_assignment_resource_id
+      role_name   = var.security_role_assignment_role_name
     }
   ] : []
 }

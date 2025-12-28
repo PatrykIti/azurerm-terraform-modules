@@ -17,6 +17,7 @@ A comprehensive collection of production-ready Terraform modules for Azure and A
 
 - [**Repository Standards**](./AGENTS.md) - Module layout, naming, and security-first conventions
 - [**Docs Index**](./docs/README.md) - Entry point for all documentation
+- [**Modules Index**](./modules/README.md) - Index of all modules with tag prefixes and descriptions
 - [**Module Creation Guide**](./docs/MODULE_GUIDE/README.md) - End-to-end module scaffolding guide
 - [**Terraform Best Practices**](./docs/TERRAFORM_BEST_PRACTICES_GUIDE.md) - Implementation standards and conventions
 - [**Testing Guide**](./docs/TESTING_GUIDE/README.md) - Testing expectations and patterns

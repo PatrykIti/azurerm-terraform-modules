@@ -14,12 +14,6 @@ module "azuredevops_work_items" {
   source = "../../../"
 
   project_id = var.project_id
-
-  work_items = [
-    {
-      key   = "basic-item"
-      title = "${var.work_item_title_prefix}-basic"
-      type  = "Task"
-    }
-  ]
+  title      = "${var.work_item_title_prefix}-basic"
+  type       = "Task"
 }

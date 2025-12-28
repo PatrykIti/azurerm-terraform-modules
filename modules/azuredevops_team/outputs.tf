@@ -1,11 +1,11 @@
-output "team_ids" {
-  description = "Map of team IDs keyed by team key."
-  value       = try({ for key, team in azuredevops_team.team : key => team.id }, {})
+output "team_id" {
+  description = "The ID of the Azure DevOps team."
+  value       = try(azuredevops_team.team.id, null)
 }
 
-output "team_descriptors" {
-  description = "Map of team descriptors keyed by team key."
-  value       = try({ for key, team in azuredevops_team.team : key => team.descriptor }, {})
+output "team_descriptor" {
+  description = "The descriptor of the Azure DevOps team."
+  value       = try(azuredevops_team.team.descriptor, null)
 }
 
 output "team_member_ids" {

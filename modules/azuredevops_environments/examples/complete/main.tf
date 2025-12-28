@@ -6,7 +6,7 @@ data "azuredevops_group" "project_collection_admins" {
 
 resource "azuredevops_serviceendpoint_kubernetes" "example" {
   project_id            = var.project_id
-  service_endpoint_name = "ado-env-complete-k8s"
+  service_endpoint_name = "ado-env-complete-example-k8s"
   apiserver_url         = var.kubernetes_api_url
   authorization_type    = "Kubeconfig"
 
@@ -42,12 +42,12 @@ module "azuredevops_environments" {
   source = "../../"
 
   project_id  = var.project_id
-  name        = "ado-env-complete"
+  name        = "ado-env-complete-example"
   description = "Production environment"
 
   kubernetes_resources = [
     {
-      name                = "ado-env-complete-k8s"
+      name                = "ado-env-complete-example-k8s"
       namespace           = "default"
       service_endpoint_id = azuredevops_serviceendpoint_kubernetes.example.id
       cluster_name        = "example-aks"
@@ -56,9 +56,9 @@ module "azuredevops_environments" {
 
   check_approvals = [
     {
-      key                  = "primary-approval"
-      target_resource_type = "environment"
-      approvers            = [data.azuredevops_group.project_collection_admins.id]
+      key                   = "primary-approval"
+      target_resource_type  = "environment"
+      approvers             = [data.azuredevops_group.project_collection_admins.origin_id]
       requester_can_approve = false
     }
   ]

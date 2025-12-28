@@ -1,7 +1,7 @@
 terraform {
   required_version = ">= 1.12.2"
   required_providers {
-  
+
     azuredevops = {
       source  = "microsoft/azuredevops"
       version = "1.12.2"
@@ -19,17 +19,12 @@ data "azuredevops_group" "readers" {
 module "azuredevops_artifacts_feed" {
   source = "../../../"
 
-  feeds = {
-    secure = {
-      name        = "${var.feed_name_prefix}-secure"
-      project_id  = var.project_id
-    }
-  }
+  name       = "${var.feed_name_prefix}-secure"
+  project_id = var.project_id
 
   feed_permissions = [
     {
       key                 = "secure-reader"
-      feed_key            = "secure"
       identity_descriptor = data.azuredevops_group.readers.descriptor
       role                = "reader"
     }
@@ -38,7 +33,6 @@ module "azuredevops_artifacts_feed" {
   feed_retention_policies = [
     {
       key                                       = "secure-retention"
-      feed_key                                  = "secure"
       count_limit                               = 10
       days_to_keep_recently_downloaded_packages = 14
     }

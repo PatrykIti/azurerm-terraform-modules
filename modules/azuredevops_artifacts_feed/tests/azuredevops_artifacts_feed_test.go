@@ -31,9 +31,9 @@ func TestBasicAzuredevopsArtifactsFeed(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		feedIDs := terraform.OutputMap(t, terraformOptions, "feed_ids")
+		feedID := terraform.Output(t, terraformOptions, "feed_id")
 
-		assert.NotEmpty(t, feedIDs)
+		assert.NotEmpty(t, feedID)
 	})
 }
 
@@ -56,9 +56,9 @@ func TestCompleteAzuredevopsArtifactsFeed(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		feedIDs := terraform.OutputMap(t, terraformOptions, "feed_ids")
+		feedID := terraform.Output(t, terraformOptions, "feed_id")
 
-		assert.NotEmpty(t, feedIDs)
+		assert.NotEmpty(t, feedID)
 	})
 }
 
@@ -81,9 +81,9 @@ func TestSecureAzuredevopsArtifactsFeed(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		feedIDs := terraform.OutputMap(t, terraformOptions, "feed_ids")
+		feedID := terraform.Output(t, terraformOptions, "feed_id")
 
-		assert.NotEmpty(t, feedIDs)
+		assert.NotEmpty(t, feedID)
 	})
 }
 
@@ -104,7 +104,7 @@ func TestAzuredevopsArtifactsFeedValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "feed_permissions.feed_key must reference a key in feeds")
+	assert.Contains(t, err.Error(), "feed_permissions.feed_id must be set when the module feed is not created")
 }
 
 // Helper function to get terraform options

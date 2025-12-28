@@ -31,9 +31,9 @@ func TestBasicAzuredevopsServicehooks(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		servicehookIDs := terraform.OutputMap(t, terraformOptions, "servicehook_ids")
+		webhookID := terraform.Output(t, terraformOptions, "webhook_id")
 
-		assert.NotEmpty(t, servicehookIDs)
+		assert.NotEmpty(t, webhookID)
 	})
 }
 
@@ -56,10 +56,12 @@ func TestCompleteAzuredevopsServicehooks(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		servicehookIDs := terraform.OutputMap(t, terraformOptions, "servicehook_ids")
+		webhookID := terraform.Output(t, terraformOptions, "webhook_id")
+		storageQueueHookID := terraform.Output(t, terraformOptions, "storage_queue_hook_id")
 		permissionIDs := terraform.OutputMap(t, terraformOptions, "servicehook_permission_ids")
 
-		assert.NotEmpty(t, servicehookIDs)
+		assert.NotEmpty(t, webhookID)
+		assert.NotEmpty(t, storageQueueHookID)
 		assert.NotEmpty(t, permissionIDs)
 	})
 }
@@ -83,10 +85,10 @@ func TestSecureAzuredevopsServicehooks(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		servicehookIDs := terraform.OutputMap(t, terraformOptions, "servicehook_ids")
+		webhookID := terraform.Output(t, terraformOptions, "webhook_id")
 		permissionIDs := terraform.OutputMap(t, terraformOptions, "servicehook_permission_ids")
 
-		assert.NotEmpty(t, servicehookIDs)
+		assert.NotEmpty(t, webhookID)
 		assert.NotEmpty(t, permissionIDs)
 	})
 }
@@ -101,7 +103,7 @@ func TestAzuredevopsServicehooksValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "webhooks must set exactly one event block")
+	assert.Contains(t, err.Error(), "webhook must set exactly one event block")
 }
 
 // Helper function to get terraform options

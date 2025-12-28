@@ -1,296 +1,208 @@
-# Azure DevOps Repositories
+# Azure DevOps Repository
 
 locals {
-  repositories_normalized = {
-    for key, repo in var.repositories : key => {
-      name                 = coalesce(repo.name, key)
-      default_branch       = repo.default_branch
-      parent_repository_id = repo.parent_repository_id
-      disabled             = repo.disabled
-      initialization = {
-        init_type = coalesce(try(repo.initialization.init_type, null), "Uninitialized")
-        source_type = try(
-          coalesce(
-            try(repo.initialization.source_type, null),
-            coalesce(try(repo.initialization.init_type, null), "Uninitialized") == "Import" ? "Git" : null
-          ),
-          null
-        )
-        source_url            = try(repo.initialization.source_url, null)
-        service_connection_id = try(repo.initialization.service_connection_id, null)
-        username              = try(repo.initialization.username, null)
-        password              = try(repo.initialization.password, null)
-      }
-    }
+  repository_enabled = var.name != null
+
+  initialization       = var.initialization == null ? {} : var.initialization
+  repository_init_type = coalesce(try(local.initialization.init_type, null), "Uninitialized")
+  repository_initialization = {
+    init_type             = local.repository_init_type
+    source_type           = local.repository_init_type == "Import" ? coalesce(try(local.initialization.source_type, null), "Git") : null
+    source_url            = local.repository_init_type == "Import" ? try(local.initialization.source_url, null) : null
+    service_connection_id = local.repository_init_type == "Import" ? try(local.initialization.service_connection_id, null) : null
+    username              = local.repository_init_type == "Import" ? try(local.initialization.username, null) : null
+    password              = local.repository_init_type == "Import" ? try(local.initialization.password, null) : null
   }
 
+  repository_id      = try(azuredevops_git_repository.git_repository[0].id, null)
+  default_ref_branch = coalesce(var.default_branch, "refs/heads/master")
+
   branches_by_key = {
-    for branch in var.branches : coalesce(
-      branch.key,
-      format(
-        "%s:%s",
-        coalesce(branch.repository_key, branch.repository_id, "missing"),
-        branch.name
+    for branch in var.branches : coalesce(branch.key, branch.name) => merge(branch, {
+      repository_id = coalesce(branch.repository_id, local.repository_id)
+      ref_branch = (
+        branch.ref_tag == null && branch.ref_commit_id == null
+        ? coalesce(branch.ref_branch, local.default_ref_branch)
+        : branch.ref_branch
       )
-    ) => branch
+    })
   }
 
   files_by_key = {
-    for file in var.files : coalesce(
-      file.key,
-      format(
-        "%s:%s:%s",
-        coalesce(file.repository_key, file.repository_id, "missing"),
-        file.file,
-        coalesce(file.branch, "default")
-      )
-    ) => file
+    for file in var.files : coalesce(file.key, file.file) => merge(file, {
+      repository_id = coalesce(file.repository_id, local.repository_id)
+    })
   }
 
   git_permissions_by_key = {
     for permission in var.git_permissions : coalesce(
       permission.key,
       format(
-        "%s:%s:%s",
-        coalesce(permission.repository_key, permission.repository_id, "missing"),
+        "%s:%s",
         coalesce(permission.branch_name, "root"),
         permission.principal
       )
-    ) => permission
+      ) => merge(permission, {
+        repository_id = coalesce(permission.repository_id, local.repository_id)
+    })
   }
 
   branch_policy_auto_reviewers_by_key = {
-    for policy in var.branch_policy_auto_reviewers : coalesce(
-      policy.key,
-      format(
-        "auto_reviewers:%s",
-        coalesce(
-          try(policy.scope[0].repository_key, null),
-          try(policy.scope[0].repository_id, null),
-          "missing"
-        )
-      )
-    ) => policy
+    for policy in var.branch_policy_auto_reviewers : coalesce(policy.key, "auto_reviewers") => merge(policy, {
+      scope = [
+        for scope in policy.scope : merge(scope, {
+          match_type     = coalesce(scope.match_type, "DefaultBranch")
+          repository_id  = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : coalesce(scope.repository_id, local.repository_id)
+          repository_ref = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : scope.repository_ref
+        })
+      ]
+    })
   }
 
   branch_policy_build_validation_by_key = {
-    for policy in var.branch_policy_build_validation : coalesce(
-      policy.key,
-      format(
-        "build_validation:%s",
-        coalesce(
-          try(policy.scope[0].repository_key, null),
-          try(policy.scope[0].repository_id, null),
-          "missing"
-        )
-      )
-    ) => policy
+    for policy in var.branch_policy_build_validation : coalesce(policy.key, "build_validation") => merge(policy, {
+      scope = [
+        for scope in policy.scope : merge(scope, {
+          match_type     = coalesce(scope.match_type, "DefaultBranch")
+          repository_id  = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : coalesce(scope.repository_id, local.repository_id)
+          repository_ref = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : scope.repository_ref
+        })
+      ]
+    })
   }
 
   branch_policy_comment_resolution_by_key = {
-    for policy in var.branch_policy_comment_resolution : coalesce(
-      policy.key,
-      format(
-        "comment_resolution:%s",
-        coalesce(
-          try(policy.scope[0].repository_key, null),
-          try(policy.scope[0].repository_id, null),
-          "missing"
-        )
-      )
-    ) => policy
+    for policy in var.branch_policy_comment_resolution : coalesce(policy.key, "comment_resolution") => merge(policy, {
+      scope = [
+        for scope in policy.scope : merge(scope, {
+          match_type     = coalesce(scope.match_type, "DefaultBranch")
+          repository_id  = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : coalesce(scope.repository_id, local.repository_id)
+          repository_ref = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : scope.repository_ref
+        })
+      ]
+    })
   }
 
   branch_policy_merge_types_by_key = {
-    for policy in var.branch_policy_merge_types : coalesce(
-      policy.key,
-      format(
-        "merge_types:%s",
-        coalesce(
-          try(policy.scope[0].repository_key, null),
-          try(policy.scope[0].repository_id, null),
-          "missing"
-        )
-      )
-    ) => policy
+    for policy in var.branch_policy_merge_types : coalesce(policy.key, "merge_types") => merge(policy, {
+      scope = [
+        for scope in policy.scope : merge(scope, {
+          match_type     = coalesce(scope.match_type, "DefaultBranch")
+          repository_id  = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : coalesce(scope.repository_id, local.repository_id)
+          repository_ref = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : scope.repository_ref
+        })
+      ]
+    })
   }
 
   branch_policy_min_reviewers_by_key = {
-    for policy in var.branch_policy_min_reviewers : coalesce(
-      policy.key,
-      format(
-        "min_reviewers:%s",
-        coalesce(
-          try(policy.scope[0].repository_key, null),
-          try(policy.scope[0].repository_id, null),
-          "missing"
-        )
-      )
-    ) => policy
+    for policy in var.branch_policy_min_reviewers : coalesce(policy.key, "min_reviewers") => merge(policy, {
+      scope = [
+        for scope in policy.scope : merge(scope, {
+          match_type     = coalesce(scope.match_type, "DefaultBranch")
+          repository_id  = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : coalesce(scope.repository_id, local.repository_id)
+          repository_ref = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : scope.repository_ref
+        })
+      ]
+    })
   }
 
   branch_policy_status_check_by_key = {
-    for policy in var.branch_policy_status_check : coalesce(
-      policy.key,
-      format(
-        "status_check:%s",
-        coalesce(
-          try(policy.scope[0].repository_key, null),
-          try(policy.scope[0].repository_id, null),
-          "missing"
-        )
-      )
-    ) => policy
+    for policy in var.branch_policy_status_check : coalesce(policy.key, "status_check") => merge(policy, {
+      scope = [
+        for scope in policy.scope : merge(scope, {
+          match_type     = coalesce(scope.match_type, "DefaultBranch")
+          repository_id  = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : coalesce(scope.repository_id, local.repository_id)
+          repository_ref = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : scope.repository_ref
+        })
+      ]
+    })
   }
 
   branch_policy_work_item_linking_by_key = {
-    for policy in var.branch_policy_work_item_linking : coalesce(
-      policy.key,
-      format(
-        "work_item_linking:%s",
-        coalesce(
-          try(policy.scope[0].repository_key, null),
-          try(policy.scope[0].repository_id, null),
-          "missing"
-        )
-      )
-    ) => policy
+    for policy in var.branch_policy_work_item_linking : coalesce(policy.key, "work_item_linking") => merge(policy, {
+      scope = [
+        for scope in policy.scope : merge(scope, {
+          match_type     = coalesce(scope.match_type, "DefaultBranch")
+          repository_id  = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : coalesce(scope.repository_id, local.repository_id)
+          repository_ref = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : scope.repository_ref
+        })
+      ]
+    })
   }
 
-  repository_ids = { for key, repo in azuredevops_git_repository.repo : key => repo.id }
-
   repository_policy_author_email_pattern_by_key = {
-    for policy in var.repository_policy_author_email_pattern : coalesce(
-      policy.key,
-      format(
-        "author_email_pattern:%s",
-        join(",", sort(concat(
-          [for id in coalesce(policy.repository_ids, []) : "id:${id}"],
-          [for key in coalesce(policy.repository_keys, []) : "key:${key}"]
-        )))
-      )
-      ) => merge(policy, {
-        repository_ids = distinct(compact(concat(
-          coalesce(policy.repository_ids, []),
-          [for key in coalesce(policy.repository_keys, []) : lookup(local.repository_ids, key, null)]
-        )))
+    for policy in var.repository_policy_author_email_pattern : coalesce(policy.key, "author_email_pattern") => merge(policy, {
+      repository_ids = distinct([
+        for repository_id in compact(coalesce(policy.repository_ids, [local.repository_id])) : trimspace(repository_id)
+      ])
     })
   }
 
   repository_policy_case_enforcement_by_key = {
-    for policy in var.repository_policy_case_enforcement : coalesce(
-      policy.key,
-      format(
-        "case_enforcement:%s",
-        join(",", sort(concat(
-          [for id in coalesce(policy.repository_ids, []) : "id:${id}"],
-          [for key in coalesce(policy.repository_keys, []) : "key:${key}"]
-        )))
-      )
-      ) => merge(policy, {
-        repository_ids = distinct(compact(concat(
-          coalesce(policy.repository_ids, []),
-          [for key in coalesce(policy.repository_keys, []) : lookup(local.repository_ids, key, null)]
-        )))
+    for policy in var.repository_policy_case_enforcement : coalesce(policy.key, "case_enforcement") => merge(policy, {
+      repository_ids = distinct([
+        for repository_id in compact(coalesce(policy.repository_ids, [local.repository_id])) : trimspace(repository_id)
+      ])
     })
   }
 
   repository_policy_file_path_pattern_by_key = {
-    for policy in var.repository_policy_file_path_pattern : coalesce(
-      policy.key,
-      format(
-        "file_path_pattern:%s",
-        join(",", sort(concat(
-          [for id in coalesce(policy.repository_ids, []) : "id:${id}"],
-          [for key in coalesce(policy.repository_keys, []) : "key:${key}"]
-        )))
-      )
-      ) => merge(policy, {
-        repository_ids = distinct(compact(concat(
-          coalesce(policy.repository_ids, []),
-          [for key in coalesce(policy.repository_keys, []) : lookup(local.repository_ids, key, null)]
-        )))
+    for policy in var.repository_policy_file_path_pattern : coalesce(policy.key, "file_path_pattern") => merge(policy, {
+      repository_ids = distinct([
+        for repository_id in compact(coalesce(policy.repository_ids, [local.repository_id])) : trimspace(repository_id)
+      ])
     })
   }
 
   repository_policy_max_file_size_by_key = {
-    for policy in var.repository_policy_max_file_size : coalesce(
-      policy.key,
-      format(
-        "max_file_size:%s",
-        join(",", sort(concat(
-          [for id in coalesce(policy.repository_ids, []) : "id:${id}"],
-          [for key in coalesce(policy.repository_keys, []) : "key:${key}"]
-        )))
-      )
-      ) => merge(policy, {
-        repository_ids = distinct(compact(concat(
-          coalesce(policy.repository_ids, []),
-          [for key in coalesce(policy.repository_keys, []) : lookup(local.repository_ids, key, null)]
-        )))
+    for policy in var.repository_policy_max_file_size : coalesce(policy.key, "max_file_size") => merge(policy, {
+      repository_ids = distinct([
+        for repository_id in compact(coalesce(policy.repository_ids, [local.repository_id])) : trimspace(repository_id)
+      ])
     })
   }
 
   repository_policy_max_path_length_by_key = {
-    for policy in var.repository_policy_max_path_length : coalesce(
-      policy.key,
-      format(
-        "max_path_length:%s",
-        join(",", sort(concat(
-          [for id in coalesce(policy.repository_ids, []) : "id:${id}"],
-          [for key in coalesce(policy.repository_keys, []) : "key:${key}"]
-        )))
-      )
-      ) => merge(policy, {
-        repository_ids = distinct(compact(concat(
-          coalesce(policy.repository_ids, []),
-          [for key in coalesce(policy.repository_keys, []) : lookup(local.repository_ids, key, null)]
-        )))
+    for policy in var.repository_policy_max_path_length : coalesce(policy.key, "max_path_length") => merge(policy, {
+      repository_ids = distinct([
+        for repository_id in compact(coalesce(policy.repository_ids, [local.repository_id])) : trimspace(repository_id)
+      ])
     })
   }
 
   repository_policy_reserved_names_by_key = {
-    for policy in var.repository_policy_reserved_names : coalesce(
-      policy.key,
-      format(
-        "reserved_names:%s",
-        join(",", sort(concat(
-          [for id in coalesce(policy.repository_ids, []) : "id:${id}"],
-          [for key in coalesce(policy.repository_keys, []) : "key:${key}"]
-        )))
-      )
-      ) => merge(policy, {
-        repository_ids = distinct(compact(concat(
-          coalesce(policy.repository_ids, []),
-          [for key in coalesce(policy.repository_keys, []) : lookup(local.repository_ids, key, null)]
-        )))
+    for policy in var.repository_policy_reserved_names : coalesce(policy.key, "reserved_names") => merge(policy, {
+      repository_ids = distinct([
+        for repository_id in compact(coalesce(policy.repository_ids, [local.repository_id])) : trimspace(repository_id)
+      ])
     })
   }
 }
 
-resource "azuredevops_git_repository" "repo" {
-  for_each = local.repositories_normalized
+resource "azuredevops_git_repository" "git_repository" {
+  count = local.repository_enabled ? 1 : 0
 
   project_id           = var.project_id
-  name                 = each.value.name
-  default_branch       = each.value.default_branch
-  parent_repository_id = each.value.parent_repository_id
-  disabled             = each.value.disabled
+  name                 = var.name
+  default_branch       = var.default_branch
+  parent_repository_id = var.parent_repository_id
+  disabled             = var.disabled
 
   initialization {
-    init_type             = each.value.initialization.init_type
-    source_type           = each.value.initialization.source_type
-    source_url            = each.value.initialization.source_url
-    service_connection_id = each.value.initialization.service_connection_id
-    username              = each.value.initialization.username
-    password              = each.value.initialization.password
+    init_type             = local.repository_initialization.init_type
+    source_type           = local.repository_initialization.source_type
+    source_url            = local.repository_initialization.source_url
+    service_connection_id = local.repository_initialization.service_connection_id
+    username              = local.repository_initialization.username
+    password              = local.repository_initialization.password
   }
 }
 
-resource "azuredevops_git_repository_branch" "branch" {
+resource "azuredevops_git_repository_branch" "git_repository_branch" {
   for_each = local.branches_by_key
 
-  repository_id = each.value.repository_id != null ? each.value.repository_id : lookup(local.repository_ids, each.value.repository_key, null)
+  repository_id = each.value.repository_id
   name          = each.value.name
   ref_branch    = each.value.ref_branch
   ref_tag       = each.value.ref_tag
@@ -298,16 +210,16 @@ resource "azuredevops_git_repository_branch" "branch" {
 
   lifecycle {
     precondition {
-      condition     = each.value.repository_key == null || contains(keys(var.repositories), each.value.repository_key)
-      error_message = "branches.repository_key must reference a key in repositories."
+      condition     = each.value.repository_id != null
+      error_message = "branches.repository_id is required when the module repository is not created."
     }
   }
 }
 
-resource "azuredevops_git_repository_file" "file" {
+resource "azuredevops_git_repository_file" "git_repository_file" {
   for_each = local.files_by_key
 
-  repository_id       = each.value.repository_id != null ? each.value.repository_id : lookup(local.repository_ids, each.value.repository_key, null)
+  repository_id       = each.value.repository_id
   file                = each.value.file
   content             = each.value.content
   branch              = each.value.branch
@@ -320,17 +232,17 @@ resource "azuredevops_git_repository_file" "file" {
 
   lifecycle {
     precondition {
-      condition     = each.value.repository_key == null || contains(keys(var.repositories), each.value.repository_key)
-      error_message = "files.repository_key must reference a key in repositories."
+      condition     = each.value.repository_id != null
+      error_message = "files.repository_id is required when the module repository is not created."
     }
   }
 }
 
-resource "azuredevops_git_permissions" "permissions" {
+resource "azuredevops_git_permissions" "git_permissions" {
   for_each = local.git_permissions_by_key
 
   project_id    = var.project_id
-  repository_id = each.value.repository_id != null ? each.value.repository_id : lookup(local.repository_ids, each.value.repository_key, null)
+  repository_id = each.value.repository_id
   branch_name   = each.value.branch_name
   principal     = each.value.principal
   permissions   = each.value.permissions
@@ -338,13 +250,13 @@ resource "azuredevops_git_permissions" "permissions" {
 
   lifecycle {
     precondition {
-      condition     = each.value.repository_key == null || contains(keys(var.repositories), each.value.repository_key)
-      error_message = "git_permissions.repository_key must reference a key in repositories."
+      condition     = each.value.repository_id != null
+      error_message = "git_permissions.repository_id is required when the module repository is not created."
     }
   }
 }
 
-resource "azuredevops_branch_policy_auto_reviewers" "policy" {
+resource "azuredevops_branch_policy_auto_reviewers" "branch_policy_auto_reviewers" {
   for_each = local.branch_policy_auto_reviewers_by_key
 
   project_id = var.project_id
@@ -361,7 +273,7 @@ resource "azuredevops_branch_policy_auto_reviewers" "policy" {
     dynamic "scope" {
       for_each = each.value.scope
       content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : lookup(local.repository_ids, scope.value.repository_key, null)
+        repository_id  = scope.value.repository_id
         repository_ref = scope.value.repository_ref
         match_type     = scope.value.match_type
       }
@@ -370,15 +282,13 @@ resource "azuredevops_branch_policy_auto_reviewers" "policy" {
 
   lifecycle {
     precondition {
-      condition = alltrue([
-        for scope in each.value.scope : scope.repository_key == null || contains(keys(var.repositories), scope.repository_key)
-      ])
-      error_message = "branch_policy_auto_reviewers.scope.repository_key must reference a key in repositories."
+      condition     = alltrue([for scope in each.value.scope : scope.match_type == "DefaultBranch" ? true : scope.repository_id != null])
+      error_message = "branch_policy_auto_reviewers.scope.repository_id is required when the module repository is not created."
     }
   }
 }
 
-resource "azuredevops_branch_policy_build_validation" "policy" {
+resource "azuredevops_branch_policy_build_validation" "branch_policy_build_validation" {
   for_each = local.branch_policy_build_validation_by_key
 
   project_id = var.project_id
@@ -396,7 +306,7 @@ resource "azuredevops_branch_policy_build_validation" "policy" {
     dynamic "scope" {
       for_each = each.value.scope
       content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : lookup(local.repository_ids, scope.value.repository_key, null)
+        repository_id  = scope.value.repository_id
         repository_ref = scope.value.repository_ref
         match_type     = scope.value.match_type
       }
@@ -405,15 +315,13 @@ resource "azuredevops_branch_policy_build_validation" "policy" {
 
   lifecycle {
     precondition {
-      condition = alltrue([
-        for scope in each.value.scope : scope.repository_key == null || contains(keys(var.repositories), scope.repository_key)
-      ])
-      error_message = "branch_policy_build_validation.scope.repository_key must reference a key in repositories."
+      condition     = alltrue([for scope in each.value.scope : scope.match_type == "DefaultBranch" ? true : scope.repository_id != null])
+      error_message = "branch_policy_build_validation.scope.repository_id is required when the module repository is not created."
     }
   }
 }
 
-resource "azuredevops_branch_policy_comment_resolution" "policy" {
+resource "azuredevops_branch_policy_comment_resolution" "branch_policy_comment_resolution" {
   for_each = local.branch_policy_comment_resolution_by_key
 
   project_id = var.project_id
@@ -424,7 +332,7 @@ resource "azuredevops_branch_policy_comment_resolution" "policy" {
     dynamic "scope" {
       for_each = each.value.scope
       content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : lookup(local.repository_ids, scope.value.repository_key, null)
+        repository_id  = scope.value.repository_id
         repository_ref = scope.value.repository_ref
         match_type     = scope.value.match_type
       }
@@ -433,15 +341,13 @@ resource "azuredevops_branch_policy_comment_resolution" "policy" {
 
   lifecycle {
     precondition {
-      condition = alltrue([
-        for scope in each.value.scope : scope.repository_key == null || contains(keys(var.repositories), scope.repository_key)
-      ])
-      error_message = "branch_policy_comment_resolution.scope.repository_key must reference a key in repositories."
+      condition     = alltrue([for scope in each.value.scope : scope.match_type == "DefaultBranch" ? true : scope.repository_id != null])
+      error_message = "branch_policy_comment_resolution.scope.repository_id is required when the module repository is not created."
     }
   }
 }
 
-resource "azuredevops_branch_policy_merge_types" "policy" {
+resource "azuredevops_branch_policy_merge_types" "branch_policy_merge_types" {
   for_each = local.branch_policy_merge_types_by_key
 
   project_id = var.project_id
@@ -457,7 +363,7 @@ resource "azuredevops_branch_policy_merge_types" "policy" {
     dynamic "scope" {
       for_each = each.value.scope
       content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : lookup(local.repository_ids, scope.value.repository_key, null)
+        repository_id  = scope.value.repository_id
         repository_ref = scope.value.repository_ref
         match_type     = scope.value.match_type
       }
@@ -466,15 +372,13 @@ resource "azuredevops_branch_policy_merge_types" "policy" {
 
   lifecycle {
     precondition {
-      condition = alltrue([
-        for scope in each.value.scope : scope.repository_key == null || contains(keys(var.repositories), scope.repository_key)
-      ])
-      error_message = "branch_policy_merge_types.scope.repository_key must reference a key in repositories."
+      condition     = alltrue([for scope in each.value.scope : scope.match_type == "DefaultBranch" ? true : scope.repository_id != null])
+      error_message = "branch_policy_merge_types.scope.repository_id is required when the module repository is not created."
     }
   }
 }
 
-resource "azuredevops_branch_policy_min_reviewers" "policy" {
+resource "azuredevops_branch_policy_min_reviewers" "branch_policy_min_reviewers" {
   for_each = local.branch_policy_min_reviewers_by_key
 
   project_id = var.project_id
@@ -493,7 +397,7 @@ resource "azuredevops_branch_policy_min_reviewers" "policy" {
     dynamic "scope" {
       for_each = each.value.scope
       content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : lookup(local.repository_ids, scope.value.repository_key, null)
+        repository_id  = scope.value.repository_id
         repository_ref = scope.value.repository_ref
         match_type     = scope.value.match_type
       }
@@ -502,15 +406,13 @@ resource "azuredevops_branch_policy_min_reviewers" "policy" {
 
   lifecycle {
     precondition {
-      condition = alltrue([
-        for scope in each.value.scope : scope.repository_key == null || contains(keys(var.repositories), scope.repository_key)
-      ])
-      error_message = "branch_policy_min_reviewers.scope.repository_key must reference a key in repositories."
+      condition     = alltrue([for scope in each.value.scope : scope.match_type == "DefaultBranch" ? true : scope.repository_id != null])
+      error_message = "branch_policy_min_reviewers.scope.repository_id is required when the module repository is not created."
     }
   }
 }
 
-resource "azuredevops_branch_policy_status_check" "policy" {
+resource "azuredevops_branch_policy_status_check" "branch_policy_status_check" {
   for_each = local.branch_policy_status_check_by_key
 
   project_id = var.project_id
@@ -529,7 +431,7 @@ resource "azuredevops_branch_policy_status_check" "policy" {
     dynamic "scope" {
       for_each = each.value.scope
       content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : lookup(local.repository_ids, scope.value.repository_key, null)
+        repository_id  = scope.value.repository_id
         repository_ref = scope.value.repository_ref
         match_type     = scope.value.match_type
       }
@@ -538,15 +440,13 @@ resource "azuredevops_branch_policy_status_check" "policy" {
 
   lifecycle {
     precondition {
-      condition = alltrue([
-        for scope in each.value.scope : scope.repository_key == null || contains(keys(var.repositories), scope.repository_key)
-      ])
-      error_message = "branch_policy_status_check.scope.repository_key must reference a key in repositories."
+      condition     = alltrue([for scope in each.value.scope : scope.match_type == "DefaultBranch" ? true : scope.repository_id != null])
+      error_message = "branch_policy_status_check.scope.repository_id is required when the module repository is not created."
     }
   }
 }
 
-resource "azuredevops_branch_policy_work_item_linking" "policy" {
+resource "azuredevops_branch_policy_work_item_linking" "branch_policy_work_item_linking" {
   for_each = local.branch_policy_work_item_linking_by_key
 
   project_id = var.project_id
@@ -557,7 +457,7 @@ resource "azuredevops_branch_policy_work_item_linking" "policy" {
     dynamic "scope" {
       for_each = each.value.scope
       content {
-        repository_id  = scope.value.repository_id != null ? scope.value.repository_id : lookup(local.repository_ids, scope.value.repository_key, null)
+        repository_id  = scope.value.repository_id
         repository_ref = scope.value.repository_ref
         match_type     = scope.value.match_type
       }
@@ -566,15 +466,13 @@ resource "azuredevops_branch_policy_work_item_linking" "policy" {
 
   lifecycle {
     precondition {
-      condition = alltrue([
-        for scope in each.value.scope : scope.repository_key == null || contains(keys(var.repositories), scope.repository_key)
-      ])
-      error_message = "branch_policy_work_item_linking.scope.repository_key must reference a key in repositories."
+      condition     = alltrue([for scope in each.value.scope : scope.match_type == "DefaultBranch" ? true : scope.repository_id != null])
+      error_message = "branch_policy_work_item_linking.scope.repository_id is required when the module repository is not created."
     }
   }
 }
 
-resource "azuredevops_repository_policy_author_email_pattern" "policy" {
+resource "azuredevops_repository_policy_author_email_pattern" "repository_policy_author_email_pattern" {
   for_each = local.repository_policy_author_email_pattern_by_key
 
   project_id            = var.project_id
@@ -585,15 +483,13 @@ resource "azuredevops_repository_policy_author_email_pattern" "policy" {
 
   lifecycle {
     precondition {
-      condition = alltrue([
-        for key in coalesce(each.value.repository_keys, []) : contains(keys(var.repositories), key)
-      ])
-      error_message = "repository_policy_author_email_pattern.repository_keys must reference keys in repositories."
+      condition     = length(each.value.repository_ids) > 0
+      error_message = "repository_policy_author_email_pattern.repository_ids must not be empty."
     }
   }
 }
 
-resource "azuredevops_repository_policy_case_enforcement" "policy" {
+resource "azuredevops_repository_policy_case_enforcement" "repository_policy_case_enforcement" {
   for_each = local.repository_policy_case_enforcement_by_key
 
   project_id              = var.project_id
@@ -604,15 +500,13 @@ resource "azuredevops_repository_policy_case_enforcement" "policy" {
 
   lifecycle {
     precondition {
-      condition = alltrue([
-        for key in coalesce(each.value.repository_keys, []) : contains(keys(var.repositories), key)
-      ])
-      error_message = "repository_policy_case_enforcement.repository_keys must reference keys in repositories."
+      condition     = length(each.value.repository_ids) > 0
+      error_message = "repository_policy_case_enforcement.repository_ids must not be empty."
     }
   }
 }
 
-resource "azuredevops_repository_policy_file_path_pattern" "policy" {
+resource "azuredevops_repository_policy_file_path_pattern" "repository_policy_file_path_pattern" {
   for_each = local.repository_policy_file_path_pattern_by_key
 
   project_id        = var.project_id
@@ -623,15 +517,13 @@ resource "azuredevops_repository_policy_file_path_pattern" "policy" {
 
   lifecycle {
     precondition {
-      condition = alltrue([
-        for key in coalesce(each.value.repository_keys, []) : contains(keys(var.repositories), key)
-      ])
-      error_message = "repository_policy_file_path_pattern.repository_keys must reference keys in repositories."
+      condition     = length(each.value.repository_ids) > 0
+      error_message = "repository_policy_file_path_pattern.repository_ids must not be empty."
     }
   }
 }
 
-resource "azuredevops_repository_policy_max_file_size" "policy" {
+resource "azuredevops_repository_policy_max_file_size" "repository_policy_max_file_size" {
   for_each = local.repository_policy_max_file_size_by_key
 
   project_id     = var.project_id
@@ -642,15 +534,13 @@ resource "azuredevops_repository_policy_max_file_size" "policy" {
 
   lifecycle {
     precondition {
-      condition = alltrue([
-        for key in coalesce(each.value.repository_keys, []) : contains(keys(var.repositories), key)
-      ])
-      error_message = "repository_policy_max_file_size.repository_keys must reference keys in repositories."
+      condition     = length(each.value.repository_ids) > 0
+      error_message = "repository_policy_max_file_size.repository_ids must not be empty."
     }
   }
 }
 
-resource "azuredevops_repository_policy_max_path_length" "policy" {
+resource "azuredevops_repository_policy_max_path_length" "repository_policy_max_path_length" {
   for_each = local.repository_policy_max_path_length_by_key
 
   project_id      = var.project_id
@@ -661,15 +551,13 @@ resource "azuredevops_repository_policy_max_path_length" "policy" {
 
   lifecycle {
     precondition {
-      condition = alltrue([
-        for key in coalesce(each.value.repository_keys, []) : contains(keys(var.repositories), key)
-      ])
-      error_message = "repository_policy_max_path_length.repository_keys must reference keys in repositories."
+      condition     = length(each.value.repository_ids) > 0
+      error_message = "repository_policy_max_path_length.repository_ids must not be empty."
     }
   }
 }
 
-resource "azuredevops_repository_policy_reserved_names" "policy" {
+resource "azuredevops_repository_policy_reserved_names" "repository_policy_reserved_names" {
   for_each = local.repository_policy_reserved_names_by_key
 
   project_id     = var.project_id
@@ -679,10 +567,8 @@ resource "azuredevops_repository_policy_reserved_names" "policy" {
 
   lifecycle {
     precondition {
-      condition = alltrue([
-        for key in coalesce(each.value.repository_keys, []) : contains(keys(var.repositories), key)
-      ])
-      error_message = "repository_policy_reserved_names.repository_keys must reference keys in repositories."
+      condition     = length(each.value.repository_ids) > 0
+      error_message = "repository_policy_reserved_names.repository_ids must not be empty."
     }
   }
 }

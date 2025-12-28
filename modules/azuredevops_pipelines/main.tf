@@ -1,21 +1,15 @@
 # Azure DevOps Pipelines
 
 locals {
-  build_definition_ids = { for key, definition in azuredevops_build_definition.build_definition : key => definition.id }
+  build_definition_id = try(azuredevops_build_definition.build_definition.id, null)
+  build_definition_id_number = local.build_definition_id == null ? null : tonumber(local.build_definition_id)
   build_folders_by_key = {
     for folder in var.build_folders :
     coalesce(folder.key, folder.path) => folder
   }
   build_definition_permissions_by_key = {
     for permission in var.build_definition_permissions :
-    coalesce(
-      permission.key,
-      format(
-        "%s:%s",
-        coalesce(permission.build_definition_key, permission.build_definition_id, "missing"),
-        permission.principal
-      )
-    ) => permission
+    coalesce(permission.key, permission.principal) => permission
   }
   build_folder_permissions_by_key = {
     for permission in var.build_folder_permissions :
@@ -25,24 +19,14 @@ locals {
     for authorization in var.pipeline_authorizations :
     coalesce(
       authorization.key,
-      format(
-        "%s:%s:%s",
-        coalesce(authorization.pipeline_id, authorization.pipeline_key, "missing"),
-        lower(authorization.type),
-        authorization.resource_id
-      )
+      format("%s:%s", lower(authorization.type), authorization.resource_id)
     ) => authorization
   }
   resource_authorizations_by_key = {
     for authorization in var.resource_authorizations :
     coalesce(
       authorization.key,
-      format(
-        "%s:%s:%s",
-        coalesce(authorization.definition_id, authorization.build_definition_key, "missing"),
-        lower(authorization.type),
-        authorization.resource_id
-      )
+      format("%s:%s", lower(authorization.type), authorization.resource_id)
     ) => authorization
   }
 }
@@ -61,29 +45,27 @@ resource "azuredevops_build_folder" "build_folder" {
 }
 
 resource "azuredevops_build_definition" "build_definition" {
-  for_each = var.build_definitions
-
   project_id              = var.project_id
-  name                    = coalesce(each.value.name, each.key)
-  path                    = each.value.path
-  agent_pool_name         = each.value.agent_pool_name
-  agent_specification     = each.value.agent_specification
-  queue_status            = each.value.queue_status == null ? null : lower(each.value.queue_status)
-  job_authorization_scope = each.value.job_authorization_scope
+  name                    = var.name
+  path                    = var.path
+  agent_pool_name         = var.agent_pool_name
+  agent_specification     = var.agent_specification
+  queue_status            = var.queue_status == null ? null : lower(var.queue_status)
+  job_authorization_scope = var.job_authorization_scope
 
   repository {
-    repo_id               = each.value.repository.repo_id
-    repo_type             = each.value.repository.repo_type
-    branch_name           = each.value.repository.branch_name
-    service_connection_id = each.value.repository.service_connection_id
-    yml_path              = each.value.repository.yml_path
-    github_enterprise_url = each.value.repository.github_enterprise_url
-    url                   = each.value.repository.url
-    report_build_status   = each.value.repository.report_build_status
+    repo_id               = var.repository.repo_id
+    repo_type             = var.repository.repo_type
+    branch_name           = var.repository.branch_name
+    service_connection_id = var.repository.service_connection_id
+    yml_path              = var.repository.yml_path
+    github_enterprise_url = var.repository.github_enterprise_url
+    url                   = var.repository.url
+    report_build_status   = var.repository.report_build_status
   }
 
   dynamic "ci_trigger" {
-    for_each = each.value.ci_trigger == null ? [] : [each.value.ci_trigger]
+    for_each = var.ci_trigger == null ? [] : [var.ci_trigger]
     content {
       use_yaml = try(ci_trigger.value.use_yaml, null)
 
@@ -112,7 +94,7 @@ resource "azuredevops_build_definition" "build_definition" {
   }
 
   dynamic "pull_request_trigger" {
-    for_each = each.value.pull_request_trigger == null ? [] : [each.value.pull_request_trigger]
+    for_each = var.pull_request_trigger == null ? [] : [var.pull_request_trigger]
     content {
       use_yaml       = try(pull_request_trigger.value.use_yaml, null)
       initial_branch = try(pull_request_trigger.value.initial_branch, null)
@@ -148,9 +130,9 @@ resource "azuredevops_build_definition" "build_definition" {
   }
 
   dynamic "build_completion_trigger" {
-    for_each = each.value.build_completion_trigger == null ? [] : [each.value.build_completion_trigger]
+    for_each = var.build_completion_trigger == null ? [] : [var.build_completion_trigger]
     content {
-      build_definition_id = build_completion_trigger.value.build_definition_id
+      build_definition_id = tonumber(build_completion_trigger.value.build_definition_id)
 
       branch_filter {
         include = build_completion_trigger.value.branch_filter.include
@@ -160,7 +142,7 @@ resource "azuredevops_build_definition" "build_definition" {
   }
 
   dynamic "schedules" {
-    for_each = each.value.schedules == null ? [] : each.value.schedules
+    for_each = var.schedules
     content {
       branch_filter {
         include = schedules.value.branch_filter.include
@@ -174,10 +156,10 @@ resource "azuredevops_build_definition" "build_definition" {
     }
   }
 
-  variable_groups = try(each.value.variable_groups, null)
+  variable_groups = var.variable_groups
 
   dynamic "variable" {
-    for_each = each.value.variables == null ? [] : each.value.variables
+    for_each = var.variables
     content {
       name           = variable.value.name
       value          = try(variable.value.value, null)
@@ -188,14 +170,14 @@ resource "azuredevops_build_definition" "build_definition" {
   }
 
   dynamic "features" {
-    for_each = each.value.features == null ? [] : [each.value.features]
+    for_each = var.features == null ? [] : [var.features]
     content {
       skip_first_run = try(features.value.skip_first_run, null)
     }
   }
 
   dynamic "jobs" {
-    for_each = each.value.jobs == null ? [] : each.value.jobs
+    for_each = var.jobs
     content {
       name                             = jobs.value.name
       ref_name                         = jobs.value.ref_name
@@ -225,7 +207,6 @@ resource "azuredevops_build_definition" "build_definition" {
       }
     }
   }
-
 }
 
 resource "azuredevops_build_definition_permissions" "build_definition_permissions" {
@@ -236,18 +217,12 @@ resource "azuredevops_build_definition_permissions" "build_definition_permission
   permissions = each.value.permissions
   replace     = each.value.replace
 
-  build_definition_id = coalesce(
-    each.value.build_definition_id,
-    try(local.build_definition_ids[each.value.build_definition_key], null)
-  )
+  build_definition_id = coalesce(each.value.build_definition_id, local.build_definition_id)
 
   lifecycle {
     precondition {
-      condition = (
-        each.value.build_definition_key == null ||
-        contains(keys(var.build_definitions), each.value.build_definition_key)
-      )
-      error_message = "build_definition_permissions.build_definition_key must reference a key in build_definitions."
+      condition     = each.value.build_definition_id != null || local.build_definition_id != null
+      error_message = "build_definition_permissions.build_definition_id must be set when the module build definition is not managed."
     }
   }
 }
@@ -269,15 +244,15 @@ resource "azuredevops_pipeline_authorization" "pipeline_authorization" {
   resource_id         = each.value.resource_id
   type                = lower(each.value.type)
   pipeline_project_id = each.value.pipeline_project_id
-  pipeline_id         = coalesce(each.value.pipeline_id, try(local.build_definition_ids[each.value.pipeline_key], null))
+  pipeline_id = coalesce(
+    each.value.pipeline_id == null ? null : tonumber(each.value.pipeline_id),
+    local.build_definition_id_number
+  )
 
   lifecycle {
     precondition {
-      condition = (
-        each.value.pipeline_key == null ||
-        contains(keys(var.build_definitions), each.value.pipeline_key)
-      )
-      error_message = "pipeline_authorizations.pipeline_key must reference a key in build_definitions."
+      condition     = each.value.pipeline_id != null || local.build_definition_id != null
+      error_message = "pipeline_authorizations.pipeline_id must be set when the module build definition is not managed."
     }
   }
 }
@@ -289,15 +264,15 @@ resource "azuredevops_pipeline_authorization" "resource_authorization" {
   resource_id = each.value.resource_id
   type        = lower(each.value.type)
 
-  pipeline_id = coalesce(each.value.definition_id, try(local.build_definition_ids[each.value.build_definition_key], null))
+  pipeline_id = coalesce(
+    each.value.definition_id == null ? null : tonumber(each.value.definition_id),
+    local.build_definition_id_number
+  )
 
   lifecycle {
     precondition {
-      condition = (
-        each.value.build_definition_key == null ||
-        contains(keys(var.build_definitions), each.value.build_definition_key)
-      )
-      error_message = "resource_authorizations.build_definition_key must reference a key in build_definitions."
+      condition     = each.value.definition_id != null || local.build_definition_id != null
+      error_message = "resource_authorizations.definition_id must be set when the module build definition is not managed."
     }
   }
 }

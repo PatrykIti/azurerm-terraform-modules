@@ -6,5 +6,5 @@ variable "project_id" {
 variable "team_name_prefix" {
   description = "Prefix for the team name."
   type        = string
-  default     = "ado-team-complete"
+  default     = "ado-team-complete-example"
 }

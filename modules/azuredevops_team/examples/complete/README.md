@@ -1,11 +1,12 @@
 # Complete Azure DevOps Team Example
 
-This example demonstrates multiple teams with memberships and administrators.
+This example demonstrates module-level for_each with memberships and administrators.
 
 ## Features
 
 - Creates multiple Azure DevOps teams
 - Adds members and administrators via group descriptors
+- Uses module-level for_each to manage multiple teams
 
 ## Key Configuration
 

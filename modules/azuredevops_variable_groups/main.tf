@@ -52,7 +52,7 @@ resource "azuredevops_variable_group_permissions" "variable_group_permissions" {
   variable_group_id = coalesce(each.value.variable_group_id, azuredevops_variable_group.variable_group.id)
   principal         = each.value.principal
   permissions       = each.value.permissions
-  replace           = try(each.value.replace, true)
+  replace           = each.value.replace
 }
 
 resource "azuredevops_library_permissions" "library_permissions" {
@@ -61,5 +61,5 @@ resource "azuredevops_library_permissions" "library_permissions" {
   project_id  = var.project_id
   principal   = each.value.principal
   permissions = each.value.permissions
-  replace     = try(each.value.replace, true)
+  replace     = each.value.replace
 }

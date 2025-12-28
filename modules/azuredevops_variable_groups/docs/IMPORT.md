@@ -70,8 +70,9 @@ Use the **variable group ID** from Azure DevOps (UI or API).
 
 ## 3) Import permissions (optional)
 
-If you manage permissions, ensure each entry has a stable `key` so the import
-address is deterministic:
+If you manage permissions, ensure each entry has a stable `key` (or a unique
+principal) so the import address is deterministic. When `variable_group_id` is
+omitted, the module variable group ID is used.
 
 ```hcl
 import {
@@ -98,4 +99,15 @@ terraform plan
 terraform apply
 ```
 
-When the plan is clean, remove `import.tf`.
+When the plan is clean, proceed to verification.
+
+---
+
+## 5) Verify and clean up
+
+```bash
+terraform plan
+terraform state list | rg azuredevops_variable_group
+```
+
+When the state is correct, remove `import.tf`.

@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Core
+# Project Context
 # -----------------------------------------------------------------------------
 
 variable "project_id" {
@@ -14,139 +14,134 @@ variable "project_id" {
 }
 
 # -----------------------------------------------------------------------------
+# Work Item
+# -----------------------------------------------------------------------------
+
+variable "title" {
+  description = "Title of the work item."
+  type        = string
+
+  validation {
+    condition     = trimspace(var.title) != ""
+    error_message = "title must be a non-empty string."
+  }
+}
+
+variable "type" {
+  description = "Work item type (for example, Issue or Task)."
+  type        = string
+
+  validation {
+    condition     = trimspace(var.type) != ""
+    error_message = "type must be a non-empty string."
+  }
+}
+
+variable "state" {
+  description = "State of the work item."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.state == null || length(trimspace(var.state)) > 0
+    error_message = "state must be a non-empty string when provided."
+  }
+}
+
+variable "tags" {
+  description = "Tags to associate with the work item."
+  type        = list(string)
+  default     = null
+
+  validation {
+    condition = var.tags == null || alltrue([
+      for tag in var.tags : length(trimspace(tag)) > 0
+    ])
+    error_message = "tags entries must be non-empty strings when provided."
+  }
+}
+
+variable "area_path" {
+  description = "Area path for the work item."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.area_path == null || length(trimspace(var.area_path)) > 0
+    error_message = "area_path must be a non-empty string when provided."
+  }
+}
+
+variable "iteration_path" {
+  description = "Iteration path for the work item."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.iteration_path == null || length(trimspace(var.iteration_path)) > 0
+    error_message = "iteration_path must be a non-empty string when provided."
+  }
+}
+
+variable "parent_id" {
+  description = "Parent work item ID."
+  type        = number
+  default     = null
+
+  validation {
+    condition     = var.parent_id == null || var.parent_id > 0
+    error_message = "parent_id must be a positive number when provided."
+  }
+}
+
+variable "custom_fields" {
+  description = "Custom fields to set on the work item."
+  type        = map(string)
+  default     = null
+
+  validation {
+    condition = var.custom_fields == null || alltrue([
+      for key, value in var.custom_fields :
+      length(trimspace(key)) > 0 && length(trimspace(value)) > 0
+    ])
+    error_message = "custom_fields keys and values must be non-empty strings when provided."
+  }
+}
+
+# -----------------------------------------------------------------------------
 # Processes
 # -----------------------------------------------------------------------------
 
 variable "processes" {
-  description = "Map of work item processes to manage."
-  type = map(object({
-    name                   = optional(string)
+  description = "List of work item processes to manage."
+  type = list(object({
+    key                    = optional(string)
+    name                   = string
     parent_process_type_id = string
     description            = optional(string)
     is_default             = optional(bool)
     is_enabled             = optional(bool)
     reference_name         = optional(string)
   }))
-  default = {}
-
-  validation {
-    condition = alltrue([
-      for process in values(var.processes) : (
-        (process.name == null || length(trimspace(process.name)) > 0) &&
-        (process.reference_name == null || length(trimspace(process.reference_name)) > 0)
-      )
-    ])
-    error_message = "processes.name and processes.reference_name must be non-empty strings when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for process in values(var.processes) : length(trimspace(process.parent_process_type_id)) > 0
-    ])
-    error_message = "processes.parent_process_type_id must be a non-empty string."
-  }
-}
-
-# -----------------------------------------------------------------------------
-# Work Items
-# -----------------------------------------------------------------------------
-
-variable "work_items" {
-  description = "List of work items to manage. parent_key must reference a top-level work item (no parent_key)."
-  type = list(object({
-    key            = optional(string)
-    project_id     = optional(string)
-    title          = string
-    type           = string
-    state          = optional(string)
-    tags           = optional(list(string))
-    area_path      = optional(string)
-    iteration_path = optional(string)
-    parent_id      = optional(number)
-    parent_key     = optional(string)
-    custom_fields  = optional(map(string))
-  }))
   default = []
 
   validation {
     condition = alltrue([
-      for item in var.work_items : (
-        (item.key == null || length(trimspace(item.key)) > 0) &&
-        (item.project_id == null || length(trimspace(item.project_id)) > 0)
+      for process in var.processes : (
+        length(trimspace(process.name)) > 0 &&
+        length(trimspace(process.parent_process_type_id)) > 0 &&
+        (process.key == null || length(trimspace(process.key)) > 0) &&
+        (process.reference_name == null || length(trimspace(process.reference_name)) > 0)
       )
     ])
-    error_message = "work_items.key and work_items.project_id must be non-empty strings when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for item in var.work_items : length(trimspace(item.title)) > 0
-    ])
-    error_message = "work_items.title must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for item in var.work_items : length(trimspace(item.type)) > 0
-    ])
-    error_message = "work_items.type must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for item in var.work_items : (
-        item.parent_id == null || item.parent_id > 0
-      )
-    ])
-    error_message = "work_items.parent_id must be a positive number when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for item in var.work_items : (
-        item.parent_key == null || length(trimspace(item.parent_key)) > 0
-      )
-    ])
-    error_message = "work_items.parent_key must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for item in var.work_items : (
-        item.parent_id == null || item.parent_key == null
-      )
-    ])
-    error_message = "work_items must not set both parent_id and parent_key."
-  }
-
-  validation {
-    condition = alltrue([
-      for item in var.work_items : (
-        item.parent_key == null ||
-        contains([
-          for candidate in var.work_items : coalesce(candidate.key, candidate.title)
-          if candidate.parent_key == null
-        ], item.parent_key)
-      )
-    ])
-    error_message = "work_items.parent_key must reference a top-level work item key (parent_key unset)."
+    error_message = "processes.name and processes.parent_process_type_id must be non-empty; key/reference_name must be non-empty when provided."
   }
 
   validation {
     condition = length(distinct([
-      for item in var.work_items : coalesce(item.key, item.title)
-    ])) == length(var.work_items)
-    error_message = "work_items entries must have unique keys (key/title)."
-  }
-
-  validation {
-    condition = alltrue([
-      for item in var.work_items : (
-        item.project_id != null ||
-        (var.project_id != null && length(trimspace(var.project_id)) > 0)
-      )
-    ])
-    error_message = "work_items require project_id either on the item or via the module default."
+      for process in var.processes : coalesce(process.key, process.name)
+    ])) == length(var.processes)
+    error_message = "processes entries must have unique keys (key/name)."
   }
 }
 
@@ -155,13 +150,13 @@ variable "work_items" {
 # -----------------------------------------------------------------------------
 
 variable "query_folders" {
-  description = "List of work item query folders to manage. parent_key must reference a top-level folder (no parent_key)."
+  description = "List of work item query folders to manage."
   type = list(object({
     key        = optional(string)
     project_id = optional(string)
     name       = string
     area       = optional(string)
-    parent_id  = optional(string)
+    parent_id  = optional(number)
     parent_key = optional(string)
   }))
   default = []
@@ -169,45 +164,23 @@ variable "query_folders" {
   validation {
     condition = alltrue([
       for folder in var.query_folders : (
+        length(trimspace(folder.name)) > 0 &&
         (folder.key == null || length(trimspace(folder.key)) > 0) &&
-        (folder.project_id == null || length(trimspace(folder.project_id)) > 0)
+        (folder.project_id == null || length(trimspace(folder.project_id)) > 0) &&
+        (folder.area == null || length(trimspace(folder.area)) > 0) &&
+        (folder.parent_key == null || length(trimspace(folder.parent_key)) > 0)
       )
     ])
-    error_message = "query_folders.key and query_folders.project_id must be non-empty strings when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for folder in var.query_folders : length(trimspace(folder.name)) > 0
-    ])
-    error_message = "query_folders.name must be a non-empty string."
+    error_message = "query_folders.name must be non-empty; key/project_id/area/parent_key must be non-empty when provided."
   }
 
   validation {
     condition = alltrue([
       for folder in var.query_folders : (
-        folder.area == null || length(trimspace(folder.area)) > 0
+        folder.parent_id == null || folder.parent_id > 0
       )
     ])
-    error_message = "query_folders.area must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for folder in var.query_folders : (
-        folder.parent_id == null || length(trimspace(folder.parent_id)) > 0
-      )
-    ])
-    error_message = "query_folders.parent_id must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for folder in var.query_folders : (
-        folder.parent_key == null || length(trimspace(folder.parent_key)) > 0
-      )
-    ])
-    error_message = "query_folders.parent_key must be a non-empty string when provided."
+    error_message = "query_folders.parent_id must be a positive number when provided."
   }
 
   validation {
@@ -262,7 +235,7 @@ variable "queries" {
     name       = string
     wiql       = string
     area       = optional(string)
-    parent_id  = optional(string)
+    parent_id  = optional(number)
     parent_key = optional(string)
   }))
   default = []
@@ -270,52 +243,24 @@ variable "queries" {
   validation {
     condition = alltrue([
       for query in var.queries : (
+        length(trimspace(query.name)) > 0 &&
+        length(trimspace(query.wiql)) > 0 &&
         (query.key == null || length(trimspace(query.key)) > 0) &&
-        (query.project_id == null || length(trimspace(query.project_id)) > 0)
+        (query.project_id == null || length(trimspace(query.project_id)) > 0) &&
+        (query.area == null || length(trimspace(query.area)) > 0) &&
+        (query.parent_key == null || length(trimspace(query.parent_key)) > 0)
       )
     ])
-    error_message = "queries.key and queries.project_id must be non-empty strings when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for query in var.queries : length(trimspace(query.name)) > 0
-    ])
-    error_message = "queries.name must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for query in var.queries : length(trimspace(query.wiql)) > 0
-    ])
-    error_message = "queries.wiql must be a non-empty string."
+    error_message = "queries.name and queries.wiql must be non-empty; key/project_id/area/parent_key must be non-empty when provided."
   }
 
   validation {
     condition = alltrue([
       for query in var.queries : (
-        query.area == null || length(trimspace(query.area)) > 0
+        query.parent_id == null || query.parent_id > 0
       )
     ])
-    error_message = "queries.area must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for query in var.queries : (
-        query.parent_id == null || length(trimspace(query.parent_id)) > 0
-      )
-    ])
-    error_message = "queries.parent_id must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for query in var.queries : (
-        query.parent_key == null || length(trimspace(query.parent_key)) > 0
-      )
-    ])
-    error_message = "queries.parent_key must be a non-empty string when provided."
+    error_message = "queries.parent_id must be a positive number when provided."
   }
 
   validation {
@@ -376,6 +321,7 @@ variable "query_permissions" {
   validation {
     condition = alltrue([
       for perm in var.query_permissions : (
+        length(trimspace(perm.principal)) > 0 &&
         (perm.key == null || length(trimspace(perm.key)) > 0) &&
         (perm.project_id == null || length(trimspace(perm.project_id)) > 0) &&
         (perm.path == null || length(trimspace(perm.path)) > 0) &&
@@ -383,14 +329,7 @@ variable "query_permissions" {
         (perm.folder_key == null || length(trimspace(perm.folder_key)) > 0)
       )
     ])
-    error_message = "query_permissions.key, project_id, path, query_key, and folder_key must be non-empty strings when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.query_permissions : length(trimspace(perm.principal)) > 0
-    ])
-    error_message = "query_permissions.principal must be a non-empty string."
+    error_message = "query_permissions.principal must be non-empty; key/project_id/path/query_key/folder_key must be non-empty when provided."
   }
 
   validation {
@@ -459,25 +398,13 @@ variable "area_permissions" {
   validation {
     condition = alltrue([
       for perm in var.area_permissions : (
+        length(trimspace(perm.path)) > 0 &&
+        length(trimspace(perm.principal)) > 0 &&
         (perm.key == null || length(trimspace(perm.key)) > 0) &&
         (perm.project_id == null || length(trimspace(perm.project_id)) > 0)
       )
     ])
-    error_message = "area_permissions.key and area_permissions.project_id must be non-empty strings when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.area_permissions : length(trimspace(perm.path)) > 0
-    ])
-    error_message = "area_permissions.path must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.area_permissions : length(trimspace(perm.principal)) > 0
-    ])
-    error_message = "area_permissions.principal must be a non-empty string."
+    error_message = "area_permissions.path and area_permissions.principal must be non-empty; key/project_id must be non-empty when provided."
   }
 
   validation {
@@ -513,25 +440,13 @@ variable "iteration_permissions" {
   validation {
     condition = alltrue([
       for perm in var.iteration_permissions : (
+        length(trimspace(perm.path)) > 0 &&
+        length(trimspace(perm.principal)) > 0 &&
         (perm.key == null || length(trimspace(perm.key)) > 0) &&
         (perm.project_id == null || length(trimspace(perm.project_id)) > 0)
       )
     ])
-    error_message = "iteration_permissions.key and iteration_permissions.project_id must be non-empty strings when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.iteration_permissions : length(trimspace(perm.path)) > 0
-    ])
-    error_message = "iteration_permissions.path must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.iteration_permissions : length(trimspace(perm.principal)) > 0
-    ])
-    error_message = "iteration_permissions.principal must be a non-empty string."
+    error_message = "iteration_permissions.path and iteration_permissions.principal must be non-empty; key/project_id must be non-empty when provided."
   }
 
   validation {
@@ -566,18 +481,12 @@ variable "tagging_permissions" {
   validation {
     condition = alltrue([
       for perm in var.tagging_permissions : (
+        length(trimspace(perm.principal)) > 0 &&
         (perm.key == null || length(trimspace(perm.key)) > 0) &&
         (perm.project_id == null || length(trimspace(perm.project_id)) > 0)
       )
     ])
-    error_message = "tagging_permissions.key and tagging_permissions.project_id must be non-empty strings when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.tagging_permissions : length(trimspace(perm.principal)) > 0
-    ])
-    error_message = "tagging_permissions.principal must be a non-empty string."
+    error_message = "tagging_permissions.principal must be non-empty; key/project_id must be non-empty when provided."
   }
 
   validation {

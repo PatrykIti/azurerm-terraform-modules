@@ -1,11 +1,12 @@
 # Complete Azure DevOps Service Endpoints Example
 
-This example demonstrates multiple service endpoint types with shared permissions.
+This example demonstrates creating multiple service endpoints using module-level for_each.
 
 ## Features
 
-- GitHub, AWS, and Kubernetes service connections
-- Root-level service endpoint permissions
+- Generic service endpoint
+- Incoming webhook service endpoint
+- Permissions applied to the module-created endpoint
 
 ## Usage
 

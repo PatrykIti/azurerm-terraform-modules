@@ -38,17 +38,12 @@ provider "azuredevops" {}
 module "azuredevops_identity" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_identity?ref=ADOPv1.0.0"
 
-  groups = {
-    platform = {
-      display_name = "ADO Platform Team"
-      description  = "Platform engineering group"
-    }
-  }
+  group_display_name = "ADO Platform Team"
+  group_description  = "Platform engineering group"
 
   group_memberships = [
     {
       key                = "platform-membership"
-      group_key          = "platform"
       member_descriptors = ["<member_descriptor>"]
     }
   ]
@@ -57,13 +52,14 @@ module "azuredevops_identity" {
 
 If you use list resources without an explicit `key`, note the derived keys:
 
-- Group memberships: `key` or `group_descriptor` or `group_key`
+- Group memberships: `key` or `group_descriptor`
 - Group entitlements: `key` or `display_name` or `origin_id`
 - User entitlements: `key` or `principal_name` or `origin_id`
 - Service principal entitlements: `key` or `origin_id`
-- Security role assignments: `key` or `scope/resource_id/role_name/identity`
+- Security role assignments: `key` or `identity_id` or `scope/resource_id/role_name`
 
-These keys must match your import addresses.
+When targeting the module-managed group without `group_descriptor`, set `key`
+explicitly to keep a stable import address.
 
 ---
 
@@ -74,7 +70,7 @@ Use the **module address** with the stable key that matches your inputs.
 
 ```hcl
 import {
-  to = module.azuredevops_identity.azuredevops_group.group["platform"]
+  to = module.azuredevops_identity.azuredevops_group.group[0]
   id = "<group_descriptor_or_id>"
 }
 
@@ -137,8 +133,8 @@ When the plan is clean, remove `import.tf`.
 ## Common errors and fixes
 
 - **Plan shows changes after import**: input values do not match existing settings.
-  Align `groups`, entitlements, and role assignments with current Azure DevOps state.
-- **Unknown key errors**: ensure `group_key`, `member_group_keys`, and
-  `identity_group_key` reference existing keys in `groups`.
+  Align group settings, entitlements, and role assignments with current Azure DevOps state.
+- **Unknown key errors**: ensure the derived keys match your list inputs or set explicit `key` values.
+- **Missing group_descriptor**: provide `group_descriptor` when the module group is not configured.
 - **Import ID not found**: verify the descriptor or ID in the Azure DevOps UI or API.
 - **Duplicate key validation**: list inputs must have unique derived keys or explicit `key` values.

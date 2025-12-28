@@ -1,36 +1,52 @@
 # -----------------------------------------------------------------------------
-# Feeds
+# Feed
 # -----------------------------------------------------------------------------
 
-variable "feeds" {
-  description = "Map of feeds to manage."
-  type = map(object({
-    name        = optional(string)
-    project_id  = optional(string)
-    features = optional(object({
-      permanent_delete = optional(bool)
-      restore          = optional(bool)
-    }))
-  }))
-  default = {}
+variable "name" {
+  description = "The name of the Azure DevOps feed. Required when creating the feed."
+  type        = string
+  default     = null
 
   validation {
-    condition = alltrue([
-      for feed in values(var.feeds) : (
-        feed.name == null || length(trimspace(feed.name)) > 0
-      )
-    ])
-    error_message = "feeds.name must be a non-empty string when provided."
+    condition     = var.name == null || length(trimspace(var.name)) > 0
+    error_message = "name must be a non-empty string when provided."
+  }
+}
+
+variable "project_id" {
+  description = "The Azure DevOps project ID to scope the feed. Required when creating the feed."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.project_id == null || length(trimspace(var.project_id)) > 0
+    error_message = "project_id must be a non-empty string when provided."
   }
 
   validation {
-    condition = alltrue([
-      for feed in values(var.feeds) : (
-        feed.project_id == null || length(trimspace(feed.project_id)) > 0
-      )
-    ])
-    error_message = "feeds.project_id must be a non-empty string when provided."
+    condition     = (var.name == null && var.project_id == null) || (var.name != null && var.project_id != null)
+    error_message = "name and project_id must be set together to create a feed."
   }
+}
+
+variable "description" {
+  description = "Description for the feed."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.description == null || length(trimspace(var.description)) > 0
+    error_message = "description must be a non-empty string when provided."
+  }
+}
+
+variable "features" {
+  description = "Feed feature flags for azuredevops_feed.features. Set to null to leave unmanaged."
+  type = object({
+    permanent_delete = optional(bool)
+    restore          = optional(bool)
+  })
+  default = null
 }
 
 # -----------------------------------------------------------------------------
@@ -42,22 +58,12 @@ variable "feed_permissions" {
   type = list(object({
     key                 = optional(string)
     feed_id             = optional(string)
-    feed_key            = optional(string)
     identity_descriptor = string
     role                = string
     project_id          = optional(string)
     display_name        = optional(string)
   }))
   default = []
-
-  validation {
-    condition = alltrue([
-      for perm in var.feed_permissions : (
-        (perm.feed_id != null) != (perm.feed_key != null)
-      )
-    ])
-    error_message = "feed_permissions must set exactly one of feed_id or feed_key."
-  }
 
   validation {
     condition = alltrue([
@@ -80,28 +86,28 @@ variable "feed_permissions" {
   validation {
     condition = alltrue([
       for perm in var.feed_permissions : (
-        perm.feed_key == null || length(trimspace(perm.feed_key)) > 0
-      )
-    ])
-    error_message = "feed_permissions.feed_key must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.feed_permissions : (
-        perm.feed_key == null || contains(keys(var.feeds), perm.feed_key)
-      )
-    ])
-    error_message = "feed_permissions.feed_key must reference a key in feeds."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.feed_permissions : (
         perm.project_id == null || length(trimspace(perm.project_id)) > 0
       )
     ])
     error_message = "feed_permissions.project_id must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for perm in var.feed_permissions : (
+        perm.display_name == null || length(trimspace(perm.display_name)) > 0
+      )
+    ])
+    error_message = "feed_permissions.display_name must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for perm in var.feed_permissions : (
+        perm.feed_id != null || (var.name != null && var.project_id != null)
+      )
+    ])
+    error_message = "feed_permissions.feed_id must be set when the module feed is not created."
   }
 
   validation {
@@ -126,9 +132,9 @@ variable "feed_permissions" {
   validation {
     condition = length(distinct([
       for perm in var.feed_permissions :
-      coalesce(perm.key, perm.feed_key, perm.feed_id, perm.identity_descriptor)
+      coalesce(perm.key, perm.identity_descriptor)
     ])) == length(var.feed_permissions)
-    error_message = "feed_permissions must have unique keys (key, feed_key, feed_id, or identity_descriptor)."
+    error_message = "feed_permissions must have unique keys (key or identity_descriptor)."
   }
 }
 
@@ -141,21 +147,11 @@ variable "feed_retention_policies" {
   type = list(object({
     key                                       = optional(string)
     feed_id                                   = optional(string)
-    feed_key                                  = optional(string)
     count_limit                               = number
     days_to_keep_recently_downloaded_packages = number
     project_id                                = optional(string)
   }))
   default = []
-
-  validation {
-    condition = alltrue([
-      for policy in var.feed_retention_policies : (
-        (policy.feed_id != null) != (policy.feed_key != null)
-      )
-    ])
-    error_message = "feed_retention_policies must set exactly one of feed_id or feed_key."
-  }
 
   validation {
     condition = alltrue([
@@ -178,28 +174,17 @@ variable "feed_retention_policies" {
   validation {
     condition = alltrue([
       for policy in var.feed_retention_policies : (
-        policy.feed_key == null || length(trimspace(policy.feed_key)) > 0
-      )
-    ])
-    error_message = "feed_retention_policies.feed_key must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for policy in var.feed_retention_policies : (
-        policy.feed_key == null || contains(keys(var.feeds), policy.feed_key)
-      )
-    ])
-    error_message = "feed_retention_policies.feed_key must reference a key in feeds."
-  }
-
-  validation {
-    condition = alltrue([
-      for policy in var.feed_retention_policies : (
         policy.project_id == null || length(trimspace(policy.project_id)) > 0
       )
     ])
     error_message = "feed_retention_policies.project_id must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for policy in var.feed_retention_policies : policy.feed_id != null || (var.name != null && var.project_id != null)
+    ])
+    error_message = "feed_retention_policies.feed_id must be set when the module feed is not created."
   }
 
   validation {
@@ -219,8 +204,15 @@ variable "feed_retention_policies" {
   validation {
     condition = length(distinct([
       for policy in var.feed_retention_policies :
-      coalesce(policy.key, policy.feed_key, policy.feed_id)
+      coalesce(
+        policy.key,
+        format(
+          "%s-%s",
+          policy.count_limit,
+          policy.days_to_keep_recently_downloaded_packages
+        )
+      )
     ])) == length(var.feed_retention_policies)
-    error_message = "feed_retention_policies must have unique keys (key, feed_key, or feed_id)."
+    error_message = "feed_retention_policies must have unique keys (key or count_limit/days_to_keep_recently_downloaded_packages)."
   }
 }
