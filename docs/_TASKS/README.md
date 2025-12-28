@@ -4,8 +4,8 @@ Task board for module work. Update statuses in markdown files.
 
 ## Statistics
 - **To Do:** 1 tasks
-- **In Progress:** 1
-- **Done:** 34 tasks
+- **In Progress:** 0
+- **Done:** 35 tasks
 
 ---
 
@@ -19,9 +19,7 @@ Task board for module work. Update statuses in markdown files.
 
 ## In Progress
 
-| ID | Title | Priority | Effort | Notes |
-|----|-------|----------|--------|-------|
-| [TASK-009](./TASK-009_Workflow_and_Scripts_Audit.md) | **Workflow + scripts audit (docs/examples/source updates)** | High | Medium | CI/CD + release automations |
+*No tasks currently in progress*
 
 ---
 
@@ -29,6 +27,7 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-009](./TASK-009_Workflow_and_Scripts_Audit.md) | **Workflow + scripts audit (docs/examples/source updates)** | High | Medium | CI/CD + release automations |
 | [TASK-ADO-027](./TASK-ADO-027_AzureDevOps_Team_Module_Refactor.md) | **Azure DevOps Team module refactor** | Medium | Medium | `modules/azuredevops_team/` |
 | [TASK-ADO-024](./TASK-ADO-024_AzureDevOps_ServiceHooks_Module_Refactor.md) | **Azure DevOps Service Hooks module refactor** | Medium | Medium | `modules/azuredevops_servicehooks/` |
 | [TASK-ADO-022](./TASK-ADO-022_AzureDevOps_ServiceEndpoint_Module_Refactor.md) | **Azure DevOps Service Endpoint module refactor** | High | Large | `modules/azuredevops_serviceendpoint/` |

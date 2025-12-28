@@ -264,9 +264,9 @@ This section lists which workflows call which scripts and where updates are expe
 | Script or command | Called from | Files written | Notes |
 |---|---|---|---|
 | `@semantic-release/changelog` | `module-release.yml` via module `.releaserc.js` | `modules/<module>/CHANGELOG.md` | Standard semantic-release changelog update. |
-| `@semantic-release/exec` `prepareCmd` (module `.releaserc.js`) | `module-release.yml` | `modules/<module>/examples/**/*.tf` | Uses `sed` to rewrite `source = "..."` patterns. Several modules use a broad regex that can touch provider sources. |
+| `@semantic-release/exec` `prepareCmd` (module `.releaserc.js`) | `module-release.yml` | `modules/<module>/examples/**/*.tf` | Rewrites only `source = "../.."` or `source = "../../"` to the release tag for the module. |
 | `@semantic-release/exec` `prepareCmd` | `module-release.yml` | `modules/<module>/**/README.md` | Rewrites `source = "../.."` and `source = "../"` in README files. |
-| `scripts/update-module-version.sh` | `module-release.yml` via `prepareCmd` | `modules/<module>/README.md` | Updates `<!-- BEGIN_VERSION -->` block. Prefix extraction relies on `.releaserc.js` constants. |
+| `scripts/update-module-version.sh` | `module-release.yml` via `prepareCmd` | `modules/<module>/README.md` | Updates `<!-- BEGIN_VERSION -->` block. Reads `tag_prefix` from `module.json` and preserves existing version style. |
 | `scripts/update-examples-list.sh` | `pr-validation.yml`, `module-release.yml` | `modules/<module>/README.md` | Rebuilds the examples list between markers. |
 | `scripts/update-module-docs.sh` | `pr-validation.yml`, `module-release.yml` | `modules/<module>/README.md` | Runs terraform-docs with module `.terraform-docs.yml` using inject mode. |
 | `scripts/update-root-readme.sh` | `module-release.yml` via `prepareCmd` | `README.md` | Expects module table and badges section to exist; otherwise minimal/no changes. |
@@ -284,17 +284,15 @@ Scripts listed here are invoked by workflows directly or via semantic-release.
 | `scripts/get-module-config.js` | `module-release.yml`, `list-modules.yml` | Reads `module.json` (`tag_prefix`, `commit_scope`) | Falls back to `.releaserc.js` if needed. |
 | `scripts/update-examples-list.sh` | `pr-validation.yml`, `module-release.yml` | Rebuilds module examples list in README | Updates content between `BEGIN_EXAMPLES` markers. |
 | `scripts/update-module-docs.sh` | `pr-validation.yml`, `module-release.yml` | Runs terraform-docs inject for module README | Skips update if markers missing. |
-| `scripts/update-module-version.sh` | `module-release.yml` | Updates module README version block | Prefix extraction relies on `.releaserc.js` constants. |
+| `scripts/update-module-version.sh` | `module-release.yml` | Updates module README version block | Reads `tag_prefix` from `module.json` and preserves README formatting. |
 | `scripts/update-root-readme.sh` | `module-release.yml` | Updates root README module table and badges | No-op if expected markers do not exist. |
 | `scripts/semantic-release-multi-scope-plugin.js` | `module-release.yml` | Filters commits to target scope for module release | Mutates `context.commits` for analysis. |
 
 ## Known Risks and Gaps (Task-009 audit)
 
-1. **Example `source` rewrite is inconsistent**: Some modules use a scoped `sed` (e.g., `modules/azurerm_network_security_group/.releaserc.js`) while others still use a broad `source.*=.*"` pattern (e.g., `modules/azuredevops_identity/.releaserc.js`, `modules/azurerm_kubernetes_secrets/.releaserc.js`). This can overwrite `required_providers.source` or other module references.
-2. **Scope parsing is azurerm-only**: `module-ci.yml`, `pr-validation.yml`, and `release-changed-modules.yml` map scopes to `azurerm_*` by default and do not handle `azuredevops_*` scopes correctly.
-3. **Version prefix extraction mismatch**: `scripts/update-module-version.sh` expects `TAG_PREFIX` in `.releaserc.js`, but module configs are now driven by `module.json`.
-4. **Root README assumptions**: `scripts/update-root-readme.sh` expects a module table and badge markers that are not present in the current root README.
-5. **Missing template in updater**: `scripts/update-module-releaserc.sh` references `scripts/templates/.releaserc.auto.js`, which does not exist.
+1. **Root README entry required**: `scripts/update-root-readme.sh` updates rows only if the module is listed in the root tables; missing rows are reported and remain unchanged.
+2. **Badge label coupling**: Badge updates rely on `MODULE_DISPLAY_NAME`; if it diverges from the README badge label, duplicates can appear.
+3. **Missing template in updater**: `scripts/update-module-releaserc.sh` references `scripts/templates/.releaserc.auto.js`, which does not exist.
 
 ## Shared Actions
 

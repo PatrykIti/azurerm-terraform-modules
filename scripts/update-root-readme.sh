@@ -39,17 +39,35 @@ escape_sed() {
 }
 
 # Escaped values
-ESCAPED_MODULE_NAME=$(escape_sed "$MODULE_NAME")
 ESCAPED_TAG_PREFIX=$(escape_sed "$TAG_PREFIX")
 ESCAPED_MODULE_DISPLAY_NAME=$(escape_sed "$MODULE_DISPLAY_NAME")
 
-# Update module status - handle both Development and already Completed status
-# First, try to update from Development status
-sed -i.bak "s#\[${ESCAPED_MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) \| 🔧 Development \| -#\[${MODULE_DISPLAY_NAME}\](./modules/${MODULE_NAME}/) | ✅ Completed | [${TAG_PREFIX}${VERSION}](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag/${TAG_PREFIX}${VERSION})#g" "$TMP_FILE"
+# Update module table row (AzureRM or Azure DevOps tables)
+VERSION_TAG="${TAG_PREFIX}${VERSION}"
+VERSION_LINK="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag/${VERSION_TAG}"
 
-# Then, update existing Completed status with new version (handles any previous version)
-# This regex matches any existing version format (v1.0.0, AKSv1.0.0, or links)
-sed -i.bak -E "s#\[${ESCAPED_MODULE_DISPLAY_NAME}\](./modules/${ESCAPED_MODULE_NAME}/) \| ✅ Completed \| [^\|]+#\[${MODULE_DISPLAY_NAME}\](./modules/${MODULE_NAME}/) | ✅ Completed | [${TAG_PREFIX}${VERSION}](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag/${TAG_PREFIX}${VERSION})#g" "$TMP_FILE"
+awk -v module="$MODULE_NAME" -v version_tag="$VERSION_TAG" -v version_link="$VERSION_LINK" '
+function trim(s) { sub(/^[ \t]+/, "", s); sub(/[ \t]+$/, "", s); return s }
+{
+    if ($0 ~ /^\|/ && $0 ~ "\\(./modules/" module "/\\)") {
+        n = split($0, parts, "|")
+        if (n >= 5) {
+            module_cell = trim(parts[2])
+            desc_cell = trim(parts[5])
+            status = "✅ Completed"
+            version = "[" version_tag "](" version_link ")"
+            printf("| %s | %s | %s | %s |\n", module_cell, status, version, desc_cell)
+            next
+        }
+    }
+    print
+}
+' "$TMP_FILE" > "${TMP_FILE}.new"
+mv "${TMP_FILE}.new" "$TMP_FILE"
+
+if ! grep -q "(./modules/${MODULE_NAME}/)" "$TMP_FILE"; then
+    echo "⚠️  Module entry not found in root README table: ${MODULE_NAME}"
+fi
 
 # Add or update module version badge at the top of the file
 echo "Adding/updating version badge for ${MODULE_NAME}"
@@ -79,6 +97,9 @@ echo "Updating example module reference"
 if grep -q 'source = "github.com/your-org/azurerm-terraform-modules' "$TMP_FILE"; then
     sed -i.bak "s|github.com/your-org/azurerm-terraform-modules|github.com/${REPO_OWNER}/${REPO_NAME}|g" "$TMP_FILE"
 fi
+
+# Update any root README snippets that reference this module's source tag
+sed -i.bak -E "s#(source = \"github.com/${REPO_OWNER}/${REPO_NAME}//modules/${MODULE_NAME}\\?ref=)[^\"]+\"#\\1${VERSION_TAG}\"#g" "$TMP_FILE"
 
 # Copy back the updated file
 cp "$TMP_FILE" "$ROOT_README"

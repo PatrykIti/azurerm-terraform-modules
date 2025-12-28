@@ -5,7 +5,7 @@
 **Category:** CI/CD / Automation  
 **Estimated Effort:** Medium  
 **Dependencies:** —  
-**Status:** 🟡 **In Progress**
+**Status:** ✅ **Done**
 
 ---
 
@@ -38,6 +38,8 @@ Zweryfikowac wszystkie workflow i skrypty, ktore modyfikuja README, examples, ve
 
 ### TASK-009-2: Bezpieczna aktualizacja `source` w examples
 
+**Status:** ✅ Done (release now rewrites only `source = "../.."` / `source = "../../"` in examples)
+
 - Zmienic logike w release tak, aby:
   - Podmieniac tylko `source` wskazujace na lokalny modul (`../..` / `../../`) lub tylko blok `module "<module_name>"`.
   - Nie dotykac `required_providers.source` ani innych modulow w examples.
@@ -45,10 +47,14 @@ Zweryfikowac wszystkie workflow i skrypty, ktore modyfikuja README, examples, ve
 
 ### TASK-009-3: Provider-aware module detection
 
+**Status:** ✅ Done (workflow detection uses `module.json` commit_scope mapping)
+
 - Rozszerzyc detekcje modulow w workflow o `azuredevops_*`.
 - Opcja preferowana: mapowanie `commit_scope` -> modul na podstawie `modules/*/module.json`.
 
 ### TASK-009-4: Aktualizacje wersji i README
+
+**Status:** ✅ Done (module + root README updates aligned to current structure)
 
 - `update-module-version.sh` czyta `tag_prefix` z `module.json` (zamiast regex na .releaserc.js).
 - `update-root-readme.sh` dostosowac do realnej struktury README lub wylaczyc.
@@ -56,11 +62,15 @@ Zweryfikowac wszystkie workflow i skrypty, ktore modyfikuja README, examples, ve
 
 ### TASK-009-5: Przeglad modulow (przyklady)
 
+**Status:** ✅ Done (verified AKS secrets, NSG, Azure DevOps identity examples)
+
 - `modules/azurerm_kubernetes_secrets` (examples z innym modulem w `source`).
 - `modules/azurerm_network_security_group` (standardowe `../..`).
 - `modules/azuredevops_identity` (drugi provider).
 
 ### TASK-009-6: Dokumentacja
+
+**Status:** ✅ Done (updated `docs/WORKFLOWS.md` with script map and catalog)
 
 - Zaktualizowac `docs/WORKFLOWS.md` i/lub `docs/MODULE_GUIDE` o nowy mechanizm podmian `source`.
 
