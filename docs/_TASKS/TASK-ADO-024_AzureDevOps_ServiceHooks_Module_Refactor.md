@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-012
-**Status:** ✅ **Done** (2025-12-25)
+**Status:** 🟠 **Re-opened**
 
 ---
 
@@ -14,6 +14,14 @@
 Refactor `modules/azuredevops_servicehooks` to align with MODULE_GUIDE/TESTING_GUIDE/TERRAFORM_BEST_PRACTICES.
 Focus on stable `for_each` keys, stricter validation, and secure handling of sensitive inputs.
 Document any deviations required by resource-specific constraints.
+The main service hook resource must be a single (non-iterated) block with flat inputs; for multiple hooks use module-level `for_each`.
+
+## Updated Rules (Re-opened)
+
+- Main resource is single (non-iterated); use module-level `for_each` in environment config to manage multiple instances.
+- Prefer `list(object)` for collections; use `map` only when provider requires key/value semantics.
+- Use simple, stable `for_each` keys based on unique fields (name, principal_id, service_principal_id, group_name, etc.); never index-based.
+- Follow docs/MODULE_GUIDE/, docs/TESTING_GUIDE, docs/TERRAFORM_BEST_PRACTICES_GUIDE.md.
 
 ## Scope (Provider Resources)
 
@@ -23,6 +31,7 @@ Document any deviations required by resource-specific constraints.
 
 ## Current Gaps (Summary)
 
+- `webhooks` and `storage_queue_hooks` are modeled as lists and iterated; should be single resources with module-level `for_each`.
 - `webhooks`, `storage_queue_hooks`, and `servicehook_permissions` use index-based `for_each`, causing unstable addressing on reorder.
 - No explicit `key` inputs or uniqueness validation for list resources; outputs are keyed by list index.
 - `servicehook_permissions` does not validate permissions map values or ensure non-empty permissions; `project_id` is not validated when provided.
@@ -33,10 +42,9 @@ Document any deviations required by resource-specific constraints.
 
 ## Target Module Design
 
-### Inputs (Webhooks)
+### Inputs (Webhook)
 
-`webhooks` (list(object)):
-- key (optional string) for stable for_each
+`webhook` (object):
 - url (string, required)
 - accept_untrusted_certs (optional bool)
 - basic_auth_username (optional string)
@@ -59,12 +67,10 @@ Validation rules:
 - Exactly one event block is set.
 - tfvc_checkin.path must be non-empty.
 - Validate enumerated fields per provider docs (resource_details_to_send/messages_to_send/detailed_messages_to_send).
-- Unique keys using `coalesce(key, "${event_type}:${url}")`.
 
-### Inputs (Storage Queue Hooks)
+### Inputs (Storage Queue Hook)
 
-`storage_queue_hooks` (list(object)):
-- key (optional string) for stable for_each
+`storage_queue_hook` (object):
 - account_name (string, required)
 - account_key (string, required, sensitive)
 - queue_name (string, required)
@@ -77,7 +83,6 @@ Validation rules:
 - account_name/account_key/queue_name must be non-empty.
 - Exactly one of run_state_changed_event or stage_state_changed_event.
 - ttl and visibility timeout must be >= 0 when provided.
-- Unique keys using `coalesce(key, "${queue_name}:${event_type}")`.
 
 ### Inputs (Service Hook Permissions)
 
@@ -93,26 +98,26 @@ Validation rules:
 - project_id must be non-empty when provided.
 - permissions map must be non-empty.
 - permissions values must be one of Allow/Deny/NotSet (normalize case if needed).
-- Unique keys using `coalesce(key, "${project_id_or_module}:${principal}")`.
+- Unique keys using `coalesce(key, principal)`.
 
 ### Locals / Implementation
 
-- Build normalized maps in `locals` for each list input using computed keys.
+- Build normalized maps in `locals` for the permissions list using computed keys.
 - Use the normalized maps for `for_each` to ensure stable resource addressing.
 - Normalize permission values before sending to the provider if required.
 
 ### Outputs
 
-- Keep `servicehook_ids` but use stable keys for maps.
-- Add `servicehook_permission_ids` (map, keyed by permission key).
-- Optionally add explicit `webhook_ids` and `storage_queue_hook_ids` outputs for clarity.
+- `webhook_id` (string, when configured)
+- `storage_queue_hook_id` (string, when configured)
+- `servicehook_permission_ids` (map, keyed by permission key).
 
 ## Examples
 
 Update examples to show stable key usage:
-- basic: single webhook with key.
-- complete: webhook + storage queue hook with keys and event filters.
-- secure: filtered webhook + permissions with key and limited permission set.
+- basic: single webhook.
+- complete: webhook + storage queue hook with event filters (show module-level `for_each` for multiple hooks).
+- secure: filtered webhook + permissions with limited permission set.
 
 ## Tests
 
@@ -120,13 +125,13 @@ Update tests per TESTING_GUIDE:
 
 - Unit:
   - event block validation (exactly one).
-  - unique key validation for each list input.
+  - unique key validation for permissions list.
   - permissions values allowed + non-empty map.
   - ttl/visibility timeout non-negative validation.
 - Integration:
-  - create webhook + storage queue hook + permissions using keys.
+  - create webhook + storage queue hook + permissions.
 - Negative:
-  - duplicate key in webhooks/storage_queue_hooks/permissions.
+  - duplicate key in permissions.
   - invalid permission value.
   - ttl/visibility timeout < 0.
 
@@ -146,8 +151,9 @@ Update tests per TESTING_GUIDE:
 
 ## Implementation Checklist
 
-- [ ] Add optional `key` to list inputs and update validations/uniqueness.
-- [ ] Refactor `main.tf` to use normalized maps and stable `for_each` keys.
+- [ ] Replace webhook/storage queue lists with single objects and add validations.
+- [ ] Add optional `key` to permissions list and update validations/uniqueness.
+- [ ] Refactor `main.tf` to use normalized maps and stable `for_each` keys for permissions.
 - [ ] Tighten validation for permissions and numeric fields; align `visi_timeout` naming with provider docs.
 - [ ] Mark sensitive inputs and update README guidance.
 - [ ] Update outputs (stable keys + permission IDs).

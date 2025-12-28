@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-010
-**Status:** ✅ **Done** (2025-12-25)
+**Status:** 🟠 **Re-opened**
 
 ---
 
@@ -14,6 +14,13 @@
 Refactor `modules/azuredevops_variable_groups` to align with MODULE_GUIDE/TESTING_GUIDE/TERRAFORM_BEST_PRACTICES.
 The main `azuredevops_variable_group` must be a single (non-iterated) resource with flat inputs.
 Permissions should use list(object) with stable for_each keys; for multiple groups use module-level for_each.
+
+## Updated Rules (Re-opened)
+
+- Main resource is single (non-iterated); use module-level `for_each` in environment config to manage multiple instances.
+- Prefer `list(object)` for collections; use `map` only when provider requires key/value semantics.
+- Use simple, stable `for_each` keys based on unique fields (name, principal_id, service_principal_id, group_name, etc.); never index-based.
+- Follow docs/MODULE_GUIDE/, docs/TESTING_GUIDE, docs/TERRAFORM_BEST_PRACTICES_GUIDE.md.
 
 ## Scope (Provider Resources)
 
@@ -26,7 +33,7 @@ Permissions should use list(object) with stable for_each keys; for multiple grou
 - `azuredevops_variable_group` is iterated via `var.variable_groups` map; core inputs are nested.
 - `key_vaults` is modeled as a list and does not match provider block semantics (`key_vault`); max-one is not enforced.
 - `variable_group_permissions` and `library_permissions` use index-based for_each, producing unstable addresses.
-- `variable_group_permissions` resolves `variable_group_key` without validating that the key exists.
+- `variable_group_permissions` does not validate/default the target group when `variable_group_id` is omitted.
 - Outputs are maps keyed by group key; module should expose single outputs for a single group.
 - Examples use random suffix provider and dynamic names (violates fixed-name examples rule).
 - Missing `docs/IMPORT.md`.
@@ -137,10 +144,10 @@ Update tests per TESTING_GUIDE:
 
 ## Implementation Checklist
 
-- [x] Refactor variables.tf: replace `variable_groups` map with flat inputs; add validations and optional key fields.
-- [x] Refactor main.tf: single `azuredevops_variable_group`; optional `key_vault`; stable for_each for permissions.
-- [x] Update outputs.tf: `variable_group_id` and `variable_group_name` outputs.
-- [x] Add `docs/IMPORT.md`.
-- [x] Update examples (fixed names, single group usage).
-- [x] Update tests (fixtures, unit, terratest, test_config).
-- [x] make docs + update README.
+- [ ] Refactor variables.tf: replace `variable_groups` map with flat inputs; add validations and optional key fields.
+- [ ] Refactor main.tf: single `azuredevops_variable_group`; optional `key_vault`; stable for_each for permissions.
+- [ ] Update outputs.tf: `variable_group_id` and `variable_group_name` outputs.
+- [ ] Add `docs/IMPORT.md`.
+- [ ] Update examples (fixed names, single group usage).
+- [ ] Update tests (fixtures, unit, terratest, test_config).
+- [ ] make docs + update README.

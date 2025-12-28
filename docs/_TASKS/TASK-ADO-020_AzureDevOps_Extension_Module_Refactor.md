@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Small
 **Dependencies:** TASK-ADO-005
-**Status:** ✅ **Done**
+**Status:** 🟠 **Re-opened**
 
 ---
 
@@ -14,6 +14,13 @@
 Refactor `modules/azuredevops_extension` to align with MODULE_GUIDE/TESTING_GUIDE/TERRAFORM_BEST_PRACTICES.
 The `azuredevops_extension` resource must be a single (non-iterated) block with flat inputs.
 For multiple extensions, use module-level `for_each`.
+
+## Updated Rules (Re-opened)
+
+- Main resource is single (non-iterated); use module-level `for_each` in environment config to manage multiple instances.
+- Prefer `list(object)` for collections; use `map` only when provider requires key/value semantics.
+- Use simple, stable `for_each` keys based on unique fields (name, principal_id, service_principal_id, group_name, etc.); never index-based.
+- Follow docs/MODULE_GUIDE/, docs/TESTING_GUIDE, docs/TERRAFORM_BEST_PRACTICES_GUIDE.md.
 
 ## Scope (Provider Resources)
 
@@ -82,10 +89,10 @@ Update tests per TESTING_GUIDE:
 
 ## Implementation Checklist
 
-- [x] Refactor variables.tf: replace `extensions` list with flat inputs + validations.
-- [x] Refactor main.tf: single `azuredevops_extension` resource block.
-- [x] Update outputs.tf: replace `extension_ids` map with `extension_id`.
-- [x] Update examples/fixtures/tests to new interface (module-level `for_each`).
-- [x] Add docs/IMPORT.md.
-- [x] Update README + regenerate docs + update examples list.
-- [x] Update tests (fixtures, unit, terratest, test_config).
+- [ ] Refactor variables.tf: replace `extensions` list with flat inputs + validations.
+- [ ] Refactor main.tf: single `azuredevops_extension` resource block.
+- [ ] Update outputs.tf: replace `extension_ids` map with `extension_id`.
+- [ ] Update examples/fixtures/tests to new interface (module-level `for_each`).
+- [ ] Add docs/IMPORT.md.
+- [ ] Update README + regenerate docs + update examples list.
+- [ ] Update tests (fixtures, unit, terratest, test_config).

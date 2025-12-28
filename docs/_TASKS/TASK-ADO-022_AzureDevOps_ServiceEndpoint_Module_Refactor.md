@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Large
 **Dependencies:** TASK-ADO-009
-**Status:** ✅ **Done** (2025-12-26)
+**Status:** 🟠 **Re-opened**
 
 ---
 
@@ -14,6 +14,14 @@
 Refactor `modules/azuredevops_serviceendpoint` to align with MODULE_GUIDE/TESTING_GUIDE/TERRAFORM_BEST_PRACTICES.
 Focus on stable for_each keys, explicit cross-field validation for authentication modes, secure handling of secrets,
 and a permissions workflow that can reference module-created endpoints. Document any provider-driven deviations.
+The main service endpoint must be a single (non-iterated) resource with flat inputs; for multiple endpoints use module-level `for_each`.
+
+## Updated Rules (Re-opened)
+
+- Main resource is single (non-iterated); use module-level `for_each` in environment config to manage multiple instances.
+- Prefer `list(object)` for collections; use `map` only when provider requires key/value semantics.
+- Use simple, stable `for_each` keys based on unique fields (name, principal_id, service_principal_id, group_name, etc.); never index-based.
+- Follow docs/MODULE_GUIDE/, docs/TESTING_GUIDE, docs/TERRAFORM_BEST_PRACTICES_GUIDE.md.
 
 ## Scope (Provider Resources)
 
@@ -63,8 +71,9 @@ and a permissions workflow that can reference module-created endpoints. Document
 
 ## Current Gaps (Summary)
 
+- Endpoint resources are modeled as lists and iterated; should be a single endpoint per module instance with module-level `for_each`.
 - All endpoint resources and permissions use index-based `for_each`, producing unstable addresses.
-- Outputs (`serviceendpoint_ids`, `serviceendpoint_names`) are keyed by index instead of stable keys.
+- Outputs (`serviceendpoint_ids`, `serviceendpoint_names`) are keyed by index instead of single values for a module instance.
 - No `key` inputs or uniqueness validation for any endpoint list or permissions list.
 - `serviceendpoint_permissions` makes `serviceendpoint_id` optional, but the resource needs it; examples/fixtures omit it
   and there is no lookup path to module-created endpoints.
@@ -78,35 +87,30 @@ and a permissions workflow that can reference module-created endpoints. Document
 
 ## Target Module Design
 
-### Inputs (Common Pattern)
+### Inputs (Endpoint)
 
-Keep separate `serviceendpoint_*` lists per type, add stable keys:
-- `key` (optional string) for all `serviceendpoint_*` objects.
-- `for_each` key = `coalesce(key, service_endpoint_name, name)` (generic_v2 uses `name`).
-- Add uniqueness validation per list; reject empty or duplicate keys.
-- Add non-empty validation for required string fields.
+Single endpoint per module instance. Use one optional object per endpoint type (matching provider schema), not lists.
+Validate that exactly one endpoint type object is set and required string fields are non-empty.
+Use `list(object)` for any nested collections where the provider supports them; keep maps only when the provider requires map semantics.
 
 ### Inputs (Permissions)
 
 `serviceendpoint_permissions` (list(object)):
 - key (optional string)
 - serviceendpoint_id (optional string)
-- serviceendpoint_type (optional string; matches `serviceendpoint_ids` keys)
-- serviceendpoint_key (optional string; matches endpoint key/name)
 - principal (string)
 - permissions (map(string))
 - replace (optional bool, default true)
 
 Validation rules:
-- exactly one of `serviceendpoint_id` or (`serviceendpoint_type` + `serviceendpoint_key`)
+- serviceendpoint_id must be non-empty when provided
+- when serviceendpoint_id is omitted, the module endpoint must be present
 - principal non-empty
 - permissions values in ["Allow", "Deny", "NotSet"]
-- `serviceendpoint_type` must be one of supported types
-- for_each key = `coalesce(key, "${serviceendpoint_type or serviceendpoint_id}:${principal}")`
+- for_each key = `coalesce(key, principal)`
 
 Implementation notes:
-- build `local.serviceendpoint_ids` map from resources and resolve IDs for permissions via `coalesce(...)`
-  with `try()`/preconditions.
+- resolve permission targets to the module-created endpoint ID when `serviceendpoint_id` is omitted.
 
 ### Inputs (Auth and Mode Validation)
 
@@ -128,20 +132,22 @@ Mark all secret/token/password/private_key fields as `sensitive = true` in `vari
 
 ### Outputs
 
-- Keep `serviceendpoint_ids` and `serviceendpoint_names`, keyed by stable keys (not index).
+- `serviceendpoint_id` (string)
+- `serviceendpoint_name` (string)
 - Key `permissions` output by stable permission key.
 
 ### Examples
 
 - Replace random naming with fixed names in basic/complete/secure.
-- Add a permissions example that references a module-created endpoint via `serviceendpoint_type` + `serviceendpoint_key`.
+- Add a permissions example that references the module-created endpoint by default (no explicit ID).
+- Show module-level `for_each` for multiple endpoints in complete.
 - Ensure examples are self-contained and runnable.
 
 ### Tests
 
 Update per TESTING_GUIDE:
 - Unit: key uniqueness, permission lookup validation, and auth-mode validations (GitHub, Kubernetes, OpenShift, SSH, AWS).
-- Integration: create a generic endpoint and permissions that resolve via key/type.
+- Integration: create a generic endpoint and permissions that resolve to the module endpoint by default.
 - Negative: invalid auth combinations and missing permission targets.
 
 ## Docs to Update After Completion
@@ -152,7 +158,8 @@ Update per TESTING_GUIDE:
 
 ## Acceptance Criteria
 
-- All service endpoints use stable keys with uniqueness validation.
+- Module manages a single service endpoint per instance (non-iterated).
+- Permissions use stable keys with uniqueness validation.
 - `serviceendpoint_permissions` can resolve module-created endpoints or accept explicit IDs with validation.
 - Sensitive values are marked as `sensitive`.
 - Examples use fixed names and include a permissions workflow.
@@ -161,9 +168,9 @@ Update per TESTING_GUIDE:
 
 ## Implementation Checklist
 
-- [ ] Refactor variables.tf: add `key` to all endpoint lists, add validations, mark sensitive fields.
-- [ ] Refactor main.tf: replace index-based `for_each` with stable keys; add locals for key maps and permissions lookup.
-- [ ] Refactor outputs.tf: stable-keyed maps and permissions output.
+- [ ] Refactor variables.tf: replace endpoint lists with a single endpoint object; add validations and mark sensitive fields.
+- [ ] Refactor main.tf: remove endpoint `for_each`, keep stable keys for permissions, add default endpoint resolution.
+- [ ] Refactor outputs.tf: single endpoint outputs and permissions output.
 - [ ] Update examples and fixtures: fixed names and permissions referencing module endpoints.
 - [ ] Add docs/IMPORT.md.
 - [ ] Update tests (unit, fixtures, terratest, test_config).

@@ -5,15 +5,22 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Large
 **Dependencies:** TASK-ADO-006
-**Status:** ✅ **Done** (2025-12-26)
+**Status:** 🟠 **Re-opened**
 
 ---
 
 ## Overview
 
 Refactor `modules/azuredevops_repository` to align with MODULE_GUIDE/TESTING_GUIDE/TERRAFORM_BEST_PRACTICES.
-Keep `repositories` as map(object) but move all list resources to stable for_each keys, add missing validations,
-tighten repository initialization rules, and update examples/docs/tests.
+The main `azuredevops_git_repository` must be a single (non-iterated) resource with flat inputs; for multiple repositories use module-level `for_each`.
+Move all list resources to stable for_each keys, add missing validations, tighten repository initialization rules, and update examples/docs/tests.
+
+## Updated Rules (Re-opened)
+
+- Main resource is single (non-iterated); use module-level `for_each` in environment config to manage multiple instances.
+- Prefer `list(object)` for collections; use `map` only when provider requires key/value semantics.
+- Use simple, stable `for_each` keys based on unique fields (name, principal_id, service_principal_id, group_name, etc.); never index-based.
+- Follow docs/MODULE_GUIDE/, docs/TESTING_GUIDE, docs/TERRAFORM_BEST_PRACTICES_GUIDE.md.
 
 ## Scope (Provider Resources)
 
@@ -38,12 +45,13 @@ tighten repository initialization rules, and update examples/docs/tests.
 
 ## Current Gaps (Summary)
 
+- `repositories` are modeled as a map and iterated; should be a single repository resource with flat inputs and module-level `for_each`.
 - Branches/files/permissions/policies use index-based `for_each`, causing unstable addressing; outputs are index-keyed.
 - No `key` fields or uniqueness validation for list inputs; reordering causes drift.
 - `repositories.initialization` is required and lacks defaults; import rules (source_url/auth) are not fully validated.
-- `repository_key` references are not validated against `repositories`, so invalid keys fail late.
+- Repository references are not validated when defaulting to the module repository.
 - `git_permissions` allows missing repository reference; permissions values are not validated.
-- Branch policy scopes allow missing repository_id/repository_key and unvalidated match_type values.
+- Branch policy scopes allow missing repository_id and unvalidated match_type values.
 - Repository policy inputs allow empty repository targets and lack validation for required lists/numeric limits.
 - Examples use random names (violates fixed-name examples rule).
 - Missing `docs/IMPORT.md` for the module.
@@ -51,9 +59,9 @@ tighten repository initialization rules, and update examples/docs/tests.
 
 ## Target Module Design
 
-### Inputs (Repositories)
+### Inputs (Repository)
 
-Keep `repositories` as map(object) with name defaulting to key.
+Flat variables for the main repository (single resource).
 Add optional `initialization` object with sensible defaults.
 
 Fields:
@@ -80,23 +88,21 @@ Validation rules:
 branches (list(object)):
 - key (optional string)
 - repository_id (optional string)
-- repository_key (optional string)
 - name (string, required)
 - ref_branch/ref_tag/ref_commit_id (optional)
 
 Validation rules:
-- exactly one of repository_id or repository_key.
-- repository_key must exist in repositories.
+- repository_id must be non-empty when provided.
+- when repository_id is omitted, the module repository must be present.
 - name non-empty.
 - only one of ref_branch/ref_tag/ref_commit_id (or default to main branch when omitted).
-- for_each key = `coalesce(key, "${repo_key or id}:${name}")` with uniqueness validation.
+- for_each key = `coalesce(key, name)` with uniqueness validation.
 
 ### Inputs (Files)
 
 files (list(object)):
 - key (optional string)
 - repository_id (optional string)
-- repository_key (optional string)
 - file (string, required)
 - content (string, required)
 - branch (optional string)
@@ -105,27 +111,27 @@ files (list(object)):
 - author_name/author_email/committer_name/committer_email (optional string)
 
 Validation rules:
-- repository selection same as branches.
+- repository selection same as branches (default to module repo).
 - file/content non-empty.
 - commit_message non-empty when provided (and required if provider demands it).
-- for_each key = `coalesce(key, "${repo_key or id}:${file}:${branch or "default"}")`.
+- for_each key = `coalesce(key, file)` with uniqueness validation.
 
 ### Inputs (Git Permissions)
 
 git_permissions (list(object)):
 - key (optional string)
 - repository_id (optional string)
-- repository_key (optional string)
 - branch_name (optional string)
 - principal (string, required)
 - permissions (map(string), required)
 - replace (optional bool, default true)
 
 Validation rules:
-- repository_id or repository_key required; repository_key must exist.
+- repository_id must be non-empty when provided.
+- when repository_id is omitted, the module repository must be present.
 - principal non-empty.
 - permissions values in ["Allow", "Deny", "NotSet"].
-- for_each key = `coalesce(key, "${repo_key or id}:${branch_name or "root"}:${principal}")`.
+- for_each key = `coalesce(key, "${branch_name or "root"}:${principal}")`.
 
 ### Inputs (Branch Policies)
 
@@ -135,15 +141,14 @@ For each branch_policy_* list:
 - policy-specific fields
 - scope (list(object)):
   - repository_id (optional string)
-  - repository_key (optional string)
   - repository_ref (optional string)
   - match_type (optional string)
 
 Validation rules:
 - scope list not empty.
-- each scope must set exactly one of repository_id or repository_key; repository_key must exist.
+- repository_id must be non-empty when provided; default to module repository when omitted.
 - match_type allowed values (DefaultBranch, Exact, Prefix); repository_ref required when match_type != DefaultBranch.
-- for_each key = `coalesce(key, "${policy_type}:${first_scope_repo_key or id}")` with uniqueness validation.
+- for_each key = `coalesce(key, policy_type)` with uniqueness validation (require `key` for multiple entries per policy type).
 - policy-specific: reviewer_count > 0, auto_reviewer_ids non-empty, build_definition_id/display_name non-empty,
   valid_duration >= 0, etc.
 
@@ -153,26 +158,25 @@ For each repository_policy_* list:
 - key (optional string)
 - enabled/blocking (optional bool)
 - repository_ids (optional list(string))
-- repository_keys (optional list(string))
 - policy-specific fields
 
 Validation rules:
-- repository_ids/repository_keys must not both be empty unless explicitly supporting apply-to-all behavior.
-- repository_keys must exist in repositories; de-duplicate IDs.
+- repository_ids must not be empty unless explicitly supporting apply-to-all behavior.
+- de-duplicate IDs and validate non-empty strings.
 - author_email_patterns/filepath_patterns non-empty when set.
 - max_file_size/max_path_length > 0.
-- for_each key = `coalesce(key, "${policy_type}:${repo_ids or repo_keys}")` with uniqueness validation.
+- for_each key = `coalesce(key, policy_type)` with uniqueness validation (require `key` for multiple entries per policy type).
 
 ### Locals / Implementation
 
 - Build normalized maps for branches/files/permissions/policies to drive stable for_each.
-- Add lifecycle preconditions for any *_key references to ensure keys exist.
+- Add lifecycle preconditions for defaulted repository IDs when module outputs are required.
 - Centralize repository ID resolution for policy lists to avoid duplicated concat/try logic.
 
 ### Outputs
 
-- repository_ids (map, keyed by repository key)
-- repository_urls (map, keyed by repository key)
+- repository_id (string)
+- repository_url (string)
 - branch_ids (map, keyed by branch key)
 - policy_ids (map of maps, keyed by policy key)
 - optional: file_ids/permission_ids if needed downstream
@@ -181,7 +185,7 @@ Validation rules:
 
 Update examples to use fixed names and stable keys:
 - basic: single repo + README file (no random provider)
-- complete: repo + branch + file + permissions + representative policies
+- complete: repo + branch + file + permissions + representative policies (show module-level `for_each` for multiple repos)
 - secure: repo with stricter review/status/repository policies
 
 ## Tests
@@ -190,14 +194,14 @@ Update tests per TESTING_GUIDE:
 
 - Unit:
   - initialization validation (Import requirements)
-  - repository_key existence checks
+  - repository_id defaulting/required validation
   - stable key uniqueness for list inputs
   - permissions allowed values
   - policy-specific constraints (reviewer_count, max_file_size, etc.)
 - Integration:
   - create repo + branch + file + policy with stable keys
 - Negative:
-  - invalid repository_key
+  - missing repository_id when module repository is not created
   - duplicate keys
   - invalid init_type/import fields
 
@@ -217,9 +221,9 @@ Update tests per TESTING_GUIDE:
 
 ## Implementation Checklist
 
-- [ ] Refactor variables.tf: optional initialization defaults, add key fields and validations.
-- [ ] Refactor main.tf: normalized maps, stable for_each keys, preconditions, shared repository ID resolver.
-- [ ] Update outputs.tf: stable branch/policy maps (and any new outputs).
+- [ ] Refactor variables.tf: replace `repositories` map with flat repository inputs, add initialization defaults and validations.
+- [ ] Refactor main.tf: single repository, normalized maps, stable for_each keys, preconditions, shared repository ID resolver.
+- [ ] Update outputs.tf: repository_id/url outputs + stable branch/policy maps (and any new outputs).
 - [ ] Add `docs/IMPORT.md`.
 - [ ] Update examples (fixed names, new key usage).
 - [ ] Update tests (fixtures, unit, terratest, test_config, Makefile/scripts).

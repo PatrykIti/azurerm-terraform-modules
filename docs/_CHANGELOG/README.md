@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [037](./037-2025-12-28-ado-refactor-tasks-reopened.md) | 2025-12-28 | Azure DevOps refactor tasks - reopened and rules updated | Maintenance / Documentation |
 | [036](./036-2025-12-26-ado-serviceendpoint-refactor.md) | 2025-12-26 | Azure DevOps Service Endpoint module – refactor & alignment | Breaking Change / Maintenance |
 | [035](./035-2025-12-26-azuredevops-servicehooks-refactor.md) | 2025-12-26 | Azure DevOps Service Hooks module – refactor & alignment | Breaking Change / Maintenance |
 | [034](./034-2025-12-26-azuredevops-repository-refactor.md) | 2025-12-26 | Azure DevOps Repository module – refactor & alignment | Breaking Change / Maintenance |

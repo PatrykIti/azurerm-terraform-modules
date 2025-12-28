@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-008
-**Status:** 🟢 **Done**
+**Status:** 🟠 **Re-opened**
 
 ---
 
@@ -13,7 +13,14 @@
 
 Refactor `modules/azuredevops_environments` to align with MODULE_GUIDE/TESTING_GUIDE/TERRAFORM_BEST_PRACTICES.
 The main `azuredevops_environment` must be a single (non-iterated) resource with flat inputs.
-Sub-resources and checks should use list(object) with stable for_each keys; for multiple environments use module-level for_each.
+Sub-resources and checks should use list(object) with stable for_each keys; for multiple environments use module-level for_each in the consuming environment configuration.
+
+## Updated Rules (Re-opened)
+
+- Main resource is single (non-iterated); use module-level `for_each` in environment config to manage multiple instances.
+- Prefer `list(object)` for collections; use `map` only when provider requires key/value semantics.
+- Use simple, stable `for_each` keys based on unique fields (name, principal_id, service_principal_id, group_name, etc.); never index-based.
+- Follow docs/MODULE_GUIDE/, docs/TESTING_GUIDE, docs/TERRAFORM_BEST_PRACTICES_GUIDE.md.
 
 ## Scope (Provider Resources)
 
