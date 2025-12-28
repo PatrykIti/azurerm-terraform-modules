@@ -129,6 +129,34 @@ locals {
       (query.parent_id != null ? try("${local.query_folder_paths_by_id[tostring(query.parent_id)]}/${query.name}", null) : null)
     )
   }
+
+  shared_queries_root   = "Shared Queries"
+  shared_queries_prefix = "Shared Queries/"
+
+  query_folder_paths_relative = {
+    for key, path in local.query_folder_paths_from_inputs :
+    key => (
+      path == null ? null :
+      (path == local.shared_queries_root ? "/" :
+      (startswith(path, local.shared_queries_prefix) ? "/${trimprefix(path, local.shared_queries_prefix)}" : path))
+    )
+  }
+  query_folder_paths_from_resources_relative = {
+    for key, path in local.query_folder_paths_from_resources :
+    key => (
+      path == null ? null :
+      (path == local.shared_queries_root ? "/" :
+      (startswith(path, local.shared_queries_prefix) ? "/${trimprefix(path, local.shared_queries_prefix)}" : path))
+    )
+  }
+  query_paths_relative = {
+    for key, path in local.query_paths :
+    key => (
+      path == null ? null :
+      (path == local.shared_queries_root ? "/" :
+      (startswith(path, local.shared_queries_prefix) ? "/${trimprefix(path, local.shared_queries_prefix)}" : path))
+    )
+  }
 }
 
 resource "azuredevops_workitemquery" "query" {
@@ -147,12 +175,16 @@ resource "azuredevops_workitemquery_permissions" "query_permissions" {
   for_each = local.query_permissions_by_key
 
   project_id = coalesce(each.value.project_id, var.project_id)
-  path = each.value.query_key != null ? local.query_paths[each.value.query_key] : (
+  path = each.value.query_key != null ? local.query_paths_relative[each.value.query_key] : (
     each.value.folder_key != null ? (
-      lookup(local.query_folder_paths_from_inputs, each.value.folder_key, null) != null ?
-      local.query_folder_paths_from_inputs[each.value.folder_key] :
-      lookup(local.query_folder_paths_from_resources, each.value.folder_key, null)
-    ) : each.value.path
+      lookup(local.query_folder_paths_relative, each.value.folder_key, null) != null ?
+      local.query_folder_paths_relative[each.value.folder_key] :
+      lookup(local.query_folder_paths_from_resources_relative, each.value.folder_key, null)
+    ) : (
+      each.value.path == null ? null :
+      (each.value.path == local.shared_queries_root ? "/" :
+      (startswith(each.value.path, local.shared_queries_prefix) ? "/${trimprefix(each.value.path, local.shared_queries_prefix)}" : each.value.path))
+    )
   )
   principal   = each.value.principal
   permissions = each.value.permissions

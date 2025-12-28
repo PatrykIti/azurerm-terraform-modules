@@ -5,7 +5,7 @@
 **Category:** CI/CD / Automation  
 **Estimated Effort:** Medium  
 **Dependencies:** —  
-**Status:** 🟡 **To Do**
+**Status:** 🟡 **In Progress**
 
 ---
 
@@ -30,6 +30,8 @@ Zweryfikowac wszystkie workflow i skrypty, ktore modyfikuja README, examples, ve
 ## Zakres i deliverables
 
 ### TASK-009-1: Inwentaryzacja
+
+**Status:** ✅ Done (workflow + script mapping in `docs/WORKFLOWS.md`)
 
 - Spisac wszystkie workflow i skrypty, ktore modyfikuja pliki (README/examples/versions/module.json).
 - Zmapowac: kto je wywoluje, jakie pliki dotyka, jakie sa marker-y/regex.

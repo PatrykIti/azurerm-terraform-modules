@@ -9,14 +9,15 @@ This document provides a detailed overview of all GitHub Actions workflows in th
 3. [Core Workflows](#core-workflows)
 4. [Workflow Script Map (Task-009 audit)](#workflow-script-map-task-009-audit)
 5. [File Mutation Map (Task-009 audit)](#file-mutation-map-task-009-audit)
-6. [Known Risks and Gaps (Task-009 audit)](#known-risks-and-gaps-task-009-audit)
-7. [Shared Actions](#shared-actions)
-8. [Workflow Interactions](#workflow-interactions)
-9. [Adding New Modules](#adding-new-modules)
-10. [Troubleshooting](#troubleshooting)
-11. [Best Practices](#best-practices)
-12. [Semantic Release Configuration](#semantic-release-configuration)
-13. [References](#references)
+6. [Script Catalog (Task-009 audit)](#script-catalog-task-009-audit)
+7. [Known Risks and Gaps (Task-009 audit)](#known-risks-and-gaps-task-009-audit)
+8. [Shared Actions](#shared-actions)
+9. [Workflow Interactions](#workflow-interactions)
+10. [Adding New Modules](#adding-new-modules)
+11. [Troubleshooting](#troubleshooting)
+12. [Best Practices](#best-practices)
+13. [Semantic Release Configuration](#semantic-release-configuration)
+14. [References](#references)
 
 ## Architecture Overview
 
@@ -272,6 +273,20 @@ This section lists which workflows call which scripts and where updates are expe
 | `.github/actions/module-runner/run-module-action.sh` | `module-ci.yml` (security job) | `modules/<module>/tfsec-results.sarif`, `modules/<module>/checkov-results.sarif` | Generated only for security scans. |
 | `scripts/create-new-module.sh` | Manual | `modules/<module>/**` | Scaffold script; writes examples with `source = "../../"`. |
 | `scripts/create-module-json.sh` | Manual | `modules/<module>/module.json`, `modules/<module>/.releaserc.js` | Creates release metadata; currently azurerm-centric defaults. |
+
+## Script Catalog (Task-009 audit)
+
+Scripts listed here are invoked by workflows directly or via semantic-release.
+
+| Script | Used by | Purpose | Notes |
+|---|---|---|---|
+| `.github/actions/module-runner/run-module-action.sh` | `module-ci.yml`, `module-release.yml` | Runs validate/test/security actions for a module | Writes SARIF files during security scans. |
+| `scripts/get-module-config.js` | `module-release.yml`, `list-modules.yml` | Reads `module.json` (`tag_prefix`, `commit_scope`) | Falls back to `.releaserc.js` if needed. |
+| `scripts/update-examples-list.sh` | `pr-validation.yml`, `module-release.yml` | Rebuilds module examples list in README | Updates content between `BEGIN_EXAMPLES` markers. |
+| `scripts/update-module-docs.sh` | `pr-validation.yml`, `module-release.yml` | Runs terraform-docs inject for module README | Skips update if markers missing. |
+| `scripts/update-module-version.sh` | `module-release.yml` | Updates module README version block | Prefix extraction relies on `.releaserc.js` constants. |
+| `scripts/update-root-readme.sh` | `module-release.yml` | Updates root README module table and badges | No-op if expected markers do not exist. |
+| `scripts/semantic-release-multi-scope-plugin.js` | `module-release.yml` | Filters commits to target scope for module release | Mutates `context.commits` for analysis. |
 
 ## Known Risks and Gaps (Task-009 audit)
 
