@@ -1,214 +1,165 @@
-# Azure Terraform Modules Repository
+# Azure Terraform Modules
 
-## Project Overview
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.5-623CE4?logo=terraform&logoColor=white)](https://www.terraform.io/)
+[![Azure](https://img.shields.io/badge/Azure-0078D4?logo=microsoft-azure&logoColor=white)](https://azure.microsoft.com/)
+[![AzureRM Provider](https://img.shields.io/badge/AzureRM_Provider-4.36.0-blue?logo=terraform)](https://registry.terraform.io/providers/hashicorp/azurerm/4.36.0)
 
-This repository is a comprehensive collection of production-ready Terraform modules for Microsoft Azure infrastructure deployment. It follows HashiCorp best practices and enterprise security standards to provide reusable, secure, and scalable infrastructure components for Azure cloud environments.
+<!-- MODULE BADGES START -->
+[![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=SAv1.1.0)
+[![Virtual Network](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=VNv*&label=Virtual%20Network&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=VNv1.0.1)
+<!-- MODULE BADGES END -->
 
-## Goals and Objectives
+A comprehensive collection of production-ready Terraform modules for Azure infrastructure, following HashiCorp best practices and enterprise security standards.
 
-### Primary Goals
-1. **Standardization**: Provide consistent, reusable Terraform modules for common Azure resources
-2. **Security-First**: Implement secure-by-default configurations with enterprise-grade security controls
-3. **Compliance**: Support major compliance standards (SOC 2, ISO 27001, GDPR, PCI DSS)
-4. **Automation**: Fully automated versioning, documentation, and release processes
-5. **Quality**: Comprehensive testing at multiple levels (unit, integration, E2E)
+## 📚 Quick Navigation
 
-### Objectives
-- Create production-ready modules that can be used across different organizations
-- Minimize manual processes through automation (CI/CD, documentation, releases)
-- Provide clear examples and documentation for each module
-- Ensure modules are cost-optimized and performant
-- Support multi-region deployments and disaster recovery scenarios
+- [**Development Guide**](./CLAUDE.md) - AI-assisted development guidelines and reference documentation
+- [**Terraform Best Practices**](./docs/TERRAFORM_BEST_PRACTICES_GUIDE.md) - Module development standards and conventions
+- [**Testing Guide**](./docs/TERRAFORM_TESTING_GUIDE.md) - Comprehensive testing strategies and examples
+- [**Workflows Documentation**](./docs/WORKFLOWS.md) - GitHub Actions CI/CD implementation details
+- [**Security Policy**](./docs/SECURITY.md) - Security guidelines and vulnerability reporting
 
-## Architecture and Structure
-
-### Repository Architecture
+## Repository Structure
 
 ```
 azurerm-terraform-modules/
-├── modules/                     # Individual Terraform modules
-│   └── <provider>_<resource>/  # Module for specific provider resource
-│       ├── main.tf             # Main resource definitions
-│       ├── variables.tf        # Input variables
-│       ├── outputs.tf          # Output values
-│       ├── versions.tf         # Provider requirements
-│       ├── examples/           # Usage examples
-│       ├── tests/              # Unit and integration tests
-│       └── README.md          # Module documentation
-├── AGENTS.md                  # Condensed repo guidelines
-├── docs/                       # Shared documentation
-├── scripts/                    # Automation scripts
-├── .github/                    # GitHub Actions workflows
-│   ├── workflows/              # CI/CD pipelines
-│   └── actions/               # Reusable composite actions
+├── modules/                             # Terraform modules
+│   ├── azurerm_kubernetes_cluster/     # AKS Kubernetes cluster module
+│   ├── azurerm_network_security_group/ # Network Security Group module
+│   ├── azurerm_route_table/            # Route Table module
+│   ├── azurerm_storage_account/        # Storage Account module
+│   ├── azurerm_subnet/                 # Subnet module
+│   └── azurerm_virtual_network/        # Virtual Network module
+├── docs/                                # Shared documentation
+├── scripts/                             # Automation scripts
+├── examples/                            # Cross-module examples
+├── tests/                               # Shared test utilities
+├── security-policies/                   # Custom security policies
+├── build-templates/                     # Azure Pipelines templates (coming soon)
+│   ├── versioning/                      # Versioning pipeline templates
+│   ├── documentation/                   # Documentation generation templates
+│   ├── security/                        # Security scanning templates
+│   ├── testing/                         # Testing pipeline templates
+│   └── release/                         # Release pipeline templates
+├── .github/workflows/                   # CI/CD workflows
+└── .claude/references/                  # AI development guides
 ```
-Modules use provider prefixes: `azurerm_` for AzureRM and `azuredevops_` for Azure DevOps.
 
-### Module Architecture
+## 🚀 Quick Start
 
-Each module follows a standardized structure:
-- **Flat module design**: No nested modules for simplicity
-- **Single responsibility**: Each module manages one Azure resource type
-- **Composable**: Modules can be combined for complex architectures
-- **Self-contained**: All module dependencies are explicit
+Each module contains comprehensive documentation and examples:
 
-### CI/CD Architecture
+1. **Browse modules** in the [`modules/`](./modules/) directory
+2. **Read module documentation** - Each module has its own README with:
+   - Usage examples
+   - Input/output specifications
+   - Requirements and prerequisites
+3. **Check examples** - Each module includes `examples/` directory with:
+   - Simple usage
+   - Advanced configurations
+   - Security-hardened setups
+   - Multi-region deployments
 
-The repository uses a sophisticated GitHub Actions architecture:
-- **Dynamic module discovery**: Automatically detects changed modules
-- **Parallel execution**: Tests and validates multiple modules concurrently
-- **Composite actions**: Reusable workflows via module-runner pattern
-- **Automated releases**: Semantic versioning with zero manual intervention
+Example module reference:
+```hcl
+module "storage_account" {
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  # See module README for configuration details
+}
+```
 
-## Repository Documentation
 
-- [AGENTS.md](AGENTS.md) - condensed repo standards
-- [Module Guide](docs/MODULE_GUIDE/README.md) - module structure and implementation
-- [Testing Guide](docs/TESTING_GUIDE/README.md) - unit/integration testing patterns
-- [Workflow Reference](docs/WORKFLOWS.md) - CI/CD pipelines and shared actions
-- [Changelog](docs/_CHANGELOG/README.md) - repository change history
-- [Terraform Best Practices](docs/TERRAFORM_BEST_PRACTICES_GUIDE.md)
-- [Security Policy](docs/SECURITY.md)
+## 📦 Available Modules
 
-## Key Features and Capabilities
+### Production Ready
 
-### 1. Security Features
-- **Secure defaults**: All security settings enabled by default
-- **Network isolation**: Private endpoint support for all applicable resources
-- **Encryption**: At-rest and in-transit encryption enforced
-- **Identity-based access**: Managed identities preferred over keys
-- **Compliance scanning**: Automated security checks in CI/CD
+| Module | Status | Version | Description |
+|--------|--------|---------|-------------|
+| [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv1.0.0) | Azure Storage Account with enterprise features |
+| [Virtual Network](./modules/azurerm_virtual_network/) | ✅ Completed | [VNv1.0.1](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=VNv1.0.0) | Virtual Network with full networking capabilities |
+| [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | v1.0.0 | Azure Kubernetes Service (AKS) cluster with enterprise features |
+| [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | v1.0.0 | Network Security Group with comprehensive rule management |
+| [Route Table](./modules/azurerm_route_table/) | ✅ Completed | v1.0.0 | Route Table with custom routing rules and BGP support |
+| [Subnet](./modules/azurerm_subnet/) | ✅ Completed | v1.0.0 | Subnet module with service endpoints and delegation support |
 
-### 2. Module Features
-- **Comprehensive variable validation**: Prevents misconfiguration
-- **Flexible configuration**: Support for simple to complex deployments
-- **Rich examples**: Multiple examples per module (basic, secure, complete)
-- **Enterprise features**: Diagnostic settings, monitoring, backup, DR
+### In Development
 
-### 3. Development Features
-- **AI-assisted development**: Integrated with Claude and TaskMaster
-- **Automated documentation**: terraform-docs integration
-- **Conventional commits**: Enforced for automated versioning
-- **Pre-commit hooks**: Local validation before commits
-- **Multi-agent support**: Coordination between multiple Claude instances
+| Module | Status | Version | Description |
+|--------|--------|---------|-------------|
+| SQL Server | 🔧 Development | - | Azure SQL Server |
+| Key Vault | 🔧 Development | - | Key management all features |
+| App Service Plan | 🔧 Development | - | App Service Plan with enterprise features |
 
-### 4. Testing Capabilities
-- **Multi-level testing pyramid**: Static → Unit → Integration → E2E
-- **Native Terraform tests**: Fast unit testing with mocks
-- **Terratest integration**: Real infrastructure validation
-- **Cost optimization**: Mock strategies for expensive resources
-- **Security testing**: Continuous compliance validation
+### Development Roadmap
 
-## Technology Stack
+- **Phase 1**: Core Infrastructure Modules ✅
+  - Storage Account with comprehensive features ✅
+  - Virtual Network with full networking capabilities ✅
+  - Subnet with service endpoints and delegation ✅
+  - Network Security Group with rule management ✅
+  - Route Table with custom routing ✅
+- **Phase 2**: Container and Orchestration ✅
+  - AKS (Azure Kubernetes Service) cluster ✅
+- **Phase 3**: Security and Data (In Progress)
+  - Key Vault module with enterprise security
+  - SQL Server with high availability
+- **Phase 4**: Application Platform (Planned)
+  - App Service Plan with enterprise features
+  - Application Gateway
+  - API Management
+### Storage Account Module Examples
 
-### Core Technologies
-- **Terraform**: >= 1.5.0 (Infrastructure as Code)
-- **Azure Provider**: >= 3.0.0 (Cloud provider)
-- **Go**: >= 1.19 (Testing framework)
-- **Node.js**: For semantic-release automation
+The Storage Account module includes comprehensive examples demonstrating various use cases:
 
-### Development Tools
-- **terraform-docs**: Automatic documentation generation
-- **TFLint**: Terraform linting and best practices
-- **Checkov**: Infrastructure security scanning
-- **tfsec**: Terraform-specific security analysis
-- **Terratest**: Go-based infrastructure testing
+| Example | Description |
+|---------|-------------|
+| [basic](./modules/azurerm_storage_account/examples/basic/README.md) | Basic storage account with minimal configuration |
+| [secure](./modules/azurerm_storage_account/examples/secure/README.md) | Security-hardened configuration with maximum protection |
+| [secure-private-endpoint](./modules/azurerm_storage_account/examples/secure-private-endpoint/README.md) | Private endpoint configuration for network isolation |
+| [data-lake-gen2](./modules/azurerm_storage_account/examples/data-lake-gen2/README.md) | Data Lake Storage Gen2 with SFTP and NFSv3 |
+| [advanced-policies](./modules/azurerm_storage_account/examples/advanced-policies/README.md) | Advanced policies (SAS, immutability, routing) |
+| [identity-access](./modules/azurerm_storage_account/examples/identity-access/README.md) | Microsoft Entra ID authentication and RBAC |
+| [complete](./modules/azurerm_storage_account/examples/complete/README.md) | Full-featured storage account with all enterprise capabilities |
+| [multi-region](./modules/azurerm_storage_account/examples/multi-region/README.md) | Multi-region setup with disaster recovery |
 
-### CI/CD Tools
-- **GitHub Actions**: Primary CI/CD platform
-- **semantic-release**: Automated versioning and changelog
-- **Commitizen**: Conventional commit helper
-- **Husky**: Git hooks management
 
-### AI/Automation Tools
-- **Claude**: AI development assistant
-- **TaskMaster**: Task management and tracking
-- **MCP (Model Context Protocol)**: Tool integration
-- **Gemini/Perplexity**: Research and analysis
+## Prerequisites
 
-## Development Methodologies
+- [Terraform](https://www.terraform.io/downloads.html) >= 1.5.0
+- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.0
+- [Go](https://golang.org/doc/install) >= 1.19 (for testing)
+- [TFLint](https://github.com/terraform-linters/tflint) >= 0.48.0 (for code quality)
+- Azure subscription with appropriate permissions
 
-### 1. Infrastructure as Code (IaC) Principles
-- **Declarative configuration**: Define desired state
-- **Version control**: All infrastructure in Git
-- **Immutable infrastructure**: Replace rather than modify
-- **Idempotency**: Safe to apply multiple times
 
-### 2. GitOps Workflow
-- **Git as single source of truth**
-- **Pull request-based changes**
-- **Automated validation and testing**
-- **Audit trail through Git history**
+## Contributing
 
-### 3. DevSecOps Integration
-- **Security scanning in CI/CD**
-- **Compliance as code**
-- **Automated vulnerability management**
-- **Security-first module design**
+We welcome contributions! This project is optimized for AI-assisted development with TaskMaster and MCP tools integration.
 
-### 4. Agile/Scrum Elements
-- **Iterative module development**
-- **Continuous improvement**
-- **Regular releases**
+For development guidelines and contribution process, see:
+- [**CLAUDE.md**](./CLAUDE.md) - AI development guidelines
+- [**Contributing Guide**](./docs/CONTRIBUTING.md) - Contribution process (when available)
 
-## Module Inventory
 
-### Production Ready Modules
-1. **Storage Account** (SAv1.0.0)
-   - Comprehensive Azure Storage with enterprise features
-   - Support for Data Lake Gen2, SFTP, private endpoints
-   - Advanced lifecycle management and security policies
 
-### Planned Modules (Roadmap)
-- **Virtual Network**: Advanced networking with security features
-- **Key Vault**: Enterprise secret management
-- **Application Gateway**: Layer 7 load balancing with WAF
-- **SQL Database**: Managed database with security features
-- **App Service**: Web application hosting platform
+## Versioning
 
-## Quality Standards
+Each module uses [Semantic Versioning](https://semver.org/) with module-specific prefixes (e.g., `SAv1.2.3` for Storage Account v1.2.3).
 
-### Code Quality
-- **Naming conventions**: Strict adherence to patterns
-- **Resource naming**: Match resource type without provider prefix
-- **Variable design**: Grouped configurations with validation
-- **Documentation**: Comprehensive README for each module
+## License
 
-### Security Standards
-- **Least privilege access**
-- **Defense in depth**
-- **Zero trust principles**
-- **Encryption by default**
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### Testing Standards
-- **100% example coverage**: All features demonstrated
-- **Security validation**: Compliance checks in tests
-- **Performance benchmarks**: Deployment time tracking
-- **Cost optimization**: Minimal test infrastructure
 
-## Project Philosophy
+## Support
 
-1. **Nothing Manual**: Everything that can be automated should be
-2. **Security First**: Never compromise security for convenience
-3. **Developer Experience**: Make the right thing the easy thing
-4. **Community Driven**: Open source with clear contribution guidelines
-5. **Enterprise Ready**: Production-grade from day one
+- **Issues**: Report bugs via GitHub Issues
+- **Security**: See [Security Policy](./docs/SECURITY.md)
+- **Documentation**: Check module-specific README files
 
-## Integration Capabilities
+---
 
-- **GitHub Projects**: Native project management integration
-- **Azure DevOps**: Compatible with ADO pipelines
-- **Terraform Cloud/Enterprise**: Remote backend support
-- **Service Management**: Integration with ITSM tools
-- **Monitoring**: Azure Monitor and third-party APM tools
+**Built with ❤️ by PatrykIti for Infrastructure Teams**
 
-## Success Metrics
-
-- **Module adoption rate**: Usage across projects
-- **Security compliance**: 100% passing security scans
-- **Test coverage**: >80% code coverage
-- **Documentation completeness**: All modules fully documented
-- **Release frequency**: Regular updates and improvements
-- **Community engagement**: Issues, PRs, and discussions
-
-This repository represents a best-in-class implementation of Terraform modules for Azure, combining security, automation, and developer experience into a comprehensive infrastructure-as-code solution.
+*This repository follows enterprise-grade standards for infrastructure as code. For development guidelines and AI-assisted workflows, see [AGENTS.md](./AGENTS.md) or read [Documentation](./docs/README.md).*
