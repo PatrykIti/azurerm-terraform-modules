@@ -7,13 +7,16 @@ This document provides a detailed overview of all GitHub Actions workflows in th
 1. [Architecture Overview](#architecture-overview)
 2. [Directory Structure](#directory-structure)
 3. [Core Workflows](#core-workflows)
-4. [Shared Actions](#shared-actions)
-5. [Workflow Interactions](#workflow-interactions)
-6. [Adding New Modules](#adding-new-modules)
-7. [Troubleshooting](#troubleshooting)
-8. [Best Practices](#best-practices)
-9. [Semantic Release Configuration](#semantic-release-configuration)
-10. [References](#references)
+4. [Workflow Script Map (Task-009 audit)](#workflow-script-map-task-009-audit)
+5. [File Mutation Map (Task-009 audit)](#file-mutation-map-task-009-audit)
+6. [Known Risks and Gaps (Task-009 audit)](#known-risks-and-gaps-task-009-audit)
+7. [Shared Actions](#shared-actions)
+8. [Workflow Interactions](#workflow-interactions)
+9. [Adding New Modules](#adding-new-modules)
+10. [Troubleshooting](#troubleshooting)
+11. [Best Practices](#best-practices)
+12. [Semantic Release Configuration](#semantic-release-configuration)
+13. [References](#references)
 
 ## Architecture Overview
 
@@ -101,6 +104,15 @@ azurerm-terraform-modules/
 - Runs always.
 - Posts a PR comment with module-level summary (only on PR events).
 
+**Scripts and actions used**:
+- `.github/actions/terraform-setup` (Terraform install + cache, optional TFLint).
+- `.github/actions/module-runner` -> `.github/actions/module-runner/run-module-action.sh`.
+- `azure/login@v2` for test jobs (OIDC).
+
+**Files written**:
+- `modules/<module>/tfsec-results.sarif` and `modules/<module>/checkov-results.sarif` when `action=security`.
+- No intentional repo changes for validate/test jobs (other than transient `.terraform` dirs on the runner).
+
 ### 2. PR Validation (`pr-validation.yml`)
 
 **Purpose**: Enforces quality gates and documentation standards for PRs.
@@ -145,6 +157,16 @@ azurerm-terraform-modules/
 #### `quality-gates`
 - Summarizes PR checks and posts a PR comment with quick-fix commands.
 
+**Scripts and actions used**:
+- `scripts/update-examples-list.sh` (documentation-check job).
+- `scripts/update-module-docs.sh` (documentation-check job).
+- `terraform-docs` binary downloaded in job.
+- `dorny/paths-filter@v3` (module detection).
+
+**Files written**:
+- Documentation check may modify `modules/<module>/README.md` during the job; any diff causes failure.
+- Example README checks run `terraform-docs` in example dirs but do not commit changes.
+
 ### 3. Module Release (`module-release.yml`)
 
 **Purpose**: Releases a single module with semantic-release.
@@ -162,6 +184,13 @@ azurerm-terraform-modules/
 - Validates module presence and `.releaserc.*`.
 - Reads module configuration via `scripts/get-module-config.js`.
 - Runs semantic-release with module-specific config.
+
+**Scripts and actions used**:
+- `.github/actions/terraform-setup` (installs terraform-docs for release).
+- `.github/actions/module-runner` (pre-release validation).
+- `scripts/get-module-config.js` (reads `module.json`).
+- Module `.releaserc.js` uses `scripts/semantic-release-multi-scope-plugin.js`.
+- Module `.releaserc.js` runs `@semantic-release/exec` `prepareCmd` (see File Mutation Map).
 
 ### 4. Release Changed Modules (`release-changed-modules.yml`)
 
@@ -181,6 +210,10 @@ azurerm-terraform-modules/
 - Calls `module-release.yml` via `workflow_call`.
 - Releases are **sequential** (`max-parallel: 1`) to avoid root README conflicts.
 
+**Scripts and actions used**:
+- Uses `gh api` to fetch PR title for scope parsing (no repo scripts).
+- Delegates all release-time scripts to `module-release.yml`.
+
 ### 5. List Modules (`list-modules.yml`)
 
 **Purpose**: Lists all modules with metadata and exports a JSON artifact.
@@ -194,6 +227,60 @@ azurerm-terraform-modules/
 - Uses `scripts/get-module-config.js` to read `tag_prefix` and `commit_scope`.
 - Writes `modules.json` and uploads it as an artifact.
 
+**Scripts and actions used**:
+- `scripts/get-module-config.js` (read-only).
+
+## Workflow Script Map (Task-009 audit)
+
+This section lists which workflows call which scripts and where updates are expected.
+
+### `module-ci.yml`
+- `.github/actions/terraform-setup` and `.github/actions/module-runner` are the only repo components used.
+- `run-module-action.sh` runs `terraform fmt/init/validate`, `tflint`, `go test`, or Docker-based tfsec/Checkov depending on action.
+
+### `pr-validation.yml`
+- `documentation-check` runs:
+  - `scripts/update-examples-list.sh`
+  - `scripts/update-module-docs.sh`
+  - `terraform-docs` for example READMEs (if markers exist)
+- Any README diff after regeneration fails the job.
+
+### `module-release.yml`
+- `scripts/get-module-config.js` reads `module.json`.
+- `semantic-release` loads `modules/<module>/.releaserc.js` which:
+  - filters commits via `scripts/semantic-release-multi-scope-plugin.js`
+  - runs `@semantic-release/exec` `prepareCmd` that performs file updates
+
+### `release-changed-modules.yml`
+- Uses inline Bash + `gh api` to detect scopes.
+- Calls `module-release.yml` for the actual release and mutations.
+
+### `list-modules.yml`
+- Uses `scripts/get-module-config.js` to extract `tag_prefix` and `commit_scope`.
+
+## File Mutation Map (Task-009 audit)
+
+| Script or command | Called from | Files written | Notes |
+|---|---|---|---|
+| `@semantic-release/changelog` | `module-release.yml` via module `.releaserc.js` | `modules/<module>/CHANGELOG.md` | Standard semantic-release changelog update. |
+| `@semantic-release/exec` `prepareCmd` (module `.releaserc.js`) | `module-release.yml` | `modules/<module>/examples/**/*.tf` | Uses `sed` to rewrite `source = "..."` patterns. Several modules use a broad regex that can touch provider sources. |
+| `@semantic-release/exec` `prepareCmd` | `module-release.yml` | `modules/<module>/**/README.md` | Rewrites `source = "../.."` and `source = "../"` in README files. |
+| `scripts/update-module-version.sh` | `module-release.yml` via `prepareCmd` | `modules/<module>/README.md` | Updates `<!-- BEGIN_VERSION -->` block. Prefix extraction relies on `.releaserc.js` constants. |
+| `scripts/update-examples-list.sh` | `pr-validation.yml`, `module-release.yml` | `modules/<module>/README.md` | Rebuilds the examples list between markers. |
+| `scripts/update-module-docs.sh` | `pr-validation.yml`, `module-release.yml` | `modules/<module>/README.md` | Runs terraform-docs with module `.terraform-docs.yml` using inject mode. |
+| `scripts/update-root-readme.sh` | `module-release.yml` via `prepareCmd` | `README.md` | Expects module table and badges section to exist; otherwise minimal/no changes. |
+| `.github/actions/module-runner/run-module-action.sh` | `module-ci.yml` (security job) | `modules/<module>/tfsec-results.sarif`, `modules/<module>/checkov-results.sarif` | Generated only for security scans. |
+| `scripts/create-new-module.sh` | Manual | `modules/<module>/**` | Scaffold script; writes examples with `source = "../../"`. |
+| `scripts/create-module-json.sh` | Manual | `modules/<module>/module.json`, `modules/<module>/.releaserc.js` | Creates release metadata; currently azurerm-centric defaults. |
+
+## Known Risks and Gaps (Task-009 audit)
+
+1. **Example `source` rewrite is inconsistent**: Some modules use a scoped `sed` (e.g., `modules/azurerm_network_security_group/.releaserc.js`) while others still use a broad `source.*=.*"` pattern (e.g., `modules/azuredevops_identity/.releaserc.js`, `modules/azurerm_kubernetes_secrets/.releaserc.js`). This can overwrite `required_providers.source` or other module references.
+2. **Scope parsing is azurerm-only**: `module-ci.yml`, `pr-validation.yml`, and `release-changed-modules.yml` map scopes to `azurerm_*` by default and do not handle `azuredevops_*` scopes correctly.
+3. **Version prefix extraction mismatch**: `scripts/update-module-version.sh` expects `TAG_PREFIX` in `.releaserc.js`, but module configs are now driven by `module.json`.
+4. **Root README assumptions**: `scripts/update-root-readme.sh` expects a module table and badge markers that are not present in the current root README.
+5. **Missing template in updater**: `scripts/update-module-releaserc.sh` references `scripts/templates/.releaserc.auto.js`, which does not exist.
+
 ## Shared Actions
 
 ### 1. Detect Modules (`detect-modules`)
@@ -203,6 +290,9 @@ azurerm-terraform-modules/
 **Outputs**:
 - `modules`: JSON array of module names
 - `filters`: YAML filters for `dorny/paths-filter`
+
+**Notes**:
+- This action is currently not used by the workflows (module detection is implemented inline).
 
 ### 2. Terraform Setup (`terraform-setup`)
 
@@ -372,14 +462,21 @@ module.exports = {
   branches: ['main'],
   tagFormat: 'SAv${version}',
   plugins: [
+    './scripts/semantic-release-multi-scope-plugin.js',
     '@semantic-release/commit-analyzer',
     '@semantic-release/release-notes-generator',
     '@semantic-release/changelog',
+    '@semantic-release/exec',
     '@semantic-release/git',
     '@semantic-release/github'
   ]
 };
 ```
+
+**Actual repository pattern**:
+- Module config is loaded from `module.json` in each module directory.
+- `.releaserc.js` is a shared template that reads `module.json` at runtime.
+- `@semantic-release/exec` runs the release-time update scripts (see File Mutation Map).
 
 ### Commit Message Format
 Commits MUST follow conventional format with module scope:
