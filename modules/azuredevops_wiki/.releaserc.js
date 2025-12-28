@@ -129,7 +129,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
             sed -i "s/^version: .*/version: \${nextRelease.version}/" "$CONFIG_FILE"
           fi
 
-          find "modules/${MODULE_NAME}/examples" -name "*.tf" -type f -exec sed -i -E 's|(^[[:space:]]*source[[:space:]]*=[[:space:]]*)"[.]{2}/[.]{2}/?"|\\1"${SOURCE_URL}"|g' {} +
+          find "modules/${MODULE_NAME}/examples" -name "*.tf" -type f -exec sed -i -E -e 's|(^[[:space:]]*source[[:space:]]*=[[:space:]]*)"[.]{2}/[.]{2}/?"|\\1"${SOURCE_URL}"|g' -e 's|(^[[:space:]]*source[[:space:]]*=[[:space:]]*)"github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}\\?ref=[^"]+"|\\1"${SOURCE_URL}"|g' {} +
 
           find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../../"|source = "${SOURCE_URL}"|g' {} +
           find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../"|source = "${SOURCE_URL}"|g' {} +
