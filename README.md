@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Azure DevOps Repository](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOR*&label=Azure%20DevOps%20Repository&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOR)
 [![Azure DevOps Pipelines](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOPI*&label=Azure%20DevOps%20Pipelines&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOPI)
 [![Azure DevOps Identity](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOI*&label=Azure%20DevOps%20Identity&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOI)
 [![Azure DevOps Extension](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOEX*&label=Azure%20DevOps%20Extension&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOEX)
@@ -92,7 +93,7 @@ module "storage_account" {
 | [Azure DevOps Pipelines](./modules/azuredevops_pipelines/) | ✅ Completed | [ADOPI1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPI1.0.0) | Azure DevOps pipelines module for managing build definitions, folders, permissions, and authorizations |
 | [Azure DevOps Project](./modules/azuredevops_project/) | ✅ Completed | [ADOP1.1.1](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOP1.1.1) | Azure DevOps project module for managing project settings, tags, and dashboards |
 | [Azure DevOps Project Permissions](./modules/azuredevops_project_permissions/) | ✅ Completed | [ADOPP1.1.1](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPP1.1.1) | Azure DevOps project permissions module for assigning group permissions |
-| [Azure DevOps Repository](./modules/azuredevops_repository/) | 🔧 Development | - | Azure DevOps repository module for managing Git repositories and policies |
+| [Azure DevOps Repository](./modules/azuredevops_repository/) | ✅ Completed | [ADOR1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOR1.0.0) | Azure DevOps repository module for managing Git repositories and policies |
 | [Azure DevOps Service Endpoints](./modules/azuredevops_serviceendpoint/) | 🔧 Development | - | Azure DevOps service endpoints module for managing service connections and permissions |
 | [Azure DevOps Service Hooks](./modules/azuredevops_servicehooks/) | 🔧 Development | - | Azure DevOps service hooks module for managing subscriptions and permissions |
 | [Azure DevOps Team](./modules/azuredevops_team/) | 🔧 Development | - | Azure DevOps team module for managing teams, members, and administrators |

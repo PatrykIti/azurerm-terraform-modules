@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_repository" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_repository?ref=ADOR1.0.0"
 
   project_id = var.project_id
   name       = "ado-repo-basic"
