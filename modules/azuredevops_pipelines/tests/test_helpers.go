@@ -30,7 +30,7 @@ func getProjectID(t testing.TB) string {
 func destroyAllowMissingPipeline(t testing.TB, options *terraform.Options) {
 	t.Helper()
 
-	err := terraform.DestroyE(t, options)
+	_, err := terraform.DestroyE(t, options)
 	if err == nil {
 		return
 	}
