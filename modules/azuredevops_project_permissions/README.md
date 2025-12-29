@@ -47,9 +47,9 @@ module "azuredevops_project_permissions" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - This example demonstrates assigning project permissions to a collection group by name.
-- [Complete](examples/complete) - This example demonstrates project-scope permissions with optional principal override.
-- [Secure](examples/secure) - This example demonstrates least-privilege permission assignments.
+- [Basic](examples/basic) - This example assigns a minimal permission set to a collection-level group by name.
+- [Complete](examples/complete) - This example demonstrates a full permissions map with mixed scopes and optional principal override.
+- [Secure](examples/secure) - This example demonstrates least-privilege permission assignments for project-level groups.
 <!-- END_EXAMPLES -->
 
 ## Module Documentation
@@ -58,8 +58,45 @@ module "azuredevops_project_permissions" {
 - [docs/IMPORT.md](docs/IMPORT.md) - Import existing permissions (limitations)
 
 <!-- BEGIN_TF_DOCS -->
-<!-- This file will be automatically populated by terraform-docs -->
-<!-- Do not edit manually - use terraform-docs to generate -->
+
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
+| <a name="requirement_azuredevops"></a> [azuredevops](#requirement\_azuredevops) | 1.12.2 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azuredevops"></a> [azuredevops](#provider\_azuredevops) | 1.12.2 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azuredevops_project_permissions.permission](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/project_permissions) | resource |
+| [azuredevops_group.permission_group](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/data-sources/group) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_permissions"></a> [permissions](#input\_permissions) | List of project permission assignments. | <pre>list(object({<br/>    key         = optional(string)<br/>    principal   = optional(string)<br/>    group_name  = optional(string)<br/>    scope       = optional(string)<br/>    permissions = map(string)<br/>    replace     = optional(bool, true)<br/>  }))</pre> | `[]` | no |
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Azure DevOps project ID. | `string` | n/a | yes |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_permission_ids"></a> [permission\_ids](#output\_permission\_ids) | Map of permission assignment IDs keyed by permission key. |
+| <a name="output_permission_principals"></a> [permission\_principals](#output\_permission\_principals) | Map of resolved principals keyed by permission key. |
 <!-- END_TF_DOCS -->
 
 ## Additional Documentation
