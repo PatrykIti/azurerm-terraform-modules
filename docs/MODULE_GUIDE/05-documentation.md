@@ -6,6 +6,10 @@ Clear, comprehensive, and consistent documentation is crucial for making modules
 
 The `README.md` is the front page of the module. It should provide all the essential information a user needs to get started. The majority of this file is generated and updated automatically by `terraform-docs` using the `.terraform-docs.yml` configuration.
 
+**How to regenerate:**
+- From the module directory: `make docs` or `./generate-docs.sh`
+- From the repository root (CI/release-safe): `./scripts/update-module-docs.sh <module_name>`
+
 **Required Sections:**
 - **Header**: A description of the module's purpose, pulled from `main.tf`.
 - **Usage**: A simple, copy-pasteable usage example, embedded from the `basic` example.
@@ -16,6 +20,19 @@ The `README.md` is the front page of the module. It should provide all the essen
 - **Providers**: Auto-generated.
 - **Resources**: Auto-generated.
 - **Security Considerations**: A custom section detailing the security posture of the module, its default settings, and any important security-related information.
+
+---
+
+## `docs/IMPORT.md`
+
+This file documents how to import existing resources into the module using Terraform import blocks. The AKS module is the reference format, but other resources may require variations that must be documented.
+
+**Required Sections:**
+- **Prerequisites**: Terraform version, provider version, and required access.
+- **Minimal module-only configuration**: Copy/pasteable module block.
+- **Import blocks**: Exact resource addressing for the module outputs.
+- **Verification**: `plan`/`state` checks and clean-up guidance.
+- **Common errors**: Typical drift causes and fixes.
 
 ---
 

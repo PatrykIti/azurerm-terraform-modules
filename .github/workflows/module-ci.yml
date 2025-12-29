@@ -56,6 +56,17 @@ jobs:
             SCOPE="${BASH_REMATCH[1]}"
             echo "Detected scope: $SCOPE"
             
+            # Build commit_scope -> module map from module.json
+            declare -A SCOPE_MAP=()
+            for module_dir in modules/*/; do
+              if [[ -f "$module_dir/module.json" ]]; then
+                scope=$(jq -r '.commit_scope // empty' "$module_dir/module.json")
+                if [[ -n "$scope" && "$scope" != "null" ]]; then
+                  SCOPE_MAP["$scope"]="$(basename "$module_dir")"
+                fi
+              fi
+            done
+
             # Split scope by comma and process each module
             IFS=',' read -ra SCOPE_ARRAY <<< "$SCOPE"
             VALID_MODULES=()
@@ -64,28 +75,30 @@ jobs:
               # Trim whitespace
               scope_item=$(echo "$scope_item" | xargs)
               echo "Processing scope item: $scope_item"
-              
-              # Check if scope matches a module name (with or without azurerm_ prefix)
-              MODULE_NAME="$scope_item"
-              
-              # If the scope already contains azurerm_, use it as is
-              if [[ "$MODULE_NAME" =~ ^azurerm_ ]]; then
-                echo "Module name already has azurerm_ prefix: $MODULE_NAME"
+
+              resolved_module=""
+
+              # Direct module name match
+              if [[ -d "modules/$scope_item" ]]; then
+                resolved_module="$scope_item"
+              # commit_scope mapping from module.json
+              elif [[ -n "${SCOPE_MAP[$scope_item]:-}" ]]; then
+                resolved_module="${SCOPE_MAP[$scope_item]}"
               else
-                # Remove azurerm- prefix if present
-                MODULE_NAME="${MODULE_NAME#azurerm-}"
-                # Replace dashes with underscores
-                MODULE_NAME="${MODULE_NAME//-/_}"
-                # Add azurerm_ prefix
-                MODULE_NAME="azurerm_${MODULE_NAME}"
+                # Fallback: try azurerm_ / azuredevops_ prefixes
+                normalized="${scope_item//-/_}"
+                if [[ -d "modules/azurerm_${normalized}" ]]; then
+                  resolved_module="azurerm_${normalized}"
+                elif [[ -d "modules/azuredevops_${normalized}" ]]; then
+                  resolved_module="azuredevops_${normalized}"
+                fi
               fi
-              
-              # Check if this module exists
-              if [[ -d "modules/$MODULE_NAME" ]]; then
-                echo "Found module: $MODULE_NAME"
-                VALID_MODULES+=("$MODULE_NAME")
+
+              if [[ -n "$resolved_module" ]]; then
+                echo "Found module: $resolved_module"
+                VALID_MODULES+=("$resolved_module")
               else
-                echo "Module $MODULE_NAME not found in modules/ directory"
+                echo "Module for scope '$scope_item' not found in modules/ directory"
               fi
             done
             
@@ -112,7 +125,7 @@ jobs:
             if [ -d "$module_dir" ]; then
               module_name=$(basename "$module_dir")
               # Include all module files, tests, fixtures, and examples
-              FILTERS="${FILTERS}${module_name}:\n  - 'modules/${module_name}/**'\n  - 'modules/${module_name}/tests/**'\n  - 'modules/${module_name}/examples/**'\n  - 'shared/**'\n"
+              FILTERS="${FILTERS}${module_name}:\n  - 'modules/${module_name}/**'\n  - 'modules/${module_name}/tests/**'\n  - 'modules/${module_name}/examples/**'\n  - '!modules/${module_name}/**/.terraform/**'\n  - '!modules/${module_name}/**/.terraform.lock.hcl'\n  - '!modules/${module_name}/**/.terraform.tfstate.lock.info'\n  - '!modules/${module_name}/**/terraform.tfstate*'\n  - '!modules/${module_name}/**/*.tfplan'\n  - '!modules/${module_name}/**/crash.log'\n  - '!modules/${module_name}/**/crash.*.log'\n  - 'shared/**'\n"
             fi
           done
           echo -e "$FILTERS" > .github/filters.yml
@@ -142,22 +155,20 @@ jobs:
             PATH_MODULES='${{ steps.filter.outputs.changes }}'
             echo "Modules from path changes: $PATH_MODULES"
             
-            # Merge both lists
-            if [[ "$PR_MODULES" != "[]" && "$PATH_MODULES" != "[]" ]]; then
-              # Both have modules - merge them
-              ALL_MODULES=$(echo "$PR_MODULES $PATH_MODULES" | jq -s -c 'add | unique')
-              echo "Merged modules (unique): $ALL_MODULES"
-              MODULES="$ALL_MODULES"
-            elif [[ "$PR_MODULES" != "[]" ]]; then
-              # Only PR title has modules
+            # Prefer PR title scopes to avoid running unrelated modules
+            if [[ "$PR_MODULES" != "[]" ]]; then
               MODULES="$PR_MODULES"
               echo "Using modules from PR title only"
+              if [[ "$PATH_MODULES" != "[]" ]]; then
+                EXTRA_MODULES=$(jq -n --argjson pr "$PR_MODULES" --argjson path "$PATH_MODULES" '$path - $pr')
+                if [[ "$EXTRA_MODULES" != "[]" ]]; then
+                  echo "⚠️  Path changes include additional modules not in PR title: $EXTRA_MODULES"
+                fi
+              fi
             elif [[ "$PATH_MODULES" != "[]" ]]; then
-              # Only path changes have modules
               MODULES="$PATH_MODULES"
               echo "Using modules from path changes only"
             else
-              # No modules detected
               MODULES="[]"
               echo "No modules detected from PR title or path changes"
             fi
@@ -230,6 +241,9 @@ jobs:
               "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}",
               "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}"
             }
+          ado-org-service-url: ${{ secrets.AZDO_ORG_SERVICE_URL }}
+          ado-personal-access-token: ${{ secrets.AZDO_PERSONAL_ACCESS_TOKEN }}
+          ado-project-id: ${{ secrets.AZDO_PROJECT_ID }}
 
   security-scan:
     needs: detect-changes

@@ -2,6 +2,8 @@
 
 This guide outlines the best practices and standards for contributing to this open-source Terraform Azure modules repository. Following these guidelines ensures consistency, security, and maintainability across all modules.
 
+The `modules/azurerm_kubernetes_cluster` module is the **gold standard** for structure, naming, testing, and documentation. Use it as the baseline, but document and justify any deviations when a specific Azure resource (or Azure DevOps service) requires different patterns or features. Not every resource supports the same feature set, so examples and docs may differ.
+
 ## Table of Contents
 
 1. [Core Principles](#core-principles)
@@ -35,55 +37,91 @@ This guide outlines the best practices and standards for contributing to this op
 
 ## Module Structure
 
-### Standard Directory Layout
+### Standard Directory Layout (AKS Baseline)
 
 ```
 modules/
-└── azurerm_<resource_name>/
+└── <provider>_<resource_name>/
+    ├── docs/
+    │   └── IMPORT.md
     ├── examples/
     │   ├── basic/
+    │   │   ├── .terraform-docs.yml
     │   │   ├── main.tf
     │   │   ├── variables.tf
     │   │   ├── outputs.tf
     │   │   └── README.md
-    │   └── complete/
-    │       ├── main.tf
-    │       ├── variables.tf
-    │       ├── outputs.tf
-    │       └── README.md
+    │   ├── complete/
+    │   │   └── ...
+    │   ├── secure/
+    │   │   └── ...
+    │   └── <feature-specific>/ (optional)
+    │       └── ...
     ├── tests/
-    │   └── terraform_test.go
+    │   ├── fixtures/
+    │   │   ├── basic/
+    │   │   ├── complete/
+    │   │   ├── secure/
+    │   │   ├── network/
+    │   │   ├── negative/
+    │   │   └── <feature-specific>/ (optional)
+    │   ├── unit/
+    │   │   ├── defaults.tftest.hcl
+    │   │   ├── naming.tftest.hcl
+    │   │   ├── validation.tftest.hcl
+    │   │   └── outputs.tftest.hcl
+    │   ├── .gitignore
+    │   ├── go.mod
+    │   ├── go.sum
+    │   ├── <module>_test.go
+    │   ├── integration_test.go
+    │   ├── performance_test.go
+    │   ├── test_helpers.go
+    │   ├── test_config.yaml
+    │   ├── test_env.sh
+    │   ├── run_tests_parallel.sh
+    │   ├── run_tests_sequential.sh
+    │   ├── test_outputs/
+    │   └── Makefile
+    ├── .releaserc.js
     ├── .terraform-docs.yml
     ├── CHANGELOG.md
     ├── README.md
+    ├── SECURITY.md
+    ├── VERSIONING.md
+    ├── CONTRIBUTING.md
+    ├── module.json
+    ├── generate-docs.sh
+    ├── Makefile
     ├── main.tf
     ├── variables.tf
     ├── outputs.tf
     └── versions.tf
 ```
+Use `azurerm_` for AzureRM modules and `azuredevops_` for Azure DevOps modules.
 
 ## Naming Conventions
 
 ### Resource Naming Rules
 
-**CRITICAL**: For any `azurerm_*` resource, the local name should match the resource type without the provider prefix:
+**CRITICAL**: For any provider resource (`azurerm_*` or `azuredevops_*`), the local name should match the resource type without the provider prefix:
 
 ```hcl
 # ❌ WRONG - Never do this
-resource "azurerm_storage_account" "azurerm_storage_account" {
+resource "azurerm_kubernetes_cluster" "azurerm_kubernetes_cluster" {
   # ...
 }
 
-resource "azurerm_storage_account" "this" {
+resource "azurerm_kubernetes_cluster" "this" {
   # ...
 }
 
-resource "azurerm_storage_account" "custom_name" {
+resource "azurerm_kubernetes_cluster" "custom_name" {
   # ...
 }
 
 # ✅ CORRECT - Always do this
-resource "azurerm_storage_account" "storage_account" {
+resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
   # ...
 }
 
@@ -95,6 +133,7 @@ resource "azurerm_key_vault" "key_vault" {
   # ...
 }
 ```
+This rule also applies to `azuredevops_*` resources.
 
 ### Iteration Variable Naming
 
@@ -144,22 +183,22 @@ variable "security_settings" {
 Lists are more readable than maps in Terraform:
 
 ```hcl
-variable "containers" {
-  description = "List of storage containers to create"
+variable "node_pools" {
+  description = "List of node pools to create"
   
   type = list(object({
-    name                  = string
-    container_access_type = optional(string, "private")
+    name    = string
+    vm_size = string
   }))
   
   default = []
   
   validation {
     condition = alltrue([
-      for container in var.containers : 
-        contains(["private", "blob", "container"], container.container_access_type)
+      for node_pool in var.node_pools :
+        can(regex("^[a-z0-9]{1,12}$", node_pool.name))
     ])
-    error_message = "Container access type must be 'private', 'blob', or 'container'."
+    error_message = "Node pool names must be 1-12 lowercase alphanumeric characters."
   }
 }
 ```
@@ -169,18 +208,13 @@ variable "containers" {
 Always include validation with helpful error messages:
 
 ```hcl
-variable "storage_account_name" {
-  description = "Name of the storage account (must be globally unique)"
+variable "name" {
+  description = "Name of the primary resource (lowercase, hyphenated)."
   type        = string
   
   validation {
-    condition     = length(var.storage_account_name) >= 3 && length(var.storage_account_name) <= 24
-    error_message = "Storage account name must be between 3 and 24 characters."
-  }
-  
-  validation {
-    condition     = can(regex("^[a-z0-9]+$", var.storage_account_name))
-    error_message = "Storage account name can only contain lowercase letters and numbers."
+    condition     = can(regex("^[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$", var.name))
+    error_message = "The name must be 1-63 chars, lowercase, and may include hyphens."
   }
 }
 ```
@@ -190,43 +224,27 @@ variable "storage_account_name" {
 ### 1. Use Dynamic Blocks for Optional Features
 
 ```hcl
-resource "azurerm_storage_account" "storage_account" {
+resource "azurerm_kubernetes_cluster" "kubernetes_cluster" {
   name                = var.name
   resource_group_name = var.resource_group_name
   location            = var.location
-  
-  # Required settings with secure defaults
-  account_tier             = var.account_tier
-  account_replication_type = var.account_replication_type
-  min_tls_version          = var.security_settings.min_tls_version
-  enable_https_traffic_only = var.security_settings.enable_https_traffic_only
-  
-  # Optional network rules
-  dynamic "network_rules" {
-    for_each = var.network_rules != null ? [var.network_rules] : []
-    
+
+  # Required settings (resource-specific)
+
+  # Optional monitoring block
+  dynamic "oms_agent" {
+    for_each = var.monitoring != null ? [var.monitoring] : []
     content {
-      default_action             = network_rules.value.default_action
-      ip_rules                   = network_rules.value.ip_rules
-      virtual_network_subnet_ids = network_rules.value.subnet_ids
-      bypass                     = network_rules.value.bypass
+      log_analytics_workspace_id = oms_agent.value.log_analytics_workspace_id
     }
   }
-  
-  # Optional blob properties
-  dynamic "blob_properties" {
-    for_each = var.blob_properties != null ? [var.blob_properties] : []
-    
-    content {
-      versioning_enabled = try(blob_properties.value.versioning_enabled, false)
-      
-      dynamic "delete_retention_policy" {
-        for_each = try(blob_properties.value.delete_retention_days, null) != null ? [1] : []
-        
-        content {
-          days = blob_properties.value.delete_retention_days
-        }
-      }
+
+  tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = var.private_cluster_enabled == false || var.private_dns_zone_id != null
+      error_message = "When private_cluster_enabled is true, private_dns_zone_id must be specified."
     }
   }
 }
@@ -235,14 +253,14 @@ resource "azurerm_storage_account" "storage_account" {
 ### 2. Resource Creation with Iteration
 
 ```hcl
-resource "azurerm_storage_container" "containers" {
+resource "azurerm_kubernetes_cluster_node_pool" "node_pool" {
   for_each = {
-    for container in var.containers : container.name => container
+    for node_pool in var.node_pools : node_pool.name => node_pool
   }
-  
+
   name                  = each.value.name
-  storage_account_name  = azurerm_storage_account.storage_account.name
-  container_access_type = each.value.container_access_type
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.kubernetes_cluster.id
+  vm_size               = each.value.vm_size
 }
 ```
 
@@ -253,18 +271,17 @@ resource "azurerm_storage_container" "containers" {
 Always set the most secure configuration as default:
 
 ```hcl
-variable "security_settings" {
+variable "security_profile" {
   type = object({
-    enable_https_traffic_only       = optional(bool, true)
-    min_tls_version                = optional(string, "TLS1_2")
-    shared_access_key_enabled      = optional(bool, false)
-    public_network_access_enabled  = optional(bool, false)
-    infrastructure_encryption_enabled = optional(bool, true)
+    private_cluster_enabled = optional(bool, true)
+    local_accounts_disabled = optional(bool, true)
+    authorized_ip_ranges    = optional(list(string), [])
   })
   
   default = {}
 }
 ```
+Fields vary by resource; use this pattern to group security-related settings and keep defaults secure.
 
 ### 2. Secret Management
 
@@ -302,12 +319,14 @@ Every module must include a basic example that demonstrates minimal usage:
 
 ```hcl
 # examples/basic/main.tf
-module "storage" {
+module "example" {
   source = "../../"
   
-  name                = "stgexamplebasic"
+  name                = "example-basic"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
+
+  # Add required module-specific inputs here
   
   tags = {
     Environment = "Test"
@@ -315,6 +334,7 @@ module "storage" {
   }
 }
 ```
+For Azure DevOps modules, replace `resource_group_name`/`location` with organization and project inputs.
 
 ### 2. Complete Example
 
@@ -322,40 +342,15 @@ Include a complete example showing all features:
 
 ```hcl
 # examples/complete/main.tf
-module "storage" {
+module "example" {
   source = "../../"
   
-  name                = "stgexamplecomplete"
+  name                = "example-complete"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  
-  account_tier             = "Premium"
-  account_replication_type = "LRS"
-  account_kind            = "BlockBlobStorage"
-  
-  security_settings = {
-    enable_https_traffic_only = true
-    min_tls_version          = "TLS1_2"
-    shared_access_key_enabled = false
-  }
-  
-  network_rules = {
-    default_action = "Deny"
-    ip_rules      = ["203.0.113.0/24"]
-    subnet_ids    = [azurerm_subnet.example.id]
-    bypass        = ["AzureServices"]
-  }
-  
-  containers = [
-    {
-      name                  = "data"
-      container_access_type = "private"
-    },
-    {
-      name                  = "logs"
-      container_access_type = "private"
-    }
-  ]
+
+  # Resource-specific configuration blocks go here
+  # Example: network_profile, identity, monitoring, security, etc.
   
   tags = {
     Environment = "Production"
@@ -363,6 +358,7 @@ module "storage" {
   }
 }
 ```
+Use a separate `secure` example to demonstrate hardened defaults (private access, encryption, policy/defender, etc.).
 
 ## Documentation Standards
 
@@ -397,14 +393,15 @@ module "example" {
 ## Examples
 - [Basic Example](examples/basic)
 - [Complete Example](examples/complete)
+- [Secure Example](examples/secure)
 
 <!-- BEGIN_TF_DOCS -->
 <!-- Automatically generated documentation -->
 <!-- END_TF_DOCS -->
 
 ## Requirements
-- Terraform >= 1.5.0
-- AzureRM Provider >= 3.0
+- Terraform >= 1.12.2
+- AzureRM Provider = 4.57.0 (or Azure DevOps provider where applicable)
 
 ## Contributing
 Please see our [contribution guidelines](../../CONTRIBUTING.md).
@@ -449,18 +446,19 @@ Before submitting a PR, ensure:
 - [ ] Module follows the naming conventions
 - [ ] All variables have validation and descriptions
 - [ ] Security defaults are properly set
-- [ ] Examples (basic and complete) are included
+- [ ] Examples (basic, complete, secure) are included
 - [ ] Tests pass successfully
 - [ ] Documentation is generated with terraform-docs
+- [ ] `docs/IMPORT.md` is present and updated
 - [ ] CHANGELOG is updated
 
 ### 2. PR Guidelines
 
 1. **Branch Naming**: `feature/module-<resource-name>` or `fix/module-<resource-name>-issue`
 2. **Commit Messages**: Use conventional commits
-   - `feat(storage): add support for encryption scopes`
-   - `fix(storage): correct validation for container names`
-   - `docs(storage): update examples with new features`
+   - `feat(aks): add support for workload identity`
+   - `fix(aks): correct validation for node pool names`
+   - `docs(aks): update examples with new features`
 
 3. **Testing**: All PRs must include:
    - Working examples

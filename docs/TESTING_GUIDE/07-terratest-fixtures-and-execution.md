@@ -12,14 +12,14 @@ To ensure consistency across all modules, the following fixture names and purpos
 
 | Fixture Name | Purpose |
 |---|---|
-| `simple` | A minimal, valid configuration to test basic resource creation and default values. |
+| `basic` | A minimal, valid configuration to test basic resource creation and default values. |
 | `complete` | A complex configuration that enables and tests the majority of the module's features. |
-| `security` | A configuration focused on security-hardened settings (e.g., disabled public access, private endpoints, CMK). |
-| `network` | Scenarios for advanced networking (e.g., VNet integration, multiple IP rules, service endpoints). |
-| `private_endpoint`| A specific scenario dedicated to validating private endpoint integration. |
-| `data_lake_gen2` | (Or similar) For features specific to a certain SKU or configuration, like Data Lake Gen2. |
-| `identity_access` | Tests for managed identity (System and User Assigned) and Customer-Managed Key (CMK) encryption. |
+| `secure` | A configuration focused on security-hardened settings (e.g., private cluster, policy, restricted access). |
+| `network` | Scenarios for advanced networking (e.g., VNet integration, custom DNS, network policy). |
 | `negative/` | A parent directory for configurations that are expected to fail Terraform validation or apply, used for negative testing. |
+| `<feature-specific>/` | Optional scenarios for module-specific features (e.g., diagnostics, extra pools, identity). |
+
+> Note: Legacy modules may still use `simple`/`security` fixture names. New modules should use `basic`/`secure`.
 
 ### Fixture Internal Structure
 
@@ -33,18 +33,18 @@ Each fixture directory must contain the following files:
 
 1.  **Use a Local Module Source**: Fixtures must always test the local version of the module using a relative path to ensure that changes are tested before they are merged.
     ```hcl
-    # in fixtures/simple/main.tf
-    module "storage_account" {
+    # in fixtures/basic/main.tf
+    module "kubernetes_cluster" {
       # This path points to the module's root directory
       source = "../../../" 
 
-      name                = "stsimple${var.random_suffix}"
+      name                = "aks-dpc-bas-${var.random_suffix}"
       resource_group_name = azurerm_resource_group.test.name
       # ... other variables
     }
     ```
 
-2.  **Ensure Unique and Descriptive Resource Names**: To enable parallel testing and easy identification in Azure, all resources within a fixture must have unique names. Test fixtures MUST follow the established naming patterns from the `azurerm_storage_account` and `azurerm_virtual_network` modules, which set the standard for this repository.
+2.  **Ensure Unique and Descriptive Resource Names**: To enable parallel testing and easy identification in Azure, all resources within a fixture must have unique names. Test fixtures MUST follow the established naming patterns from the `azurerm_kubernetes_cluster` module, which sets the standard for this repository.
 
     ### Resource Naming Pattern for Test Fixtures
     
@@ -57,31 +57,26 @@ Each fixture directory must contain the following files:
     
     | Resource Type | Prefix | Test Example |
     |--------------|--------|--------------|
-    | Resource Group | `rg-` | `rg-dpc-smp-${var.random_suffix}` |
-    | Virtual Network | `vnet-` | `vnet-dpc-cmp-${var.random_suffix}` |
-    | Subnet | `snet-` or `subnet-` | `snet-web` or `subnet-storage` |
-    | Storage Account | `st` or custom | `dpcsmp${var.random_suffix}` (no hyphens) |
-    | Network Security Group | `nsg-` | `nsg-dpc-sec-${var.random_suffix}` |
-    | Log Analytics Workspace | `law-` | `law-dpc-cmp-${var.random_suffix}` |
-    | Route Table | `rt-` | `rt-dpc-net-web-${var.random_suffix}` |
-    | DDoS Protection Plan | `ddos-` | `ddos-dpc-sec-${var.random_suffix}` |
-    | Network Watcher | `nw-` | `nw-dpc-sec-${var.random_suffix}` |
+| Resource Group | `rg-` | `rg-dpc-bas-${var.random_suffix}` |
+| Virtual Network | `vnet-` | `vnet-dpc-cmp-${var.random_suffix}` |
+| Subnet | `snet-` | `snet-dpc-cmp-${var.random_suffix}` |
+| Network Security Group | `nsg-` | `nsg-dpc-sec-${var.random_suffix}` |
+| Log Analytics Workspace | `law-` | `law-dpc-cmp-${var.random_suffix}` |
+| User Assigned Identity | `uai-` | `uai-dpc-cmp-${var.random_suffix}` |
+| AKS Cluster | `aks-` | `aks-dpc-bas-${var.random_suffix}` |
 
     ### Standard Abbreviations
     
     - `{project}` is a short identifier for the overall project (e.g., `dpc`).
     - `{scenario}` is a short identifier for the fixture:
       - `bas` - basic
-      - `smp` - simple  
+      - `smp` - legacy simple
       - `cmp` - complete
       - `sec` - security/secure
       - `net` - network
-      - `pe` - private endpoint
-      - `adv` - advanced
-      - `dlg` - data lake gen2
-      - `id` - identity
+      - `neg` - negative
 
-    **Example (`fixtures/simple/main.tf`):**
+    **Example (`fixtures/basic/main.tf`):**
     ```hcl
     # variables.tf
     variable "random_suffix" {
@@ -91,38 +86,38 @@ Each fixture directory must contain the following files:
 
     # main.tf
     resource "azurerm_resource_group" "test" {
-      # e.g., rg-dpc-smp-a1b2c3
-      name     = "rg-dpc-smp-${var.random_suffix}"
+      # e.g., rg-dpc-bas-a1b2c3
+      name     = "rg-dpc-bas-${var.random_suffix}"
       location = var.location
     }
 
-    module "storage_account" {
+    module "kubernetes_cluster" {
       source = "../../../"
 
-      # e.g., dpcsmpa1b2c3
-      name                     = "dpcsmp${var.random_suffix}"
-      resource_group_name      = azurerm_resource_group.test.name
+      # e.g., aks-dpc-bas-a1b2c3
+      name                = "aks-dpc-bas-${var.random_suffix}"
+      resource_group_name = azurerm_resource_group.test.name
       # ... other variables
     }
     ```
 
     **Key Differences from Examples:**
     - Test fixtures ALWAYS use `var.random_suffix` for uniqueness (never `random_string` resource)
-    - Test fixtures use abbreviated scenario names (e.g., `smp` vs `simple`)
+    - Test fixtures use abbreviated scenario names (e.g., `bas` vs `basic`; legacy modules may use `smp` vs `simple`)
     - Test fixtures include project identifier (`dpc`) in resource names
     - All test resources must support parallel execution
 
 3.  **Define Clear Outputs for Validation**: Each fixture must expose the key attributes of the created resources as outputs. The Go tests will read these outputs to get the names and IDs needed for validation with the Azure SDK.
     ```hcl
-    # in fixtures/simple/outputs.tf
-    output "storage_account_id" {
-      description = "The ID of the created storage account."
-      value       = module.storage_account.id
+    # in fixtures/basic/outputs.tf
+    output "kubernetes_cluster_id" {
+      description = "The ID of the created Kubernetes Cluster."
+      value       = module.kubernetes_cluster.id
     }
 
-    output "storage_account_name" {
-      description = "The name of the created storage account."
-      value       = module.storage_account.name
+    output "kubernetes_cluster_name" {
+      description = "The name of the created Kubernetes Cluster."
+      value       = module.kubernetes_cluster.name
     }
     ```
 
@@ -140,8 +135,8 @@ The `Makefile` provides convenient targets for common operations, ensuring that 
 |---|---|
 | `make test` | Runs all Go tests in parallel. The default command for a full test run. |
 | `make test-single TEST_NAME=<TestFunctionName>` | Runs a single, specific test function. Useful for debugging. |
-| `make test-basic` | Runs only the `TestBasicStorageAccount` test. |
-| `make test-security` | Runs only the `TestStorageAccountSecurity` test. |
+| `make test-basic` | Runs only the `TestBasicKubernetesCluster` test. |
+| `make test-secure` | Runs only the security-focused test (e.g., `TestSecureKubernetesCluster`). |
 | `make benchmark` | Runs all performance benchmarks. |
 | `make test-coverage` | Runs tests and generates an HTML code coverage report (`coverage.html`). |
 | `make test-junit` | Runs tests and generates a JUnit XML report (`test-results.xml`) for CI/CD integration. |
@@ -155,8 +150,8 @@ The `Makefile` provides convenient targets for common operations, ensuring that 
 # Run all tests with a 45-minute timeout
 make test TIMEOUT=45m
 
-# Run only the private endpoint test
-make test-single TEST_NAME=TestStorageAccountPrivateEndpoint
+# Run only the secure test
+make test-single TEST_NAME=TestSecureKubernetesCluster
 
 # Check for linting errors
 make lint

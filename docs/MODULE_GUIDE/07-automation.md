@@ -124,3 +124,15 @@ terraform-docs markdown table --output-file README.md --output-mode inject "$SCR
 
 echo "✅ Documentation generated successfully!"
 ```
+
+---
+
+## Release-safe docs update
+
+During releases, documentation updates are executed from the repository root. Use the wrapper script to avoid accidentally overwriting the root `README.md`:
+
+```bash
+./scripts/update-module-docs.sh <module_name>
+```
+
+This script enforces module-scoped output and verifies that the root README was not touched.

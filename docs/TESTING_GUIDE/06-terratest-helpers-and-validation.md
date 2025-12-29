@@ -10,19 +10,18 @@ For each module, we create a dedicated Go struct that acts as a "helper." This s
 
 The struct holds authenticated Azure SDK clients and any other shared information, like the subscription ID.
 
-**Example (`test_helpers.go` for `azurerm_storage_account`):**
+**Example (`test_helpers.go` for `azurerm_kubernetes_cluster`):**
 ```go
-// StorageAccountHelper provides helper methods for storage account testing
-type StorageAccountHelper struct {
+// KubernetesClusterHelper provides helper methods for AKS testing
+type KubernetesClusterHelper struct {
 	subscriptionID string
 	credential     azcore.TokenCredential
-	client         *armstorage.AccountsClient
-	blobClient     *armstorage.BlobServicesClient
+	client         *armcontainerservice.ManagedClustersClient
 }
 ```
 -   `subscriptionID`: Caches the subscription ID to avoid repeated lookups.
 -   `credential`: Stores the `azcore.TokenCredential` used for authenticating all SDK clients.
--   `client`, `blobClient`, etc.: Instances of the specific SDK clients needed to manage the resource (e.g., `AccountsClient` for the storage account itself, `BlobServicesClient` for its blob properties).
+-   `client`: Instances of the specific SDK clients needed to manage the resource (e.g., `ManagedClustersClient` for AKS).
 
 ### 2. Helper Factory Function
 
@@ -34,10 +33,10 @@ A `New...Helper` factory function is responsible for creating and initializing a
 3.  Initialize all necessary Azure SDK clients.
 4.  Return the fully configured helper struct.
 
-**Example (`NewStorageAccountHelper`):**
+**Example (`NewKubernetesClusterHelper`):**
 ```go
-// NewStorageAccountHelper creates a new helper instance
-func NewStorageAccountHelper(t *testing.T) *StorageAccountHelper {
+// NewKubernetesClusterHelper creates a new helper instance
+func NewKubernetesClusterHelper(t *testing.T) *KubernetesClusterHelper {
 	subscriptionID := getRequiredEnvVar(t, "AZURE_SUBSCRIPTION_ID")
 	
 	// Standard authentication logic
@@ -45,17 +44,13 @@ func NewStorageAccountHelper(t *testing.T) *StorageAccountHelper {
 	require.NoError(t, err, "Failed to create default credential")
 
 	// Initialize the required clients
-	client, err := armstorage.NewAccountsClient(subscriptionID, credential, nil)
-	require.NoError(t, err, "Failed to create storage accounts client")
-	
-	blobClient, err := armstorage.NewBlobServicesClient(subscriptionID, credential, nil)
-	require.NoError(t, err, "Failed to create blob services client")
+	client, err := armcontainerservice.NewManagedClustersClient(subscriptionID, credential, nil)
+	require.NoError(t, err, "Failed to create AKS client")
 
-	return &StorageAccountHelper{
+	return &KubernetesClusterHelper{
 		subscriptionID: subscriptionID,
 		credential:     credential,
 		client:         client,
-		blobClient:     blobClient,
 	}
 }
 ```
@@ -66,22 +61,17 @@ Validation methods are attached to the helper struct. They contain the logic to 
 
 **Best Practices:**
 -   **Single Responsibility**: Each function should validate one logical aspect (e.g., encryption, network rules, tags).
--   **Accept the SDK Object**: To minimize API calls, functions should accept the `armstorage.Account` (or similar) object, which is fetched once in the main test function.
+-   **Accept the SDK Object**: To minimize API calls, functions should accept the `armcontainerservice.ManagedCluster` (or similar) object, which is fetched once in the main test function.
 -   **Use `require` and `assert`**: Use `require` for fatal assertions that stop the test if they fail (e.g., the resource object is `nil`). Use `assert` for non-fatal checks.
 -   **Provide Clear Error Messages**: Every assertion must have a descriptive message.
 
-### Example: Encryption Validation
+### Example: Network Profile Validation
 ```go
-// ValidateStorageAccountEncryption validates encryption settings
-func (h *StorageAccountHelper) ValidateStorageAccountEncryption(t *testing.T, account armstorage.Account) {
-	require.NotNil(t, account.Properties.Encryption, "Encryption properties should not be nil")
-	
-	// Assert that Microsoft Managed Keys are used
-	require.Equal(t, armstorage.KeySourceMicrosoftStorage, *account.Properties.Encryption.KeySource, "Key source should be Microsoft.Storage")
-	
-	// Assert that blob service encryption is enabled
-	require.NotNil(t, account.Properties.Encryption.Services.Blob, "Blob encryption service should be configured")
-	assert.True(t, *account.Properties.Encryption.Services.Blob.Enabled, "Blob encryption should be enabled")
+// ValidateKubernetesClusterNetwork validates network profile settings
+func (h *KubernetesClusterHelper) ValidateKubernetesClusterNetwork(t *testing.T, cluster armcontainerservice.ManagedCluster) {
+	require.NotNil(t, cluster.Properties.NetworkProfile, "Network profile should not be nil")
+	require.Equal(t, armcontainerservice.NetworkPluginAzure, *cluster.Properties.NetworkProfile.NetworkPlugin, "Network plugin should be Azure")
+	require.Equal(t, armcontainerservice.NetworkPolicyAzure, *cluster.Properties.NetworkProfile.NetworkPolicy, "Network policy should be Azure")
 }
 ```
 
@@ -89,21 +79,20 @@ func (h *StorageAccountHelper) ValidateStorageAccountEncryption(t *testing.T, ac
 
 Azure operations can be asynchronous. Waiter functions use Terratest's `retry` package to poll a resource until it reaches a desired state.
 
-### Example: Wait for GRS Replication
+### Example: Wait for Provisioning State
 ```go
-// WaitForGRSSecondaryEndpoints waits for GRS secondary endpoints to be available
-func (h *StorageAccountHelper) WaitForGRSSecondaryEndpoints(t *testing.T, accountName, resourceGroupName string) {
-	description := fmt.Sprintf("Waiting for GRS secondary endpoints for %s", accountName)
+// WaitForKubernetesClusterReady waits for provisioning to complete
+func (h *KubernetesClusterHelper) WaitForKubernetesClusterReady(t *testing.T, resourceGroupName, clusterName string) {
+	description := fmt.Sprintf("Waiting for AKS cluster %s to be ready", clusterName)
 	
 	// Poll for up to 10 minutes (60 attempts * 10 seconds)
 	retry.DoWithRetry(t, description, 60, 10*time.Second, func() (string, error) {
-		account := h.GetStorageAccountProperties(t, accountName, resourceGroupName)
-		
-		if account.Properties.SecondaryEndpoints != nil && account.Properties.SecondaryEndpoints.Blob != nil && *account.Properties.SecondaryEndpoints.Blob != "" {
-			return "GRS secondary endpoints are available.", nil
+		cluster := h.GetKubernetesClusterProperties(t, resourceGroupName, clusterName)
+		if cluster.Properties != nil && cluster.Properties.ProvisioningState != nil && *cluster.Properties.ProvisioningState == "Succeeded" {
+			return "AKS cluster is ready.", nil
 		}
-		
-		return "", fmt.Errorf("GRS secondary endpoints are not yet available")
+
+		return "", fmt.Errorf("AKS cluster is not ready yet")
 	})
 }
 ```
@@ -131,9 +120,9 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		NoColor: true,
 		// Configure retries for common transient Azure errors
 		RetryableTerraformErrors: map[string]string{
-			".*ResourceGroupNotFound.*":      "Resource group not found, retrying.",
-			".*StorageAccountAlreadyTaken.*": "Storage account name taken, retrying.",
-			".*timeout.*":                    "Timeout error, retrying.",
+			".*timeout.*":                      "Timeout error, retrying.",
+			".*ResourceGroupNotFound.*":        "Resource group not found, retrying.",
+			".*Another operation is in progress.*": "Another operation is in progress, retrying.",
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,

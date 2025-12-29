@@ -38,6 +38,17 @@ jobs:
             SCOPE="${BASH_REMATCH[1]}"
             echo "Detected scope: $SCOPE"
             
+            # Build commit_scope -> module map from module.json
+            declare -A SCOPE_MAP=()
+            for module_dir in modules/*/; do
+              if [[ -f "$module_dir/module.json" ]]; then
+                scope=$(jq -r '.commit_scope // empty' "$module_dir/module.json")
+                if [[ -n "$scope" && "$scope" != "null" ]]; then
+                  SCOPE_MAP["$scope"]="$(basename "$module_dir")"
+                fi
+              fi
+            done
+
             # Split scope by comma and process each module
             IFS=',' read -ra SCOPE_ARRAY <<< "$SCOPE"
             VALID_MODULES=()
@@ -53,27 +64,29 @@ jobs:
                 continue
               fi
               
-              # Check if scope matches a module name
-              MODULE_NAME="$scope_item"
-              
-              # If the scope already contains azurerm_, use it as is
-              if [[ "$MODULE_NAME" =~ ^azurerm_ ]]; then
-                echo "Module name already has azurerm_ prefix: $MODULE_NAME"
+              resolved_module=""
+
+              # Direct module name match
+              if [[ -d "modules/$scope_item" ]]; then
+                resolved_module="$scope_item"
+              # commit_scope mapping from module.json
+              elif [[ -n "${SCOPE_MAP[$scope_item]:-}" ]]; then
+                resolved_module="${SCOPE_MAP[$scope_item]}"
               else
-                # Remove azurerm- prefix if present
-                MODULE_NAME="${MODULE_NAME#azurerm-}"
-                # Replace dashes with underscores
-                MODULE_NAME="${MODULE_NAME//-/_}"
-                # Add azurerm_ prefix
-                MODULE_NAME="azurerm_${MODULE_NAME}"
+                # Fallback: try azurerm_ / azuredevops_ prefixes
+                normalized="${scope_item//-/_}"
+                if [[ -d "modules/azurerm_${normalized}" ]]; then
+                  resolved_module="azurerm_${normalized}"
+                elif [[ -d "modules/azuredevops_${normalized}" ]]; then
+                  resolved_module="azuredevops_${normalized}"
+                fi
               fi
-              
-              # Check if this module exists
-              if [[ -d "modules/$MODULE_NAME" ]]; then
-                echo "Found module: $MODULE_NAME"
-                VALID_MODULES+=("$MODULE_NAME")
+
+              if [[ -n "$resolved_module" ]]; then
+                echo "Found module: $resolved_module"
+                VALID_MODULES+=("$resolved_module")
               else
-                echo "Module $MODULE_NAME not found in modules/ directory"
+                echo "Module for scope '$scope_item' not found in modules/ directory"
               fi
             done
             
@@ -99,7 +112,7 @@ jobs:
           for module_dir in modules/*/; do
             if [ -d "$module_dir" ]; then
               module_name=$(basename "$module_dir")
-              FILTERS="${FILTERS}${module_name}:\n  - 'modules/${module_name}/**'\n  - 'shared/**'\n"
+              FILTERS="${FILTERS}${module_name}:\n  - 'modules/${module_name}/**'\n  - '!modules/${module_name}/**/.terraform/**'\n  - '!modules/${module_name}/**/.terraform.lock.hcl'\n  - '!modules/${module_name}/**/.terraform.tfstate.lock.info'\n  - '!modules/${module_name}/**/terraform.tfstate*'\n  - '!modules/${module_name}/**/*.tfplan'\n  - '!modules/${module_name}/**/crash.log'\n  - '!modules/${module_name}/**/crash.*.log'\n  - 'shared/**'\n"
             fi
           done
           echo -e "$FILTERS" > .github/filters.yml
@@ -124,36 +137,22 @@ jobs:
           PATH_MODULES='${{ steps.filter.outputs.changes }}'
           echo "Modules from path changes: $PATH_MODULES"
           
-          # Merge both lists
-          if [[ "$PR_MODULES" != "[]" && "$PATH_MODULES" != "[]" ]]; then
-            # Both have modules - merge them
-            ALL_MODULES=$(echo "$PR_MODULES $PATH_MODULES" | jq -s -c 'add | unique')
-            echo "Merged modules (unique): $ALL_MODULES"
-            MODULES="$ALL_MODULES"
-          elif [[ "$PR_MODULES" != "[]" ]]; then
-            # Only PR title has modules
+          # Prefer PR title scopes to avoid running unrelated modules
+          if [[ "$PR_MODULES" != "[]" ]]; then
             MODULES="$PR_MODULES"
             echo "Using modules from PR title only"
+            if [[ "$PATH_MODULES" != "[]" ]]; then
+              EXTRA_MODULES=$(jq -n --argjson pr "$PR_MODULES" --argjson path "$PATH_MODULES" '$path - $pr')
+              if [[ "$EXTRA_MODULES" != "[]" ]]; then
+                echo "⚠️  Path changes include additional modules not in PR title: $EXTRA_MODULES"
+              fi
+            fi
           elif [[ "$PATH_MODULES" != "[]" ]]; then
-            # Only path changes have modules
             MODULES="$PATH_MODULES"
             echo "Using modules from path changes only"
           else
-            # No modules detected - check all
-            echo "No specific modules detected - will validate all"
-            # Get all modules
-            ALL_MODULES=()
-            for module_dir in modules/*/; do
-              if [ -d "$module_dir" ]; then
-                module_name=$(basename "$module_dir")
-                ALL_MODULES+=("$module_name")
-              fi
-            done
-            if [ ${#ALL_MODULES[@]} -eq 0 ]; then
-              MODULES="[]"
-            else
-              MODULES=$(printf '%s\n' "${ALL_MODULES[@]}" | jq -R -s -c 'split("\n")[:-1]')
-            fi
+            echo "No modules detected from PR title or path changes"
+            MODULES="[]"
           fi
           
           echo "=== Final modules to validate: $MODULES ==="
@@ -197,10 +196,26 @@ jobs:
             storage-account
             virtual-network
             kubernetes-cluster
+            kubernetes-secrets
             network-security-group
-            app-gateway
-            subnet
             route-table
+            subnet
+            azuredevops-agent-pools
+            azuredevops-artifacts-feed
+            azuredevops-environments
+            azuredevops-extension
+            azuredevops-identity
+            azuredevops-pipelines
+            azuredevops-project
+            azuredevops-project-permissions
+            azuredevops-repository
+            azuredevops-serviceendpoint
+            azuredevops-servicehooks
+            azuredevops-team
+            azuredevops-variable-groups
+            azuredevops-wiki
+            azuredevops-work-items
+            app-gateway
             bastion-host
             container-registry
             key-vault
@@ -485,30 +500,26 @@ jobs:
           if [[ -d "$module_dir/examples" ]] && [[ -x "./scripts/update-examples-list.sh" ]]; then
             echo "Updating examples list for ${{ matrix.module }}..."
             ./scripts/update-examples-list.sh "$module_dir"
-            
-            # Regenerate terraform-docs after updating examples list
-            echo "Regenerating terraform-docs for ${{ matrix.module }}..."
-            (cd "$module_dir" && terraform-docs markdown table --output-file README.md .)
+          fi
+          
+          # Regenerate terraform-docs using the safe wrapper to avoid root README overwrite
+          if [[ -x "./scripts/update-module-docs.sh" ]]; then
+            echo "Regenerating terraform-docs for ${{ matrix.module }} via wrapper..."
+            ./scripts/update-module-docs.sh "${{ matrix.module }}"
+          else
+            echo "❌ update-module-docs.sh not found or not executable"
+            docs_outdated=true
           fi
           
           if [[ -f "$module_dir/README.md" ]]; then
-            # Check if terraform-docs content is up to date
-            if [[ -x "./scripts/check-terraform-docs.sh" ]]; then
-              if ! ./scripts/check-terraform-docs.sh "$module_dir"; then
-                echo "❌ Documentation is outdated for module: ${{ matrix.module }}"
-                docs_outdated=true
-              else
-                echo "✅ Documentation is up to date for module: ${{ matrix.module }}"
-              fi
+            if ! grep -q "<!-- BEGIN_TF_DOCS -->" "$module_dir/README.md" || ! grep -q "<!-- END_TF_DOCS -->" "$module_dir/README.md"; then
+              echo "❌ terraform-docs markers not found in README for module: ${{ matrix.module }}"
+              docs_outdated=true
+            elif ! git diff --quiet -- "$module_dir/README.md"; then
+              echo "❌ Documentation is outdated for module: ${{ matrix.module }}"
+              docs_outdated=true
             else
-              # Fallback to old method
-              if terraform-docs markdown table --output-file README.md.tmp "$module_dir" 2>/dev/null; then
-                if ! diff -q "$module_dir/README.md" "$module_dir/README.md.tmp" > /dev/null 2>&1; then
-                  echo "❌ Documentation is outdated for module: ${{ matrix.module }}"
-                  docs_outdated=true
-                fi
-                rm -f "$module_dir/README.md.tmp"
-              fi
+              echo "✅ Documentation is up to date for module: ${{ matrix.module }}"
             fi
           else
             echo "❌ Missing README.md for module: ${{ matrix.module }}"

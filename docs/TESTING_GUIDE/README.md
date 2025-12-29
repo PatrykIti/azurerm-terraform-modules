@@ -1,6 +1,6 @@
 # Terraform Testing Guide - Complete Reference
 
-This comprehensive testing guide is organized into focused sections covering all aspects of testing Terraform modules in this repository. It establishes the standards and patterns that all module tests must follow.
+This comprehensive testing guide is organized into focused sections covering all aspects of testing Terraform modules in this repository. It establishes the standards and patterns that all module tests must follow. The `modules/azurerm_kubernetes_cluster` module is the baseline for test structure; adapt patterns only when a resource or service requires it and document the deviation. Some resources will have fewer or different test scenarios based on their capabilities.
 
 ## 📚 Guide Structure
 

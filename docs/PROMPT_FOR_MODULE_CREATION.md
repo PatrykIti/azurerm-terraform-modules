@@ -1,11 +1,10 @@
 # MODULE CREATION TASK – {{ module name}}
 
-You are tasked with creating a new Terraform module named `{{ module name}}` according to the latest AzureRM provider version **4.36.0**. Follow strictly the internal module development standards defined in `@CLAUDE.md`. Use the helper script `@scripts/create-new-module.sh` to generate the initial structure.
-First you need to check script and what will be created as a module template.
+You are tasked with creating a new Terraform module named `{{ module name}}` according to the latest AzureRM provider version **4.57.0**. Follow strictly the internal module development standards defined in `@AGENTS.md` and the `docs/MODULE_GUIDE/` series. Use the helper script `@scripts/create-new-module.sh` to generate the initial structure.
 
-## 🗂️ WORKTREE SETUP – CLAUDE MULTI-AGENT FLOW
+## 🗂️ WORKTREE SETUP – PARALLEL WORK (OPTIONAL)
 
-To isolate agent work, each Claude agent should use a separate **Git worktree**, with its own branch and workspace
+If multiple agents or contributors work in parallel, use separate Git worktrees with distinct branches and workspaces.
 
 Worktree: git worktree add ../azurerm-terraform-modules-<shortcut_for_created_module> feature/<module_name_without_azurerm_prefix>_module
 
@@ -25,12 +24,7 @@ Once inside the new directory, you’ll work independently from other modules or
 
 Create a standalone, production-ready Terraform module for `{{ module name}}`, supporting **all configuration scenarios** according to the latest AzureRM documentation. Ensure that the module is flexible, reusable, and documented.
 
----
-
-## 📋 MAIN TASKS
-
-Before start, plan everything and set up proper task in taskmaster (@CLAUDE has proper guidance for this) and create proper subtasks with full description what needs to be done.
-Taskmaster is initialized already and do not do this again!!!
+Use `modules/azurerm_kubernetes_cluster` as the gold standard for structure, testing, and documentation. When a resource requires different patterns, document the reason for the deviation.
 
 ---
 
@@ -42,38 +36,34 @@ bash @scripts/create-new-module.sh {{ module name}} (each module folder has name
 ```
 - Validate that `main.tf`, `variables.tf`, `outputs.tf`, `README.md`, and test directory were created
 
+Optional flags:
+```bash
+# customize examples list (must include basic, complete, secure)
+bash @scripts/create-new-module.sh --examples=basic,complete,secure {{ module name}} "Display Name" XX scope "Description"
+```
+Add any feature-specific examples (e.g., `diagnostic-settings`, `multi-node-pool`, `workload-identity`) manually after scaffolding.
+
 Most of the files for module documentation have place holders which should be replaced with proper name of module but most of them are for review and standard correction where the script is not correcting them.
 
 ---
 
 ### 2. 📚 Schema exploration
-- Research the full structure and capabilities of `azurerm_{{ module name}}` resource block using AzureRM provider version 4.36.0:
+- Research the full structure and capabilities of `azurerm_{{ module name}}` resource block using AzureRM provider version 4.57.0:
   - Official Terraform Registry
   - Azure provider changelog (breaking changes, deprecations, defaults)
 - Document optional and required arguments
-- Use gemini zen when possible - for almost all tasks which needs a documentation review
 
 ---
 
-## 🛠️ PARALLEL AGENTS (run concurrently)
+## 🛠️ PARALLEL CONTRIBUTORS (OPTIONAL)
 
-Each of the following sub-agents runs in its own Claude Code session inside its worktree:
+If work is split across multiple contributors, divide responsibilities by area:
 
-### Agent A – main files for module:
-- See guidelines in @CLAUDE.md - MANDATORY!!
-- `main.tf`, `variables.tf`, `outputs.tf`, `versions.tf` 
+- **Core module files**: `main.tf`, `variables.tf`, `outputs.tf`, `versions.tf`
+- **Tests**: `tests/unit/*.tftest.hcl`, `tests/fixtures/*`, Go tests, `tests/Makefile`
+- **Examples**: `examples/basic`, `examples/complete`, `examples/secure`, plus optional feature examples
 
-### Agent B - tests
-- See guidelines in @CLAUDE.md - MANDATORY!!
-- Start creation / correction for tests files ui / integration etc.
-
-### Agent C – examples
-- See guidelines in @CLAUDE.md - MANDATORY!!
-- Start creation / correction for examples files
-
-### Agent D – .... if needed
-
-Check the existing module directory structure and divide the work for the agents in logic, proper way that they will not collide with each other.
+Ensure all contributors follow `@AGENTS.md` and `docs/MODULE_GUIDE/`.
 
 ---
 
@@ -92,4 +82,4 @@ Check the existing module directory structure and divide the work for the agents
 ## 🚫 NOT IN SCOPE
 - Do NOT implement `vnet`/`nsg`/`route` linking logic here – this will be part of the `azurerm_networking` wrapper
 - Do NOT hardcode naming conventions or globals – inherit via input variables only
-- Everything for terraform module creation is described in the @CLAUDE.md and referenced files
+- Everything for terraform module creation is described in the @AGENTS.md and referenced files

@@ -40,15 +40,32 @@ The `tests/` directory is structured to support this multi-layered approach:
 
 ```
 tests/
-├─── fixtures/         # Terraform code for Terratest scenarios
+├─── fixtures/                # Terraform code for Terratest scenarios
 │    ├─── basic/
-│    └─── complete/
-├─── unit/             # Native Terraform tests
-│    └─── defaults.tftest.hcl
-├─── go.mod            # Go dependencies for Terratest
-├─── module_test.go    # Terratest code
-└─── Makefile          # Helper to run tests
+│    ├─── complete/
+│    ├─── secure/
+│    ├─── network/
+│    └─── negative/
+├─── unit/                    # Native Terraform tests
+│    ├─── defaults.tftest.hcl
+│    ├─── naming.tftest.hcl
+│    ├─── validation.tftest.hcl
+│    └─── outputs.tftest.hcl
+├─── go.mod                   # Go dependencies for Terratest
+├─── go.sum
+├─── <module>_test.go          # Module-specific Terratest
+├─── integration_test.go
+├─── performance_test.go
+├─── test_helpers.go
+├─── test_config.yaml
+├─── test_env.sh
+├─── run_tests_parallel.sh
+├─── run_tests_sequential.sh
+├─── test_outputs/
+└─── Makefile                  # Helper to run tests
 ```
+
+Note: dynamic/random naming is reserved for Go-based E2E tests in `tests/` and should not be used in examples.
 
 ## Next Steps
 

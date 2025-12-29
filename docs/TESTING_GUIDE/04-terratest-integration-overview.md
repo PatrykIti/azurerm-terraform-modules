@@ -17,7 +17,7 @@ Terratest is the ideal tool for scenarios that cannot be verified with static an
 To run integration tests, the development environment must be equipped with:
 
 1.  **Go**: Version 1.21 or newer.
-2.  **Terraform**: Version 1.5.0 or newer.
+2.  **Terraform**: Version 1.12.2 or newer.
 3.  **Azure CLI**: For authentication and interaction with Azure.
 4.  **Key Go Packages**: Dependencies are managed by `go.mod`.
 
@@ -26,14 +26,14 @@ To run integration tests, the development environment must be equipped with:
 The `go.mod` file in the `tests` directory defines key libraries. The most important ones are:
 
 ```go
-module github.com/example/azurerm-storage-account/tests
+module github.com/PatrykIti/azurerm-terraform-modules/modules/azurerm_kubernetes_cluster/tests
 
 go 1.21
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.9.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.4.0
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v1.5.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.6.0
 	github.com/gruntwork-io/terratest v0.46.7
 	github.com/stretchr/testify v1.8.4
 )
@@ -63,7 +63,7 @@ To run tests locally, a user would:
 3.  Source the file: `source test_env.local.sh`.
 
 ```bash
-# modules/azurerm_storage_account/tests/test_env.sh
+# modules/azurerm_kubernetes_cluster/tests/test_env.sh
 #!/bin/bash
 # Azure credentials for testing
 export AZURE_CLIENT_ID="YOUR_AZURE_CLIENT_ID_HERE"

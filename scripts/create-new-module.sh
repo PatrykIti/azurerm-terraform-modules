@@ -31,7 +31,14 @@ print_warning() {
 # Function to show usage
 usage() {
     cat << EOF
-Usage: $0 <module_name> <display_name> <prefix> <scope> <description>
+Usage: $0 [options] <module_name> <display_name> <prefix> <scope> <description>
+
+Options:
+  --examples=<csv>           Comma-separated list of examples to generate.
+                             Allowed: basic, complete, secure, private-endpoint
+                             Default: basic,complete,secure
+  --with-private-endpoint    Shortcut to include private-endpoint example.
+  -h, --help                 Show this help and exit.
 
 Arguments:
   module_name    - Technical name (e.g., azurerm_virtual_network)
@@ -40,12 +47,53 @@ Arguments:
   scope          - Commit scope (e.g., virtual-network)
   description    - Brief module description
 
-Example:
+Examples:
   $0 azurerm_virtual_network "Virtual Network" VN virtual-network "Manages Azure Virtual Networks with subnets and peering"
+  $0 --with-private-endpoint azurerm_storage_account "Storage Account" SA storage-account "Manages storage accounts"
+  $0 --examples=basic,secure azurerm_subnet "Subnet" SN subnet "Manages Azure subnets"
 
 EOF
     exit 1
 }
+
+EXAMPLES_CSV=""
+INCLUDE_PRIVATE_ENDPOINT="false"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --examples=*)
+            EXAMPLES_CSV="${1#*=}"
+            shift
+            ;;
+        --examples)
+            shift
+            if [ $# -eq 0 ]; then
+                print_error "Missing value for --examples"
+                usage
+            fi
+            EXAMPLES_CSV="$1"
+            shift
+            ;;
+        --with-private-endpoint)
+            INCLUDE_PRIVATE_ENDPOINT="true"
+            shift
+            ;;
+        -h|--help)
+            usage
+            ;;
+        --)
+            shift
+            break
+            ;;
+        -*)
+            print_error "Unknown option: $1"
+            usage
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
 
 # Check arguments
 if [ $# -ne 5 ]; then
@@ -59,8 +107,75 @@ PREFIX="$3"
 SCOPE="$4"
 DESCRIPTION="$5"
 
+contains_example() {
+    local needle="$1"
+    shift
+    local item
+    for item in "$@"; do
+        if [[ "$item" == "$needle" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 # Derive module type from name (remove azurerm_ prefix)
 MODULE_TYPE="${MODULE_NAME#azurerm_}"
+MODULE_PASCAL="$(echo "$MODULE_TYPE" | awk -F'_' '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))}1' | tr -d ' ')"
+
+EXAMPLES=()
+if [[ -z "$EXAMPLES_CSV" ]]; then
+    EXAMPLES=(basic complete secure)
+else
+    IFS=',' read -ra EXAMPLE_ITEMS <<< "$EXAMPLES_CSV"
+    if [ ${#EXAMPLE_ITEMS[@]} -eq 0 ]; then
+        print_error "Invalid --examples value"
+        usage
+    fi
+    for example in "${EXAMPLE_ITEMS[@]}"; do
+        if [[ -z "$example" ]]; then
+            print_error "Invalid --examples value (empty item)"
+            usage
+        fi
+        if [[ "$example" =~ [[:space:]] ]]; then
+            print_error "Invalid --examples value (whitespace not allowed): $example"
+            usage
+        fi
+        case "$example" in
+            basic|complete|secure|private-endpoint)
+                ;;
+            *)
+                print_error "Unknown example: $example"
+                usage
+                ;;
+        esac
+        if ! contains_example "$example" "${EXAMPLES[@]}"; then
+            EXAMPLES+=("$example")
+        fi
+    done
+fi
+
+if [[ "$INCLUDE_PRIVATE_ENDPOINT" == "true" ]]; then
+    if ! contains_example "private-endpoint" "${EXAMPLES[@]}"; then
+        EXAMPLES+=("private-endpoint")
+    fi
+fi
+
+REQUIRED_EXAMPLES=(basic complete secure)
+for required in "${REQUIRED_EXAMPLES[@]}"; do
+    if ! contains_example "$required" "${EXAMPLES[@]}"; then
+        print_warning "Adding required example '$required' (missing from --examples)"
+        EXAMPLES+=("$required")
+    fi
+done
+
+ORDERED_EXAMPLES=()
+for example in basic complete secure private-endpoint; do
+    if contains_example "$example" "${EXAMPLES[@]}"; then
+        ORDERED_EXAMPLES+=("$example")
+    fi
+done
+EXAMPLES=("${ORDERED_EXAMPLES[@]}")
 
 # Validate module doesn't already exist
 if [ -d "$MODULES_DIR/$MODULE_NAME" ]; then
@@ -72,27 +187,68 @@ print_info "Creating new module: $MODULE_NAME"
 print_info "Display name: $DISPLAY_NAME"
 print_info "Version prefix: ${PREFIX}v"
 print_info "Commit scope: $SCOPE"
+print_info "Examples: ${EXAMPLES[*]}"
 
 # Create module directory structure
 MODULE_DIR="$MODULES_DIR/$MODULE_NAME"
 mkdir -p "$MODULE_DIR"
-mkdir -p "$MODULE_DIR/.github"
-mkdir -p "$MODULE_DIR/examples/basic"
-mkdir -p "$MODULE_DIR/examples/complete"
-mkdir -p "$MODULE_DIR/examples/secure"
-mkdir -p "$MODULE_DIR/examples/private-endpoint"
+mkdir -p "$MODULE_DIR/examples"
 mkdir -p "$MODULE_DIR/docs"
 mkdir -p "$MODULE_DIR/tests"
 mkdir -p "$MODULE_DIR/tests/test_outputs"
 mkdir -p "$MODULE_DIR/tests/unit"
-mkdir -p "$MODULE_DIR/tests/fixtures/basic"
-mkdir -p "$MODULE_DIR/tests/fixtures/complete"
-mkdir -p "$MODULE_DIR/tests/fixtures/secure"
-mkdir -p "$MODULE_DIR/tests/fixtures/private_endpoint"
+mkdir -p "$MODULE_DIR/tests/fixtures"
+for example in "${EXAMPLES[@]}"; do
+    mkdir -p "$MODULE_DIR/examples/$example"
+    fixture_dir="$example"
+    if [[ "$example" == "private-endpoint" ]]; then
+        fixture_dir="private_endpoint"
+    fi
+    mkdir -p "$MODULE_DIR/tests/fixtures/$fixture_dir"
+done
 mkdir -p "$MODULE_DIR/tests/fixtures/network"
 mkdir -p "$MODULE_DIR/tests/fixtures/negative"
 
 print_info "Created directory structure"
+
+REQUIRED_TEMPLATES=(
+    "main.tf"
+    "variables.tf"
+    "outputs.tf"
+    "versions.tf"
+    "README.md"
+    "CHANGELOG.md"
+    "CONTRIBUTING.md"
+    "VERSIONING.md"
+    "SECURITY.md"
+    ".releaserc.js"
+    "generate-docs.sh"
+    "Makefile"
+    "go.mod"
+    "go.sum"
+    "MODULE_TYPE_test.go"
+    "integration_test.go"
+    "performance_test.go"
+    "test_helpers.go"
+    "Makefile.tests"
+    "test_config_cicd.yaml"
+    "tests_gitignore"
+    "tests_README.md"
+    "run_tests_parallel.sh"
+    "run_tests_sequential.sh"
+    "test_env.sh"
+    "defaults.tftest.hcl"
+    "naming.tftest.hcl"
+    "validation.tftest.hcl"
+    "outputs.tftest.hcl"
+)
+
+for template in "${REQUIRED_TEMPLATES[@]}"; do
+    if [[ ! -f "$TEMPLATES_DIR/$template" ]]; then
+        print_error "Missing template: $TEMPLATES_DIR/$template"
+        exit 1
+    fi
+done
 
 # Function to replace placeholders in a file
 replace_placeholders() {
@@ -105,6 +261,7 @@ replace_placeholders() {
         sed -i '' \
             -e "s/MODULE_NAME_PLACEHOLDER/$MODULE_NAME/g" \
             -e "s/MODULE_DISPLAY_NAME_PLACEHOLDER/$DISPLAY_NAME/g" \
+            -e "s/MODULE_PASCAL_PLACEHOLDER/$MODULE_PASCAL/g" \
             -e "s/MODULE_TYPE_PLACEHOLDER/$MODULE_TYPE/g" \
             -e "s/MODULE_DESCRIPTION_PLACEHOLDER/$DESCRIPTION/g" \
             -e "s/PREFIX_PLACEHOLDER/$PREFIX/g" \
@@ -120,6 +277,7 @@ replace_placeholders() {
         sed -i \
             -e "s/MODULE_NAME_PLACEHOLDER/$MODULE_NAME/g" \
             -e "s/MODULE_DISPLAY_NAME_PLACEHOLDER/$DISPLAY_NAME/g" \
+            -e "s/MODULE_PASCAL_PLACEHOLDER/$MODULE_PASCAL/g" \
             -e "s/MODULE_TYPE_PLACEHOLDER/$MODULE_TYPE/g" \
             -e "s/MODULE_DESCRIPTION_PLACEHOLDER/$DESCRIPTION/g" \
             -e "s/PREFIX_PLACEHOLDER/$PREFIX/g" \
@@ -151,7 +309,6 @@ cp "$TEMPLATES_DIR/SECURITY.md" "$MODULE_DIR/"
 
 # Configuration files
 cp "$TEMPLATES_DIR/.releaserc.js" "$MODULE_DIR/"
-cp "$TEMPLATES_DIR/module-config.yml" "$MODULE_DIR/.github/"
 
 # Scripts
 cp "$TEMPLATES_DIR/generate-docs.sh" "$MODULE_DIR/"
@@ -162,19 +319,31 @@ cp "$TEMPLATES_DIR/Makefile" "$MODULE_DIR/"
 
 # Test files
 cp "$TEMPLATES_DIR/go.mod" "$MODULE_DIR/tests/"
+cp "$TEMPLATES_DIR/go.sum" "$MODULE_DIR/tests/"
 # Copy MODULE_TYPE_test.go and rename it to actual module type
 cp "$TEMPLATES_DIR/MODULE_TYPE_test.go" "$MODULE_DIR/tests/${MODULE_TYPE}_test.go"
 cp "$TEMPLATES_DIR/integration_test.go" "$MODULE_DIR/tests/"
 cp "$TEMPLATES_DIR/performance_test.go" "$MODULE_DIR/tests/"
 cp "$TEMPLATES_DIR/test_helpers.go" "$MODULE_DIR/tests/"
 cp "$TEMPLATES_DIR/Makefile.tests" "$MODULE_DIR/tests/Makefile"
+cp "$TEMPLATES_DIR/run_tests_parallel.sh" "$MODULE_DIR/tests/"
+cp "$TEMPLATES_DIR/run_tests_sequential.sh" "$MODULE_DIR/tests/"
+cp "$TEMPLATES_DIR/test_env.sh" "$MODULE_DIR/tests/"
 cp "$TEMPLATES_DIR/test_config_cicd.yaml" "$MODULE_DIR/tests/test_config.yaml"
 cp "$TEMPLATES_DIR/tests_gitignore" "$MODULE_DIR/tests/.gitignore"
 cp "$TEMPLATES_DIR/tests_README.md" "$MODULE_DIR/tests/README.md"
+cp "$TEMPLATES_DIR/defaults.tftest.hcl" "$MODULE_DIR/tests/unit/"
+cp "$TEMPLATES_DIR/naming.tftest.hcl" "$MODULE_DIR/tests/unit/"
+cp "$TEMPLATES_DIR/validation.tftest.hcl" "$MODULE_DIR/tests/unit/"
+cp "$TEMPLATES_DIR/outputs.tftest.hcl" "$MODULE_DIR/tests/unit/"
+
+chmod +x "$MODULE_DIR/tests/run_tests_parallel.sh"
+chmod +x "$MODULE_DIR/tests/run_tests_sequential.sh"
+chmod +x "$MODULE_DIR/tests/test_env.sh"
 
 # Replace placeholders in all copied files
 print_info "Customizing templates..."
-find "$MODULE_DIR" -type f \( -name "*.tf" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.js" -o -name "*.go" -o -name "*.mod" -o -name "*.sh" -o -name "Makefile" -o -name ".gitignore" \) | while read -r file; do
+find "$MODULE_DIR" -type f \( -name "*.tf" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.js" -o -name "*.go" -o -name "*.mod" -o -name "*.sh" -o -name "*.hcl" -o -name "Makefile" -o -name ".gitignore" \) | while read -r file; do
     replace_placeholders "$file"
 done
 
@@ -356,8 +525,9 @@ EOF
     esac
 }
 
-# Basic example
-cat > "$MODULE_DIR/examples/basic/main.tf" << EOF
+if contains_example "basic" "${EXAMPLES[@]}"; then
+    # Basic example
+    cat > "$MODULE_DIR/examples/basic/main.tf" << EOF
 provider "azurerm" {
   features {}
 }
@@ -381,7 +551,7 @@ module "$MODULE_TYPE" {
 }
 EOF
 
-cat > "$MODULE_DIR/examples/basic/variables.tf" << EOF
+    cat > "$MODULE_DIR/examples/basic/variables.tf" << EOF
 variable "location" {
   description = "Azure region for resources"
   type        = string
@@ -389,7 +559,7 @@ variable "location" {
 }
 EOF
 
-cat > "$MODULE_DIR/examples/basic/outputs.tf" << EOF
+    cat > "$MODULE_DIR/examples/basic/outputs.tf" << EOF
 output "${MODULE_TYPE}_id" {
   description = "The ID of the created $DISPLAY_NAME"
   value       = module.${MODULE_TYPE}.id
@@ -401,11 +571,13 @@ output "${MODULE_TYPE}_name" {
 }
 EOF
 
-# Generate README for basic example
-generate_example_readme "basic" "$MODULE_DIR/examples/basic" "$MODULE_TYPE" "$DISPLAY_NAME"
+    # Generate README for basic example
+    generate_example_readme "basic" "$MODULE_DIR/examples/basic" "$MODULE_TYPE" "$DISPLAY_NAME"
+fi
 
-# Create complete example files
-cat > "$MODULE_DIR/examples/complete/main.tf" << EOF
+if contains_example "complete" "${EXAMPLES[@]}"; then
+    # Create complete example files
+    cat > "$MODULE_DIR/examples/complete/main.tf" << EOF
 provider "azurerm" {
   features {}
 }
@@ -431,7 +603,7 @@ module "$MODULE_TYPE" {
 }
 EOF
 
-cat > "$MODULE_DIR/examples/complete/variables.tf" << EOF
+    cat > "$MODULE_DIR/examples/complete/variables.tf" << EOF
 variable "location" {
   description = "Azure region for resources"
   type        = string
@@ -439,7 +611,7 @@ variable "location" {
 }
 EOF
 
-cat > "$MODULE_DIR/examples/complete/outputs.tf" << EOF
+    cat > "$MODULE_DIR/examples/complete/outputs.tf" << EOF
 output "${MODULE_TYPE}_id" {
   description = "The ID of the created $DISPLAY_NAME"
   value       = module.${MODULE_TYPE}.id
@@ -451,11 +623,13 @@ output "${MODULE_TYPE}_name" {
 }
 EOF
 
-# Generate README for complete example
-generate_example_readme "complete" "$MODULE_DIR/examples/complete" "$MODULE_TYPE" "$DISPLAY_NAME"
+    # Generate README for complete example
+    generate_example_readme "complete" "$MODULE_DIR/examples/complete" "$MODULE_TYPE" "$DISPLAY_NAME"
+fi
 
-# Create secure example files
-cat > "$MODULE_DIR/examples/secure/main.tf" << EOF
+if contains_example "secure" "${EXAMPLES[@]}"; then
+    # Create secure example files
+    cat > "$MODULE_DIR/examples/secure/main.tf" << EOF
 provider "azurerm" {
   features {}
 }
@@ -481,7 +655,7 @@ module "$MODULE_TYPE" {
 }
 EOF
 
-cat > "$MODULE_DIR/examples/secure/variables.tf" << EOF
+    cat > "$MODULE_DIR/examples/secure/variables.tf" << EOF
 variable "location" {
   description = "Azure region for resources"
   type        = string
@@ -489,7 +663,7 @@ variable "location" {
 }
 EOF
 
-cat > "$MODULE_DIR/examples/secure/outputs.tf" << EOF
+    cat > "$MODULE_DIR/examples/secure/outputs.tf" << EOF
 output "${MODULE_TYPE}_id" {
   description = "The ID of the created $DISPLAY_NAME"
   value       = module.${MODULE_TYPE}.id
@@ -501,11 +675,13 @@ output "${MODULE_TYPE}_name" {
 }
 EOF
 
-# Generate README for secure example
-generate_example_readme "secure" "$MODULE_DIR/examples/secure" "$MODULE_TYPE" "$DISPLAY_NAME"
+    # Generate README for secure example
+    generate_example_readme "secure" "$MODULE_DIR/examples/secure" "$MODULE_TYPE" "$DISPLAY_NAME"
+fi
 
-# Create private-endpoint example files
-cat > "$MODULE_DIR/examples/private-endpoint/main.tf" << EOF
+if contains_example "private-endpoint" "${EXAMPLES[@]}"; then
+    # Create private-endpoint example files
+    cat > "$MODULE_DIR/examples/private-endpoint/main.tf" << EOF
 provider "azurerm" {
   features {}
 }
@@ -557,7 +733,7 @@ module "$MODULE_TYPE" {
 }
 EOF
 
-cat > "$MODULE_DIR/examples/private-endpoint/variables.tf" << EOF
+    cat > "$MODULE_DIR/examples/private-endpoint/variables.tf" << EOF
 variable "location" {
   description = "Azure region for resources"
   type        = string
@@ -565,7 +741,7 @@ variable "location" {
 }
 EOF
 
-cat > "$MODULE_DIR/examples/private-endpoint/outputs.tf" << EOF
+    cat > "$MODULE_DIR/examples/private-endpoint/outputs.tf" << EOF
 output "${MODULE_TYPE}_id" {
   description = "The ID of the created $DISPLAY_NAME"
   value       = module.${MODULE_TYPE}.id
@@ -580,28 +756,31 @@ output "private_endpoints" {
   description = "Information about the created private endpoints"
   value       = module.${MODULE_TYPE}.private_endpoints
 }
+EOF
 
-# Create module.json and .releaserc.js
-print_info "Creating module.json and .releaserc.js..."
+    # Generate README for private-endpoint example
+    generate_example_readme "private-endpoint" "$MODULE_DIR/examples/private-endpoint" "$MODULE_TYPE" "$DISPLAY_NAME"
+fi
+
+# Create module.json
+print_info "Creating module.json..."
 if [[ -x "$SCRIPT_DIR/create-module-json.sh" ]]; then
     "$SCRIPT_DIR/create-module-json.sh" "$MODULE_DIR" "$DISPLAY_NAME" "$SCOPE" "$PREFIX"
 else
     print_warning "scripts/create-module-json.sh not found or not executable."
 fi
 
-EOF
-
-# Generate README for private-endpoint example
-generate_example_readme "private-endpoint" "$MODULE_DIR/examples/private-endpoint" "$MODULE_TYPE" "$DISPLAY_NAME"
-
 # Create test fixtures by copying examples
 print_info "Creating test fixtures..."
 
 # Copy examples to test fixtures
-cp -r "$MODULE_DIR/examples/basic/"* "$MODULE_DIR/tests/fixtures/basic/"
-cp -r "$MODULE_DIR/examples/complete/"* "$MODULE_DIR/tests/fixtures/complete/"
-cp -r "$MODULE_DIR/examples/secure/"* "$MODULE_DIR/tests/fixtures/secure/"
-cp -r "$MODULE_DIR/examples/private-endpoint/"* "$MODULE_DIR/tests/fixtures/private_endpoint/"
+for example in "${EXAMPLES[@]}"; do
+    fixture_dir="$example"
+    if [[ "$example" == "private-endpoint" ]]; then
+        fixture_dir="private_endpoint"
+    fi
+    cp -r "$MODULE_DIR/examples/$example/"* "$MODULE_DIR/tests/fixtures/$fixture_dir/"
+done
 
 # Create additional test fixtures
 cat > "$MODULE_DIR/tests/fixtures/network/main.tf" << EOF
@@ -704,14 +883,7 @@ else
     print_warning "example-terraform-docs.yml template not found - examples will need manual configuration"
 fi
 
-# Add to workflow choices
-print_info "Updating workflow configurations..."
-
-# This would need to be done manually or via a more complex script
-print_warning "Remember to manually add '$MODULE_NAME' to:"
-print_warning "  - .github/workflows/module-ci.yml (workflow_dispatch choices)"
-print_warning "  - .github/workflows/module-release.yml (workflow_dispatch choices)"
-print_warning "  - .github/workflows/pr-validation.yml (if needed)"
+print_info "CI/CD: module.json is the release metadata; workflows auto-detect modules."
 
 print_info "Module scaffold created successfully!"
 print_info ""
@@ -723,9 +895,9 @@ print_info "4. Generate documentation:"
 print_info "   cd $MODULE_DIR"
 print_info "   terraform-docs markdown table --output-file README.md --output-mode inject ."
 print_info "   ./scripts/update-examples-list.sh ."
-print_info "5. Create complete, secure, and private-endpoint examples"
-print_info "6. Write tests for the module"
-print_info "7. Update the module category in .github/module-config.yml"
+print_info "5. Review and adjust generated examples (basic/complete/secure [+ private-endpoint if enabled])"
+print_info "6. Write tests for the module (Terratest + terraform test)"
+print_info "7. Review module.json metadata (title/scope/prefix/description)"
 print_info "8. Commit with: git commit -m \"feat($SCOPE): initial $MODULE_TYPE module scaffold\""
 
 echo ""

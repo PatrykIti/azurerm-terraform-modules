@@ -28,7 +28,7 @@ jobs:
         id: filter
         with:
           filters: |
-            storage_account: modules/azurerm_storage_account/**
+            kubernetes_cluster: modules/azurerm_kubernetes_cluster/**
             # ... other modules
 
   unit-test:

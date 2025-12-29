@@ -82,7 +82,7 @@ Our testing pyramid consists of four distinct levels, each serving a specific pu
 - `checkov` - Infrastructure security scanning
 - `tfsec` - Terraform security analysis
 
-**When**: On every commit via pre-commit hooks
+**When**: On every commit (recommended via pre-commit hooks)
 
 **Duration**: < 30 seconds
 
@@ -125,21 +125,37 @@ repos:
 ```hcl
 # tests/unit/defaults.tftest.hcl
 mock_provider "azurerm" {
-  mock_resource "azurerm_storage_account" {
+  mock_resource "azurerm_kubernetes_cluster" {
     defaults = {
-      id = "/subscriptions/mock/resourceGroups/mock-rg/providers/Microsoft.Storage/storageAccounts/mocksa"
-      min_tls_version = "TLS1_2"
-      enable_https_traffic_only = true
+      id   = "/subscriptions/mock/resourceGroups/mock-rg/providers/Microsoft.ContainerService/managedClusters/test-aks"
+      name = "test-aks"
     }
   }
 }
 
-run "verify_secure_defaults" {
+variables {
+  name                = "test-aks"
+  resource_group_name = "test-rg"
+  location            = "northeurope"
+  dns_config = {
+    dns_prefix = "testaks"
+  }
+  default_node_pool = {
+    name       = "default"
+    vm_size    = "Standard_D2_v2"
+    node_count = 1
+  }
+  network_profile = {
+    network_plugin = "azure"
+  }
+}
+
+run "verify_default_identity" {
   command = plan
   
   assert {
-    condition     = azurerm_storage_account.storage_account.min_tls_version == "TLS1_2"
-    error_message = "Default TLS version should be TLS1_2"
+    condition     = azurerm_kubernetes_cluster.kubernetes_cluster.identity[0].type == "SystemAssigned"
+    error_message = "Default identity type should be SystemAssigned"
   }
 }
 ```
@@ -165,7 +181,7 @@ run "verify_secure_defaults" {
 
 **Example Test Structure**:
 ```go
-func TestStorageAccountBasic(t *testing.T) {
+func TestBasicKubernetesCluster(t *testing.T) {
     t.Parallel()
     
     terraformOptions := &terraform.Options{
@@ -179,9 +195,9 @@ func TestStorageAccountBasic(t *testing.T) {
     terraform.InitAndApply(t, terraformOptions)
     
     // Validate using Azure SDK
-    helper := NewStorageAccountHelper(t)
-    account := helper.GetStorageAccountProperties(t, accountName, resourceGroupName)
-    assert.True(t, *account.Properties.EnableHTTPSTrafficOnly)
+    helper := NewKubernetesClusterHelper(t)
+    cluster := helper.GetKubernetesClusterProperties(t, resourceGroupName, clusterName)
+    assert.Equal(t, "Succeeded", string(*cluster.Properties.ProvisioningState))
 }
 ```
 
@@ -282,7 +298,7 @@ Tests are executed in parallel to minimize total execution time:
 # Example GitHub Actions matrix
 strategy:
   matrix:
-    module: [storage_account, virtual_network, key_vault]
+    module: [kubernetes_cluster, virtual_network, key_vault]
     test_type: [unit, integration, security]
   max-parallel: 6
 ```
@@ -322,8 +338,8 @@ Use the cheapest possible Azure SKUs for testing:
 func GetTestSKUs() map[string]interface{} {
     return map[string]interface{}{
         "vm_size":              "Standard_B1s",    // Cheapest VM
-        "storage_account_tier": "Standard",        // Standard tier
-        "storage_replication":  "LRS",            // Local redundancy
+        "node_count":           1,                 // Smallest node count
+        "sku_tier":             "Free",           // Lowest AKS tier
         "db_sku":              "Basic",           // Basic database
         "app_service_sku":     "F1",             // Free tier
     }
@@ -396,13 +412,13 @@ run "verify_security_defaults" {
   command = plan
   
   assert {
-    condition = azurerm_storage_account.storage_account.enable_https_traffic_only == true
-    error_message = "HTTPS must be enforced by default"
+    condition = azurerm_kubernetes_cluster.kubernetes_cluster.azure_policy_enabled == false
+    error_message = "Azure Policy should be disabled by default"
   }
   
   assert {
-    condition = azurerm_storage_account.storage_account.min_tls_version == "TLS1_2"
-    error_message = "Minimum TLS version must be 1.2"
+    condition = azurerm_kubernetes_cluster.kubernetes_cluster.workload_identity_enabled == false
+    error_message = "Workload Identity should be disabled by default"
   }
 }
 ```
@@ -410,16 +426,13 @@ run "verify_security_defaults" {
 ### Integration Security Tests
 ```go
 func validateSecurityConfiguration(t *testing.T, terraformOptions *terraform.Options) {
-    // Validate encryption at rest
-    helper := NewStorageAccountHelper(t)
-    account := helper.GetStorageAccountProperties(t, accountName, resourceGroupName)
-    
-    require.True(t, *account.Properties.Encryption.Services.Blob.Enabled)
-    require.True(t, *account.Properties.Encryption.RequireInfrastructureEncryption)
-    
-    // Validate network isolation
-    require.Equal(t, armstorage.DefaultActionDeny, 
-        *account.Properties.NetworkRuleSet.DefaultAction)
+    // Validate private cluster and policy settings
+    helper := NewKubernetesClusterHelper(t)
+    cluster := helper.GetKubernetesClusterProperties(t, resourceGroupName, clusterName)
+
+    require.True(t, *cluster.Properties.APIServerAccessProfile.EnablePrivateCluster)
+    require.NotNil(t, cluster.Properties.AddonProfiles["azurepolicy"])
+    require.True(t, *cluster.Properties.AddonProfiles["azurepolicy"].Enabled)
 }
 ```
 
