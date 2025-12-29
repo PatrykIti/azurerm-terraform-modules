@@ -2,10 +2,10 @@
 # Update module documentation safely
 # This script replaces terraform-docs to ensure root README is never overwritten
 
-set -e
+set -euo pipefail
 
 # Get module name from parameter or environment
-MODULE_NAME="${1:-$MODULE_NAME}"
+MODULE_NAME="${1:-${MODULE_NAME:-}}"
 
 if [ -z "$MODULE_NAME" ]; then
     echo "Error: MODULE_NAME not provided"
@@ -17,6 +17,7 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 MODULE_DIR="${ROOT_DIR}/modules/${MODULE_NAME}"
+ROOT_README="${ROOT_DIR}/README.md"
 
 # Check if module exists
 if [ ! -d "$MODULE_DIR" ]; then
@@ -51,29 +52,43 @@ fi
 # Create a backup just in case
 cp "$MODULE_README" "${MODULE_README}.bak"
 
-# Run terraform-docs with explicit paths and inject mode
-# IMPORTANT: We use absolute paths and explicitly specify the output file
-if terraform-docs \
-    --config "${MODULE_DIR}/.terraform-docs.yml" \
-    --output-file "${MODULE_README}" \
+# Backup root README so we can detect or revert accidental writes
+ROOT_README_BAK=""
+if [ -f "$ROOT_README" ]; then
+    ROOT_README_BAK="$(mktemp)"
+    cp "$ROOT_README" "$ROOT_README_BAK"
+fi
+
+# Run terraform-docs from the module directory to ensure relative output paths
+if pushd "$MODULE_DIR" > /dev/null && terraform-docs \
+    --config ".terraform-docs.yml" \
+    --output-file "README.md" \
     --output-mode inject \
-    "${MODULE_DIR}" 2>/dev/null; then
+    "." 2>/dev/null; then
+
+    popd > /dev/null
 
     echo "✅ Successfully updated documentation for ${MODULE_NAME}"
     rm -f "${MODULE_README}.bak"
 
     # Verify root README was not touched
-    if [ -f "${ROOT_DIR}/README.md" ]; then
-        if grep -q "^# terraform-docs" "${ROOT_DIR}/README.md" 2>/dev/null; then
-            echo "❌ ERROR: Root README appears to have been overwritten!"
-            echo "This should not happen. Please check the terraform-docs configuration."
+    if [ -n "$ROOT_README_BAK" ] && [ -f "$ROOT_README_BAK" ] && [ -f "$ROOT_README" ]; then
+        if ! cmp -s "$ROOT_README_BAK" "$ROOT_README"; then
+            echo "❌ ERROR: Root README was modified during terraform-docs!"
+            echo "Restoring root README..."
+            mv "$ROOT_README_BAK" "$ROOT_README"
             exit 1
         fi
     fi
+    rm -f "$ROOT_README_BAK"
 else
+    popd > /dev/null || true
     echo "❌ Failed to update documentation for ${MODULE_NAME}"
     echo "Restoring backup..."
     mv "${MODULE_README}.bak" "$MODULE_README"
+    if [ -n "$ROOT_README_BAK" ] && [ -f "$ROOT_README_BAK" ] && [ -f "$ROOT_README" ]; then
+        mv "$ROOT_README_BAK" "$ROOT_README"
+    fi
     exit 1
 fi
 
