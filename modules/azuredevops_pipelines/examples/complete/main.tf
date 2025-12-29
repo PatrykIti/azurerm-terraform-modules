@@ -92,7 +92,7 @@ locals {
 module "azuredevops_pipelines" {
   for_each = local.pipelines
 
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_pipelines?ref=ADOPI1.0.0"
 
   project_id = var.project_id
   name       = each.value.name

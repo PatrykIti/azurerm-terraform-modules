@@ -20,7 +20,7 @@ resource "azuredevops_git_repository" "example" {
 }
 
 module "azuredevops_pipelines" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_pipelines?ref=ADOPI1.0.0"
 
   project_id = var.project_id
 
