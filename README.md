@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Azure DevOps Artifacts Feed](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAF*&label=Azure%20DevOps%20Artifacts%20Feed&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOAF)
 [![Azure DevOps Agent Pools](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAP*&label=Azure%20DevOps%20Agent%20Pools&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOAP)
 [![Azure DevOps Project Permissions](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOPP*&label=Azure%20DevOps%20Project%20Permissions&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOPP)
 [![Azure DevOps Project](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOP*&label=Azure%20DevOps%20Project&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOP)
@@ -80,7 +81,7 @@ module "storage_account" {
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
 | [Azure DevOps Agent Pools](./modules/azuredevops_agent_pools/) | ✅ Completed | [ADOAP1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAP1.0.0) | Azure DevOps agent pools module for managing pools, queues, and elastic pools |
-| [Azure DevOps Artifacts Feed](./modules/azuredevops_artifacts_feed/) | 🔧 Development | - | Azure DevOps artifacts feed module for managing feeds, retention, and permissions |
+| [Azure DevOps Artifacts Feed](./modules/azuredevops_artifacts_feed/) | ✅ Completed | [ADOAF1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAF1.0.0) | Azure DevOps artifacts feed module for managing feeds, retention, and permissions |
 | [Azure DevOps Environments](./modules/azuredevops_environments/) | 🔧 Development | - | Azure DevOps environments module for managing environments, resources, and checks |
 | [Azure DevOps Extension](./modules/azuredevops_extension/) | 🔧 Development | - | Azure DevOps extension module for managing Marketplace extensions |
 | [Azure DevOps Identity](./modules/azuredevops_identity/) | 🔧 Development | - | Azure DevOps identity module for managing groups, entitlements, memberships, and role assignments |

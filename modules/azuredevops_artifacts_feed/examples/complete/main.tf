@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_artifacts_feed" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_artifacts_feed?ref=ADOAF1.0.0"
 
   name       = var.feed_name
   project_id = var.project_id
