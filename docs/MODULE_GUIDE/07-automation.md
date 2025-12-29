@@ -10,7 +10,7 @@ A `Makefile` at the root of the module provides a standard interface for common 
 - `test` or `test-all`: Runs the full suite of tests (unit and integration).
 - `test-short`: Runs a quick subset of tests, typically the basic Terratest example and native unit tests.
 - `validate`: Initializes Terraform, validates the configuration (`terraform validate`), and checks formatting (`terraform fmt -check`).
-- `docs`: Generates or updates the `README.md` by running `terraform-docs`.
+- `docs`: Generates or updates the `README.md` by running `./generate-docs.sh`.
 - `security`: Runs security scanning tools like `tfsec` and `checkov`.
 - `check`: A convenience target that runs `validate` and `security`.
 - `clean`: Removes temporary files and test artifacts.
@@ -85,25 +85,25 @@ help:
 
 ## `generate-docs.sh`
 
-This shell script is a simple wrapper around the `terraform-docs` command. It ensures that documentation is generated with the correct configuration and provides a single, consistent command for both local use and CI/CD pipelines.
+This shell script is a wrapper around the repository documentation helpers. It keeps doc generation consistent and avoids accidental root `README.md` overwrites.
 
 **Key Responsibilities:**
 - Verify that `terraform-docs` is installed.
-- (Optional) Run any pre-generation scripts, such as one to dynamically update the examples list in the `.terraform-docs.yml` file.
-- Execute `terraform-docs` with the correct arguments to inject content into the `README.md`.
+- Update the examples list via `scripts/update-examples-list.sh`.
+- Regenerate the module `README.md` via `scripts/update-module-docs.sh`.
 
 **Template (`generate-docs.sh`):**
 ```bash
 #!/bin/bash
 
-# This script generates README.md using terraform-docs for the current module.
+# This script generates README.md using the repository wrapper.
 
 set -e
 
-# Get the directory of the script to find the module root
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+MODULE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+MODULE_NAME="$(basename "$MODULE_DIR")"
 
-echo "Generating documentation for the module in $SCRIPT_DIR..."
+echo "Generating documentation for ${MODULE_NAME} module..."
 
 # Check if terraform-docs is installed
 if ! command -v terraform-docs &> /dev/null; then
@@ -112,15 +112,19 @@ if ! command -v terraform-docs &> /dev/null; then
     exit 1
 fi
 
-# (Optional) Logic to update .terraform-docs.yml with the current list of examples
-# if [[ -x "../../scripts/update-examples-list.sh" ]]; then
-#     echo "Updating examples list in .terraform-docs.yml..."
-#     "../../scripts/update-examples-list.sh" "$SCRIPT_DIR"
-# fi
+# Update examples list if the helper exists
+if [ -x "$MODULE_DIR/../../scripts/update-examples-list.sh" ]; then
+    echo "Updating examples list..."
+    "$MODULE_DIR/../../scripts/update-examples-list.sh" "$MODULE_DIR"
+fi
 
-# Generate documentation
-echo "Running terraform-docs..."
-terraform-docs markdown table --output-file README.md --output-mode inject "$SCRIPT_DIR"
+# Regenerate module README using the safe wrapper
+if [ -x "$MODULE_DIR/../../scripts/update-module-docs.sh" ]; then
+    "$MODULE_DIR/../../scripts/update-module-docs.sh" "$MODULE_NAME"
+else
+    echo "Error: update-module-docs.sh not found or not executable."
+    exit 1
+fi
 
 echo "✅ Documentation generated successfully!"
 ```

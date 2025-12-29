@@ -33,7 +33,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_project" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_project?ref=ADOPv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_project?ref=ADOP1.0.0"
 
   name               = "existing-project-name"
   description        = "Existing project managed by Terraform"
