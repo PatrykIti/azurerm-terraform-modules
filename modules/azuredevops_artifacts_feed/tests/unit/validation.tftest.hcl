@@ -10,20 +10,6 @@ mock_provider "azuredevops" {
   }
 }
 
-run "invalid_feed_description" {
-  command = plan
-
-  variables {
-    name        = "example-feed"
-    project_id  = "00000000-0000-0000-0000-000000000000"
-    description = "  "
-  }
-
-  expect_failures = [
-    var.description,
-  ]
-}
-
 run "invalid_feed_name_without_project_id" {
   command = plan
 

@@ -18,7 +18,7 @@ func TestAzuredevopsPipelinesFullIntegration(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		destroyAllowMissingPipeline(t, getTerraformOptions(t, testFolder))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {

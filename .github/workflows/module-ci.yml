@@ -244,6 +244,9 @@ jobs:
           ado-org-service-url: ${{ secrets.AZDO_ORG_SERVICE_URL }}
           ado-personal-access-token: ${{ secrets.AZDO_PERSONAL_ACCESS_TOKEN }}
           ado-project-id: ${{ secrets.AZDO_PROJECT_ID }}
+          ado-extension-publisher-id: ${{ secrets.AZDO_EXTENSION_PUBLISHER_ID || vars.AZDO_EXTENSION_PUBLISHER_ID }}
+          ado-extension-id: ${{ secrets.AZDO_EXTENSION_ID || vars.AZDO_EXTENSION_ID }}
+          ado-extension-version: ${{ secrets.AZDO_EXTENSION_VERSION || vars.AZDO_EXTENSION_VERSION }}
 
   security-scan:
     needs: detect-changes

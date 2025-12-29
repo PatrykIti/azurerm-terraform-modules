@@ -13,12 +13,11 @@ import (
 
 // Test basic azuredevops_pipelines creation
 func TestBasicAzuredevopsPipelines(t *testing.T) {
-	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		destroyAllowMissingPipeline(t, getTerraformOptions(t, testFolder))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -38,12 +37,11 @@ func TestBasicAzuredevopsPipelines(t *testing.T) {
 
 // Test complete azuredevops_pipelines configuration
 func TestCompleteAzuredevopsPipelines(t *testing.T) {
-	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		destroyAllowMissingPipeline(t, getTerraformOptions(t, testFolder))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -65,12 +63,11 @@ func TestCompleteAzuredevopsPipelines(t *testing.T) {
 
 // Test secure azuredevops_pipelines configuration
 func TestSecureAzuredevopsPipelines(t *testing.T) {
-	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		destroyAllowMissingPipeline(t, getTerraformOptions(t, testFolder))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -90,7 +87,6 @@ func TestSecureAzuredevopsPipelines(t *testing.T) {
 
 // Negative test cases for validation rules
 func TestAzuredevopsPipelinesValidationRules(t *testing.T) {
-	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/negative")

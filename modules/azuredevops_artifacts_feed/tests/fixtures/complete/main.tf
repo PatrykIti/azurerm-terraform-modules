@@ -19,9 +19,8 @@ data "azuredevops_group" "readers" {
 module "azuredevops_artifacts_feed" {
   source = "../../../"
 
-  name        = "${var.feed_name_prefix}-complete"
-  project_id  = var.project_id
-  description = "Complete artifacts feed fixture"
+  name       = "${var.feed_name_prefix}-complete"
+  project_id = var.project_id
   features = {
     permanent_delete = false
     restore          = false

@@ -2,7 +2,11 @@ package test
 
 import (
 	"os"
+	"strings"
 	"testing"
+
+	"github.com/gruntwork-io/terratest/modules/terraform"
+	"github.com/stretchr/testify/require"
 )
 
 func requireADOEnv(t testing.TB) {
@@ -21,4 +25,22 @@ func getProjectID(t testing.TB) string {
 	t.Helper()
 
 	return os.Getenv("AZDO_PROJECT_ID")
+}
+
+func destroyAllowMissingPipeline(t testing.TB, options *terraform.Options) {
+	t.Helper()
+
+	err := terraform.DestroyE(t, options)
+	if err == nil {
+		return
+	}
+
+	message := err.Error()
+	if strings.Contains(message, "deleting authorized resource: Pipelines with ID(s)") &&
+		strings.Contains(message, "could not be found") {
+		t.Logf("Ignoring missing pipeline during destroy: %v", err)
+		return
+	}
+
+	require.NoError(t, err)
 }
