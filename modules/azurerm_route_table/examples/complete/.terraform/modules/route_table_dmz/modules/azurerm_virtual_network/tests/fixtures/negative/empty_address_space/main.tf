@@ -24,7 +24,7 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.3"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.4"
 
   # Invalid: empty address space
   name                = "vnet-empty-address"

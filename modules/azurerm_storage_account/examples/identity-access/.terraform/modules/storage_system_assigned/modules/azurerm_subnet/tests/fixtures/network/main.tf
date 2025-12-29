@@ -46,7 +46,7 @@ resource "azurerm_network_security_group" "test" {
 
 # Test with service endpoints
 module "subnet" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.3"
 
   name                 = "subnet-network-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.test.name

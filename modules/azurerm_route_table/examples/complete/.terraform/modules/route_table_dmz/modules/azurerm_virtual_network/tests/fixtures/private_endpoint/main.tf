@@ -45,7 +45,7 @@ resource "azurerm_private_dns_zone" "blob" {
 
 # Virtual Network optimized for private endpoint scenarios
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.3"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.4"
 
   name                = "vnet-dpc-pep-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
@@ -92,7 +92,7 @@ resource "azurerm_subnet" "workloads" {
 
 # Use the Storage Account module to demonstrate private endpoint connectivity
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.3"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.4"
 
   name                     = "dpcpep${random_string.suffix.result}${var.random_suffix}"
   resource_group_name      = azurerm_resource_group.test.name

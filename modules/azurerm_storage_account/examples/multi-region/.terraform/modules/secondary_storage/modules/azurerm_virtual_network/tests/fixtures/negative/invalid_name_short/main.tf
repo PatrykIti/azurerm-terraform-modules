@@ -24,7 +24,7 @@ resource "azurerm_resource_group" "test" {
 }
 
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.3"
 
   # Invalid: name too short (less than 2 characters)
   name                = "v"

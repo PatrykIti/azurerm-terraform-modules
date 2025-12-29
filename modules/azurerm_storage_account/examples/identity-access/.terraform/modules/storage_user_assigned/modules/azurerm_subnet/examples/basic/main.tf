@@ -37,7 +37,7 @@ resource "azurerm_virtual_network" "example" {
 
 # Basic Subnet configuration
 module "subnet" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.3"
 
   name                 = var.subnet_name
   resource_group_name  = azurerm_resource_group.example.name

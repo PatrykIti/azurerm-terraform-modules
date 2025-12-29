@@ -81,7 +81,7 @@ locals {
 
 # Storage Account with Advanced Policies
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.3"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.4"
 
   # Basic configuration
   name                     = "stadvancedpoliciesex"

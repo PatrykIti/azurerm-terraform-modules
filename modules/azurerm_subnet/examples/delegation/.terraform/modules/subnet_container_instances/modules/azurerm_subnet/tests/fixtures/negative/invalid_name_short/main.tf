@@ -1,5 +1,5 @@
 module "subnet" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.3"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.4"
 
   name                 = "" # Too short - should fail validation
   resource_group_name  = "test-rg"

@@ -42,7 +42,7 @@ resource "azurerm_storage_account" "example" {
 
 # Subnet optimized for private endpoints
 module "subnet" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.3"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.4"
 
   name                 = "subnet-pe-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.example.name

@@ -51,7 +51,7 @@ resource "azurerm_private_dns_zone" "blob" {
 
 # Virtual Network optimized for private endpoint scenarios
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.3"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.4"
 
   name                = "vnet-private-endpoint-example"
   resource_group_name = azurerm_resource_group.example.name
