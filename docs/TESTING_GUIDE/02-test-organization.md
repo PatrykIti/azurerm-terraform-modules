@@ -143,7 +143,7 @@ func TestBasicKubernetesCluster(t *testing.T) {
     t.Parallel()
 
     // 1. Setup: Copy the fixture to a temp folder
-    testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_cluster/tests/fixtures/basic")
+    testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 
     // 2. Defer Cleanup: Ensure destroy is always called
     defer test_structure.RunTestStage(t, "cleanup", func() {

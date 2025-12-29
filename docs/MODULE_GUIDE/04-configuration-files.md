@@ -35,6 +35,7 @@ This file configures the `semantic-release` process for the module. The template
 - **Custom Tagging**: Uses the `tag_prefix` from `module.json`.
 - **Automated Updates**: Runs scripts to update the module version, examples, and `README.md` files upon release.
 - **Conventional Commits**: Enforces conventional commit standards for automated changelog generation and version bumping.
+- **Shell Compatibility**: `@semantic-release/exec` runs under `/bin/sh`, so `prepareCmd` must use POSIX syntax (`[ ... ]`).
 
 **Template (`.releaserc.js`):**
 ```javascript

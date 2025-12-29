@@ -5,6 +5,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { getRepoInfo } = require(path.join(__dirname, '..', '..', 'scripts', 'repo-info'));
 
 // Auto-detect module directory
 const moduleDir = __dirname;
@@ -32,13 +33,15 @@ const COMMIT_SCOPE = moduleConfig.commit_scope;
 const TAG_PREFIX = moduleConfig.tag_prefix;
 const MODULE_TITLE = moduleConfig.title;
 
+const { owner: REPO_OWNER, repo: REPO_NAME } = getRepoInfo();
+
 // Validate that directory name matches module name
 if (moduleName !== MODULE_NAME) {
   console.warn(`Warning: Directory name '${moduleName}' doesn't match module name '${MODULE_NAME}' in module.json`);
 }
 
-const SOURCE_URL = `github.com/PatrykIti/azurerm-terraform-modules//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}`;
-const DOC_URL = `https://github.com/PatrykIti/azurerm-terraform-modules/tree/${TAG_PREFIX}\${nextRelease.version}/modules/${MODULE_NAME}`;
+const SOURCE_URL = `github.com/${REPO_OWNER}/${REPO_NAME}//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}`;
+const DOC_URL = `https://github.com/${REPO_OWNER}/${REPO_NAME}/tree/${TAG_PREFIX}\${nextRelease.version}/modules/${MODULE_NAME}`;
 
 console.log(`📦 Semantic Release Configuration for ${MODULE_TITLE}`);
 console.log(`   Module: ${MODULE_NAME}`);
@@ -150,7 +153,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
           fi
 
           if [ -x "./scripts/update-root-readme.sh" ]; then
-            ./scripts/update-root-readme.sh "${MODULE_NAME}" "${MODULE_TITLE}" "${TAG_PREFIX}" "\${nextRelease.version}" "PatrykIti" "azurerm-terraform-modules"
+            ./scripts/update-root-readme.sh "${MODULE_NAME}" "${MODULE_TITLE}" "${TAG_PREFIX}" "\${nextRelease.version}" "${REPO_OWNER}" "${REPO_NAME}"
           fi
         `.trim()
       }

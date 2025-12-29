@@ -24,8 +24,8 @@ func TestVirtualNetworkBasic(t *testing.T) {
 	t.Parallel()
 
 	// Copy fixture to temp folder
-	fixtureFolder := "azurerm_virtual_network/tests/fixtures/basic"
-	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
+	fixtureFolder := "tests/fixtures/basic"
+	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "..", fixtureFolder)
 
 	// Generate random suffix
 	randomSuffix := generateRandomSuffix()
@@ -62,8 +62,8 @@ func TestVirtualNetworkBasic(t *testing.T) {
 func TestVirtualNetworkComplete(t *testing.T) {
 	t.Parallel()
 
-	fixtureFolder := "azurerm_virtual_network/tests/fixtures/complete"
-	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
+	fixtureFolder := "tests/fixtures/complete"
+	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "..", fixtureFolder)
 
 	randomSuffix := generateRandomSuffix()
 
@@ -95,8 +95,8 @@ func TestVirtualNetworkComplete(t *testing.T) {
 func TestVirtualNetworkSecure(t *testing.T) {
 	t.Parallel()
 
-	fixtureFolder := "azurerm_virtual_network/tests/fixtures/secure"
-	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
+	fixtureFolder := "tests/fixtures/secure"
+	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "..", fixtureFolder)
 
 	randomSuffix := generateRandomSuffix()
 
@@ -128,8 +128,8 @@ func TestVirtualNetworkSecure(t *testing.T) {
 func TestVirtualNetworkNetwork(t *testing.T) {
 	t.Parallel()
 
-	fixtureFolder := "azurerm_virtual_network/tests/fixtures/network"
-	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
+	fixtureFolder := "tests/fixtures/network"
+	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "..", fixtureFolder)
 
 	randomSuffix := generateRandomSuffix()
 
@@ -161,8 +161,8 @@ func TestVirtualNetworkNetwork(t *testing.T) {
 func TestVirtualNetworkPrivateEndpointBasic(t *testing.T) {
 	t.Parallel()
 
-	fixtureFolder := "azurerm_virtual_network/tests/fixtures/private_endpoint"
-	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fixtureFolder)
+	fixtureFolder := "tests/fixtures/private_endpoint"
+	tempFolder := test_structure.CopyTerraformFolderToTemp(t, "..", fixtureFolder)
 
 	randomSuffix := generateRandomSuffix()
 

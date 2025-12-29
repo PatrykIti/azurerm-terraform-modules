@@ -21,6 +21,7 @@ Before submitting a pull request for a new module, please review this checklist 
 ## Documentation
 
 - [ ] `README.md` is generated and includes all required sections.
+- [ ] `docs/README.md` is present and linked from the module `README.md`.
 - [ ] `docs/IMPORT.md` is present and aligned with the basic example.
 - [ ] `CONTRIBUTING.md` is present and tailored to the module.
 - [ ] `SECURITY.md` is present and details the module's security features.
@@ -61,3 +62,4 @@ Before submitting a pull request for a new module, please review this checklist 
 ## CI/CD Integration
 
 - [ ] `module.json` and `.releaserc.js` are configured for release automation.
+- [ ] `commit_scope` is added to `scopes` in `.github/workflows/pr-validation.yml`.

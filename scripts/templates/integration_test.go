@@ -21,7 +21,7 @@ func TestMODULE_PASCAL_PLACEHOLDERFullIntegration(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -165,7 +165,7 @@ func TestMODULE_PASCAL_PLACEHOLDERWithNetworkRules(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/network")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/network")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -211,7 +211,7 @@ func TestMODULE_PASCAL_PLACEHOLDERPrivateEndpointIntegration(t *testing.T) {
 		t.Skip("Private endpoint fixture not found; skipping test")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/private_endpoint")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/private_endpoint")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -252,7 +252,7 @@ func TestMODULE_PASCAL_PLACEHOLDERSecurityConfiguration(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -294,7 +294,7 @@ func TestMODULE_PASCAL_PLACEHOLDERLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
 	defer terraform.Destroy(t, terraformOptions)
@@ -330,7 +330,7 @@ func TestMODULE_PASCAL_PLACEHOLDERLifecycle(t *testing.T) {
 func TestMODULE_PASCAL_PLACEHOLDERCompliance(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
 	defer terraform.Destroy(t, terraformOptions)

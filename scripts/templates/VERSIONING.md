@@ -109,7 +109,7 @@ module "MODULE_TYPE_PLACEHOLDER" {
 
 # After release (automatically updated)
 module "MODULE_TYPE_PLACEHOLDER" {
-  source = "github.com/org/repo//modules/MODULE_NAME_PLACEHOLDER?ref=PREFIX_PLACEHOLDERv1.2.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/MODULE_NAME_PLACEHOLDER?ref=PREFIX_PLACEHOLDERv1.2.0"
 }
 ```
 

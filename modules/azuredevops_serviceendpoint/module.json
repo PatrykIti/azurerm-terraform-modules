@@ -1,0 +1,7 @@
+{
+  "name": "azuredevops_serviceendpoint",
+  "title": "Azure DevOps Service Endpoints",
+  "commit_scope": "azuredevops-serviceendpoint",
+  "tag_prefix": "ADOSE",
+  "description": "Azure DevOps service endpoints module for managing a single service connection and permissions"
+}

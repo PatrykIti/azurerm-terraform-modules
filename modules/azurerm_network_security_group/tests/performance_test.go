@@ -19,7 +19,7 @@ func BenchmarkNetworkSecurityGroupCreation(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_network_security_group/tests/fixtures/simple")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/simple")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 		b.StartTimer()
@@ -38,7 +38,7 @@ func TestNetworkSecurityGroupCreationTime(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/simple")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)

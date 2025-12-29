@@ -19,7 +19,7 @@ func TestBasicMODULE_PASCAL_PLACEHOLDER(t *testing.T) {
 	t.Parallel()
 
 	// Create a folder for this test
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -53,7 +53,7 @@ func TestBasicMODULE_PASCAL_PLACEHOLDER(t *testing.T) {
 func TestCompleteMODULE_PASCAL_PLACEHOLDER(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -84,7 +84,7 @@ func TestCompleteMODULE_PASCAL_PLACEHOLDER(t *testing.T) {
 func TestSecureMODULE_PASCAL_PLACEHOLDER(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -114,7 +114,7 @@ func TestSecureMODULE_PASCAL_PLACEHOLDER(t *testing.T) {
 func TestNetworkMODULE_PASCAL_PLACEHOLDER(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/network")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/network")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -146,7 +146,7 @@ func TestMODULE_PASCAL_PLACEHOLDERPrivateEndpoint(t *testing.T) {
 		t.Skip("Private endpoint fixture not found; skipping test")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/private_endpoint")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/private_endpoint")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -194,7 +194,7 @@ func TestMODULE_PASCAL_PLACEHOLDERValidationRules(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fmt.Sprintf("MODULE_NAME_PLACEHOLDER/tests/fixtures/%s", tc.fixtureFile))
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", fmt.Sprintf("fixtures/%s", tc.fixtureFile))
 			
 			// Use minimal terraform options for negative tests (no variables)
 			terraformOptions := &terraform.Options{
@@ -219,7 +219,7 @@ func BenchmarkMODULE_PASCAL_PLACEHOLDERCreation(b *testing.B) {
 		b.Skip("Skipping benchmark in short mode")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
 	terraformOptions := getTerraformOptions(b, testFolder)
 
 	// Cleanup after benchmark

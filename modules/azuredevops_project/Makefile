@@ -1,16 +1,18 @@
 .PHONY: test test-short test-integration test-all docs clean validate
+MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+TESTS_DIR := $(abspath $(MAKEFILE_DIR)/tests)
 
 # Run only short tests (basic functionality)
 test-short:
-	cd tests && go test -v -short -parallel 8 -timeout 30m
+	cd "$(TESTS_DIR)" && go test -v -short -parallel 8 -timeout 30m
 
 # Run only integration tests
 test-integration:
-	cd tests && go test -v -run "Integration|Lifecycle|Disaster|Compliance|Monitoring" -parallel 4 -timeout 60m
+	cd "$(TESTS_DIR)" && go test -v -run "Integration|Lifecycle|Disaster|Compliance|Monitoring" -parallel 4 -timeout 60m
 
 # Run all tests
 test-all:
-	cd tests && go test -v -parallel 8 -timeout 60m
+	cd "$(TESTS_DIR)" && go test -v -parallel 8 -timeout 60m
 
 # Default test target
 test: test-short
@@ -18,8 +20,7 @@ test: test-short
 # Generate documentation
 docs:
 	@echo "Generating documentation..."
-	terraform-docs markdown table --output-file README.md --output-mode inject .
-	@echo "Documentation updated in README.md"
+	./generate-docs.sh
 
 # Clean up test artifacts
 clean:

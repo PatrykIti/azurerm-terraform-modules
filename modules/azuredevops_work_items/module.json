@@ -1,0 +1,7 @@
+{
+  "name": "azuredevops_work_items",
+  "title": "Azure DevOps Work Items",
+  "commit_scope": "azuredevops-work-items",
+  "tag_prefix": "ADOWK",
+  "description": "Azure DevOps work items module for managing work items, processes, queries, and permissions"
+}

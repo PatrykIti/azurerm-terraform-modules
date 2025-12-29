@@ -22,7 +22,7 @@ func TestSubnetFullIntegration(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -126,7 +126,7 @@ func TestSubnetWithNetworkRules(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/network")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/network")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -166,7 +166,7 @@ func TestSubnetPrivateEndpointIntegration(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/private_endpoint")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/private_endpoint")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -206,7 +206,7 @@ func TestSubnetSecurityConfiguration(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -272,7 +272,7 @@ func TestSubnetValidationIntegration(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fmt.Sprintf("azurerm_subnet/tests/fixtures/%s", tc.fixturePath))
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", fmt.Sprintf("tests/fixtures/%s", tc.fixturePath))
 			
 			terraformOptions := &terraform.Options{
 				TerraformDir: testFolder,
@@ -299,7 +299,7 @@ func TestSubnetLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	
 	// Initial deployment
 	test_structure.RunTestStage(t, "deploy_initial", func() {
@@ -337,7 +337,7 @@ func TestSubnetCompliance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_subnet/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	
 	// Deploy infrastructure
 	defer terraform.Destroy(t, getTerraformOptions(t, testFolder))
@@ -367,7 +367,7 @@ func BenchmarkSubnetIntegrationCreation(b *testing.B) {
 		b.Skip("Skipping benchmark in short mode")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_subnet/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(b, testFolder)
 
 	// Cleanup after benchmark

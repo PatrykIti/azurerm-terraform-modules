@@ -5,7 +5,7 @@ Task board for module work. Update statuses in markdown files.
 ## Statistics
 - **To Do:** 11 tasks
 - **In Progress:** 0
-- **Done:** 25 tasks
+- **Done:** 28 tasks
 
 ---
 
@@ -37,6 +37,8 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-010](./TASK-010_Workflow_and_Module_Docs_Alignment.md) | **Workflow and module documentation alignment** | Medium | Medium | `docs/WORKFLOWS.md`, `docs/MODULE_GUIDE/*`, ADO docs |
+| [TASK-011](./TASK-011_Terratest_Fixture_Path_Portability.md) | **Terratest fixture path portability** | Medium | Medium | Remove hardcoded `tests/fixtures` paths |
 | [TASK-009](./TASK-009_Workflow_and_Scripts_Audit.md) | **Workflow + scripts audit (docs/examples/source updates)** | High | Medium | CI/CD + release automations |
 | [TASK-001](./TASK-001_AKS_Module_Fixes.md) | **AKS module – walidacje, SP/MI UX, docs i bump wersji** | High | Medium | `modules/azurerm_kubernetes_cluster/` |
 | [TASK-003](./TASK-003_Module_Scaffold_Fix.md) | **Generator scaffoldu – naprawa i zgodnosc z AKS** | High | Medium | `scripts/create-new-module.sh` + `scripts/templates/` |
@@ -59,6 +61,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-015](./TASK-ADO-015_AzureDevOps_Agent_Pools_Module_Refactor.md) | **Azure DevOps Agent Pools module refactor** | High | Medium | `modules/azuredevops_agent_pools/` |
 | [TASK-ADO-016](./TASK-ADO-016_AzureDevOps_Project_Permissions_Verification.md) | **Azure DevOps Project Permissions module – verification & alignment** | Medium | Small | `modules/azuredevops_project_permissions/` |
 | [TASK-ADO-018](./TASK-ADO-018_AzureDevOps_Identity_Module_Refactor.md) | **Azure DevOps Identity module refactor** | High | Medium | Re-opened; `modules/azuredevops_identity/` |
+| [TASK-ADO-028](./TASK-ADO-028_AzureDevOps_Contributing_Docs_Alignment.md) | **Azure DevOps CONTRIBUTING docs alignment** | Medium | Small | `modules/azuredevops_*/CONTRIBUTING.md`, `scripts/templates/CONTRIBUTING.md` |
 | [TASK-006](./TASK-006_NSG_Observability_and_Documentation.md) | **NSG observability + docs alignment (diagnostic settings)** | High | Large | `modules/azurerm_network_security_group/` + repo docs |
 | [TASK-007](./TASK-007_Route_Table_Module_Alignment.md) | **Route Table module – alignment z guide (docs, examples, tests)** | High | Medium | `modules/azurerm_route_table/` |
 | [TASK-008](./TASK-008_Storage_Account_Module_Alignment.md) | **Storage Account module – alignment z guide (docs, examples, tests)** | High | Large | `modules/azurerm_storage_account/` |

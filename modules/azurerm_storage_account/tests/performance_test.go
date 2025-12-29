@@ -16,7 +16,7 @@ func BenchmarkStorageAccountCreationSimple(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_storage_account/tests/fixtures/simple")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/simple")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		// Override the random_suffix for benchmarking
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -44,7 +44,7 @@ func BenchmarkStorageAccountCreationWithContainers(b *testing.B) {
 		b.Run(fmt.Sprintf("Containers_%d", count), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_storage_account/tests/fixtures/simple")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/simple")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
 				// Generate containers configuration
@@ -85,7 +85,7 @@ func BenchmarkStorageAccountCreationWithNetworkRules(b *testing.B) {
 		b.Run(fmt.Sprintf("IPRules_%d", count), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_storage_account/tests/fixtures/simple")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/simple")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
 				// Generate IP rules
@@ -129,7 +129,7 @@ func BenchmarkStorageAccountParallelCreation(b *testing.B) {
 			b.RunParallel(func(pb *testing.PB) {
 				i := 0
 				for pb.Next() {
-					testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_storage_account/tests/fixtures/simple")
+					testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/simple")
 					terraformOptions := getTerraformOptions(b, testFolder)
 					// Override the random_suffix for parallel testing
 					terraformOptions.Vars["random_suffix"] = fmt.Sprintf("par%d%d%s", parallel, i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -155,7 +155,7 @@ func TestStorageAccountCreationTime(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/simple")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -183,7 +183,7 @@ func TestStorageAccountScaling(t *testing.T) {
 
 	// Create multiple storage accounts sequentially
 	for i := 0; i < accountCount; i++ {
-		testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/simple")
+		testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/simple")
 		terraformOptions := getTerraformOptions(t, testFolder)
 		// Override the random_suffix for each iteration
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("scale%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])

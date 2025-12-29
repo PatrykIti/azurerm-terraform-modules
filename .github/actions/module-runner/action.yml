@@ -27,6 +27,15 @@ inputs:
   ado-project-id:
     description: 'Azure DevOps project ID (optional for some modules)'
     required: false
+  ado-extension-publisher-id:
+    description: 'Azure DevOps extension publisher ID'
+    required: false
+  ado-extension-id:
+    description: 'Azure DevOps extension ID'
+    required: false
+  ado-extension-version:
+    description: 'Azure DevOps extension version (optional)'
+    required: false
 
 outputs:
   tfsec-sarif:
@@ -69,6 +78,9 @@ runs:
         AZDO_ORG_SERVICE_URL: ${{ inputs.ado-org-service-url }}
         AZDO_PERSONAL_ACCESS_TOKEN: ${{ inputs.ado-personal-access-token }}
         AZDO_PROJECT_ID: ${{ inputs.ado-project-id }}
+        AZDO_EXTENSION_PUBLISHER_ID: ${{ inputs.ado-extension-publisher-id }}
+        AZDO_EXTENSION_ID: ${{ inputs.ado-extension-id }}
+        AZDO_EXTENSION_VERSION: ${{ inputs.ado-extension-version }}
       run: |
         .github/actions/module-runner/run-module-action.sh "${{ inputs.module }}" "${{ inputs.action }}" "${{ inputs.terraform-version }}"
     

@@ -80,4 +80,4 @@ The `examples/secure` configuration is the reference hardened setup for this mod
 
 **Module Version**: 1.0.0  
 **Last Updated**: 2025-12-23  
-**Security Contact**: security@yourorganization.com
+**Security Contact**: patryk.ciechanski@patrykiti.pl
