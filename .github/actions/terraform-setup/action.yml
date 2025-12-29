@@ -64,8 +64,10 @@ runs:
           fi
         done
 
-        tar -xzf terraform-docs.tar.gz
-        chmod +x terraform-docs
-        sudo mv terraform-docs /usr/local/bin/
+        tmp_dir="$(mktemp -d)"
+        trap 'rm -rf -- "$tmp_dir"' EXIT
+        tar -xzf terraform-docs.tar.gz -C "$tmp_dir"
+        chmod +x "$tmp_dir/terraform-docs"
+        sudo mv "$tmp_dir/terraform-docs" /usr/local/bin/
         rm -f terraform-docs.tar.gz
         terraform-docs --version
