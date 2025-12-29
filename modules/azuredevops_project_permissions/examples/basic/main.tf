@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_project_permissions" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_project_permissions?ref=ADOPP1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_project_permissions?ref=ADOPP1.1.0"
 
   project_id = var.project_id
 
