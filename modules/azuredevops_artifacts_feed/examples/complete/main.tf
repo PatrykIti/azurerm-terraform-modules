@@ -15,7 +15,6 @@ module "azuredevops_artifacts_feed" {
 
   name        = var.feed_name
   project_id  = var.project_id
-  description = "Complete artifacts feed example"
   features = {
     permanent_delete = false
     restore          = false
