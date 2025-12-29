@@ -84,7 +84,7 @@ module "storage_account" {
 | [Azure DevOps Extension](./modules/azuredevops_extension/) | 🔧 Development | - | Azure DevOps extension module for managing Marketplace extensions |
 | [Azure DevOps Identity](./modules/azuredevops_identity/) | 🔧 Development | - | Azure DevOps identity module for managing groups, entitlements, memberships, and role assignments |
 | [Azure DevOps Pipelines](./modules/azuredevops_pipelines/) | 🔧 Development | - | Azure DevOps pipelines module for managing build definitions, folders, permissions, and authorizations |
-| [Azure DevOps Project](./modules/azuredevops_project/) | ✅ Completed | [ADOP1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOP1.0.0) | Azure DevOps project module for managing project settings, tags, and dashboards |
+| [Azure DevOps Project](./modules/azuredevops_project/) | ✅ Completed | [ADOP1.1.1](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOP1.1.1) | Azure DevOps project module for managing project settings, tags, and dashboards |
 | [Azure DevOps Project Permissions](./modules/azuredevops_project_permissions/) | ✅ Completed | [ADOPP1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPP1.0.0) | Azure DevOps project permissions module for assigning group permissions |
 | [Azure DevOps Repository](./modules/azuredevops_repository/) | 🔧 Development | - | Azure DevOps repository module for managing Git repositories and policies |
 | [Azure DevOps Service Endpoints](./modules/azuredevops_serviceendpoint/) | 🔧 Development | - | Azure DevOps service endpoints module for managing service connections and permissions |
