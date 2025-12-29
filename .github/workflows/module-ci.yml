@@ -155,22 +155,20 @@ jobs:
             PATH_MODULES='${{ steps.filter.outputs.changes }}'
             echo "Modules from path changes: $PATH_MODULES"
             
-            # Merge both lists
-            if [[ "$PR_MODULES" != "[]" && "$PATH_MODULES" != "[]" ]]; then
-              # Both have modules - merge them
-              ALL_MODULES=$(echo "$PR_MODULES $PATH_MODULES" | jq -s -c 'add | unique')
-              echo "Merged modules (unique): $ALL_MODULES"
-              MODULES="$ALL_MODULES"
-            elif [[ "$PR_MODULES" != "[]" ]]; then
-              # Only PR title has modules
+            # Prefer PR title scopes to avoid running unrelated modules
+            if [[ "$PR_MODULES" != "[]" ]]; then
               MODULES="$PR_MODULES"
               echo "Using modules from PR title only"
+              if [[ "$PATH_MODULES" != "[]" ]]; then
+                EXTRA_MODULES=$(jq -n --argjson pr "$PR_MODULES" --argjson path "$PATH_MODULES" '$path - $pr')
+                if [[ "$EXTRA_MODULES" != "[]" ]]; then
+                  echo "⚠️  Path changes include additional modules not in PR title: $EXTRA_MODULES"
+                fi
+              fi
             elif [[ "$PATH_MODULES" != "[]" ]]; then
-              # Only path changes have modules
               MODULES="$PATH_MODULES"
               echo "Using modules from path changes only"
             else
-              # No modules detected
               MODULES="[]"
               echo "No modules detected from PR title or path changes"
             fi
