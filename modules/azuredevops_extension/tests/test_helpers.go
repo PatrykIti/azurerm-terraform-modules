@@ -69,7 +69,7 @@ type importTarget struct {
 func applyWithImportIfInstalled(t testing.TB, options *terraform.Options, targets []importTarget) (bool, error) {
 	t.Helper()
 
-	if err := terraform.InitAndApplyE(t, options); err != nil {
+	if _, err := terraform.InitAndApplyE(t, options); err != nil {
 		if !isAlreadyInstalledError(err) {
 			return false, err
 		}
@@ -81,7 +81,9 @@ func applyWithImportIfInstalled(t testing.TB, options *terraform.Options, target
 		t.Logf("Extension already installed; importing existing resource(s) into state")
 		terraform.Init(t, options)
 		for _, target := range targets {
-			terraform.Import(t, options, target.address, target.id)
+			if importErr := importTerraformResourceE(t, options, target); importErr != nil {
+				return false, importErr
+			}
 		}
 
 		return false, nil
@@ -137,4 +139,33 @@ func stringFromVar(t testing.TB, vars map[string]interface{}, key string) string
 	stringValue, ok := value.(string)
 	require.Truef(t, ok, "expected %q to be a string, got %T", key, value)
 	return stringValue
+}
+
+func importTerraformResourceE(t testing.TB, options *terraform.Options, target importTarget) error {
+	t.Helper()
+
+	args := buildImportArgs(options, target.address, target.id)
+	_, err := terraform.RunTerraformCommandE(t, options, args...)
+	return err
+}
+
+func buildImportArgs(options *terraform.Options, address, id string) []string {
+	args := []string{"import", "-input=false"}
+
+	if options.NoColor {
+		args = append(args, "-no-color")
+	}
+
+	args = append(args, terraform.FormatTerraformLockAsArgs(options.Lock, options.LockTimeout)...)
+
+	if options.SetVarsAfterVarFiles {
+		args = append(args, terraform.FormatTerraformArgs("-var-file", options.VarFiles)...)
+		args = append(args, terraform.FormatTerraformVarsAsArgs(options.Vars)...)
+	} else {
+		args = append(args, terraform.FormatTerraformVarsAsArgs(options.Vars)...)
+		args = append(args, terraform.FormatTerraformArgs("-var-file", options.VarFiles)...)
+	}
+
+	args = append(args, address, id)
+	return args
 }
