@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_wiki" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_wiki?ref=ADOWI1.0.0"
 
   project_id = var.project_id
 
