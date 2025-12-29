@@ -17,7 +17,7 @@ func BenchmarkKubernetesClusterCreation(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		b.StartTimer()
 
@@ -35,7 +35,7 @@ func TestKubernetesClusterCreationTime(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)

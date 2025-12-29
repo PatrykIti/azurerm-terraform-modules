@@ -15,7 +15,7 @@ func TestNetworkSecurityGroupLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/simple")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -70,7 +70,7 @@ func TestSecureNetworkSecurityGroup(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/security")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/security")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)

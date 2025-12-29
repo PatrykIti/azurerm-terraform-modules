@@ -16,7 +16,7 @@ func TestAzuredevopsExtensionFullIntegration(t *testing.T) {
 
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	vars := map[string]interface{}{
 		"extensions": getExtensionsFromEnv(),
 	}

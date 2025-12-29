@@ -14,7 +14,7 @@ import (
 func TestBasicKubernetesCluster(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -47,7 +47,7 @@ func TestBasicKubernetesCluster(t *testing.T) {
 func TestCompleteKubernetesCluster(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -82,7 +82,7 @@ func TestCompleteKubernetesCluster(t *testing.T) {
 func TestSecureKubernetesCluster(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -114,7 +114,7 @@ func TestSecureKubernetesCluster(t *testing.T) {
 func TestNetworkKubernetesCluster(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/network")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/network")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -168,7 +168,7 @@ func TestKubernetesClusterValidationRules(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/negative")
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/negative")
 			
 			// Merge the random_suffix with the test case variables
 			vars := getTerraformOptions(t, testFolder).Vars
