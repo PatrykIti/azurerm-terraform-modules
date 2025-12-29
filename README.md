@@ -1,432 +1,149 @@
-# terraform-docs
+# Azure Terraform Modules
 
-[![Build Status](https://github.com/terraform-docs/terraform-docs/workflows/ci/badge.svg)](https://github.com/terraform-docs/terraform-docs/actions) [![GoDoc](https://pkg.go.dev/badge/github.com/terraform-docs/terraform-docs)](https://pkg.go.dev/github.com/terraform-docs/terraform-docs) [![Go Report Card](https://goreportcard.com/badge/github.com/terraform-docs/terraform-docs)](https://goreportcard.com/report/github.com/terraform-docs/terraform-docs) [![Codecov Report](https://codecov.io/gh/terraform-docs/terraform-docs/branch/master/graph/badge.svg)](https://codecov.io/gh/terraform-docs/terraform-docs) [![License](https://img.shields.io/github/license/terraform-docs/terraform-docs)](https://github.com/terraform-docs/terraform-docs/blob/master/LICENSE) [![Latest release](https://img.shields.io/github/v/release/terraform-docs/terraform-docs)](https://github.com/terraform-docs/terraform-docs/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.12.2-623CE4?logo=terraform&logoColor=white)](https://www.terraform.io/)
+[![Azure](https://img.shields.io/badge/Azure-0078D4?logo=microsoft-azure&logoColor=white)](https://azure.microsoft.com/)
+[![AzureRM Provider](https://img.shields.io/badge/AzureRM_Provider-4.57.0-blue?logo=terraform)](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0)
+[![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
-![terraform-docs-teaser](./images/terraform-docs-teaser.png)
+<!-- MODULE BADGES START -->
+[![Azure DevOps Project](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOP*&label=Azure%20DevOps%20Project&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOP)
+[![Azure DevOps Project Permissions](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOPP*&label=Azure%20DevOps%20Project%20Permissions&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOPP)
+[![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=SAv)
+[![Virtual Network](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=VNv*&label=Virtual%20Network&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=VNv)
+<!-- MODULE BADGES END -->
 
-## What is terraform-docs
+A comprehensive collection of production-ready Terraform modules for Azure and Azure DevOps, aligned with HashiCorp best practices and security-first defaults.
 
-A utility to generate documentation from Terraform modules in various output formats.
+## 📚 Quick Navigation
 
-## Installation
+- [**Repository Standards**](./AGENTS.md) - Module layout, naming, and security-first conventions
+- [**Docs Index**](./docs/README.md) - Entry point for all documentation
+- [**Modules Index**](./modules/README.md) - Index of all modules with tag prefixes and descriptions
+- [**Module Creation Guide**](./docs/MODULE_GUIDE/README.md) - End-to-end module scaffolding guide
+- [**Terraform Best Practices**](./docs/TERRAFORM_BEST_PRACTICES_GUIDE.md) - Implementation standards and conventions
+- [**Testing Guide**](./docs/TESTING_GUIDE/README.md) - Testing expectations and patterns
+- [**Workflows Documentation**](./docs/WORKFLOWS.md) - CI/CD pipeline details
+- [**Security Policy**](./docs/SECURITY.md) - Security guidelines and reporting
 
-macOS users can install using [Homebrew]:
+## Repository Structure
 
-```bash
-brew install terraform-docs
+```
+azurerm-terraform-modules/
+├── modules/                             # Terraform modules (azurerm_* and azuredevops_*)
+│   ├── azurerm_<resource>/              # Azure Resource Manager modules
+│   └── azuredevops_<resource>/          # Azure DevOps modules
+├── docs/                                # Global documentation
+│   ├── MODULE_GUIDE/                    # Module creation guide
+│   └── TESTING_GUIDE/                   # Testing reference
+├── scripts/                             # Automation scripts
+├── security-policies/                   # Security policy definitions
+├── examples/                            # Cross-module examples (if any)
+└── .github/                             # GitHub Actions workflows and templates
 ```
 
-or
+## 🚀 Quick Start
 
-```bash
-brew install terraform-docs/tap/terraform-docs
-```
+Each module includes usage documentation and ready-to-run examples:
 
-Windows users can install using [Scoop]:
+1. **Browse modules** in the [`modules/`](./modules/) directory
+2. **Read module documentation** - Each module has its own README and `docs/IMPORT.md` where applicable
+3. **Start with examples** - Every module includes `examples/basic`, `examples/complete`, and `examples/secure`
 
-```bash
-scoop bucket add terraform-docs https://github.com/terraform-docs/scoop-bucket
-scoop install terraform-docs
-```
+Azure DevOps modules use the `azuredevops` provider and typically require a PAT or service connection.
 
-or [Chocolatey]:
-
-```bash
-choco install terraform-docs
-```
-
-Stable binaries are also available on the [releases] page. To install, download the
-binary for your platform from "Assets" and place this into your `$PATH`:
-
-```bash
-curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.20.0/terraform-docs-v0.20.0-$(uname)-amd64.tar.gz
-tar -xzf terraform-docs.tar.gz
-chmod +x terraform-docs
-mv terraform-docs /usr/local/bin/terraform-docs
-```
-
-**NOTE:** Windows releases are in `ZIP` format.
-
-The latest version can be installed using `go install` or `go get`:
-
-```bash
-# go1.17+
-go install github.com/terraform-docs/terraform-docs@v0.20.0
-```
-
-```bash
-# go1.16
-GO111MODULE="on" go get github.com/terraform-docs/terraform-docs@v0.20.0
-```
-
-**NOTE:** please use the latest Go to do this, minimum `go1.16` is required.
-
-This will put `terraform-docs` in `$(go env GOPATH)/bin`. If you encounter the error
-`terraform-docs: command not found` after installation then you may need to either add
-that directory to your `$PATH` as shown [here] or do a manual installation by cloning
-the repo and run `make build` from the repository which will put `terraform-docs` in:
-
-```bash
-$(go env GOPATH)/src/github.com/terraform-docs/terraform-docs/bin/$(uname | tr '[:upper:]' '[:lower:]')-amd64/terraform-docs
-```
-
-## Usage
-
-### Running the binary directly
-
-To run and generate documentation into README within a directory:
-
-```bash
-terraform-docs markdown table --output-file README.md --output-mode inject /path/to/module
-```
-
-Check [`output`] configuration for more details and examples.
-
-### Using docker
-
-terraform-docs can be run as a container by mounting a directory with `.tf`
-files in it and run the following command:
-
-```bash
-docker run --rm --volume "$(pwd):/terraform-docs" -u $(id -u) quay.io/terraform-docs/terraform-docs:0.20.0 markdown /terraform-docs
-```
-
-If `output.file` is not enabled for this module, generated output can be redirected
-back to a file:
-
-```bash
-docker run --rm --volume "$(pwd):/terraform-docs" -u $(id -u) quay.io/terraform-docs/terraform-docs:0.20.0 markdown /terraform-docs > doc.md
-```
-
-**NOTE:** Docker tag `latest` refers to _latest_ stable released version and `edge`
-refers to HEAD of `master` at any given point in time.
-
-### Using GitHub Actions
-
-To use terraform-docs GitHub Action, configure a YAML workflow file (e.g.
-`.github/workflows/documentation.yml`) with the following:
-
-```yaml
-name: Generate terraform docs
-on:
-  - pull_request
-
-jobs:
-  docs:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.pull_request.head.ref }}
-
-    - name: Render terraform docs and push changes back to PR
-      uses: terraform-docs/gh-actions@main
-      with:
-        working-dir: .
-        output-file: README.md
-        output-method: inject
-        git-push: "true"
-```
-
-Read more about [terraform-docs GitHub Action] and its configuration and
-examples.
-
-### pre-commit hook
-
-With pre-commit, you can ensure your Terraform module documentation is kept
-up-to-date each time you make a commit.
-
-First [install pre-commit] and then create or update a `.pre-commit-config.yaml`
-in the root of your Git repo with at least the following content:
-
-```yaml
-repos:
-  - repo: https://github.com/terraform-docs/terraform-docs
-    rev: "v0.20.0"
-    hooks:
-      - id: terraform-docs-go
-        args: ["markdown", "table", "--output-file", "README.md", "./mymodule/path"]
-```
-
-Then run:
-
-```bash
-pre-commit install
-pre-commit install-hooks
-```
-
-Further changes to your module's `.tf` files will cause an update to documentation
-when you make a commit.
-
-## Configuration
-
-terraform-docs can be configured with a yaml file. The default name of this file is
-`.terraform-docs.yml` and the path order for locating it is:
-
-1. root of module directory
-1. `.config/` folder at root of module directory
-1. current directory
-1. `.config/` folder at current directory
-1. `$HOME/.tfdocs.d/`
-
-```yaml
-formatter: "" # this is required
-
-version: ""
-
-header-from: main.tf
-footer-from: ""
-
-recursive:
-  enabled: false
-  path: modules
-  include-main: true
-
-sections:
-  hide: []
-  show: []
-
-content: ""
-
-output:
-  file: ""
-  mode: inject
-  template: |-
-    <!-- BEGIN_TF_DOCS -->
-    {{ .Content }}
-    <!-- END_TF_DOCS -->
-
-output-values:
-  enabled: false
-  from: ""
-
-sort:
-  enabled: true
-  by: name
-
-settings:
-  anchor: true
-  color: true
-  default: true
-  description: false
-  escape: true
-  hide-empty: false
-  html: true
-  indent: 2
-  lockfile: true
-  read-comments: true
-  required: true
-  sensitive: true
-  type: true
-```
-
-## Content Template
-
-Generated content can be customized further away with `content` in configuration.
-If the `content` is empty the default order of sections is used.
-
-Compatible formatters for customized content are `asciidoc` and `markdown`. `content`
-will be ignored for other formatters.
-
-`content` is a Go template with following additional variables:
-
-- `{{ .Header }}`
-- `{{ .Footer }}`
-- `{{ .Inputs }}`
-- `{{ .Modules }}`
-- `{{ .Outputs }}`
-- `{{ .Providers }}`
-- `{{ .Requirements }}`
-- `{{ .Resources }}`
-
-and following functions:
-
-- `{{ include "relative/path/to/file" }}`
-
-These variables are the generated output of individual sections in the selected
-formatter. For example `{{ .Inputs }}` is Markdown Table representation of _inputs_
-when formatter is set to `markdown table`.
-
-Note that sections visibility (i.e. `sections.show` and `sections.hide`) takes
-precedence over the `content`.
-
-Additionally there's also one extra special variable avaialble to the `content`:
-
-- `{{ .Module }}`
-
-As opposed to the other variables mentioned above, which are generated sections
-based on a selected formatter, the `{{ .Module }}` variable is just a `struct`
-representing a [Terraform module].
-
-````yaml
-content: |-
-  Any arbitrary text can be placed anywhere in the content
-
-  {{ .Header }}
-
-  and even in between sections
-
-  {{ .Providers }}
-
-  and they don't even need to be in the default order
-
-  {{ .Outputs }}
-
-  include any relative files
-
-  {{ include "relative/path/to/file" }}
-
-  {{ .Inputs }}
-
-  # Examples
-
-  ```hcl
-  {{ include "examples/foo/main.tf" }}
-  ```
-
-  ## Resources
-
-  {{ range .Module.Resources }}
-  - {{ .GetMode }}.{{ .Spec }} ({{ .Position.Filename }}#{{ .Position.Line }})
-  {{- end }}
-````
-
-## Build on top of terraform-docs
-
-terraform-docs primary use-case is to be utilized as a standalone binary, but
-some parts of it is also available publicly and can be imported in your project
-as a library.
-
-```go
-import (
-    "github.com/terraform-docs/terraform-docs/format"
-    "github.com/terraform-docs/terraform-docs/print"
-    "github.com/terraform-docs/terraform-docs/terraform"
-)
-
-// buildTerraformDocs for module root `path` and provided content `tmpl`.
-func buildTerraformDocs(path string, tmpl string) (string, error) {
-    config := print.DefaultConfig()
-    config.ModuleRoot = path // module root path (can be relative or absolute)
-
-    module, err := terraform.LoadWithOptions(config)
-    if err != nil {
-        return "", err
-    }
-
-    // Generate in Markdown Table format
-    formatter := format.NewMarkdownTable(config)
-
-    if err := formatter.Generate(module); err != nil {
-        return "", err
-    }
-
-    // // Note: if you don't intend to provide additional template for the generated
-    // // content, or the target format doesn't provide templating (e.g. json, yaml,
-    // // xml, or toml) you can use `Content()` function instead of `Render()`.
-    // // `Content()` returns all the sections combined with predefined order.
-    // return formatter.Content(), nil
-
-    return formatter.Render(tmpl)
+Example module reference:
+```hcl
+module "storage_account" {
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
+  # See module README for configuration details
 }
 ```
 
-## Plugin
+## 📦 Available Modules
 
-Generated output can be heavily customized with [`content`], but if using that
-is not enough for your use-case, you can write your own plugin.
+### AzureRM Modules
 
-In order to install a plugin the following steps are needed:
+| Module | Status | Version | Description |
+|--------|--------|---------|-------------|
+| [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.0.4](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.0.4) | Azure Kubernetes Service (AKS) Terraform module for managing clusters with node pools, addons, and enterprise-grade security features |
+| [Kubernetes Secrets](./modules/azurerm_kubernetes_secrets/) | 🔧 Development | - | Azure Kubernetes Secrets Terraform module with enterprise-grade features |
+| [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.3) | Manages Azure Network Security Groups with comprehensive security rules configuration |
+| [Route Table](./modules/azurerm_route_table/) | ✅ Completed | [RTv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.0.3) | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
+| [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv1.2.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv1.2.2) | Azure Storage Account Terraform module with enterprise-grade security features |
+| [Subnet](./modules/azurerm_subnet/) | ✅ Completed | [SNv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SNv1.0.3) | Azure Subnet Terraform module for managing subnets with service endpoints, delegations, network policies, and enterprise-grade security features |
+| [Virtual Network](./modules/azurerm_virtual_network/) | ✅ Completed | [VNv1.1.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/VNv1.1.3) | Azure Virtual Network Terraform module with advanced networking features |
 
-- download the plugin and place it in `~/.tfdocs.d/plugins` (or `./.tfdocs.d/plugins`)
-- make sure the plugin file name is `tfdocs-format-<NAME>`
-- modify [`formatter`] of `.terraform-docs.yml` file to be `<NAME>`
+### Azure DevOps Modules
 
-**Important notes:**
+| Module | Status | Version | Description |
+|--------|--------|---------|-------------|
+| [Azure DevOps Agent Pools](./modules/azuredevops_agent_pools/) | 🔧 Development | - | Azure DevOps agent pools module for managing pools, queues, and elastic pools |
+| [Azure DevOps Artifacts Feed](./modules/azuredevops_artifacts_feed/) | 🔧 Development | - | Azure DevOps artifacts feed module for managing feeds, retention, and permissions |
+| [Azure DevOps Environments](./modules/azuredevops_environments/) | 🔧 Development | - | Azure DevOps environments module for managing environments, resources, and checks |
+| [Azure DevOps Extension](./modules/azuredevops_extension/) | 🔧 Development | - | Azure DevOps extension module for managing Marketplace extensions |
+| [Azure DevOps Identity](./modules/azuredevops_identity/) | 🔧 Development | - | Azure DevOps identity module for managing groups, entitlements, memberships, and role assignments |
+| [Azure DevOps Pipelines](./modules/azuredevops_pipelines/) | 🔧 Development | - | Azure DevOps pipelines module for managing build definitions, folders, permissions, and authorizations |
+| [Azure DevOps Project](./modules/azuredevops_project/) | ✅ Completed | [ADOP1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOP1.0.0) | Azure DevOps project module for managing project settings, tags, and dashboards |
+| [Azure DevOps Project Permissions](./modules/azuredevops_project_permissions/) | ✅ Completed | [ADOPP1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPP1.0.0) | Azure DevOps project permissions module for assigning group permissions |
+| [Azure DevOps Repository](./modules/azuredevops_repository/) | 🔧 Development | - | Azure DevOps repository module for managing Git repositories and policies |
+| [Azure DevOps Service Endpoints](./modules/azuredevops_serviceendpoint/) | 🔧 Development | - | Azure DevOps service endpoints module for managing service connections and permissions |
+| [Azure DevOps Service Hooks](./modules/azuredevops_servicehooks/) | 🔧 Development | - | Azure DevOps service hooks module for managing subscriptions and permissions |
+| [Azure DevOps Team](./modules/azuredevops_team/) | 🔧 Development | - | Azure DevOps team module for managing teams, members, and administrators |
+| [Azure DevOps Variable Groups](./modules/azuredevops_variable_groups/) | 🔧 Development | - | Azure DevOps variable groups module for managing variables and library permissions |
+| [Azure DevOps Wiki](./modules/azuredevops_wiki/) | 🔧 Development | - | Azure DevOps wiki module for managing wikis and pages |
+| [Azure DevOps Work Items](./modules/azuredevops_work_items/) | 🔧 Development | - | Azure DevOps work items module for managing processes, queries, and permissions |
 
-- if the plugin file name is different than the example above, terraform-docs won't
-be able to to pick it up nor register it properly
-- you can only use plugin thorough `.terraform-docs.yml` file and it cannot be used
-with CLI arguments
+Versions are sourced from module changelogs and release tags. Modules without a tagged release remain in Development.
 
-To create a new plugin create a new repository called `tfdocs-format-<NAME>` with
-following `main.go`:
+### Storage Account Module Examples
 
-```go
-package main
+The Storage Account module ships with a full example catalog:
 
-import (
-    _ "embed" //nolint
+| Example | Description |
+|---------|-------------|
+| [basic](./modules/azurerm_storage_account/examples/basic/README.md) | Minimal storage account with secure defaults |
+| [complete](./modules/azurerm_storage_account/examples/complete/README.md) | Full feature coverage |
+| [secure](./modules/azurerm_storage_account/examples/secure/README.md) | Hardened configuration |
+| [secure-private-endpoint](./modules/azurerm_storage_account/examples/secure-private-endpoint/README.md) | Private endpoints and security controls |
+| [data-lake-gen2](./modules/azurerm_storage_account/examples/data-lake-gen2/README.md) | ADLS Gen2 with SFTP/NFS |
+| [advanced-policies](./modules/azurerm_storage_account/examples/advanced-policies/README.md) | SAS/immutability/routing policies |
+| [identity-access](./modules/azurerm_storage_account/examples/identity-access/README.md) | Managed identities and keyless auth |
+| [multi-region](./modules/azurerm_storage_account/examples/multi-region/README.md) | Multi-region replication patterns |
 
-    "github.com/terraform-docs/terraform-docs/plugin"
-    "github.com/terraform-docs/terraform-docs/print"
-    "github.com/terraform-docs/terraform-docs/template"
-    "github.com/terraform-docs/terraform-docs/terraform"
-)
+Other modules include their own example catalogs under `modules/<module>/examples`.
 
-func main() {
-    plugin.Serve(&plugin.ServeOpts{
-        Name:    "<NAME>",
-        Version: "0.1.0",
-        Printer: printerFunc,
-    })
-}
+## Prerequisites
 
-//go:embed sections.tmpl
-var tplCustom []byte
+- [Terraform](https://www.terraform.io/downloads.html) >= 1.12.2
+- [AzureRM Provider](https://registry.terraform.io/providers/hashicorp/azurerm) 4.57.0 (for `azurerm_*` modules)
+- [Azure DevOps Provider](https://registry.terraform.io/providers/microsoft/azuredevops) 1.12.2 (for `azuredevops_*` modules)
+- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) (for Azure authentication and examples)
+- [Go](https://golang.org/doc/install) >= 1.21 (for Terratest)
 
-// printerFunc the function being executed by the plugin client.
-func printerFunc(config *print.Config, module *terraform.Module) (string, error) {
-    tpl := template.New(config,
-        &template.Item{Name: "custom", Text: string(tplCustom)},
-    )
+## Contributing
 
-    rendered, err := tpl.Render("custom", module)
-    if err != nil {
-        return "", err
-    }
+We welcome contributions! Start with the repository guidelines and contribution docs:
+- [**AGENTS.md**](./AGENTS.md) - Standards and conventions
+- [**CONTRIBUTING.md**](./CONTRIBUTING.md) - Contribution process
+- [**Module Creation Guide**](./docs/MODULE_GUIDE/README.md) - Scaffold new modules
 
-    return rendered, nil
-}
-```
+## Versioning
 
-Please refer to [tfdocs-format-template] for more details. You can create a new
-repository from it by clicking on `Use this template` button.
-
-## Documentation
-
-- **Users**
-  - Read the [User Guide] to learn how to use terraform-docs
-  - Read the [Formats Guide] to learn about different output formats of terraform-docs
-  - Refer to [Config File Reference] for all the available configuration options
-- **Developers**
-  - Read [Contributing Guide] before submitting a pull request
-
-Visit [our website] for all documentation.
-
-## Community
-
-- Discuss terraform-docs on [Slack]
+Each module uses Semantic Versioning with a module-specific tag prefix defined in `module.json` (for example: `SAv1.2.2`, `AKSv1.0.4`). Release notes live in each module's `CHANGELOG.md` and in GitHub releases.
 
 ## License
 
-MIT License - Copyright (c) 2021 The terraform-docs Authors.
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
-[Chocolatey]: https://www.chocolatey.org
-[Config File Reference]: https://terraform-docs.io/user-guide/configuration/
-[`content`]: https://terraform-docs.io/user-guide/configuration/content/
-[Contributing Guide]: CONTRIBUTING.md
-[Formats Guide]: https://terraform-docs.io/reference/terraform-docs/
-[`formatter`]: https://terraform-docs.io/user-guide/configuration/formatter/
-[here]: https://golang.org/doc/code.html#GOPATH
-[Homebrew]: https://brew.sh
-[install pre-commit]: https://pre-commit.com/#install
-[`output`]: https://terraform-docs.io/user-guide/configuration/output/
-[releases]: https://github.com/terraform-docs/terraform-docs/releases
-[Scoop]: https://scoop.sh/
-[Slack]: https://slack.terraform-docs.io/
-[terraform-docs GitHub Action]: https://github.com/terraform-docs/gh-actions
-[Terraform module]: https://pkg.go.dev/github.com/terraform-docs/terraform-docs/terraform#Module
-[tfdocs-format-template]: https://github.com/terraform-docs/tfdocs-format-template
-[our website]: https://terraform-docs.io/
-[User Guide]: https://terraform-docs.io/user-guide/introduction/
+## Support
+
+- **Issues**: Report bugs via GitHub Issues
+- **Security**: See [Security Policy](./docs/SECURITY.md)
+- **Documentation**: Module README files and the [docs index](./docs/README.md)
+
+---
+
+**Built with ❤️ by PatrykIti for Infrastructure Teams**
+
+*This repository follows enterprise-grade standards for infrastructure as code. For development guidelines, see [AGENTS.md](./AGENTS.md) or browse the [Documentation](./docs/README.md).*

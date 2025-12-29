@@ -125,7 +125,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       {
         prepareCmd: `
           CONFIG_FILE="modules/${MODULE_NAME}/.github/module-config.yml"
-          if [[ -f "$CONFIG_FILE" ]]; then
+          if [ -f "$CONFIG_FILE" ]; then
             sed -i "s/^version: .*/version: \${nextRelease.version}/" "$CONFIG_FILE"
           fi
 
@@ -136,11 +136,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
           find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's| ../../ | ${SOURCE_URL} |g' {} +
           find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's| ../.. | ${SOURCE_URL} |g' {} +
 
-          if [[ -x "./scripts/update-module-version.sh" ]]; then
+          if [ -x "./scripts/update-module-version.sh" ]; then
             ./scripts/update-module-version.sh "modules/${MODULE_NAME}" "\${nextRelease.version}"
           fi
 
-          if [[ -x "./scripts/update-examples-list.sh" ]]; then
+          if [ -x "./scripts/update-examples-list.sh" ]; then
             ./scripts/update-examples-list.sh "modules/${MODULE_NAME}"
           fi
 
@@ -150,7 +150,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
             ./scripts/update-module-docs.sh "${MODULE_NAME}"
           fi
 
-          if [[ -x "./scripts/update-root-readme.sh" ]]; then
+          if [ -x "./scripts/update-root-readme.sh" ]; then
             ./scripts/update-root-readme.sh "${MODULE_NAME}" "${MODULE_TITLE}" "${TAG_PREFIX}" "\${nextRelease.version}" "PatrykIti" "azurerm-terraform-modules"
           fi
         `.trim()
