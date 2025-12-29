@@ -13,8 +13,8 @@ provider "azuredevops" {}
 module "azuredevops_artifacts_feed" {
   source = "../../"
 
-  name        = var.feed_name
-  project_id  = var.project_id
+  name       = var.feed_name
+  project_id = var.project_id
   features = {
     permanent_delete = false
     restore          = false
