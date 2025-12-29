@@ -12,19 +12,28 @@ import (
 
 // Test basic azuredevops_extension creation
 func TestBasicAzuredevopsExtension(t *testing.T) {
-	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	vars := getExtensionVarsFromEnv()
+	shouldCleanup := true
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(testFolder, vars))
+		if shouldCleanup {
+			terraform.Destroy(t, getTerraformOptions(testFolder, vars))
+			return
+		}
+
+		t.Log("Skipping cleanup because extension existed prior to test run")
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(testFolder, vars)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
+		created, err := applyWithImportIfInstalled(t, terraformOptions, buildBasicImportTargets(t, vars))
+		require.NoError(t, err)
+		if !created {
+			shouldCleanup = false
+		}
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
@@ -38,21 +47,31 @@ func TestBasicAzuredevopsExtension(t *testing.T) {
 
 // Test complete azuredevops_extension with multiple extensions
 func TestCompleteAzuredevopsExtension(t *testing.T) {
-	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
+	extensions := getExtensionsFromEnv()
 	vars := map[string]interface{}{
-		"extensions": getExtensionsFromEnv(),
+		"extensions": extensions,
 	}
+	shouldCleanup := true
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(testFolder, vars))
+		if shouldCleanup {
+			terraform.Destroy(t, getTerraformOptions(testFolder, vars))
+			return
+		}
+
+		t.Log("Skipping cleanup because extension existed prior to test run")
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(testFolder, vars)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
+		created, err := applyWithImportIfInstalled(t, terraformOptions, buildForEachImportTargets(t, extensions))
+		require.NoError(t, err)
+		if !created {
+			shouldCleanup = false
+		}
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
@@ -67,21 +86,31 @@ func TestCompleteAzuredevopsExtension(t *testing.T) {
 
 // Test secure azuredevops_extension configuration
 func TestSecureAzuredevopsExtension(t *testing.T) {
-	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
+	extensions := getExtensionsFromEnv()
 	vars := map[string]interface{}{
-		"approved_extensions": getExtensionsFromEnv(),
+		"approved_extensions": extensions,
 	}
+	shouldCleanup := true
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(testFolder, vars))
+		if shouldCleanup {
+			terraform.Destroy(t, getTerraformOptions(testFolder, vars))
+			return
+		}
+
+		t.Log("Skipping cleanup because extension existed prior to test run")
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(testFolder, vars)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
+		created, err := applyWithImportIfInstalled(t, terraformOptions, buildForEachImportTargets(t, extensions))
+		require.NoError(t, err)
+		if !created {
+			shouldCleanup = false
+		}
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
@@ -95,7 +124,6 @@ func TestSecureAzuredevopsExtension(t *testing.T) {
 
 // Negative test cases for validation rules
 func TestAzuredevopsExtensionValidationRules(t *testing.T) {
-	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/negative")
