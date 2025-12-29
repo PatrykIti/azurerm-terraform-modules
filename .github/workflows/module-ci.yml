@@ -125,7 +125,7 @@ jobs:
             if [ -d "$module_dir" ]; then
               module_name=$(basename "$module_dir")
               # Include all module files, tests, fixtures, and examples
-              FILTERS="${FILTERS}${module_name}:\n  - 'modules/${module_name}/**'\n  - 'modules/${module_name}/tests/**'\n  - 'modules/${module_name}/examples/**'\n  - 'shared/**'\n"
+              FILTERS="${FILTERS}${module_name}:\n  - 'modules/${module_name}/**'\n  - 'modules/${module_name}/tests/**'\n  - 'modules/${module_name}/examples/**'\n  - '!modules/${module_name}/**/.terraform/**'\n  - '!modules/${module_name}/**/.terraform.lock.hcl'\n  - '!modules/${module_name}/**/.terraform.tfstate.lock.info'\n  - '!modules/${module_name}/**/terraform.tfstate*'\n  - '!modules/${module_name}/**/*.tfplan'\n  - '!modules/${module_name}/**/crash.log'\n  - '!modules/${module_name}/**/crash.*.log'\n  - 'shared/**'\n"
             fi
           done
           echo -e "$FILTERS" > .github/filters.yml
@@ -243,6 +243,9 @@ jobs:
               "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}",
               "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}"
             }
+          ado-org-service-url: ${{ secrets.AZDO_ORG_SERVICE_URL }}
+          ado-personal-access-token: ${{ secrets.AZDO_PERSONAL_ACCESS_TOKEN }}
+          ado-project-id: ${{ secrets.AZDO_PROJECT_ID }}
 
   security-scan:
     needs: detect-changes

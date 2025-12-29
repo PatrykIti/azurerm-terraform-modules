@@ -18,6 +18,15 @@ inputs:
   azure-credentials:
     description: 'Azure credentials for testing'
     required: false
+  ado-org-service-url:
+    description: 'Azure DevOps organization URL'
+    required: false
+  ado-personal-access-token:
+    description: 'Azure DevOps personal access token'
+    required: false
+  ado-project-id:
+    description: 'Azure DevOps project ID (optional for some modules)'
+    required: false
 
 outputs:
   tfsec-sarif:
@@ -57,6 +66,9 @@ runs:
         ARM_SUBSCRIPTION_ID: ${{ inputs.azure-credentials && fromJSON(inputs.azure-credentials).subscriptionId || '' }}
         ARM_CLIENT_SECRET: ${{ inputs.azure-credentials && fromJSON(inputs.azure-credentials).clientSecret || '' }}
         ARM_USE_OIDC: ${{ !inputs.azure-credentials || !fromJSON(inputs.azure-credentials).clientSecret }}
+        AZDO_ORG_SERVICE_URL: ${{ inputs.ado-org-service-url }}
+        AZDO_PERSONAL_ACCESS_TOKEN: ${{ inputs.ado-personal-access-token }}
+        AZDO_PROJECT_ID: ${{ inputs.ado-project-id }}
       run: |
         .github/actions/module-runner/run-module-action.sh "${{ inputs.module }}" "${{ inputs.action }}" "${{ inputs.terraform-version }}"
     

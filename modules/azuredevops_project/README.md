@@ -36,6 +36,11 @@ module "azuredevops_project" {
 - [Secure](examples/secure) - This example demonstrates a security-focused Azure DevOps project configuration with restrictive pipeline settings and limited features.
 <!-- END_EXAMPLES -->
 
+## Module Documentation
+
+- [docs/README.md](docs/README.md) - Module-specific documentation overview
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps projects into the module
+
 <!-- BEGIN_TF_DOCS -->
 
 
@@ -98,7 +103,6 @@ No modules.
 
 ## Additional Documentation
 
-- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps projects into the module
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines

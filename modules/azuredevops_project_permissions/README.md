@@ -52,6 +52,11 @@ module "azuredevops_project_permissions" {
 - [Secure](examples/secure) - This example demonstrates least-privilege permission assignments.
 <!-- END_EXAMPLES -->
 
+## Module Documentation
+
+- [docs/README.md](docs/README.md) - Module-specific documentation overview
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing permissions (limitations)
+
 <!-- BEGIN_TF_DOCS -->
 <!-- This file will be automatically populated by terraform-docs -->
 <!-- Do not edit manually - use terraform-docs to generate -->
@@ -59,7 +64,6 @@ module "azuredevops_project_permissions" {
 
 ## Additional Documentation
 
-- [docs/IMPORT.md](docs/IMPORT.md) - Import existing permissions (limitations)
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
