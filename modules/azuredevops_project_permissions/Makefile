@@ -13,7 +13,7 @@ test-all:
 	$(MAKE) -C tests test
 
 # Default test target
-test: test-short
+test: test-all
 
 # Generate documentation
 docs:
@@ -53,7 +53,7 @@ check: validate security
 # Show help
 help:
 	@echo "Available targets:"
-	@echo "  make test           - Run short tests (default)"
+	@echo "  make test           - Run all tests (default)"
 	@echo "  make test-short     - Run only basic functionality tests"
 	@echo "  make test-integration - Run integration tests"
 	@echo "  make test-all       - Run all tests"

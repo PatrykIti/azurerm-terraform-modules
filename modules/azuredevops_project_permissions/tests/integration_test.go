@@ -14,6 +14,7 @@ func TestAzuredevopsProjectPermissionsFullIntegration(t *testing.T) {
 		t.Skip("Skipping integration test in short mode")
 	}
 
+	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_project_permissions/tests/fixtures/complete")
