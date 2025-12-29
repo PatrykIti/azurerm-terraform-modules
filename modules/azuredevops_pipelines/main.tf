@@ -1,7 +1,7 @@
 # Azure DevOps Pipelines
 
 locals {
-  build_definition_id = try(azuredevops_build_definition.build_definition.id, null)
+  build_definition_id        = try(azuredevops_build_definition.build_definition.id, null)
   build_definition_id_number = local.build_definition_id == null ? null : tonumber(local.build_definition_id)
   build_folders_by_key = {
     for folder in var.build_folders :

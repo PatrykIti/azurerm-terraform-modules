@@ -71,9 +71,9 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Azure DevOps project ID where the team will be created. | `string` | n/a | yes |
-| <a name="input_name"></a> [name](#input\_name) | Name of the Azure DevOps team. | `string` | n/a | yes |
 | <a name="input_description"></a> [description](#input\_description) | Description of the Azure DevOps team. | `string` | `null` | no |
+| <a name="input_name"></a> [name](#input\_name) | Name of the Azure DevOps team. | `string` | n/a | yes |
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Azure DevOps project ID where the team will be created. | `string` | n/a | yes |
 | <a name="input_team_administrators"></a> [team\_administrators](#input\_team\_administrators) | List of team administrator assignments. | <pre>list(object({<br/>    key               = optional(string)<br/>    team_id           = optional(string)<br/>    admin_descriptors = list(string)<br/>    mode              = optional(string, "add")<br/>  }))</pre> | `[]` | no |
 | <a name="input_team_members"></a> [team\_members](#input\_team\_members) | List of team membership assignments. | <pre>list(object({<br/>    key                = optional(string)<br/>    team_id            = optional(string)<br/>    member_descriptors = list(string)<br/>    mode               = optional(string, "add")<br/>  }))</pre> | `[]` | no |
 

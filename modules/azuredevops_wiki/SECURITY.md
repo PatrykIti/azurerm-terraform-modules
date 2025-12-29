@@ -63,4 +63,4 @@ module "azuredevops_wiki" {
 
 **Module Version**: 1.0.0  
 **Last Updated**: 2025-12-24  
-**Security Contact**: security@yourorganization.com
+**Security Contact**: patryk.ciechanski@patrykiti.pl

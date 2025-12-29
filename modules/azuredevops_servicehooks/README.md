@@ -34,7 +34,7 @@ For multiple hooks, use module-level `for_each` in your configuration.
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates creating a simple webhook service hook.
 - [Complete](examples/complete) - This example demonstrates module-level for_each for webhook and storage queue hooks with pipeline filters.
-- [Secure](examples/secure) - This example demonstrates a filtered webhook with restricted permissions.
+- [Secure](examples/secure) - This example demonstrates a filtered webhook with restricted permissions and stable keys.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->

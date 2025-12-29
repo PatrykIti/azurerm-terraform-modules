@@ -27,7 +27,7 @@ module "azuredevops_identity" {
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates a minimal Azure DevOps identity configuration.
-- [Complete](examples/complete) - This example demonstrates a group, memberships, entitlements, and a role assignment.
+- [Complete](examples/complete) - This example demonstrates a group, memberships, and optional entitlements.
 - [Secure](examples/secure) - This example demonstrates a security-focused identity configuration with explicit memberships and minimal entitlements.
 <!-- END_EXAMPLES -->
 

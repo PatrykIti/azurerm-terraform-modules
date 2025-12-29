@@ -29,17 +29,6 @@ variable "project_id" {
   }
 }
 
-variable "description" {
-  description = "Description for the feed."
-  type        = string
-  default     = null
-
-  validation {
-    condition     = var.description == null || length(trimspace(var.description)) > 0
-    error_message = "description must be a non-empty string when provided."
-  }
-}
-
 variable "features" {
   description = "Feed feature flags for azuredevops_feed.features. Set to null to leave unmanaged."
   type = object({

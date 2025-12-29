@@ -101,6 +101,7 @@ No modules.
 | [azuredevops_workitem.work_item](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/workitem) | resource |
 | [azuredevops_workitemquery.query](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/workitemquery) | resource |
 | [azuredevops_workitemquery_folder.query_folder](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/workitemquery_folder) | resource |
+| [azuredevops_workitemquery_folder.query_folder_child](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/workitemquery_folder) | resource |
 | [azuredevops_workitemquery_permissions.query_permissions](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/workitemquery_permissions) | resource |
 | [azuredevops_workitemtrackingprocess_process.process](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/workitemtrackingprocess_process) | resource |
 

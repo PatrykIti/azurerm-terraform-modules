@@ -46,8 +46,48 @@ module "azuredevops_wiki" {
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
-<!-- This file will be automatically populated by terraform-docs -->
-<!-- Do not edit manually - use terraform-docs to generate -->
+
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
+| <a name="requirement_azuredevops"></a> [azuredevops](#requirement\_azuredevops) | 1.12.2 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azuredevops"></a> [azuredevops](#provider\_azuredevops) | 1.12.2 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azuredevops_wiki.wiki](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/wiki) | resource |
+| [azuredevops_wiki_page.wiki_page](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/wiki_page) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Azure DevOps project ID. | `string` | n/a | yes |
+| <a name="input_wiki_pages"></a> [wiki\_pages](#input\_wiki\_pages) | List of wiki pages to manage. | <pre>list(object({<br/>    wiki_id  = optional(string)<br/>    wiki_key = optional(string)<br/>    path     = string<br/>    content  = string<br/>  }))</pre> | `[]` | no |
+| <a name="input_wikis"></a> [wikis](#input\_wikis) | Map of wikis to manage. | <pre>map(object({<br/>    name          = optional(string)<br/>    type          = string<br/>    repository_id = optional(string)<br/>    version       = optional(string)<br/>    mapped_path   = optional(string)<br/>  }))</pre> | `{}` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_wiki_ids"></a> [wiki\_ids](#output\_wiki\_ids) | Map of wiki IDs keyed by wiki key. |
+| <a name="output_wiki_page_ids"></a> [wiki\_page\_ids](#output\_wiki\_page\_ids) | Map of wiki page IDs keyed by index. |
+| <a name="output_wiki_remote_urls"></a> [wiki\_remote\_urls](#output\_wiki\_remote\_urls) | Map of wiki remote URLs keyed by wiki key. |
+| <a name="output_wiki_urls"></a> [wiki\_urls](#output\_wiki\_urls) | Map of wiki REST URLs keyed by wiki key. |
 <!-- END_TF_DOCS -->
 
 ## Additional Documentation

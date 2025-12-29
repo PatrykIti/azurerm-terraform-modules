@@ -18,7 +18,7 @@ test: test-short
 # Generate documentation
 docs:
 	@echo "Generating documentation..."
-	terraform-docs markdown table --output-file README.md --output-mode inject .
+	./generate-docs.sh
 	@echo "Documentation updated in README.md"
 
 # Clean up test artifacts

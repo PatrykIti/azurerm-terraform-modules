@@ -33,7 +33,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_extension" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOPv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOEX1.0.0"
 
   publisher_id = "existing-publisher-id"
   extension_id = "existing-extension-id"
@@ -93,7 +93,7 @@ keys and add one import block per instance:
 
 ```hcl
 module "azuredevops_extension" {
-  source   = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOPv1.0.0"
+  source   = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOEX1.0.0"
   for_each = {
     "publisher/extension" = {
       publisher_id = "publisher"

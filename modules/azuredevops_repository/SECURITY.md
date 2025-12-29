@@ -85,4 +85,4 @@ Note: Azure DevOps has deprecated the "Check credentials" policy, and the provid
 
 **Module Version**: Unreleased  
 **Last Updated**: 2025-12-28  
-**Security Contact**: security@yourorganization.com
+**Security Contact**: patryk.ciechanski@patrykiti.pl

@@ -33,7 +33,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_team" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_team?ref=ADOTv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_team?ref=ADOT1.0.0"
 
   project_id  = "00000000-0000-0000-0000-000000000000"
   name        = "existing-team-name"
