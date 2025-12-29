@@ -19,7 +19,7 @@ resource "random_string" "suffix" {
 }
 
 module "azuredevops_agent_pools" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_agent_pools?ref=ADOAP1.0.0"
 
   name           = "${var.pool_name_prefix}-${random_string.suffix.result}"
   auto_provision = false
