@@ -4,8 +4,10 @@ Beyond validating the initial creation of resources, a robust test suite must co
 
 **Note**: All advanced tests must be skippable in CI/CD for pull requests by including the `testing.Short()` check.
 
+> Note: Legacy modules may still reference `fixtures/simple` or `fixtures/security`. New modules should use `fixtures/basic` and `fixtures/secure`.
+
 ```go
-func TestStorageAccountLifecycle(t *testing.T) {
+func TestKubernetesClusterLifecycle(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping advanced test in short mode")
 	}
@@ -27,35 +29,35 @@ Lifecycle tests verify that the module correctly handles updates to existing res
 
 **Example (`integration_test.go`):**
 ```go
-func TestStorageAccountLifecycle(t *testing.T) {
+func TestKubernetesClusterLifecycle(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_cluster/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
 	defer terraform.Destroy(t, terraformOptions)
 
-	// 1. Initial deployment with blob versioning disabled
+	// 1. Initial deployment
 	terraform.InitAndApply(t, terraformOptions)
 	
-	storageAccountName := terraform.Output(t, terraformOptions, "storage_account_name")
 	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
-	helper := NewStorageAccountHelper(t)
+	clusterName := terraform.Output(t, terraformOptions, "kubernetes_cluster_name")
+	helper := NewKubernetesClusterHelper(t)
 	
-	// 2. Verify initial state (versioning is false)
-	blobServiceProps := helper.GetBlobServiceProperties(t, storageAccountName, resourceGroupName)
-	assert.False(t, *blobServiceProps.IsVersioningEnabled)
+	// 2. Verify initial state (node count is 1)
+	cluster := helper.GetKubernetesClusterProperties(t, resourceGroupName, clusterName)
+	assert.Equal(t, int32(1), *(*cluster.Properties.AgentPoolProfiles[0]).Count)
 
-	// 3. Update configuration to enable blob versioning
-	terraformOptions.Vars["enable_blob_versioning"] = true
+	// 3. Update configuration to change node count
+	terraformOptions.Vars["node_count"] = 2
 	terraform.Apply(t, terraformOptions)
 
 	// 4. Verify the update was applied
-	blobServicePropsAfterUpdate := helper.GetBlobServiceProperties(t, storageAccountName, resourceGroupName)
-	assert.True(t, *blobServicePropsAfterUpdate.IsVersioningEnabled)
+	clusterAfterUpdate := helper.GetKubernetesClusterProperties(t, resourceGroupName, clusterName)
+	assert.Equal(t, int32(2), *(*clusterAfterUpdate.Properties.AgentPoolProfiles[0]).Count)
 
 	// 5. Test for idempotency (this apply should result in no changes)
 	terraform.Apply(t, terraformOptions)
@@ -64,18 +66,18 @@ func TestStorageAccountLifecycle(t *testing.T) {
 
 ## 2. Security and Compliance Testing
 
-Compliance tests validate that a resource deployed with a security-focused configuration meets a predefined set of security rules. This is often done using a dedicated `security` fixture.
+Compliance tests validate that a resource deployed with a security-focused configuration meets a predefined set of security rules. This is often done using a dedicated `secure` fixture.
 
 The recommended pattern is to create a slice of check structs, allowing for easy extension and clear, granular test results using `t.Run()`.
 
 **Example (`integration_test.go`):**
 ```go
-func TestStorageAccountCompliance(t *testing.T) {
+func TestKubernetesClusterCompliance(t *testing.T) {
 	t.Parallel()
-	// ... deploy resource from the "security" fixture ...
+	// ... deploy resource from the "secure" fixture ...
 
-	helper := NewStorageAccountHelper(t)
-	account := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
+	helper := NewKubernetesClusterHelper(t)
+	cluster := helper.GetKubernetesClusterProperties(t, resourceGroupName, clusterName)
 	
 	// Define a list of compliance checks to perform
 	complianceChecks := []struct {
@@ -84,19 +86,14 @@ func TestStorageAccountCompliance(t *testing.T) {
 		message   string
 	}{
 		{
-			name:    "Enforce HTTPS Only",
-			check:   func() bool { return *account.Properties.EnableHTTPSTrafficOnly },
-			message: "HTTPS-only traffic must be enforced.",
+			name:    "Private Cluster Enabled",
+			check:   func() bool { return *cluster.Properties.APIServerAccessProfile.EnablePrivateCluster },
+			message: "Private cluster must be enabled.",
 		},
 		{
-			name:    "Require TLS 1.2",
-			check:   func() bool { return *account.Properties.MinimumTLSVersion == armstorage.MinimumTLSVersionTLS12 },
-			message: "Minimum TLS version must be 1.2.",
-		},
-		{
-			name:    "Disable Public Blob Access",
-			check:   func() bool { return !*account.Properties.AllowBlobPublicAccess },
-			message: "Public blob access must be disabled.",
+			name:    "Azure Policy Enabled",
+			check:   func() bool { return cluster.Properties.AddonProfiles["azurepolicy"] != nil && *cluster.Properties.AddonProfiles["azurepolicy"].Enabled },
+			message: "Azure Policy add-on must be enabled.",
 		},
 	}
 	
@@ -109,37 +106,28 @@ func TestStorageAccountCompliance(t *testing.T) {
 }
 ```
 
-## 3. Disaster Recovery Testing
+## 3. Feature-Specific Advanced Testing
 
-These tests validate features related to high availability and geo-redundancy. This often involves configuring a specific replication type (like `GRS` or `RA-GRS`) and then using a "waiter" function to poll until the secondary location is available for reads.
+These tests validate advanced, module-specific features beyond basic creation. For AKS, common examples include network profile validation, add-on enablement, or node pool behavior.
 
 **Example (`integration_test.go`):**
 ```go
-func TestStorageAccountDisasterRecovery(t *testing.T) {
+func TestKubernetesClusterNetworkProfile(t *testing.T) {
 	if testing.Short() {
-		t.Skip("Skipping disaster recovery test in short mode")
+		t.Skip("Skipping advanced test in short mode")
 	}
 	// ... setup ...
-	
-	// Use RA-GRS to enable read access from the secondary region
-	terraformOptions.Vars["account_replication_type"] = "RAGRS"
 	
 	defer terraform.Destroy(t, terraformOptions)
 	terraform.InitAndApply(t, terraformOptions)
 	
 	// ... get outputs ...
-	helper := NewStorageAccountHelper(t)
-	
-	// 1. Wait for the secondary endpoint to become available
-	helper.WaitForGRSSecondaryEndpoints(t, storageAccountName, resourceGroupName)
-	
-	// 2. Get the updated properties
-	account := helper.GetStorageAccountProperties(t, storageAccountName, resourceGroupName)
-	
-	// 3. Validate the secondary endpoint
-	require.NotNil(t, account.Properties.SecondaryEndpoints, "Secondary endpoints should be available for RA-GRS")
-	require.NotEmpty(t, *account.Properties.SecondaryEndpoints.Blob, "Secondary blob endpoint should not be empty")
-	assert.Contains(t, *account.Properties.SecondaryEndpoints.Blob, "-secondary.blob.core.")
+	helper := NewKubernetesClusterHelper(t)
+	cluster := helper.GetKubernetesClusterProperties(t, resourceGroupName, clusterName)
+
+	require.NotNil(t, cluster.Properties.NetworkProfile, "Network profile should be available")
+	assert.Equal(t, armcontainerservice.NetworkPluginAzure, *cluster.Properties.NetworkProfile.NetworkPlugin)
+	assert.Equal(t, armcontainerservice.NetworkPolicyAzure, *cluster.Properties.NetworkProfile.NetworkPolicy)
 }
 ```
 
@@ -153,7 +141,7 @@ Benchmarks measure the time it takes to perform an action (like `terraform apply
 
 **Example (`performance_test.go`):**
 ```go
-func BenchmarkStorageAccountCreationSimple(b *testing.B) {
+func BenchmarkKubernetesClusterCreation(b *testing.B) {
 	// b.N is the number of iterations, managed by the Go test runner
 	for i := 0; i < b.N; i++ {
 		b.StopTimer() // Pause the timer for setup
@@ -176,11 +164,11 @@ go test -run=^$ -bench=.
 
 ### SLA Validation Tests
 
-These are standard tests that validate the deployment time against a Service Level Agreement (SLA), such as "a simple storage account must be created in under 5 minutes."
+These are standard tests that validate the deployment time against a Service Level Agreement (SLA), such as "a basic AKS cluster must be created in under 20 minutes."
 
 **Example (`performance_test.go`):**
 ```go
-func TestStorageAccountCreationTime(t *testing.T) {
+func TestKubernetesClusterCreationTime(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping performance test in short mode")
 	}
@@ -191,7 +179,7 @@ func TestStorageAccountCreationTime(t *testing.T) {
 	duration := time.Since(start)
 
 	// Define and assert the SLA
-	maxDuration := 5 * time.Minute
-	require.LessOrEqual(t, duration, maxDuration, "Storage account creation took %v, expected less than %v", duration, maxDuration)
+	maxDuration := 20 * time.Minute
+	require.LessOrEqual(t, duration, maxDuration, "Kubernetes cluster creation took %v, expected less than %v", duration, maxDuration)
 }
 ```

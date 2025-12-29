@@ -2,39 +2,47 @@
 test_suites:
   - name: "Basic Tests"
     tests:
-      - TestBasicMODULE_DISPLAY_NAME_PLACEHOLDER
+      - TestBasicMODULE_PASCAL_PLACEHOLDER
     parallel: true
     timeout: 15m
     
   - name: "Complete Feature Tests"
     tests:
-      - TestCompleteMODULE_DISPLAY_NAME_PLACEHOLDER
-      - TestMODULE_DISPLAY_NAME_PLACEHOLDERSecurity
-      - TestMODULE_DISPLAY_NAME_PLACEHOLDERNetworkRules
-      - TestMODULE_DISPLAY_NAME_PLACEHOLDERPrivateEndpoint
+      - TestCompleteMODULE_PASCAL_PLACEHOLDER
+      - TestSecureMODULE_PASCAL_PLACEHOLDER
+      - TestNetworkMODULE_PASCAL_PLACEHOLDER
+      - TestMODULE_PASCAL_PLACEHOLDERPrivateEndpoint
     parallel: true
     timeout: 30m
     
   - name: "Validation Tests"
     tests:
-      - TestMODULE_DISPLAY_NAME_PLACEHOLDERValidationRules
+      - TestMODULE_PASCAL_PLACEHOLDERValidationRules
     parallel: true
     timeout: 10m
     
   - name: "Integration Tests"
     tests:
-      - TestMODULE_DISPLAY_NAME_PLACEHOLDERFullIntegration
-      - TestMODULE_DISPLAY_NAME_PLACEHOLDERLifecycle
-      - TestMODULE_DISPLAY_NAME_PLACEHOLDERCompliance
-      - TestMODULE_DISPLAY_NAME_PLACEHOLDERMonitoring
+      - TestMODULE_PASCAL_PLACEHOLDERFullIntegration
+      - TestMODULE_PASCAL_PLACEHOLDERWithNetworkRules
+      - TestMODULE_PASCAL_PLACEHOLDERPrivateEndpointIntegration
+      - TestMODULE_PASCAL_PLACEHOLDERSecurityConfiguration
+      - TestMODULE_PASCAL_PLACEHOLDERLifecycle
+      - TestMODULE_PASCAL_PLACEHOLDERCompliance
     parallel: false
     timeout: 45m
     
   - name: "Performance Tests"
     tests:
-      - BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERCreation
-      - TestMODULE_DISPLAY_NAME_PLACEHOLDERCreationTime
-      - TestMODULE_DISPLAY_NAME_PLACEHOLDERScaling
+      - BenchmarkMODULE_PASCAL_PLACEHOLDERCreation
+      - BenchmarkMODULE_PASCAL_PLACEHOLDERCreationSimple
+      - BenchmarkMODULE_PASCAL_PLACEHOLDERCreationWithFeatures
+      - BenchmarkMODULE_PASCAL_PLACEHOLDERCreationWithScale
+      - BenchmarkMODULE_PASCAL_PLACEHOLDERParallelCreation
+      - TestMODULE_PASCAL_PLACEHOLDERCreationTime
+      - TestMODULE_PASCAL_PLACEHOLDERScaling
+      - TestMODULE_PASCAL_PLACEHOLDERUpdatePerformance
+      - TestMODULE_PASCAL_PLACEHOLDERDestroyPerformance
     parallel: false
     timeout: 60m
     benchmark: true

@@ -6,23 +6,21 @@ All modules must follow a consistent directory structure for tests to ensure mai
 
 ### Complete Module Test Structure
 
-The following is the standard directory structure, based on the `azurerm_storage_account` module:
+The following is the standard directory structure, based on the `azurerm_kubernetes_cluster` module:
 
 ```
 tests/
 ├── fixtures/                    # Terraform configurations for various test scenarios
-│   ├── simple/                  # Minimal, basic configuration
+│   ├── basic/                   # Minimal, basic configuration
 │   ├── complete/                # Configuration with all features
-│   ├── security/                # Security-focused configuration
+│   ├── secure/                  # Security-focused configuration
 │   ├── network/                 # Network scenarios
-│   ├── private_endpoint/        # Tests using Private Endpoint
-│   ├── data_lake_gen2/          # Scenarios for Data Lake Gen2 features
-│   ├── identity_access/         # Tests for managed identity and CMK encryption
-│   └── negative/                # Scenarios intended to fail (e.g., invalid names)
-│       ├── invalid_name_chars/
-│       └── ...
+│   ├── negative/                # Scenarios intended to fail (e.g., invalid names)
+│   └── <feature-specific>/      # Optional feature scenarios
 ├── unit/                        # Native Terraform tests (`.tftest.hcl`)
-│   ├── containers.tftest.hcl    # Conditional logic for sub-resources
+│   ├── node_pools.tftest.hcl    # Conditional logic for sub-resources
+│   ├── api_server_validation.tftest.hcl
+│   ├── diagnostic_settings.tftest.hcl
 │   ├── defaults.tftest.hcl      # Default value validation
 │   ├── naming.tftest.hcl        # Naming convention tests
 │   ├── outputs.tftest.hcl       # Output validation
@@ -30,7 +28,7 @@ tests/
 ├── go.mod                       # Go module definition and dependencies
 ├── go.sum                       # Dependency checksums
 ├── Makefile                     # Helper scripts for running tests
-├── storage_account_test.go      # Main tests for basic scenarios (e.g., simple, complete)
+├── kubernetes_cluster_test.go   # Main tests for basic scenarios (e.g., basic, complete)
 ├── integration_test.go          # More complex integration and lifecycle tests
 ├── performance_test.go          # Performance tests and benchmarks
 ├── test_helpers.go              # Helper functions, validation, and Azure SDK clients
@@ -41,6 +39,8 @@ tests/
 └── test_outputs/                # Directory for test results (ignored by Git)
     └── .gitkeep
 ```
+
+> Note: Legacy modules may still use `simple`/`security` fixture names. New modules should use `basic`/`secure`.
 
 ## Test File Naming Conventions
 
@@ -64,7 +64,7 @@ Located in the root of `tests/`, these files use the Go testing framework and Te
 
 | File | Purpose |
 |------|---------|
-| `{module_name}_test.go` | **Main Test File**: Contains the primary test functions for basic and common scenarios (e.g., `simple`, `complete`, `security`). |
+| `{module_name}_test.go` | **Main Test File**: Contains the primary test functions for basic and common scenarios (e.g., `basic`, `complete`, `secure`). |
 | `integration_test.go` | **Advanced Tests**: For complex scenarios, including resource lifecycle (updates, idempotency), disaster recovery, and compliance checks. |
 | `performance_test.go` | **Performance Tests**: Contains benchmarks (`Benchmark...`) and tests that validate deployment time SLAs. |
 | `test_helpers.go` | **Utilities**: A crucial file containing shared helper functions, Azure SDK clients, and custom validation logic to keep test files clean and DRY. |
@@ -94,17 +94,17 @@ Go test functions must follow standard Go conventions and be descriptive.
 
 ```go
 // Pattern: Test{Module}{Scenario}
-func TestStorageAccountBasic(t *testing.T) { ... }
-func TestStorageAccountCompleteWithContainers(t *testing.T) { ... }
-func TestStorageAccountSecurityHardened(t *testing.T) { ... }
+func TestBasicKubernetesCluster(t *testing.T) { ... }
+func TestCompleteKubernetesCluster(t *testing.T) { ... }
+func TestSecureKubernetesCluster(t *testing.T) { ... }
 
 // For integration_test.go
-func TestStorageAccountLifecycleUpdate(t *testing.T) { ... }
-func TestStorageAccountDisasterRecoveryFailover(t *testing.T) { ... }
+func TestKubernetesClusterLifecycle(t *testing.T) { ... }
+func TestKubernetesClusterCompliance(t *testing.T) { ... }
 
 // For performance_test.go
-func BenchmarkStorageAccountCreation(b *testing.B) { ... }
-func TestStorageAccountCreationTimeSLA(t *testing.T) { ... }
+func BenchmarkKubernetesClusterCreation(b *testing.B) { ... }
+func TestKubernetesClusterCreationTime(t *testing.T) { ... }
 ```
 
 ## Test Categorization
@@ -126,7 +126,7 @@ Tests are categorized by type and scope to allow for flexible execution in diffe
 
 ```go
 // In integration_test.go or performance_test.go
-func TestStorageAccountLifecycle(t *testing.T) {
+func TestKubernetesClusterLifecycle(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -139,11 +139,11 @@ func TestStorageAccountLifecycle(t *testing.T) {
 To ensure robustness and proper cleanup, all integration tests must use the `test-structure` library to define distinct stages. This guarantees that cleanup code (`terraform destroy`) always runs, even if validation fails.
 
 ```go
-func TestBasicStorageAccount(t *testing.T) {
+func TestBasicKubernetesCluster(t *testing.T) {
     t.Parallel()
 
     // 1. Setup: Copy the fixture to a temp folder
-    testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/simple")
+    testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_cluster/tests/fixtures/basic")
 
     // 2. Defer Cleanup: Ensure destroy is always called
     defer test_structure.RunTestStage(t, "cleanup", func() {

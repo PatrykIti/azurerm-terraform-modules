@@ -31,8 +31,8 @@ azurerm-terraform-modules/
 │   ├── WORKFLOWS.md              # GitHub Actions documentation
 │   ├── TERRAFORM_BEST_PRACTICES_GUIDE.md
 │   └── TERRAFORM_TESTING_GUIDE.md
-└── .claude/                       # Development guidelines
-    └── references/                # Workflow patterns and guidelines
+├── AGENTS.md                      # Condensed repo guidelines
+└── .taskmaster/                   # TaskMaster configuration
 ```
 
 ## 🚀 Getting Started
@@ -99,14 +99,14 @@ See [docs/WORKFLOWS.md](docs/WORKFLOWS.md#adding-new-modules) for detailed instr
 #### 📚 Documentation Updates
 
 1. Update relevant README.md files
-2. Ensure terraform-docs is regenerated
+2. Regenerate terraform-docs using module tooling (see checklist)
 3. Update examples if needed
 
 ## 🎯 Coding Standards
 
 ### Terraform Best Practices
 
-1. **Resource Naming**: Follow the pattern established in CLAUDE.md
+1. **Resource Naming**: Follow the pattern established in AGENTS.md
    ```hcl
    resource "azurerm_storage_account" "storage_account" {
      # NOT "this" or "main" or "storage_account"
@@ -145,7 +145,7 @@ Before submitting your PR, ensure:
 - [ ] All Terraform files are formatted: `terraform fmt -recursive`
 - [ ] Module validates: `terraform init && terraform validate`
 - [ ] TFLint passes: `tflint --init && tflint`
-- [ ] Documentation is updated: `terraform-docs markdown table . > README.md`
+- [ ] Documentation is updated (module dir: `make docs` or `./generate-docs.sh`; repo root: `./scripts/update-module-docs.sh <module_name>`)
 - [ ] Examples work correctly
 - [ ] Tests pass (if applicable)
 - [ ] CHANGELOG.md is updated (for feature changes)

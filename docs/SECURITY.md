@@ -2,7 +2,9 @@
 
 ## Overview
 
-This document outlines the security policies and best practices implemented across all Azure Terraform modules in this repository. Our modules follow a "security-by-default" approach, ensuring that resources are deployed with the most secure configuration possible while maintaining functionality.
+This document outlines the security policies and best practices implemented across all Terraform modules in this repository. Our modules follow a "security-by-default" approach, ensuring that resources are deployed with the most secure configuration possible while maintaining functionality.
+
+The `modules/azurerm_kubernetes_cluster` module is the security documentation baseline. Use its structure and level of detail as a reference, but document and justify deviations when a specific Azure resource (or Azure DevOps service) requires different controls. Some services do not support all controls, so module security docs must reflect actual capabilities.
 
 ## Security Principles
 
@@ -28,7 +30,7 @@ This document outlines the security policies and best practices implemented acro
 
 ## Compliance Standards
 
-Our modules are designed to help meet the following compliance standards:
+Our modules are designed to help meet the following compliance standards. Coverage is module-specific; document any gaps or unsupported controls in the module-level `SECURITY.md`.
 
 ### SOC 2 Type II
 - **Access Controls**: Private endpoints, RBAC, MFA
@@ -54,55 +56,40 @@ Our modules are designed to help meet the following compliance standards:
 - **Encryption**: TLS 1.2+ for data in transit
 - **Monitoring**: Security event logging
 
-## Security Controls by Service
+## Security Controls (Apply Where Supported)
 
-### Storage Accounts
-- ✅ HTTPS-only traffic (enforced by default)
-- ✅ Minimum TLS version 1.2
-- ✅ Public blob access disabled by default
-- ✅ Infrastructure encryption enabled
-- ✅ Private endpoints support
-- ✅ Network ACLs with deny-by-default
-- ✅ Azure AD authentication preferred
-- ✅ Soft delete and versioning enabled
-- ✅ Advanced threat protection
-- ✅ Customer-managed keys support
-- ✅ Diagnostic logging enabled
+- **Encryption**: At rest and in transit (TLS 1.2+).
+- **Identity & Access**: Azure AD/RBAC, managed identities, least-privilege roles.
+- **Network Isolation**: Private endpoints, private clusters, authorized IP ranges, default-deny where possible.
+- **Monitoring & Logging**: Diagnostic settings, audit logs, metrics.
+- **Threat Protection**: Microsoft Defender integration and policy compliance where applicable.
 
-### Key Vault
-- ✅ Soft delete and purge protection
-- ✅ Network ACLs with deny-by-default
-- ✅ Private endpoints support
-- ✅ RBAC authorization
-- ✅ Diagnostic logging
-- ✅ Key rotation policies
+## AKS Reference Patterns
 
-### SQL Database
-- ✅ Transparent Data Encryption (TDE)
-- ✅ Advanced threat protection
-- ✅ Vulnerability assessments
-- ✅ Private endpoints
-- ✅ Azure AD authentication
-- ✅ Audit logging
+Use the AKS module as a reference for security documentation depth and structure. Typical AKS security controls include:
+- Private cluster enablement and private DNS configuration.
+- Azure AD RBAC integration and local account disablement.
+- Authorized API server IP ranges.
+- Network policy and CNI configuration.
+- Diagnostic settings to Log Analytics.
 
-### App Service
-- ✅ HTTPS only
-- ✅ Minimum TLS version 1.2
-- ✅ Managed identity
-- ✅ Private endpoints
-- ✅ Authentication/Authorization
-- ✅ Diagnostic logging
+## Module Security Documentation Requirements
+
+- Every module MUST include its own `SECURITY.md`.
+- Reference the `secure` example (or the most hardened example available).
+- Describe default security posture and the implications of opt-out settings.
+- Explicitly call out unsupported security controls for the target service.
 
 ## Security Scanning
 
-### Pre-commit Hooks
-All code must pass security scanning before commit:
+### Pre-commit Hooks (Recommended)
+If you use pre-commit locally, include:
 - **Checkov**: Infrastructure as Code security scanning
 - **tfsec**: Terraform static analysis
 - **terraform fmt**: Code formatting
 - **terraform validate**: Configuration validation
 
-### CI/CD Pipeline Security
+### CI/CD Pipeline Security (Required)
 - Automated security scanning on every PR
 - Security gate requirements before merge
 - Dependency vulnerability scanning
@@ -118,8 +105,7 @@ We maintain custom security policies for organization-specific requirements:
 ## Vulnerability Management
 
 ### Reporting Security Issues
-Please report security vulnerabilities to: security@yourorganization.com
-
+Please report security vulnerabilities through the organization-approved private channel.
 Do NOT create public GitHub issues for security vulnerabilities.
 
 ### Response Process
@@ -134,11 +120,11 @@ Do NOT create public GitHub issues for security vulnerabilities.
 
 ## Best Practices for Module Users
 
-### 1. **Always Use Latest Versions**
+### 1. **Always Use the Latest Compatible Versions**
 ```hcl
-module "storage" {
-  source  = "your-org/storage-account/azurerm"
-  version = ">= 2.0.0" # Always use latest major version
+module "example" {
+  source  = "your-org/<module>/azurerm"
+  version = ">= 1.0.0"
   # ...
 }
 ```
@@ -147,42 +133,25 @@ module "storage" {
 Before overriding any security defaults, understand the implications:
 ```hcl
 # ⚠️ WARNING: Only disable if you understand the security implications
-shared_access_key_enabled = true  # Not recommended
+public_network_access_enabled = true  # Not recommended
 ```
 
-### 3. **Enable All Monitoring**
+### 3. **Enable Monitoring**
 ```hcl
 diagnostic_settings = {
   name                       = "security-logs"
   log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-  logs = [
-    { category = "StorageRead" },
-    { category = "StorageWrite" },
-    { category = "StorageDelete" }
-  ]
-  metrics = [
-    { category = "Transaction" }
-  ]
 }
 ```
 
-### 4. **Use Private Endpoints**
+### 4. **Prefer Private Connectivity Where Supported**
 ```hcl
 private_endpoints = {
-  blob = {
-    name                 = "storage-blob-pe"
+  example = {
+    name                 = "example-pe"
     subnet_id            = azurerm_subnet.private.id
-    private_dns_zone_ids = [azurerm_private_dns_zone.blob.id]
+    private_dns_zone_ids = [azurerm_private_dns_zone.example.id]
   }
-}
-```
-
-### 5. **Implement Network Restrictions**
-```hcl
-network_rules = {
-  default_action = "Deny"
-  ip_rules       = ["203.0.113.0/24"] # Your organization's IPs
-  bypass         = ["AzureServices"]
 }
 ```
 
@@ -191,13 +160,13 @@ network_rules = {
 When creating new modules, ensure:
 
 - [ ] All resources have secure defaults
-- [ ] Encryption at rest is enabled
-- [ ] Encryption in transit is enforced (HTTPS/TLS 1.2+)
-- [ ] Network access is restricted by default
-- [ ] Private endpoint support is implemented
+- [ ] Encryption at rest is enabled (where supported)
+- [ ] Encryption in transit is enforced (HTTPS/TLS 1.2+ where supported)
+- [ ] Network access is restricted by default (where applicable)
+- [ ] Private connectivity is supported when the service allows it
 - [ ] Managed identity is preferred over keys
 - [ ] Diagnostic settings are configurable
-- [ ] Advanced threat protection is available
+- [ ] Threat protection is available or explicitly documented as unsupported
 - [ ] All outputs mark sensitive data appropriately
 - [ ] Security documentation is comprehensive
 - [ ] Examples demonstrate secure configurations

@@ -1,27 +1,38 @@
-<!-- BEGIN_TF_DOCS -->
+# Modules Index
 
+This directory contains all Terraform modules published from this repository. Each module has its own README, examples, and changelog.
 
-## Requirements
+- Naming convention: `azurerm_<resource>` for AzureRM and `azuredevops_<resource>` for Azure DevOps.
+- Release tag prefixes come from each module's `module.json` (for example: `SAv1.2.2`).
 
-No requirements.
+## AzureRM Modules
 
-## Providers
+| Module | Tag Prefix | Description |
+| --- | --- | --- |
+| [Kubernetes Cluster](./azurerm_kubernetes_cluster/) (`azurerm_kubernetes_cluster`) | `AKSv` | Azure Kubernetes Service (AKS) Terraform module for managing clusters with node pools, addons, and enterprise-grade security features |
+| [Kubernetes Secrets](./azurerm_kubernetes_secrets/) (`azurerm_kubernetes_secrets`) | `AKSS` | Azure Kubernetes Secrets Terraform module with enterprise-grade features |
+| [Network Security Group](./azurerm_network_security_group/) (`azurerm_network_security_group`) | `NSGv` | Manages Azure Network Security Groups with comprehensive security rules configuration |
+| [Route Table](./azurerm_route_table/) (`azurerm_route_table`) | `RTv` | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
+| [Storage Account](./azurerm_storage_account/) (`azurerm_storage_account`) | `SAv` | Azure Storage Account Terraform module with enterprise-grade security features |
+| [Subnet](./azurerm_subnet/) (`azurerm_subnet`) | `SNv` | Azure Subnet Terraform module for managing subnets with service endpoints, delegations, network policies, and enterprise-grade security features |
+| [Virtual Network](./azurerm_virtual_network/) (`azurerm_virtual_network`) | `VNv` | Azure Virtual Network Terraform module with advanced networking features |
 
-No providers.
+## Azure DevOps Modules
 
-## Modules
-
-No modules.
-
-## Resources
-
-No resources.
-
-## Inputs
-
-No inputs.
-
-## Outputs
-
-No outputs.
-<!-- END_TF_DOCS -->
+| Module | Tag Prefix | Description |
+| --- | --- | --- |
+| [Azure DevOps Agent Pools](./azuredevops_agent_pools/) (`azuredevops_agent_pools`) | `ADOAP` | Azure DevOps agent pools module for managing pools, queues, and elastic pools |
+| [Azure DevOps Artifacts Feed](./azuredevops_artifacts_feed/) (`azuredevops_artifacts_feed`) | `ADOAF` | Azure DevOps artifacts feed module for managing a feed, retention policies, and permissions |
+| [Azure DevOps Environments](./azuredevops_environments/) (`azuredevops_environments`) | `ADOE` | Azure DevOps environments module for a single environment with optional resources and checks |
+| [Azure DevOps Extension](./azuredevops_extension/) (`azuredevops_extension`) | `ADOEX` | Azure DevOps extension module for managing a single Marketplace extension |
+| [Azure DevOps Identity](./azuredevops_identity/) (`azuredevops_identity`) | `ADOI` | Azure DevOps identity module for managing groups, entitlements, memberships, and role assignments |
+| [Azure DevOps Pipelines](./azuredevops_pipelines/) (`azuredevops_pipelines`) | `ADOPI` | Azure DevOps pipelines module for managing a build definition with folders, permissions, and authorizations |
+| [Azure DevOps Project](./azuredevops_project/) (`azuredevops_project`) | `ADOP` | Azure DevOps project module for managing project settings, tags, and dashboards |
+| [Azure DevOps Project Permissions](./azuredevops_project_permissions/) (`azuredevops_project_permissions`) | `ADOPP` | Azure DevOps project permissions module for assigning group permissions |
+| [Azure DevOps Repository](./azuredevops_repository/) (`azuredevops_repository`) | `ADOR` | Azure DevOps repository module for managing a Git repository, branches, permissions, and policies |
+| [Azure DevOps Service Endpoints](./azuredevops_serviceendpoint/) (`azuredevops_serviceendpoint`) | `ADOSE` | Azure DevOps service endpoints module for managing a single service connection and permissions |
+| [Azure DevOps Service Hooks](./azuredevops_servicehooks/) (`azuredevops_servicehooks`) | `ADOSH` | Azure DevOps service hooks module for managing single webhook/storage queue subscriptions and permissions (use module-level for_each for multiples) |
+| [Azure DevOps Team](./azuredevops_team/) (`azuredevops_team`) | `ADOT` | Azure DevOps team module for managing a team, members, and administrators |
+| [Azure DevOps Variable Groups](./azuredevops_variable_groups/) (`azuredevops_variable_groups`) | `ADOVG` | Azure DevOps variable groups module for managing variables, permissions, and optional Key Vault integration |
+| [Azure DevOps Wiki](./azuredevops_wiki/) (`azuredevops_wiki`) | `ADOWI` | Azure DevOps wiki module for managing wikis and pages |
+| [Azure DevOps Work Items](./azuredevops_work_items/) (`azuredevops_work_items`) | `ADOWK` | Azure DevOps work items module for managing work items, processes, queries, and permissions |

@@ -21,34 +21,39 @@ Native Terraform tests use `.tftest.hcl` files to define test scenarios with moc
 
 # Mock provider to avoid real API calls
 mock_provider "azurerm" {
-  mock_resource "azurerm_storage_account" {
+  mock_resource "azurerm_kubernetes_cluster" {
     defaults = {
-      id                       = "/subscriptions/mock/resourceGroups/mock-rg/providers/Microsoft.Storage/storageAccounts/mocksa"
-      primary_blob_endpoint    = "https://mocksa.blob.core.windows.net/"
-      primary_access_key       = "mock-access-key"
-      primary_connection_string = "DefaultEndpointsProtocol=https;AccountName=mocksa;AccountKey=mock-key"
+      id   = "/subscriptions/mock/resourceGroups/mock-rg/providers/Microsoft.ContainerService/managedClusters/test-aks"
+      name = "test-aks"
     }
   }
 }
 
 # Define test variables
 variables {
+  name                = "test-aks"
   resource_group_name = "test-rg"
   location           = "northeurope"
+  dns_config = {
+    dns_prefix = "testaks"
+  }
+  default_node_pool = {
+    name       = "default"
+    vm_size    = "Standard_D2_v2"
+    node_count = 1
+  }
+  network_profile = {
+    network_plugin = "azure"
+  }
 }
 
 # Test scenario
-run "verify_secure_defaults" {
+run "verify_default_identity" {
   command = plan
 
   assert {
-    condition     = azurerm_storage_account.storage_account.min_tls_version == "TLS1_2"
-    error_message = "Default TLS version should be TLS1_2"
-  }
-
-  assert {
-    condition     = azurerm_storage_account.storage_account.enable_https_traffic_only == true
-    error_message = "HTTPS traffic only should be enabled by default"
+    condition     = azurerm_kubernetes_cluster.kubernetes_cluster.identity[0].type == "SystemAssigned"
+    error_message = "Default identity type should be SystemAssigned"
   }
 }
 ```
@@ -71,59 +76,76 @@ Tests that verify secure defaults are properly applied:
 # tests/unit/defaults.tftest.hcl
 
 mock_provider "azurerm" {
-  mock_resource "azurerm_storage_account" {
+  mock_resource "azurerm_kubernetes_cluster" {
     defaults = {
-      id = "/subscriptions/mock/resourceGroups/mock-rg/providers/Microsoft.Storage/storageAccounts/mocksa"
-      min_tls_version = "TLS1_2"
-      enable_https_traffic_only = true
-      shared_access_key_enabled = false
-      infrastructure_encryption_enabled = true
+      id   = "/subscriptions/mock/resourceGroups/mock-rg/providers/Microsoft.ContainerService/managedClusters/test-aks"
+      name = "test-aks"
     }
   }
 }
 
 variables {
+  name                = "test-aks"
   resource_group_name = "test-rg"
   location           = "northeurope"
-}
-
-# Test 1: Verify TLS defaults
-run "verify_tls_defaults" {
-  command = plan
-
-  assert {
-    condition     = azurerm_storage_account.storage_account.min_tls_version == "TLS1_2"
-    error_message = "Default TLS version should be TLS1_2"
+  dns_config = {
+    dns_prefix = "testaks"
+  }
+  default_node_pool = {
+    name       = "default"
+    vm_size    = "Standard_D2_v2"
+    node_count = 1
+  }
+  network_profile = {
+    network_plugin = "azure"
   }
 }
 
-# Test 2: Verify HTTPS enforcement
-run "verify_https_enforcement" {
+# Test 1: Verify default identity
+run "verify_default_identity" {
   command = plan
 
   assert {
-    condition     = azurerm_storage_account.storage_account.enable_https_traffic_only == true
-    error_message = "HTTPS traffic only should be enabled by default"
+    condition     = azurerm_kubernetes_cluster.kubernetes_cluster.identity[0].type == "SystemAssigned"
+    error_message = "Default identity type should be SystemAssigned"
   }
 }
 
-# Test 3: Verify shared access keys disabled
-run "verify_shared_keys_disabled" {
+# Test 2: Verify default SKU
+run "verify_default_sku" {
   command = plan
 
   assert {
-    condition     = azurerm_storage_account.storage_account.shared_access_key_enabled == false
-    error_message = "Shared access keys should be disabled by default"
+    condition     = azurerm_kubernetes_cluster.kubernetes_cluster.sku_tier == "Free"
+    error_message = "Default SKU tier should be Free"
   }
 }
 
-# Test 4: Verify infrastructure encryption
-run "verify_infrastructure_encryption" {
+# Test 3: Verify default network profile
+run "verify_default_network_profile" {
   command = plan
 
   assert {
-    condition     = azurerm_storage_account.storage_account.infrastructure_encryption_enabled == true
-    error_message = "Infrastructure encryption should be enabled by default"
+    condition     = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].network_plugin == "azure"
+    error_message = "Default network plugin should be azure"
+  }
+  assert {
+    condition     = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].load_balancer_sku == "standard"
+    error_message = "Default load balancer SKU should be standard"
+  }
+}
+
+# Test 4: Verify default feature flags
+run "verify_default_features" {
+  command = plan
+
+  assert {
+    condition     = azurerm_kubernetes_cluster.kubernetes_cluster.azure_policy_enabled == false
+    error_message = "Azure Policy should be disabled by default"
+  }
+  assert {
+    condition     = azurerm_kubernetes_cluster.kubernetes_cluster.workload_identity_enabled == false
+    error_message = "Workload Identity should be disabled by default"
   }
 }
 ```
@@ -135,107 +157,59 @@ Tests that validate naming logic and constraints:
 ```hcl
 # tests/unit/naming.tftest.hcl
 
-mock_provider "azurerm" {}
-
-# Test 1: Basic naming
-run "test_basic_naming" {
-  command = plan
-
-  variables {
-    name                = "teststorage"
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-  }
-
-  assert {
-    condition     = azurerm_storage_account.storage_account.name == "teststorage"
-    error_message = "Storage account name should match input"
+mock_provider "azurerm" {
+  mock_resource "azurerm_kubernetes_cluster" {
+    defaults = {
+      id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ContainerService/managedClusters/test-aks"
+      name = "test-aks"
+    }
   }
 }
 
-# Test 2: Name with suffix
-run "test_naming_with_suffix" {
-  command = plan
-
-  variables {
-    name                = "teststorage"
-    random_suffix       = "abc123"
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-  }
-
-  assert {
-    condition     = azurerm_storage_account.storage_account.name == "teststorageabc123"
-    error_message = "Storage account name should include suffix when provided"
+variables {
+  resource_group_name = "test-rg"
+  location            = "northeurope"
+  default_node_pool = {
+    name       = "default"
+    vm_size    = "Standard_D2_v2"
+    node_count = 1
   }
 }
 
-# Test 3: Name length validation
-run "test_name_length_limits" {
+# Test 1: Valid dns_prefix
+run "valid_dns_prefix" {
   command = plan
 
   variables {
-    name                = "verylongstorageaccountname"
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-  }
-
-  # This should trigger validation error
-  expect_failures = [
-    var.name
-  ]
-}
-
-# Test 4: Name character validation
-run "test_name_character_validation" {
-  command = plan
-
-  variables {
-    name                = "test-storage-account"  # Contains hyphens
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-  }
-
-  expect_failures = [
-    var.name
-  ]
-}
-
-# Test 5: Name case sensitivity
-run "test_name_case_handling" {
-  command = plan
-
-  variables {
-    name                = "TestStorage"
-    resource_group_name = "test-rg"
-    location           = "northeurope"
+    name = "validakscluster"
+    dns_config = {
+      dns_prefix = "validdnsprefix"
+    }
   }
 
   assert {
-    condition     = azurerm_storage_account.storage_account.name == lower("TestStorage")
-    error_message = "Storage account name should be converted to lowercase"
+    condition     = azurerm_kubernetes_cluster.kubernetes_cluster.dns_prefix == "validdnsprefix"
+    error_message = "DNS prefix should be set correctly"
   }
 }
 
-# Test 6: Global uniqueness handling
-run "test_global_uniqueness" {
+# Test 2: Valid dns_prefix_private_cluster
+run "valid_dns_prefix_private_cluster" {
   command = plan
 
   variables {
-    name                = "storage"
-    random_suffix       = "unique123"
-    resource_group_name = "test-rg"
-    location           = "northeurope"
+    name = "validakscluster"
+    dns_config = {
+      dns_prefix_private_cluster = "validprivateprefix"
+    }
+    private_cluster_config = {
+      private_cluster_enabled = true
+    }
   }
 
   assert {
-    condition     = length(azurerm_storage_account.storage_account.name) <= 24
-    error_message = "Storage account name must not exceed 24 characters"
-  }
-
-  assert {
-    condition     = length(azurerm_storage_account.storage_account.name) >= 3
-    error_message = "Storage account name must be at least 3 characters"
+    condition     = azurerm_kubernetes_cluster.kubernetes_cluster.dns_prefix_private_cluster == "validprivateprefix"
+    error_message = "Private DNS prefix should be set correctly"
   }
 }
 ```
@@ -248,21 +222,29 @@ Tests that verify output structure and values:
 # tests/unit/outputs.tftest.hcl
 
 mock_provider "azurerm" {
-  mock_resource "azurerm_storage_account" {
+  mock_resource "azurerm_kubernetes_cluster" {
     defaults = {
-      id                       = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/teststorage"
-      name                     = "teststorage"
-      primary_blob_endpoint    = "https://teststorage.blob.core.windows.net/"
-      primary_access_key       = "mock-access-key"
-      primary_connection_string = "DefaultEndpointsProtocol=https;AccountName=teststorage;AccountKey=mock-key"
+      id   = "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/test-rg/providers/Microsoft.ContainerService/managedClusters/test-aks"
+      name = "test-aks"
     }
   }
 }
 
 variables {
-  name                = "teststorage"
+  name                = "test-aks"
   resource_group_name = "test-rg"
   location           = "northeurope"
+  dns_config = {
+    dns_prefix = "testaks"
+  }
+  default_node_pool = {
+    name       = "default"
+    vm_size    = "Standard_D2_v2"
+    node_count = 1
+  }
+  network_profile = {
+    network_plugin = "azure"
+  }
 }
 
 # Test 1: ID output format
@@ -275,7 +257,7 @@ run "verify_id_output" {
   }
 
   assert {
-    condition     = can(regex("^/subscriptions/.*/resourceGroups/.*/providers/Microsoft.Storage/storageAccounts/.*", output.id))
+    condition     = can(regex("^/subscriptions/.*/resourceGroups/.*/providers/Microsoft.ContainerService/managedClusters/.*", output.id))
     error_message = "ID should be a valid Azure resource ID"
   }
 }
@@ -285,44 +267,18 @@ run "verify_name_output" {
   command = plan
 
   assert {
-    condition     = output.name == "teststorage"
-    error_message = "Name output should match the storage account name"
+    condition     = output.name == "test-aks"
+    error_message = "Name output should match the cluster name"
   }
 }
 
-# Test 3: Endpoint outputs
-run "verify_endpoint_outputs" {
+# Test 3: Resource group output
+run "verify_resource_group_output" {
   command = plan
 
   assert {
-    condition     = can(regex("^https://.*\\.blob\\.core\\.windows\\.net/$", output.primary_blob_endpoint))
-    error_message = "Primary blob endpoint should be a valid HTTPS URL"
-  }
-
-  assert {
-    condition     = output.primary_blob_endpoint != ""
-    error_message = "Primary blob endpoint should not be empty"
-  }
-}
-
-# Test 4: Sensitive outputs handling
-run "verify_sensitive_outputs" {
-  command = plan
-
-  # Access key should be marked as sensitive
-  assert {
-    condition     = output.primary_access_key != ""
-    error_message = "Primary access key should be available in output"
-  }
-}
-
-# Test 5: Connection string format
-run "verify_connection_string_format" {
-  command = plan
-
-  assert {
-    condition     = can(regex("^DefaultEndpointsProtocol=https;AccountName=.*;AccountKey=.*", output.primary_connection_string))
-    error_message = "Connection string should have correct format"
+    condition     = output.resource_group_name == "test-rg"
+    error_message = "Resource group output should match input"
   }
 }
 ```
@@ -334,407 +290,205 @@ Tests that verify input validation rules work correctly:
 ```hcl
 # tests/unit/validation.tftest.hcl
 
-mock_provider "azurerm" {}
-
-# Test 1: Valid storage account name
-run "valid_storage_account_name" {
-  command = plan
-
-  variables {
-    name                = "validstorageaccount"
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-  }
-
-  # Should succeed without errors
-}
-
-# Test 2: Invalid name - too short
-run "invalid_name_too_short" {
-  command = plan
-
-  variables {
-    name                = "ab"  # Too short
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-  }
-
-  expect_failures = [
-    var.name
-  ]
-}
-
-# Test 3: Invalid name - too long
-run "invalid_name_too_long" {
-  command = plan
-
-  variables {
-    name                = "verylongstorageaccountnamethatexceedslimit"  # Too long
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-  }
-
-  expect_failures = [
-    var.name
-  ]
-}
-
-# Test 4: Invalid name - special characters
-run "invalid_name_special_chars" {
-  command = plan
-
-  variables {
-    name                = "test-storage-account"  # Contains hyphens
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-  }
-
-  expect_failures = [
-    var.name
-  ]
-}
-
-# Test 5: Invalid name - uppercase
-run "invalid_name_uppercase" {
-  command = plan
-
-  variables {
-    name                = "TestStorageAccount"  # Contains uppercase
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-  }
-
-  expect_failures = [
-    var.name
-  ]
-}
-
-# Test 6: Valid account tier
-run "valid_account_tier" {
-  command = plan
-
-  variables {
-    name                = "teststorage"
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-    account_tier        = "Standard"
-  }
-
-  # Should succeed
-}
-
-# Test 7: Invalid account tier
-run "invalid_account_tier" {
-  command = plan
-
-  variables {
-    name                = "teststorage"
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-    account_tier        = "InvalidTier"
-  }
-
-  expect_failures = [
-    var.account_tier
-  ]
-}
-
-# Test 8: Valid replication type
-run "valid_replication_type" {
-  command = plan
-
-  variables {
-    name                     = "teststorage"
-    resource_group_name      = "test-rg"
-    location                = "northeurope"
-    account_replication_type = "LRS"
-  }
-
-  # Should succeed
-}
-
-# Test 9: Invalid replication type
-run "invalid_replication_type" {
-  command = plan
-
-  variables {
-    name                     = "teststorage"
-    resource_group_name      = "test-rg"
-    location                = "northeurope"
-    account_replication_type = "INVALID"
-  }
-
-  expect_failures = [
-    var.account_replication_type
-  ]
-}
-
-# Test 10: Valid location
-run "valid_location" {
-  command = plan
-
-  variables {
-    name                = "teststorage"
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-  }
-
-  # Should succeed
-}
-
-# Test 11: Container access type validation
-run "valid_container_access_type" {
-  command = plan
-
-  variables {
-    name                = "teststorage"
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-    containers = [
-      {
-        name                  = "testcontainer"
-        container_access_type = "private"
-      }
-    ]
-  }
-
-  # Should succeed
-}
-
-# Test 12: Invalid container access type
-run "invalid_container_access_type" {
-  command = plan
-
-  variables {
-    name                = "teststorage"
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-    containers = [
-      {
-        name                  = "testcontainer"
-        container_access_type = "invalid"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.containers
-  ]
-}
-
-# Test 13: Network rules validation
-run "valid_network_rules" {
-  command = plan
-
-  variables {
-    name                = "teststorage"
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-    network_rules = {
-      default_action = "Deny"
-      ip_rules      = ["203.0.113.0/24"]
-      bypass        = "AzureServices"
-    }
-  }
-
-  # Should succeed
-}
-
-# Test 14: Invalid network default action
-run "invalid_network_default_action" {
-  command = plan
-
-  variables {
-    name                = "teststorage"
-    resource_group_name = "test-rg"
-    location           = "northeurope"
-    network_rules = {
-      default_action = "Invalid"
-      ip_rules      = ["203.0.113.0/24"]
-      bypass        = "AzureServices"
-    }
-  }
-
-  expect_failures = [
-    var.network_rules
-  ]
-}
-```
-
-### 5. Conditional Logic Testing (`containers.tftest.hcl`)
-
-Tests that verify conditional resource creation works correctly:
-
-```hcl
-# tests/unit/containers.tftest.hcl
-
 mock_provider "azurerm" {
-  mock_resource "azurerm_storage_container" {
+  mock_resource "azurerm_kubernetes_cluster" {
     defaults = {
-      id                    = "/subscriptions/mock/resourceGroups/mock-rg/providers/Microsoft.Storage/storageAccounts/mocksa/blobServices/default/containers/mockcontainer"
-      name                  = "mockcontainer"
-      container_access_type = "private"
+      id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ContainerService/managedClusters/test-aks"
+      name = "test-aks"
     }
   }
 }
 
 variables {
-  name                = "teststorage"
+  resource_group_name = "test-rg"
+  location            = "northeurope"
+  default_node_pool = {
+    name       = "default"
+    vm_size    = "Standard_D2_v2"
+    node_count = 1
+  }
+}
+
+# Test 1: Invalid name - uppercase
+run "invalid_name_uppercase" {
+  command = plan
+
+  variables {
+    name = "InvalidAKSName"
+  }
+
+  expect_failures = [
+    var.name,
+  ]
+}
+
+# Test 2: Invalid name - special characters
+run "invalid_name_special_chars" {
+  command = plan
+
+  variables {
+    name = "invalid_aks_name"
+  }
+
+  expect_failures = [
+    var.name,
+  ]
+}
+
+# Test 3: Missing dns_prefix/dns_prefix_private_cluster
+run "missing_dns_prefix" {
+  command = plan
+
+  variables {
+    name       = "validname"
+    dns_config = {}
+  }
+
+  expect_failures = [
+    var.dns_config,
+  ]
+}
+
+# Test 4: Both dns_prefix and dns_prefix_private_cluster set
+run "both_dns_prefixes_set" {
+  command = plan
+
+  variables {
+    name = "validname"
+    dns_config = {
+      dns_prefix                 = "publicprefix"
+      dns_prefix_private_cluster = "privateprefix"
+    }
+  }
+
+  expect_failures = [
+    var.dns_config,
+  ]
+}
+
+# Test 5: Diagnostic settings missing destination
+run "diagnostic_settings_missing_destination" {
+  command = plan
+
+  variables {
+    name = "validname"
+    diagnostic_settings = [
+      {
+        name  = "missing-destination"
+        areas = ["api_plane"]
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings,
+  ]
+}
+```
+
+### 5. Conditional Logic Testing (`node_pools.tftest.hcl`)
+
+Tests that verify conditional resource creation works correctly:
+
+```hcl
+# tests/unit/node_pools.tftest.hcl
+
+mock_provider "azurerm" {
+  mock_resource "azurerm_kubernetes_cluster" {
+    defaults = {
+      id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ContainerService/managedClusters/test-aks"
+      name = "test-aks"
+    }
+  }
+  mock_resource "azurerm_kubernetes_cluster_node_pool" {
+    defaults = {
+      id   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ContainerService/managedClusters/test-aks/agentPools/testpool"
+      name = "testpool"
+    }
+  }
+}
+
+variables {
+  name                = "akstestcluster"
   resource_group_name = "test-rg"
   location           = "northeurope"
-}
-
-# Test 1: No containers by default
-run "no_containers_by_default" {
-  command = plan
-
-  assert {
-    condition     = length(azurerm_storage_container.containers) == 0
-    error_message = "No containers should be created by default"
+  dns_config = {
+    dns_prefix = "akstest"
+  }
+  default_node_pool = {
+    name       = "default"
+    vm_size    = "Standard_D2_v2"
+    node_count = 1
   }
 }
 
-# Test 2: Single container creation
-run "single_container_creation" {
+# Test 1: No additional node pools by default
+run "no_additional_node_pools_by_default" {
+  command = plan
+
+  assert {
+    condition     = length(azurerm_kubernetes_cluster_node_pool.kubernetes_cluster_node_pool) == 0
+    error_message = "No additional node pools should be created when node_pools is not set"
+  }
+}
+
+# Test 2: Single additional node pool
+run "single_additional_node_pool" {
   command = plan
 
   variables {
-    containers = [
+    node_pools = [
       {
-        name                  = "testcontainer"
-        container_access_type = "private"
+        name       = "userpool1"
+        vm_size    = "Standard_D2_v2"
+        node_count = 2
       }
     ]
   }
 
   assert {
-    condition     = length(azurerm_storage_container.containers) == 1
-    error_message = "Should create exactly one container"
+    condition     = length(azurerm_kubernetes_cluster_node_pool.kubernetes_cluster_node_pool) == 1
+    error_message = "Should create exactly one additional node pool"
   }
 
   assert {
-    condition     = azurerm_storage_container.containers["testcontainer"].name == "testcontainer"
-    error_message = "Container name should match input"
+    condition     = azurerm_kubernetes_cluster_node_pool.kubernetes_cluster_node_pool["userpool1"].name == "userpool1"
+    error_message = "Node pool name should match input"
   }
 
   assert {
-    condition     = azurerm_storage_container.containers["testcontainer"].container_access_type == "private"
-    error_message = "Container access type should match input"
+    condition     = azurerm_kubernetes_cluster_node_pool.kubernetes_cluster_node_pool["userpool1"].node_count == 2
+    error_message = "Node count for the additional node pool should be 2"
   }
 }
 
-# Test 3: Multiple containers creation
-run "multiple_containers_creation" {
+# Test 3: Multiple additional node pools
+run "multiple_additional_node_pools" {
   command = plan
 
   variables {
-    containers = [
+    node_pools = [
       {
-        name                  = "container1"
-        container_access_type = "private"
+        name       = "userpool1"
+        vm_size    = "Standard_D2_v2"
+        node_count = 1
       },
       {
-        name                  = "container2"
-        container_access_type = "blob"
-      },
-      {
-        name                  = "container3"
-        container_access_type = "container"
+        name       = "userpool2"
+        vm_size    = "Standard_D4_v3"
+        node_count = 3
       }
     ]
   }
 
   assert {
-    condition     = length(azurerm_storage_container.containers) == 3
-    error_message = "Should create exactly three containers"
+    condition     = length(azurerm_kubernetes_cluster_node_pool.kubernetes_cluster_node_pool) == 2
+    error_message = "Should create exactly two additional node pools"
   }
 
   assert {
-    condition     = azurerm_storage_container.containers["container1"].container_access_type == "private"
-    error_message = "Container1 should have private access"
-  }
-
-  assert {
-    condition     = azurerm_storage_container.containers["container2"].container_access_type == "blob"
-    error_message = "Container2 should have blob access"
-  }
-
-  assert {
-    condition     = azurerm_storage_container.containers["container3"].container_access_type == "container"
-    error_message = "Container3 should have container access"
-  }
-}
-
-# Test 4: Container dependencies
-run "container_dependencies" {
-  command = plan
-
-  variables {
-    containers = [
-      {
-        name                  = "testcontainer"
-        container_access_type = "private"
-      }
-    ]
-  }
-
-  # Verify container depends on storage account
-  assert {
-    condition     = azurerm_storage_container.containers["testcontainer"].storage_account_name == azurerm_storage_account.storage_account.name
-    error_message = "Container should reference storage account name"
-  }
-}
-
-# Test 5: Container naming validation
-run "container_naming_validation" {
-  command = plan
-
-  variables {
-    containers = [
-      {
-        name                  = "valid-container-name"
-        container_access_type = "private"
-      }
-    ]
-  }
-
-  # Should succeed with valid container name
-}
-
-# Test 6: Empty containers list
-run "empty_containers_list" {
-  command = plan
-
-  variables {
-    containers = []
-  }
-
-  assert {
-    condition     = length(azurerm_storage_container.containers) == 0
-    error_message = "Empty containers list should create no containers"
-  }
-}
-
-# Test 7: Container with metadata
-run "container_with_metadata" {
-  command = plan
-
-  variables {
-    containers = [
-      {
-        name                  = "testcontainer"
-        container_access_type = "private"
-        metadata = {
-          environment = "test"
-          purpose     = "testing"
-        }
-      }
-    ]
-  }
-
-  assert {
-    condition     = azurerm_storage_container.containers["testcontainer"].metadata["environment"] == "test"
-    error_message = "Container metadata should be preserved"
+    condition     = azurerm_kubernetes_cluster_node_pool.kubernetes_cluster_node_pool["userpool2"].vm_size == "Standard_D4_v3"
+    error_message = "VM size for the second node pool should be correct"
   }
 }
 ```
@@ -745,7 +499,7 @@ run "container_with_metadata" {
 
 ```bash
 # Run all unit tests
-cd modules/azurerm_storage_account
+cd modules/azurerm_kubernetes_cluster
 terraform test
 
 # Run specific test file
@@ -763,35 +517,36 @@ terraform test -test-directory=tests/unit
 #### Successful Test Run
 ```
 tests/unit/defaults.tftest.hcl... in progress
-  run "verify_tls_defaults"... pass
-  run "verify_https_enforcement"... pass
-  run "verify_shared_keys_disabled"... pass
-  run "verify_infrastructure_encryption"... pass
+  run "verify_default_identity"... pass
+  run "verify_default_sku"... pass
+  run "verify_default_network_profile"... pass
+  run "verify_default_features"... pass
 tests/unit/defaults.tftest.hcl... pass
 
 tests/unit/validation.tftest.hcl... in progress
-  run "valid_storage_account_name"... pass
-  run "invalid_name_too_short"... pass
-  run "invalid_name_too_long"... pass
+  run "invalid_name_uppercase"... pass
+  run "invalid_name_special_chars"... pass
+  run "missing_dns_prefix"... pass
+  run "both_dns_prefixes_set"... pass
 tests/unit/validation.tftest.hcl... pass
 
-Success! 7 passed, 0 failed.
+Success! 8 passed, 0 failed.
 ```
 
 #### Failed Test Run
 ```
 tests/unit/defaults.tftest.hcl... in progress
-  run "verify_tls_defaults"... pass
-  run "verify_https_enforcement"... fail
+  run "verify_default_identity"... pass
+  run "verify_default_network_profile"... fail
 
 Error: Test assertion failed
 
-  on tests/unit/defaults.tftest.hcl line 25, in run "verify_https_enforcement":
-  25:     condition     = azurerm_storage_account.storage_account.enable_https_traffic_only == true
+  on tests/unit/defaults.tftest.hcl line 35, in run "verify_default_network_profile":
+  35:     condition     = azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].network_plugin == "azure"
       ├────────────────
-      │ azurerm_storage_account.storage_account.enable_https_traffic_only is false
+      │ azurerm_kubernetes_cluster.kubernetes_cluster.network_profile[0].network_plugin is "kubenet"
 
-HTTPS traffic only should be enabled by default
+Default network plugin should be azure
 
 tests/unit/defaults.tftest.hcl... fail
 
@@ -806,18 +561,18 @@ Always mock the Azure provider to avoid real API calls:
 
 ```hcl
 mock_provider "azurerm" {
-  mock_resource "azurerm_storage_account" {
+  mock_resource "azurerm_kubernetes_cluster" {
     defaults = {
       # Provide realistic mock values
-      id = "/subscriptions/mock/resourceGroups/mock-rg/providers/Microsoft.Storage/storageAccounts/mocksa"
+      id = "/subscriptions/mock/resourceGroups/mock-rg/providers/Microsoft.ContainerService/managedClusters/test-aks"
       # Include all attributes your tests will reference
     }
   }
   
   # Mock additional resources as needed
-  mock_resource "azurerm_storage_container" {
+  mock_resource "azurerm_kubernetes_cluster_node_pool" {
     defaults = {
-      id = "/subscriptions/mock/resourceGroups/mock-rg/providers/Microsoft.Storage/storageAccounts/mocksa/blobServices/default/containers/mockcontainer"
+      id = "/subscriptions/mock/resourceGroups/mock-rg/providers/Microsoft.ContainerService/managedClusters/test-aks/agentPools/testpool"
     }
   }
 }
@@ -829,13 +584,13 @@ Write clear, specific assertions with helpful error messages:
 
 ```hcl
 assert {
-  condition     = azurerm_storage_account.storage_account.min_tls_version == "TLS1_2"
-  error_message = "Default TLS version should be TLS1_2 for security compliance"
+  condition     = azurerm_kubernetes_cluster.kubernetes_cluster.identity[0].type == "SystemAssigned"
+  error_message = "Default identity type should be SystemAssigned for security compliance"
 }
 
 assert {
-  condition     = length(azurerm_storage_account.storage_account.name) >= 3 && length(azurerm_storage_account.storage_account.name) <= 24
-  error_message = "Storage account name must be between 3 and 24 characters (current: ${length(azurerm_storage_account.storage_account.name)})"
+  condition     = can(regex("^[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$", var.name))
+  error_message = "Cluster name must follow AKS naming rules"
 }
 ```
 
@@ -863,15 +618,25 @@ Use consistent variable patterns across tests:
 ```hcl
 # Standard variables for all tests
 variables {
-  name                = "teststorage"
+  name                = "test-aks"
   resource_group_name = "test-rg"
   location           = "northeurope"
+  dns_config = {
+    dns_prefix = "testaks"
+  }
+  default_node_pool = {
+    name       = "default"
+    vm_size    = "Standard_D2_v2"
+    node_count = 1
+  }
 }
 
 # Override specific variables per test
-run "test_with_custom_tier" {
+run "test_with_custom_sku" {
   variables {
-    account_tier = "Premium"
+    sku_config = {
+      sku_tier = "Standard"
+    }
   }
   
   # Test implementation
@@ -884,9 +649,9 @@ Test validation rules thoroughly:
 
 ```hcl
 # Test each validation rule separately
-run "invalid_name_too_short" {
+run "invalid_name_uppercase" {
   variables {
-    name = "ab"  # Specific invalid case
+    name = "InvalidAKSName"
   }
   
   expect_failures = [var.name]
@@ -894,7 +659,7 @@ run "invalid_name_too_short" {
 
 run "invalid_name_special_chars" {
   variables {
-    name = "test-storage"  # Different invalid case
+    name = "invalid_aks_name"
   }
   
   expect_failures = [var.name]
@@ -919,14 +684,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        module: [storage_account, virtual_network, key_vault]
+        module: [kubernetes_cluster, virtual_network, key_vault]
     
     steps:
       - uses: actions/checkout@v5
       
       - uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.9.0
+          terraform_version: 1.12.2
       
       - name: Run Unit Tests
         run: |
@@ -935,7 +700,7 @@ jobs:
           terraform test -test-directory=tests/unit
 ```
 
-### Pre-commit Hook
+### Pre-commit Hook (Optional)
 
 ```yaml
 # .pre-commit-config.yaml
@@ -944,7 +709,7 @@ repos:
     hooks:
       - id: terraform-test
         name: Terraform Unit Tests
-        entry: bash -c 'cd modules/azurerm_storage_account && terraform test -test-directory=tests/unit'
+        entry: bash -c 'cd modules/azurerm_kubernetes_cluster && terraform test -test-directory=tests/unit'
         language: system
         files: \.(tf|tftest\.hcl)$
         pass_filenames: false
@@ -954,9 +719,9 @@ repos:
 
 Now that you understand native Terraform tests, proceed to:
 
-1. **[Variable Validation Testing](04-variable-validation.md)** - Deep dive into input validation
-2. **[Terratest Framework](05-terratest-framework.md)** - Learn integration testing
-3. **[Test Helpers & Utilities](07-test-helpers.md)** - Shared testing utilities
+1. **[Terratest Integration Overview](04-terratest-integration-overview.md)** - Learn integration testing
+2. **[Terratest Go File Structure](05-terratest-file-structure.md)** - Structure your Go tests
+3. **[Helper Pattern & Validation](06-terratest-helpers-and-validation.md)** - Shared testing utilities
 
 ---
 

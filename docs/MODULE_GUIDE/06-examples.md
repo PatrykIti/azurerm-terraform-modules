@@ -11,7 +11,7 @@ Examples are one of the most important parts of a module. They provide users wit
 
 ## Standard Example Scenarios
 
-Each module should, at a minimum, include the following examples. Add other use-case-specific examples as needed (e.g., `private-endpoint`).
+Each module should, at a minimum, include the following examples. Add other use-case-specific examples as needed (e.g., `diagnostic-settings`, `multi-node-pool`, `workload-identity`). The AKS module is the baseline, but examples may differ when a resource has a different feature set.
 
 ### 1. `basic`
 
@@ -36,76 +36,55 @@ A configuration that is hardened for production or security-sensitive environmen
 Each example is a self-contained Terraform configuration and MUST have the following files:
 
 - **`main.tf`**: The main configuration file for the example. It should call the module and set up any necessary dependencies (like a resource group or virtual network).
-- **`variables.tf`**: Defines any variables needed for the example. Often, this is just for a `location` or a random suffix for resource naming.
+- **`variables.tf`**: Defines any variables needed for the example. Often, this is just for a `location` and fixed resource names.
 - **`outputs.tf`**: Outputs any useful information from the created resources.
 - **`README.md`**: A dedicated documentation file for the example.
+- **`.terraform-docs.yml`**: Example-level terraform-docs configuration (AKS pattern).
 
 ## Resource Naming Conventions for Examples
 
-All examples MUST follow the established resource naming patterns from the `azurerm_storage_account` and `azurerm_virtual_network` modules, which were the first modules created and set the standard for this repository.
+All examples MUST follow the naming patterns from `azurerm_kubernetes_cluster`, which is the gold standard for this repository.
 
 ### Standard Naming Pattern
 
-Resources in examples should use the following naming pattern:
-- **Format**: `{prefix}-{resource-type}-{example-type}-example`
-- **No random suffixes in basic examples** (use fixed names for simplicity)
-- **Random suffixes only where needed** (complete/secure examples for uniqueness)
+Resources in examples should use fixed names with this pattern:
+- **Format**: `{prefix}-{module-or-resource}-{example-type}-example`
+- **Fixed names only** (no random suffixes in examples).
+- If a resource requires global uniqueness, use a fixed, compliant name and allow overrides via variables.
 
-### Resource Prefix Standards
+### Resource Prefix Standards (AKS-aligned examples)
 
 | Resource Type | Prefix | Example |
 |--------------|--------|---------|
-| Resource Group | `rg-` | `rg-storage-basic-example` |
-| Virtual Network | `vnet-` | `vnet-storage-complete-example` |
-| Subnet | `snet-` or `subnet-` | `snet-private-endpoints` |
-| Storage Account | `st` | `stexamplebasic001` (no hyphens) |
-| Network Security Group | `nsg-` | `nsg-storage-secure-example` |
-| Log Analytics Workspace | `law-` | `law-storage-example-${random_suffix}` |
-| Key Vault | `kv-` | `kv-storage-${random_suffix}` |
-| User Assigned Identity | `id-` | `id-storage-cmk-${random_suffix}` |
-| Route Table | `rt-` | `rt-network-basic-example` |
-| DDoS Protection Plan | `ddos-` | `ddos-vnet-secure-example` |
-| Network Watcher | `nw-` | `nw-vnet-example-${location}` |
-| Private Endpoint | `pe-` | `pe-storage-blob` |
+| Resource Group | `rg-` | `rg-aks-basic-example` |
+| Virtual Network | `vnet-` | `vnet-aks-complete-example` |
+| Subnet | `snet-` | `snet-aks-nodes-example` |
+| Network Security Group | `nsg-` | `nsg-aks-nodes-example` |
+| Log Analytics Workspace | `law-` | `law-aks-complete-example` |
+| User Assigned Identity | `uai-` | `uai-aks-complete-example` |
+| AKS Cluster | `aks-` | `aks-basic-example` |
 
 ### Example-Specific Guidelines
 
 #### Basic Examples
-- Use **fixed names** with variables and defaults
-- Pattern: `{prefix}-{resource-type}-basic-example`
-- Example: `var.resource_group_name` with default `"rg-storage-basic-example"`
+- Use **fixed names** with variables and defaults.
+- Pattern: `{prefix}-{module}-basic-example`.
 
 #### Complete Examples
-- Use **fixed base names** with optional random suffixes for globally unique resources
-- Pattern: `{prefix}-{resource-type}-complete-example[-${random_suffix}]`
-- Example: `"rg-storage-complete-example"` (no suffix for RG)
-- Example: `"stcomplete${random_string.suffix.result}"` (suffix for storage account)
+- Use **fixed names** (no random suffixes).
+- Pattern: `{prefix}-{module}-complete-example`.
+- Focus on feature coverage (networking, identity, monitoring).
 
 #### Secure Examples
-- Similar to complete examples but emphasize security features
-- Pattern: `{prefix}-{resource-type}-secure-example[-${random_suffix}]`
-- Use random suffixes for resources requiring uniqueness
-
-### Random Suffix Implementation
-
-When random suffixes are needed:
-```hcl
-resource "random_string" "suffix" {
-  length  = 8
-  special = false
-  upper   = false
-}
-```
+- Use **fixed names** (no random suffixes).
+- Pattern: `{prefix}-{module}-secure-example`.
+- Emphasize security-hardening features.
 
 ### Important Notes
 
-1. **Storage Account Names**: Due to Azure limitations, storage account names cannot contain hyphens and must be lowercase. Use patterns like `stexamplebasic001` or `stcomplete${random_suffix}`.
-
-2. **Fixed vs Random Names**: Basic examples should prefer fixed names for simplicity. Complete and secure examples should use random suffixes where global uniqueness is required.
-
-3. **Special Azure Requirements**: Some resources have specific naming requirements (e.g., `AzureFirewallSubnet` must be named exactly as shown).
-
-4. **Test Fixtures**: Note that test fixtures (in `/tests/` directories) follow a different pattern described in the Testing Guide.
+1. **Resource naming constraints**: Some Azure resources (e.g., storage accounts) have stricter naming rules (lowercase, no hyphens). Use fixed, compliant names in examples.
+2. **Special Azure requirements**: Some resources have mandatory names (e.g., `AzureFirewallSubnet`). Follow the provider requirements exactly.
+3. **Tests vs examples**: Dynamic/random names are used only in Go-based E2E tests under `tests/`.
 
 ### Example `README.md` Template
 

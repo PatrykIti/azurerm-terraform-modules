@@ -10,13 +10,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERCreationSimple benchmarks simple MODULE_TYPE_PLACEHOLDER creation
-func BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERCreationSimple(b *testing.B) {
+// BenchmarkMODULE_PASCAL_PLACEHOLDERCreationSimple benchmarks simple MODULE_TYPE_PLACEHOLDER creation
+func BenchmarkMODULE_PASCAL_PLACEHOLDERCreationSimple(b *testing.B) {
 	b.ReportAllocs()
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/simple")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		// Override the random_suffix for benchmarking
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -34,8 +34,8 @@ func BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERCreationSimple(b *testing.B) {
 	}
 }
 
-// BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERCreationWithFeatures benchmarks MODULE_TYPE_PLACEHOLDER with various features
-func BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERCreationWithFeatures(b *testing.B) {
+// BenchmarkMODULE_PASCAL_PLACEHOLDERCreationWithFeatures benchmarks MODULE_TYPE_PLACEHOLDER with various features
+func BenchmarkMODULE_PASCAL_PLACEHOLDERCreationWithFeatures(b *testing.B) {
 	b.ReportAllocs()
 
 	// Define different feature configurations to benchmark
@@ -73,7 +73,7 @@ func BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERCreationWithFeatures(b *testing.B) 
 		b.Run(fc.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/simple")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
 				// Apply feature configuration
@@ -99,8 +99,8 @@ func BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERCreationWithFeatures(b *testing.B) 
 	}
 }
 
-// BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERCreationWithScale benchmarks with different scale configurations
-func BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERCreationWithScale(b *testing.B) {
+// BenchmarkMODULE_PASCAL_PLACEHOLDERCreationWithScale benchmarks with different scale configurations
+func BenchmarkMODULE_PASCAL_PLACEHOLDERCreationWithScale(b *testing.B) {
 	b.ReportAllocs()
 
 	// Define different scale configurations
@@ -110,7 +110,7 @@ func BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERCreationWithScale(b *testing.B) {
 		b.Run(fmt.Sprintf("Scale_%d", count), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/simple")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
 				// Configure scale parameters based on resource type
@@ -136,8 +136,8 @@ func BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERCreationWithScale(b *testing.B) {
 	}
 }
 
-// BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERParallelCreation benchmarks parallel creation of MODULE_TYPE_PLACEHOLDER
-func BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERParallelCreation(b *testing.B) {
+// BenchmarkMODULE_PASCAL_PLACEHOLDERParallelCreation benchmarks parallel creation of MODULE_TYPE_PLACEHOLDER
+func BenchmarkMODULE_PASCAL_PLACEHOLDERParallelCreation(b *testing.B) {
 	parallelCounts := []int{1, 2, 5, 10}
 
 	for _, parallel := range parallelCounts {
@@ -146,7 +146,7 @@ func BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERParallelCreation(b *testing.B) {
 			b.RunParallel(func(pb *testing.PB) {
 				i := 0
 				for pb.Next() {
-					testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/simple")
+					testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
 					terraformOptions := getTerraformOptions(b, testFolder)
 					// Override the random_suffix for parallel testing
 					terraformOptions.Vars["random_suffix"] = fmt.Sprintf("par%d%d%s", parallel, i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -165,14 +165,14 @@ func BenchmarkMODULE_DISPLAY_NAME_PLACEHOLDERParallelCreation(b *testing.B) {
 	}
 }
 
-// TestMODULE_DISPLAY_NAME_PLACEHOLDERCreationTime validates creation time is within acceptable limits
-func TestMODULE_DISPLAY_NAME_PLACEHOLDERCreationTime(t *testing.T) {
+// TestMODULE_PASCAL_PLACEHOLDERCreationTime validates creation time is within acceptable limits
+func TestMODULE_PASCAL_PLACEHOLDERCreationTime(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping performance test in short mode")
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -190,8 +190,8 @@ func TestMODULE_DISPLAY_NAME_PLACEHOLDERCreationTime(t *testing.T) {
 	t.Logf("MODULE_DISPLAY_NAME_PLACEHOLDER created in %v", duration)
 }
 
-// TestMODULE_DISPLAY_NAME_PLACEHOLDERScaling tests creating multiple MODULE_TYPE_PLACEHOLDER instances
-func TestMODULE_DISPLAY_NAME_PLACEHOLDERScaling(t *testing.T) {
+// TestMODULE_PASCAL_PLACEHOLDERScaling tests creating multiple MODULE_TYPE_PLACEHOLDER instances
+func TestMODULE_PASCAL_PLACEHOLDERScaling(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping scaling test in short mode")
 	}
@@ -201,7 +201,7 @@ func TestMODULE_DISPLAY_NAME_PLACEHOLDERScaling(t *testing.T) {
 
 	// Create multiple instances sequentially
 	for i := 0; i < instanceCount; i++ {
-		testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/simple")
+		testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(t, testFolder)
 		// Override the random_suffix for each iteration
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("scale%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -231,14 +231,14 @@ func TestMODULE_DISPLAY_NAME_PLACEHOLDERScaling(t *testing.T) {
 		"Average creation time %v exceeds maximum of 3 minutes", avgTime)
 }
 
-// TestMODULE_DISPLAY_NAME_PLACEHOLDERUpdatePerformance tests update performance
-func TestMODULE_DISPLAY_NAME_PLACEHOLDERUpdatePerformance(t *testing.T) {
+// TestMODULE_PASCAL_PLACEHOLDERUpdatePerformance tests update performance
+func TestMODULE_PASCAL_PLACEHOLDERUpdatePerformance(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping performance test in short mode")
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -289,14 +289,14 @@ func TestMODULE_DISPLAY_NAME_PLACEHOLDERUpdatePerformance(t *testing.T) {
 	}
 }
 
-// TestMODULE_DISPLAY_NAME_PLACEHOLDERDestroyPerformance tests destroy performance
-func TestMODULE_DISPLAY_NAME_PLACEHOLDERDestroyPerformance(t *testing.T) {
+// TestMODULE_PASCAL_PLACEHOLDERDestroyPerformance tests destroy performance
+func TestMODULE_PASCAL_PLACEHOLDERDestroyPerformance(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping performance test in short mode")
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	// Create resource

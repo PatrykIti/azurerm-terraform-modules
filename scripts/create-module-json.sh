@@ -3,6 +3,8 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Function to convert module name to different formats
 convert_name() {
     local module_name=$1
@@ -68,8 +70,13 @@ echo "✅ Created $MODULE_JSON_PATH"
 
 # Also create/update .releaserc.js if it doesn't exist or is old format
 RELEASERC_PATH="$MODULE_DIR/.releaserc.js"
+TEMPLATE_RELEASERC="$SCRIPT_DIR/templates/.releaserc.js"
 if [[ ! -f "$RELEASERC_PATH" ]] || ! grep -q "module.json" "$RELEASERC_PATH"; then
-    echo "📝 Creating/updating $RELEASERC_PATH..."
-    cp scripts/templates/.releaserc.auto.js "$RELEASERC_PATH"
-    echo "✅ Created/updated $RELEASERC_PATH"
+    if [[ -f "$TEMPLATE_RELEASERC" ]]; then
+        echo "📝 Creating/updating $RELEASERC_PATH..."
+        cp "$TEMPLATE_RELEASERC" "$RELEASERC_PATH"
+        echo "✅ Created/updated $RELEASERC_PATH"
+    else
+        echo "⚠️  Template $TEMPLATE_RELEASERC not found. Skipping .releaserc.js creation."
+    fi
 fi
