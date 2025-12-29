@@ -6,6 +6,9 @@ kubeconfig
 
 # Local .terraform directories
 **/.terraform/*
+**/.terraform/
+**/.terraform.tfstate.lock.info
+**/terraform.tfstate.d/
 tfplan
 
 # .tfstate files
