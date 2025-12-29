@@ -5,7 +5,7 @@ This example exercises secure repository policies and stricter review requiremen
 ## Features
 
 - Minimum reviewers policy with blocking enabled
-- Check credentials policy enabled
+- Dedicated branch used for policy scope (develop)
 - Reserved names policy enabled
 
 ## Key Configuration

@@ -52,7 +52,7 @@ locals {
       scope = [
         for scope in policy.scope : merge(scope, {
           match_type     = coalesce(scope.match_type, "DefaultBranch")
-          repository_id  = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : coalesce(scope.repository_id, local.repository_id)
+          repository_id  = coalesce(scope.repository_id, local.repository_id)
           repository_ref = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : scope.repository_ref
         })
       ]
@@ -64,7 +64,7 @@ locals {
       scope = [
         for scope in policy.scope : merge(scope, {
           match_type     = coalesce(scope.match_type, "DefaultBranch")
-          repository_id  = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : coalesce(scope.repository_id, local.repository_id)
+          repository_id  = coalesce(scope.repository_id, local.repository_id)
           repository_ref = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : scope.repository_ref
         })
       ]
@@ -76,7 +76,7 @@ locals {
       scope = [
         for scope in policy.scope : merge(scope, {
           match_type     = coalesce(scope.match_type, "DefaultBranch")
-          repository_id  = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : coalesce(scope.repository_id, local.repository_id)
+          repository_id  = coalesce(scope.repository_id, local.repository_id)
           repository_ref = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : scope.repository_ref
         })
       ]
@@ -88,7 +88,7 @@ locals {
       scope = [
         for scope in policy.scope : merge(scope, {
           match_type     = coalesce(scope.match_type, "DefaultBranch")
-          repository_id  = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : coalesce(scope.repository_id, local.repository_id)
+          repository_id  = coalesce(scope.repository_id, local.repository_id)
           repository_ref = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : scope.repository_ref
         })
       ]
@@ -100,7 +100,7 @@ locals {
       scope = [
         for scope in policy.scope : merge(scope, {
           match_type     = coalesce(scope.match_type, "DefaultBranch")
-          repository_id  = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : coalesce(scope.repository_id, local.repository_id)
+          repository_id  = coalesce(scope.repository_id, local.repository_id)
           repository_ref = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : scope.repository_ref
         })
       ]
@@ -112,7 +112,7 @@ locals {
       scope = [
         for scope in policy.scope : merge(scope, {
           match_type     = coalesce(scope.match_type, "DefaultBranch")
-          repository_id  = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : coalesce(scope.repository_id, local.repository_id)
+          repository_id  = coalesce(scope.repository_id, local.repository_id)
           repository_ref = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : scope.repository_ref
         })
       ]
@@ -124,7 +124,7 @@ locals {
       scope = [
         for scope in policy.scope : merge(scope, {
           match_type     = coalesce(scope.match_type, "DefaultBranch")
-          repository_id  = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : coalesce(scope.repository_id, local.repository_id)
+          repository_id  = coalesce(scope.repository_id, local.repository_id)
           repository_ref = coalesce(scope.match_type, "DefaultBranch") == "DefaultBranch" ? null : scope.repository_ref
         })
       ]

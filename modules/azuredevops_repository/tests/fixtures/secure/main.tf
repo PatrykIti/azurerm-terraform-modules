@@ -20,6 +20,13 @@ module "azuredevops_repository" {
     init_type = "Clean"
   }
 
+  branches = [
+    {
+      key  = "develop"
+      name = "develop"
+    }
+  ]
+
   branch_policy_min_reviewers = [
     {
       key            = "min-reviewers"
@@ -27,7 +34,8 @@ module "azuredevops_repository" {
       blocking       = true
       scope = [
         {
-          match_type = "DefaultBranch"
+          match_type     = "Exact"
+          repository_ref = "refs/heads/develop"
         }
       ]
     }

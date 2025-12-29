@@ -15,3 +15,4 @@
 - **Stable list keys + validation:** branches/files/permissions/policies now use `list(object)` with stable keys, uniqueness checks, and preconditions for repository defaulting.
 - **Policy scope fixes:** match_type validation plus DefaultBranch scope handling (repository_id/repository_ref optional) and tightened policy-specific rules.
 - **Outputs/docs/tests:** new map-based outputs for branches/files/permissions/policies, updated import guide, examples, fixtures, unit tests, and terratest scenarios; removed deprecated check_credentials policy support to avoid provider warnings.
+- **DefaultBranch scoping:** branch policies now default to the module repository when match_type is DefaultBranch to avoid project-wide policy conflicts.

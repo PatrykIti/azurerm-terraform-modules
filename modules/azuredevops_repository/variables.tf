@@ -539,13 +539,11 @@ variable "branch_policy_auto_reviewers" {
     condition = alltrue([
       for policy in var.branch_policy_auto_reviewers : alltrue([
         for scope in policy.scope : (
-          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || (
-            scope.repository_id == null && scope.repository_ref == null
-          )
+          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || scope.repository_ref == null
         )
       ])
     ])
-    error_message = "branch_policy_auto_reviewers.scope must omit repository_id and repository_ref when match_type is DefaultBranch."
+    error_message = "branch_policy_auto_reviewers.scope.repository_ref must be omitted when match_type is DefaultBranch."
   }
 
   validation {
@@ -678,13 +676,11 @@ variable "branch_policy_build_validation" {
     condition = alltrue([
       for policy in var.branch_policy_build_validation : alltrue([
         for scope in policy.scope : (
-          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || (
-            scope.repository_id == null && scope.repository_ref == null
-          )
+          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || scope.repository_ref == null
         )
       ])
     ])
-    error_message = "branch_policy_build_validation.scope must omit repository_id and repository_ref when match_type is DefaultBranch."
+    error_message = "branch_policy_build_validation.scope.repository_ref must be omitted when match_type is DefaultBranch."
   }
 
   validation {
@@ -788,13 +784,11 @@ variable "branch_policy_comment_resolution" {
     condition = alltrue([
       for policy in var.branch_policy_comment_resolution : alltrue([
         for scope in policy.scope : (
-          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || (
-            scope.repository_id == null && scope.repository_ref == null
-          )
+          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || scope.repository_ref == null
         )
       ])
     ])
-    error_message = "branch_policy_comment_resolution.scope must omit repository_id and repository_ref when match_type is DefaultBranch."
+    error_message = "branch_policy_comment_resolution.scope.repository_ref must be omitted when match_type is DefaultBranch."
   }
 
   validation {
@@ -902,13 +896,11 @@ variable "branch_policy_merge_types" {
     condition = alltrue([
       for policy in var.branch_policy_merge_types : alltrue([
         for scope in policy.scope : (
-          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || (
-            scope.repository_id == null && scope.repository_ref == null
-          )
+          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || scope.repository_ref == null
         )
       ])
     ])
-    error_message = "branch_policy_merge_types.scope must omit repository_id and repository_ref when match_type is DefaultBranch."
+    error_message = "branch_policy_merge_types.scope.repository_ref must be omitted when match_type is DefaultBranch."
   }
 
   validation {
@@ -1026,13 +1018,11 @@ variable "branch_policy_min_reviewers" {
     condition = alltrue([
       for policy in var.branch_policy_min_reviewers : alltrue([
         for scope in policy.scope : (
-          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || (
-            scope.repository_id == null && scope.repository_ref == null
-          )
+          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || scope.repository_ref == null
         )
       ])
     ])
-    error_message = "branch_policy_min_reviewers.scope must omit repository_id and repository_ref when match_type is DefaultBranch."
+    error_message = "branch_policy_min_reviewers.scope.repository_ref must be omitted when match_type is DefaultBranch."
   }
 
   validation {
@@ -1168,13 +1158,11 @@ variable "branch_policy_status_check" {
     condition = alltrue([
       for policy in var.branch_policy_status_check : alltrue([
         for scope in policy.scope : (
-          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || (
-            scope.repository_id == null && scope.repository_ref == null
-          )
+          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || scope.repository_ref == null
         )
       ])
     ])
-    error_message = "branch_policy_status_check.scope must omit repository_id and repository_ref when match_type is DefaultBranch."
+    error_message = "branch_policy_status_check.scope.repository_ref must be omitted when match_type is DefaultBranch."
   }
 
   validation {
@@ -1278,13 +1266,11 @@ variable "branch_policy_work_item_linking" {
     condition = alltrue([
       for policy in var.branch_policy_work_item_linking : alltrue([
         for scope in policy.scope : (
-          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || (
-            scope.repository_id == null && scope.repository_ref == null
-          )
+          coalesce(scope.match_type, "DefaultBranch") != "DefaultBranch" || scope.repository_ref == null
         )
       ])
     ])
-    error_message = "branch_policy_work_item_linking.scope must omit repository_id and repository_ref when match_type is DefaultBranch."
+    error_message = "branch_policy_work_item_linking.scope.repository_ref must be omitted when match_type is DefaultBranch."
   }
 
   validation {

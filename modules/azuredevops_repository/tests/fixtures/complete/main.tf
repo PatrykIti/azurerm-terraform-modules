@@ -43,7 +43,8 @@ module "azuredevops_repository" {
       reviewer_count = 1
       scope = [
         {
-          match_type = "DefaultBranch"
+          match_type     = "Exact"
+          repository_ref = "refs/heads/develop"
         }
       ]
     }
