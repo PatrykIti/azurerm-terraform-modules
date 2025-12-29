@@ -19,7 +19,7 @@ resource "random_string" "suffix" {
 }
 
 module "azuredevops_identity" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_identity?ref=ADOI1.0.0"
 
   group_display_name = "${var.group_name_prefix}-${random_string.suffix.result}"
   group_description  = "Read-only group for demos"
