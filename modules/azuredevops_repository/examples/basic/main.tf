@@ -1,0 +1,22 @@
+provider "azuredevops" {}
+
+module "azuredevops_repository" {
+  source = "../../"
+
+  project_id = var.project_id
+  name       = "ado-repo-basic"
+
+  initialization = {
+    init_type = "Clean"
+  }
+
+  files = [
+    {
+      key                 = "readme"
+      file                = "README.md"
+      content             = "# Repository\n\nManaged by Terraform."
+      commit_message      = "Add README"
+      overwrite_on_create = true
+    }
+  ]
+}

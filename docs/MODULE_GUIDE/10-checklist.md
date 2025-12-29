@@ -61,3 +61,4 @@ Before submitting a pull request for a new module, please review this checklist 
 ## CI/CD Integration
 
 - [ ] `module.json` and `.releaserc.js` are configured for release automation.
+- [ ] `commit_scope` is added to `scopes` in `.github/workflows/pr-validation.yml`.

@@ -1,0 +1,28 @@
+provider "azuredevops" {}
+
+resource "azuredevops_git_repository" "example" {
+  project_id = var.project_id
+  name       = var.repo_name
+
+  initialization {
+    init_type = "Clean"
+  }
+}
+
+module "azuredevops_pipelines" {
+  source = "../../"
+
+  project_id = var.project_id
+
+  name = var.pipeline_name
+
+  repository = {
+    repo_type = "TfsGit"
+    repo_id   = azuredevops_git_repository.example.id
+    yml_path  = var.yaml_path
+  }
+
+  ci_trigger = {
+    use_yaml = true
+  }
+}

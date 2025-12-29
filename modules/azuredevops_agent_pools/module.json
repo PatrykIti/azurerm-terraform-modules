@@ -1,0 +1,7 @@
+{
+  "name": "azuredevops_agent_pools",
+  "title": "Azure DevOps Agent Pools",
+  "commit_scope": "azuredevops-agent-pools",
+  "tag_prefix": "ADOAP",
+  "description": "Azure DevOps agent pools module for managing pools, queues, and elastic pools"
+}

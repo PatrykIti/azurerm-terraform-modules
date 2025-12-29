@@ -1,0 +1,58 @@
+# Test configuration for CI/CD integration
+
+test_suites:
+  - name: "Basic Tests"
+    tests:
+      - TestBasicAzuredevopsEnvironments
+    parallel: true
+    timeout: 15m
+
+  - name: "Complete Tests"
+    tests:
+      - TestCompleteAzuredevopsEnvironments
+      - TestSecureAzuredevopsEnvironments
+    parallel: true
+    timeout: 30m
+
+  - name: "Validation Tests"
+    tests:
+      - TestAzuredevopsEnvironmentsValidationRules
+    parallel: true
+    timeout: 10m
+
+  - name: "Integration Tests"
+    tests:
+      - TestAzuredevopsEnvironmentsFullIntegration
+    parallel: false
+    timeout: 45m
+
+# Test environment requirements
+environment:
+  required_vars:
+    - AZDO_ORG_SERVICE_URL
+    - AZDO_PERSONAL_ACCESS_TOKEN
+    - AZDO_PROJECT_ID
+
+# Test stages for CI/CD pipelines
+stages:
+  - name: "validation"
+    description: "Validate code and configurations"
+    steps:
+      - "fmt-check"
+      - "lint"
+      - "validate-fixtures"
+      - "security"
+
+  - name: "unit"
+    description: "Run unit and validation tests"
+    test_suites:
+      - "Basic Tests"
+      - "Validation Tests"
+    fail_fast: true
+
+  - name: "integration"
+    description: "Run integration tests"
+    test_suites:
+      - "Complete Tests"
+      - "Integration Tests"
+    fail_fast: false
