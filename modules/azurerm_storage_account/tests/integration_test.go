@@ -20,7 +20,7 @@ func TestStorageAccountFullIntegration(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -157,7 +157,7 @@ func TestStorageAccountLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/simple")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
 	defer terraform.Destroy(t, terraformOptions)
@@ -191,7 +191,7 @@ func TestStorageAccountDisasterRecovery(t *testing.T) {
 		t.Skip("Skipping disaster recovery test in short mode")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/simple")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
 	// Use RA-GRS for read access to secondary region
@@ -238,7 +238,7 @@ func TestStorageAccountDisasterRecovery(t *testing.T) {
 func TestStorageAccountCompliance(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/security")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/security")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
 	defer terraform.Destroy(t, terraformOptions)
@@ -295,7 +295,7 @@ func TestStorageAccountCompliance(t *testing.T) {
 func TestStorageAccountMonitoring(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_storage_account/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
 	defer terraform.Destroy(t, terraformOptions)

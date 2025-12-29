@@ -109,7 +109,7 @@ module "virtual_network" {
 
 # After release (automatically updated)
 module "virtual_network" {
-  source = "github.com/org/repo//modules/azurerm_virtual_network?ref=VNv1.2.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.2.0"
 }
 ```
 

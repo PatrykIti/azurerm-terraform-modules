@@ -15,7 +15,7 @@ func TestBasicAzuredevopsExtension(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_extension/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	vars := getExtensionVarsFromEnv()
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(testFolder, vars))
@@ -41,7 +41,7 @@ func TestCompleteAzuredevopsExtension(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_extension/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
 	vars := map[string]interface{}{
 		"extensions": getExtensionsFromEnv(),
 	}
@@ -70,7 +70,7 @@ func TestSecureAzuredevopsExtension(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_extension/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
 	vars := map[string]interface{}{
 		"approved_extensions": getExtensionsFromEnv(),
 	}
@@ -98,7 +98,7 @@ func TestAzuredevopsExtensionValidationRules(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_extension/tests/fixtures/negative")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/negative")
 	terraformOptions := &terraform.Options{
 		TerraformDir: testFolder,
 		NoColor:      true,

@@ -17,7 +17,7 @@ func TestBasicAzuredevopsVariableGroups(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_variable_groups/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -42,7 +42,7 @@ func TestCompleteAzuredevopsVariableGroups(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_variable_groups/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -67,7 +67,7 @@ func TestSecureAzuredevopsVariableGroups(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_variable_groups/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -92,7 +92,7 @@ func TestAzuredevopsVariableGroupsValidationRules(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_variable_groups/tests/fixtures/negative")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/negative")
 	terraformOptions := &terraform.Options{
 		TerraformDir: testFolder,
 		Vars: map[string]interface{}{

@@ -13,7 +13,7 @@ import (
 func TestSimpleNetworkSecurityGroup(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/simple")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/simple")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -42,7 +42,7 @@ func TestSimpleNetworkSecurityGroup(t *testing.T) {
 func TestCompleteNetworkSecurityGroup(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -74,7 +74,7 @@ func TestCompleteNetworkSecurityGroup(t *testing.T) {
 func TestNetworkNetworkSecurityGroup(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/network")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/network")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
@@ -105,7 +105,7 @@ func TestNetworkNetworkSecurityGroup(t *testing.T) {
 func TestNetworkSecurityGroupValidationRules(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_network_security_group/tests/fixtures/negative")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/negative")
 
 	terraformOptions := &terraform.Options{
 		TerraformDir: testFolder,

@@ -45,6 +45,12 @@ module "azuredevops_wiki" {
 - [Secure](examples/secure) - This example demonstrates a minimal wiki intended for security guidance.
 <!-- END_EXAMPLES -->
 
+## Module Documentation
+
+- [docs/README.md](docs/README.md) - Module-specific documentation overview
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps wikis into the module
+
+
 <!-- BEGIN_TF_DOCS -->
 
 

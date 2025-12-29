@@ -80,8 +80,10 @@ azurerm-terraform-modules/
 
 #### `detect-changes`
 - Parses PR title scopes (e.g., `feat(azurerm_virtual_network): ...`) for module names.
-- Generates dynamic `paths-filter` based on current module list.
-- Merges PR-title detection and path detection.
+- Builds a `commit_scope` → module map from `module.json` and resolves scopes accordingly.
+- Prefers PR-title scopes when present; path-based detection is a fallback only.
+- Warns when path changes include modules not listed in the PR title scope.
+- Generates dynamic `paths-filter` based on current module list, ignoring Terraform caches (`.terraform`, lockfiles, state, plans, crash logs).
 - For workflow_dispatch with `module` input, uses that module directly.
 - Outputs:
   - `modules` (JSON array)
@@ -96,6 +98,7 @@ azurerm-terraform-modules/
 - Logs in to Azure via OIDC (`azure/login@v2`).
 - Runs `.github/actions/module-runner` with `action=test`.
 - Passes Azure credentials JSON for ARM/AZURE env var setup.
+- Passes Azure DevOps secrets (`AZDO_ORG_SERVICE_URL`, `AZDO_PERSONAL_ACCESS_TOKEN`, `AZDO_PROJECT_ID`) for ADO integration tests.
 
 #### `security-scan` (matrix)
 - Runs `.github/actions/module-runner` with `action=security`.
@@ -124,13 +127,14 @@ azurerm-terraform-modules/
 **Jobs**:
 
 #### `detect-changes`
-- Same detection strategy as Module CI.
+- Same detection strategy as Module CI (scope-first; path-only fallback).
+- Ignores non-module scopes (e.g., `core`, `docs`, `ci`) when parsing PR titles.
 - Outputs module matrix.
 
 #### `validate-pr-title`
 - Uses `amannn/action-semantic-pull-request@v6`.
 - Enforces conventional commit style.
-- Scopes include module names and core tooling scopes.
+- Scopes include module names and core tooling scopes (manually maintained).
 
 #### `terraform-fmt` (matrix)
 - Runs `terraform fmt -check -recursive` across module subdirs containing `.tf`.
@@ -185,6 +189,7 @@ azurerm-terraform-modules/
 - Validates module presence and `.releaserc.*`.
 - Reads module configuration via `scripts/get-module-config.js`.
 - Runs semantic-release with module-specific config.
+- `@semantic-release/exec` executes under `/bin/sh`; `prepareCmd` must use POSIX syntax (`[ ... ]`).
 
 **Scripts and actions used**:
 - `.github/actions/terraform-setup` (installs terraform-docs for release).
@@ -205,7 +210,7 @@ azurerm-terraform-modules/
 - If manual input `modules` is provided, uses it directly.
 - Otherwise attempts to detect the PR number from the merge commit.
 - Uses `gh api` to fetch the PR title and parse scope(s).
-- Builds a module list for release.
+- Builds a module list using `commit_scope` from `module.json` (no path detection).
 
 **Release behavior**:
 - Calls `module-release.yml` via `workflow_call`.
@@ -292,7 +297,8 @@ Scripts listed here are invoked by workflows directly or via semantic-release.
 
 1. **Root README entry required**: `scripts/update-root-readme.sh` updates rows only if the module is listed in the root tables; missing rows are reported and remain unchanged.
 2. **Badge label coupling**: Badge updates rely on `MODULE_DISPLAY_NAME`; if it diverges from the README badge label, duplicates can appear.
-3. **Missing template in updater**: `scripts/update-module-releaserc.sh` references `scripts/templates/.releaserc.auto.js`, which does not exist.
+3. **Shell compatibility in release**: `@semantic-release/exec` runs in `/bin/sh`; bash-only conditionals (`[[ ... ]]`) will be skipped and may prevent release-time updates.
+4. **Missing template in updater**: `scripts/update-module-releaserc.sh` references `scripts/templates/.releaserc.auto.js`, which does not exist.
 
 ## Shared Actions
 
@@ -315,6 +321,7 @@ Scripts listed here are invoked by workflows directly or via semantic-release.
 - Installs Terraform (default `1.12.2`).
 - Caches provider plugins.
 - Optionally installs TFLint and terraform-docs.
+- Installs terraform-docs via a temporary directory and cleans up artifacts.
 
 ### 3. Module Runner (`module-runner`)
 
@@ -404,7 +411,10 @@ Ensure `module.json` exists and is correct:
 
 ### Step 3: Workflow Auto-Detection
 
-No manual updates are needed. CI/CD workflows automatically detect modules under `modules/`.
+CI/CD workflows automatically detect modules under `modules/`, but you must update the PR title scope list:
+
+1. Add the module `commit_scope` to `.github/workflows/pr-validation.yml` under `validate-pr-title.scopes`.
+2. Confirm `module.json` is committed so scope-to-module resolution works.
 
 ## Troubleshooting
 
@@ -435,6 +445,12 @@ No manual updates are needed. CI/CD workflows automatically detect modules under
      ./scripts/update-module-docs.sh <module_name>
      ```
    - Avoid running terraform-docs from repo root.
+
+7. **Release prepare step skips updates**
+   - Ensure `prepareCmd` uses POSIX `[ ... ]` instead of `[[ ... ]]` because it runs under `/bin/sh`.
+
+8. **Azure DevOps tests skip unexpectedly**
+   - Confirm `AZDO_ORG_SERVICE_URL`, `AZDO_PERSONAL_ACCESS_TOKEN`, and `AZDO_PROJECT_ID` secrets are available.
 
 7. **Network Watcher limit reached**
    - Azure allows only one Network Watcher per region.

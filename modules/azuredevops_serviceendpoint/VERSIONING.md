@@ -109,7 +109,7 @@ module "azuredevops_serviceendpoint" {
 
 # After release (automatically updated)
 module "azuredevops_serviceendpoint" {
-  source = "github.com/org/repo//modules/azuredevops_serviceendpoint?ref=ADORv1.2.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_serviceendpoint?ref=ADORv1.2.0"
 }
 ```
 

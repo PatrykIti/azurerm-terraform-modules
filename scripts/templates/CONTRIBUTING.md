@@ -63,7 +63,7 @@ Types:
 1. All changes must include tests
 2. Run tests locally before submitting PR:
    ```bash
-   cd modules/MODULE_NAME_PLACEHOLDER/tests
+   cd tests
    make test
    ```
 3. Ensure all tests pass

@@ -16,7 +16,7 @@ func BenchmarkMODULE_PASCAL_PLACEHOLDERCreationSimple(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		// Override the random_suffix for benchmarking
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -73,7 +73,7 @@ func BenchmarkMODULE_PASCAL_PLACEHOLDERCreationWithFeatures(b *testing.B) {
 		b.Run(fc.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
 				// Apply feature configuration
@@ -110,7 +110,7 @@ func BenchmarkMODULE_PASCAL_PLACEHOLDERCreationWithScale(b *testing.B) {
 		b.Run(fmt.Sprintf("Scale_%d", count), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
 				// Configure scale parameters based on resource type
@@ -146,7 +146,7 @@ func BenchmarkMODULE_PASCAL_PLACEHOLDERParallelCreation(b *testing.B) {
 			b.RunParallel(func(pb *testing.PB) {
 				i := 0
 				for pb.Next() {
-					testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
+					testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
 					terraformOptions := getTerraformOptions(b, testFolder)
 					// Override the random_suffix for parallel testing
 					terraformOptions.Vars["random_suffix"] = fmt.Sprintf("par%d%d%s", parallel, i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -172,7 +172,7 @@ func TestMODULE_PASCAL_PLACEHOLDERCreationTime(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -201,7 +201,7 @@ func TestMODULE_PASCAL_PLACEHOLDERScaling(t *testing.T) {
 
 	// Create multiple instances sequentially
 	for i := 0; i < instanceCount; i++ {
-		testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 		terraformOptions := getTerraformOptions(t, testFolder)
 		// Override the random_suffix for each iteration
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("scale%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -238,7 +238,7 @@ func TestMODULE_PASCAL_PLACEHOLDERUpdatePerformance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -296,7 +296,7 @@ func TestMODULE_PASCAL_PLACEHOLDERDestroyPerformance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "MODULE_NAME_PLACEHOLDER/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	// Create resource

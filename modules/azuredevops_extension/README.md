@@ -35,6 +35,12 @@ Note: Terraform reserves the module argument `version`, so the optional pin is e
 - [Secure](examples/secure) - This example demonstrates installing only approved Azure DevOps Marketplace extensions using an allowlist.
 <!-- END_EXAMPLES -->
 
+## Module Documentation
+
+- [docs/README.md](docs/README.md) - Module-specific documentation overview
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps extensions into the module
+
+
 <!-- BEGIN_TF_DOCS -->
 
 
@@ -81,4 +87,3 @@ No modules.
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
-- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps extensions into the module

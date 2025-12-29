@@ -18,7 +18,7 @@ func TestBasicAzuredevopsIdentity(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_identity/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -48,7 +48,7 @@ func TestCompleteAzuredevopsIdentity(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_identity/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -81,7 +81,7 @@ func TestSecureAzuredevopsIdentity(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_identity/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -109,7 +109,7 @@ func TestAzuredevopsIdentityValidationRules(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_identity/tests/fixtures/negative")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/negative")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)

@@ -109,7 +109,7 @@ module "azuredevops_identity" {
 
 # After release (automatically updated)
 module "azuredevops_identity" {
-  source = "github.com/org/repo//modules/azuredevops_identity?ref=ADOIv1.2.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_identity?ref=ADOIv1.2.0"
 }
 ```
 

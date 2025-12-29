@@ -109,7 +109,7 @@ module "azuredevops_variable_groups" {
 
 # After release (automatically updated)
 module "azuredevops_variable_groups" {
-  source = "github.com/org/repo//modules/azuredevops_variable_groups?ref=ADOVGv1.2.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_variable_groups?ref=ADOVGv1.2.0"
 }
 ```
 

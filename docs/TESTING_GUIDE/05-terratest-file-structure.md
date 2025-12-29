@@ -26,7 +26,7 @@ func TestBasicKubernetesCluster(t *testing.T) {
 	t.Parallel()
 
 	// 1. Setup: Copy the fixture to a temp folder
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_cluster/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	
 	// 2. Defer Cleanup
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -86,7 +86,7 @@ func TestKubernetesClusterValidationRules(t *testing.T) {
 			t.Parallel()
 
 			// Copy the specific negative fixture
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_cluster/tests/fixtures/"+tc.fixtureFolder)
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/"+tc.fixtureFolder)
 			
 			terraformOptions := &terraform.Options{
 				TerraformDir: testFolder,
@@ -123,7 +123,7 @@ func TestKubernetesClusterLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_cluster/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
 	defer terraform.Destroy(t, terraformOptions)
@@ -166,7 +166,7 @@ func BenchmarkKubernetesClusterCreation(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer() // Pause timer for setup
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_kubernetes_cluster/tests/fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		b.StartTimer() // Resume timer for the operation
 

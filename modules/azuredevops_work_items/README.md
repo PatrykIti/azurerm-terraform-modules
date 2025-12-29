@@ -71,6 +71,12 @@ module "work_items" {
 - [Secure](examples/secure) - This example demonstrates restricted permissions for work item areas, iterations, and tagging alongside a basic work item.
 <!-- END_EXAMPLES -->
 
+## Module Documentation
+
+- [docs/README.md](docs/README.md) - Module-specific documentation overview
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing work items, queries, and permissions into the module
+
+
 <!-- BEGIN_TF_DOCS -->
 
 
@@ -142,7 +148,6 @@ No modules.
 
 ## Additional Documentation
 
-- [docs/IMPORT.md](docs/IMPORT.md) - Import existing work items, queries, and permissions into the module
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines

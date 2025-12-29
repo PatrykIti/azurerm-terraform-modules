@@ -17,7 +17,7 @@ func TestBasicAzuredevopsServicehooks(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_servicehooks/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -42,7 +42,7 @@ func TestCompleteAzuredevopsServicehooks(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_servicehooks/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -71,7 +71,7 @@ func TestSecureAzuredevopsServicehooks(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_servicehooks/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -98,7 +98,7 @@ func TestAzuredevopsServicehooksValidationRules(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_servicehooks/tests/fixtures/negative")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/negative")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)

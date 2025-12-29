@@ -39,6 +39,12 @@ module "azuredevops_team" {
 - [Secure](examples/secure) - This example demonstrates a security-focused team configuration.
 <!-- END_EXAMPLES -->
 
+## Module Documentation
+
+- [docs/README.md](docs/README.md) - Module-specific documentation overview
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps teams into the module
+
+
 <!-- BEGIN_TF_DOCS -->
 
 
@@ -89,7 +95,6 @@ No modules.
 
 ## Additional Documentation
 
-- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps teams into the module
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines

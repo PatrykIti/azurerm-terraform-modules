@@ -39,6 +39,12 @@ module "azuredevops_agent_pools" {
 - [Secure](examples/secure) - This example demonstrates a security-focused Azure DevOps Agent Pools configuration with minimal automation.
 <!-- END_EXAMPLES -->
 
+## Module Documentation
+
+- [docs/README.md](docs/README.md) - Module-specific documentation overview
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps Agent Pools into the module
+
+
 <!-- BEGIN_TF_DOCS -->
 
 

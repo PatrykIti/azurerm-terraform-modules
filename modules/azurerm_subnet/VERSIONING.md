@@ -109,7 +109,7 @@ module "subnet" {
 
 # After release (automatically updated)
 module "subnet" {
-  source = "github.com/org/repo//modules/azurerm_subnet?ref=SNv1.2.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.2.0"
 }
 ```
 

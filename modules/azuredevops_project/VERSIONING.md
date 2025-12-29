@@ -109,7 +109,7 @@ module "azuredevops_project" {
 
 # After release (automatically updated)
 module "azuredevops_project" {
-  source = "github.com/org/repo//modules/azuredevops_project?ref=ADOPv1.2.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_project?ref=ADOPv1.2.0"
 }
 ```
 

@@ -16,7 +16,7 @@ func TestBasicAzuredevopsPipelines(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_pipelines/tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -41,7 +41,7 @@ func TestCompleteAzuredevopsPipelines(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_pipelines/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -68,7 +68,7 @@ func TestSecureAzuredevopsPipelines(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_pipelines/tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -93,7 +93,7 @@ func TestAzuredevopsPipelinesValidationRules(t *testing.T) {
 	t.Parallel()
 	requireADOEnv(t)
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azuredevops_pipelines/tests/fixtures/negative")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/negative")
 	terraformOptions := &terraform.Options{
 		TerraformDir: testFolder,
 		NoColor:      true,

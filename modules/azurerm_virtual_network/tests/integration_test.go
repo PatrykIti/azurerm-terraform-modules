@@ -16,7 +16,7 @@ func TestVirtualNetworkFullIntegration(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_virtual_network/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -117,7 +117,7 @@ func TestVirtualNetworkWithPeering(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_virtual_network/tests/fixtures/network")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/network")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -157,7 +157,7 @@ func TestVirtualNetworkPrivateEndpoint(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_virtual_network/tests/fixtures/private_endpoint")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/private_endpoint")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -194,7 +194,7 @@ func TestVirtualNetworkDNS(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_virtual_network/tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -231,7 +231,7 @@ func TestVirtualNetworkFlowLogs(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_virtual_network/tests/fixtures/flow_logs")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/flow_logs")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -274,25 +274,25 @@ func TestVirtualNetworkValidationRules(t *testing.T) {
 	}{
 		{
 			name:          "InvalidNameShort",
-			fixturePath:   "azurerm_virtual_network/tests/fixtures/negative/invalid_name_short",
+			fixturePath:   "fixtures/negative/invalid_name_short",
 			expectError:   true,
 			errorContains: "Virtual Network name must be 2-80 characters long",
 		},
 		{
 			name:          "InvalidNameLong",
-			fixturePath:   "azurerm_virtual_network/tests/fixtures/negative/invalid_name_long",
+			fixturePath:   "fixtures/negative/invalid_name_long",
 			expectError:   true,
 			errorContains: "Virtual Network name must be 2-80 characters long",
 		},
 		{
 			name:          "InvalidNameChars",
-			fixturePath:   "azurerm_virtual_network/tests/fixtures/negative/invalid_name_chars",
+			fixturePath:   "fixtures/negative/invalid_name_chars",
 			expectError:   true,
 			errorContains: "Virtual Network name must be 2-80 characters long",
 		},
 		{
 			name:          "EmptyAddressSpace",
-			fixturePath:   "azurerm_virtual_network/tests/fixtures/negative/empty_address_space",
+			fixturePath:   "fixtures/negative/empty_address_space",
 			expectError:   true,
 			errorContains: "At least one address space must be provided",
 		},
@@ -301,7 +301,7 @@ func TestVirtualNetworkValidationRules(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc // capture range variable
 		t.Run(tc.name, func(t *testing.T) {
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", tc.fixturePath)
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", tc.fixturePath)
 			
 			// Use minimal terraform options for negative tests (no variables)
 			terraformOptions := &terraform.Options{

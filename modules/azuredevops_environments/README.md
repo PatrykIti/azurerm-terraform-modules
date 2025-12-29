@@ -37,6 +37,12 @@ module "azuredevops_environments" {
 - [Secure](examples/secure) - This example demonstrates environment approvals, exclusive locks, and business hours.
 <!-- END_EXAMPLES -->
 
+## Module Documentation
+
+- [docs/README.md](docs/README.md) - Module-specific documentation overview
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps Environments into the module
+
+
 <!-- BEGIN_TF_DOCS -->
 
 

@@ -38,6 +38,12 @@ module "azuredevops_pipelines" {
 - [Secure](examples/secure) - This example demonstrates a pipeline with restricted permissions and explicit authorizations.
 <!-- END_EXAMPLES -->
 
+## Module Documentation
+
+- [docs/README.md](docs/README.md) - Module-specific documentation overview
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps Pipelines into the module
+
+
 <!-- BEGIN_TF_DOCS -->
 
 

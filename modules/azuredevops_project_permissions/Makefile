@@ -1,16 +1,18 @@
 .PHONY: test test-short test-integration test-all docs clean validate
+MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+TESTS_DIR := $(abspath $(MAKEFILE_DIR)/tests)
 
 # Run only short tests (basic functionality)
 test-short:
-	$(MAKE) -C tests test-short
+	$(MAKE) -C "$(TESTS_DIR)" test-short
 
 # Run only integration tests
 test-integration:
-	$(MAKE) -C tests test-integration
+	$(MAKE) -C "$(TESTS_DIR)" test-integration
 
 # Run all tests
 test-all:
-	$(MAKE) -C tests test
+	$(MAKE) -C "$(TESTS_DIR)" test
 
 # Default test target
 test: test-all

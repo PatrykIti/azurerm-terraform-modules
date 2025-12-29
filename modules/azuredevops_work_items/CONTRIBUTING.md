@@ -63,7 +63,7 @@ Types:
 1. All changes must include tests
 2. Run tests locally before submitting PR:
    ```bash
-   cd modules/azuredevops_work_items/tests
+   cd tests
    make test
    ```
 3. Ensure all tests pass

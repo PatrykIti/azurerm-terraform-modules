@@ -109,7 +109,7 @@ module "network_security_group" {
 
 # After release (automatically updated)
 module "network_security_group" {
-  source = "github.com/org/repo//modules/azurerm_network_security_group?ref=NSGv1.2.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.2.0"
 }
 ```
 

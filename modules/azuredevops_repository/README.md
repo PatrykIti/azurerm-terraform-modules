@@ -36,6 +36,12 @@ module "azuredevops_repository" {
 - [Secure](examples/secure) - This example demonstrates a repository with stricter review and status policies.
 <!-- END_EXAMPLES -->
 
+## Module Documentation
+
+- [docs/README.md](docs/README.md) - Module-specific documentation overview
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps repositories into the module
+
+
 <!-- BEGIN_TF_DOCS -->
 
 

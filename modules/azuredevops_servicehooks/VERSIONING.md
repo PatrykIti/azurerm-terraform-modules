@@ -109,7 +109,7 @@ module "azuredevops_servicehooks" {
 
 # After release (automatically updated)
 module "azuredevops_servicehooks" {
-  source = "github.com/org/repo//modules/azuredevops_servicehooks?ref=ADOSHv1.2.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_servicehooks?ref=ADOSHv1.2.0"
 }
 ```
 
