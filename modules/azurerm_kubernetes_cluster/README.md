@@ -58,7 +58,7 @@ resource "azurerm_subnet" "example" {
 }
 
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.0"
+  source = "path/to/azurerm_kubernetes_cluster"
 
   # Core configuration
   name                = "aks-example"
@@ -102,7 +102,7 @@ module "kubernetes_cluster" {
 
 ```hcl
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.0"
+  source = "path/to/azurerm_kubernetes_cluster"
 
   # ... basic configuration ...
 
@@ -137,7 +137,7 @@ module "kubernetes_cluster" {
 
 ```hcl
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.0"
+  source = "path/to/azurerm_kubernetes_cluster"
 
   # ... basic configuration ...
 

@@ -1,4 +1,4 @@
-.PHONY: test test-short test-integration test-all
+.PHONY: test test-short test-integration test-all docs
 MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 TESTS_DIR := $(abspath $(MAKEFILE_DIR)/tests)
 
@@ -16,3 +16,8 @@ test-all:
 
 # Default target
 test: test-short
+
+# Generate documentation
+docs:
+	@echo "Generating documentation..."
+	./generate-docs.sh

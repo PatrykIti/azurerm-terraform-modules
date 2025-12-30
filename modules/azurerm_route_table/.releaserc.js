@@ -113,7 +113,7 @@ module.exports = {
     [
       '@semantic-release/changelog',
       {
-        changelogFile: `modules/${MODULE_NAME}/CHANGELOG.md`,
+        changelogFile: 'CHANGELOG.md',
         changelogTitle: `# Changelog
 
 All notable changes to the ${MODULE_TITLE} Terraform module will be documented in this file.
@@ -132,8 +132,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
             sed -i "s/^version: .*/version: \${nextRelease.version}/" "$CONFIG_FILE"
           fi
 
-          # Update only module source references in examples (not provider sources or other fields)
-          find "modules/${MODULE_NAME}/examples" -name "*.tf" -type f -exec sed -i '/^module /,/^}/ s|source[[:space:]]*=[[:space:]]*"\.\./.*"|source = "${SOURCE_URL}"|g' {} +
+          find "modules/${MODULE_NAME}/examples" -name "*.tf" -type f -exec sed -i -E -e 's|(^[[:space:]]*source[[:space:]]*=[[:space:]]*)"[.]{2}/[.]{2}/?"|\\1"${SOURCE_URL}"|g' -e 's|(^[[:space:]]*source[[:space:]]*=[[:space:]]*)"github.com/[^/]+/[^/]+//modules/${MODULE_NAME}\\?ref=[^"]+"|\\1"${SOURCE_URL}"|g' {} +
 
           find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../../"|source = "${SOURCE_URL}"|g' {} +
           find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../"|source = "${SOURCE_URL}"|g' {} +
@@ -148,8 +147,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
             ./scripts/update-examples-list.sh "modules/${MODULE_NAME}"
           fi
 
-          if command -v terraform-docs > /dev/null 2>&1; then
-            terraform-docs --config "$(pwd)/modules/${MODULE_NAME}/.terraform-docs.yml" --output-file "$(pwd)/modules/${MODULE_NAME}/README.md" --output-mode inject "$(pwd)/modules/${MODULE_NAME}"
+          # Use our safe wrapper script instead of terraform-docs directly
+          # This ensures root README is never overwritten
+          if [ -x "./scripts/update-module-docs.sh" ]; then
+            ./scripts/update-module-docs.sh "${MODULE_NAME}"
           fi
 
           if [ -x "./scripts/update-root-readme.sh" ]; then

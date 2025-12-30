@@ -1,10 +1,19 @@
 # Makefile for Terratest execution
+SHELL := /bin/bash
 
 # Variables
 TIMEOUT ?= 30m
 TEST_FILTER ?= Test
 PARALLEL ?= 8
 AZURE_LOCATION ?= northeurope
+LOG_DIR ?= test_outputs
+LOG_TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)
+
+define run_with_log
+	@mkdir -p $(LOG_DIR)
+	@echo "Saving test output to $(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"
+	@bash -c 'set -o pipefail; $(2) 2>&1 | tee "$(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"'
+endef
 
 # Environment check
 check-env:
@@ -24,108 +33,100 @@ deps:
 # Run all tests
 test: check-env deps
 	@echo "Running all tests..."
-	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...
+	$(call run_with_log,all,go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...)
 
 # Run specific test
 test-single: check-env deps
 	@echo "Running test: $(TEST_NAME)"
-	go test -v -timeout $(TIMEOUT) -run $(TEST_NAME) ./...
+	$(call run_with_log,single,go test -v -timeout $(TIMEOUT) -run $(TEST_NAME) ./...)
 
 # Run basic tests only
 test-basic: check-env deps
 	@echo "Running basic tests..."
-	go test -v -timeout 15m -run TestBasicSubnet ./...
+	$(call run_with_log,basic,go test -v -timeout 15m -run TestBasicSubnet ./...)
 
 # Run complete tests
 test-complete: check-env deps
 	@echo "Running complete tests..."
-	go test -v -timeout 30m -run TestCompleteSubnet ./...
+	$(call run_with_log,complete,go test -v -timeout 30m -run TestCompleteSubnet ./...)
 
 # Run security tests
 test-security: check-env deps
 	@echo "Running security tests..."
-	go test -v -timeout 30m -run TestSubnetSecurity ./...
-	go test -v -timeout 30m -run TestSubnetSecurityConfiguration ./...
+	$(call run_with_log,security,go test -v -timeout 30m -run TestSubnetSecurity ./... && go test -v -timeout 30m -run TestSubnetSecurityConfiguration ./...)
 
 # Run network tests
 test-network: check-env deps
 	@echo "Running network tests..."
-	go test -v -timeout 30m -run TestSubnetNetworkRules ./...
-	go test -v -timeout 30m -run TestSubnetWithNetworkRules ./...
+	$(call run_with_log,network,go test -v -timeout 30m -run TestSubnetNetworkRules ./... && go test -v -timeout 30m -run TestSubnetWithNetworkRules ./...)
 
 # Run private endpoint tests
 test-private-endpoint: check-env deps
 	@echo "Running private endpoint tests..."
-	go test -v -timeout 30m -run TestSubnetPrivateEndpoint ./...
-	go test -v -timeout 30m -run TestSubnetPrivateEndpointIntegration ./...
+	$(call run_with_log,private-endpoint,go test -v -timeout 30m -run TestSubnetPrivateEndpoint ./... && go test -v -timeout 30m -run TestSubnetPrivateEndpointIntegration ./...)
 
 # Run validation tests
 test-validation: check-env deps
 	@echo "Running validation tests..."
-	go test -v -timeout 10m -run TestSubnetValidationRules ./...
-	go test -v -timeout 30m -run TestSubnetValidationIntegration ./...
+	$(call run_with_log,validation,go test -v -timeout 10m -run TestSubnetValidationRules ./... && go test -v -timeout 30m -run TestSubnetValidationIntegration ./...)
 
 # Run lifecycle tests
 test-lifecycle: check-env deps
 	@echo "Running lifecycle tests..."
-	go test -v -timeout 30m -run TestSubnetLifecycle ./...
+	$(call run_with_log,lifecycle,go test -v -timeout 30m -run TestSubnetLifecycle ./...)
 
 # Run compliance tests
 test-compliance: check-env deps
 	@echo "Running compliance tests..."
-	go test -v -timeout 30m -run TestSubnetCompliance ./...
+	$(call run_with_log,compliance,go test -v -timeout 30m -run TestSubnetCompliance ./...)
 
 # Run integration tests
 test-integration: check-env deps
 	@echo "Running integration tests..."
-	go test -v -timeout 45m -run TestSubnetFullIntegration ./...
+	$(call run_with_log,integration,go test -v -timeout 45m -run TestSubnetFullIntegration ./...)
 
 # Run performance tests
 test-performance: check-env deps
 	@echo "Running performance tests..."
-	go test -v -timeout 60m -run TestSubnetCreationTime ./...
-	go test -v -timeout 60m -run TestSubnetScaling ./...
-	go test -v -timeout 60m -run TestSubnetUpdatePerformance ./...
-	go test -v -timeout 60m -run TestSubnetDestroyPerformance ./...
+	$(call run_with_log,performance,go test -v -timeout 60m -run TestSubnetCreationTime ./... && go test -v -timeout 60m -run TestSubnetScaling ./... && go test -v -timeout 60m -run TestSubnetUpdatePerformance ./... && go test -v -timeout 60m -run TestSubnetDestroyPerformance ./...)
 
 # Run benchmarks
 benchmark: check-env deps
 	@echo "Running benchmarks..."
-	go test -v -run=^$$ -bench=. -benchtime=1x ./...
+	$(call run_with_log,bench,go test -v -run=^$$ -bench=. -benchtime=1x ./...)
 
 # Run specific benchmarks
 benchmark-creation: check-env deps
 	@echo "Running creation benchmarks..."
-	go test -v -run=^$$ -bench=BenchmarkSubnetCreation -benchtime=1x ./...
+	$(call run_with_log,bench-creation,go test -v -run=^$$ -bench=BenchmarkSubnetCreation -benchtime=1x ./...)
 
 benchmark-integration: check-env deps
 	@echo "Running integration benchmarks..."
-	go test -v -run=^$$ -bench=BenchmarkSubnetIntegrationCreation -benchtime=1x ./...
+	$(call run_with_log,bench-integration,go test -v -run=^$$ -bench=BenchmarkSubnetIntegrationCreation -benchtime=1x ./...)
 
 benchmark-performance: check-env deps
 	@echo "Running performance benchmarks..."
-	go test -v -run=^$$ -bench=BenchmarkSubnetCreationSimple -benchtime=1x ./...
-	go test -v -run=^$$ -bench=BenchmarkSubnetCreationWithFeatures -benchtime=1x ./...
-	go test -v -run=^$$ -bench=BenchmarkSubnetCreationWithScale -benchtime=1x ./...
-	go test -v -run=^$$ -bench=BenchmarkSubnetParallelCreation -benchtime=1x ./...
+	$(call run_with_log,bench-performance,go test -v -run=^$$ -bench=BenchmarkSubnetCreationSimple -benchtime=1x ./... && go test -v -run=^$$ -bench=BenchmarkSubnetCreationWithFeatures -benchtime=1x ./... && go test -v -run=^$$ -bench=BenchmarkSubnetCreationWithScale -benchtime=1x ./... && go test -v -run=^$$ -bench=BenchmarkSubnetParallelCreation -benchtime=1x ./...)
 
 # Run tests with coverage
 test-coverage: check-env deps
 	@echo "Running tests with coverage..."
-	go test -v -timeout $(TIMEOUT) -coverprofile=coverage.out -covermode=atomic ./...
+	$(call run_with_log,coverage,go test -v -timeout $(TIMEOUT) -coverprofile=coverage.out -covermode=atomic ./...)
 	go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report generated: coverage.html"
 
 # Run tests with race detection
 test-race: check-env deps
 	@echo "Running tests with race detection..."
-	go test -v -timeout $(TIMEOUT) -race ./...
+	$(call run_with_log,race,go test -v -timeout $(TIMEOUT) -race ./...)
 
 # Generate JUnit report
 test-junit: check-env deps
 	@echo "Running tests with JUnit output..."
 	go install github.com/jstemmer/go-junit-report/v2@latest
-	go test -v -timeout $(TIMEOUT) ./... 2>&1 | go-junit-report -set-exit-code > test-results.xml
+	@mkdir -p $(LOG_DIR)
+	@echo "Saving test output to $(LOG_DIR)/junit_$(LOG_TIMESTAMP).log"
+	@bash -c 'set -o pipefail; go test -v -timeout $(TIMEOUT) ./... 2>&1 | tee "$(LOG_DIR)/junit_$(LOG_TIMESTAMP).log" | go-junit-report -set-exit-code > test-results.xml'
 
 # Clean test artifacts
 clean:
@@ -182,7 +183,7 @@ security:
 # Run quick smoke tests
 test-quick: check-env deps
 	@echo "Running quick smoke tests..."
-	go test -v -timeout 5m -short ./...
+	$(call run_with_log,quick,go test -v -timeout 5m -short ./...)
 
 # Run tests sequentially (for debugging)
 test-sequential: check-env deps

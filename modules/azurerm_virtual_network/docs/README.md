@@ -25,7 +25,7 @@ This directory contains additional documentation for the Azure Virtual Network T
 ### 1. Basic Usage
 ```hcl
 module "vnet" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNETv1.0.0"
+  source = "path/to/azurerm_virtual_network"
   
   name                = "vnet-example"
   resource_group_name = "my-resource-group"

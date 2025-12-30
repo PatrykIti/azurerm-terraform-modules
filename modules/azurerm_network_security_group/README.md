@@ -39,7 +39,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "network_security_group" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.0"
+  source = "path/to/azurerm_network_security_group"
 
   # Core configuration
   name                = "nsg-example"
@@ -73,7 +73,7 @@ module "network_security_group" {
 
 ```hcl
 module "network_security_group" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.0"
+  source = "path/to/azurerm_network_security_group"
 
   # Core configuration
   name                = "nsg-production"

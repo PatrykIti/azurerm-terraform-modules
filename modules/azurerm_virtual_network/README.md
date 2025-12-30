@@ -35,7 +35,7 @@ This Terraform module creates and manages Azure Virtual Networks with comprehens
 
 ```hcl
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNvX.X.X"
+  source = "path/to/azurerm_virtual_network"
 
   name                = "vnet-example"
   resource_group_name = azurerm_resource_group.example.name
@@ -53,7 +53,7 @@ module "virtual_network" {
 
 ```hcl
 module "secure_virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNvX.X.X"
+  source = "path/to/azurerm_virtual_network"
 
   name                = "vnet-secure-example"
   resource_group_name = azurerm_resource_group.example.name

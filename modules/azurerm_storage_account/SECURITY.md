@@ -126,7 +126,7 @@ diagnostic_settings = {
 ### 1. **Maximum Security Configuration**
 ```hcl
 module "storage_account" {
-  source = "./modules/storage_account"
+  source = "./modules/azurerm_storage_account"
 
   name                = "mystorageaccount"
   resource_group_name = azurerm_resource_group.main.name
@@ -217,7 +217,7 @@ module "storage_account" {
 ### 2. **Development Environment Configuration**
 ```hcl
 module "storage_account_dev" {
-  source = "./modules/storage_account"
+  source = "./modules/azurerm_storage_account"
 
   name                = "devstorageaccount"
   resource_group_name = azurerm_resource_group.dev.name

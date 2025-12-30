@@ -109,7 +109,7 @@ module "kubernetes_cluster" {
 
 # After release (automatically updated)
 module "kubernetes_cluster" {
-  source = "github.com/org/repo//modules/azurerm_kubernetes_cluster?ref=AKSv1.2.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.2.0"
 }
 ```
 

@@ -1,54 +1,33 @@
 #!/bin/bash
 
-# Script to generate documentation using terraform-docs
-# Requires terraform-docs to be installed
+# Generate documentation for this module using the repository wrapper.
 
 set -e
 
-echo "Generating documentation for Azure Storage Account module..."
+MODULE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+MODULE_NAME="$(basename "$MODULE_DIR")"
+
+echo "Generating documentation for ${MODULE_NAME} module..."
 
 # Check if terraform-docs is installed
-if ! command -v terraform-docs &> /dev/null; then
-    echo "terraform-docs is not installed. Please install it first:"
-    echo "  brew install terraform-docs"
-    echo "  or"
-    echo "  curl -sSLo terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.16.0/terraform-docs-v0.16.0-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64.tar.gz"
+if ! command -v terraform-docs > /dev/null 2>&1; then
+    echo "Error: terraform-docs is not installed. Please install it first."
+    echo "Visit: https://terraform-docs.io/user-guide/installation/"
     exit 1
 fi
 
-# Generate main module documentation
-echo "Generating main module documentation..."
-terraform-docs markdown table . --config .terraform-docs.yml --output-file README.md --output-mode inject
+# Update examples list if the helper exists
+if [ -x "$MODULE_DIR/../../scripts/update-examples-list.sh" ]; then
+    echo "Updating examples list..."
+    "$MODULE_DIR/../../scripts/update-examples-list.sh" "$MODULE_DIR"
+fi
 
-# Generate documentation for examples
-for example in examples/*/; do
-    if [ -d "$example" ]; then
-        example_name=$(basename "$example")
-        echo "Generating documentation for example: $example_name"
-        
-        # Create a simple terraform-docs config for examples
-        cat > "$example/.terraform-docs.yml" << EOF
-formatter: "markdown"
-content: |-
-  {{ .Providers }}
-  {{ .Inputs }}
-  {{ .Outputs }}
-EOF
-        
-        # Generate and append to example README
-        if [ -f "$example/README.md" ]; then
-            echo -e "\n## Module Documentation\n" >> "$example/README.md"
-            terraform-docs markdown "$example" >> "$example/README.md"
-        fi
-        
-        # Clean up temp config
-        rm -f "$example/.terraform-docs.yml"
-    fi
-done
+# Regenerate module README using the safe wrapper
+if [ -x "$MODULE_DIR/../../scripts/update-module-docs.sh" ]; then
+    "$MODULE_DIR/../../scripts/update-module-docs.sh" "$MODULE_NAME"
+else
+    echo "Error: update-module-docs.sh not found or not executable."
+    exit 1
+fi
 
-echo "Documentation generation complete!"
-echo ""
-echo "Next steps:"
-echo "1. Review the generated documentation in README.md"
-echo "2. Check example documentation in examples/*/README.md"
-echo "3. Commit the changes if everything looks correct"
+echo "✅ Documentation generated successfully!"

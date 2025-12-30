@@ -25,7 +25,7 @@ This directory contains additional documentation for the Azure Storage Account T
 ### 1. Basic Usage
 ```hcl
 module "storage" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.0.0"
+  source = "path/to/azurerm_storage_account"
   
   name                = "mystorageaccount"
   resource_group_name = "my-resource-group"

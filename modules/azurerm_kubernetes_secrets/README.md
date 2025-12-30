@@ -35,7 +35,7 @@ apply in two stages: create the cluster first, then apply this module once CSI/E
 ### Manual (KV → TF → K8s Secret)
 ```hcl
 module "kubernetes_secrets" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_secrets?ref=AKSSv1.0.0"
+  source = "path/to/azurerm_kubernetes_secrets"
 
   strategy  = "manual"
   namespace = "app"
@@ -59,7 +59,7 @@ module "kubernetes_secrets" {
 ### CSI (SecretProviderClass)
 ```hcl
 module "kubernetes_secrets" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_secrets?ref=AKSSv1.0.0"
+  source = "path/to/azurerm_kubernetes_secrets"
 
   strategy  = "csi"
   namespace = "app"
@@ -85,7 +85,7 @@ module "kubernetes_secrets" {
 ### ESO (SecretStore + ExternalSecret)
 ```hcl
 module "kubernetes_secrets" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_secrets?ref=AKSSv1.0.0"
+  source = "path/to/azurerm_kubernetes_secrets"
 
   strategy  = "eso"
   namespace = "app"

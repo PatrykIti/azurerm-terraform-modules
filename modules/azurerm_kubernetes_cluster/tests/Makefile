@@ -1,12 +1,19 @@
 # Makefile for Terratest execution
+SHELL := /bin/bash
 
 # Variables
 TIMEOUT ?= 60m
 TEST_FILTER ?= Test
 PARALLEL ?= 8
 AZURE_LOCATION ?= northeurope
-TEST_OUTPUT_DIR ?= test_outputs
-TEST_LOG ?= $(TEST_OUTPUT_DIR)/terratest-$(shell date +%Y%m%d-%H%M%S).log
+LOG_DIR ?= test_outputs
+LOG_TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)
+
+define run_with_log
+	@mkdir -p $(LOG_DIR)
+	@echo "Saving test output to $(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"
+	@bash -c 'set -o pipefail; $(2) 2>&1 | tee "$(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"'
+endef
 
 # Normalize credential environment variables (ARM_ <-> AZURE_)
 ifdef AZURE_SUBSCRIPTION_ID
@@ -50,58 +57,59 @@ check-env:
 # Install dependencies
 deps:
 	@echo "Installing Go dependencies..."
+	go mod download
 	go mod tidy
 
 # Run all tests
 test: check-env deps
 	@echo "Running all tests..."
-	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...
+	$(call run_with_log,all,go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...)
 
 # Run specific test
 test-single: check-env deps
 	@echo "Running test: $(TEST_NAME)"
-	go test -v -timeout $(TIMEOUT) -run $(TEST_NAME) ./...
+	$(call run_with_log,single,go test -v -timeout $(TIMEOUT) -run $(TEST_NAME) ./...)
 
 # Run basic tests only
 test-basic: check-env deps
 	@echo "Running basic tests..."
-	go test -v -timeout 30m -run TestBasicKubernetesCluster ./...
+	$(call run_with_log,basic,go test -v -timeout 30m -run TestBasicKubernetesCluster ./...)
 
 # Run complete tests
 test-complete: check-env deps
 	@echo "Running complete tests..."
-	go test -v -timeout 60m -run TestCompleteKubernetesCluster ./...
+	$(call run_with_log,complete,go test -v -timeout 60m -run TestCompleteKubernetesCluster ./...)
 
 # Run security tests
 test-secure: check-env deps
 	@echo "Running security tests..."
-	go test -v -timeout 60m -run TestSecureKubernetesCluster ./...
+	$(call run_with_log,secure,go test -v -timeout 60m -run TestSecureKubernetesCluster ./...)
 
 # Run network tests
 test-network: check-env deps
 	@echo "Running network tests..."
-	go test -v -timeout 60m -run TestNetworkKubernetesCluster ./...
+	$(call run_with_log,network,go test -v -timeout 60m -run TestNetworkKubernetesCluster ./...)
 
 
 # Run validation tests
 test-validation: check-env deps
 	@echo "Running validation tests..."
-	go test -v -timeout 15m -run TestKubernetesClusterValidationRules ./...
+	$(call run_with_log,validation,go test -v -timeout 15m -run TestKubernetesClusterValidationRules ./...)
 
 # Run integration tests (long-running)
 test-integration: check-env deps
 	@echo "Running integration tests..."
-	go test -v -timeout 60m -run "TestKubernetesClusterLifecycle" ./...
+	$(call run_with_log,integration,go test -v -timeout 60m -run "TestKubernetesClusterLifecycle" ./...)
 
 # Run benchmarks
 benchmark: check-env deps
 	@echo "Running benchmarks..."
-	go test -v -run=^$ -bench=. -benchtime=1x ./...
+	$(call run_with_log,bench,go test -v -run=^$ -bench=. -benchtime=1x ./...)
 
 # Run tests with coverage
 test-coverage: check-env deps
 	@echo "Running tests with coverage..."
-	go test -v -timeout $(TIMEOUT) -coverprofile=coverage.out -covermode=atomic ./...
+	$(call run_with_log,coverage,go test -v -timeout $(TIMEOUT) -coverprofile=coverage.out -covermode=atomic ./...)
 	go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report generated: coverage.html"
 
@@ -109,7 +117,9 @@ test-coverage: check-env deps
 test-junit: check-env deps
 	@echo "Running tests with JUnit output..."
 	go install github.com/jstemmer/go-junit-report/v2@latest
-	go test -v -timeout $(TIMEOUT) ./... 2>&1 | go-junit-report -set-exit-code > test-results.xml
+	@mkdir -p $(LOG_DIR)
+	@echo "Saving test output to $(LOG_DIR)/junit_$(LOG_TIMESTAMP).log"
+	@bash -c 'set -o pipefail; go test -v -timeout $(TIMEOUT) ./... 2>&1 | tee "$(LOG_DIR)/junit_$(LOG_TIMESTAMP).log" | go-junit-report -set-exit-code > test-results.xml'
 
 # Clean test artifacts
 clean:
