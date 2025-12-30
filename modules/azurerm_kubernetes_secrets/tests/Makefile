@@ -2,9 +2,9 @@
 SHELL := /bin/bash
 
 # Variables
-TIMEOUT ?= 30m
+TIMEOUT ?= 60m
 TEST_FILTER ?= Test
-PARALLEL ?= 8
+PARALLEL ?= 1
 AZURE_LOCATION ?= northeurope
 LOG_DIR ?= test_outputs
 LOG_TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)
