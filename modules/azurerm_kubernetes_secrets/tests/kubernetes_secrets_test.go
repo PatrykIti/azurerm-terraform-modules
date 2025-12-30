@@ -19,7 +19,8 @@ func TestBasicKubernetesSecrets(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_secrets/tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -47,7 +48,8 @@ func TestCompleteKubernetesSecrets(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_secrets/tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -75,7 +77,8 @@ func TestSecureKubernetesSecrets(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_secrets/tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -103,7 +106,8 @@ func TestNetworkKubernetesSecrets(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_secrets/tests/fixtures/network")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {

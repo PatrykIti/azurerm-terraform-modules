@@ -13,7 +13,6 @@ func TestKubernetesClusterLifecycle(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping lifecycle test in short mode")
 	}
-	t.Parallel()
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 

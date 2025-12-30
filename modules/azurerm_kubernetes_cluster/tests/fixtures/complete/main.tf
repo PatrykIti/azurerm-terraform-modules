@@ -100,7 +100,12 @@ module "kubernetes_cluster" {
   }
 
   kubernetes_config = {
-    kubernetes_version = "1.30.5"
+    kubernetes_version = "1.34.1"
+  }
+
+  sku_config = {
+    sku_tier     = "Premium"
+    support_plan = "AKSLongTermSupport"
   }
 
   # Identity configuration
@@ -112,7 +117,7 @@ module "kubernetes_cluster" {
   # Default node pool
   default_node_pool = {
     name           = "default"
-    node_count     = 2
+    node_count     = 1
     vm_size        = "Standard_DS2_v2"
     vnet_subnet_id = azurerm_subnet.test.id
   }

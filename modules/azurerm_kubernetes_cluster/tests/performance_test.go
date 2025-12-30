@@ -33,7 +33,6 @@ func TestKubernetesClusterCreationTime(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping performance test in short mode")
 	}
-	t.Parallel()
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_cluster/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)

@@ -2,9 +2,8 @@
 SHELL := /bin/bash
 
 # Variables
-TIMEOUT ?= 60m
+TIMEOUT ?= 90m
 TEST_FILTER ?= Test
-PARALLEL ?= 8
 AZURE_LOCATION ?= northeurope
 LOG_DIR ?= test_outputs
 LOG_TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)
@@ -63,7 +62,7 @@ deps:
 # Run all tests
 test: check-env deps
 	@echo "Running all tests..."
-	$(call run_with_log,all,go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...)
+	$(call run_with_log,all,go test -v -timeout $(TIMEOUT) ./...)
 
 # Run specific test
 test-single: check-env deps

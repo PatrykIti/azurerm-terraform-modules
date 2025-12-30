@@ -2,7 +2,7 @@
 SHELL := /bin/bash
 
 # Variables
-TIMEOUT ?= 60m
+TIMEOUT ?= 90m
 TEST_FILTER ?= Test
 PARALLEL ?= 1
 AZURE_LOCATION ?= northeurope

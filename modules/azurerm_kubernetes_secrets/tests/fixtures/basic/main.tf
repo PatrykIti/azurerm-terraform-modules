@@ -86,6 +86,8 @@ resource "kubernetes_namespace_v1" "app" {
   metadata {
     name = "app"
   }
+
+  depends_on = [module.kubernetes_cluster]
 }
 
 resource "azurerm_key_vault" "test" {
