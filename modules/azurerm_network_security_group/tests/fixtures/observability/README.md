@@ -1,6 +1,5 @@
 # Observability Network Security Group Example
 
-This fixture validates diagnostic settings for the NSG module.
+This fixture validates security rule configuration for the NSG module.
 
-- Creates Log Analytics and Storage Account.
-- Enables diagnostic settings for events, rule counters, and metrics.
+- Creates a resource group and NSG with inbound HTTPS rule.

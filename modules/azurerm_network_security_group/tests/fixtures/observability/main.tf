@@ -1,31 +1,20 @@
-provider "azurerm" {
-  features {}
+terraform {
+  required_version = ">= 1.12.2"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 4.57.0"
+    }
+  }
 }
 
-locals {
-  storage_account_name = substr("stnsgobs${var.random_suffix}", 0, 24)
+provider "azurerm" {
+  features {}
 }
 
 resource "azurerm_resource_group" "test" {
   name     = "rg-nsg-obs-${var.random_suffix}"
   location = var.location
-}
-
-resource "azurerm_log_analytics_workspace" "test" {
-  name                = "law-nsg-obs-${var.random_suffix}"
-  location            = azurerm_resource_group.test.location
-  resource_group_name = azurerm_resource_group.test.name
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
-}
-
-resource "azurerm_storage_account" "diagnostics" {
-  name                     = local.storage_account_name
-  location                 = azurerm_resource_group.test.location
-  resource_group_name      = azurerm_resource_group.test.name
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  min_tls_version          = "TLS1_2"
 }
 
 module "network_security_group" {
@@ -47,15 +36,6 @@ module "network_security_group" {
       source_address_prefix      = "Internet"
       destination_address_prefix = "*"
       description                = "Allow HTTPS inbound"
-    }
-  ]
-
-  diagnostic_settings = [
-    {
-      name                       = "nsg-obs-diagnostics"
-      areas                      = ["event", "rule_counter", "metrics"]
-      log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
-      storage_account_id         = azurerm_storage_account.diagnostics.id
     }
   ]
 

@@ -143,13 +143,13 @@ module "network_security_group" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.43.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.57.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.43.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.57.0 |
 
 ## Modules
 
@@ -159,8 +159,8 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_network_security_group.network_security_group](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/network_security_group) | resource |
-| [azurerm_network_security_rule.security_rules](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/network_security_rule) | resource |
+| [azurerm_network_security_group.network_security_group](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/network_security_group) | resource |
+| [azurerm_network_security_rule.security_rules](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/network_security_rule) | resource |
 
 ## Inputs
 
@@ -199,10 +199,10 @@ For production deployments, see the [secure example](examples/secure) which demo
 
 ## Monitoring and Compliance
 
-The module supports comprehensive monitoring through:
+The module supports monitoring through:
 
-- **Log Analytics Integration** - Centralized logging and alerting
-- **Diagnostic Settings** - Export logs to various destinations
+- **Activity Logs** - Azure platform activity auditing
+- **NSG Flow Logs** - Configure via Network Watcher (outside this module)
 - **Compliance Reporting** - Support for regulatory requirements
 
 ## Best Practices

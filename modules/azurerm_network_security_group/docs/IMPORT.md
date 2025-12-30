@@ -102,7 +102,7 @@ To get the **exact ID**:
 az network nsg show -g <rg> -n <nsg> --query id -o tsv
 ```
 
-### Optional imports (rules, diagnostics)
+### Optional imports (rules)
 
 If you want the module to **manage existing rules**, you must:
 1) Define them in `security_rules`, and
@@ -121,19 +121,6 @@ To get rule IDs:
 az network nsg rule show -g <rg> --nsg-name <nsg> -n <rule> --query id -o tsv
 ```
 
-If you already have **diagnostic settings** on the NSG and want Terraform to manage them:
-
-```hcl
-import {
-  to = module.network_security_group.azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings["nsg-logs"]
-  id = "<diagnostic_settings_id>"
-}
-```
-
-```bash
-az monitor diagnostic-settings list --resource <nsg_id> --query "[].id" -o tsv
-```
-
 ---
 
 ## 3) Run the import
@@ -146,7 +133,7 @@ terraform apply
 
 Expected output in `plan`:
 - one **import** action for the NSG
-- **no other changes** (unless you plan to manage rules/diagnostics)
+- **no other changes** (unless you plan to manage rules)
 
 ---
 
@@ -170,4 +157,3 @@ If the plan is clean, you can **remove the import block** (`import.tf`).
   - tags
   - location and resource group
 - **Rules not managed**: if you want rule management, define them in `security_rules` and import each rule.
-- **Diagnostics drift**: those are not managed unless you configure and import them explicitly.

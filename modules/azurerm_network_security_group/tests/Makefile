@@ -14,6 +14,36 @@ define run_with_log
 	@bash -c 'set -o pipefail; $(2) 2>&1 | tee "$(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"'
 endef
 
+# Normalize credential environment variables (ARM_ <-> AZURE_)
+ifdef AZURE_SUBSCRIPTION_ID
+ARM_SUBSCRIPTION_ID ?= $(AZURE_SUBSCRIPTION_ID)
+endif
+ifdef AZURE_TENANT_ID
+ARM_TENANT_ID ?= $(AZURE_TENANT_ID)
+endif
+ifdef AZURE_CLIENT_ID
+ARM_CLIENT_ID ?= $(AZURE_CLIENT_ID)
+endif
+ifdef AZURE_CLIENT_SECRET
+ARM_CLIENT_SECRET ?= $(AZURE_CLIENT_SECRET)
+endif
+
+ifdef ARM_SUBSCRIPTION_ID
+AZURE_SUBSCRIPTION_ID ?= $(ARM_SUBSCRIPTION_ID)
+endif
+ifdef ARM_TENANT_ID
+AZURE_TENANT_ID ?= $(ARM_TENANT_ID)
+endif
+ifdef ARM_CLIENT_ID
+AZURE_CLIENT_ID ?= $(ARM_CLIENT_ID)
+endif
+ifdef ARM_CLIENT_SECRET
+AZURE_CLIENT_SECRET ?= $(ARM_CLIENT_SECRET)
+endif
+
+export ARM_SUBSCRIPTION_ID ARM_TENANT_ID ARM_CLIENT_ID ARM_CLIENT_SECRET
+export AZURE_SUBSCRIPTION_ID AZURE_TENANT_ID AZURE_CLIENT_ID AZURE_CLIENT_SECRET
+
 # Environment check
 check-env:
 	@echo "Checking required environment variables..."

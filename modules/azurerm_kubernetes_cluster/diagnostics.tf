@@ -94,11 +94,10 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
     }
   }
 
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = local.diagnostic_settings_resolved_by_name[each.key].metric_categories
     content {
-      category = metric.value
-      enabled  = true
+      category = enabled_metric.value
     }
   }
 }
