@@ -7,6 +7,23 @@ mock_provider "azurerm" {
       name = "test-aks"
     }
   }
+
+  mock_resource "azurerm_monitor_diagnostic_setting" {}
+
+  mock_data "azurerm_monitor_diagnostic_categories" {
+    defaults = {
+      log_category_types = [
+        "kube-apiserver",
+        "kube-audit",
+        "kube-audit-admin",
+        "kube-scheduler",
+        "cluster-autoscaler",
+        "guard",
+        "cloud-controller-manager"
+      ]
+      metrics = ["AllMetrics"]
+    }
+  }
 }
 
 variables {
@@ -76,5 +93,121 @@ run "both_dns_prefixes_set" {
 
   expect_failures = [
     var.dns_config,
+  ]
+}
+
+# Test that a single-character dns_prefix is allowed
+run "single_character_dns_prefix_passes" {
+  command = plan
+
+  variables {
+    name = "validname"
+    dns_config = {
+      dns_prefix = "a"
+    }
+  }
+}
+
+# Diagnostic settings validation: missing destination
+run "diagnostic_settings_missing_destination" {
+  command = plan
+
+  variables {
+    name = "validname"
+    diagnostic_settings = [
+      {
+        name  = "missing-destination"
+        areas = ["api_plane"]
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings,
+  ]
+}
+
+# Diagnostic settings validation: Event Hub name required
+run "diagnostic_settings_missing_eventhub_name" {
+  command = plan
+
+  variables {
+    name = "validname"
+    diagnostic_settings = [
+      {
+        name                           = "eventhub-missing-name"
+        areas                          = ["metrics"]
+        eventhub_authorization_rule_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.EventHub/namespaces/ns/authorizationRules/rule"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings,
+  ]
+}
+
+# Diagnostic settings validation: invalid area
+run "diagnostic_settings_invalid_area" {
+  command = plan
+
+  variables {
+    name = "validname"
+    diagnostic_settings = [
+      {
+        name                       = "invalid-area"
+        areas                      = ["pods"]
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings,
+  ]
+}
+
+# Diagnostic settings validation: duplicate names
+run "diagnostic_settings_duplicate_names" {
+  command = plan
+
+  variables {
+    name = "validname"
+    diagnostic_settings = [
+      {
+        name                       = "duplicate"
+        areas                      = ["api_plane"]
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+      },
+      {
+        name                       = "duplicate"
+        areas                      = ["metrics"]
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings,
+  ]
+}
+
+# Diagnostic settings validation: limit exceeded
+run "diagnostic_settings_limit_exceeded" {
+  command = plan
+
+  variables {
+    name = "validname"
+    diagnostic_settings = [
+      for idx in range(6) : {
+        name                       = "diag-${idx}"
+        areas                      = ["api_plane"]
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings,
   ]
 }

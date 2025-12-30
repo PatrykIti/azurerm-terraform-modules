@@ -36,6 +36,23 @@ run "verify_default_identity" {
   }
 }
 
+# Test service principal configuration works without requiring identity=null
+run "verify_service_principal_config" {
+  command = plan
+
+  variables {
+    service_principal = {
+      client_id     = "00000000-0000-0000-0000-000000000000"
+      client_secret = "dummy-secret"
+    }
+  }
+
+  assert {
+    condition     = azurerm_kubernetes_cluster.kubernetes_cluster.service_principal[0].client_id == "00000000-0000-0000-0000-000000000000"
+    error_message = "Service principal client_id should match input when service_principal is configured."
+  }
+}
+
 # Test default SKU tier
 run "verify_default_sku" {
   command = plan

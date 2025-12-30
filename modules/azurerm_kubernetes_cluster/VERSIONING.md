@@ -109,7 +109,7 @@ module "kubernetes_cluster" {
 
 # After release (automatically updated)
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.2.0"
+  source = "github.com/org/repo//modules/azurerm_kubernetes_cluster?ref=AKSv1.2.0"
 }
 ```
 
@@ -117,7 +117,7 @@ module "kubernetes_cluster" {
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| AKSv1.0.x | >= 1.3.0 | 4.43.0 (pinned) | TBD |
+| AKSv1.0.x | >= 1.12.2 | 4.57.0 (pinned) | TBD |
 
 **Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
 
