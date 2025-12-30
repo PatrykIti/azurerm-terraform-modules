@@ -6,7 +6,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
   }
 }
@@ -17,13 +17,13 @@ provider "azurerm" {
 
 # Create a resource group for this example
 resource "azurerm_resource_group" "example" {
-  name     = "rg-subnet-secure-example"
+  name     = var.resource_group_name
   location = var.location
 }
 
 # Create a Virtual Network
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-subnet-secure-example"
+  name                = var.virtual_network_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   address_space       = ["10.0.0.0/16"]
@@ -38,7 +38,7 @@ resource "azurerm_virtual_network" "example" {
 
 # Create restrictive Network Security Group
 resource "azurerm_network_security_group" "secure" {
-  name                = "nsg-subnet-secure-example"
+  name                = var.network_security_group_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -79,7 +79,7 @@ resource "azurerm_network_security_group" "secure" {
 module "subnet" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
 
-  name                 = "subnet-secure-example"
+  name                 = var.subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -95,13 +95,9 @@ module "subnet" {
   private_endpoint_network_policies_enabled     = true
   private_link_service_network_policies_enabled = true
 
-  depends_on = [azurerm_virtual_network.example]
-}
-
-# Associate Network Security Group with Subnet
-resource "azurerm_subnet_network_security_group_association" "secure" {
-  subnet_id                 = module.subnet.id
-  network_security_group_id = azurerm_network_security_group.secure.id
-
-  depends_on = [module.subnet]
+  associations = {
+    network_security_group = {
+      id = azurerm_network_security_group.secure.id
+    }
+  }
 }

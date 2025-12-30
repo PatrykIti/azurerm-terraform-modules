@@ -161,9 +161,9 @@ This example exposes ALL available outputs from the storage account module, incl
 
 - Azure subscription with appropriate permissions
 - Terraform >= 1.3.0
-- AzureRM Provider 4.43.0 (as specified in the module's [versions.tf](../../versions.tf))
+- AzureRM Provider 4.57.0 (as specified in the module's [versions.tf](../../versions.tf))
 
-**Note**: The module uses a pinned version of the AzureRM provider (4.43.0) to ensure consistent behavior across all deployments.
+**Note**: The module uses a pinned version of the AzureRM provider (4.57.0) to ensure consistent behavior across all deployments.
 
 ## Usage
 
@@ -202,45 +202,43 @@ terraform apply
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.43.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.57.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.43.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.57.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | ../../ | n/a |
+| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | ../.. | n/a |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [azurerm_key_vault.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/key_vault) | resource |
-| [azurerm_key_vault_key.storage](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/key_vault_key) | resource |
-| [azurerm_log_analytics_workspace.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/log_analytics_workspace) | resource |
-| [azurerm_monitor_diagnostic_setting.blob_service](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/monitor_diagnostic_setting) | resource |
-| [azurerm_monitor_diagnostic_setting.storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/monitor_diagnostic_setting) | resource |
-| [azurerm_private_dns_zone.blob](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/private_dns_zone) | resource |
-| [azurerm_private_dns_zone.file](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/private_dns_zone) | resource |
-| [azurerm_private_dns_zone.queue](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/private_dns_zone) | resource |
-| [azurerm_private_dns_zone.table](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/private_dns_zone) | resource |
-| [azurerm_private_dns_zone_virtual_network_link.blob](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/private_dns_zone_virtual_network_link) | resource |
-| [azurerm_private_dns_zone_virtual_network_link.file](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/private_dns_zone_virtual_network_link) | resource |
-| [azurerm_private_endpoint.blob](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/private_endpoint) | resource |
-| [azurerm_private_endpoint.file](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/private_endpoint) | resource |
-| [azurerm_private_endpoint.queue](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/private_endpoint) | resource |
-| [azurerm_private_endpoint.table](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/private_endpoint) | resource |
-| [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/resource_group) | resource |
-| [azurerm_subnet.private_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/subnet) | resource |
-| [azurerm_subnet.services](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/subnet) | resource |
-| [azurerm_user_assigned_identity.storage](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/user_assigned_identity) | resource |
-| [azurerm_virtual_network.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/virtual_network) | resource |
-| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/data-sources/client_config) | data source |
+| [azurerm_key_vault.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/key_vault) | resource |
+| [azurerm_key_vault_key.storage](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/key_vault_key) | resource |
+| [azurerm_log_analytics_workspace.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/log_analytics_workspace) | resource |
+| [azurerm_private_dns_zone.blob](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone.file](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone.queue](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone.table](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.blob](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.file](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_private_endpoint.blob](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_endpoint) | resource |
+| [azurerm_private_endpoint.file](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_endpoint) | resource |
+| [azurerm_private_endpoint.queue](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_endpoint) | resource |
+| [azurerm_private_endpoint.table](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_endpoint) | resource |
+| [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/resource_group) | resource |
+| [azurerm_subnet.private_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/subnet) | resource |
+| [azurerm_subnet.services](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/subnet) | resource |
+| [azurerm_user_assigned_identity.storage](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/user_assigned_identity) | resource |
+| [azurerm_virtual_network.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/virtual_network) | resource |
+| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/data-sources/client_config) | data source |
 
 ## Inputs
 
@@ -257,7 +255,6 @@ No inputs.
 | <a name="output_allow_nested_items_to_be_public"></a> [allow\_nested\_items\_to\_be\_public](#output\_allow\_nested\_items\_to\_be\_public) | Are nested items allowed to be public |
 | <a name="output_containers"></a> [containers](#output\_containers) | Map of created storage containers |
 | <a name="output_cross_tenant_replication_enabled"></a> [cross\_tenant\_replication\_enabled](#output\_cross\_tenant\_replication\_enabled) | Is cross tenant replication enabled |
-| <a name="output_diagnostic_settings"></a> [diagnostic\_settings](#output\_diagnostic\_settings) | Map of diagnostic settings created |
 | <a name="output_file_shares"></a> [file\_shares](#output\_file\_shares) | Map of created file shares |
 | <a name="output_https_traffic_only_enabled"></a> [https\_traffic\_only\_enabled](#output\_https\_traffic\_only\_enabled) | Is HTTPS traffic only enabled |
 | <a name="output_identity"></a> [identity](#output\_identity) | The identity configuration of the storage account |

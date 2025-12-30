@@ -12,12 +12,15 @@ output "security_rule_ids" {
   description = "Map of security rule names to their IDs."
   value       = module.network_security_group.security_rule_ids
 }
-
-
 output "application_security_group_ids" {
   description = "The IDs of the created Application Security Groups."
   value = {
     web_servers      = azurerm_application_security_group.web_servers.id
     database_servers = azurerm_application_security_group.database_servers.id
   }
+}
+
+output "diagnostic_settings_ids" {
+  description = "Map of diagnostic settings names to their IDs."
+  value       = module.network_security_group.diagnostic_settings_ids
 }

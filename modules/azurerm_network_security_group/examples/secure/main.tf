@@ -14,10 +14,18 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "rg-nsg-secure-example"
+  name     = var.resource_group_name
   location = var.location
 }
 
+# Log Analytics workspace for diagnostics
+resource "azurerm_log_analytics_workspace" "example" {
+  name                = var.log_analytics_workspace_name
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
 
 # Application Security Groups for a three-tier application
 resource "azurerm_application_security_group" "web_tier" {
@@ -40,12 +48,11 @@ resource "azurerm_application_security_group" "db_tier" {
 
 # Secure NSG Module
 module "network_security_group" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.0"
+  source = "../.."
 
   name                = "nsg-secure-example"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-
 
   # Zero-trust security rules
   security_rules = [
@@ -123,6 +130,14 @@ module "network_security_group" {
       source_address_prefix      = "*"
       destination_address_prefix = "AzureCloud.WestEurope"
       description                = "Allow outbound traffic to essential Azure PaaS services."
+    }
+  ]
+
+  diagnostic_settings = [
+    {
+      name                       = "nsg-secure-diagnostics"
+      areas                      = ["event", "rule_counter", "metrics"]
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
     }
   ]
 

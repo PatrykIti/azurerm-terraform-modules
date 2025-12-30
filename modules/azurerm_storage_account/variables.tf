@@ -83,6 +83,89 @@ variable "security_settings" {
   }
 }
 
+# Diagnostic Settings (Storage Account + Services)
+variable "diagnostic_settings" {
+  description = <<-EOT
+    Diagnostic settings for the storage account and services (blob/queue/file/table/dfs).
+
+    Each entry creates a separate azurerm_monitor_diagnostic_setting for the selected scope.
+    Use areas to group categories (read/write/delete/transaction/capacity) or provide explicit
+    log_categories / metric_categories. Entries with no available categories are skipped and
+    reported in diagnostic_settings_skipped.
+  EOT
+
+  type = list(object({
+    name                           = string
+    scope                          = optional(string, "storage_account")
+    areas                          = optional(list(string))
+    log_categories                 = optional(list(string))
+    metric_categories              = optional(list(string))
+    log_analytics_workspace_id     = optional(string)
+    log_analytics_destination_type = optional(string)
+    storage_account_id             = optional(string)
+    eventhub_authorization_rule_id = optional(string)
+    eventhub_name                  = optional(string)
+  }))
+
+  default = []
+
+  validation {
+    condition = alltrue([
+      for scope in distinct([for ds in var.diagnostic_settings : try(ds.scope, "storage_account")]) :
+      length([for ds in var.diagnostic_settings : ds if try(ds.scope, "storage_account") == scope]) <= 5
+    ])
+    error_message = "Azure allows a maximum of 5 diagnostic settings per target resource scope."
+  }
+
+  validation {
+    condition     = length(distinct([for ds in var.diagnostic_settings : ds.name])) == length(var.diagnostic_settings)
+    error_message = "Each diagnostic_settings entry must have a unique name."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.log_analytics_workspace_id != null || ds.storage_account_id != null || ds.eventhub_authorization_rule_id != null
+    ])
+    error_message = "Each diagnostic_settings entry must specify at least one destination: log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.eventhub_authorization_rule_id == null || (ds.eventhub_name != null && ds.eventhub_name != "")
+    ])
+    error_message = "eventhub_name is required when eventhub_authorization_rule_id is set."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.log_analytics_destination_type == null || contains(["Dedicated", "AzureDiagnostics"], ds.log_analytics_destination_type)
+    ])
+    error_message = "log_analytics_destination_type must be either Dedicated or AzureDiagnostics."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      contains(["storage_account", "blob", "queue", "file", "table", "dfs"], try(ds.scope, "storage_account"))
+    ])
+    error_message = "scope must be one of: storage_account, blob, queue, file, table, dfs."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([
+        for area in coalescelist(try(ds.areas, null), ["all"]) :
+        contains(["all", "read", "write", "delete", "transaction", "capacity", "metrics"], area)
+      ])
+    ])
+    error_message = "areas may contain only: all, read, write, delete, transaction, capacity, metrics."
+  }
+}
+
 # Network Security
 variable "network_rules" {
   description = <<-EOT

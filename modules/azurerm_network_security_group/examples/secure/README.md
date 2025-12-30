@@ -6,7 +6,7 @@ This example demonstrates a maximum-security Network Security Group configuratio
 
 - **Zero-Trust Ruleset**: Denies all traffic by default and only allows specific, required communication paths.
 - **Application Security Groups (ASGs)**: Uses ASGs to create logical, application-based security boundaries instead of relying on IP subnets.
-- **Flow Logs & Traffic Analytics**: Enables comprehensive network monitoring and security analysis.
+- **Diagnostic Settings**: Sends NSG logs and metrics to Log Analytics.
 - **Service Tag Integration**: Uses service tags for secure communication with Azure services.
 
 ## Architecture & Security Rules

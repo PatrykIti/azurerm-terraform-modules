@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
   }
 }
@@ -25,8 +25,8 @@ data "azurerm_client_config" "current" {}
 
 # Create a resource group for the example
 resource "azurerm_resource_group" "example" {
-  name     = "rg-storage-identity-example"
-  location = "West Europe"
+  name     = var.resource_group_name
+  location = var.location
 }
 
 # ==============================================================================
@@ -97,7 +97,7 @@ resource "azurerm_role_assignment" "uai_kv_crypto_user" {
 # ==============================================================================
 
 module "storage_system_assigned" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.0"
+  source = "../.."
 
   name                     = "stsysidentityexample"
   resource_group_name      = azurerm_resource_group.example.name
@@ -152,7 +152,7 @@ resource "azurerm_role_assignment" "system_identity_kv_access" {
 # ==============================================================================
 
 module "storage_user_assigned" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.0"
+  source = "../.."
 
   name                     = "stuseridentityexample"
   resource_group_name      = azurerm_resource_group.example.name
@@ -212,7 +212,7 @@ module "storage_user_assigned" {
 # ==============================================================================
 
 module "storage_combined" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.0"
+  source = "../.."
 
   name                     = "stcombidentityexample"
   resource_group_name      = azurerm_resource_group.example.name

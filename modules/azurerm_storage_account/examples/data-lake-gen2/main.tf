@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -44,8 +44,8 @@ resource "azuread_service_principal" "data_analyst" {
 
 # Resource Group
 resource "azurerm_resource_group" "example" {
-  name     = "rg-datalake-gen2-example"
-  location = "West Europe"
+  name     = var.resource_group_name
+  location = var.location
 }
 
 # Virtual Network for NFSv3 Support
@@ -77,7 +77,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # Data Lake Storage Gen2 Account
 module "data_lake_storage" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.0"
+  source = "../.."
 
   name                = "stdatalakegen2example"
   resource_group_name = azurerm_resource_group.example.name

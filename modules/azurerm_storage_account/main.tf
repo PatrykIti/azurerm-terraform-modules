@@ -298,9 +298,9 @@ resource "azurerm_storage_container" "storage_container" {
 resource "azurerm_storage_queue" "storage_queue" {
   for_each = { for queue in var.queues : queue.name => queue }
 
-  name                 = each.value.name
-  storage_account_name = azurerm_storage_account.storage_account.name
-  metadata             = each.value.metadata
+  name               = each.value.name
+  storage_account_id = azurerm_storage_account.storage_account.id
+  metadata           = each.value.metadata
 
   depends_on = [
     azurerm_storage_account.storage_account

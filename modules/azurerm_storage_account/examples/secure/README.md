@@ -69,7 +69,7 @@ This configuration is suitable for:
 
 - Azure subscription with appropriate security clearances
 - Terraform >= 1.3.0
-- AzureRM Provider 4.43.0 (as specified in the module's [versions.tf](../../versions.tf))
+- AzureRM Provider 4.57.0 (as specified in the module's [versions.tf](../../versions.tf))
 - Permissions to create:
   - Premium Key Vault with HSM
   - Private endpoints and DNS zones
@@ -77,7 +77,7 @@ This configuration is suitable for:
   - Monitor alerts
 - Network connectivity to private endpoints
 
-**Note**: The module uses a pinned version of the AzureRM provider (4.43.0) to ensure consistent behavior across all deployments.
+**Note**: The module uses a pinned version of the AzureRM provider (4.57.0) to ensure consistent behavior across all deployments.
 
 ## Deployment Considerations
 
@@ -193,40 +193,43 @@ This configuration implements a **Defense-in-Depth** strategy with multiple laye
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.0.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.57.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 3.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.57.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | ../../ | n/a |
+| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | ../.. | n/a |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [azurerm_key_vault.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) | resource |
-| [azurerm_key_vault_key.storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_key) | resource |
-| [azurerm_log_analytics_workspace.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
-| [azurerm_monitor_action_group.security](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_action_group) | resource |
-| [azurerm_monitor_metric_alert.storage_auth_failures](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
-| [azurerm_private_dns_zone.storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) | resource |
-| [azurerm_private_dns_zone_virtual_network_link.storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
-| [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
-| [azurerm_subnet.private_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
-| [azurerm_user_assigned_identity.storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
-| [azurerm_virtual_network.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
-| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
+| [azurerm_key_vault.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/key_vault) | resource |
+| [azurerm_key_vault_key.storage](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/key_vault_key) | resource |
+| [azurerm_log_analytics_workspace.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/log_analytics_workspace) | resource |
+| [azurerm_monitor_action_group.security](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_action_group) | resource |
+| [azurerm_monitor_metric_alert.storage_auth_failures](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_metric_alert) | resource |
+| [azurerm_private_dns_zone.storage](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.storage](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/resource_group) | resource |
+| [azurerm_subnet.private_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/subnet) | resource |
+| [azurerm_user_assigned_identity.storage](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/user_assigned_identity) | resource |
+| [azurerm_virtual_network.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/virtual_network) | resource |
+| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/data-sources/client_config) | data source |
 
 ## Inputs
 
-No inputs.
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_location"></a> [location](#input\_location) | The Azure region where resources will be created | `string` | `"West Europe"` | no |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group | `string` | `"rg-storage-secure-example"` | no |
 
 ## Outputs
 
