@@ -55,16 +55,3 @@ output "security_rules" {
     }
   }
 }
-
-output "diagnostic_settings_ids" {
-  description = "Map of diagnostic settings names to their resource IDs."
-  value = {
-    for name, setting in azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings :
-    name => setting.id
-  }
-}
-
-output "diagnostic_settings_skipped" {
-  description = "Diagnostic settings entries skipped because no categories were available after filtering."
-  value       = local.diagnostic_settings_skipped
-}
