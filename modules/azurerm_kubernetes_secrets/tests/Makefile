@@ -73,37 +73,37 @@ test-single: check-env deps
 # Run basic tests only
 test-basic: check-env deps
 	@echo "Running basic tests..."
-	$(call run_with_log,basic,go test -v -timeout 15m -run TestBasicKubernetesSecrets ./...)
+	$(call run_with_log,basic,go test -v -timeout $(TIMEOUT) -run TestBasicKubernetesSecrets ./...)
 
 # Run complete tests
 test-complete: check-env deps
 	@echo "Running complete tests..."
-	$(call run_with_log,complete,go test -v -timeout 30m -run TestCompleteKubernetesSecrets ./...)
+	$(call run_with_log,complete,go test -v -timeout $(TIMEOUT) -run TestCompleteKubernetesSecrets ./...)
 
 # Run security tests
 test-secure: check-env deps
 	@echo "Running security tests..."
-	$(call run_with_log,secure,go test -v -timeout 30m -run TestSecureKubernetesSecrets ./...)
+	$(call run_with_log,secure,go test -v -timeout $(TIMEOUT) -run TestSecureKubernetesSecrets ./...)
 
 # Run network tests
 test-network: check-env deps
 	@echo "Running network tests..."
-	$(call run_with_log,network,go test -v -timeout 20m -run TestNetworkKubernetesSecrets ./...)
+	$(call run_with_log,network,go test -v -timeout $(TIMEOUT) -run TestNetworkKubernetesSecrets ./...)
 
 # Run validation tests
 test-validation: check-env deps
 	@echo "Running validation tests..."
-	$(call run_with_log,validation,go test -v -timeout 10m -run TestKubernetesSecretsValidationRules ./...)
+	$(call run_with_log,validation,go test -v -timeout $(TIMEOUT) -run TestKubernetesSecretsValidationRules ./...)
 
 # Run integration tests
 test-integration: check-env deps
 	@echo "Running integration tests..."
-	$(call run_with_log,integration,go test -v -timeout 45m -run TestKubernetesSecretsLifecycle ./...)
+	$(call run_with_log,integration,go test -v -timeout $(TIMEOUT) -run TestKubernetesSecretsLifecycle ./...)
 
 # Run performance tests
 test-performance: check-env deps
 	@echo "Running performance tests..."
-	$(call run_with_log,performance,go test -v -timeout 60m -run TestKubernetesSecretsCreationTime ./...)
+	$(call run_with_log,performance,go test -v -timeout $(TIMEOUT) -run TestKubernetesSecretsCreationTime ./...)
 
 # Run benchmarks
 benchmark: check-env deps

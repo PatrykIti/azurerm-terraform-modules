@@ -26,7 +26,7 @@ func TestBasicKubernetesSecrets(t *testing.T) {
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
+		applyWithClusterFirst(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
@@ -55,7 +55,7 @@ func TestCompleteKubernetesSecrets(t *testing.T) {
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
+		applyWithClusterFirst(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
@@ -167,4 +167,14 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,
 	}
+}
+
+func applyWithClusterFirst(t testing.TB, terraformOptions *terraform.Options) {
+	terraform.Init(t, terraformOptions)
+
+	targetOptions := *terraformOptions
+	targetOptions.Targets = []string{"module.kubernetes_cluster"}
+
+	terraform.Apply(t, &targetOptions)
+	terraform.Apply(t, terraformOptions)
 }

@@ -72,33 +72,33 @@ test-single: check-env deps
 # Run basic tests only
 test-basic: check-env deps
 	@echo "Running basic tests..."
-	$(call run_with_log,basic,go test -v -timeout 30m -run TestBasicKubernetesCluster ./...)
+	$(call run_with_log,basic,go test -v -timeout $(TIMEOUT) -run TestBasicKubernetesCluster ./...)
 
 # Run complete tests
 test-complete: check-env deps
 	@echo "Running complete tests..."
-	$(call run_with_log,complete,go test -v -timeout 60m -run TestCompleteKubernetesCluster ./...)
+	$(call run_with_log,complete,go test -v -timeout $(TIMEOUT) -run TestCompleteKubernetesCluster ./...)
 
 # Run security tests
 test-secure: check-env deps
 	@echo "Running security tests..."
-	$(call run_with_log,secure,go test -v -timeout 60m -run TestSecureKubernetesCluster ./...)
+	$(call run_with_log,secure,go test -v -timeout $(TIMEOUT) -run TestSecureKubernetesCluster ./...)
 
 # Run network tests
 test-network: check-env deps
 	@echo "Running network tests..."
-	$(call run_with_log,network,go test -v -timeout 60m -run TestNetworkKubernetesCluster ./...)
+	$(call run_with_log,network,go test -v -timeout $(TIMEOUT) -run TestNetworkKubernetesCluster ./...)
 
 
 # Run validation tests
 test-validation: check-env deps
 	@echo "Running validation tests..."
-	$(call run_with_log,validation,go test -v -timeout 15m -run TestKubernetesClusterValidationRules ./...)
+	$(call run_with_log,validation,go test -v -timeout $(TIMEOUT) -run TestKubernetesClusterValidationRules ./...)
 
 # Run integration tests (long-running)
 test-integration: check-env deps
 	@echo "Running integration tests..."
-	$(call run_with_log,integration,go test -v -timeout 60m -run "TestKubernetesClusterLifecycle" ./...)
+	$(call run_with_log,integration,go test -v -timeout $(TIMEOUT) -run "TestKubernetesClusterLifecycle" ./...)
 
 # Run benchmarks
 benchmark: check-env deps
