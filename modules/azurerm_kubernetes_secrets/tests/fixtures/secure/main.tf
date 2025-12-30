@@ -57,7 +57,7 @@ module "kubernetes_cluster" {
 
   default_node_pool = {
     name           = "default"
-    vm_size        = "Standard_B2s"
+    vm_size        = "Standard_E2s_v3"
     node_count     = 2
     vnet_subnet_id = azurerm_subnet.test.id
   }

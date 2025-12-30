@@ -126,7 +126,7 @@ module "kubernetes_cluster" {
   # Comprehensive default node pool configuration
   default_node_pool = {
     name                 = "system"
-    vm_size              = "Standard_B2s"
+    vm_size              = "Standard_DS2_v2"
     node_count           = 1
     auto_scaling_enabled = true
     min_count            = 1
