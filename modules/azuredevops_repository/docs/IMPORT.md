@@ -14,6 +14,18 @@ files, permissions, and policies into `modules/azuredevops_repository` using Ter
 
 ---
 
+## Azure CLI setup (optional)
+
+These commands use the Azure DevOps CLI extension to fetch IDs used in import blocks.
+
+```bash
+az extension add --name azure-devops
+az devops configure --defaults organization=https://dev.azure.com/<ORG> project=<PROJECT>
+az devops login --organization https://dev.azure.com/<ORG>
+```
+
+---
+
 ## 1) Minimal module configuration
 
 Create `main.tf` with a minimal module block and fill it with the **current**
@@ -48,6 +60,8 @@ module "azuredevops_repository" {
   # branches = [
   #   {
   #     name = "develop"
+  #     # policies defaults to {} and must not be null
+  #     # policies = {}
   #   }
   # ]
 }
@@ -68,6 +82,18 @@ import {
 
 Use the repository ID from Azure DevOps (UI or API).
 
+Get repository ID with Azure CLI:
+
+```bash
+az repos show --repository <repo-name> --query id -o tsv
+```
+
+Get project ID with Azure CLI (module input):
+
+```bash
+az devops project show --project <PROJECT> --query id -o tsv
+```
+
 ---
 
 ## 3) Import branches (optional)
@@ -85,6 +111,12 @@ The branch import ID format depends on the provider (commonly a repository ID
 and branch name). Follow the Azure DevOps provider documentation for the exact
 format.
 
+Get branch refs with Azure CLI:
+
+```bash
+az repos ref list --repository <repo-name-or-id> --filter heads/ --query "[].name" -o tsv
+```
+
 ---
 
 ## 4) Import files (optional)
@@ -99,6 +131,17 @@ import {
 }
 ```
 
+List repository files (paths) with Azure CLI:
+
+```bash
+az devops invoke --http-method GET \
+  --uri "https://dev.azure.com/<ORG>/<PROJECT>/_apis/git/repositories/<REPO_ID>/items?scopePath=/&recursionLevel=Full&api-version=7.1-preview.1" \
+  --query "value[].path" -o tsv
+```
+
+File import IDs are provider-specific; you typically combine repository ID,
+branch, and file path. Use the provider docs for the exact import ID format.
+
 ---
 
 ## 5) Import permissions (optional)
@@ -112,6 +155,17 @@ import {
   id = "<permissions_import_id>"
 }
 ```
+
+Get principal descriptors with Azure CLI:
+
+```bash
+az devops security group list --project <PROJECT> -o table
+az devops user list --organization https://dev.azure.com/<ORG> -o table
+```
+
+Permission import IDs are provider-specific; you typically combine project ID,
+repository ID, branch name, and principal descriptor. Use the provider docs for
+the exact import ID format.
 
 ---
 
@@ -143,6 +197,19 @@ import {
 ```
 
 Repeat for other policy resources as needed.
+
+Get policy configuration IDs with Azure CLI:
+
+```bash
+az repos policy list --project <PROJECT> -o table
+```
+
+If your CLI does not support `az repos policy`, use the REST API via `az devops invoke`:
+
+```bash
+az devops invoke --http-method GET \
+  --uri "https://dev.azure.com/<ORG>/<PROJECT>/_apis/policy/configurations?api-version=7.1-preview.1"
+```
 
 ---
 
