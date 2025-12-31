@@ -431,8 +431,7 @@ variable "git_permissions" {
 
 variable "branch_policy_auto_reviewers" {
   description = "List of auto reviewer branch policies."
-  type = list(object({
-    key                         = optional(string)
+  type = (object({
     enabled                     = optional(bool)
     blocking                    = optional(bool)
     auto_reviewer_ids           = list(string)
@@ -440,13 +439,12 @@ variable "branch_policy_auto_reviewers" {
     submitter_can_vote          = optional(bool)
     message                     = optional(string)
     minimum_number_of_reviewers = optional(number)
-    scope = list(object({
-      repository_id  = optional(string)
+    scope = optional((object({
       repository_ref = optional(string)
       match_type     = optional(string)
-    }))
+    })), null)
   }))
-  default = []
+  default = null
 
   validation {
     condition = alltrue([
@@ -560,7 +558,7 @@ variable "branch_policy_auto_reviewers" {
 
 variable "branch_policy_build_validation" {
   description = "List of build validation branch policies."
-  type = list(object({
+  type = (object({
     key                         = optional(string)
     enabled                     = optional(bool)
     blocking                    = optional(bool)
@@ -570,13 +568,12 @@ variable "branch_policy_build_validation" {
     queue_on_source_update_only = optional(bool)
     valid_duration              = optional(number)
     filename_patterns           = optional(list(string))
-    scope = list(object({
-      repository_id  = optional(string)
+    scope = optional(object({
       repository_ref = optional(string)
       match_type     = optional(string)
-    }))
+    }), null)
   }))
-  default = []
+  default =  null
 
   validation {
     condition = alltrue([
