@@ -24,7 +24,7 @@ output "permission_ids" {
 }
 
 output "policy_ids" {
-  description = "Map of policy IDs grouped by policy type and keyed by branch name (single policies) or policy name (list policies)."
+  description = "Map of policy IDs grouped by policy type and keyed by branch name (single policies), policy name (list policies), or policy type name (repository policies)."
   value = {
     branch_auto_reviewers     = try({ for key, policy in azuredevops_branch_policy_auto_reviewers.branch_policy_auto_reviewers : key => policy.id }, {})
     branch_build_validation   = try({ for key, policy in azuredevops_branch_policy_build_validation.branch_policy_build_validation : key => policy.id }, {})
@@ -33,11 +33,23 @@ output "policy_ids" {
     branch_min_reviewers      = try({ for key, policy in azuredevops_branch_policy_min_reviewers.branch_policy_min_reviewers : key => policy.id }, {})
     branch_status_check       = try({ for key, policy in azuredevops_branch_policy_status_check.branch_policy_status_check : key => policy.id }, {})
     branch_work_item_linking  = try({ for key, policy in azuredevops_branch_policy_work_item_linking.branch_policy_work_item_linking : key => policy.id }, {})
-    repo_author_email_pattern = try({ for key, policy in azuredevops_repository_policy_author_email_pattern.repository_policy_author_email_pattern : key => policy.id }, {})
-    repo_case_enforcement     = try({ for key, policy in azuredevops_repository_policy_case_enforcement.repository_policy_case_enforcement : key => policy.id }, {})
-    repo_file_path_pattern    = try({ for key, policy in azuredevops_repository_policy_file_path_pattern.repository_policy_file_path_pattern : key => policy.id }, {})
-    repo_max_file_size        = try({ for key, policy in azuredevops_repository_policy_max_file_size.repository_policy_max_file_size : key => policy.id }, {})
-    repo_max_path_length      = try({ for key, policy in azuredevops_repository_policy_max_path_length.repository_policy_max_path_length : key => policy.id }, {})
-    repo_reserved_names       = try({ for key, policy in azuredevops_repository_policy_reserved_names.repository_policy_reserved_names : key => policy.id }, {})
+    repo_author_email_pattern = try({
+      author_email_pattern = azuredevops_repository_policy_author_email_pattern.repository_policy_author_email_pattern[0].id
+    }, {})
+    repo_case_enforcement = try({
+      case_enforcement = azuredevops_repository_policy_case_enforcement.repository_policy_case_enforcement[0].id
+    }, {})
+    repo_file_path_pattern = try({
+      file_path_pattern = azuredevops_repository_policy_file_path_pattern.repository_policy_file_path_pattern[0].id
+    }, {})
+    repo_max_file_size = try({
+      max_file_size = azuredevops_repository_policy_max_file_size.repository_policy_max_file_size[0].id
+    }, {})
+    repo_max_path_length = try({
+      max_path_length = azuredevops_repository_policy_max_path_length.repository_policy_max_path_length[0].id
+    }, {})
+    repo_reserved_names = try({
+      reserved_names = azuredevops_repository_policy_reserved_names.repository_policy_reserved_names[0].id
+    }, {})
   }
 }

@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [051](./051-2025-12-31-ado-repository-policies-count.md) | 2025-12-31 | Azure DevOps Repository policies - count-based repo policies | Breaking Change / Maintenance |
 | [050](./050-2025-12-29-makefile-tests-path-portability.md) | 2025-12-29 | Makefile tests path portability | Fix / Maintenance |
 | [049](./049-2025-12-29-workflow-and-module-docs-alignment.md) | 2025-12-29 | Workflow and module documentation alignment | Maintenance / Documentation |
 | [048](./048-2025-12-28-azuredevops-identity-refactor-alignment.md) | 2025-12-28 | Azure DevOps Identity module refactor alignment | Breaking Change / Maintenance |

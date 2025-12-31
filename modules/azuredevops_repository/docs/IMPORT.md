@@ -121,13 +121,7 @@ Branch policies are keyed by:
 - **single policies**: `<branch_name>`
 - **list policies**: `<policy_name>` (must be unique across all branches for a given policy type)
 
-Repository policies are keyed by policy type name:
-- `author_email_pattern`
-- `file_path_pattern`
-- `case_enforcement`
-- `reserved_names`
-- `max_path_length`
-- `max_file_size`
+Repository policies use `count` and are addressed with `[0]` when enabled.
 
 Examples:
 
@@ -143,7 +137,7 @@ import {
 }
 
 import {
-  to = module.azuredevops_repository.azuredevops_repository_policy_reserved_names.repository_policy_reserved_names["reserved_names"]
+  to = module.azuredevops_repository.azuredevops_repository_policy_reserved_names.repository_policy_reserved_names[0]
   id = "<repository_policy_import_id>"
 }
 ```

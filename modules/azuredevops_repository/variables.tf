@@ -167,10 +167,11 @@ variable "policies" {
       max_file_size = number
     }), null)
   })
-  default = null
+  default  = {}
+  nullable = false
 
   validation {
-    condition = var.policies == null || try(var.policies.author_email_pattern, null) == null || (
+    condition = var.policies.author_email_pattern == null || (
       length(var.policies.author_email_pattern.author_email_patterns) > 0 &&
       alltrue([
         for pattern in var.policies.author_email_pattern.author_email_patterns : length(trimspace(pattern)) > 0
@@ -180,7 +181,7 @@ variable "policies" {
   }
 
   validation {
-    condition = var.policies == null || try(var.policies.file_path_pattern, null) == null || (
+    condition = var.policies.file_path_pattern == null || (
       length(var.policies.file_path_pattern.filepath_patterns) > 0 &&
       alltrue([
         for pattern in var.policies.file_path_pattern.filepath_patterns : length(trimspace(pattern)) > 0
@@ -190,14 +191,14 @@ variable "policies" {
   }
 
   validation {
-    condition = var.policies == null || try(var.policies.maximum_path_length, null) == null || (
+    condition = var.policies.maximum_path_length == null || (
       var.policies.maximum_path_length.max_path_length > 0
     )
     error_message = "policies.maximum_path_length.max_path_length must be greater than 0."
   }
 
   validation {
-    condition = var.policies == null || try(var.policies.maximum_file_size, null) == null || (
+    condition = var.policies.maximum_file_size == null || (
       var.policies.maximum_file_size.max_file_size > 0
     )
     error_message = "policies.maximum_file_size.max_file_size must be greater than 0."
@@ -275,7 +276,7 @@ variable "branches" {
         message                     = optional(string)
         minimum_number_of_reviewers = optional(number)
       })), [])
-    }), null)
+    }), {})
   }))
   default = []
 

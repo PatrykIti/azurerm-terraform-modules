@@ -155,6 +155,8 @@ Scope generation (always per branch, no user input):
 - `repository_ref = "refs/heads/${branch.name}"`
 - `repository_id = azuredevops_git_repository.git_repository.id`
 
+Repository policies use `count` (single instance) instead of `for_each`.
+
 ---
 
 ## Resource Mapping
@@ -267,3 +269,4 @@ Fixtures and examples should follow the new input schema and produce determinist
 ## Migration Notes
 
 This is a breaking change. Existing configurations must be rewritten to the new policy structure. The module will no longer allow policy management without a repository resource in state.
+Repository policy resources now use `count`, so addresses change from `...["policy_name"]` to `...[0]` when enabled (update imports or run `terraform state mv`).

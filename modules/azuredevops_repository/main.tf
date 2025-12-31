@@ -26,23 +26,23 @@ locals {
   }
 
   branch_policy_min_reviewers_by_branch = {
-    for branch in var.branches : branch.name => try(branch.policies.min_reviewers, null)
-    if try(branch.policies.min_reviewers, null) != null
+    for branch in var.branches : branch.name => branch.policies.min_reviewers
+    if branch.policies.min_reviewers != null
   }
 
   branch_policy_comment_resolution_by_branch = {
-    for branch in var.branches : branch.name => try(branch.policies.comment_resolution, null)
-    if try(branch.policies.comment_resolution, null) != null
+    for branch in var.branches : branch.name => branch.policies.comment_resolution
+    if branch.policies.comment_resolution != null
   }
 
   branch_policy_work_item_linking_by_branch = {
-    for branch in var.branches : branch.name => try(branch.policies.work_item_linking, null)
-    if try(branch.policies.work_item_linking, null) != null
+    for branch in var.branches : branch.name => branch.policies.work_item_linking
+    if branch.policies.work_item_linking != null
   }
 
   branch_policy_merge_types_by_branch = {
-    for branch in var.branches : branch.name => try(branch.policies.merge_types, null)
-    if try(branch.policies.merge_types, null) != null
+    for branch in var.branches : branch.name => branch.policies.merge_types
+    if branch.policies.merge_types != null
   }
 
   branch_policy_build_validation_by_name = {
@@ -78,12 +78,6 @@ locals {
     ]) : item.policy.name => item
   }
 
-  repo_policy_author_email_pattern = try(var.policies.author_email_pattern, null)
-  repo_policy_file_path_pattern    = try(var.policies.file_path_pattern, null)
-  repo_policy_case_enforcement     = try(var.policies.case_enforcement, null)
-  repo_policy_reserved_names       = try(var.policies.reserved_names, null)
-  repo_policy_max_path_length      = try(var.policies.maximum_path_length, null)
-  repo_policy_max_file_size        = try(var.policies.maximum_file_size, null)
 }
 
 resource "azuredevops_git_repository" "git_repository" {
@@ -296,72 +290,60 @@ resource "azuredevops_branch_policy_work_item_linking" "branch_policy_work_item_
 }
 
 resource "azuredevops_repository_policy_author_email_pattern" "repository_policy_author_email_pattern" {
-  for_each = local.repo_policy_author_email_pattern == null ? {} : {
-    author_email_pattern = local.repo_policy_author_email_pattern
-  }
+  count = var.policies.author_email_pattern == null ? 0 : 1
 
   project_id            = var.project_id
-  enabled               = each.value.enabled
-  blocking              = each.value.blocking
-  author_email_patterns = each.value.author_email_patterns
+  enabled               = var.policies.author_email_pattern.enabled
+  blocking              = var.policies.author_email_pattern.blocking
+  author_email_patterns = var.policies.author_email_pattern.author_email_patterns
   repository_ids        = [azuredevops_git_repository.git_repository.id]
 }
 
 resource "azuredevops_repository_policy_case_enforcement" "repository_policy_case_enforcement" {
-  for_each = local.repo_policy_case_enforcement == null ? {} : {
-    case_enforcement = local.repo_policy_case_enforcement
-  }
+  count = var.policies.case_enforcement == null ? 0 : 1
 
   project_id              = var.project_id
-  enabled                 = each.value.enabled
-  blocking                = each.value.blocking
-  enforce_consistent_case = each.value.enforce_consistent_case
+  enabled                 = var.policies.case_enforcement.enabled
+  blocking                = var.policies.case_enforcement.blocking
+  enforce_consistent_case = var.policies.case_enforcement.enforce_consistent_case
   repository_ids          = [azuredevops_git_repository.git_repository.id]
 }
 
 resource "azuredevops_repository_policy_file_path_pattern" "repository_policy_file_path_pattern" {
-  for_each = local.repo_policy_file_path_pattern == null ? {} : {
-    file_path_pattern = local.repo_policy_file_path_pattern
-  }
+  count = var.policies.file_path_pattern == null ? 0 : 1
 
   project_id        = var.project_id
-  enabled           = each.value.enabled
-  blocking          = each.value.blocking
-  filepath_patterns = each.value.filepath_patterns
+  enabled           = var.policies.file_path_pattern.enabled
+  blocking          = var.policies.file_path_pattern.blocking
+  filepath_patterns = var.policies.file_path_pattern.filepath_patterns
   repository_ids    = [azuredevops_git_repository.git_repository.id]
 }
 
 resource "azuredevops_repository_policy_max_file_size" "repository_policy_max_file_size" {
-  for_each = local.repo_policy_max_file_size == null ? {} : {
-    max_file_size = local.repo_policy_max_file_size
-  }
+  count = var.policies.maximum_file_size == null ? 0 : 1
 
   project_id     = var.project_id
-  enabled        = each.value.enabled
-  blocking       = each.value.blocking
-  max_file_size  = each.value.max_file_size
+  enabled        = var.policies.maximum_file_size.enabled
+  blocking       = var.policies.maximum_file_size.blocking
+  max_file_size  = var.policies.maximum_file_size.max_file_size
   repository_ids = [azuredevops_git_repository.git_repository.id]
 }
 
 resource "azuredevops_repository_policy_max_path_length" "repository_policy_max_path_length" {
-  for_each = local.repo_policy_max_path_length == null ? {} : {
-    max_path_length = local.repo_policy_max_path_length
-  }
+  count = var.policies.maximum_path_length == null ? 0 : 1
 
   project_id      = var.project_id
-  enabled         = each.value.enabled
-  blocking        = each.value.blocking
-  max_path_length = each.value.max_path_length
+  enabled         = var.policies.maximum_path_length.enabled
+  blocking        = var.policies.maximum_path_length.blocking
+  max_path_length = var.policies.maximum_path_length.max_path_length
   repository_ids  = [azuredevops_git_repository.git_repository.id]
 }
 
 resource "azuredevops_repository_policy_reserved_names" "repository_policy_reserved_names" {
-  for_each = local.repo_policy_reserved_names == null ? {} : {
-    reserved_names = local.repo_policy_reserved_names
-  }
+  count = var.policies.reserved_names == null ? 0 : 1
 
   project_id     = var.project_id
-  enabled        = each.value.enabled
-  blocking       = each.value.blocking
+  enabled        = var.policies.reserved_names.enabled
+  blocking       = var.policies.reserved_names.blocking
   repository_ids = [azuredevops_git_repository.git_repository.id]
 }
