@@ -49,7 +49,7 @@ EOT
 }
 
 module "azuredevops_environments" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_environments?ref=ADOE1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_environments?ref=ADOE1.0.0"
 
   project_id  = var.project_id
   name        = "ado-env-complete-example"

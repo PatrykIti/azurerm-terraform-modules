@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_extension" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOEX1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOEX1.0.0"
 
   publisher_id      = var.publisher_id
   extension_id      = var.extension_id

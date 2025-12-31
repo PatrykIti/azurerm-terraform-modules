@@ -109,7 +109,7 @@ module "azuredevops_artifacts_feed" {
 
 # After release (automatically updated)
 module "azuredevops_artifacts_feed" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_artifacts_feed?ref=ADOAFv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_artifacts_feed?ref=ADOAFv1.2.0"
 }
 ```
 

@@ -109,7 +109,7 @@ module "route_table" {
 
 # After release (automatically updated)
 module "route_table" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.2.0"
 }
 ```
 

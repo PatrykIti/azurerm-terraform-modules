@@ -18,7 +18,7 @@ locals {
 }
 
 module "azuredevops_extension" {
-  source   = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOEX1.0.0"
+  source   = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOEX1.0.0"
   for_each = local.approved_extensions_by_key
 
   publisher_id      = each.value.publisher_id

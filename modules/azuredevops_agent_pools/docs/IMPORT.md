@@ -33,7 +33,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_agent_pools" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_agent_pools?ref=ADOAP1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_agent_pools?ref=ADOAP1.0.0"
 
   name           = "existing-pool-name"
   auto_provision = false

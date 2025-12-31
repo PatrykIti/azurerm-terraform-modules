@@ -34,7 +34,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_repository" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_repository?ref=ADOR1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_repository?ref=ADOR1.0.0"
 
   project_id = "00000000-0000-0000-0000-000000000000"
   name       = "existing-repo-name"

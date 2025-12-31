@@ -109,7 +109,7 @@ module "azuredevops_agent_pools" {
 
 # After release (automatically updated)
 module "azuredevops_agent_pools" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_agent_pools?ref=ADOAPv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_agent_pools?ref=ADOAPv1.2.0"
 }
 ```
 

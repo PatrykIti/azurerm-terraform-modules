@@ -109,7 +109,7 @@ module "azuredevops_wiki" {
 
 # After release (automatically updated)
 module "azuredevops_wiki" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_wiki?ref=ADOWIv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_wiki?ref=ADOWIv1.2.0"
 }
 ```
 

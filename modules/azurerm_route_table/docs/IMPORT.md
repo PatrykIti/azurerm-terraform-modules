@@ -38,7 +38,7 @@ provider "azurerm" {
 }
 
 module "route_table" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.3"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.3"
 
   name                = var.route_table_name
   resource_group_name = var.resource_group_name

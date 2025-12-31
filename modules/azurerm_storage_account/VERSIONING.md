@@ -109,7 +109,7 @@ module "storage_account" {
 
 # After release (automatically updated)
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.0"
 }
 ```
 

@@ -38,7 +38,7 @@ provider "azurerm" {
 }
 
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.0"
 
   name                = var.cluster_name
   resource_group_name = var.resource_group_name

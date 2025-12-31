@@ -38,7 +38,7 @@ provider "azurerm" {
 }
 
 module "network_security_group" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.3"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.3"
 
   name                = var.nsg_name
   resource_group_name = var.resource_group_name

@@ -37,7 +37,7 @@ provider "azurerm" {
 }
 
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
 
   name                = var.storage_account_name
   resource_group_name = var.resource_group_name

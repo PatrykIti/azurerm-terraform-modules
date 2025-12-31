@@ -109,7 +109,7 @@ module "kubernetes_secrets" {
 
 # After release (automatically updated)
 module "kubernetes_secrets" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_secrets?ref=AKSSv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_secrets?ref=AKSSv1.2.0"
 }
 ```
 

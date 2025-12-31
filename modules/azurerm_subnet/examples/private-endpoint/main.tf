@@ -31,7 +31,7 @@ resource "azurerm_virtual_network" "example" {
 
 # Subnet configured for private endpoints
 module "subnet" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
 
   name                 = var.subnet_name
   resource_group_name  = azurerm_resource_group.example.name

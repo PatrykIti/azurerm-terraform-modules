@@ -73,7 +73,7 @@ resource "azurerm_user_assigned_identity" "example" {
 
 # Create secure AKS cluster
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.0"
 
   # Core configuration
   name                = var.cluster_name

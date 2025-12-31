@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_work_items" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_work_items?ref=ADOWK1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_work_items?ref=ADOWK1.0.0"
 
   project_id = var.project_id
 

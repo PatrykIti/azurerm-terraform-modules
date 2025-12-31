@@ -202,7 +202,7 @@ resource "azurerm_subnet" "example" {
 }
 
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.4"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.4"
 
   name                = "aks-basic"
   resource_group_name = azurerm_resource_group.example.name
@@ -306,7 +306,7 @@ resource "azurerm_subnet" "example" {
 }
 
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.4"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.4"
 
   name                = "aks-complete"
   resource_group_name = azurerm_resource_group.example.name
@@ -424,7 +424,7 @@ resource "azurerm_subnet" "example" {
 }
 
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.4"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.4"
 
   name                = "aks-secure"
   resource_group_name = azurerm_resource_group.example.name

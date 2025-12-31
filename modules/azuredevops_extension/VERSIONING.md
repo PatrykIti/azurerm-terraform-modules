@@ -109,7 +109,7 @@ module "azuredevops_extension" {
 
 # After release (automatically updated)
 module "azuredevops_extension" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOEXv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOEXv1.2.0"
 }
 ```
 

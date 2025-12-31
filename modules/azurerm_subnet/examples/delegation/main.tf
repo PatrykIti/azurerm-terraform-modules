@@ -37,7 +37,7 @@ resource "azurerm_virtual_network" "example" {
 
 # Subnet delegated to Azure Container Instances
 module "subnet_container_instances" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
 
   name                 = var.container_instances_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
@@ -73,7 +73,7 @@ module "subnet_container_instances" {
 
 # Subnet delegated to Azure Database for PostgreSQL Flexible Server
 module "subnet_postgresql" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
 
   name                 = var.postgresql_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
@@ -105,7 +105,7 @@ module "subnet_postgresql" {
 
 # Subnet delegated to Azure App Service (Web Apps)
 module "subnet_app_service" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
 
   name                 = var.app_service_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
@@ -141,7 +141,7 @@ module "subnet_app_service" {
 
 # Subnet delegated to Azure Batch
 module "subnet_batch" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
 
   name                 = var.batch_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
@@ -175,7 +175,7 @@ module "subnet_batch" {
 
 # Regular subnet for comparison (no delegation)
 module "subnet_regular" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
 
   name                 = var.regular_subnet_name
   resource_group_name  = azurerm_resource_group.example.name

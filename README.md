@@ -68,7 +68,7 @@ Azure DevOps modules use the `azuredevops` provider and typically require a PAT 
 Example module reference:
 ```hcl
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
   # See module README for configuration details
 }
 ```
