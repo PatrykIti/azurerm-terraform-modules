@@ -93,11 +93,12 @@ Notes:
 - `ref_branch` (optional string)
 - `ref_tag` (optional string)
 - `ref_commit_id` (optional string)
-- `policies` (optional object)
+- `policies` (optional object, default `{}`; treat as always present)
 
 Validation rules:
 - branch names must be unique within the list.
 - only one of `ref_branch`, `ref_tag`, `ref_commit_id` can be set per branch.
+- `branches.policies` must not be null (omit it or use `{}`).
 
 ### Branch Policies (nested per branch)
 
@@ -122,6 +123,8 @@ Multi-instance policy requirements:
 Notes:
 - `name` is required for list policies and must be unique across all branches.
 - No user-provided `scope` blocks. Scope is derived from branch name.
+- `branches[*].policies` defaults to `{}` and list policies default to `[]`, so locals can access
+  `branch.policies.*` directly without `try`/`coalesce`.
 
 ---
 
@@ -133,6 +136,37 @@ Keying strategy:
 - Single policies: `<branch_name>`
 - List policies: `<policy_name>` (unique across all branches)
 
+Single-instance policies per branch (example):
+
+```
+locals {
+  branch_policy_min_reviewers_by_branch = {
+    for branch in var.branches : branch.name => branch.policies.min_reviewers
+    if branch.policies.min_reviewers != null
+  }
+}
+```
+
+Resource usage (example):
+
+```
+resource "azuredevops_branch_policy_min_reviewers" "branch_policy_min_reviewers" {
+  for_each = local.branch_policy_min_reviewers_by_branch
+
+  project_id = var.project_id
+
+  settings {
+    reviewer_count = each.value.reviewer_count
+
+    scope {
+      repository_id  = azuredevops_git_repository.git_repository.id
+      repository_ref = format("refs/heads/%s", each.key)
+      match_type     = "Exact"
+    }
+  }
+}
+```
+
 Example (build validation):
 
 ```
@@ -140,7 +174,7 @@ locals {
   branch_build_validations = {
     for item in flatten([
       for branch in var.branches : [
-        for policy in coalesce(try(branch.policies.build_validation, []), []) : {
+        for policy in branch.policies.build_validation : {
           branch = branch
           policy = policy
         }

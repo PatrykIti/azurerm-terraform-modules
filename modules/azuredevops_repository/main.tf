@@ -48,7 +48,7 @@ locals {
   branch_policy_build_validation_by_name = {
     for item in flatten([
       for branch in var.branches : [
-        for policy in coalesce(try(branch.policies.build_validation, []), []) : {
+        for policy in branch.policies.build_validation : {
           branch = branch
           policy = policy
         }
@@ -59,7 +59,7 @@ locals {
   branch_policy_status_check_by_name = {
     for item in flatten([
       for branch in var.branches : [
-        for policy in coalesce(try(branch.policies.status_check, []), []) : {
+        for policy in branch.policies.status_check : {
           branch = branch
           policy = policy
         }
@@ -70,7 +70,7 @@ locals {
   branch_policy_auto_reviewers_by_name = {
     for item in flatten([
       for branch in var.branches : [
-        for policy in coalesce(try(branch.policies.auto_reviewers, []), []) : {
+        for policy in branch.policies.auto_reviewers : {
           branch = branch
           policy = policy
         }

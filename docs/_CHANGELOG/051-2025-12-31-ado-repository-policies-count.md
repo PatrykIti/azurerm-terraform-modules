@@ -14,3 +14,5 @@
 - Switched repository-level policy resources to `count` (single instance) instead of `for_each`; addresses now use `[0]` when enabled.
 - Updated `policy_ids` output handling and import documentation for the new count-based repo policies.
 - Set `policies` default to `{}` with `nullable = false` to avoid null guards.
+- Standardized branch policy locals to map by branch name with `policies` default `{}` for direct access in locals/resources.
+- Removed `try`/`coalesce` from list policy locals and added validation that `branches.policies` cannot be `null`.

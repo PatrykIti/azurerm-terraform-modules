@@ -288,6 +288,13 @@ variable "branches" {
   }
 
   validation {
+    condition = alltrue([
+      for branch in var.branches : branch.policies != null
+    ])
+    error_message = "branches.policies must not be null; omit it or use {}."
+  }
+
+  validation {
     condition = length(distinct([
       for branch in var.branches : branch.name
     ])) == length(var.branches)
