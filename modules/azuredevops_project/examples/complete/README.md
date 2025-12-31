@@ -44,7 +44,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_azuredevops_project"></a> [azuredevops\_project](#module\_azuredevops\_project) | github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_project | ADOP1.1.1 |
+| <a name="module_azuredevops_project"></a> [azuredevops\_project](#module\_azuredevops\_project) | github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_project | ADOPv1.1.1 |
 
 ## Resources
 

@@ -39,14 +39,14 @@ module "azuredevops_repository" {
   project_id = "00000000-0000-0000-0000-000000000000"
   name       = "existing-repo-name"
 
-  initialization = {
-    init_type = "Clean"
-  }
+  # Optional: repository initialization
+  # initialization = {
+  #   init_type = "Clean"
+  # }
 
   # Optional: manage branches/files/permissions/policies
   # branches = [
   #   {
-  #     key  = "develop"
   #     name = "develop"
   #   }
   # ]
@@ -61,7 +61,7 @@ Create `import.tf`:
 
 ```hcl
 import {
-  to = module.azuredevops_repository.azuredevops_git_repository.git_repository[0]
+  to = module.azuredevops_repository.azuredevops_git_repository.git_repository
   id = "<repository_id>"
 }
 ```
@@ -72,7 +72,7 @@ Use the repository ID from Azure DevOps (UI or API).
 
 ## 3) Import branches (optional)
 
-If you manage branches, ensure each branch has a stable `key` and then add:
+Branch resources are keyed by branch name:
 
 ```hcl
 import {
@@ -89,11 +89,12 @@ format.
 
 ## 4) Import files (optional)
 
-If you manage repository files, use stable keys:
+File resources are keyed by `<file_path>:<branch>` where `<branch>` is `default`
+when the branch is not set.
 
 ```hcl
 import {
-  to = module.azuredevops_repository.azuredevops_git_repository_file.git_repository_file["readme"]
+  to = module.azuredevops_repository.azuredevops_git_repository_file.git_repository_file["README.md:default"]
   id = "<file_import_id>"
 }
 ```
@@ -102,9 +103,12 @@ import {
 
 ## 5) Import permissions (optional)
 
+Permission resources are keyed by `<branch_name>:<principal>` where
+`branch_name` is `root` when not set.
+
 ```hcl
 import {
-  to = module.azuredevops_repository.azuredevops_git_permissions.git_permissions["main-contributors"]
+  to = module.azuredevops_repository.azuredevops_git_permissions.git_permissions["root:group-1"]
   id = "<permissions_import_id>"
 }
 ```
@@ -113,19 +117,38 @@ import {
 
 ## 6) Import policies (optional)
 
+Branch policies are keyed by:
+- **single policies**: `<branch_name>`
+- **list policies**: `<policy_name>` (must be unique across all branches for a given policy type)
+
+Repository policies are keyed by policy type name:
+- `author_email_pattern`
+- `file_path_pattern`
+- `case_enforcement`
+- `reserved_names`
+- `max_path_length`
+- `max_file_size`
+
+Examples:
+
 ```hcl
 import {
-  to = module.azuredevops_repository.azuredevops_branch_policy_min_reviewers.branch_policy_min_reviewers["min-reviewers"]
+  to = module.azuredevops_repository.azuredevops_branch_policy_min_reviewers.branch_policy_min_reviewers["develop"]
   id = "<branch_policy_import_id>"
 }
 
 import {
-  to = module.azuredevops_repository.azuredevops_repository_policy_reserved_names.repository_policy_reserved_names["reserved-names"]
+  to = module.azuredevops_repository.azuredevops_branch_policy_build_validation.branch_policy_build_validation["ci"]
+  id = "<branch_policy_import_id>"
+}
+
+import {
+  to = module.azuredevops_repository.azuredevops_repository_policy_reserved_names.repository_policy_reserved_names["reserved_names"]
   id = "<repository_policy_import_id>"
 }
 ```
 
-Repeat for other branch/repository policy resources as needed.
+Repeat for other policy resources as needed.
 
 ---
 

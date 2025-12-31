@@ -7,24 +7,7 @@ variables {
   name       = "unit-repo"
 }
 
-run "missing_branch_repository_id_without_repo" {
-  command = plan
-
-  variables {
-    name = null
-    branches = [
-      {
-        name = "invalid"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.branches,
-  ]
-}
-
-run "duplicate_branch_keys" {
+run "duplicate_branch_names" {
   command = plan
 
   variables {
@@ -145,91 +128,159 @@ run "invalid_min_reviewers" {
   command = plan
 
   variables {
-    branch_policy_min_reviewers = [
+    branches = [
       {
-        reviewer_count = 0
-        scope = [
-          {
-            match_type = "DefaultBranch"
+        name = "main"
+        policies = {
+          min_reviewers = {
+            reviewer_count = 0
           }
-        ]
+        }
       }
     ]
   }
 
   expect_failures = [
-    var.branch_policy_min_reviewers,
+    var.branches,
   ]
 }
 
-run "duplicate_policy_keys" {
+run "duplicate_build_validation_names" {
   command = plan
 
   variables {
-    branch_policy_min_reviewers = [
+    branches = [
       {
-        reviewer_count = 1
-        scope = [
-          {
-            match_type = "DefaultBranch"
-          }
-        ]
+        name = "main"
+        policies = {
+          build_validation = [
+            {
+              name                = "ci"
+              build_definition_id = "1"
+              display_name        = "CI"
+            },
+            {
+              name                = "ci"
+              build_definition_id = "2"
+              display_name        = "CI2"
+            }
+          ]
+        }
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.branches,
+  ]
+}
+
+run "duplicate_build_validation_names_across_branches" {
+  command = plan
+
+  variables {
+    branches = [
+      {
+        name = "main"
+        policies = {
+          build_validation = [
+            {
+              name                = "ci"
+              build_definition_id = "1"
+              display_name        = "CI"
+            }
+          ]
+        }
       },
       {
-        reviewer_count = 2
-        scope = [
-          {
-            match_type = "DefaultBranch"
-          }
-        ]
+        name = "develop"
+        policies = {
+          build_validation = [
+            {
+              name                = "ci"
+              build_definition_id = "2"
+              display_name        = "CI2"
+            }
+          ]
+        }
       }
     ]
   }
 
   expect_failures = [
-    var.branch_policy_min_reviewers,
+    var.branches,
   ]
 }
 
-run "invalid_match_type" {
+run "invalid_build_validation_display_name" {
   command = plan
 
   variables {
-    branch_policy_status_check = [
+    branches = [
       {
-        name = "status"
-        scope = [
-          {
-            match_type = "Invalid"
-          }
-        ]
+        name = "main"
+        policies = {
+          build_validation = [
+            {
+              name                = "ci"
+              build_definition_id = "1"
+              display_name        = ""
+            }
+          ]
+        }
       }
     ]
   }
 
   expect_failures = [
-    var.branch_policy_status_check,
+    var.branches,
   ]
 }
 
-run "invalid_repository_ref_requirement" {
+run "invalid_status_check_name" {
   command = plan
 
   variables {
-    branch_policy_status_check = [
+    branches = [
       {
-        name = "status"
-        scope = [
-          {
-            match_type = "Exact"
-          }
-        ]
+        name = "main"
+        policies = {
+          status_check = [
+            {
+              name = ""
+            }
+          ]
+        }
       }
     ]
   }
 
   expect_failures = [
-    var.branch_policy_status_check,
+    var.branches,
+  ]
+}
+
+run "invalid_auto_reviewer_ids" {
+  command = plan
+
+  variables {
+    branches = [
+      {
+        name = "main"
+        policies = {
+          auto_reviewers = [
+            {
+              name              = "auto"
+              auto_reviewer_ids = []
+            }
+          ]
+        }
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.branches,
   ]
 }
 
@@ -237,29 +288,14 @@ run "invalid_max_file_size" {
   command = plan
 
   variables {
-    repository_policy_max_file_size = [
-      {
+    policies = {
+      maximum_file_size = {
         max_file_size = 0
       }
-    ]
+    }
   }
 
   expect_failures = [
-    var.repository_policy_max_file_size,
-  ]
-}
-
-run "missing_repository_targets" {
-  command = plan
-
-  variables {
-    name = null
-    repository_policy_reserved_names = [
-      {}
-    ]
-  }
-
-  expect_failures = [
-    var.repository_policy_reserved_names,
+    var.policies,
   ]
 }

@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Large
 **Dependencies:** TASK-ADO-023
-**Status:** Proposed
+**Status:** Done (2025-12-31)
 
 ---
 
@@ -120,7 +120,7 @@ Multi-instance policy requirements:
 - `auto_reviewers`: `name`, `auto_reviewer_ids`, optional tuning fields
 
 Notes:
-- `name` is required for list policies and must be unique within the branch.
+- `name` is required for list policies and must be unique across all branches.
 - No user-provided `scope` blocks. Scope is derived from branch name.
 
 ---
@@ -130,8 +130,8 @@ Notes:
 We will flatten nested policy lists into maps for stable `for_each` keys.
 
 Keying strategy:
-- Single policies: `<branch_name>:<policy_type>`
-- List policies: `<branch_name>:<policy_name>`
+- Single policies: `<branch_name>`
+- List policies: `<policy_name>` (unique across all branches)
 
 Example (build validation):
 
@@ -145,7 +145,7 @@ locals {
           policy = policy
         }
       ]
-    ]) : format("%s:%s", item.branch.name, item.policy.name) => item
+    ]) : item.policy.name => item
   }
 }
 ```
@@ -192,7 +192,7 @@ Branch Policies (per branch and per policy):
 Update outputs to reflect new keys:
 - `repository_id`, `repository_url` use direct resource ID (no `[0]` index)
 - `branch_ids` keyed by branch name
-- `policy_ids` keyed by `<branch_name>:<policy_type>` for single policies and `<branch_name>:<policy_name>` for list policies
+- `policy_ids` keyed by `<branch_name>` for single policies and `<policy_name>` for list policies
 - `repo_*` policy IDs keyed by policy type name
 
 ---
@@ -220,7 +220,7 @@ Unit tests to update or replace:
 - Add validations for:
   - unique branch names
   - only one of ref_branch/ref_tag/ref_commit_id
-  - policy list `name` uniqueness per branch
+  - policy list `name` uniqueness across all branches
   - required fields (build_definition_id, display_name, auto_reviewer_ids, reviewer_count > 0)
   - repo policy constraints (max_file_size/max_path_length > 0, patterns non-empty)
 

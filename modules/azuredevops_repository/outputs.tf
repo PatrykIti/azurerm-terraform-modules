@@ -1,30 +1,30 @@
 output "repository_id" {
   description = "The ID of the repository managed by this module."
-  value       = try(azuredevops_git_repository.git_repository[0].id, null)
+  value       = azuredevops_git_repository.git_repository.id
 }
 
 output "repository_url" {
   description = "The web URL of the repository managed by this module."
-  value       = try(azuredevops_git_repository.git_repository[0].web_url, null)
+  value       = azuredevops_git_repository.git_repository.web_url
 }
 
 output "branch_ids" {
-  description = "Map of branch IDs keyed by branch key."
+  description = "Map of branch IDs keyed by branch name."
   value       = try({ for key, branch in azuredevops_git_repository_branch.git_repository_branch : key => branch.id }, {})
 }
 
 output "file_ids" {
-  description = "Map of file IDs keyed by file key."
+  description = "Map of file IDs keyed by file path and branch."
   value       = try({ for key, file in azuredevops_git_repository_file.git_repository_file : key => file.id }, {})
 }
 
 output "permission_ids" {
-  description = "Map of permission IDs keyed by permission key."
+  description = "Map of permission IDs keyed by branch and principal."
   value       = try({ for key, permission in azuredevops_git_permissions.git_permissions : key => permission.id }, {})
 }
 
 output "policy_ids" {
-  description = "Map of policy IDs grouped by policy type and keyed by policy key."
+  description = "Map of policy IDs grouped by policy type and keyed by branch name (single policies) or policy name (list policies)."
   value = {
     branch_auto_reviewers     = try({ for key, policy in azuredevops_branch_policy_auto_reviewers.branch_policy_auto_reviewers : key => policy.id }, {})
     branch_build_validation   = try({ for key, policy in azuredevops_branch_policy_build_validation.branch_policy_build_validation : key => policy.id }, {})

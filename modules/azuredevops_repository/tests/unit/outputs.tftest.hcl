@@ -27,20 +27,12 @@ variables {
 
   branches = [
     {
-      key  = "main-branch"
       name = "main"
-    }
-  ]
-
-  branch_policy_min_reviewers = [
-    {
-      key            = "min-reviewers"
-      reviewer_count = 1
-      scope = [
-        {
-          match_type = "DefaultBranch"
+      policies = {
+        min_reviewers = {
+          reviewer_count = 1
         }
-      ]
+      }
     }
   ]
 }
@@ -59,12 +51,12 @@ run "outputs_apply" {
   }
 
   assert {
-    condition     = contains(keys(output.branch_ids), "main-branch")
-    error_message = "branch_ids should be keyed by branch key."
+    condition     = contains(keys(output.branch_ids), "main")
+    error_message = "branch_ids should be keyed by branch name."
   }
 
   assert {
-    condition     = contains(keys(output.policy_ids.branch_min_reviewers), "min-reviewers")
-    error_message = "policy_ids should be keyed by policy key."
+    condition     = contains(keys(output.policy_ids.branch_min_reviewers), "main")
+    error_message = "policy_ids.branch_min_reviewers should be keyed by branch name."
   }
 }

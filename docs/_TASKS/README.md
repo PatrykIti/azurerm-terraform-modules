@@ -5,7 +5,7 @@ Task board for module work. Update statuses in markdown files.
 ## Statistics
 - **To Do:** 12 tasks
 - **In Progress:** 0
-- **Done:** 28 tasks
+- **Done:** 29 tasks
 
 ---
 
@@ -24,7 +24,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-025](./TASK-ADO-025_AzureDevOps_Variable_Groups_Module_Refactor.md) | **Azure DevOps Variable Groups module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_variable_groups/` |
 | [TASK-ADO-026](./TASK-ADO-026_AzureDevOps_Work_Items_Module_Refactor.md) | **Azure DevOps Work Items module refactor** | High | Medium | Re-opened; `modules/azuredevops_work_items/` |
 | [TASK-ADO-027](./TASK-ADO-027_AzureDevOps_Team_Module_Refactor.md) | **Azure DevOps Team module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_team/` |
-| [TASK-ADO-029](./TASK-ADO-029_AzureDevOps_Repository_Policies_Restructure.md) | **Azure DevOps Repository policies restructure** | High | Large | New nested policy inputs for `modules/azuredevops_repository/` |
+| [TASK-ADO-030](./TASK-ADO-030_AzureDevOps_Project_Docs_and_Release_Alignment.md) | **Azure DevOps Project docs and release alignment** | Medium | Small | `modules/azuredevops_project/` docs + release config |
 
 ---
 
@@ -63,6 +63,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-016](./TASK-ADO-016_AzureDevOps_Project_Permissions_Verification.md) | **Azure DevOps Project Permissions module – verification & alignment** | Medium | Small | `modules/azuredevops_project_permissions/` |
 | [TASK-ADO-018](./TASK-ADO-018_AzureDevOps_Identity_Module_Refactor.md) | **Azure DevOps Identity module refactor** | High | Medium | Re-opened; `modules/azuredevops_identity/` |
 | [TASK-ADO-028](./TASK-ADO-028_AzureDevOps_Contributing_Docs_Alignment.md) | **Azure DevOps CONTRIBUTING docs alignment** | Medium | Small | `modules/azuredevops_*/CONTRIBUTING.md`, `scripts/templates/CONTRIBUTING.md` |
+| [TASK-ADO-029](./TASK-ADO-029_AzureDevOps_Repository_Policies_Restructure.md) | **Azure DevOps Repository policies restructure** | High | Large | New nested policy inputs for `modules/azuredevops_repository/` |
 | [TASK-006](./TASK-006_NSG_Observability_and_Documentation.md) | **NSG observability + docs alignment (diagnostic settings)** | High | Large | `modules/azurerm_network_security_group/` + repo docs |
 | [TASK-007](./TASK-007_Route_Table_Module_Alignment.md) | **Route Table module – alignment z guide (docs, examples, tests)** | High | Medium | `modules/azurerm_route_table/` |
 | [TASK-008](./TASK-008_Storage_Account_Module_Alignment.md) | **Storage Account module – alignment z guide (docs, examples, tests)** | High | Large | `modules/azurerm_storage_account/` |

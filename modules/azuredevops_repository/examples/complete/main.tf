@@ -34,14 +34,24 @@ module "azuredevops_repository" {
 
   branches = [
     {
-      key  = "develop"
       name = "develop"
+      policies = {
+        min_reviewers = {
+          reviewer_count = var.reviewer_count
+        }
+        build_validation = [
+          {
+            name                = "ci"
+            build_definition_id = var.build_definition_id
+            display_name        = "CI"
+          }
+        ]
+      }
     }
   ]
 
   files = [
     {
-      key                 = "readme"
       file                = "README.md"
       content             = "# Repository\n\nManaged by Terraform."
       commit_message      = "Add README"
@@ -51,7 +61,6 @@ module "azuredevops_repository" {
 
   git_permissions = [
     {
-      key       = "contributors"
       principal = var.principal_descriptor
       permissions = {
         GenericRead       = "Allow"
@@ -60,41 +69,12 @@ module "azuredevops_repository" {
     }
   ]
 
-  branch_policy_min_reviewers = [
-    {
-      key            = "min-reviewers"
-      reviewer_count = var.reviewer_count
-      scope = [
-        {
-          match_type = "DefaultBranch"
-        }
-      ]
-    }
-  ]
-
-  branch_policy_build_validation = [
-    {
-      key                 = "build-validation"
-      build_definition_id = var.build_definition_id
-      display_name        = "CI"
-      scope = [
-        {
-          match_type = "DefaultBranch"
-        }
-      ]
-    }
-  ]
-
-  repository_policy_author_email_pattern = [
-    {
-      key                   = "author-email"
+  policies = {
+    author_email_pattern = {
       author_email_patterns = var.author_email_patterns
     }
-  ]
-
-  repository_policy_reserved_names = [
-    {
-      key = "reserved-names"
+    reserved_names = {
+      blocking = true
     }
-  ]
+  }
 }

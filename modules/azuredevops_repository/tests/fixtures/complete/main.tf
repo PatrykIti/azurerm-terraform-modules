@@ -22,14 +22,17 @@ module "azuredevops_repository" {
 
   branches = [
     {
-      key  = "develop"
       name = "develop"
+      policies = {
+        min_reviewers = {
+          reviewer_count = 1
+        }
+      }
     }
   ]
 
   files = [
     {
-      key                 = "readme"
       file                = "README.md"
       content             = "# Repository\n\nManaged by Terraform."
       commit_message      = "Add README"
@@ -37,22 +40,9 @@ module "azuredevops_repository" {
     }
   ]
 
-  branch_policy_min_reviewers = [
-    {
-      key            = "min-reviewers"
-      reviewer_count = 1
-      scope = [
-        {
-          match_type     = "Exact"
-          repository_ref = "refs/heads/develop"
-        }
-      ]
+  policies = {
+    reserved_names = {
+      blocking = true
     }
-  ]
-
-  repository_policy_reserved_names = [
-    {
-      key = "reserved-names"
-    }
-  ]
+  }
 }
