@@ -38,12 +38,6 @@ resource "azurerm_virtual_network" "virtual_network" {
   }
 
   tags = var.tags
-
-  # lifecycle {
-  #   # Prevent destruction of VNet if it contains subnets
-  #   # Note: prevent_destroy must be a literal value, not a variable
-  #   prevent_destroy = true
-  # }
 }
 
 
