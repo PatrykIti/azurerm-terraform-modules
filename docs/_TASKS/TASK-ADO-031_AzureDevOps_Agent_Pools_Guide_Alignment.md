@@ -12,7 +12,8 @@
 ## Overview
 
 Bring `modules/azuredevops_agent_pools` into full compliance with `docs/MODULE_GUIDE`,
-covering example naming rules, main.tf patterns, and documentation consistency.
+covering example naming rules, main.tf patterns, documentation consistency, and
+moving `agent_queues` out of this module (queues are project-scoped).
 
 ---
 
@@ -27,19 +28,19 @@ covering example naming rules, main.tf patterns, and documentation consistency.
 - `azuredevops_elastic_pool` uses `try(...)` on every attribute; `count = 0`
   already prevents evaluation when the object is null. Remove `try` and rely on
   direct access + validations, keeping `count`.
-- `agent_queues_by_key` uses a multi-fallback key; this is correct but undocumented
-  in module docs. Users should see how keys are derived and when to set `key`.
+- `agent_queues` are project-scoped and do not logically belong in
+  `azuredevops_agent_pools`; they should be removed from this module.
 
 ---
 
 ## Scope
 
-1) **Main module (elastic pool + queue keys)**
+1) **Main module (elastic pool + queue removal)**
    - Keep `count`, remove `try(...)` in `azuredevops_elastic_pool`, and use
      direct access to `var.elastic_pool.*`.
    - Update outputs to use a conditional guard instead of `try(...)`.
-   - Document `agent_queues_by_key` key selection in README/variables docs:
-     `key` → `name` → `agent_pool_id` (as string) → `project_id`.
+   - Remove `agent_queues` inputs, locals, resources, outputs, and tests.
+   - Update examples to show only agent pool + optional elastic pool usage.
 
 **Note:** Terraform does not evaluate resource arguments when `count = 0`, so
 direct access to an optional object is safe inside the resource. Outputs and
@@ -90,7 +91,7 @@ other references still need conditional guards.
 - terraform-docs output matches example `main.tf` sources (no stale `../../` entries).
 - `azuredevops_elastic_pool` no longer uses `try(...)`; direct inputs are used
   with `count` and validations, and outputs are conditionally guarded.
-- `agent_queues_by_key` key selection is documented for users.
+- `agent_queues` inputs/resources/outputs are removed from this module.
 
 ---
 
@@ -99,7 +100,7 @@ other references still need conditional guards.
 - [ ] Update `main.tf` to keep `count`, remove `try(...)`, and access
   `var.elastic_pool.*` directly.
 - [ ] Update outputs to use a conditional guard instead of `try(...)`.
-- [ ] Document agent queue key selection in README or variables docs.
+- [ ] Remove `agent_queues` variables, locals, resources, outputs, examples, and tests.
 - [ ] Update example `main.tf` files to remove random suffixes and providers.
 - [ ] Adjust example `variables.tf` defaults to fixed names per guide patterns.
 - [ ] Update example `README.md` text to match deterministic naming.
