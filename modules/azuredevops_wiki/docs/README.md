@@ -2,7 +2,7 @@
 
 ## Overview
 
-This module manages Azure DevOps azure devops wiki resources and related configuration.
+This module manages Azure DevOps wiki resources and related configuration.
 
 ## Managed Resources
 

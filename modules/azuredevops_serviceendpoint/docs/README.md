@@ -2,7 +2,7 @@
 
 ## Overview
 
-This module manages Azure DevOps azure devops service endpoints resources and related configuration.
+This module manages Azure DevOps service endpoints resources and related configuration.
 
 ## Managed Resources
 

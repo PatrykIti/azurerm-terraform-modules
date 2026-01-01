@@ -15,6 +15,7 @@ Azure DevOps repository module for managing a Git repository, branches, permissi
 - `initialization` defaults to `init_type = "Uninitialized"` and is always sent to the provider.
 - For `init_type = "Import"`, set `source_type = "Git"`, `source_url`, and one auth method.
 - `branches[*].policies` defaults to `{}` and must not be `null`; omit it or use `{}`.
+- `files[*].branch` defaults to `default_branch` when omitted.
 - Each branch must set exactly one of `ref_branch`, `ref_tag`, or `ref_commit_id`.
 - List policy names (`build_validation`, `status_check`, `auto_reviewers`) must be unique across all branches.
 - Repository policies use `count`; addresses are `[0]` when enabled (see `docs/IMPORT.md`).

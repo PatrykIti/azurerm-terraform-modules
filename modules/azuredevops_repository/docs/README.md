@@ -22,12 +22,13 @@ branches, files, permissions, and repository/branch policies. Use a module-level
 - For `init_type = "Import"`, set `source_type = "Git"`, `source_url`, and one auth method (service connection or username/password).
 - `policies` defaults to `{}` and must not be `null`.
 - `branches[*].policies` defaults to `{}` and must not be `null`.
+- `files[*].branch` defaults to `default_branch` when omitted.
 - Branch policy scope is derived from branch name; no user-provided scope blocks.
 - List policy names must be unique across all branches.
 - Each branch must set exactly one of `ref_branch`, `ref_tag`, or `ref_commit_id`.
 - Address/key rules used by imports and outputs:
   - Branches: `branch.name`
-  - Files: `<file_path>:<branch>` (branch defaults to `default`)
+  - Files: `<file_path>:<branch>` (branch key defaults to `default`; apply uses `default_branch`)
   - Permissions: `<branch_name>:<principal>` (branch defaults to `root`)
   - Branch policies (single): `<branch_name>`
   - Branch policies (list): `<policy.name>`

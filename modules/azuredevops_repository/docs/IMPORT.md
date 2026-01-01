@@ -91,6 +91,12 @@ Get repository ID with Azure CLI:
 az repos show --repository <repo-name> --query id -o tsv
 ```
 
+List repositories with IDs (handy for lookups):
+
+```bash
+az repos list --query "[].{name:name,id:id,defaultBranch:defaultBranch}" -o table
+```
+
 Get project ID with Azure CLI (module input):
 
 ```bash
@@ -124,6 +130,19 @@ Get branch refs with Azure CLI:
 az repos ref list --repository <repo-name-or-id> --filter heads/ --query "[].name" -o tsv
 ```
 
+Get branch refs with object IDs (useful for matching existing refs):
+
+```bash
+az repos ref list --repository <repo-name-or-id> --filter heads/ \
+  --query "[].{name:name,objectId:objectId}" -o table
+```
+
+List tag refs (if you use `ref_tag` in inputs):
+
+```bash
+az repos ref list --repository <repo-name-or-id> --filter tags/ --query "[].name" -o tsv
+```
+
 ---
 
 ## 4) Import files (optional)
@@ -138,12 +157,23 @@ import {
 }
 ```
 
+When `files[*].branch` is omitted, the module uses `default_branch` at apply time,
+but the import key still uses `default`.
+
 List repository files (paths) with Azure CLI:
 
 ```bash
 az devops invoke --http-method GET \
   --uri "https://dev.azure.com/<ORG>/<PROJECT>/_apis/git/repositories/<REPO_ID>/items?scopePath=/&recursionLevel=Full&api-version=7.1-preview.1" \
   --query "value[].path" -o tsv
+```
+
+List files for a specific branch (include metadata to help with matching):
+
+```bash
+az devops invoke --http-method GET \
+  --uri "https://dev.azure.com/<ORG>/<PROJECT>/_apis/git/repositories/<REPO_ID>/items?scopePath=/&recursionLevel=Full&includeContentMetadata=true&versionDescriptor.versionType=branch&versionDescriptor.version=<BRANCH>&api-version=7.1-preview.1" \
+  --query "value[].{path:path,objectId:objectId}" -o table
 ```
 
 File import IDs are provider-specific; you typically combine repository ID,
@@ -168,6 +198,20 @@ Get principal descriptors with Azure CLI:
 ```bash
 az devops security group list --project <PROJECT> -o table
 az devops user list --organization https://dev.azure.com/<ORG> -o table
+```
+
+List group descriptors explicitly:
+
+```bash
+az devops security group list --project <PROJECT> \
+  --query "graphGroups[].{name:displayName,descriptor:descriptor}" -o table
+```
+
+List user descriptors explicitly:
+
+```bash
+az devops user list --organization https://dev.azure.com/<ORG> \
+  --query "members[].{name:principalName,descriptor:descriptor}" -o table
 ```
 
 Permission import IDs are provider-specific; you typically combine project ID,
@@ -211,11 +255,32 @@ Get policy configuration IDs with Azure CLI:
 az repos policy list --project <PROJECT> -o table
 ```
 
+List policy config IDs with scope details:
+
+```bash
+az repos policy list --project <PROJECT> \
+  --query "[].{id:id,type:type.displayName,repo:settings.scope[0].repositoryId,ref:settings.scope[0].refName}" -o table
+```
+
 If your CLI does not support `az repos policy`, use the REST API via `az devops invoke`:
 
 ```bash
 az devops invoke --http-method GET \
   --uri "https://dev.azure.com/<ORG>/<PROJECT>/_apis/policy/configurations?api-version=7.1-preview.1"
+```
+
+Get build definition IDs (used in build validation inputs):
+
+```bash
+az pipelines build definition list --project <PROJECT> \
+  --query "[].{name:name,id:id}" -o table
+```
+
+Get service connection IDs (used for import initialization auth):
+
+```bash
+az devops service-endpoint list --project <PROJECT> \
+  --query "[].{name:name,id:id,type:type}" -o table
 ```
 
 ---

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This module manages Azure DevOps azure devops variable groups resources and related configuration.
+This module manages Azure DevOps variable groups resources and related configuration.
 
 ## Managed Resources
 

@@ -102,7 +102,7 @@ resource "azuredevops_git_repository_file" "git_repository_file" {
   repository_id       = azuredevops_git_repository.git_repository.id
   file                = each.value.file
   content             = each.value.content
-  branch              = each.value.branch
+  branch              = coalesce(each.value.branch, var.default_branch)
   commit_message      = each.value.commit_message
   overwrite_on_create = each.value.overwrite_on_create
   author_name         = each.value.author_name

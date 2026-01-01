@@ -2,7 +2,7 @@
 
 ## Overview
 
-This module manages Azure DevOps azure devops extension resources and related configuration.
+This module manages Azure DevOps extension resources and related configuration.
 
 ## Managed Resources
 

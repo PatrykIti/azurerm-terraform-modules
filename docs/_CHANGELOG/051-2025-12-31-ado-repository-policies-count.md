@@ -21,3 +21,4 @@
 - Branch creation now requires exactly one of `ref_branch`, `ref_tag`, or `ref_commit_id`; removed implicit fallback to `default_branch`.
 - `initialization` now defaults to `init_type = "Uninitialized"` and the block is always sent (provider requires it).
 - `source_type` is now explicitly required for `init_type = "Import"` (no implicit Git default).
+- Repository files now default `branch` to `default_branch` when omitted (avoids provider defaulting to `refs/heads/master`).

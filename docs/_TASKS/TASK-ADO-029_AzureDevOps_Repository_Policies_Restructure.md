@@ -100,6 +100,11 @@ Validation rules:
 - exactly one of `ref_branch`, `ref_tag`, `ref_commit_id` must be set per branch.
 - `branches.policies` must not be null (omit it or use `{}`).
 
+### Files
+
+`files` (list(object)):
+- `branch` is optional; when omitted the module uses `default_branch` to avoid provider defaults like `refs/heads/master`.
+
 ### Branch Policies (nested per branch)
 
 `branches[*].policies` (optional object):

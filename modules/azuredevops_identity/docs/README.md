@@ -2,7 +2,7 @@
 
 ## Overview
 
-This module manages Azure DevOps azure devops identity resources and related configuration.
+This module manages Azure DevOps identity resources and related configuration.
 
 ## Managed Resources
 

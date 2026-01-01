@@ -2,7 +2,7 @@
 
 ## Overview
 
-This module manages Azure DevOps azure devops agent pools resources and related configuration.
+This module manages Azure DevOps agent pools resources and related configuration.
 
 ## Managed Resources
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This module manages Azure DevOps azure devops pipelines resources and related configuration.
+This module manages Azure DevOps pipelines resources and related configuration.
 
 ## Managed Resources
 

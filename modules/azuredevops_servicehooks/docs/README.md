@@ -2,7 +2,7 @@
 
 ## Overview
 
-This module manages Azure DevOps azure devops service hooks resources and related configuration.
+This module manages Azure DevOps service hooks resources and related configuration.
 
 ## Managed Resources
 
