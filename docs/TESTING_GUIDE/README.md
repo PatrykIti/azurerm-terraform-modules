@@ -1,11 +1,11 @@
 # Terraform Testing Guide - Complete Reference
 
-This comprehensive testing guide is organized into focused sections covering all aspects of testing Terraform modules in this repository. It establishes the standards and patterns that all module tests must follow. The `modules/azurerm_kubernetes_cluster` module is the baseline for test structure; adapt patterns only when a resource or service requires it and document the deviation. Some resources will have fewer or different test scenarios based on their capabilities.
+This comprehensive testing guide is organized into focused sections covering all aspects of testing Terraform modules in this repository. It establishes the standards and patterns that all module tests must follow. The `modules/azurerm_kubernetes_cluster` module is the baseline for test structure; Azure DevOps modules (for example `modules/azuredevops_repository`) follow the same structure but use Azure DevOps credentials and provider-specific validation. Some resources will have fewer or different test scenarios based on their capabilities.
 
 ## 📚 Guide Structure
 
 ### Part 1: Core Concepts
-- [**01 - Testing Philosophy & Pyramid**](01-testing-philosophy.md) - Outlines the core principles, testing levels (static, unit, integration, E2E), and the "fail fast" approach.
+- [**01 - Testing Philosophy & Pyramid**](01-testing-philosophy.md) - Outlines the core principles, testing levels (static, unit, integration), and the "fail fast" approach.
 - [**02 - Test Organization & Structure**](02-test-organization.md) - Details the standard directory structure for tests, including fixtures, unit tests, and Go files.
 
 ### Part 2: Unit Testing (Native Terraform)
@@ -38,7 +38,7 @@ To get started with writing tests for a new module:
 All modules in this repository must meet these testing standards:
 
 -   **Unit Test Coverage**: All input variable validation logic must be covered by native Terraform tests.
--   **Integration Test Coverage**: All major module features and configuration scenarios must be covered by Terratest integration tests.
+-   **Integration Test Coverage**: All major module features and configuration scenarios must be covered by Terratest integration tests. In this repo, integration tests are the end-to-end validation for a single module (no separate E2E tier).
 -   **Security Validation**: All security-related features (e.g., network rules, encryption, secure defaults) must be explicitly validated.
 -   **Clean Test Runs**: All tests must pass, and `make clean` should leave no test artifacts behind.
 -   **CI/CD Compliance**: All tests must successfully run in the automated GitHub Actions pipeline before a pull request can be merged.

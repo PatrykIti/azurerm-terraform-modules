@@ -14,7 +14,7 @@ This is the primary file for testing the module's core functionality. It should 
 -   **One Test Function per Fixture**: Each major fixture (e.g., `basic`, `complete`, `secure`, `network`) should have its own `Test...` function.
 -   **Parallel Execution**: All test functions in this file must run in parallel using `t.Parallel()`.
 -   **Use of `test-structure`**: Each test must follow the `setup -> deploy -> validate -> cleanup` pattern using `test_structure` to ensure robustness.
--   **Validation via Helpers**: The `validate` stage should call specific validation functions from `test_helpers.go` rather than containing raw Azure SDK calls.
+-   **Validation via Helpers**: The `validate` stage should call validation functions from `test_helpers.go` rather than containing raw SDK calls. For Azure DevOps modules, helpers may only validate outputs or call REST APIs.
 
 > Note: Legacy modules may still use `simple`/`security` fixture names. New modules should use `basic`/`secure`.
 
@@ -26,7 +26,7 @@ func TestBasicKubernetesCluster(t *testing.T) {
 	t.Parallel()
 
 	// 1. Setup: Copy the fixture to a temp folder
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	
 	// 2. Defer Cleanup
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -86,7 +86,7 @@ func TestKubernetesClusterValidationRules(t *testing.T) {
 			t.Parallel()
 
 			// Copy the specific negative fixture
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/"+tc.fixtureFolder)
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/"+tc.fixtureFolder)
 			
 			terraformOptions := &terraform.Options{
 				TerraformDir: testFolder,
@@ -123,7 +123,7 @@ func TestKubernetesClusterLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
 	defer terraform.Destroy(t, terraformOptions)
@@ -166,7 +166,7 @@ func BenchmarkKubernetesClusterCreation(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer() // Pause timer for setup
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		b.StartTimer() // Resume timer for the operation
 

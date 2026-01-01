@@ -44,7 +44,7 @@ Each fixture directory must contain the following files:
     }
     ```
 
-2.  **Ensure Unique and Descriptive Resource Names**: To enable parallel testing and easy identification in Azure, all resources within a fixture must have unique names. Test fixtures MUST follow the established naming patterns from the `azurerm_kubernetes_cluster` module, which sets the standard for this repository.
+2.  **Ensure Unique and Descriptive Resource Names**: To enable parallel testing and easy identification in Azure or Azure DevOps, all resources within a fixture must have unique names. AzureRM fixtures follow the established naming patterns from the `azurerm_kubernetes_cluster` module, which sets the standard for this repository.
 
     ### Resource Naming Pattern for Test Fixtures
     
@@ -107,6 +107,28 @@ Each fixture directory must contain the following files:
     - Test fixtures include project identifier (`dpc`) in resource names
     - All test resources must support parallel execution
 
+    ### Azure DevOps Fixture Naming
+
+    Azure DevOps fixtures are project-scoped and do not create Azure resource groups. Use a unique prefix derived from the Go test to avoid collisions.
+
+    **Example (`modules/azuredevops_repository/tests/fixtures/basic/main.tf`):**
+    ```hcl
+    # variables.tf
+    variable "repo_name_prefix" {
+      type        = string
+      description = "Prefix used for repository names in tests."
+    }
+
+    # main.tf
+    module "azuredevops_repository" {
+      source = "../../../"
+
+      project_id = var.project_id
+      name       = "${var.repo_name_prefix}-basic"
+    }
+    ```
+    In Go tests, `project_id` is typically injected from `AZDO_PROJECT_ID`.
+
 3.  **Define Clear Outputs for Validation**: Each fixture must expose the key attributes of the created resources as outputs. The Go tests will read these outputs to get the names and IDs needed for validation with the Azure SDK.
     ```hcl
     # in fixtures/basic/outputs.tf
@@ -156,6 +178,9 @@ make test-single TEST_NAME=TestSecureKubernetesCluster
 # Check for linting errors
 make lint
 ```
+
+Note: target names are consistent, but the underlying Go test names vary per module
+(for example `TestBasicAzuredevopsRepository` in Azure DevOps modules).
 
 ## Advanced Test Execution Scripts (Per-Module)
 

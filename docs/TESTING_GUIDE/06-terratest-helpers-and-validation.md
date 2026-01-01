@@ -1,6 +1,6 @@
 # Helper Pattern and Validation Functions
 
-The `test_helpers.go` file is the cornerstone of our integration testing strategy. It promotes the Don't Repeat Yourself (DRY) principle by centralizing all Azure SDK interactions, validation logic, and other utility functions. This keeps the main `*_test.go` files clean, readable, and focused on orchestrating test scenarios.
+The `test_helpers.go` file is the cornerstone of our integration testing strategy. It promotes the Don't Repeat Yourself (DRY) principle by centralizing validation logic and utility functions. AzureRM modules typically include Azure SDK clients; Azure DevOps modules often keep helpers lightweight (environment checks, output helpers, REST calls). This keeps the main `*_test.go` files clean, readable, and focused on orchestrating test scenarios.
 
 ## The Helper Class Pattern
 
@@ -51,6 +51,18 @@ func NewKubernetesClusterHelper(t *testing.T) *KubernetesClusterHelper {
 		subscriptionID: subscriptionID,
 		credential:     credential,
 		client:         client,
+	}
+}
+```
+
+### Azure DevOps helper example
+
+```go
+func requireADOEnv(t testing.TB) {
+	t.Helper()
+
+	if os.Getenv("AZDO_ORG_SERVICE_URL") == "" || os.Getenv("AZDO_PERSONAL_ACCESS_TOKEN") == "" {
+		t.Skip("Skipping Azure DevOps tests: AZDO_ORG_SERVICE_URL and AZDO_PERSONAL_ACCESS_TOKEN are required")
 	}
 }
 ```

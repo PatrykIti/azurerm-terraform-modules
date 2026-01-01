@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 11 tasks
+- **To Do:** 12 tasks
 - **In Progress:** 0
-- **Done:** 31 tasks
+- **Done:** 32 tasks
 
 ---
 
@@ -24,6 +24,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-025](./TASK-ADO-025_AzureDevOps_Variable_Groups_Module_Refactor.md) | **Azure DevOps Variable Groups module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_variable_groups/` |
 | [TASK-ADO-026](./TASK-ADO-026_AzureDevOps_Work_Items_Module_Refactor.md) | **Azure DevOps Work Items module refactor** | High | Medium | Re-opened; `modules/azuredevops_work_items/` |
 | [TASK-ADO-027](./TASK-ADO-027_AzureDevOps_Team_Module_Refactor.md) | **Azure DevOps Team module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_team/` |
+| [TASK-ADO-031](./TASK-ADO-031_AzureDevOps_Agent_Pools_Guide_Alignment.md) | **Azure DevOps Agent Pools module guide alignment (examples + main.tf + docs)** | Medium | Small | `modules/azuredevops_agent_pools/` |
 
 ---
 
@@ -40,6 +41,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-010](./TASK-010_Workflow_and_Module_Docs_Alignment.md) | **Workflow and module documentation alignment** | Medium | Medium | `docs/WORKFLOWS.md`, `docs/MODULE_GUIDE/*`, ADO docs |
 | [TASK-011](./TASK-011_Terratest_Fixture_Path_Portability.md) | **Terratest fixture path portability** | Medium | Medium | Remove hardcoded `tests/fixtures` paths |
 | [TASK-012](./TASK-012_Module_Guide_Alignment.md) | **Module guide alignment (AKS + ADO patterns)** | Medium | Medium | `docs/MODULE_GUIDE/*` |
+| [TASK-013](./TASK-013_Testing_Guide_Alignment.md) | **Testing guide alignment (AKS + ADO patterns)** | Medium | Medium | `docs/TESTING_GUIDE/*` |
 | [TASK-009](./TASK-009_Workflow_and_Scripts_Audit.md) | **Workflow + scripts audit (docs/examples/source updates)** | High | Medium | CI/CD + release automations |
 | [TASK-001](./TASK-001_AKS_Module_Fixes.md) | **AKS module – walidacje, SP/MI UX, docs i bump wersji** | High | Medium | `modules/azurerm_kubernetes_cluster/` |
 | [TASK-003](./TASK-003_Module_Scaffold_Fix.md) | **Generator scaffoldu – naprawa i zgodnosc z AKS** | High | Medium | `scripts/create-new-module.sh` + `scripts/templates/` |

@@ -264,6 +264,35 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pool" {
 }
 ```
 
+### 3. Optional Resources with count
+
+When a resource is driven by an optional object input, `count` can guard the
+entire resource. Terraform does not evaluate resource arguments when `count = 0`,
+so it is safe to reference `var.optional_object.*` inside the resource even if
+the object is null. Outputs and other references still need guards.
+
+```hcl
+variable "monitoring" {
+  description = "Optional monitoring settings."
+  type = object({
+    name               = string
+    target_resource_id = string
+  })
+  default = null
+}
+
+resource "azurerm_monitor_diagnostic_setting" "monitoring" {
+  count = var.monitoring == null ? 0 : 1
+
+  name               = var.monitoring.name
+  target_resource_id = var.monitoring.target_resource_id
+}
+
+output "monitoring_id" {
+  value = var.monitoring == null ? null : azurerm_monitor_diagnostic_setting.monitoring[0].id
+}
+```
+
 ## Security Best Practices
 
 ### 1. Secure Defaults

@@ -1,6 +1,6 @@
 # Terratest Integration (Integration Tests)
 
-Integration tests are the third level of the testing pyramid and are crucial for verifying that Terraform modules correctly create and configure real infrastructure in Azure. For this purpose, we use the **Terratest** framework, written in Go.
+Integration tests are the third level of the testing pyramid and are crucial for verifying that Terraform modules correctly create and configure real infrastructure in Azure or Azure DevOps. For this purpose, we use the **Terratest** framework, written in Go.
 
 ## When to Use Terratest?
 
@@ -18,7 +18,7 @@ To run integration tests, the development environment must be equipped with:
 
 1.  **Go**: Version 1.21 or newer.
 2.  **Terraform**: Version 1.12.2 or newer.
-3.  **Azure CLI**: For authentication and interaction with Azure.
+3.  **Azure CLI**: Required for AzureRM modules; optional for Azure DevOps modules.
 4.  **Key Go Packages**: Dependencies are managed by `go.mod`.
 
 ### Main Dependencies in `go.mod`
@@ -45,7 +45,11 @@ require (
 
 ## Authentication
 
-Terratest tests require authentication with Azure. Our scripts and helpers support several methods, which are used in the following order:
+Terratest tests require authentication for the target provider.
+
+### AzureRM modules
+
+Our scripts and helpers support several methods, which are used in the following order:
 
 1.  **Service Principal (Environment Variables)**: The preferred method in CI/CD.
     - `AZURE_CLIENT_ID`
@@ -55,7 +59,7 @@ Terratest tests require authentication with Azure. Our scripts and helpers suppo
 2.  **Azure CLI**: The default method for local development if the above variables are not set. You just need to be logged in via `az login`.
 3.  **Default Azure Credential**: The final method, which tries various mechanisms (Managed Identity, etc.).
 
-Each module's `tests` directory should contain a `test_env.sh` file, which serves as a template for developers to set these environment variables for local test runs. **This file should be added to `.gitignore` and never be committed with real credentials.**
+Each module's `tests` directory contains a `test_env.sh` template for local test runs. Keep real credentials in a local copy (for example `test_env.local.sh`) and do not commit it.
 
 To run tests locally, a user would:
 1.  Copy `test_env.sh` to `test_env.local.sh`.
@@ -76,6 +80,18 @@ export ARM_CLIENT_ID="${AZURE_CLIENT_ID}"
 export ARM_CLIENT_SECRET="${AZURE_CLIENT_SECRET}"
 export ARM_SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID}"
 export ARM_TENANT_ID="${AZURE_TENANT_ID}"
+```
+
+### Azure DevOps modules
+
+Azure DevOps tests require a PAT and org URL:
+
+```bash
+# modules/azuredevops_repository/tests/test_env.sh
+#!/bin/bash
+export AZDO_ORG_SERVICE_URL="https://dev.azure.com/YOUR_ORG_HERE"
+export AZDO_PERSONAL_ACCESS_TOKEN="YOUR_PAT_HERE"
+export AZDO_PROJECT_ID="YOUR_PROJECT_ID_HERE"
 ```
 
 ## Basic Test Lifecycle
