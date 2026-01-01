@@ -25,15 +25,16 @@ variable "name" {
 variable "default_branch" {
   description = "Default branch ref for the repository (for example, refs/heads/main)."
   type        = string
-  default     = null
+  default     = "refs/heads/main"
+  nullable    = false
 
   validation {
-    condition     = var.default_branch == null || length(trimspace(var.default_branch)) > 0
-    error_message = "default_branch must be a non-empty string when provided."
+    condition     = length(trimspace(var.default_branch)) > 0
+    error_message = "default_branch must be a non-empty string."
   }
 
   validation {
-    condition     = var.default_branch == null || startswith(var.default_branch, "refs/heads/")
+    condition     = startswith(var.default_branch, "refs/heads/")
     error_message = "default_branch must start with refs/heads/."
   }
 }
@@ -313,10 +314,28 @@ variable "branches" {
   validation {
     condition = alltrue([
       for branch in var.branches : (
+        branch.ref_branch == null || startswith(branch.ref_branch, "refs/heads/")
+      )
+    ])
+    error_message = "branches.ref_branch must start with refs/heads/ when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for branch in var.branches : (
         branch.ref_tag == null || length(trimspace(branch.ref_tag)) > 0
       )
     ])
     error_message = "branches.ref_tag must be a non-empty string when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for branch in var.branches : (
+        branch.ref_tag == null || startswith(branch.ref_tag, "refs/tags/")
+      )
+    ])
+    error_message = "branches.ref_tag must start with refs/tags/ when provided."
   }
 
   validation {
@@ -335,10 +354,10 @@ variable "branches" {
           branch.ref_branch,
           branch.ref_tag,
           branch.ref_commit_id,
-        ])) <= 1
+        ])) == 1
       )
     ])
-    error_message = "branches may set only one of ref_branch, ref_tag, or ref_commit_id."
+    error_message = "branches must set exactly one of ref_branch, ref_tag, or ref_commit_id."
   }
 
   validation {

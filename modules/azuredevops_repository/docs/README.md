@@ -22,6 +22,7 @@ branches, files, permissions, and repository/branch policies. Use a module-level
 - `branches[*].policies` defaults to `{}` and must not be `null`.
 - Branch policy scope is derived from branch name; no user-provided scope blocks.
 - List policy names must be unique across all branches.
+- Each branch must set exactly one of `ref_branch`, `ref_tag`, or `ref_commit_id`.
 - Address/key rules used by imports and outputs:
   - Branches: `branch.name`
   - Files: `<file_path>:<branch>` (branch defaults to `default`)

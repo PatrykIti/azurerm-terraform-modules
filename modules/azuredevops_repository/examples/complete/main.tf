@@ -34,7 +34,8 @@ module "azuredevops_repository" {
 
   branches = [
     {
-      name = "develop"
+      name       = "develop"
+      ref_branch = "refs/heads/main"
       policies = {
         min_reviewers = {
           reviewer_count = var.reviewer_count

@@ -13,10 +13,12 @@ run "duplicate_branch_names" {
   variables {
     branches = [
       {
-        name = "dev"
+        name       = "dev"
+        ref_branch = "refs/heads/main"
       },
       {
-        name = "dev"
+        name       = "dev"
+        ref_branch = "refs/heads/main"
       }
     ]
   }
@@ -130,7 +132,8 @@ run "invalid_min_reviewers" {
   variables {
     branches = [
       {
-        name = "main"
+        name       = "main"
+        ref_branch = "refs/heads/main"
         policies = {
           min_reviewers = {
             reviewer_count = 0
@@ -151,7 +154,8 @@ run "duplicate_build_validation_names" {
   variables {
     branches = [
       {
-        name = "main"
+        name       = "main"
+        ref_branch = "refs/heads/main"
         policies = {
           build_validation = [
             {
@@ -181,7 +185,8 @@ run "duplicate_build_validation_names_across_branches" {
   variables {
     branches = [
       {
-        name = "main"
+        name       = "main"
+        ref_branch = "refs/heads/main"
         policies = {
           build_validation = [
             {
@@ -193,7 +198,8 @@ run "duplicate_build_validation_names_across_branches" {
         }
       },
       {
-        name = "develop"
+        name       = "develop"
+        ref_branch = "refs/heads/main"
         policies = {
           build_validation = [
             {
@@ -218,7 +224,8 @@ run "invalid_build_validation_display_name" {
   variables {
     branches = [
       {
-        name = "main"
+        name       = "main"
+        ref_branch = "refs/heads/main"
         policies = {
           build_validation = [
             {
@@ -243,7 +250,8 @@ run "invalid_status_check_name" {
   variables {
     branches = [
       {
-        name = "main"
+        name       = "main"
+        ref_branch = "refs/heads/main"
         policies = {
           status_check = [
             {
@@ -266,7 +274,8 @@ run "invalid_auto_reviewer_ids" {
   variables {
     branches = [
       {
-        name = "main"
+        name       = "main"
+        ref_branch = "refs/heads/main"
         policies = {
           auto_reviewers = [
             {

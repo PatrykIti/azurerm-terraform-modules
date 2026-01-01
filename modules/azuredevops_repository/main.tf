@@ -1,17 +1,6 @@
 # Azure DevOps Repository
 
 locals {
-  default_ref_branch = coalesce(var.default_branch, "refs/heads/master")
-
-  branches_by_name = {
-    for branch in var.branches : branch.name => merge(branch, {
-      ref_branch = (
-        branch.ref_tag == null && branch.ref_commit_id == null
-        ? coalesce(branch.ref_branch, local.default_ref_branch)
-        : branch.ref_branch
-      )
-    })
-  }
 
   files_by_key = {
     for file in var.files : format("%s:%s", file.file, coalesce(file.branch, "default")) => file
@@ -108,7 +97,7 @@ resource "azuredevops_git_repository" "git_repository" {
 }
 
 resource "azuredevops_git_repository_branch" "git_repository_branch" {
-  for_each = local.branches_by_name
+  for_each = { for branch in var.branches : branch.name => branch }
 
   repository_id = azuredevops_git_repository.git_repository.id
   name          = each.value.name

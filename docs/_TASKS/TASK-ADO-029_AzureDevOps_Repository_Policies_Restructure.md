@@ -97,7 +97,7 @@ Notes:
 
 Validation rules:
 - branch names must be unique within the list.
-- only one of `ref_branch`, `ref_tag`, `ref_commit_id` can be set per branch.
+- exactly one of `ref_branch`, `ref_tag`, `ref_commit_id` must be set per branch.
 - `branches.policies` must not be null (omit it or use `{}`).
 
 ### Branch Policies (nested per branch)
@@ -255,7 +255,7 @@ Unit tests to update or replace:
 - Remove validations tied to `repository_id` inputs (no longer exposed).
 - Add validations for:
   - unique branch names
-  - only one of ref_branch/ref_tag/ref_commit_id
+  - exactly one of ref_branch/ref_tag/ref_commit_id
   - policy list `name` uniqueness across all branches
   - required fields (build_definition_id, display_name, auto_reviewer_ids, reviewer_count > 0)
   - repo policy constraints (max_file_size/max_path_length > 0, patterns non-empty)

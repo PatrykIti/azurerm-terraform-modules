@@ -19,7 +19,8 @@ module "azuredevops_repository" {
 
   branches = [
     {
-      name = "invalid-branch"
+      name       = "invalid-branch"
+      ref_branch = "refs/heads/main"
       policies = {
         min_reviewers = {
           reviewer_count = 0

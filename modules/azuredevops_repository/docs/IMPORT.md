@@ -60,6 +60,7 @@ module "azuredevops_repository" {
   # branches = [
   #   {
   #     name = "develop"
+  #     ref_branch = "refs/heads/main"
   #     # policies defaults to {} and must not be null
   #     # policies = {}
   #   }
@@ -110,6 +111,10 @@ import {
 The branch import ID format depends on the provider (commonly a repository ID
 and branch name). Follow the Azure DevOps provider documentation for the exact
 format.
+
+Module input requires exactly one of `ref_branch`, `ref_tag`, or `ref_commit_id`
+for each branch. For existing branches, use `ref_branch = "refs/heads/<name>"`
+to match the current ref.
 
 Get branch refs with Azure CLI:
 
