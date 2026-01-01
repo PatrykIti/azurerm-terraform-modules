@@ -17,3 +17,4 @@
 - Standardized branch policy locals to map by branch name with `policies` default `{}` for direct access in locals/resources.
 - Removed `try`/`coalesce` from list policy locals and added validation that `branches.policies` cannot be `null`.
 - Expanded `docs/IMPORT.md` with keying rules, provider notes, and Azure CLI helper commands; aligned `docs/README.md` structure with module usage notes.
+- Aligned `modules/azuredevops_repository/.releaserc.js` with updated source URL and README/examples replacement rules.
