@@ -25,11 +25,4 @@ module "azuredevops_agent_pools" {
   name           = "${var.pool_name_prefix}-${random_string.suffix.result}"
   auto_provision = false
   auto_update    = false
-
-  agent_queues = [
-    {
-      key        = "locked"
-      project_id = var.project_id
-    }
-  ]
 }

@@ -7,14 +7,13 @@ This module manages Azure DevOps agent pools resources and related configuration
 ## Managed Resources
 
 - `azuredevops_agent_pool`
-- `azuredevops_agent_queue`
 - `azuredevops_elastic_pool`
 
 ## Usage Notes
 
 - Use `git::https://...//modules/azuredevops_agent_pools?ref=ADOAPvX.Y.Z` for module source.
 - Optional child resources are created only when corresponding inputs are set.
-- Use stable keys and unique names for list/object inputs to avoid address churn.
+- Agent queues are project-scoped; manage them in the Azure DevOps project module.
 
 ## Inputs (Highlights)
 
@@ -24,7 +23,6 @@ This module manages Azure DevOps agent pools resources and related configuration
 ## Outputs (Highlights)
 
 - `agent_pool_id`
-- `agent_queue_ids`
 - `elastic_pool_id`
 
 ## Import Existing Resources

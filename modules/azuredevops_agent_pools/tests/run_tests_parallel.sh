@@ -59,8 +59,6 @@ tests=(
     "TestBasicAzuredevopsAgentPools"
     "TestCompleteAzuredevopsAgentPools"
     "TestSecureAzuredevopsAgentPools"
-    "TestAzuredevopsAgentPoolsExternalQueue"
-    "TestAzuredevopsAgentPoolsValidationRules"
     "TestAzuredevopsAgentPoolsFullIntegration"
 )
 

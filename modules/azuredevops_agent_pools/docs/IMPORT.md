@@ -1,7 +1,7 @@
 # Import existing Azure DevOps Agent Pools into the module
 
-This guide explains how to import existing Azure DevOps agent pools, queues, and
-elastic pools into `modules/azuredevops_agent_pools` using Terraform **import blocks**.
+This guide explains how to import existing Azure DevOps agent pools and elastic
+pools into `modules/azuredevops_agent_pools` using Terraform **import blocks**.
 
 ---
 
@@ -40,14 +40,6 @@ module "azuredevops_agent_pools" {
   auto_update    = true
   pool_type      = "automation"
 
-  # Optional: manage queues
-  # agent_queues = [
-  #   {
-  #     key        = "default"
-  #     project_id = "00000000-0000-0000-0000-000000000000"
-  #   }
-  # ]
-
   # Optional: manage elastic pool
   # elastic_pool = {
   #   name                   = "existing-elastic-pool"
@@ -77,24 +69,7 @@ Use the **agent pool ID** from Azure DevOps (UI or API).
 
 ---
 
-## 3) Import queues (optional)
-
-If you manage queues, ensure each queue has a stable `key` and then add
-import blocks like:
-
-```hcl
-import {
-  to = module.azuredevops_agent_pools.azuredevops_agent_queue.agent_queue["default"]
-  id = "<queue_import_id>"
-}
-```
-
-The queue import ID format depends on the provider (commonly project and queue
-IDs). Follow the Azure DevOps provider documentation for the exact format.
-
----
-
-## 4) Import elastic pool (optional)
+## 3) Import elastic pool (optional)
 
 If you manage an elastic pool, add:
 
@@ -109,7 +84,7 @@ Use the elastic pool ID from Azure DevOps.
 
 ---
 
-## 5) Run the import
+## 4) Run the import
 
 ```bash
 terraform init
@@ -118,4 +93,3 @@ terraform apply
 ```
 
 When the plan is clean, remove `import.tf`.
-

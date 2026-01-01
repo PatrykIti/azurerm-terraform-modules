@@ -1,10 +1,5 @@
-variable "project_id" {
-  description = "Azure DevOps project ID."
+variable "pool_name" {
+  description = "Name of the agent pool."
   type        = string
-}
-
-variable "pool_name_prefix" {
-  description = "Prefix for the agent pool name."
-  type        = string
-  default     = "ado-agent-pool-basic"
+  default     = "ado-agent-pools-basic-example"
 }

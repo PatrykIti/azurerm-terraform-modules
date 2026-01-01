@@ -20,7 +20,6 @@ check-env:
 	@echo "Checking required environment variables..."
 	@test -n "$(AZDO_ORG_SERVICE_URL)" || (echo "AZDO_ORG_SERVICE_URL is not set" && exit 1)
 	@test -n "$(AZDO_PERSONAL_ACCESS_TOKEN)" || (echo "AZDO_PERSONAL_ACCESS_TOKEN is not set" && exit 1)
-	@test -n "$(AZDO_PROJECT_ID)" || (echo "AZDO_PROJECT_ID is not set" && exit 1)
 	@echo "All required environment variables are set."
 
 # Install dependencies
@@ -53,11 +52,6 @@ test-complete: check-env deps
 test-secure: check-env deps
 	@echo "Running security tests..."
 	$(call run_with_log,secure,go test -v -timeout 30m -run TestSecureAzuredevopsAgentPools ./...)
-
-# Run validation tests
-test-validation: check-env deps
-	@echo "Running validation tests..."
-	$(call run_with_log,validation,go test -v -timeout 10m -run TestAzuredevopsAgentPoolsValidationRules ./...)
 
 # Run integration tests
 test-integration: check-env deps

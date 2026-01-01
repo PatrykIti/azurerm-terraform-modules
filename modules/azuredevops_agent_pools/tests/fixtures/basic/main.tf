@@ -23,11 +23,4 @@ module "azuredevops_agent_pools" {
   source = "../../../"
 
   name = "${var.pool_name_prefix}-${random_string.suffix.result}"
-
-  agent_queues = [
-    {
-      key        = "default"
-      project_id = var.project_id
-    }
-  ]
 }

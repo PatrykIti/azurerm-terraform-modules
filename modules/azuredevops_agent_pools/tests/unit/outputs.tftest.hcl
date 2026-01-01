@@ -7,12 +7,6 @@ mock_provider "azuredevops" {
     }
   }
 
-  mock_resource "azuredevops_agent_queue" {
-    defaults = {
-      id = "queue-0001"
-    }
-  }
-
   mock_resource "azuredevops_elastic_pool" {
     defaults = {
       id = "elastic-0001"
@@ -22,18 +16,6 @@ mock_provider "azuredevops" {
 
 variables {
   name = "Default Pool"
-
-  agent_queues = [
-    {
-      key        = "default"
-      project_id = "00000000-0000-0000-0000-000000000000"
-    },
-    {
-      key           = "external"
-      project_id    = "00000000-0000-0000-0000-000000000000"
-      agent_pool_id = 2
-    }
-  ]
 
   elastic_pool = {
     name                   = "Elastic Pool"
@@ -51,11 +33,6 @@ run "outputs_apply" {
   assert {
     condition     = output.agent_pool_id == "1"
     error_message = "agent_pool_id should match the mock ID."
-  }
-
-  assert {
-    condition     = length(keys(output.agent_queue_ids)) == 2
-    error_message = "agent_queue_ids should include all configured queues."
   }
 
   assert {

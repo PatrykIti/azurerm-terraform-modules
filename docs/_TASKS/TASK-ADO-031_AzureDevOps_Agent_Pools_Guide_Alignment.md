@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules / Documentation
 **Estimated Effort:** Small
 **Dependencies:** TASK-ADO-015
-**Status:** To Do
+**Status:** ✅ **Done** (2026-01-01)
 
 ---
 
@@ -97,14 +97,14 @@ other references still need conditional guards.
 
 ## Implementation Checklist
 
-- [ ] Update `main.tf` to keep `count`, remove `try(...)`, and access
+- [x] Update `main.tf` to keep `count`, remove `try(...)`, and access
   `var.elastic_pool.*` directly.
-- [ ] Update outputs to use a conditional guard instead of `try(...)`.
-- [ ] Remove `agent_queues` variables, locals, resources, outputs, examples, and tests.
-- [ ] Update example `main.tf` files to remove random suffixes and providers.
-- [ ] Adjust example `variables.tf` defaults to fixed names per guide patterns.
-- [ ] Update example `README.md` text to match deterministic naming.
-- [ ] Re-run docs:
+- [x] Update outputs to use a conditional guard instead of `try(...)`.
+- [x] Remove `agent_queues` variables, locals, resources, outputs, examples, and tests.
+- [x] Update example `main.tf` files to remove random suffixes and providers.
+- [x] Adjust example `variables.tf` defaults to fixed names per guide patterns.
+- [x] Update example `README.md` text to match deterministic naming.
+- [x] Re-run docs:
   - `./scripts/update-module-docs.sh azuredevops_agent_pools`
   - `./scripts/update-examples-list.sh azuredevops_agent_pools`
-- [ ] Verify example README module sources match `git::https` and are release-safe.
+- [x] Verify example README module sources match `git::https` and are release-safe.

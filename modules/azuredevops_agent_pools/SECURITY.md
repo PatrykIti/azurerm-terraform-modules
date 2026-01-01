@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes security considerations for Azure DevOps agent pools, queues, and elastic pools managed by Terraform.
+This document describes security considerations for Azure DevOps agent pools and elastic pools managed by Terraform.
 
 ## Security Features
 
@@ -10,11 +10,7 @@ This document describes security considerations for Azure DevOps agent pools, qu
 - Use dedicated pools for sensitive workloads.
 - Separate hosted and self-hosted pools by purpose.
 
-### 2. Agent Queues
-- Queue access is project-scoped; keep access minimal.
-- Avoid sharing queues across unrelated projects.
-
-### 3. Elastic Pools
+### 2. Elastic Pools
 - Restrict service endpoints to least privilege.
 - Limit max capacity to avoid unexpected spend.
 
@@ -27,13 +23,6 @@ module "azuredevops_agent_pools" {
   name           = "ado-secure-pool"
   auto_provision = false
   auto_update    = false
-
-  agent_queues = [
-    {
-      key        = "secure"
-      project_id = "00000000-0000-0000-0000-000000000000"
-    }
-  ]
 }
 ```
 
@@ -42,13 +31,11 @@ module "azuredevops_agent_pools" {
 - [ ] Limit pool usage to approved projects.
 - [ ] Use least-privilege service endpoints for elastic pools.
 - [ ] Cap elastic pool max capacity.
-- [ ] Review queue access regularly.
 
 ## Common Security Mistakes to Avoid
 
 1. **Sharing a single pool across high/low trust workloads**
-2. **Granting wide access to project queues**
-3. **Allowing elastic pools to scale without limits**
+2. **Allowing elastic pools to scale without limits**
 
 ## Additional Resources
 
