@@ -126,7 +126,7 @@ module "azuredevops_variable_groups" {
 ### Direct from GitHub (Recommended)
 ```hcl
 module "azuredevops_variable_groups" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_variable_groups?ref=ADOVGv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_variable_groups?ref=ADOVGv1.0.0"
   
   # Module configuration
   # ...

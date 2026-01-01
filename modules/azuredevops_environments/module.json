@@ -2,6 +2,6 @@
   "name": "azuredevops_environments",
   "title": "Azure DevOps Environments",
   "commit_scope": "azuredevops-environments",
-  "tag_prefix": "ADOE",
+  "tag_prefix": "ADOEv",
   "description": "Azure DevOps environments module for a single environment with optional resources and checks"
 }

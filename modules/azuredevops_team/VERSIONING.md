@@ -126,7 +126,7 @@ module "azuredevops_team" {
 ### Direct from GitHub (Recommended)
 ```hcl
 module "azuredevops_team" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_team?ref=ADOTv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_team?ref=ADOTv1.0.0"
   
   # Module configuration
   # ...

@@ -7,7 +7,7 @@ This module uses **semantic-release** for fully automated version management bas
 This module follows a custom semantic versioning format:
 
 ```
-ADORv{major}.{minor}.{patch}
+ADOPIv{major}.{minor}.{patch}
 ```
 
 Where:
@@ -16,10 +16,10 @@ Where:
 - `{major}.{minor}.{patch}` = semantic version numbers (automatically determined)
 
 ### Examples:
-- `ADORv1.0.0` - First stable release
-- `ADORv1.1.0` - Minor feature addition (from `feat:` commits)
-- `ADORv1.0.1` - Bug fix (from `fix:` commits)
-- `ADORv2.0.0` - Breaking change (from `BREAKING CHANGE:` commits)
+- `ADOPIv1.0.0` - First stable release
+- `ADOPIv1.1.0` - Minor feature addition (from `feat:` commits)
+- `ADOPIv1.0.1` - Bug fix (from `fix:` commits)
+- `ADOPIv2.0.0` - Breaking change (from `BREAKING CHANGE:` commits)
 
 ## Automated Version Determination
 
@@ -82,7 +82,7 @@ test(azuredevops-pipelines): add unit tests for validation
    - Updates CHANGELOG.md
    - Updates module version in configs
    - Updates examples to use new version tag
-   - Creates git tag (e.g., `ADORv1.2.0`)
+   - Creates git tag (e.g., `ADOPIv1.2.0`)
    - Publishes GitHub release
    - Commits all changes
 
@@ -109,7 +109,7 @@ module "azuredevops_pipelines" {
 
 # After release (automatically updated)
 module "azuredevops_pipelines" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_pipelines?ref=ADORv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_pipelines?ref=ADOPIv1.2.0"
 }
 ```
 
@@ -117,7 +117,7 @@ module "azuredevops_pipelines" {
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| ADORv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
+| ADOPIv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
 
 **Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
 
@@ -126,7 +126,7 @@ module "azuredevops_pipelines" {
 ### Direct from GitHub (Recommended)
 ```hcl
 module "azuredevops_pipelines" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_pipelines?ref=ADORv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_pipelines?ref=ADOPIv1.0.0"
   
   # Module configuration
   # ...
@@ -134,7 +134,7 @@ module "azuredevops_pipelines" {
 ```
 
 ### Version Selection Strategy
-- **Production**: Always use specific version tags (e.g., `ref=ADORv1.2.3`)
+- **Production**: Always use specific version tags (e.g., `ref=ADOPIv1.2.3`)
 - **Development**: Can use branch references (e.g., `ref=feature/my-feature`)
 - **Testing**: Can use commit SHA (e.g., `ref=a1b2c3d4`)
 

@@ -18,6 +18,8 @@ branches, files, permissions, and repository/branch policies. Use a module-level
 ## Usage Notes
 
 - The repository is always managed by this module; import existing repositories.
+- `initialization` defaults to `init_type = "Uninitialized"` and is always sent to the provider.
+- For `init_type = "Import"`, set `source_type = "Git"`, `source_url`, and one auth method (service connection or username/password).
 - `policies` defaults to `{}` and must not be `null`.
 - `branches[*].policies` defaults to `{}` and must not be `null`.
 - Branch policy scope is derived from branch name; no user-provided scope blocks.

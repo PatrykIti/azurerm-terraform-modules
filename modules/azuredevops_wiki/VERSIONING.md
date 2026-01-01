@@ -126,7 +126,7 @@ module "azuredevops_wiki" {
 ### Direct from GitHub (Recommended)
 ```hcl
 module "azuredevops_wiki" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_wiki?ref=ADOWIv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_wiki?ref=ADOWIv1.0.0"
   
   # Module configuration
   # ...

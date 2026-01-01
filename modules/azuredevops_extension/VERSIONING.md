@@ -126,7 +126,7 @@ module "azuredevops_extension" {
 ### Direct from GitHub (Recommended)
 ```hcl
 module "azuredevops_extension" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOEXv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOEXv1.0.0"
   
   # Module configuration
   # ...

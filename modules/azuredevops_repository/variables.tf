@@ -72,60 +72,52 @@ variable "initialization" {
     username              = optional(string)
     password              = optional(string)
   })
-  default   = null
+  default   = {}
+  nullable  = false
   sensitive = true
 
   validation {
-    condition = var.initialization == null || contains(
-      ["Uninitialized", "Clean", "Import"],
-      coalesce(try(var.initialization.init_type, null), "Uninitialized")
+    condition = (
+      var.initialization.init_type != null &&
+      contains(["Uninitialized", "Clean", "Import"], var.initialization.init_type)
     )
     error_message = "initialization.init_type must be Uninitialized, Clean, or Import."
   }
 
   validation {
-    condition = var.initialization == null || (
-      coalesce(try(var.initialization.init_type, null), "Uninitialized") == "Import"
-      ? (try(var.initialization.source_type, null) == null || try(var.initialization.source_type, null) == "Git")
-      : try(var.initialization.source_type, null) == null
-    )
+    condition = var.initialization.init_type == "Import" ? (
+      var.initialization.source_type != null &&
+      var.initialization.source_type == "Git"
+    ) : var.initialization.source_type == null
     error_message = "initialization.source_type must be Git when init_type is Import, and null otherwise."
   }
 
   validation {
-    condition = var.initialization == null || (
-      coalesce(try(var.initialization.init_type, null), "Uninitialized") == "Import"
-      ? (
-        try(var.initialization.source_url, null) != null &&
-        length(trimspace(try(var.initialization.source_url, ""))) > 0
-      )
-      : try(var.initialization.source_url, null) == null
-    )
+    condition = var.initialization.init_type == "Import" ? (
+      var.initialization.source_url != null &&
+      length(trimspace(var.initialization.source_url)) > 0
+    ) : var.initialization.source_url == null
     error_message = "initialization.source_url is required when init_type is Import and must be null otherwise."
   }
 
   validation {
-    condition = var.initialization == null || (
-      coalesce(try(var.initialization.init_type, null), "Uninitialized") == "Import"
-      ? (
-        (
-          try(var.initialization.service_connection_id, null) != null &&
-          length(trimspace(try(var.initialization.service_connection_id, ""))) > 0 &&
-          try(var.initialization.username, null) == null &&
-          try(var.initialization.password, null) == null
-          ) || (
-          try(var.initialization.service_connection_id, null) == null &&
-          try(var.initialization.username, null) != null &&
-          length(trimspace(try(var.initialization.username, ""))) > 0 &&
-          try(var.initialization.password, null) != null &&
-          length(trimspace(try(var.initialization.password, ""))) > 0
-        )
+    condition = var.initialization.init_type == "Import" ? (
+      (
+        var.initialization.service_connection_id != null &&
+        length(trimspace(var.initialization.service_connection_id)) > 0 &&
+        var.initialization.username == null &&
+        var.initialization.password == null
+        ) || (
+        var.initialization.service_connection_id == null &&
+        var.initialization.username != null &&
+        length(trimspace(var.initialization.username)) > 0 &&
+        var.initialization.password != null &&
+        length(trimspace(var.initialization.password)) > 0
       )
-      : (
-        try(var.initialization.service_connection_id, null) == null &&
-        try(var.initialization.username, null) == null &&
-        try(var.initialization.password, null) == null
-      )
+      ) : (
+      var.initialization.service_connection_id == null &&
+      var.initialization.username == null &&
+      var.initialization.password == null
     )
     error_message = "initialization Import requires service_connection_id or username/password (exactly one), and auth fields are only allowed when init_type is Import."
   }
@@ -363,7 +355,7 @@ variable "branches" {
   validation {
     condition = alltrue([
       for branch in var.branches : (
-        try(branch.policies.min_reviewers, null) == null ||
+        branch.policies.min_reviewers == null ||
         branch.policies.min_reviewers.reviewer_count > 0
       )
     ])
@@ -373,7 +365,7 @@ variable "branches" {
   validation {
     condition = alltrue([
       for branch in var.branches : alltrue([
-        for policy in coalesce(try(branch.policies.build_validation, []), []) : length(trimspace(policy.name)) > 0
+        for policy in branch.policies.build_validation : length(trimspace(policy.name)) > 0
       ])
     ])
     error_message = "branches.policies.build_validation.name must be a non-empty string."
@@ -383,11 +375,11 @@ variable "branches" {
     condition = (
       length(distinct(flatten([
         for branch in var.branches : [
-          for policy in coalesce(try(branch.policies.build_validation, []), []) : policy.name
+          for policy in branch.policies.build_validation : policy.name
         ]
         ]))) == length(flatten([
         for branch in var.branches : [
-          for policy in coalesce(try(branch.policies.build_validation, []), []) : policy.name
+          for policy in branch.policies.build_validation : policy.name
         ]
       ]))
     )
@@ -397,7 +389,7 @@ variable "branches" {
   validation {
     condition = alltrue([
       for branch in var.branches : alltrue([
-        for policy in coalesce(try(branch.policies.build_validation, []), []) :
+        for policy in branch.policies.build_validation :
         length(trimspace(policy.build_definition_id)) > 0
       ])
     ])
@@ -407,7 +399,7 @@ variable "branches" {
   validation {
     condition = alltrue([
       for branch in var.branches : alltrue([
-        for policy in coalesce(try(branch.policies.build_validation, []), []) :
+        for policy in branch.policies.build_validation :
         length(trimspace(policy.display_name)) > 0
       ])
     ])
@@ -417,7 +409,7 @@ variable "branches" {
   validation {
     condition = alltrue([
       for branch in var.branches : alltrue([
-        for policy in coalesce(try(branch.policies.build_validation, []), []) :
+        for policy in branch.policies.build_validation :
         policy.valid_duration == null || policy.valid_duration >= 0
       ])
     ])
@@ -427,7 +419,7 @@ variable "branches" {
   validation {
     condition = alltrue([
       for branch in var.branches : alltrue([
-        for policy in coalesce(try(branch.policies.status_check, []), []) : length(trimspace(policy.name)) > 0
+        for policy in branch.policies.status_check : length(trimspace(policy.name)) > 0
       ])
     ])
     error_message = "branches.policies.status_check.name must be a non-empty string."
@@ -437,11 +429,11 @@ variable "branches" {
     condition = (
       length(distinct(flatten([
         for branch in var.branches : [
-          for policy in coalesce(try(branch.policies.status_check, []), []) : policy.name
+          for policy in branch.policies.status_check : policy.name
         ]
         ]))) == length(flatten([
         for branch in var.branches : [
-          for policy in coalesce(try(branch.policies.status_check, []), []) : policy.name
+          for policy in branch.policies.status_check : policy.name
         ]
       ]))
     )
@@ -451,7 +443,7 @@ variable "branches" {
   validation {
     condition = alltrue([
       for branch in var.branches : alltrue([
-        for policy in coalesce(try(branch.policies.status_check, []), []) : (
+        for policy in branch.policies.status_check : (
           policy.genre == null || length(trimspace(policy.genre)) > 0
         )
       ])
@@ -462,7 +454,7 @@ variable "branches" {
   validation {
     condition = alltrue([
       for branch in var.branches : alltrue([
-        for policy in coalesce(try(branch.policies.status_check, []), []) : (
+        for policy in branch.policies.status_check : (
           policy.display_name == null || length(trimspace(policy.display_name)) > 0
         )
       ])
@@ -473,7 +465,7 @@ variable "branches" {
   validation {
     condition = alltrue([
       for branch in var.branches : alltrue([
-        for policy in coalesce(try(branch.policies.auto_reviewers, []), []) : length(trimspace(policy.name)) > 0
+        for policy in branch.policies.auto_reviewers : length(trimspace(policy.name)) > 0
       ])
     ])
     error_message = "branches.policies.auto_reviewers.name must be a non-empty string."
@@ -483,11 +475,11 @@ variable "branches" {
     condition = (
       length(distinct(flatten([
         for branch in var.branches : [
-          for policy in coalesce(try(branch.policies.auto_reviewers, []), []) : policy.name
+          for policy in branch.policies.auto_reviewers : policy.name
         ]
         ]))) == length(flatten([
         for branch in var.branches : [
-          for policy in coalesce(try(branch.policies.auto_reviewers, []), []) : policy.name
+          for policy in branch.policies.auto_reviewers : policy.name
         ]
       ]))
     )
@@ -497,7 +489,7 @@ variable "branches" {
   validation {
     condition = alltrue([
       for branch in var.branches : alltrue([
-        for policy in coalesce(try(branch.policies.auto_reviewers, []), []) : length(policy.auto_reviewer_ids) > 0
+        for policy in branch.policies.auto_reviewers : length(policy.auto_reviewer_ids) > 0
       ])
     ])
     error_message = "branches.policies.auto_reviewers.auto_reviewer_ids must not be empty."
@@ -506,7 +498,7 @@ variable "branches" {
   validation {
     condition = alltrue([
       for branch in var.branches : alltrue([
-        for policy in coalesce(try(branch.policies.auto_reviewers, []), []) : alltrue([
+        for policy in branch.policies.auto_reviewers : alltrue([
           for reviewer_id in policy.auto_reviewer_ids : length(trimspace(reviewer_id)) > 0
         ])
       ])

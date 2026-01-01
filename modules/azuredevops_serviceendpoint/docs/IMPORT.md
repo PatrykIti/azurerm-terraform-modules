@@ -35,7 +35,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_serviceendpoint" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_serviceendpoint?ref=ADOSE1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_serviceendpoint?ref=ADOSEv1.0.0"
 
   project_id = var.project_id
 

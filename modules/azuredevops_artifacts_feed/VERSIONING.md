@@ -126,7 +126,7 @@ module "azuredevops_artifacts_feed" {
 ### Direct from GitHub (Recommended)
 ```hcl
 module "azuredevops_artifacts_feed" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_artifacts_feed?ref=ADOAFv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_artifacts_feed?ref=ADOAFv1.0.0"
   
   # Module configuration
   # ...

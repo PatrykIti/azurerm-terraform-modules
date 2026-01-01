@@ -126,7 +126,7 @@ module "azuredevops_work_items" {
 ### Direct from GitHub (Recommended)
 ```hcl
 module "azuredevops_work_items" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_work_items?ref=ADOWKv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_work_items?ref=ADOWKv1.0.0"
   
   # Module configuration
   # ...

@@ -41,7 +41,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_azuredevops_repository"></a> [azuredevops\_repository](#module\_azuredevops\_repository) | git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_repository | ADOR1.0.0 |
+| <a name="module_azuredevops_repository"></a> [azuredevops\_repository](#module\_azuredevops\_repository) | git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_repository | ADORv1.0.0 |
 
 ## Resources
 

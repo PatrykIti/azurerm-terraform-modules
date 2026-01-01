@@ -2,16 +2,46 @@
 
 ## Overview
 
-This directory contains additional documentation for the Azure DevOps Service Hooks module.
+This module manages Azure DevOps azure devops service hooks resources and related configuration.
 
-## Contents
+## Managed Resources
 
-- [IMPORT.md](IMPORT.md) - Import instructions for existing service hooks and permissions
-- Architecture diagrams (coming soon)
-- Best practices guide (coming soon)
-- Troubleshooting guide (coming soon)
-- Migration guides (coming soon)
+- `azuredevops_servicehook_permissions`
+- `azuredevops_servicehook_storage_queue_pipelines`
+- `azuredevops_servicehook_webhook_tfs`
 
-## Contributing
+## Usage Notes
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines on adding documentation.
+- Requires `project_id` for project scoping.
+- Use `git::https://...//modules/azuredevops_servicehooks?ref=ADOSHvX.Y.Z` for module source.
+- Optional child resources are created only when corresponding inputs are set.
+- Use stable keys and unique names for list/object inputs to avoid address churn.
+
+## Inputs (Highlights)
+
+- Required: `project_id`
+- Optional: see `../README.md` and `../variables.tf`.
+
+## Outputs (Highlights)
+
+- `servicehook_permission_ids`
+- `storage_queue_hook_id`
+- `webhook_id`
+
+## Import Existing Resources
+
+See [IMPORT.md](./IMPORT.md) for import blocks and IDs.
+
+## Troubleshooting
+
+- **Permission errors**: ensure the PAT has rights for the target resource scope.
+- **Plan drift**: align inputs with existing state or leave optional inputs unset.
+- **Duplicate keys**: ensure list/object inputs use unique keys or names.
+
+## Related Docs
+
+- [README.md](../README.md) - module usage and inputs/outputs
+- [IMPORT.md](./IMPORT.md) - import guide
+- [VERSIONING.md](../VERSIONING.md) - tag format and release flow
+- [SECURITY.md](../SECURITY.md) - security guidance
+- [CONTRIBUTING.md](../CONTRIBUTING.md) - contribution rules

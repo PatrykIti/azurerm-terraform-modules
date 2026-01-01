@@ -76,23 +76,13 @@ resource "azuredevops_git_repository" "git_repository" {
   parent_repository_id = var.parent_repository_id
   disabled             = var.disabled
 
-  dynamic "initialization" {
-    for_each = var.initialization == null ? [] : [{
-      init_type             = coalesce(var.initialization.init_type, "Uninitialized")
-      source_type           = coalesce(var.initialization.init_type, "Uninitialized") == "Import" ? coalesce(var.initialization.source_type, "Git") : null
-      source_url            = coalesce(var.initialization.init_type, "Uninitialized") == "Import" ? var.initialization.source_url : null
-      service_connection_id = coalesce(var.initialization.init_type, "Uninitialized") == "Import" ? var.initialization.service_connection_id : null
-      username              = coalesce(var.initialization.init_type, "Uninitialized") == "Import" ? var.initialization.username : null
-      password              = coalesce(var.initialization.init_type, "Uninitialized") == "Import" ? var.initialization.password : null
-    }]
-    content {
-      init_type             = initialization.value.init_type
-      source_type           = initialization.value.source_type
-      source_url            = initialization.value.source_url
-      service_connection_id = initialization.value.service_connection_id
-      username              = initialization.value.username
-      password              = initialization.value.password
-    }
+  initialization {
+    init_type             = var.initialization.init_type
+    source_type           = var.initialization.source_type
+    source_url            = var.initialization.source_url
+    service_connection_id = var.initialization.service_connection_id
+    username              = var.initialization.username
+    password              = var.initialization.password
   }
 }
 

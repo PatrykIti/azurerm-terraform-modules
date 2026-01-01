@@ -2,6 +2,6 @@
   "name": "azuredevops_extension",
   "title": "Azure DevOps Extension",
   "commit_scope": "azuredevops-extension",
-  "tag_prefix": "ADOEX",
+  "tag_prefix": "ADOEXv",
   "description": "Azure DevOps extension module for managing a single Marketplace extension"
 }

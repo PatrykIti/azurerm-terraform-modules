@@ -41,7 +41,7 @@ Reference a specific version tag in Terraform:
 
 ```hcl
 module "azuredevops_project_permissions" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_project_permissions?ref=ADOPPv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_project_permissions?ref=ADOPPv1.0.0"
 }
 ```
 

@@ -46,7 +46,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_repository" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_repository?ref=ADOR1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_repository?ref=ADORv1.0.0"
 
   project_id = "00000000-0000-0000-0000-000000000000"
   name       = "existing-repo-name"
@@ -55,6 +55,8 @@ module "azuredevops_repository" {
   # initialization = {
   #   init_type = "Clean"
   # }
+  # Defaults to init_type = "Uninitialized" when omitted.
+  # For init_type = "Import", set source_type = "Git", source_url, and auth.
 
   # Optional: manage branches/files/permissions/policies
   # branches = [

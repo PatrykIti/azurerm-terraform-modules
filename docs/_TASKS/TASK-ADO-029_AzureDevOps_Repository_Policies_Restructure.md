@@ -47,7 +47,7 @@ This is a breaking change. Backward compatibility is not required.
 - `default_branch` (optional string)
 - `parent_repository_id` (optional string)
 - `disabled` (optional bool)
-- `initialization` (optional object, default null; dynamic block used only when set)
+- `initialization` (optional object, default `{}`; block always present, `init_type` defaults to "Uninitialized")
 
 `initialization` object:
 - `init_type` (optional string, default "Uninitialized")
@@ -57,9 +57,9 @@ This is a breaking change. Backward compatibility is not required.
 - `username` (optional string)
 - `password` (optional string)
 
-Validation rules (as-is, but now repository is always present):
+Validation rules:
 - `name` must be non-empty.
-- `default_branch` must be non-empty and start with `refs/heads/` when provided.
+- `default_branch` must be non-empty and start with `refs/heads/`.
 - `init_type` allowed: Uninitialized, Clean, Import.
 - If `init_type = Import`, require `source_url` and exactly one auth method (service_connection_id OR username/password).
 - If `init_type != Import`, disallow import-only fields.
@@ -197,7 +197,7 @@ Repository policies use `count` (single instance) instead of `for_each`.
 
 Repository:
 - `azuredevops_git_repository` (always present)
-- `initialization` is dynamic and omitted when `initialization` is null
+- `initialization` block is always present (provider requires at least one block); defaults to `init_type = "Uninitialized"`
 
 Branches/Files/Permissions:
 - `azuredevops_git_repository_branch` uses `branches` list

@@ -126,7 +126,7 @@ module "azuredevops_repository" {
 ### Direct from GitHub (Recommended)
 ```hcl
 module "azuredevops_repository" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_repository?ref=ADORv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_repository?ref=ADORv1.0.0"
   
   # Module configuration
   # ...

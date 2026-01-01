@@ -40,7 +40,7 @@ if (moduleName !== MODULE_NAME) {
   console.warn(`Warning: Directory name '${moduleName}' doesn't match module name '${MODULE_NAME}' in module.json`);
 }
 
-const SOURCE_URL = `github.com/${REPO_OWNER}/${REPO_NAME}//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}`;
+const SOURCE_URL = `git::https://github.com/${REPO_OWNER}/${REPO_NAME}//modules/${MODULE_NAME}?ref=${TAG_PREFIX}\${nextRelease.version}`;
 const DOC_URL = `https://github.com/${REPO_OWNER}/${REPO_NAME}/tree/${TAG_PREFIX}\${nextRelease.version}/modules/${MODULE_NAME}`;
 
 console.log(`📦 Semantic Release Configuration for ${MODULE_TITLE}`);
@@ -132,11 +132,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
             sed -i "s/^version: .*/version: \${nextRelease.version}/" "$CONFIG_FILE"
           fi
 
-          find "modules/${MODULE_NAME}/examples" -name "*.tf" -type f -exec sed -i -E -e 's|(^[[:space:]]*source[[:space:]]*=[[:space:]]*)"[.]{2}/[.]{2}/?"|\\1"${SOURCE_URL}"|g' -e 's|(^[[:space:]]*source[[:space:]]*=[[:space:]]*)"github.com/[^/]+/[^/]+//modules/${MODULE_NAME}\\?ref=[^"]+"|\\1"${SOURCE_URL}"|g' {} +
+          find "modules/${MODULE_NAME}/examples" -name "*.tf" -type f -exec sed -i -E -e 's|(^[[:space:]]*source[[:space:]]*=[[:space:]]*)"[.]{2}(/[.]{2}){1,2}/?"|\\1"${SOURCE_URL}"|g' -e 's|(^[[:space:]]*source[[:space:]]*=[[:space:]]*)"((git::)?https://)?github.com/[^/]+/[^/]+//modules/${MODULE_NAME}[^"]*"|\\1"${SOURCE_URL}"|g' {} +
 
           find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../../"|source = "${SOURCE_URL}"|g' {} +
+          find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../../../"|source = "${SOURCE_URL}"|g' {} +
+          find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../.."|source = "${SOURCE_URL}"|g' {} +
           find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../"|source = "${SOURCE_URL}"|g' {} +
           find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's| ../../ | ${SOURCE_URL} |g' {} +
+          find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's| ../../../ | ${SOURCE_URL} |g' {} +
           find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's| ../.. | ${SOURCE_URL} |g' {} +
 
           if [ -x "./scripts/update-module-version.sh" ]; then

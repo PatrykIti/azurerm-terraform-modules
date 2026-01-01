@@ -126,7 +126,7 @@ module "azuredevops_identity" {
 ### Direct from GitHub (Recommended)
 ```hcl
 module "azuredevops_identity" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_identity?ref=ADOIv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_identity?ref=ADOIv1.0.0"
   
   # Module configuration
   # ...

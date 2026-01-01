@@ -36,7 +36,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_identity" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_identity?ref=ADOI1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_identity?ref=ADOIv1.0.0"
 
   group_display_name = "ADO Platform Team"
   group_description  = "Platform engineering group"
