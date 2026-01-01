@@ -10,7 +10,7 @@ Before submitting a pull request for a new module, please review this checklist 
 - [ ] `variables.tf` is complete with descriptions and validation for all variables.
 - [ ] `main.tf` contains the core module logic.
 - [ ] `outputs.tf` provides clear, described outputs for all relevant resources.
-- [ ] `locals.tf` is used for any computed values or complex logic (if applicable).
+- [ ] `locals` are used for computed values or complex logic (in `main.tf` or `locals.tf`, if applicable).
 
 ## Configuration
 
@@ -21,7 +21,7 @@ Before submitting a pull request for a new module, please review this checklist 
 ## Documentation
 
 - [ ] `README.md` is generated and includes all required sections.
-- [ ] `docs/README.md` is present and linked from the module `README.md`.
+- [ ] `docs/README.md` is present for complex modules and linked from the module `README.md` (optional for simple modules).
 - [ ] `docs/IMPORT.md` is present and aligned with the basic example.
 - [ ] `CONTRIBUTING.md` is present and tailored to the module.
 - [ ] `SECURITY.md` is present and details the module's security features.
@@ -62,4 +62,5 @@ Before submitting a pull request for a new module, please review this checklist 
 ## CI/CD Integration
 
 - [ ] `module.json` and `.releaserc.js` are configured for release automation.
+- [ ] `commit_scope` is added to `scopes` in `.github/workflows/pr-validation.yml` when using scoped PR titles.
 - [ ] `commit_scope` is added to `scopes` in `.github/workflows/pr-validation.yml`.

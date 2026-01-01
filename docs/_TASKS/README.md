@@ -5,7 +5,7 @@ Task board for module work. Update statuses in markdown files.
 ## Statistics
 - **To Do:** 11 tasks
 - **In Progress:** 0
-- **Done:** 30 tasks
+- **Done:** 31 tasks
 
 ---
 
@@ -39,6 +39,7 @@ Task board for module work. Update statuses in markdown files.
 |----|-------|----------|--------|-------|
 | [TASK-010](./TASK-010_Workflow_and_Module_Docs_Alignment.md) | **Workflow and module documentation alignment** | Medium | Medium | `docs/WORKFLOWS.md`, `docs/MODULE_GUIDE/*`, ADO docs |
 | [TASK-011](./TASK-011_Terratest_Fixture_Path_Portability.md) | **Terratest fixture path portability** | Medium | Medium | Remove hardcoded `tests/fixtures` paths |
+| [TASK-012](./TASK-012_Module_Guide_Alignment.md) | **Module guide alignment (AKS + ADO patterns)** | Medium | Medium | `docs/MODULE_GUIDE/*` |
 | [TASK-009](./TASK-009_Workflow_and_Scripts_Audit.md) | **Workflow + scripts audit (docs/examples/source updates)** | High | Medium | CI/CD + release automations |
 | [TASK-001](./TASK-001_AKS_Module_Fixes.md) | **AKS module – walidacje, SP/MI UX, docs i bump wersji** | High | Medium | `modules/azurerm_kubernetes_cluster/` |
 | [TASK-003](./TASK-003_Module_Scaffold_Fix.md) | **Generator scaffoldu – naprawa i zgodnosc z AKS** | High | Medium | `scripts/create-new-module.sh` + `scripts/templates/` |

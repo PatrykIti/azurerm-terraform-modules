@@ -7,7 +7,7 @@ A consistent directory structure is essential for maintainability and ease of us
 ```
 modules/<provider>_<resource_name>/
 ├─── docs/
-│    ├─── README.md
+│    ├─── README.md (optional)
 │    └─── IMPORT.md
 ├─── examples/
 │    ├─── basic/
@@ -27,8 +27,8 @@ modules/<provider>_<resource_name>/
 │    │    ├─── basic/
 │    │    ├─── complete/
 │    │    ├─── secure/
-│    │    ├─── network/
-│    │    ├─── negative/
+│    │    ├─── network/ (optional)
+│    │    ├─── negative/ (optional)
 │    │    └─── <feature-specific>/ (optional)
 │    ├─── unit/
 │    │    ├─── defaults.tftest.hcl
@@ -66,7 +66,7 @@ modules/<provider>_<resource_name>/
 
 ## Key Components Explained
 
-- **`docs/`**: Contains supplementary documentation. `README.md` is the module-specific doc hub; `IMPORT.md` documents Terraform import blocks aligned with the AKS module.
+- **`docs/`**: Contains supplementary documentation. `README.md` is optional but recommended for complex modules and should follow the Azure DevOps module format; `IMPORT.md` documents Terraform import blocks aligned with the module's addressing scheme.
 - **`examples/`**: Contains practical, runnable examples for different use cases. Each example should have its own `README.md` and `.terraform-docs.yml`. Feature-specific examples are optional (e.g., `diagnostic-settings`, `multi-node-pool`, `workload-identity`).
 - **`tests/`**: Contains all tests for the module.
   - **`fixtures/`**: Terraform code for different test scenarios used by Terratest.

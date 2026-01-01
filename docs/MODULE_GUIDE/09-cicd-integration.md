@@ -43,6 +43,11 @@ The CI/CD pipeline will automatically detect your module based on:
 - The `module.json` file for release configuration
 - Standard Terraform module structure (main.tf, variables.tf, outputs.tf)
 
+PR title validation uses a static allowlist of scopes. If you use scoped PR titles
+(`type(scope): subject`), add the module `commit_scope` to
+`.github/workflows/pr-validation.yml` to avoid validation failures. Module detection
+for jobs remains path-based.
+
 No additional configuration is needed for standard modules. The workflows will:
 - Automatically detect changes to your module
 - Run validation and linting
