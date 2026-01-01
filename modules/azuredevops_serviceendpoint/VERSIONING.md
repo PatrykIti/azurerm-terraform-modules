@@ -11,7 +11,7 @@ ADOSEv{major}.{minor}.{patch}
 ```
 
 Where:
-- `ADOR` = azuredevops_serviceendpoint module identifier
+- `ADOSE` = azuredevops_serviceendpoint module identifier
 - `v` = version prefix
 - `{major}.{minor}.{patch}` = semantic version numbers (automatically determined)
 

@@ -11,7 +11,7 @@ ADOPIv{major}.{minor}.{patch}
 ```
 
 Where:
-- `ADOR` = azuredevops_pipelines module identifier
+- `ADOPI` = azuredevops_pipelines module identifier
 - `v` = version prefix
 - `{major}.{minor}.{patch}` = semantic version numbers (automatically determined)
 
