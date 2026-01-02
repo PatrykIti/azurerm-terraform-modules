@@ -104,7 +104,7 @@ func TestAzuredevopsArtifactsFeedValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "feed_permissions.feed_id must be set when the module feed is not created")
+	assert.Contains(t, err.Error(), "feed_permissions.role must be reader, contributor, collaborator, or administrator")
 }
 
 // Helper function to get terraform options

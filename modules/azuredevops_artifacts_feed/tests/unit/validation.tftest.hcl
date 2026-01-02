@@ -10,7 +10,19 @@ mock_provider "azuredevops" {
   }
 }
 
-run "invalid_feed_name_without_project_id" {
+run "missing_name" {
+  command = plan
+
+  variables {
+    project_id = "00000000-0000-0000-0000-000000000000"
+  }
+
+  expect_failures = [
+    var.name,
+  ]
+}
+
+run "missing_project_id" {
   command = plan
 
   variables {
@@ -22,39 +34,17 @@ run "invalid_feed_name_without_project_id" {
   ]
 }
 
-run "missing_feed_id_without_module_feed_permissions" {
+run "invalid_description" {
   command = plan
 
   variables {
-    feed_permissions = [
-      {
-        key                 = "missing-feed"
-        identity_descriptor = "vssgp.Uy0xLTktMTIzNDU2"
-        role                = "reader"
-      }
-    ]
+    name        = "example-feed"
+    project_id  = "00000000-0000-0000-0000-000000000000"
+    description = ""
   }
 
   expect_failures = [
-    var.feed_permissions,
-  ]
-}
-
-run "missing_feed_id_without_module_feed_retention" {
-  command = plan
-
-  variables {
-    feed_retention_policies = [
-      {
-        key                                       = "missing-feed"
-        count_limit                               = 10
-        days_to_keep_recently_downloaded_packages = 30
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.feed_retention_policies,
+    var.description,
   ]
 }
 
@@ -191,7 +181,7 @@ run "role_normalization" {
   }
 }
 
-run "feed_permission_defaults_from_module_feed" {
+run "feed_permission_attaches_to_module_feed" {
   command = apply
 
   variables {
@@ -209,16 +199,16 @@ run "feed_permission_defaults_from_module_feed" {
 
   assert {
     condition     = azuredevops_feed_permission.feed_permission["default-feed"].feed_id == "11111111-1111-1111-1111-111111111111"
-    error_message = "feed_permissions.feed_id should default to the module feed when omitted."
+    error_message = "feed_permissions should attach to the module feed."
   }
 
   assert {
     condition     = azuredevops_feed_permission.feed_permission["default-feed"].project_id == "00000000-0000-0000-0000-000000000000"
-    error_message = "feed_permissions.project_id should default to the module project when omitted."
+    error_message = "feed_permissions should use the module project_id."
   }
 }
 
-run "feed_retention_defaults_from_module_feed" {
+run "feed_retention_attaches_to_module_feed" {
   command = apply
 
   variables {
@@ -236,11 +226,11 @@ run "feed_retention_defaults_from_module_feed" {
 
   assert {
     condition     = azuredevops_feed_retention_policy.feed_retention_policy["default-retention"].feed_id == "11111111-1111-1111-1111-111111111111"
-    error_message = "feed_retention_policies.feed_id should default to the module feed when omitted."
+    error_message = "feed_retention_policies should attach to the module feed."
   }
 
   assert {
     condition     = azuredevops_feed_retention_policy.feed_retention_policy["default-retention"].project_id == "00000000-0000-0000-0000-000000000000"
-    error_message = "feed_retention_policies.project_id should default to the module project when omitted."
+    error_message = "feed_retention_policies should use the module project_id."
   }
 }

@@ -11,12 +11,7 @@ run "feed_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_feed.feed) == 1
-    error_message = "A feed should be created when name/project_id are set."
-  }
-
-  assert {
-    condition     = azuredevops_feed.feed[0].name == "core-feed"
+    condition     = azuredevops_feed.feed.name == "core-feed"
     error_message = "Feed name should match the name variable."
   }
 }

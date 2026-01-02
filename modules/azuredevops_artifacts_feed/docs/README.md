@@ -14,6 +14,7 @@ This module manages Azure DevOps artifacts feed resources and related configurat
 
 - Use `git::https://...//modules/azuredevops_artifacts_feed?ref=ADOAFvX.Y.Z` for module source.
 - Optional child resources are created only when corresponding inputs are set.
+- Permissions and retention policies always attach to the module-managed feed.
 - Use stable keys and unique names for list/object inputs to avoid address churn.
 
 ## Inputs (Highlights)

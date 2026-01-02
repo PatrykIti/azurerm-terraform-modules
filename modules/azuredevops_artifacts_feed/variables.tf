@@ -3,29 +3,35 @@
 # -----------------------------------------------------------------------------
 
 variable "name" {
-  description = "The name of the Azure DevOps feed. Required when creating the feed."
+  description = "The name of the Azure DevOps feed."
   type        = string
-  default     = null
+  nullable    = false
 
   validation {
-    condition     = var.name == null || length(trimspace(var.name)) > 0
-    error_message = "name must be a non-empty string when provided."
+    condition     = length(trimspace(var.name)) > 0
+    error_message = "name must be a non-empty string."
   }
 }
 
 variable "project_id" {
-  description = "The Azure DevOps project ID to scope the feed. Required when creating the feed."
+  description = "The Azure DevOps project ID to scope the feed."
+  type        = string
+  nullable    = false
+
+  validation {
+    condition     = length(trimspace(var.project_id)) > 0
+    error_message = "project_id must be a non-empty string."
+  }
+}
+
+variable "description" {
+  description = "Optional description for the Azure DevOps feed."
   type        = string
   default     = null
 
   validation {
-    condition     = var.project_id == null || length(trimspace(var.project_id)) > 0
-    error_message = "project_id must be a non-empty string when provided."
-  }
-
-  validation {
-    condition     = (var.name == null && var.project_id == null) || (var.name != null && var.project_id != null)
-    error_message = "name and project_id must be set together to create a feed."
+    condition     = var.description == null || length(trimspace(var.description)) > 0
+    error_message = "description must be a non-empty string when provided."
   }
 }
 
@@ -46,10 +52,8 @@ variable "feed_permissions" {
   description = "List of feed permissions to assign."
   type = list(object({
     key                 = optional(string)
-    feed_id             = optional(string)
     identity_descriptor = string
     role                = string
-    project_id          = optional(string)
     display_name        = optional(string)
   }))
   default = []
@@ -66,37 +70,10 @@ variable "feed_permissions" {
   validation {
     condition = alltrue([
       for perm in var.feed_permissions : (
-        perm.feed_id == null || length(trimspace(perm.feed_id)) > 0
-      )
-    ])
-    error_message = "feed_permissions.feed_id must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.feed_permissions : (
-        perm.project_id == null || length(trimspace(perm.project_id)) > 0
-      )
-    ])
-    error_message = "feed_permissions.project_id must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.feed_permissions : (
         perm.display_name == null || length(trimspace(perm.display_name)) > 0
       )
     ])
     error_message = "feed_permissions.display_name must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.feed_permissions : (
-        perm.feed_id != null || (var.name != null && var.project_id != null)
-      )
-    ])
-    error_message = "feed_permissions.feed_id must be set when the module feed is not created."
   }
 
   validation {
@@ -135,10 +112,8 @@ variable "feed_retention_policies" {
   description = "List of feed retention policies to manage."
   type = list(object({
     key                                       = optional(string)
-    feed_id                                   = optional(string)
     count_limit                               = number
     days_to_keep_recently_downloaded_packages = number
-    project_id                                = optional(string)
   }))
   default = []
 
@@ -149,31 +124,6 @@ variable "feed_retention_policies" {
       )
     ])
     error_message = "feed_retention_policies.key must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for policy in var.feed_retention_policies : (
-        policy.feed_id == null || length(trimspace(policy.feed_id)) > 0
-      )
-    ])
-    error_message = "feed_retention_policies.feed_id must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for policy in var.feed_retention_policies : (
-        policy.project_id == null || length(trimspace(policy.project_id)) > 0
-      )
-    ])
-    error_message = "feed_retention_policies.project_id must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for policy in var.feed_retention_policies : policy.feed_id != null || (var.name != null && var.project_id != null)
-    ])
-    error_message = "feed_retention_policies.feed_id must be set when the module feed is not created."
   }
 
   validation {
