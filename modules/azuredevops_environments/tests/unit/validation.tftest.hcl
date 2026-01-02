@@ -172,25 +172,6 @@ run "invalid_minimum_approvers" {
   ]
 }
 
-run "kubernetes_checks_null" {
-  command = plan
-
-  variables {
-    kubernetes_resources = [
-      {
-        service_endpoint_id = "00000000-0000-0000-0000-000000000000"
-        name                = "k8s-null-checks"
-        namespace           = "default"
-        checks              = null
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.kubernetes_resources,
-  ]
-}
-
 run "duplicate_nested_branch_controls" {
   command = plan
 

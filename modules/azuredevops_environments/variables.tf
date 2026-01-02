@@ -156,13 +156,6 @@ variable "kubernetes_resources" {
 
   validation {
     condition = alltrue([
-      for resource in var.kubernetes_resources : resource.checks != null
-    ])
-    error_message = "kubernetes_resources.checks must not be null; omit it or use {}."
-  }
-
-  validation {
-    condition = alltrue([
       for resource in var.kubernetes_resources : alltrue([
         for check in try(resource.checks.approvals, []) : length(trimspace(check.name)) > 0
       ])
