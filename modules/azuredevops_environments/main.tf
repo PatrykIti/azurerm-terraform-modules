@@ -168,7 +168,7 @@ resource "azuredevops_check_approval" "check_approval" {
   for_each = local.check_approvals
 
   project_id                 = var.project_id
-  target_resource_type       = each.value.scope == "environment" ? "environment" : "environmentResource"
+  target_resource_type       = "environment"
   target_resource_id         = each.value.scope == "environment" ? azuredevops_environment.environment.id : azuredevops_environment_resource_kubernetes.environment_resource_kubernetes[each.value.resource_name].id
   approvers                  = each.value.check.approvers
   instructions               = each.value.check.instructions
@@ -182,7 +182,7 @@ resource "azuredevops_check_branch_control" "check_branch_control" {
 
   project_id                       = var.project_id
   display_name                     = each.value.check.name
-  target_resource_type             = each.value.scope == "environment" ? "environment" : "environmentResource"
+  target_resource_type             = "environment"
   target_resource_id               = each.value.scope == "environment" ? azuredevops_environment.environment.id : azuredevops_environment_resource_kubernetes.environment_resource_kubernetes[each.value.resource_name].id
   allowed_branches                 = each.value.check.allowed_branches
   verify_branch_protection         = each.value.check.verify_branch_protection
@@ -195,7 +195,7 @@ resource "azuredevops_check_business_hours" "check_business_hours" {
 
   project_id           = var.project_id
   display_name         = each.value.check.name
-  target_resource_type = each.value.scope == "environment" ? "environment" : "environmentResource"
+  target_resource_type = "environment"
   target_resource_id   = each.value.scope == "environment" ? azuredevops_environment.environment.id : azuredevops_environment_resource_kubernetes.environment_resource_kubernetes[each.value.resource_name].id
   start_time           = each.value.check.start_time
   end_time             = each.value.check.end_time
@@ -214,7 +214,7 @@ resource "azuredevops_check_exclusive_lock" "check_exclusive_lock" {
   for_each = local.check_exclusive_locks
 
   project_id           = var.project_id
-  target_resource_type = each.value.scope == "environment" ? "environment" : "environmentResource"
+  target_resource_type = "environment"
   target_resource_id   = each.value.scope == "environment" ? azuredevops_environment.environment.id : azuredevops_environment_resource_kubernetes.environment_resource_kubernetes[each.value.resource_name].id
   timeout              = each.value.check.timeout
 }
@@ -223,7 +223,7 @@ resource "azuredevops_check_required_template" "check_required_template" {
   for_each = local.check_required_templates
 
   project_id           = var.project_id
-  target_resource_type = each.value.scope == "environment" ? "environment" : "environmentResource"
+  target_resource_type = "environment"
   target_resource_id   = each.value.scope == "environment" ? azuredevops_environment.environment.id : azuredevops_environment_resource_kubernetes.environment_resource_kubernetes[each.value.resource_name].id
 
   dynamic "required_template" {
@@ -242,7 +242,7 @@ resource "azuredevops_check_rest_api" "check_rest_api" {
 
   project_id                      = var.project_id
   display_name                    = each.value.check.name
-  target_resource_type            = each.value.scope == "environment" ? "environment" : "environmentResource"
+  target_resource_type            = "environment"
   target_resource_id              = each.value.scope == "environment" ? azuredevops_environment.environment.id : azuredevops_environment_resource_kubernetes.environment_resource_kubernetes[each.value.resource_name].id
   connected_service_name_selector = each.value.check.connected_service_name_selector
   connected_service_name          = each.value.check.connected_service_name
