@@ -19,6 +19,7 @@ Align `modules/azuredevops_environments` with module standards for subresource s
 - `coalesce` is used for `target_resource_id` and `target_resource_type` defaults in `main.tf`; this should be handled via input defaults and validation instead.
 - for_each keys rely on `coalesce(..., target_resource_id)` instead of stable name/display_name or required keys; approvals, exclusive locks, and required templates lack a required key.
 - No internal reference path exists to target module-created environment resources (kubernetes) without passing raw IDs.
+- Checks are only top-level; there is no per-kubernetes nested checks structure for implicit targeting.
 - Resource local name for `azuredevops_environment_resource_kubernetes` does not match the resource type naming convention.
 - Example README terraform-docs sections are stale relative to example `main.tf` (module source and provider details).
 - `.terraform` and `.terraform.lock.hcl` artifacts are present in the module root.
@@ -193,6 +194,44 @@ Validation rules (summary):
 - Root-level checks always target the environment resource.
 - Disallow external environment IDs in all inputs.
 
+Consistency note:
+- This nested object pattern mirrors `modules/azuredevops_repository` (`branches[*].policies`), keeping per-resource policy/check configuration grouped with the resource.
+
+## Example Usage (Draft)
+
+```hcl
+module "azuredevops_environments" {
+  source = "../../"
+
+  project_id = var.project_id
+  name       = "ado-env-basic"
+
+  kubernetes_resources = [
+    {
+      name                = "ado-env-k8s"
+      service_endpoint_id = var.k8s_service_endpoint_id
+      namespace           = "default"
+      checks = {
+        branch_controls = [
+          {
+            name                     = "k8s-branch-gate"
+            allowed_branches         = "refs/heads/main"
+            verify_branch_protection = true
+          }
+        ]
+      }
+    }
+  ]
+
+  check_approvals = [
+    {
+      name      = "env-approval"
+      approvers = [var.approver_id]
+    }
+  ]
+}
+```
+
 ## Proposed Main.tf Shape (Draft)
 
 ```hcl
@@ -366,7 +405,7 @@ Outside module:
 - Subresources always depend on `azuredevops_environment` and cannot target external environments.
 - Kubernetes checks are nested under `kubernetes_resources[*].checks` and always target that resource; root-level checks target the environment only.
 - Inputs no longer accept external environment IDs; validations provide explicit errors and guidance.
-- for_each keys use stable `name` (and `display_name = name` where required), with no target-based fallbacks.
+- for_each keys use stable `name` only; `display_name` is derived from `name` where required, with no target-based fallbacks.
 - Target resolution is implicit by placement (root vs nested), removing `target_resource_type`/`target_resource_id` inputs and `coalesce` defaults.
 - Module root no longer contains `.terraform/` or `.terraform.lock.hcl`.
 - `azuredevops_environment_resource_kubernetes` local name matches the resource type and references are updated consistently.
@@ -380,6 +419,7 @@ Outside module:
 - [ ] Remove external environment ID inputs and move Kubernetes checks under `kubernetes_resources[*].checks`; keep root checks for environment-only.
 - [ ] Update check resources to target environment or kubernetes implicitly (no `target_resource_type`/`target_resource_id` inputs).
 - [ ] Require stable `name` keys for all checks; map `display_name = name` where needed.
+- [ ] Align nested checks structure with `modules/azuredevops_repository` policy nesting patterns in docs/examples.
 - [ ] Update outputs to group environment vs kubernetes checks by resource name.
 - [ ] Rename the Kubernetes environment resource local name and update references in outputs, tests, README, and import docs.
 - [ ] Regenerate terraform-docs for examples and verify README alignment.
