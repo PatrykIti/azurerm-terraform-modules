@@ -127,20 +127,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       '@semantic-release/exec',
       {
         prepareCmd: `
+          sed_in_place() {
+            file="$1"
+            shift
+            tmp="$file.tmp.$$"
+            sed "$@" "$file" > "$tmp" && mv "$tmp" "$file"
+          }
+
           CONFIG_FILE="modules/${MODULE_NAME}/.github/module-config.yml"
           if [ -f "$CONFIG_FILE" ]; then
-            sed -i "s/^version: .*/version: \${nextRelease.version}/" "$CONFIG_FILE"
+            sed_in_place "$CONFIG_FILE" -e "s/^version: .*/version: \${nextRelease.version}/"
           fi
 
-          find "modules/${MODULE_NAME}/examples" -name "*.tf" -type f -exec sed -i -E -e 's|(^[[:space:]]*source[[:space:]]*=[[:space:]]*)"[.]{2}(/[.]{2}){1,2}/?"|\\1"${SOURCE_URL}"|g' -e 's|(^[[:space:]]*source[[:space:]]*=[[:space:]]*)"((git::)?https://)?github.com/[^/]+/[^/]+//modules/${MODULE_NAME}[^"]*"|\\1"${SOURCE_URL}"|g' {} +
+          find "modules/${MODULE_NAME}/examples" -name "*.tf" -type f -print | while IFS= read -r tf_file; do
+            sed_in_place "$tf_file" \
+              -e 's|^\\([[:space:]]*source[[:space:]]*=[[:space:]]*\\)"\\.\\.\\(/\\.\\.\\)\\{1,2\\}/\\{0,1\\}"|\\1"${SOURCE_URL}"|g' \
+              -e 's|^\\([[:space:]]*source[[:space:]]*=[[:space:]]*\\)"\\(\\(git::\\)\\{0,1\\}https://\\)\\{0,1\\}github.com/[^/]\\{1,\\}/[^/]\\{1,\\}//modules/${MODULE_NAME}[^"]*"|\\1"${SOURCE_URL}"|g'
+          done
 
-          find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../../"|source = "${SOURCE_URL}"|g' {} +
-          find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../../../"|source = "${SOURCE_URL}"|g' {} +
-          find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../.."|source = "${SOURCE_URL}"|g' {} +
-          find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../"|source = "${SOURCE_URL}"|g' {} +
-          find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's| ../../ | ${SOURCE_URL} |g' {} +
-          find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's| ../../../ | ${SOURCE_URL} |g' {} +
-          find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's| ../.. | ${SOURCE_URL} |g' {} +
+          find "modules/${MODULE_NAME}" -name "README.md" -type f -print | while IFS= read -r readme; do
+            sed_in_place "$readme" \
+              -e 's|source = "\\.\\./\\.\\./"|source = "${SOURCE_URL}"|g' \
+              -e 's|source = "\\.\\./\\.\\./\\.\\./"|source = "${SOURCE_URL}"|g' \
+              -e 's|source = "\\.\\./\\.\\."|source = "${SOURCE_URL}"|g' \
+              -e 's|source = "\\.\\./"|source = "${SOURCE_URL}"|g' \
+              -e 's| \\.\\./\\.\\./ | ${SOURCE_URL} |g' \
+              -e 's| \\.\\./\\.\\./\\.\\./ | ${SOURCE_URL} |g' \
+              -e 's| \\.\\./\\.\\. | ${SOURCE_URL} |g'
+          done
 
           if [ -x "./scripts/update-module-version.sh" ]; then
             ./scripts/update-module-version.sh "modules/${MODULE_NAME}" "\${nextRelease.version}"
