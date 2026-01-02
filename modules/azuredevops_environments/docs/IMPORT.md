@@ -60,12 +60,10 @@ import {
 
 ---
 
-## 3) (Optional) Import Kubernetes resources and checks
+## 3) (Optional) Import Kubernetes resources and environment checks
 
 When importing child resources, use the same names you configured in
-`kubernetes_resources` and the `check_*` lists. Environment checks are keyed
-as `environment:<check_name>`. Kubernetes checks are keyed as
-`kubernetes:<resource_name>:<check_name>`.
+`kubernetes_resources` and the `check_*` lists.
 
 ```hcl
 import {
@@ -74,12 +72,7 @@ import {
 }
 
 import {
-  to = module.azuredevops_environments.azuredevops_check_approval.check_approval["environment:prod-approval"]
-  id = "<project_id>/<check_id>"
-}
-
-import {
-  to = module.azuredevops_environments.azuredevops_check_branch_control.check_branch_control["kubernetes:ado-env-import-k8s:k8s-branch-gate"]
+  to = module.azuredevops_environments.azuredevops_check_approval.check_approval["prod-approval"]
   id = "<project_id>/<check_id>"
 }
 ```
@@ -116,5 +109,5 @@ When the plan is clean, you can remove `import.tf`.
 
 ## Additional resources
 
-- Check resources (Kubernetes resources and approvals) can be imported separately
-  if you want Terraform to own them; use the provider docs for the required IDs.
+- Check resources can be imported separately if you want Terraform to own them;
+  use the provider docs for the required IDs.

@@ -1,16 +1,16 @@
 # Complete Azure DevOps Environments Example
 
-This example demonstrates an environment with a Kubernetes resource and approval checks.
+This example demonstrates an environment with a Kubernetes resource and environment-level checks.
 
 ## Features
 
 - Environment creation with descriptive metadata
 - Kubernetes resource attachment
-- Approval check configuration
+- Approval and branch control checks on the environment
 
 ## Key Configuration
 
-This example showcases environment resources and checks suitable for production workflows.
+This example showcases environment resources and environment-level checks suitable for production workflows.
 
 ## Usage
 

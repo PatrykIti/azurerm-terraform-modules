@@ -64,7 +64,7 @@ go test -v -run TestBasicAzuredevopsEnvironments -timeout 30m
 The `fixtures/` directory contains Terraform configurations for different test scenarios:
 
 - `fixtures/basic/` - Basic environment
-- `fixtures/complete/` - Environment with Kubernetes resource and checks
+- `fixtures/complete/` - Environment with Kubernetes resource and environment-level checks
 - `fixtures/secure/` - Environment with approval checks
 - `fixtures/negative/` - Negative test cases
 

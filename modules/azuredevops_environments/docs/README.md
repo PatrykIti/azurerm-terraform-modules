@@ -20,7 +20,7 @@ This module manages Azure DevOps environments resources and related configuratio
 - Requires `project_id` for project scoping.
 - Use `git::https://...//modules/azuredevops_environments?ref=ADOEvX.Y.Z` for module source.
 - Environment checks are configured via root `check_*` inputs.
-- Kubernetes checks are configured per resource under `kubernetes_resources[*].checks`.
+- Kubernetes environment resources do not support approvals and checks.
 - Optional child resources are created only when corresponding inputs are set.
 - Use stable names and unique names per list to avoid address churn.
 

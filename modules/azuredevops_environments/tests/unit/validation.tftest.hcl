@@ -171,33 +171,3 @@ run "invalid_minimum_approvers" {
     var.check_approvals,
   ]
 }
-
-run "duplicate_nested_branch_controls" {
-  command = plan
-
-  variables {
-    kubernetes_resources = [
-      {
-        service_endpoint_id = "00000000-0000-0000-0000-000000000000"
-        name                = "k8s-branch"
-        namespace           = "default"
-        checks = {
-          branch_controls = [
-            {
-              name             = "duplicate"
-              allowed_branches = "refs/heads/main"
-            },
-            {
-              name             = "duplicate"
-              allowed_branches = "refs/heads/main"
-            }
-          ]
-        }
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.kubernetes_resources,
-  ]
-}
