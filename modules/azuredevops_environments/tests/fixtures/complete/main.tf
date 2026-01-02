@@ -62,13 +62,21 @@ module "azuredevops_environments" {
       namespace           = "default"
       service_endpoint_id = azuredevops_serviceendpoint_kubernetes.example.id
       cluster_name        = "example-aks"
+      checks = {
+        branch_controls = [
+          {
+            name                     = "k8s-branch-control"
+            allowed_branches         = "refs/heads/main"
+            verify_branch_protection = true
+          }
+        ]
+      }
     }
   ]
 
   check_approvals = [
     {
-      key                   = "integration-approval"
-      target_resource_type  = "environment"
+      name                  = "integration-approval"
       approvers             = [data.azuredevops_group.project_collection_admins.origin_id]
       requester_can_approve = false
     }

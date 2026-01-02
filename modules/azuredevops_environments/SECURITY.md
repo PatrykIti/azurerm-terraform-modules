@@ -28,14 +28,15 @@ module "azuredevops_environments" {
 
   check_approvals = [
     {
-      key                  = "prod-approval"
-      target_resource_type = "environment"
+      name                 = "prod-approval"
       approvers            = ["00000000-0000-0000-0000-000000000000"]
       requester_can_approve = false
     }
   ]
 }
 ```
+
+For a hardened configuration, see the secure example in `modules/azuredevops_environments/examples/secure`.
 
 ## Security Hardening Checklist
 

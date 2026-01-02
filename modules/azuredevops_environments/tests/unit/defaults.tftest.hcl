@@ -16,7 +16,7 @@ run "defaults_plan" {
   }
 
   assert {
-    condition     = length(azuredevops_environment_resource_kubernetes.kubernetes_resource) == 0
+    condition     = length(azuredevops_environment_resource_kubernetes.environment_resource_kubernetes) == 0
     error_message = "No Kubernetes resources should be created by default."
   }
 

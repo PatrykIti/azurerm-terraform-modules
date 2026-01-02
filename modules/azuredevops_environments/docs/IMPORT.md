@@ -62,17 +62,24 @@ import {
 
 ## 3) (Optional) Import Kubernetes resources and checks
 
-When importing child resources, use the same keys you configured in
-`kubernetes_resources` and the `check_*` lists.
+When importing child resources, use the same names you configured in
+`kubernetes_resources` and the `check_*` lists. Environment checks are keyed
+as `environment:<check_name>`. Kubernetes checks are keyed as
+`kubernetes:<resource_name>:<check_name>`.
 
 ```hcl
 import {
-  to = module.azuredevops_environments.azuredevops_environment_resource_kubernetes.kubernetes_resource["ado-env-import-k8s"]
+  to = module.azuredevops_environments.azuredevops_environment_resource_kubernetes.environment_resource_kubernetes["ado-env-import-k8s"]
   id = "<project_id>/<environment_id>/<kubernetes_resource_id>"
 }
 
 import {
-  to = module.azuredevops_environments.azuredevops_check_approval.check_approval["prod-approval"]
+  to = module.azuredevops_environments.azuredevops_check_approval.check_approval["environment:prod-approval"]
+  id = "<project_id>/<check_id>"
+}
+
+import {
+  to = module.azuredevops_environments.azuredevops_check_branch_control.check_branch_control["kubernetes:ado-env-import-k8s:k8s-branch-gate"]
   id = "<project_id>/<check_id>"
 }
 ```

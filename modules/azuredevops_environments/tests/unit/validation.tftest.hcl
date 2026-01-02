@@ -19,15 +19,14 @@ run "invalid_name" {
   ]
 }
 
-run "invalid_target_resource_type" {
+run "invalid_approval_name" {
   command = plan
 
   variables {
     check_approvals = [
       {
-        key                  = "bad-type"
-        target_resource_type = "invalid"
-        approvers            = ["00000000-0000-0000-0000-000000000000"]
+        name      = ""
+        approvers = ["00000000-0000-0000-0000-000000000000"]
       }
     ]
   }
@@ -43,7 +42,7 @@ run "invalid_approver_entries" {
   variables {
     check_approvals = [
       {
-        key       = "empty-approver"
+        name      = "empty-approver"
         approvers = [""]
       }
     ]
@@ -54,7 +53,7 @@ run "invalid_approver_entries" {
   ]
 }
 
-run "duplicate_kubernetes_keys" {
+run "duplicate_kubernetes_names" {
   command = plan
 
   variables {
@@ -77,17 +76,17 @@ run "duplicate_kubernetes_keys" {
   ]
 }
 
-run "duplicate_check_keys" {
+run "duplicate_check_names" {
   command = plan
 
   variables {
     check_branch_controls = [
       {
-        display_name     = "Duplicate check"
+        name             = "Duplicate check"
         allowed_branches = "refs/heads/main"
       },
       {
-        display_name     = "Duplicate check"
+        name             = "Duplicate check"
         allowed_branches = "refs/heads/main"
       }
     ]
@@ -104,11 +103,11 @@ run "invalid_business_hours_fields" {
   variables {
     check_business_hours = [
       {
-        display_name = "Invalid business hours"
-        start_time   = ""
-        end_time     = "18:00"
-        time_zone    = "UTC"
-        monday       = true
+        name       = "Invalid business hours"
+        start_time = ""
+        end_time   = "18:00"
+        time_zone  = "UTC"
+        monday     = true
       }
     ]
   }
@@ -124,7 +123,7 @@ run "invalid_rest_api_fields" {
   variables {
     check_rest_apis = [
       {
-        display_name                    = "Invalid REST API check"
+        name                            = "Invalid REST API check"
         connected_service_name_selector = ""
         connected_service_name          = "service"
         method                          = "GET"
@@ -161,7 +160,7 @@ run "invalid_minimum_approvers" {
   variables {
     check_approvals = [
       {
-        key                        = "min-approver"
+        name                       = "min-approver"
         approvers                  = ["00000000-0000-0000-0000-000000000000"]
         minimum_required_approvers = 2
       }
@@ -170,5 +169,54 @@ run "invalid_minimum_approvers" {
 
   expect_failures = [
     var.check_approvals,
+  ]
+}
+
+run "kubernetes_checks_null" {
+  command = plan
+
+  variables {
+    kubernetes_resources = [
+      {
+        service_endpoint_id = "00000000-0000-0000-0000-000000000000"
+        name                = "k8s-null-checks"
+        namespace           = "default"
+        checks              = null
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.kubernetes_resources,
+  ]
+}
+
+run "duplicate_nested_branch_controls" {
+  command = plan
+
+  variables {
+    kubernetes_resources = [
+      {
+        service_endpoint_id = "00000000-0000-0000-0000-000000000000"
+        name                = "k8s-branch"
+        namespace           = "default"
+        checks = {
+          branch_controls = [
+            {
+              name             = "duplicate"
+              allowed_branches = "refs/heads/main"
+            },
+            {
+              name             = "duplicate"
+              allowed_branches = "refs/heads/main"
+            }
+          ]
+        }
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.kubernetes_resources,
   ]
 }

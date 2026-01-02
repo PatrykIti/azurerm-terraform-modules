@@ -24,8 +24,7 @@ module "azuredevops_environments" {
 
   check_approvals = [
     {
-      key                   = "secure-approval"
-      target_resource_type  = "environment"
+      name                  = "secure-approval"
       approvers             = [data.azuredevops_group.project_collection_admins.origin_id]
       requester_can_approve = false
     }
@@ -33,9 +32,8 @@ module "azuredevops_environments" {
 
   check_exclusive_locks = [
     {
-      key                  = "secure-lock"
-      target_resource_type = "environment"
-      timeout              = 43200
+      name    = "secure-lock"
+      timeout = 43200
     }
   ]
 }

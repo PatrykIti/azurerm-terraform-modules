@@ -115,11 +115,11 @@ module "azuredevops_environments" {
 
 ## Version Compatibility Matrix
 
-| Module Version | Terraform Version | AzureRM Provider | Azure API Version |
-|----------------|-------------------|------------------|-------------------|
-| ADOEv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
+| Module Version | Terraform Version | Azure DevOps Provider |
+|----------------|-------------------|-----------------------|
+| ADOEv1.0.x | >= 1.12.2 | 1.12.2 (pinned) |
 
-**Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
+**Note**: The Azure DevOps provider version is pinned to ensure consistent behavior across all deployments.
 
 ## Module Versioning in Usage
 

@@ -61,24 +61,23 @@ module "azuredevops_environments" {
       namespace           = "default"
       service_endpoint_id = azuredevops_serviceendpoint_kubernetes.example.id
       cluster_name        = "example-aks"
+      checks = {
+        branch_controls = [
+          {
+            name                     = "Require protected branches"
+            allowed_branches         = "refs/heads/main"
+            verify_branch_protection = true
+          }
+        ]
+      }
     }
   ]
 
   check_approvals = [
     {
-      key                   = "primary-approval"
-      target_resource_type  = "environment"
+      name                  = "primary-approval"
       approvers             = [data.azuredevops_group.project_collection_admins.origin_id]
       requester_can_approve = false
-    }
-  ]
-
-  check_branch_controls = [
-    {
-      display_name             = "Require protected branches"
-      target_resource_type     = "environment"
-      allowed_branches         = "refs/heads/main"
-      verify_branch_protection = true
     }
   ]
 }
