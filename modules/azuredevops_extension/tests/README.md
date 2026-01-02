@@ -26,6 +26,14 @@ Optional version pins:
 export AZDO_EXTENSION_VERSION="1.2.3"
 ```
 
+Optional secondary extension inputs (used by complete/secure tests when provided):
+
+```bash
+export AZDO_EXTENSION_PUBLISHER_ID_2="your-second-publisher-id"
+export AZDO_EXTENSION_ID_2="your-second-extension-id"
+export AZDO_EXTENSION_VERSION_2="2.0.0"
+```
+
 ## Running Tests
 
 ### Install Dependencies

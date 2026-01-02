@@ -11,8 +11,7 @@ This module manages Azure DevOps extension resources and related configuration.
 ## Usage Notes
 
 - Use `git::https://...//modules/azuredevops_extension?ref=ADOEXvX.Y.Z` for module source.
-- Optional child resources are created only when corresponding inputs are set.
-- Use stable keys and unique names for list/object inputs to avoid address churn.
+- For multiple extensions, use module-level `for_each` with stable keys (for example, `publisher_id/extension_id`).
 
 ## Inputs (Highlights)
 
