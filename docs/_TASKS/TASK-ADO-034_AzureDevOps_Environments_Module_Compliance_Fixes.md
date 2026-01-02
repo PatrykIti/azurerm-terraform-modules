@@ -34,41 +34,92 @@ variable "name" { ... }
 variable "description" { ... }
 
 variable "kubernetes_resources" {
-  description = "Kubernetes resources attached to the environment."
+  description = "Kubernetes resources attached to the environment (checks can be nested per resource)."
   type = list(object({
     name                = string
     service_endpoint_id = string
     namespace           = string
     cluster_name        = optional(string)
     tags                = optional(list(string))
+    checks = optional(object({
+      approvals = optional(list(object({
+        name                        = string
+        approvers                  = list(string)
+        instructions               = optional(string)
+        minimum_required_approvers = optional(number)
+        requester_can_approve      = optional(bool)
+        timeout                    = optional(number)
+      })), [])
+      branch_controls = optional(list(object({
+        name                             = string
+        allowed_branches                 = optional(string)
+        verify_branch_protection         = optional(bool)
+        ignore_unknown_protection_status = optional(bool)
+        timeout                          = optional(number)
+      })), [])
+      business_hours = optional(list(object({
+        name       = string
+        start_time = string
+        end_time   = string
+        time_zone  = string
+        monday     = optional(bool)
+        tuesday    = optional(bool)
+        wednesday  = optional(bool)
+        thursday   = optional(bool)
+        friday     = optional(bool)
+        saturday   = optional(bool)
+        sunday     = optional(bool)
+        timeout    = optional(number)
+      })), [])
+      exclusive_locks = optional(list(object({
+        name    = string
+        timeout = optional(number)
+      })), [])
+      required_templates = optional(list(object({
+        name = string
+        required_templates = list(object({
+          template_path   = string
+          repository_name = string
+          repository_ref  = string
+          repository_type = optional(string)
+        }))
+      })), [])
+      rest_apis = optional(list(object({
+        name                             = string
+        connected_service_name_selector = string
+        connected_service_name          = string
+        method                          = string
+        body                            = optional(string)
+        headers                         = optional(string)
+        retry_interval                  = optional(number)
+        success_criteria                = optional(string)
+        url_suffix                      = optional(string)
+        variable_group_name             = optional(string)
+        completion_event                = optional(string)
+        timeout                         = optional(string)
+      })), [])
+    }), {})
   }))
   default = []
 }
 
-# All checks require name for stable keys. target_resource_type defaults to "environment".
-# target_resource_name is only allowed when targeting environmentResource and must reference
-# kubernetes_resources[*].name. If there is exactly one Kubernetes resource, target_resource_name
-# may be omitted and the module will target that single resource.
-
+# Environment-level checks (apply to azuredevops_environment).
+# All checks require name for stable keys.
 variable "check_approvals" {
   type = list(object({
-    name                 = string
-    target_resource_type = optional(string, "environment")
-    target_resource_name = optional(string)
-    approvers            = list(string)
-    instructions         = optional(string)
+    name                        = string
+    approvers                  = list(string)
+    instructions               = optional(string)
     minimum_required_approvers = optional(number)
     requester_can_approve      = optional(bool)
-    timeout                   = optional(number)
+    timeout                    = optional(number)
   }))
   default = []
 }
 
 variable "check_branch_controls" {
   type = list(object({
-    name                 = string
-    target_resource_type = optional(string, "environment")
-    target_resource_name = optional(string)
+    name                             = string
     allowed_branches                 = optional(string)
     verify_branch_protection         = optional(bool)
     ignore_unknown_protection_status = optional(bool)
@@ -79,9 +130,7 @@ variable "check_branch_controls" {
 
 variable "check_business_hours" {
   type = list(object({
-    name                 = string
-    target_resource_type = optional(string, "environment")
-    target_resource_name = optional(string)
+    name       = string
     start_time = string
     end_time   = string
     time_zone  = string
@@ -99,19 +148,15 @@ variable "check_business_hours" {
 
 variable "check_exclusive_locks" {
   type = list(object({
-    name                 = string
-    target_resource_type = optional(string, "environment")
-    target_resource_name = optional(string)
-    timeout              = optional(number)
+    name    = string
+    timeout = optional(number)
   }))
   default = []
 }
 
 variable "check_required_templates" {
   type = list(object({
-    name                 = string
-    target_resource_type = optional(string, "environment")
-    target_resource_name = optional(string)
+    name = string
     required_templates = list(object({
       template_path   = string
       repository_name = string
@@ -124,9 +169,7 @@ variable "check_required_templates" {
 
 variable "check_rest_apis" {
   type = list(object({
-    name                 = string
-    target_resource_type = optional(string, "environment")
-    target_resource_name = optional(string)
+    name                             = string
     connected_service_name_selector = string
     connected_service_name          = string
     method                          = string
@@ -144,11 +187,10 @@ variable "check_rest_apis" {
 ```
 
 Validation rules (summary):
-- All `name` fields are required and unique per list.
-- `target_resource_type` in ["environment", "environmentResource"].
-- When `target_resource_type = "environmentResource"`:
-  - if `length(kubernetes_resources) == 1`, `target_resource_name` may be omitted (auto-target the single resource).
-  - if `length(kubernetes_resources) > 1`, `target_resource_name` is required and must match a name in `kubernetes_resources`.
+- `kubernetes_resources[*].name` is required and unique.
+- All `name` fields are required and unique per list (root checks and nested checks per resource).
+- Nested checks are allowed only under `kubernetes_resources[*].checks` and always target that resource.
+- Root-level checks always target the environment resource.
 - Disallow external environment IDs in all inputs.
 
 ## Proposed Main.tf Shape (Draft)
@@ -172,22 +214,13 @@ resource "azuredevops_environment_resource_kubernetes" "environment_resource_kub
   tags                = each.value.tags
 }
 
-resource "azuredevops_check_approval" "check_approval" {
+# Environment-level checks
+resource "azuredevops_check_approval" "check_approval_environment" {
   for_each = { for check in var.check_approvals : check.name => check }
 
   project_id           = var.project_id
-  target_resource_type = each.value.target_resource_type
-  target_resource_id = each.value.target_resource_type == "environment" ? (
-    azuredevops_environment.environment.id
-  ) : (
-    each.value.target_resource_name != null ? (
-      azuredevops_environment_resource_kubernetes.environment_resource_kubernetes[each.value.target_resource_name].id
-    ) : (
-      azuredevops_environment_resource_kubernetes.environment_resource_kubernetes[
-        one(keys(azuredevops_environment_resource_kubernetes.environment_resource_kubernetes))
-      ].id
-    )
-  )
+  target_resource_type = "environment"
+  target_resource_id   = azuredevops_environment.environment.id
   approvers                  = each.value.approvers
   instructions               = each.value.instructions
   minimum_required_approvers = each.value.minimum_required_approvers
@@ -195,34 +228,44 @@ resource "azuredevops_check_approval" "check_approval" {
   timeout                    = each.value.timeout
 }
 
-resource "azuredevops_check_branch_control" "check_branch_control" {
+resource "azuredevops_check_branch_control" "check_branch_control_environment" {
   for_each = { for check in var.check_branch_controls : check.name => check }
 
   project_id           = var.project_id
   display_name         = each.value.name
-  target_resource_type = each.value.target_resource_type
-  target_resource_id = each.value.target_resource_type == "environment" ? (
-    azuredevops_environment.environment.id
-  ) : (
-    each.value.target_resource_name != null ? (
-      azuredevops_environment_resource_kubernetes.environment_resource_kubernetes[each.value.target_resource_name].id
-    ) : (
-      azuredevops_environment_resource_kubernetes.environment_resource_kubernetes[
-        one(keys(azuredevops_environment_resource_kubernetes.environment_resource_kubernetes))
-      ].id
-    )
-  )
+  target_resource_type = "environment"
+  target_resource_id   = azuredevops_environment.environment.id
   allowed_branches                 = each.value.allowed_branches
   verify_branch_protection         = each.value.verify_branch_protection
   ignore_unknown_protection_status = each.value.ignore_unknown_protection_status
   timeout                          = each.value.timeout
 }
 
-# Repeat the same target resolution pattern for:
-# - azuredevops_check_business_hours (display_name = name)
-# - azuredevops_check_exclusive_lock
-# - azuredevops_check_required_template
-# - azuredevops_check_rest_api (display_name = name)
+# Kubernetes-level checks (per resource)
+resource "azuredevops_check_branch_control" "check_branch_control_kubernetes" {
+  for_each = {
+    for item in flatten([
+      for resource in var.kubernetes_resources : [
+        for check in try(resource.checks.branch_controls, []) : {
+          resource_name = resource.name
+          check         = check
+        }
+      ]
+    ]) : "${item.resource_name}:${item.check.name}" => item
+  }
+
+  project_id           = var.project_id
+  display_name         = each.value.check.name
+  target_resource_type = "environmentResource"
+  target_resource_id   = azuredevops_environment_resource_kubernetes.environment_resource_kubernetes[each.value.resource_name].id
+  allowed_branches                 = each.value.check.allowed_branches
+  verify_branch_protection         = each.value.check.verify_branch_protection
+  ignore_unknown_protection_status = each.value.check.ignore_unknown_protection_status
+  timeout                          = each.value.check.timeout
+}
+
+# Repeat the same pattern for other check types:
+# - approvals, business_hours, exclusive_locks, required_templates, rest_apis
 ```
 
 ## Proposed Outputs.tf Shape (Draft)
@@ -242,18 +285,54 @@ output "kubernetes_resource_ids" {
 }
 
 output "check_ids" {
-  description = "Map of check IDs grouped by check type and keyed by name."
+  description = "Map of check IDs grouped by target (environment vs kubernetes resources)."
   value = {
-    approvals = { for key, check in azuredevops_check_approval.check_approval : key => check.id }
-    branch_controls = { for key, check in azuredevops_check_branch_control.check_branch_control : key => check.id }
-    business_hours = { for key, check in azuredevops_check_business_hours.check_business_hours : key => check.id }
-    exclusive_locks = { for key, check in azuredevops_check_exclusive_lock.check_exclusive_lock : key => check.id }
-    required_templates = { for key, check in azuredevops_check_required_template.check_required_template : key => check.id }
-    rest_apis = { for key, check in azuredevops_check_rest_api.check_rest_api : key => check.id }
+    environment = {
+      approvals = { for key, check in azuredevops_check_approval.check_approval_environment : key => check.id }
+      branch_controls = { for key, check in azuredevops_check_branch_control.check_branch_control_environment : key => check.id }
+      business_hours = { for key, check in azuredevops_check_business_hours.check_business_hours_environment : key => check.id }
+      exclusive_locks = { for key, check in azuredevops_check_exclusive_lock.check_exclusive_lock_environment : key => check.id }
+      required_templates = { for key, check in azuredevops_check_required_template.check_required_template_environment : key => check.id }
+      rest_apis = { for key, check in azuredevops_check_rest_api.check_rest_api_environment : key => check.id }
+    }
+    kubernetes_resources = {
+      for resource_name in keys(azuredevops_environment_resource_kubernetes.environment_resource_kubernetes) :
+      resource_name => {
+        approvals = {
+          for key, check in azuredevops_check_approval.check_approval_kubernetes :
+          split(":", key)[1] => check.id
+          if split(":", key)[0] == resource_name
+        }
+        branch_controls = {
+          for key, check in azuredevops_check_branch_control.check_branch_control_kubernetes :
+          split(":", key)[1] => check.id
+          if split(":", key)[0] == resource_name
+        }
+        business_hours = {
+          for key, check in azuredevops_check_business_hours.check_business_hours_kubernetes :
+          split(":", key)[1] => check.id
+          if split(":", key)[0] == resource_name
+        }
+        exclusive_locks = {
+          for key, check in azuredevops_check_exclusive_lock.check_exclusive_lock_kubernetes :
+          split(":", key)[1] => check.id
+          if split(":", key)[0] == resource_name
+        }
+        required_templates = {
+          for key, check in azuredevops_check_required_template.check_required_template_kubernetes :
+          split(":", key)[1] => check.id
+          if split(":", key)[0] == resource_name
+        }
+        rest_apis = {
+          for key, check in azuredevops_check_rest_api.check_rest_api_kubernetes :
+          split(":", key)[1] => check.id
+          if split(":", key)[0] == resource_name
+        }
+      }
+    }
   }
 }
 ```
-
 ## Scope
 
 - `modules/azuredevops_environments/main.tf`
@@ -285,9 +364,10 @@ Outside module:
 ## Acceptance Criteria
 
 - Subresources always depend on `azuredevops_environment` and cannot target external environments.
+- Kubernetes checks are nested under `kubernetes_resources[*].checks` and always target that resource; root-level checks target the environment only.
 - Inputs no longer accept external environment IDs; validations provide explicit errors and guidance.
-- for_each keys use stable name/display_name or required key fields (no target_resource_id fallback).
-- Defaults for `target_resource_type` are defined in input schema, removing `coalesce` from resource arguments.
+- for_each keys use stable `name` (and `display_name = name` where required), with no target-based fallbacks.
+- Target resolution is implicit by placement (root vs nested), removing `target_resource_type`/`target_resource_id` inputs and `coalesce` defaults.
 - Module root no longer contains `.terraform/` or `.terraform.lock.hcl`.
 - `azuredevops_environment_resource_kubernetes` local name matches the resource type and references are updated consistently.
 - Example README terraform-docs sections match their `main.tf` (providers and module source).
@@ -297,9 +377,10 @@ Outside module:
 ## Implementation Checklist
 
 - [ ] Remove `.terraform/` and `.terraform.lock.hcl` from `modules/azuredevops_environments` and add to ignore list if needed.
-- [ ] Remove external environment ID inputs or gate them with validation; introduce module-scoped references for checks targeting kubernetes resources.
-- [ ] Define `target_resource_type` defaults in `variables.tf` and remove `coalesce` from resource arguments where possible.
-- [ ] Require stable keys for check types without display_name; use name/display_name for other for_each keys.
+- [ ] Remove external environment ID inputs and move Kubernetes checks under `kubernetes_resources[*].checks`; keep root checks for environment-only.
+- [ ] Update check resources to target environment or kubernetes implicitly (no `target_resource_type`/`target_resource_id` inputs).
+- [ ] Require stable `name` keys for all checks; map `display_name = name` where needed.
+- [ ] Update outputs to group environment vs kubernetes checks by resource name.
 - [ ] Rename the Kubernetes environment resource local name and update references in outputs, tests, README, and import docs.
 - [ ] Regenerate terraform-docs for examples and verify README alignment.
 - [ ] Add a secure example reference to `SECURITY.md`.

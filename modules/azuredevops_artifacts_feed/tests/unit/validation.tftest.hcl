@@ -14,6 +14,7 @@ run "missing_name" {
   command = plan
 
   variables {
+    name       = ""
     project_id = "00000000-0000-0000-0000-000000000000"
   }
 
@@ -26,25 +27,12 @@ run "missing_project_id" {
   command = plan
 
   variables {
-    name = "example-feed"
+    name       = "example-feed"
+    project_id = ""
   }
 
   expect_failures = [
     var.project_id,
-  ]
-}
-
-run "invalid_description" {
-  command = plan
-
-  variables {
-    name        = "example-feed"
-    project_id  = "00000000-0000-0000-0000-000000000000"
-    description = ""
-  }
-
-  expect_failures = [
-    var.description,
   ]
 }
 

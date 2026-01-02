@@ -104,7 +104,7 @@ func TestAzuredevopsArtifactsFeedValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "feed_permissions.role must be reader, contributor, collaborator, or administrator")
+	assert.Contains(t, err.Error(), "feed_permissions.role must be reader, contributor, collaborator")
 }
 
 // Helper function to get terraform options

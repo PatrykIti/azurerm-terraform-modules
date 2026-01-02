@@ -69,7 +69,6 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_description"></a> [description](#input\_description) | Optional description for the Azure DevOps feed. | `string` | `null` | no |
 | <a name="input_features"></a> [features](#input\_features) | Feed feature flags for azuredevops\_feed.features. Set to null to leave unmanaged. | <pre>object({<br/>    permanent_delete = optional(bool)<br/>    restore          = optional(bool)<br/>  })</pre> | `null` | no |
 | <a name="input_feed_permissions"></a> [feed\_permissions](#input\_feed\_permissions) | List of feed permissions to assign. | <pre>list(object({<br/>    key                 = optional(string)<br/>    identity_descriptor = string<br/>    role                = string<br/>    display_name        = optional(string)<br/>  }))</pre> | `[]` | no |
 | <a name="input_feed_retention_policies"></a> [feed\_retention\_policies](#input\_feed\_retention\_policies) | List of feed retention policies to manage. | <pre>list(object({<br/>    key                                       = optional(string)<br/>    count_limit                               = number<br/>    days_to_keep_recently_downloaded_packages = number<br/>  }))</pre> | `[]` | no |

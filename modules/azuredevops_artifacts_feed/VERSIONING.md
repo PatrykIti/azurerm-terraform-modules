@@ -115,11 +115,11 @@ module "azuredevops_artifacts_feed" {
 
 ## Version Compatibility Matrix
 
-| Module Version | Terraform Version | AzureRM Provider | Azure API Version |
-|----------------|-------------------|------------------|-------------------|
-| ADOAFv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
+| Module Version | Terraform Version | Azure DevOps Provider | Azure DevOps API Version |
+|----------------|-------------------|-----------------------|---------------------------|
+| ADOAFv1.0.x | >= 1.12.2 | 1.12.2 (pinned) | TBD |
 
-**Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
+**Note**: The Azure DevOps provider version is pinned to ensure consistent behavior across all deployments.
 
 ## Module Versioning in Usage
 
