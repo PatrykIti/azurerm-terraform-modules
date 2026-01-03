@@ -8,6 +8,7 @@ This directory contains automated tests for the Kubernetes Secrets Terraform mod
 2. **Terraform**: Version 1.12.2 or later
 3. **Azure CLI**: Authenticated with appropriate permissions
 4. **Azure Service Principal**: With Contributor access to the test subscription
+5. **kubectl**: Required for `TestSecureKubernetesSecrets` to install ESO CRDs (v1.18+ for server-side apply)
 
 ## Environment Variables
 
@@ -19,6 +20,7 @@ export ARM_TENANT_ID="your-tenant-id"
 export ARM_CLIENT_ID="your-client-id"
 export ARM_CLIENT_SECRET="your-client-secret"
 export ARM_LOCATION="northeurope"  # Optional, defaults to northeurope
+export ESO_CRD_URL="https://raw.githubusercontent.com/external-secrets/external-secrets/main/deploy/crds/bundle.yaml" # Optional override
 ```
 
 ## Running Tests

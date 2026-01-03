@@ -78,13 +78,15 @@ func TestSecureKubernetesSecrets(t *testing.T) {
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_secrets/tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		terraform.Destroy(t, terraformOptions)
+		destroyWithoutRefresh(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		applyWithClusterFirst(t, terraformOptions)
+		applyWithClusterFirstAndSetup(t, terraformOptions, func() {
+			ensureESOCRDs(t, terraformOptions)
+		})
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
@@ -170,11 +172,24 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 }
 
 func applyWithClusterFirst(t testing.TB, terraformOptions *terraform.Options) {
+	applyWithClusterFirstAndSetup(t, terraformOptions, nil)
+}
+
+func applyWithClusterFirstAndSetup(t testing.TB, terraformOptions *terraform.Options, setup func()) {
 	terraform.Init(t, terraformOptions)
 
 	targetOptions := *terraformOptions
 	targetOptions.Targets = []string{"module.kubernetes_cluster"}
 
 	terraform.Apply(t, &targetOptions)
+	if setup != nil {
+		setup()
+	}
 	terraform.Apply(t, terraformOptions)
+}
+
+func destroyWithoutRefresh(t testing.TB, terraformOptions *terraform.Options) {
+	// Avoid refresh to keep kube_config values for the Kubernetes provider during cleanup.
+	args := terraform.FormatArgs(terraformOptions, "destroy", "-auto-approve", "-input=false", "-refresh=false")
+	terraform.RunTerraformCommand(t, terraformOptions, args...)
 }

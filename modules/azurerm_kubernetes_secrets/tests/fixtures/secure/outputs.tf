@@ -17,3 +17,9 @@ output "resource_group_name" {
   description = "Resource group name"
   value       = azurerm_resource_group.test.name
 }
+
+output "kube_config_raw" {
+  description = "Kubeconfig for test automation"
+  value       = module.kubernetes_cluster.kube_config_raw
+  sensitive   = true
+}
