@@ -14,6 +14,9 @@ This example demonstrates the **CSI** strategy using `SecretProviderClass` with 
 
 ## Usage
 
+If the AKS cluster is created in the same Terraform configuration/state, follow the two-stage
+apply below. If you reference an existing AKS cluster, you can skip stage 1.
+
 ```bash
 terraform init
 # Stage 1: create AKS first (kubernetes_manifest requires a live cluster)

@@ -29,6 +29,9 @@ This module provides a unified, user-friendly API for managing Kubernetes secret
 
 `kubernetes_manifest` requires a live cluster (and CRDs) at plan time. For brand-new AKS clusters,
 apply in two stages: create the cluster first, then apply this module once CSI/ESO is installed.
+If the AKS cluster and this module live in the same Terraform configuration/state, use a two-step
+apply (target the cluster first, then install CSI/ESO and run `terraform apply` again). If AKS is
+managed elsewhere, make sure kubeconfig and the required CRDs exist before applying this module.
 
 ## Usage
 

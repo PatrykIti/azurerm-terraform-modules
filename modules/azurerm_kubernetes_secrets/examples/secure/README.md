@@ -14,6 +14,10 @@ This example demonstrates the **ESO** strategy with Workload Identity.
 
 ## Usage
 
+If the AKS cluster is created in the same Terraform configuration/state, follow the two-stage
+apply below. If you reference an existing AKS cluster, skip stage 1 and install ESO/CRDs before
+the final apply.
+
 ```bash
 terraform init
 # Stage 1: create AKS first (kubernetes_manifest requires a live cluster)
