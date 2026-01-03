@@ -169,7 +169,7 @@ resource "azurerm_key_vault" "example" {
 
   sku_name = "standard"
 
-  enable_rbac_authorization = true
+  rbac_authorization_enabled = true
   purge_protection_enabled  = false # Disabled for easy cleanup in examples
 }
 
