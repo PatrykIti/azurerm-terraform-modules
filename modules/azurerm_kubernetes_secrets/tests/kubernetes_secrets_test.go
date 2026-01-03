@@ -84,7 +84,7 @@ func TestSecureKubernetesSecrets(t *testing.T) {
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
+		applyWithClusterFirst(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
