@@ -1,31 +1,4 @@
 # Azure DevOps Environments
-
-locals {
-  check_approvals = {
-    for check in var.check_approvals : check.name => check
-  }
-
-  check_branch_controls = {
-    for check in var.check_branch_controls : check.name => check
-  }
-
-  check_business_hours = {
-    for check in var.check_business_hours : check.name => check
-  }
-
-  check_exclusive_locks = {
-    for check in var.check_exclusive_locks : check.name => check
-  }
-
-  check_required_templates = {
-    for check in var.check_required_templates : check.name => check
-  }
-
-  check_rest_apis = {
-    for check in var.check_rest_apis : check.name => check
-  }
-}
-
 resource "azuredevops_environment" "environment" {
   project_id  = var.project_id
   name        = var.name
@@ -45,7 +18,7 @@ resource "azuredevops_environment_resource_kubernetes" "environment_resource_kub
 }
 
 resource "azuredevops_check_approval" "check_approval" {
-  for_each = local.check_approvals
+  for_each = { for check in var.check_approvals : check.name => check }
 
   project_id                 = var.project_id
   target_resource_type       = "environment"
@@ -58,7 +31,7 @@ resource "azuredevops_check_approval" "check_approval" {
 }
 
 resource "azuredevops_check_branch_control" "check_branch_control" {
-  for_each = local.check_branch_controls
+  for_each = { for check in var.check_branch_controls : check.name => check }
 
   project_id                       = var.project_id
   display_name                     = each.value.name
@@ -71,7 +44,7 @@ resource "azuredevops_check_branch_control" "check_branch_control" {
 }
 
 resource "azuredevops_check_business_hours" "check_business_hours" {
-  for_each = local.check_business_hours
+  for_each = { for check in var.check_business_hours : check.name => check }
 
   project_id           = var.project_id
   display_name         = each.value.name
@@ -91,7 +64,7 @@ resource "azuredevops_check_business_hours" "check_business_hours" {
 }
 
 resource "azuredevops_check_exclusive_lock" "check_exclusive_lock" {
-  for_each = local.check_exclusive_locks
+  for_each = { for check in var.check_exclusive_locks : check.name => check }
 
   project_id           = var.project_id
   target_resource_type = "environment"
@@ -100,7 +73,7 @@ resource "azuredevops_check_exclusive_lock" "check_exclusive_lock" {
 }
 
 resource "azuredevops_check_required_template" "check_required_template" {
-  for_each = local.check_required_templates
+  for_each = { for check in var.check_required_templates : check.name => check }
 
   project_id           = var.project_id
   target_resource_type = "environment"
@@ -118,7 +91,7 @@ resource "azuredevops_check_required_template" "check_required_template" {
 }
 
 resource "azuredevops_check_rest_api" "check_rest_api" {
-  for_each = local.check_rest_apis
+  for_each = { for check in var.check_rest_apis : check.name => check }
 
   project_id                      = var.project_id
   display_name                    = each.value.name
