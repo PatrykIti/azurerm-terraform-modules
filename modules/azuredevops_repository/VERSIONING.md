@@ -115,11 +115,11 @@ module "azuredevops_repository" {
 
 ## Version Compatibility Matrix
 
-| Module Version | Terraform Version | AzureRM Provider | Azure API Version |
+| Module Version | Terraform Version | Azure DevOps Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| ADORv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
+| ADORv1.0.x | >= 1.3.0 | 1.12.2 (pinned) | TBD |
 
-**Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
+**Note**: The Azure DevOps provider version is pinned to ensure consistent behavior across all deployments.
 
 ## Module Versioning in Usage
 

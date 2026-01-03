@@ -35,7 +35,7 @@ module "azuredevops_environments" {
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates creating a basic Azure DevOps environment.
-- [Complete](examples/complete) - This example demonstrates an environment with a Kubernetes resource, approval checks, and branch control.
+- [Complete](examples/complete) - This example demonstrates an environment with a Kubernetes resource and environment-level approvals and branch control.
 - [Secure](examples/secure) - This example demonstrates environment approvals, exclusive locks, and business hours.
 <!-- END_EXAMPLES -->
 
