@@ -83,7 +83,12 @@ test-complete: check-env deps
 # Run security tests
 test-secure: check-env deps
 	@echo "Running security tests..."
-	$(call run_with_log,secure,go test -v -timeout $(TIMEOUT) -run TestSecureKubernetesSecrets ./...)
+	$(call run_with_log,secure,go test -v -timeout $(TIMEOUT) -run ^TestSecureKubernetesSecrets$$ ./...)
+
+# Run security tests with Terraform-managed ESO install
+test-secure-eso: check-env deps
+	@echo "Running security tests (ESO install)..."
+	$(call run_with_log,secure-eso,go test -v -timeout $(TIMEOUT) -run ^TestSecureKubernetesSecretsESOInstall$$ ./...)
 
 # Run network tests
 test-network: check-env deps
@@ -196,6 +201,7 @@ help:
 	@echo "  make test-basic          - Run basic tests only"
 	@echo "  make test-complete       - Run complete tests"
 	@echo "  make test-secure         - Run security tests"
+	@echo "  make test-secure-eso     - Run security tests (ESO install)"
 	@echo "  make test-network        - Run network tests"
 	@echo "  make test-validation     - Run validation tests"
 	@echo "  make test-integration    - Run integration tests"

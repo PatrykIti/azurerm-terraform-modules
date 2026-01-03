@@ -1,4 +1,4 @@
-# Secure AKS Secrets Example (ESO + Workload Identity + Helm)
+# Secure fixture for kubernetes secrets (ESO + Workload Identity + Helm)
 
 terraform {
   required_version = ">= 1.12.2"
@@ -20,43 +20,39 @@ terraform {
 }
 
 provider "azurerm" {
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-  }
+  features {}
 }
 
 data "azurerm_client_config" "current" {}
 
-resource "azurerm_resource_group" "example" {
-  name     = var.resource_group_name
+resource "azurerm_resource_group" "test" {
+  name     = "rg-akssec-sec-${var.random_suffix}"
   location = var.location
 }
 
-resource "azurerm_virtual_network" "example" {
-  name                = var.virtual_network_name
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+resource "azurerm_virtual_network" "test" {
+  name                = "vnet-akssec-sec-${var.random_suffix}"
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
   address_space       = ["10.2.0.0/16"]
 }
 
-resource "azurerm_subnet" "example" {
-  name                 = var.subnet_name
-  resource_group_name  = azurerm_resource_group.example.name
-  virtual_network_name = azurerm_virtual_network.example.name
+resource "azurerm_subnet" "test" {
+  name                 = "snet-akssec-sec-${var.random_suffix}"
+  resource_group_name  = azurerm_resource_group.test.name
+  virtual_network_name = azurerm_virtual_network.test.name
   address_prefixes     = ["10.2.1.0/24"]
 }
 
 module "kubernetes_cluster" {
-  source = "../../../azurerm_kubernetes_cluster"
+  source = "../../../../azurerm_kubernetes_cluster"
 
-  name                = var.cluster_name
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name                = "akssec-sec-${var.random_suffix}"
+  resource_group_name = azurerm_resource_group.test.name
+  location            = azurerm_resource_group.test.location
 
   dns_config = {
-    dns_prefix = var.dns_prefix
+    dns_prefix = "akssec-sec-${var.random_suffix}"
   }
 
   identity = {
@@ -67,7 +63,7 @@ module "kubernetes_cluster" {
     name           = "default"
     vm_size        = "Standard_E2s_v3"
     node_count     = 2
-    vnet_subnet_id = azurerm_subnet.example.id
+    vnet_subnet_id = azurerm_subnet.test.id
   }
 
   network_profile = {
@@ -83,7 +79,7 @@ module "kubernetes_cluster" {
   }
 
   tags = {
-    Environment = "Production"
+    Environment = "Test"
     Example     = "Secure"
   }
 }
@@ -112,17 +108,17 @@ resource "kubernetes_namespace_v1" "app" {
   depends_on = [module.kubernetes_cluster]
 }
 
-resource "azurerm_key_vault" "example" {
-  name                       = var.key_vault_name
-  location                   = azurerm_resource_group.example.location
-  resource_group_name        = azurerm_resource_group.example.name
+resource "azurerm_key_vault" "test" {
+  name                       = "kv-akssec-sec-${var.random_suffix}"
+  location                   = azurerm_resource_group.test.location
+  resource_group_name        = azurerm_resource_group.test.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   rbac_authorization_enabled = true
   sku_name                   = "standard"
 }
 
 resource "azurerm_role_assignment" "kv_admin" {
-  scope                = azurerm_key_vault.example.id
+  scope                = azurerm_key_vault.test.id
   role_definition_name = "Key Vault Secrets Officer"
   principal_id         = data.azurerm_client_config.current.object_id
 }
@@ -130,20 +126,20 @@ resource "azurerm_role_assignment" "kv_admin" {
 resource "azurerm_key_vault_secret" "db_password" {
   name         = "db-password"
   value        = "change-me"
-  key_vault_id = azurerm_key_vault.example.id
+  key_vault_id = azurerm_key_vault.test.id
 
   depends_on = [azurerm_role_assignment.kv_admin]
 }
 
 resource "azurerm_user_assigned_identity" "eso" {
-  name                = "id-aks-secrets-eso"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  name                = "id-akssec-eso-${var.random_suffix}"
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
 }
 
 resource "azurerm_federated_identity_credential" "eso" {
-  name                = "eso-fic"
-  resource_group_name = azurerm_resource_group.example.name
+  name                = "eso-fic-${var.random_suffix}"
+  resource_group_name = azurerm_resource_group.test.name
   parent_id           = azurerm_user_assigned_identity.eso.id
   issuer              = module.kubernetes_cluster.oidc_issuer_url
   subject             = "system:serviceaccount:app:eso-sa"
@@ -151,7 +147,7 @@ resource "azurerm_federated_identity_credential" "eso" {
 }
 
 resource "azurerm_role_assignment" "kv_eso" {
-  scope                = azurerm_key_vault.example.id
+  scope                = azurerm_key_vault.test.id
   role_definition_name = "Key Vault Secrets User"
   principal_id         = azurerm_user_assigned_identity.eso.principal_id
 }
@@ -184,7 +180,7 @@ resource "helm_release" "external_secrets" {
 }
 
 module "kubernetes_secrets" {
-  source = "../.."
+  source = "../../.."
 
   strategy  = "eso"
   namespace = kubernetes_namespace_v1.app.metadata[0].name
@@ -195,7 +191,7 @@ module "kubernetes_secrets" {
       kind           = "SecretStore"
       name           = "kv-store"
       tenant_id      = module.kubernetes_cluster.identity.tenant_id
-      key_vault_name = azurerm_key_vault.example.name
+      key_vault_name = azurerm_key_vault.test.name
       auth = {
         type = "workload_identity"
         workload_identity = {
@@ -207,8 +203,7 @@ module "kubernetes_secrets" {
     }
     external_secrets = [
       {
-        name             = "db-secret"
-        refresh_interval = "1h"
+        name = "db-secret"
         remote_ref = {
           name    = "db-password"
           version = null

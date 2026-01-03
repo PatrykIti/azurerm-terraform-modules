@@ -11,6 +11,7 @@ test_suites:
     tests:
       - TestCompleteKubernetesSecrets
       - TestSecureKubernetesSecrets
+      - TestSecureKubernetesSecretsESOInstall
       - TestNetworkKubernetesSecrets
     parallel: true
     timeout: 45m

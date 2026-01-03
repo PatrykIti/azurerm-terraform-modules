@@ -102,6 +102,39 @@ func TestSecureKubernetesSecrets(t *testing.T) {
 	})
 }
 
+// Test secure Kubernetes Secrets configuration with Terraform-managed ESO install
+func TestSecureKubernetesSecretsESOInstall(t *testing.T) {
+	t.Parallel()
+
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_kubernetes_secrets/tests/fixtures/secure-eso")
+	defer test_structure.RunTestStage(t, "cleanup", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		destroyWithoutRefresh(t, terraformOptions)
+	})
+
+	test_structure.RunTestStage(t, "deploy", func() {
+		terraformOptions := getTerraformOptions(t, testFolder)
+		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
+		applyWithClusterFirstAndSetup(t, terraformOptions, func() {
+			targetOptions := *terraformOptions
+			targetOptions.Targets = []string{"helm_release.external_secrets"}
+			terraform.Apply(t, &targetOptions)
+		})
+	})
+
+	test_structure.RunTestStage(t, "validate", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+
+		strategy := terraform.Output(t, terraformOptions, "strategy")
+		secretStoreName := terraform.Output(t, terraformOptions, "secret_store_name")
+		externalSecretNames := terraform.OutputList(t, terraformOptions, "external_secret_names")
+
+		assert.Equal(t, "eso", strategy)
+		assert.NotEmpty(t, secretStoreName)
+		assert.Greater(t, len(externalSecretNames), 0)
+	})
+}
+
 // Test additional fixture (network naming scenario)
 func TestNetworkKubernetesSecrets(t *testing.T) {
 	t.Parallel()

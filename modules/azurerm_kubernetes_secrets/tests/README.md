@@ -49,6 +49,13 @@ make test-quick
 make test-integration
 ```
 
+### Run Secure Tests Only
+
+```bash
+make test-secure
+make test-secure-eso
+```
+
 ### Run Specific Test
 
 ```bash
@@ -72,6 +79,7 @@ The `fixtures/` directory contains Terraform configurations for different test s
 - `fixtures/basic/` - Manual strategy configuration
 - `fixtures/complete/` - CSI strategy configuration
 - `fixtures/secure/` - ESO strategy configuration
+- `fixtures/secure-eso/` - ESO strategy with Terraform-managed ESO install (Helm)
 - `fixtures/network/` - Network scenario fixture (manual)
 - `fixtures/negative/` - Negative test cases
 

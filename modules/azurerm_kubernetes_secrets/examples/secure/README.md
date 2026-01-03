@@ -1,38 +1,34 @@
-# Secure AKS Secrets Example (ESO + Workload Identity)
+# Secure AKS Secrets Example (ESO + Workload Identity + Helm)
 
 This example demonstrates the **ESO** strategy with Workload Identity.
 
 ## Features
 
 - AKS with Workload Identity enabled
+- ESO installed via Helm (CRDs included)
 - User-assigned identity + federated identity credential
 - SecretStore + ExternalSecret in the cluster
 
 ## Prerequisites
 
-- External Secrets Operator installed in the cluster
+- Azure access with permissions to create AKS and Key Vault resources
+- Terraform 1.12.2+
 
 ## Usage
 
-If the AKS cluster is created in the same Terraform configuration/state, follow the two-stage
-apply below. If you reference an existing AKS cluster, skip stage 1 and install ESO/CRDs before
-the final apply.
+This example installs ESO via the Helm provider. When the AKS cluster is created in the same
+Terraform configuration/state, apply in stages so the CRDs exist before the ESO resources are planned.
+If you reuse an existing AKS cluster, skip stage 1.
 
 ```bash
 terraform init
-# Stage 1: create AKS first (kubernetes_manifest requires a live cluster)
+# Stage 1: create AKS first (providers need a live cluster)
 terraform apply -target=module.kubernetes_cluster
 
-# Fetch kubeconfig for Helm/kubectl, install ESO, then wait for CRDs
-az aks get-credentials -g <resource_group_name> -n <cluster_name> --overwrite-existing
-helm repo add external-secrets https://charts.external-secrets.io
-helm repo update
-helm upgrade --install external-secrets external-secrets/external-secrets \
-  -n external-secrets --create-namespace --set installCRDs=true
-kubectl wait --for=condition=Established --timeout=120s crd/secretstores.external-secrets.io
-kubectl wait --for=condition=Established --timeout=120s crd/externalsecrets.external-secrets.io
+# Stage 2: install ESO + CRDs via Helm
+terraform apply -target=helm_release.external_secrets
 
-# Apply the SecretStore/ExternalSecret
+# Stage 3: apply the SecretStore/ExternalSecret
 terraform apply
 ```
 
