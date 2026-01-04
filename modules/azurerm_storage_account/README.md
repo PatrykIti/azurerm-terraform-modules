@@ -73,13 +73,13 @@ module "storage_account" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.43.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.57.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.43.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.57.0 |
 
 ## Modules
 
@@ -89,14 +89,16 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_storage_account.storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/storage_account) | resource |
-| [azurerm_storage_account_queue_properties.queue_properties](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/storage_account_queue_properties) | resource |
-| [azurerm_storage_account_static_website.static_website](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/storage_account_static_website) | resource |
-| [azurerm_storage_container.storage_container](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/storage_container) | resource |
-| [azurerm_storage_management_policy.storage_management_policy](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/storage_management_policy) | resource |
-| [azurerm_storage_queue.storage_queue](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/storage_queue) | resource |
-| [azurerm_storage_share.storage_share](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/storage_share) | resource |
-| [azurerm_storage_table.storage_table](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/storage_table) | resource |
+| [azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
+| [azurerm_storage_account.storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/storage_account) | resource |
+| [azurerm_storage_account_queue_properties.queue_properties](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/storage_account_queue_properties) | resource |
+| [azurerm_storage_account_static_website.static_website](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/storage_account_static_website) | resource |
+| [azurerm_storage_container.storage_container](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/storage_container) | resource |
+| [azurerm_storage_management_policy.storage_management_policy](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/storage_management_policy) | resource |
+| [azurerm_storage_queue.storage_queue](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/storage_queue) | resource |
+| [azurerm_storage_share.storage_share](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/storage_share) | resource |
+| [azurerm_storage_table.storage_table](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/storage_table) | resource |
+| [azurerm_monitor_diagnostic_categories.storage](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/data-sources/monitor_diagnostic_categories) | data source |
 
 ## Inputs
 
@@ -113,6 +115,7 @@ No modules.
 | <a name="input_cross_tenant_replication_enabled"></a> [cross\_tenant\_replication\_enabled](#input\_cross\_tenant\_replication\_enabled) | Should cross Tenant replication be enabled? Defaults to false. | `bool` | `null` | no |
 | <a name="input_custom_domain"></a> [custom\_domain](#input\_custom\_domain) | Custom domain configuration for the storage account. | <pre>object({<br/>    name          = string<br/>    use_subdomain = optional(bool)<br/>  })</pre> | `null` | no |
 | <a name="input_default_to_oauth_authentication"></a> [default\_to\_oauth\_authentication](#input\_default\_to\_oauth\_authentication) | Default to Azure Active Directory authorization in the Azure portal when accessing the Storage Account. The default value is false. This will have no effect when the account is not in the same tenant as your Azure subscription. | `bool` | `null` | no |
+| <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Diagnostic settings for the storage account and services (blob/queue/file/table/dfs).<br/><br/>Each entry creates a separate azurerm\_monitor\_diagnostic\_setting for the selected scope.<br/>Use areas to group categories (read/write/delete/transaction/capacity) or provide explicit<br/>log\_categories / metric\_categories. Entries with no available categories are skipped and<br/>reported in diagnostic\_settings\_skipped. | <pre>list(object({<br/>    name                           = string<br/>    scope                          = optional(string, "storage_account")<br/>    areas                          = optional(list(string))<br/>    log_categories                 = optional(list(string))<br/>    metric_categories              = optional(list(string))<br/>    log_analytics_workspace_id     = optional(string)<br/>    log_analytics_destination_type = optional(string)<br/>    storage_account_id             = optional(string)<br/>    eventhub_authorization_rule_id = optional(string)<br/>    eventhub_name                  = optional(string)<br/>  }))</pre> | `[]` | no |
 | <a name="input_edge_zone"></a> [edge\_zone](#input\_edge\_zone) | Specifies the Edge Zone within the Azure Region where this Storage Account should exist. Defaults to null for backward compatibility. | `string` | `null` | no |
 | <a name="input_encryption"></a> [encryption](#input\_encryption) | Encryption configuration for the storage account. | <pre>object({<br/>    enabled                           = optional(bool, true)<br/>    infrastructure_encryption_enabled = optional(bool, true)<br/>    key_vault_key_id                  = optional(string)<br/>    user_assigned_identity_id         = optional(string)<br/>  })</pre> | <pre>{<br/>  "enabled": true,<br/>  "infrastructure_encryption_enabled": true<br/>}</pre> | no |
 | <a name="input_file_shares"></a> [file\_shares](#input\_file\_shares) | List of file shares to create. | <pre>list(object({<br/>    name             = string<br/>    quota            = optional(number, 5120)<br/>    access_tier      = optional(string, "Hot")<br/>    enabled_protocol = optional(string, "SMB")<br/>    metadata         = optional(map(string), {})<br/>  }))</pre> | `[]` | no |
@@ -151,6 +154,7 @@ No modules.
 | <a name="output_allow_nested_items_to_be_public"></a> [allow\_nested\_items\_to\_be\_public](#output\_allow\_nested\_items\_to\_be\_public) | Are nested items allowed to be public for the storage account |
 | <a name="output_containers"></a> [containers](#output\_containers) | Map of created storage containers with all available attributes |
 | <a name="output_cross_tenant_replication_enabled"></a> [cross\_tenant\_replication\_enabled](#output\_cross\_tenant\_replication\_enabled) | Is cross tenant replication enabled for the storage account |
+| <a name="output_diagnostic_settings_skipped"></a> [diagnostic\_settings\_skipped](#output\_diagnostic\_settings\_skipped) | Diagnostic settings entries skipped because no categories were available after filtering. |
 | <a name="output_file_shares"></a> [file\_shares](#output\_file\_shares) | Map of created file shares |
 | <a name="output_https_traffic_only_enabled"></a> [https\_traffic\_only\_enabled](#output\_https\_traffic\_only\_enabled) | Is HTTPS traffic only enabled for the storage account |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the Storage Account |

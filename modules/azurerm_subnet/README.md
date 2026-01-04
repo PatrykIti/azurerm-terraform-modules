@@ -147,11 +147,11 @@ module "delegated_subnet" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - This example demonstrates the minimal configuration required to create a subnet within an Azure Virtual Network.
-- [Complete](examples/complete) - This example demonstrates a comprehensive subnet configuration with all available features including service endpoints, network security groups, route tables, and service endpoint policies.
-- [Delegation](examples/delegation) - This example demonstrates subnet delegation to various Azure services, showing how to configure subnets that are dedicated to specific Azure service types and their required network policies.
-- [Private Endpoint](examples/private-endpoint) - This example demonstrates subnet configuration optimized for private endpoint scenarios, showing how to properly configure subnets for private endpoint connectivity to Azure services.
-- [Secure](examples/secure) - This example demonstrates a security-focused subnet configuration with enhanced security features including DDoS protection, restrictive network security groups, secure routing, and comprehensive monitoring.
+- [Basic](examples/basic) - This example demonstrates a basic subnet deployment using secure defaults.
+- [Complete](examples/complete) - This example demonstrates a comprehensive subnet configuration with service endpoints, service endpoint policies, and security associations.
+- [Delegation](examples/delegation) - This example demonstrates subnet delegation for multiple Azure services and includes one regular subnet for comparison.
+- [Private Endpoint](examples/private-endpoint) - This example configures a subnet for private endpoints and creates a private endpoint to a storage account.
+- [Secure](examples/secure) - This example demonstrates a security-focused subnet configuration with restrictive NSG rules and hardened network policies.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
@@ -162,13 +162,13 @@ module "delegated_subnet" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.43.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.57.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.43.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.57.0 |
 
 ## Modules
 
@@ -178,17 +178,17 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_subnet.subnet](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/subnet) | resource |
-| [azurerm_subnet_nat_gateway_association.subnet_nat_gateway_association](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/subnet_nat_gateway_association) | resource |
-| [azurerm_subnet_network_security_group_association.subnet_network_security_group_association](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/subnet_network_security_group_association) | resource |
-| [azurerm_subnet_route_table_association.subnet_route_table_association](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/subnet_route_table_association) | resource |
+| [azurerm_subnet.subnet](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/subnet) | resource |
+| [azurerm_subnet_nat_gateway_association.subnet_nat_gateway_association](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/subnet_nat_gateway_association) | resource |
+| [azurerm_subnet_network_security_group_association.subnet_network_security_group_association](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/subnet_network_security_group_association) | resource |
+| [azurerm_subnet_route_table_association.subnet_route_table_association](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/subnet_route_table_association) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_address_prefixes"></a> [address\_prefixes](#input\_address\_prefixes) | The address prefixes to use for the subnet. This is a list of IPv4 or IPv6 address ranges. | `list(string)` | n/a | yes |
-| <a name="input_associations"></a> [associations](#input\_associations) | List of parameters to associate other resources to Subnet:<br/>  nat\_gateway\_id - ID of NAT gateway to associate with<br/>  network\_security\_group\_id - D of network security group to associate with<br/>  route\_table\_id - ID of route table to associate with | <pre>object({<br/>    nat_gateway = optional(object({<br/>      id = string<br/>    }), null)<br/>    network_security_group = optional(object({<br/>      id = string<br/>    }), null)<br/>    route_table = optional(object({<br/>      id = string<br/>    }), null)<br/>  })</pre> | `null` | no |
+| <a name="input_associations"></a> [associations](#input\_associations) | Optional associations for the subnet:<br/>  nat\_gateway - ID of NAT gateway to associate with<br/>  network\_security\_group - ID of network security group to associate with<br/>  route\_table - ID of route table to associate with | <pre>object({<br/>    nat_gateway = optional(object({<br/>      id = string<br/>    }), null)<br/>    network_security_group = optional(object({<br/>      id = string<br/>    }), null)<br/>    route_table = optional(object({<br/>      id = string<br/>    }), null)<br/>  })</pre> | `null` | no |
 | <a name="input_delegations"></a> [delegations](#input\_delegations) | One or more delegation blocks for the subnet. | <pre>map(object({<br/>    name = string<br/>    service_delegation = object({<br/>      name    = string<br/>      actions = optional(list(string), [])<br/>    })<br/>  }))</pre> | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the subnet. Changing this forces a new resource to be created. | `string` | n/a | yes |
 | <a name="input_private_endpoint_network_policies_enabled"></a> [private\_endpoint\_network\_policies\_enabled](#input\_private\_endpoint\_network\_policies\_enabled) | Enable or Disable network policies for the private endpoint on the subnet. Setting this to true will Enable the policy and setting this to false will Disable the policy. Defaults to true. | `bool` | `true` | no |

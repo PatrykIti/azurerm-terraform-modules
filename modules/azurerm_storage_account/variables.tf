@@ -33,7 +33,7 @@ variable "account_tier" {
 variable "account_replication_type" {
   description = "Defines the type of replication to use for this storage account."
   type        = string
-  default     = "ZRS"
+  default     = "LRS"
 
   validation {
     condition     = contains(["LRS", "GRS", "RAGRS", "ZRS", "GZRS", "RAGZRS"], var.account_replication_type)

@@ -117,7 +117,7 @@ module "subnet" {
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| SNv1.0.x | >= 1.3.0 | 4.43.0 (pinned) | TBD |
+| SNv1.0.x | >= 1.3.0 | 4.57.0 (pinned) | TBD |
 
 **Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
 

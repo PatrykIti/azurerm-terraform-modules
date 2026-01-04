@@ -184,7 +184,7 @@ terraform destroy -auto-approve
 Before submitting a PR for this module:
 
 - [ ] Verified no deprecated blocks are used (static_website, queue_properties)
-- [ ] Tested with azurerm provider 4.43.0
+- [ ] Tested with azurerm provider 4.57.0
 - [ ] All 5 examples tested and working
 - [ ] Considered ZRS limitations for lifecycle rules
 - [ ] Security defaults maintained (HTTPS only, TLS 1.2)
@@ -207,9 +207,9 @@ To release a new version:
 ## 📚 Module Resources
 
 - [Azure Storage Account Documentation](https://docs.microsoft.com/azure/storage/common/storage-account-overview)
-- [Terraform azurerm_storage_account Resource](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/storage_account)
-- [Static Website Resource](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/storage_account_static_website)
-- [Queue Properties Resource](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/storage_account_queue_properties)
+- [Terraform azurerm_storage_account Resource](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/storage_account)
+- [Static Website Resource](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/storage_account_static_website)
+- [Queue Properties Resource](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/storage_account_queue_properties)
 
 ## ❓ Need Help?
 
