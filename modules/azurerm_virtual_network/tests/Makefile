@@ -61,6 +61,11 @@ deps:
 	go mod download
 	go mod tidy
 
+# Run unit tests (Terraform native)
+test-unit:
+	@echo "Running unit tests..."
+	cd .. && terraform test -test-directory=tests/unit
+
 # Run all tests
 test: check-env deps
 	@echo "Running all tests..."
@@ -179,6 +184,7 @@ ci: clean fmt-check lint test-coverage test-junit
 help:
 	@echo "Available targets:"
 	@echo "  make test                 - Run all tests"
+	@echo "  make test-unit            - Run Terraform unit tests"
 	@echo "  make test-single TEST_NAME=TestName - Run specific test"
 	@echo "  make test-basic          - Run basic tests only"
 	@echo "  make test-complete       - Run complete tests"
@@ -197,4 +203,4 @@ help:
 	@echo "  make security           - Run security scan"
 	@echo "  make ci                 - Run CI pipeline"
 
-.PHONY: check-env deps test test-single test-basic test-complete test-secure test-network test-private-endpoint test-validation benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security ci help
+.PHONY: check-env deps test-unit test test-single test-basic test-complete test-secure test-network test-private-endpoint test-validation benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security ci help

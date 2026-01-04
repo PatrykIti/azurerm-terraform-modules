@@ -2,166 +2,70 @@
 
 ## Overview
 
-This document details the security features and configurations available in the azurerm_virtual_network Terraform module. The module implements comprehensive security controls following Azure best practices.
+This document describes the security-related configuration available in the
+azurerm_virtual_network module. The module manages only the VNet resource; all
+network controls for subnets, NSGs, private endpoints, and diagnostics are
+configured outside the module.
 
 ## Security Features
 
-### 1. **Encryption**
+### DDoS Protection Plan Association
 
-#### At Rest
-- **Default**: All data encrypted at rest using Azure-managed keys
-- **Infrastructure Encryption**: Additional layer of encryption when supported
-- **Customer-Managed Keys**: Optional BYOK support (if applicable)
+- The module can associate an existing DDoS plan with the VNet.
+- The DDoS plan must already exist in the same region.
 
-#### In Transit
-- **HTTPS/TLS**: All communications encrypted in transit
-- **Minimum TLS Version**: TLS 1.2 enforced by default
+### Encryption Enforcement
 
-### 2. **Access Control**
+- The module can enforce VNet encryption behavior via `encryption.enforcement`.
+- Supported values: `AllowUnencrypted` or `DropUnencrypted`.
 
-#### Authentication
-- **Azure AD Integration**: Preferred authentication method
-- **Managed Identity**: Support for system and user-assigned identities
-- **Key-based Access**: Disabled by default where possible
+### DNS Server Configuration
 
-#### Network Security
-- **Private Endpoints**: Support for private connectivity
-- **Network Rules**: Default deny with explicit allow rules
-- **Service Endpoints**: Virtual network integration
+- Custom DNS servers can be configured to enforce trusted name resolution.
+- Use only internal or approved DNS resolvers.
 
-### 3. **Monitoring and Compliance**
+## Security Configuration Example
 
-#### Audit Logging
-- **Diagnostic Settings**: Comprehensive logging to Log Analytics
-- **Activity Tracking**: All operations logged
-- **Metrics**: Performance and security metrics collected
-
-#### Compliance
-- **Azure Policy**: Compatible with organizational policies
-- **Security Center**: Integration ready
-- **Threat Protection**: Microsoft Defender support where applicable
-
-## Security Configuration Examples
-
-### Maximum Security Configuration
 ```hcl
 module "virtual_network" {
   source = "./modules/azurerm_virtual_network"
 
-  name                = "example-secure"
+  name                = "vnet-secure"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
+  address_space       = ["10.0.0.0/16"]
 
-  # Security settings
-  enable_https_traffic_only = true
-  min_tls_version          = "TLS1_2"
-  
-  # Network isolation
-  network_rules = {
-    default_action = "Deny"
-    ip_rules       = []
-    bypass         = ["AzureServices"]
+  ddos_protection_plan = {
+    id     = azurerm_network_ddos_protection_plan.main.id
+    enable = true
   }
 
-  # Private endpoint
-  private_endpoints = [{
-    name                 = "example-pe"
-    subnet_id            = azurerm_subnet.private.id
-    private_dns_zone_ids = [azurerm_private_dns_zone.example.id]
-  }]
-
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+  encryption = {
+    enforcement = "DropUnencrypted"
   }
 
   tags = {
-    Environment        = "Production"
-    DataClassification = "Confidential"
+    Environment = "Production"
   }
 }
 ```
 
 ## Security Hardening Checklist
 
-Before deploying to production:
-
-- [ ] Enable all applicable encryption features
-- [ ] Configure network isolation (private endpoints/service endpoints)
-- [ ] Disable public network access where possible
-- [ ] Enable audit logging and monitoring
-- [ ] Apply appropriate RBAC permissions
-- [ ] Configure Azure Policy compliance
-- [ ] Enable threat protection features
-- [ ] Review and apply security tags
-- [ ] Document security exceptions
+- Associate a DDoS protection plan where required.
+- Enable encryption enforcement if mandated by policy.
+- Use subnet-level NSGs and route tables (outside this module).
+- Enable diagnostic settings for the VNet (outside this module).
+- Use private endpoints and service endpoints as needed (outside this module).
 
 ## Common Security Mistakes to Avoid
 
-1. **Leaving Public Access Enabled**
-   ```hcl
-   # ❌ AVOID
-   public_network_access_enabled = true
-   ```
-
-2. **Using Weak TLS Versions**
-   ```hcl
-   # ❌ AVOID
-   min_tls_version = "TLS1_0"
-   ```
-
-3. **Overly Permissive Network Rules**
-   ```hcl
-   # ❌ AVOID
-   network_rules = {
-     default_action = "Allow"
-   }
-   ```
-
-## Incident Response
-
-If a security incident occurs:
-
-1. **Immediate Actions**
-   - Review audit logs
-   - Check for unauthorized access
-   - Apply additional network restrictions
-
-2. **Investigation**
-   - Use Log Analytics queries
-   - Review security alerts
-   - Check configuration compliance
-
-3. **Remediation**
-   - Apply security patches
-   - Update configurations
-   - Document lessons learned
-
-## Compliance Mapping
-
-### SOC 2 Controls
-| Control | Implementation |
-|---------|---------------|
-| CC6.1 | RBAC and Azure AD |
-| CC6.6 | Encryption at rest/transit |
-| CC7.2 | Diagnostic logging |
-
-### ISO 27001 Controls
-| Control | Implementation |
-|---------|---------------|
-| A.10.1.1 | Cryptographic controls |
-| A.9.1.2 | Network access controls |
-| A.12.4.1 | Event logging |
+1. Leaving DDoS protection unconfigured in production.
+2. Using untrusted DNS servers.
+3. Assuming the module creates NSGs, diagnostics, or private endpoints.
 
 ## Additional Resources
 
-- [Azure Security Best Practices](https://docs.microsoft.com/en-us/azure/security/fundamentals/best-practices-and-patterns)
-- [Azure Security Center](https://docs.microsoft.com/en-us/azure/security-center/)
-- [Azure Policy](https://docs.microsoft.com/en-us/azure/governance/policy/)
-
----
-
-**Module Version**: 1.0.0  
-**Last Updated**: 2025-07-13  
-**Security Contact**: patryk.ciechanski@patrykiti.pl
+- https://learn.microsoft.com/azure/virtual-network/virtual-network-overview
+- https://learn.microsoft.com/azure/ddos-protection/ddos-protection-overview
+- https://learn.microsoft.com/azure/virtual-network/virtual-network-encryption

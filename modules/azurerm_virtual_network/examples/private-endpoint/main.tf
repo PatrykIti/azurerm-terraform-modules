@@ -23,7 +23,7 @@ resource "azurerm_resource_group" "example" {
 
 # Create a storage account to demonstrate private endpoint connectivity
 resource "azurerm_storage_account" "example" {
-  name                     = "stvnetprivateendpoint"
+  name                     = var.storage_account_name
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -51,7 +51,7 @@ resource "azurerm_private_dns_zone" "blob" {
 
 # Virtual Network optimized for private endpoint scenarios
 module "virtual_network" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.1.0"
+  source = "../.."
 
   name                = "vnet-private-endpoint-example"
   resource_group_name = azurerm_resource_group.example.name
@@ -63,8 +63,6 @@ module "virtual_network" {
 
   # Network flow configuration
   flow_timeout_in_minutes = 10
-
-  # Lifecycle Management
 
   tags = {
     Environment = "Development"

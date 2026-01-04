@@ -4,12 +4,10 @@ This example demonstrates a Virtual Network configuration with private endpoint 
 
 ## Features
 
-- Creates a virtual_network with private endpoint access
-- Disables public network access for maximum security
-- Configures virtual network and subnet for private connectivity
-- Demonstrates private DNS integration
-- Network isolation and secure connectivity patterns
-- Enterprise-grade security configuration
+- Creates a VNet with subnets for private endpoints and workloads
+- Creates a storage account with public access disabled
+- Adds a private endpoint and private DNS zone for blob access
+- Demonstrates private connectivity patterns outside the module
 
 ## Key Configuration
 
@@ -18,9 +16,8 @@ This example showcases private endpoint implementation with complete network iso
 ## Network Architecture
 
 - Virtual Network with dedicated subnet for private endpoints
-- Private endpoint connection to the virtual_network
+- Private endpoint connection to the storage account
 - DNS resolution for private connectivity
-- Network security group rules (if applicable)
 
 ## Usage
 
@@ -35,6 +32,10 @@ terraform apply
 ```bash
 terraform destroy
 ```
+
+## Notes
+
+- `storage_account_name` must be globally unique. Override the default if needed.
 
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->

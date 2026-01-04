@@ -12,11 +12,21 @@ variable "name" {
 variable "resource_group_name" {
   description = "The name of the resource group in which to create the Virtual Network."
   type        = string
+
+  validation {
+    condition     = length(trimspace(var.resource_group_name)) > 0
+    error_message = "resource_group_name must not be empty."
+  }
 }
 
 variable "location" {
   description = "The Azure Region where the Virtual Network should exist."
   type        = string
+
+  validation {
+    condition     = length(trimspace(var.location)) > 0
+    error_message = "location must not be empty."
+  }
 }
 
 variable "address_space" {
@@ -26,6 +36,11 @@ variable "address_space" {
   validation {
     condition     = length(var.address_space) > 0
     error_message = "At least one address space must be provided."
+  }
+
+  validation {
+    condition     = alltrue([for address in var.address_space : can(cidrhost(address, 0))])
+    error_message = "All address_space entries must be valid CIDR blocks."
   }
 }
 
@@ -82,6 +97,11 @@ variable "ddos_protection_plan" {
     enable = bool
   })
   default = null
+
+  validation {
+    condition     = var.ddos_protection_plan == null || length(trimspace(var.ddos_protection_plan.id)) > 0
+    error_message = "ddos_protection_plan.id must not be empty when ddos_protection_plan is set."
+  }
 }
 
 # Encryption Configuration
@@ -92,13 +112,11 @@ variable "encryption" {
   })
   default = null
 
-
+  validation {
+    condition     = var.encryption == null || contains(["AllowUnencrypted", "DropUnencrypted"], var.encryption.enforcement)
+    error_message = "encryption.enforcement must be AllowUnencrypted or DropUnencrypted."
+  }
 }
-
-
-
-
-
 # Tags
 variable "tags" {
   description = "A mapping of tags to assign to the Virtual Network and associated resources."

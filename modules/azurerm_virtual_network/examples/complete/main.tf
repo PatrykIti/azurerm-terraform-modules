@@ -56,7 +56,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # Create Storage Account for diagnostic settings
 resource "azurerm_storage_account" "example" {
-  name                     = "stvnetcompleteexample"
+  name                     = var.storage_account_name
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -81,7 +81,7 @@ resource "azurerm_private_dns_zone" "example" {
 
 # Complete Virtual Network configuration with all features
 module "virtual_network" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.1.0"
+  source = "../.."
 
   name                = "vnet-complete-example"
   resource_group_name = azurerm_resource_group.example.name
@@ -102,8 +102,6 @@ module "virtual_network" {
     enforcement = "AllowUnencrypted"
   }
 
-
-  # Lifecycle Management
 
   tags = {
     Environment = "Development"

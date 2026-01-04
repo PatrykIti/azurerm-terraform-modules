@@ -8,26 +8,27 @@ Current version: **1.1.4**
 
 ## Description
 
-This Terraform module creates and manages Azure Virtual Networks with comprehensive configuration options including:
+This Terraform module creates and manages an Azure Virtual Network (VNet) and
+exposes the core configuration options:
 
-- **Core Virtual Network**: Address spaces, DNS servers, flow timeout configuration
-- **Security Features**: DDoS protection, encryption enforcement, network flow logs
-- **Network Peering**: Virtual network peering with customizable settings
-- **DNS Integration**: Private DNS zone virtual network links
-- **Monitoring**: Diagnostic settings with Log Analytics and Storage Account integration
-- **BGP Support**: BGP community configuration for ExpressRoute scenarios
+- Address spaces and DNS servers
+- Flow timeout configuration
+- BGP community (ExpressRoute scenarios)
+- Edge zone
+- Optional DDoS protection plan association
+- Optional encryption enforcement
+- Tags
 
-**Note**: This module focuses on Virtual Network resources only. For complete enterprise networking scenarios that include subnets, route tables, and network security groups, please refer to the upcoming `azurerm_networking` example in the root `examples/` directory. This comprehensive example will integrate multiple networking modules (`azurerm_virtual_network`, `azurerm_subnet`, `azurerm_route_table`, `azurerm_network_security_group`) to provide flexible configuration patterns for various enterprise scenarios.
+This module manages only the VNet resource. Subnets, peerings, private endpoints,
+diagnostic settings, and flow logs must be created outside the module.
 
 ## Features
 
-- ✅ **Comprehensive Configuration**: Support for all Virtual Network features
-- ✅ **Security-First**: DDoS protection, encryption, and comprehensive logging
-- ✅ **Network Peering**: Automated peering setup with validation
-- ✅ **DNS Integration**: Private DNS zone linking with registration control
-- ✅ **Monitoring**: Built-in diagnostic settings and flow logs
-- ✅ **Validation**: Input validation for all critical parameters
-- ✅ **Lifecycle Management**: Prevent destroy protection for production environments
+- Core VNet configuration (address_space, dns_servers, flow timeout)
+- Optional DDoS protection plan association
+- Optional encryption enforcement
+- Optional BGP community and edge zone
+- Input validation for critical parameters
 
 ## Usage
 
@@ -70,13 +71,6 @@ module "secure_virtual_network" {
     enforcement = "DropUnencrypted"
   }
 
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    storage_account_id         = azurerm_storage_account.example.id
-  }
-
   tags = {
     Environment   = "Production"
     SecurityLevel = "High"
@@ -84,13 +78,26 @@ module "secure_virtual_network" {
 }
 ```
 
+## Module Documentation
+
+- [docs/README.md](docs/README.md) - Additional usage notes and guidance
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing VNet into the module
+
+## Security Considerations
+
+- DDoS protection requires an external DDoS plan; the module only associates it.
+- Azure allows a single DDoS plan per region; reuse an existing plan when needed.
+- Encryption enforcement is optional and must be set explicitly.
+- DNS server configuration should be limited to trusted resolvers.
+- Monitoring, diagnostic settings, NSGs, subnets, and private endpoints are out of scope.
+
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - This example demonstrates a basic Virtual Network configuration using secure defaults and minimal setup.
-- [Complete](examples/complete) - This example demonstrates a comprehensive deployment of Virtual Network with all available features and configurations.
-- [Private Endpoint](examples/private-endpoint) - This example demonstrates a Virtual Network configuration with private endpoint connectivity for enhanced security and network isolation.
-- [Secure](examples/secure) - This example demonstrates a maximum-security Virtual Network configuration suitable for highly sensitive data and regulated environments.
+- [Basic](examples/basic) - Basic Virtual Network configuration with minimal inputs.
+- [Complete](examples/complete) - VNet with external resources (peering, private DNS, diagnostic settings).
+- [Private Endpoint](examples/private-endpoint) - VNet plus private endpoint resources created outside the module.
+- [Secure](examples/secure) - VNet with DDoS plan and encryption; monitoring configured externally.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->

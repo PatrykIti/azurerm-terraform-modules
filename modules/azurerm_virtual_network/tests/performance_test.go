@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -34,27 +35,25 @@ func BenchmarkVirtualNetworkCreationSimple(b *testing.B) {
 	}
 }
 
-// BenchmarkVirtualNetworkCreationWithSubnets benchmarks virtual network with different subnet counts
-func BenchmarkVirtualNetworkCreationWithSubnets(b *testing.B) {
+// BenchmarkVirtualNetworkCreationWithAddressSpaces benchmarks virtual network with multiple address spaces
+func BenchmarkVirtualNetworkCreationWithAddressSpaces(b *testing.B) {
 	b.ReportAllocs()
 
-	subnetCounts := []int{1, 5, 10, 20}
+	addressSpaceCounts := []int{1, 2, 4, 8}
 
-	for _, count := range subnetCounts {
-		b.Run(fmt.Sprintf("Subnets_%d", count), func(b *testing.B) {
+	for _, count := range addressSpaceCounts {
+		b.Run(fmt.Sprintf("AddressSpaces_%d", count), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
 				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
-				// Generate subnets configuration
-				subnets := make(map[string]map[string]interface{})
+				// Generate address space configuration
+				addressSpaces := make([]string, 0, count)
 				for j := 0; j < count; j++ {
-					subnets[fmt.Sprintf("subnet%d", j)] = map[string]interface{}{
-						"address_prefixes": []string{fmt.Sprintf("10.0.%d.0/24", j)},
-					}
+					addressSpaces = append(addressSpaces, fmt.Sprintf("10.%d.0.0/16", j))
 				}
-				terraformOptions.Vars["subnets"] = subnets
+				terraformOptions.Vars["address_space"] = addressSpaces
 				// Override the random_suffix for benchmarking
 				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 				b.StartTimer()
@@ -68,27 +67,27 @@ func BenchmarkVirtualNetworkCreationWithSubnets(b *testing.B) {
 				b.StartTimer()
 
 				b.ReportMetric(float64(creationTime.Milliseconds()), "creation_ms")
-				b.ReportMetric(float64(count), "subnet_count")
+				b.ReportMetric(float64(count), "address_space_count")
 			}
 		})
 	}
 }
 
-// BenchmarkVirtualNetworkCreationWithNSG benchmarks with different NSG rule configurations
-func BenchmarkVirtualNetworkCreationWithNSG(b *testing.B) {
+// BenchmarkVirtualNetworkCreationWithNameLengths benchmarks different name lengths
+func BenchmarkVirtualNetworkCreationWithNameLengths(b *testing.B) {
 	b.ReportAllocs()
 
-	ruleCounts := []int{0, 5, 10, 50}
+	nameLengths := []int{5, 20, 50}
 
-	for _, count := range ruleCounts {
-		b.Run(fmt.Sprintf("NSGRules_%d", count), func(b *testing.B) {
+	for _, length := range nameLengths {
+		b.Run(fmt.Sprintf("NameLength_%d", length), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/secure")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 				// Override the random_suffix for benchmarking
 				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
-				terraformOptions.Vars["nsg_rule_count"] = count
+				terraformOptions.Vars["virtual_network_name"] = fmt.Sprintf("vnet%s", strings.Repeat("a", length-4))
 				b.StartTimer()
 
 				start := time.Now()
@@ -100,7 +99,7 @@ func BenchmarkVirtualNetworkCreationWithNSG(b *testing.B) {
 				b.StartTimer()
 
 				b.ReportMetric(float64(creationTime.Milliseconds()), "creation_ms")
-				b.ReportMetric(float64(count), "nsg_rule_count")
+				b.ReportMetric(float64(length), "name_length")
 			}
 		})
 	}

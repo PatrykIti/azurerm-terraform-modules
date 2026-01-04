@@ -4,16 +4,14 @@ This example demonstrates a comprehensive deployment of Virtual Network with all
 
 ## Features
 
-- Full virtual_network configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
+- VNet configuration with custom DNS and multiple address spaces
+- Peering to a second VNet (external resource)
+- Private DNS zone link (external resource)
+- Diagnostic settings for monitoring (external resource)
 
 ## Key Configuration
 
-This comprehensive example showcases all available features of the virtual_network module, demonstrating enterprise-grade capabilities suitable for production environments.
+This example focuses on VNet configuration and demonstrates how to attach peering, private DNS, and diagnostic settings outside the module.
 
 ## Usage
 
@@ -22,6 +20,10 @@ terraform init
 terraform plan
 terraform apply
 ```
+
+## Notes
+
+- `storage_account_name` must be globally unique. Override the default if needed.
 
 ## Cleanup
 
