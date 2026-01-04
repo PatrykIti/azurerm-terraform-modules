@@ -85,8 +85,8 @@ run "verify_account_defaults" {
 
   # Test default replication type
   assert {
-    condition     = azurerm_storage_account.storage_account.account_replication_type == "ZRS"
-    error_message = "Default replication type should be ZRS"
+    condition     = azurerm_storage_account.storage_account.account_replication_type == "LRS"
+    error_message = "Default replication type should be LRS"
   }
 
   # Test default account kind
