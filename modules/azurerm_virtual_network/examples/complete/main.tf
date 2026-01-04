@@ -162,9 +162,8 @@ resource "azurerm_monitor_diagnostic_setting" "example" {
   }
 
   # Virtual Network Metrics
-  metric {
+  enabled_metric {
     category = "AllMetrics"
-    enabled  = true
   }
 
   depends_on = [module.virtual_network]
