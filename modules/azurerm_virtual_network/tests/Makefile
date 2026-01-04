@@ -15,7 +15,6 @@ define run_with_log
 	@bash -c 'set -o pipefail; $(2) 2>&1 | tee "$(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"'
 endef
 
-
 # Normalize credential environment variables (ARM_ <-> AZURE_)
 ifdef AZURE_SUBSCRIPTION_ID
 ARM_SUBSCRIPTION_ID ?= $(AZURE_SUBSCRIPTION_ID)
