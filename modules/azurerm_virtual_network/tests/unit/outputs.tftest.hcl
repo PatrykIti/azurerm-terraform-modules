@@ -24,7 +24,7 @@ variables {
 }
 
 run "verify_outputs" {
-  command = plan
+  command = apply
 
   assert {
     condition     = output.id != null && output.id != ""
