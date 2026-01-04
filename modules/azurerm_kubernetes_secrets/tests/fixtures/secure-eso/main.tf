@@ -92,7 +92,7 @@ provider "kubernetes" {
 }
 
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     host                   = module.kubernetes_cluster.kube_config.host
     client_certificate     = base64decode(module.kubernetes_cluster.kube_config.client_certificate)
     client_key             = base64decode(module.kubernetes_cluster.kube_config.client_key)
@@ -171,10 +171,12 @@ resource "helm_release" "external_secrets" {
   wait             = true
   timeout          = 600
 
-  set {
-    name  = "installCRDs"
-    value = "true"
-  }
+  set = [
+    {
+      name  = "installCRDs"
+      value = "true"
+    }
+  ]
 
   depends_on = [module.kubernetes_cluster]
 }

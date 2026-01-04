@@ -1,7 +1,7 @@
 variable "location" {
   description = "Azure region for resources"
   type        = string
-  default     = "northeurope"
+  default     = "westeurope"
 }
 
 variable "random_suffix" {
