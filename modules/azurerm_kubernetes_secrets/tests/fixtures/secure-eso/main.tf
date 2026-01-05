@@ -171,7 +171,7 @@ resource "helm_release" "external_secrets" {
   wait             = true
   timeout          = 600
 
-  set  {
+  set {
     name  = "installCRDs"
     value = "true"
   }
