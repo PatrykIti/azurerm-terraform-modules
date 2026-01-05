@@ -70,7 +70,7 @@ resource "azurerm_storage_account" "security" {
 
 # Secure Virtual Network configuration with enhanced security features
 module "virtual_network" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.2.0"
 
   name                = "vnet-secure-example"
   resource_group_name = azurerm_resource_group.example.name

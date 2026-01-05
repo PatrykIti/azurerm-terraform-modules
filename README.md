@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Virtual Network](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=VNv*&label=Virtual%20Network&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=VNv)
 [![Subnet](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SNv*&label=Subnet&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=SNv)
 [![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=SAv)
 [![Route Table](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=RTv*&label=Route%20Table&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=RTv)
@@ -35,7 +36,6 @@
 [![Azure DevOps Agent Pools](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAP*&label=Azure%20DevOps%20Agent%20Pools&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOAP)
 [![Azure DevOps Project Permissions](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOPP*&label=Azure%20DevOps%20Project%20Permissions&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOPP)
 [![Azure DevOps Project](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOP*&label=Azure%20DevOps%20Project&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOP)
-[![Virtual Network](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=VNv*&label=Virtual%20Network&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=VNv)
 <!-- MODULE BADGES END -->
 
 A comprehensive collection of production-ready Terraform modules for Azure and Azure DevOps, aligned with HashiCorp best practices and security-first defaults.
@@ -97,7 +97,7 @@ module "storage_account" {
 | [Route Table](./modules/azurerm_route_table/) | ✅ Completed | [RTv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.1.0) | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
 | [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv1.3.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv1.3.0) | Azure Storage Account Terraform module with enterprise-grade security features |
 | [Subnet](./modules/azurerm_subnet/) | ✅ Completed | [SNv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SNv1.1.0) | Azure Subnet Terraform module for managing subnets with service endpoints, delegations, network policies, and enterprise-grade security features |
-| [Virtual Network](./modules/azurerm_virtual_network/) | ✅ Completed | [VNv1.1.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/VNv1.1.3) | Azure Virtual Network Terraform module with advanced networking features |
+| [Virtual Network](./modules/azurerm_virtual_network/) | ✅ Completed | [VNv1.2.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/VNv1.2.0) | Azure Virtual Network Terraform module with advanced networking features |
 
 ### Azure DevOps Modules
 
