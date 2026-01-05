@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Azure DevOps Project](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOPv*&label=Azure%20DevOps%20Project&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOPv)
 [![Azure DevOps Extension](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOEXv*&label=Azure%20DevOps%20Extension&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOEXv)
 [![Azure DevOps Environments](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOEv*&label=Azure%20DevOps%20Environments&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOEv)
 [![Azure DevOps Artifacts Feed](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAFv*&label=Azure%20DevOps%20Artifacts%20Feed&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOAFv)
@@ -101,7 +102,7 @@ module "storage_account" {
 | [Azure DevOps Extension](./modules/azuredevops_extension/) | ✅ Completed | [ADOEXv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOEXv1.0.0) | Azure DevOps extension module for managing Marketplace extensions |
 | [Azure DevOps Identity](./modules/azuredevops_identity/) | ✅ Completed | [ADOI1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOI1.0.0) | Azure DevOps identity module for managing groups, entitlements, memberships, and role assignments |
 | [Azure DevOps Pipelines](./modules/azuredevops_pipelines/) | ✅ Completed | [ADOPI1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPI1.0.0) | Azure DevOps pipelines module for managing build definitions, folders, permissions, and authorizations |
-| [Azure DevOps Project](./modules/azuredevops_project/) | ✅ Completed | [ADOP1.1.1](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOP1.1.1) | Azure DevOps project module for managing project settings, tags, and dashboards |
+| [Azure DevOps Project](./modules/azuredevops_project/) | ✅ Completed | [ADOPv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPv1.0.0) | Azure DevOps project module for managing project settings, tags, and dashboards |
 | [Azure DevOps Project Permissions](./modules/azuredevops_project_permissions/) | ✅ Completed | [ADOPP1.1.1](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPP1.1.1) | Azure DevOps project permissions module for assigning group permissions |
 | [Azure DevOps Repository](./modules/azuredevops_repository/) | ✅ Completed | [ADOR1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOR1.0.0) | Azure DevOps repository module for managing Git repositories and policies |
 | [Azure DevOps Service Endpoints](./modules/azuredevops_serviceendpoint/) | ✅ Completed | [ADOSE1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOSE1.0.0) | Azure DevOps service endpoints module for managing service connections and permissions |
