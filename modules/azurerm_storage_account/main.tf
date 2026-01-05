@@ -125,14 +125,18 @@ resource "azurerm_storage_account" "storage_account" {
   dynamic "network_rules" {
     for_each = var.network_rules != null ? [var.network_rules] : []
     content {
-      # Automatically determine default_action:
+      # Automatically determine default_action unless explicitly set:
       # - If any IP rules or subnet IDs are specified: Deny all except those (most common scenario)
       # - If both are empty: Allow public access
       # This means you only specify what SHOULD have access; otherwise public access remains open
-      default_action = (
-        try(length(network_rules.value.ip_rules), 0) > 0 ||
-        try(length(network_rules.value.virtual_network_subnet_ids), 0) > 0
-      ) ? "Deny" : "Allow"
+      # If default_action is set, it overrides the automatic behavior
+      default_action = coalesce(
+        network_rules.value.default_action,
+        (
+          try(length(network_rules.value.ip_rules), 0) > 0 ||
+          try(length(network_rules.value.virtual_network_subnet_ids), 0) > 0
+        ) ? "Deny" : "Allow"
+      )
 
       bypass                     = network_rules.value.bypass
       ip_rules                   = network_rules.value.ip_rules

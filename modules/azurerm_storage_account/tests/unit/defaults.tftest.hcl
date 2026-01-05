@@ -149,7 +149,7 @@ run "verify_network_rules_defaults" {
   }
 
   # Network rules are applied via a separate resource in the actual implementation
-  # The default_action is derived from ip_rules and virtual_network_subnet_ids
+  # The default_action is derived from ip_rules and virtual_network_subnet_ids unless overridden
   # Here we verify the network rules structure is valid
   assert {
     condition     = can(var.network_rules.bypass)

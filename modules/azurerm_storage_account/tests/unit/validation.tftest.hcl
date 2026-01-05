@@ -175,7 +175,23 @@ run "invalid_tls_version" {
   ]
 }
 
-# Test removed - default_action is computed from ip_rules and virtual_network_subnet_ids
+# Test invalid network_rules default_action
+run "invalid_network_rules_default_action" {
+  command = plan
+
+  variables {
+    name = "validstorageaccount"
+    network_rules = {
+      default_action = "Block"
+    }
+  }
+
+  expect_failures = [
+    var.network_rules,
+  ]
+}
+
+# Test removed - default_action is computed from ip_rules and virtual_network_subnet_ids unless overridden
 # The module no longer requires users to specify default_action
 
 # Test invalid container access type

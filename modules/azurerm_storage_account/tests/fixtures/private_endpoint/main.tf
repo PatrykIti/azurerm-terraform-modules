@@ -64,6 +64,7 @@ module "storage_account" {
 
   # Network rules - deny all public access
   network_rules = {
+    default_action             = "Deny"
     ip_rules                   = []
     virtual_network_subnet_ids = []
     bypass                     = [] # No bypass, completely private

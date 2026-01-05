@@ -37,11 +37,12 @@ This document details the security features and configurations available in the 
 - **SAS Tokens**: Use Azure AD when possible
 
 #### Network Security
-- **Conditional Default Action**: When IP rules or subnet IDs are provided, access is allow-listed (default_action = "Deny"); when both are empty, public access is allowed
+- **Conditional Default Action**: When IP rules or subnet IDs are provided, access is allow-listed (default_action = "Deny"); when both are empty, public access is allowed. Set default_action to "Allow" or "Deny" to override this behavior.
   ```hcl
   network_rules = {
-    ip_rules = ["203.0.113.0/24"]
-    bypass   = ["AzureServices"]
+    default_action = "Deny"
+    ip_rules       = ["203.0.113.0/24"]
+    bypass         = ["AzureServices"]
   }
   ```
 - **Private Endpoints**: Full support for all storage services

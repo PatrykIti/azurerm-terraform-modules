@@ -173,8 +173,10 @@ variable "network_rules" {
 
     When ip_rules or virtual_network_subnet_ids are specified, only those sources will have access (default_action will be "Deny").
     When both are empty/null, all public access will be allowed (default_action will be "Allow").
+    If default_action is set to "Allow" or "Deny", it overrides the automatic behavior.
 
-    To allow all public access, set this variable to null or leave ip_rules and virtual_network_subnet_ids empty.
+    To allow all public access, set this variable to null, set default_action to "Allow",
+    or leave ip_rules and virtual_network_subnet_ids empty.
 
     bypass: Azure services that should bypass network rules (default: ["AzureServices"])
     ip_rules: Set of public IP addresses or CIDR blocks that should have access
@@ -183,6 +185,7 @@ variable "network_rules" {
   EOT
 
   type = object({
+    default_action             = optional(string)
     bypass                     = optional(set(string), ["AzureServices"])
     ip_rules                   = optional(set(string), [])
     virtual_network_subnet_ids = optional(set(string), [])
@@ -195,6 +198,14 @@ variable "network_rules" {
   default = {
     bypass = ["AzureServices"]
     # Empty ip_rules and virtual_network_subnet_ids means public access is allowed
+  }
+
+  validation {
+    condition = var.network_rules == null || (
+      var.network_rules.default_action == null ||
+      contains(["Allow", "Deny"], var.network_rules.default_action)
+    )
+    error_message = "network_rules.default_action must be null, \"Allow\", or \"Deny\"."
   }
 }
 

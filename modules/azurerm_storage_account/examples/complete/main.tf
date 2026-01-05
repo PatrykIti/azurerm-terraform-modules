@@ -195,7 +195,7 @@ module "storage_account" {
     bypass                     = ["AzureServices", "Logging", "Metrics"]
     ip_rules                   = [] # Add your IP ranges here for access
     virtual_network_subnet_ids = [] # Add subnet IDs here for access
-    # When both are empty, all public access is denied (secure by default)
+    # When both are empty, public access is allowed (set default_action = "Deny" to block)
   }
 
 

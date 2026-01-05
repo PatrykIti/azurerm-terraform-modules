@@ -178,6 +178,7 @@ module "storage_account" {
 
   # Strict network rules (deny all)
   network_rules = {
+    default_action             = "Deny"
     bypass                     = [] # No bypass, not even for Azure services
     ip_rules                   = [] # No public IPs allowed
     virtual_network_subnet_ids = [] # Only private endpoints
