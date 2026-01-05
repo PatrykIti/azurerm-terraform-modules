@@ -92,7 +92,7 @@ provider "kubernetes" {
 }
 
 provider "helm" {
-  kubernetes = {
+  kubernetes {
     host                   = module.kubernetes_cluster.kube_config.host
     client_certificate     = base64decode(module.kubernetes_cluster.kube_config.client_certificate)
     client_key             = base64decode(module.kubernetes_cluster.kube_config.client_key)
