@@ -19,8 +19,8 @@ locals {
 }
 
 resource "azuredevops_feed" "feed" {
-  name        = var.name
-  project_id  = var.project_id
+  name       = var.name
+  project_id = var.project_id
 
   dynamic "features" {
     for_each = var.features == null ? [] : [var.features]

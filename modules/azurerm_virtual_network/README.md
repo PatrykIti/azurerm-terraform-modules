@@ -94,10 +94,10 @@ module "secure_virtual_network" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - Basic Virtual Network configuration with minimal inputs.
-- [Complete](examples/complete) - VNet with external resources (peering, private DNS, diagnostic settings).
-- [Private Endpoint](examples/private-endpoint) - VNet plus private endpoint resources created outside the module.
-- [Secure](examples/secure) - VNet with DDoS plan and encryption; monitoring configured externally.
+- [Basic](examples/basic) - This example demonstrates a basic Virtual Network configuration using secure defaults and minimal setup.
+- [Complete](examples/complete) - This example demonstrates a comprehensive deployment of Virtual Network with all available features and configurations.
+- [Private Endpoint](examples/private-endpoint) - This example demonstrates a Virtual Network configuration with private endpoint connectivity for enhanced security and network isolation.
+- [Secure](examples/secure) - This example demonstrates a security-focused Virtual Network configuration suitable for sensitive environments.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
