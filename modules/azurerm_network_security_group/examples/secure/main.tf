@@ -48,7 +48,7 @@ resource "azurerm_application_security_group" "db_tier" {
 
 # Secure NSG Module
 module "network_security_group" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.1.0"
 
   name                = "nsg-secure-example"
   resource_group_name = azurerm_resource_group.example.name

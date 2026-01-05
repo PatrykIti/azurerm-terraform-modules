@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Network Security Group](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=NSGv*&label=Network%20Security%20Group&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=NSGv)
 [![Kubernetes Secrets](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AKSS*&label=Kubernetes%20Secrets&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=AKSS)
 [![Kubernetes Cluster](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AKSv*&label=Kubernetes%20Cluster&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=AKSv)
 [![Azure DevOps Repository](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADORv*&label=Azure%20DevOps%20Repository&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADORv)
@@ -90,7 +91,7 @@ module "storage_account" {
 |--------|--------|---------|-------------|
 | [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.1.0) | Azure Kubernetes Service (AKS) Terraform module for managing clusters with node pools, addons, and enterprise-grade security features |
 | [Kubernetes Secrets](./modules/azurerm_kubernetes_secrets/) | ✅ Completed | [AKSS1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSS1.0.0) | Azure Kubernetes Secrets Terraform module with enterprise-grade features |
-| [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.0.3) | Manages Azure Network Security Groups with comprehensive security rules configuration |
+| [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.1.0) | Manages Azure Network Security Groups with comprehensive security rules configuration |
 | [Route Table](./modules/azurerm_route_table/) | ✅ Completed | [RTv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.0.3) | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
 | [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv1.2.2](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv1.2.2) | Azure Storage Account Terraform module with enterprise-grade security features |
 | [Subnet](./modules/azurerm_subnet/) | ✅ Completed | [SNv1.0.3](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SNv1.0.3) | Azure Subnet Terraform module for managing subnets with service endpoints, delegations, network policies, and enterprise-grade security features |
