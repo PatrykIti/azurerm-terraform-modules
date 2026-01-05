@@ -60,6 +60,7 @@ module "storage_account" {
   # Enable shared access key for tests
   security_settings = {
     shared_access_key_enabled = true
+    public_network_access_enabled = false
   }
 
   # Network rules - deny all public access
