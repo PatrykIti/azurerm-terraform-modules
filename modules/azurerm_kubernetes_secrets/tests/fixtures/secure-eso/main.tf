@@ -171,12 +171,10 @@ resource "helm_release" "external_secrets" {
   wait             = true
   timeout          = 600
 
-  set = [
-    {
-      name  = "installCRDs"
-      value = "true"
-    }
-  ]
+  set  {
+    name  = "installCRDs"
+    value = "true"
+  }
 
   depends_on = [module.kubernetes_cluster]
 }
