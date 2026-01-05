@@ -16,8 +16,3 @@ output "application_security_group_ids" {
     db_tier  = azurerm_application_security_group.db_tier.id
   }
 }
-
-output "diagnostic_settings_ids" {
-  description = "Map of diagnostic settings names to their IDs."
-  value       = module.network_security_group.diagnostic_settings_ids
-}
