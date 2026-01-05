@@ -47,7 +47,8 @@ resource "azurerm_storage_account" "security" {
   # Security settings
   https_traffic_only_enabled      = true
   min_tls_version                 = "TLS1_2"
-  public_network_access_enabled   = false
+  # Required for tests from public networks.
+  public_network_access_enabled   = true
   # Required for provider data plane reads during tests.
   shared_access_key_enabled       = true
   allow_nested_items_to_be_public = false

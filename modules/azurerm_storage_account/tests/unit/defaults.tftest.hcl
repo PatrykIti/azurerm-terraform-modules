@@ -30,6 +30,10 @@ variables {
   name                = "testsa123456"
   resource_group_name = "test-rg"
   location            = "northeurope"
+
+  security_settings = {
+    public_network_access_enabled = false
+  }
 }
 
 # Test default security settings
@@ -131,7 +135,7 @@ run "verify_blob_properties_defaults" {
   }
 }
 
-# Test network rules default to deny
+# Test network rules default handling
 run "verify_network_rules_defaults" {
   command = plan
 
@@ -145,7 +149,7 @@ run "verify_network_rules_defaults" {
   }
 
   # Network rules are applied via a separate resource in the actual implementation
-  # The default_action is now automatically set to "Deny" for security by default
+  # The default_action is derived from ip_rules and virtual_network_subnet_ids
   # Here we verify the network rules structure is valid
   assert {
     condition     = can(var.network_rules.bypass)

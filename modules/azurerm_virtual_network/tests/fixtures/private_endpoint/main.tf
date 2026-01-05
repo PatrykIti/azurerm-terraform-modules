@@ -102,16 +102,11 @@ module "storage_account" {
 
   # Enable shared access key for tests
   security_settings = {
-    shared_access_key_enabled = true
+    shared_access_key_enabled     = true
+    public_network_access_enabled = true
   }
 
-  # Network rules - deny all public access
-  network_rules = {
-    default_action             = "Deny"
-    ip_rules                   = []
-    virtual_network_subnet_ids = []
-    bypass                     = [] # No bypass, completely private
-  }
+  # Network rules omitted to allow public access for tests without VPN.
 
   tags = {
     Environment = "Test"

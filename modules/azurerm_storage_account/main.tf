@@ -127,9 +127,12 @@ resource "azurerm_storage_account" "storage_account" {
     content {
       # Automatically determine default_action:
       # - If any IP rules or subnet IDs are specified: Deny all except those (most common scenario)
-      # - If both are empty: Deny all public access (secure by default)
-      # This means you only specify what SHOULD have access, everything else is blocked
-      default_action = "Deny"
+      # - If both are empty: Allow public access
+      # This means you only specify what SHOULD have access; otherwise public access remains open
+      default_action = (
+        try(length(network_rules.value.ip_rules), 0) > 0 ||
+        try(length(network_rules.value.virtual_network_subnet_ids), 0) > 0
+      ) ? "Deny" : "Allow"
 
       bypass                     = network_rules.value.bypass
       ip_rules                   = network_rules.value.ip_rules

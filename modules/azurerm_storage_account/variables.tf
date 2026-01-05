@@ -73,7 +73,7 @@ variable "security_settings" {
     allow_nested_items_to_be_public   = optional(bool, false)
     infrastructure_encryption_enabled = optional(bool, true)
     enable_advanced_threat_protection = optional(bool, true)
-    public_network_access_enabled     = optional(bool, false)
+    public_network_access_enabled     = optional(bool, true)
   })
   default = {}
 
@@ -172,9 +172,9 @@ variable "network_rules" {
     Network access control rules for the storage account.
 
     When ip_rules or virtual_network_subnet_ids are specified, only those sources will have access (default_action will be "Deny").
-    When both are empty/null, all public access will be denied (default_action will be "Deny").
+    When both are empty/null, all public access will be allowed (default_action will be "Allow").
 
-    To allow all public access, set this entire variable to null.
+    To allow all public access, set this variable to null or leave ip_rules and virtual_network_subnet_ids empty.
 
     bypass: Azure services that should bypass network rules (default: ["AzureServices"])
     ip_rules: Set of public IP addresses or CIDR blocks that should have access
@@ -194,7 +194,7 @@ variable "network_rules" {
 
   default = {
     bypass = ["AzureServices"]
-    # Empty ip_rules and virtual_network_subnet_ids means no public access (secure by default)
+    # Empty ip_rules and virtual_network_subnet_ids means public access is allowed
   }
 }
 

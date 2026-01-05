@@ -175,7 +175,7 @@ run "invalid_tls_version" {
   ]
 }
 
-# Test removed - default_action is now automatically set to "Deny"
+# Test removed - default_action is computed from ip_rules and virtual_network_subnet_ids
 # The module no longer requires users to specify default_action
 
 # Test invalid container access type
