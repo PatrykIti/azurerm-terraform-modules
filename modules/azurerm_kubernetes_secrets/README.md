@@ -3,7 +3,7 @@
 ## Module Version
 
 <!-- BEGIN_VERSION -->
-Current version: **vUnreleased**
+Current version: **1.0.0**
 <!-- END_VERSION -->
 
 ## Description
@@ -175,7 +175,7 @@ module "kubernetes_secrets" {
 | Name | Version |
 |------|---------|
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.57.0 |
-| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | >= 2.20.0 |
+| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | 3.0.1 |
 
 ## Modules
 
