@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Azure DevOps Agent Pools](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAPv*&label=Azure%20DevOps%20Agent%20Pools&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOAPv)
 [![Azure DevOps Work Items](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOWK*&label=Azure%20DevOps%20Work%20Items&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOWK)
 [![Azure DevOps Wiki](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOWI*&label=Azure%20DevOps%20Wiki&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOWI)
 [![Azure DevOps Variable Groups](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOVG*&label=Azure%20DevOps%20Variable%20Groups&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOVG)
@@ -91,7 +92,7 @@ module "storage_account" {
 
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
-| [Azure DevOps Agent Pools](./modules/azuredevops_agent_pools/) | ✅ Completed | [ADOAP1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAP1.0.0) | Azure DevOps agent pools module for managing pools, queues, and elastic pools |
+| [Azure DevOps Agent Pools](./modules/azuredevops_agent_pools/) | ✅ Completed | [ADOAPv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAPv1.0.0) | Azure DevOps agent pools module for managing pools, queues, and elastic pools |
 | [Azure DevOps Artifacts Feed](./modules/azuredevops_artifacts_feed/) | ✅ Completed | [ADOAF1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAF1.0.0) | Azure DevOps artifacts feed module for managing feeds, retention, and permissions |
 | [Azure DevOps Environments](./modules/azuredevops_environments/) | ✅ Completed | [ADOE1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOE1.0.0) | Azure DevOps environments module for managing environments, resources, and checks |
 | [Azure DevOps Extension](./modules/azuredevops_extension/) | ✅ Completed | [ADOEX1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOEX1.0.0) | Azure DevOps extension module for managing Marketplace extensions |
