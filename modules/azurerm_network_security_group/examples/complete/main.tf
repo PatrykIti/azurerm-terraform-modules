@@ -175,18 +175,6 @@ module "network_security_group" {
     }
   ]
 
-  diagnostic_settings = [
-    {
-      name                           = "nsg-complete-diagnostics"
-      areas                          = ["event", "rule_counter", "metrics"]
-      log_analytics_workspace_id     = azurerm_log_analytics_workspace.example.id
-      log_analytics_destination_type = "Dedicated"
-      storage_account_id             = azurerm_storage_account.diagnostics.id
-      eventhub_authorization_rule_id = azurerm_eventhub_namespace_authorization_rule.example.id
-      eventhub_name                  = azurerm_eventhub.example.name
-    }
-  ]
-
   tags = {
     Environment = "Development"
     Example     = "Complete"

@@ -23,7 +23,7 @@ locals {
 
 module "azuredevops_repository" {
   for_each = local.repositories
-  source   = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_repository?ref=ADOR1.0.0"
+  source   = "../.."
 
   project_id = var.project_id
   name       = each.value.name

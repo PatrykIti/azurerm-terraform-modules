@@ -133,14 +133,6 @@ module "network_security_group" {
     }
   ]
 
-  diagnostic_settings = [
-    {
-      name                       = "nsg-secure-diagnostics"
-      areas                      = ["event", "rule_counter", "metrics"]
-      log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    }
-  ]
-
   tags = {
     Environment = "Production"
     Example     = "Secure"
