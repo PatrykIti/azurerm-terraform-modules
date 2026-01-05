@@ -153,7 +153,7 @@ data "azurerm_client_config" "current" {}
 
 # Complete Storage Account with all features
 module "storage_account" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.3.0"
 
   name                = "stcompleteexample001"
   resource_group_name = azurerm_resource_group.example.name
