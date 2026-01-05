@@ -132,7 +132,6 @@ module "network_security_group" {
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates a basic Network Security Group configuration with simple inbound and outbound security rules.
 - [Complete](examples/complete) - This example demonstrates a comprehensive deployment of Azure Network Security Group with advanced security rules and diagnostic settings.
-- [Diagnostic Settings](examples/diagnostic-settings) - This example demonstrates configuring NSG diagnostic settings with multiple destinations.
 - [Secure](examples/secure) - This example demonstrates a maximum-security Network Security Group configuration suitable for a three-tier application (web, app, db) using a zero-trust approach.
 <!-- END_EXAMPLES -->
 
