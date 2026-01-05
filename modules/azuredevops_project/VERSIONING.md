@@ -109,24 +109,24 @@ module "azuredevops_project" {
 
 # After release (automatically updated)
 module "azuredevops_project" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_project?ref=ADOPv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_project?ref=ADOPv1.2.0"
 }
 ```
 
 ## Version Compatibility Matrix
 
-| Module Version | Terraform Version | AzureRM Provider | Azure API Version |
+| Module Version | Terraform Version | Azure DevOps Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| ADOPv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
+| ADOPv1.0.x | >= 1.3.0 | 1.12.2 (pinned) | TBD |
 
-**Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
+**Note**: The Azure DevOps provider version is pinned to ensure consistent behavior across all deployments.
 
 ## Module Versioning in Usage
 
 ### Direct from GitHub (Recommended)
 ```hcl
 module "azuredevops_project" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_project?ref=ADOPv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_project?ref=ADOPv1.0.0"
   
   # Module configuration
   # ...

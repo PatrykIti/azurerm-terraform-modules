@@ -1,9 +1,9 @@
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = ">= 1.12.2"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
   }
 }
@@ -33,6 +33,7 @@ module "storage_account" {
     min_tls_version                 = "TLS1_2"
     allow_nested_items_to_be_public = false
     shared_access_key_enabled       = true # Required for Terraform to manage
+    public_network_access_enabled   = false
   }
 
   # Encryption configuration
@@ -48,9 +49,10 @@ module "storage_account" {
 
   # Network security - deny all by default
   network_rules = {
-    ip_rules   = []
-    subnet_ids = []
-    bypass     = []
+    default_action = "Deny"
+    ip_rules       = []
+    subnet_ids     = []
+    bypass         = []
   }
 
   tags = {

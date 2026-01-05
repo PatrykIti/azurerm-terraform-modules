@@ -248,43 +248,46 @@ The storage account's managed identity can access other services:
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.43.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.57.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.43.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.57.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_storage_combined"></a> [storage\_combined](#module\_storage\_combined) | ../../ | n/a |
-| <a name="module_storage_system_assigned"></a> [storage\_system\_assigned](#module\_storage\_system\_assigned) | ../../ | n/a |
-| <a name="module_storage_user_assigned"></a> [storage\_user\_assigned](#module\_storage\_user\_assigned) | ../../ | n/a |
+| <a name="module_storage_combined"></a> [storage\_combined](#module\_storage\_combined) | ../.. | n/a |
+| <a name="module_storage_system_assigned"></a> [storage\_system\_assigned](#module\_storage\_system\_assigned) | ../.. | n/a |
+| <a name="module_storage_user_assigned"></a> [storage\_user\_assigned](#module\_storage\_user\_assigned) | ../.. | n/a |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [azurerm_key_vault.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/key_vault) | resource |
-| [azurerm_key_vault_key.storage](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/key_vault_key) | resource |
-| [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/resource_group) | resource |
-| [azurerm_role_assignment.combined_system_identity_kv_secrets](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.container_level_access](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.current_user_combined](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.current_user_kv_admin](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.current_user_system](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.current_user_user](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.system_identity_kv_access](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.uai_kv_crypto_user](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/role_assignment) | resource |
-| [azurerm_user_assigned_identity.storage](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/user_assigned_identity) | resource |
-| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/data-sources/client_config) | data source |
+| [azurerm_key_vault.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/key_vault) | resource |
+| [azurerm_key_vault_key.storage](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/key_vault_key) | resource |
+| [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/resource_group) | resource |
+| [azurerm_role_assignment.combined_system_identity_kv_secrets](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.container_level_access](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.current_user_combined](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.current_user_kv_admin](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.current_user_system](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.current_user_user](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.system_identity_kv_access](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.uai_kv_crypto_user](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/role_assignment) | resource |
+| [azurerm_user_assigned_identity.storage](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/user_assigned_identity) | resource |
+| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/data-sources/client_config) | data source |
 
 ## Inputs
 
-No inputs.
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_location"></a> [location](#input\_location) | The Azure region where resources will be created | `string` | `"West Europe"` | no |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group | `string` | `"rg-storage-identity-example"` | no |
 
 ## Outputs
 

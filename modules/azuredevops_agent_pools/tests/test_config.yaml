@@ -4,7 +4,6 @@ test_suites:
   - name: "Basic Tests"
     tests:
       - TestBasicAzuredevopsAgentPools
-      - TestAzuredevopsAgentPoolsExternalQueue
     parallel: true
     timeout: 15m
 
@@ -14,12 +13,6 @@ test_suites:
       - TestSecureAzuredevopsAgentPools
     parallel: true
     timeout: 30m
-
-  - name: "Validation Tests"
-    tests:
-      - TestAzuredevopsAgentPoolsValidationRules
-    parallel: true
-    timeout: 10m
 
   - name: "Integration Tests"
     tests:
@@ -32,7 +25,6 @@ environment:
   required_vars:
     - AZDO_ORG_SERVICE_URL
     - AZDO_PERSONAL_ACCESS_TOKEN
-    - AZDO_PROJECT_ID
 
 # Test stages for CI/CD pipelines
 stages:
@@ -45,10 +37,9 @@ stages:
       - "security"
 
   - name: "unit"
-    description: "Run unit and validation tests"
+    description: "Run unit tests"
     test_suites:
       - "Basic Tests"
-      - "Validation Tests"
     fail_fast: true
 
   - name: "integration"

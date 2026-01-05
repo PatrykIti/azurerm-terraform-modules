@@ -7,7 +7,6 @@ This directory contains automated tests for the Azure DevOps Agent Pools Terrafo
 1. **Go**: Version 1.21 or later
 2. **Terraform**: Version 1.12.2 or later
 3. **Azure DevOps Organization**: Access with a Personal Access Token (PAT)
-4. **Azure DevOps Project**: Project ID for queue creation
 
 ## Environment Variables
 
@@ -16,7 +15,6 @@ Set the following environment variables before running tests:
 ```bash
 export AZDO_ORG_SERVICE_URL="https://dev.azure.com/your-org"
 export AZDO_PERSONAL_ACCESS_TOKEN="your-pat"
-export AZDO_PROJECT_ID="your-project-id"
 ```
 
 ## Running Tests
@@ -55,7 +53,7 @@ go test -v -run TestBasicAzuredevopsAgentPools -timeout 30m
 
 ### Test Files
 
-- `azuredevops_agent_pools_test.go` - Basic, complete, secure, external queue, and validation tests
+- `azuredevops_agent_pools_test.go` - Basic, complete, and secure tests
 - `integration_test.go` - Full apply test using the complete fixture
 - `performance_test.go` - Benchmarks are disabled by default
 
@@ -64,10 +62,8 @@ go test -v -run TestBasicAzuredevopsAgentPools -timeout 30m
 The `fixtures/` directory contains Terraform configurations for different test scenarios:
 
 - `fixtures/basic/` - Basic module configuration
-- `fixtures/complete/` - Module pool with multiple queues (including external pool)
+- `fixtures/complete/` - Module pool with non-default settings
 - `fixtures/secure/` - Security-focused configuration
-- `fixtures/network/` - Queue created with an external pool ID
-- `fixtures/negative/` - Negative test cases
 
 ## Debugging Tests
 
@@ -115,9 +111,8 @@ When adding new tests:
 ### Common Issues
 
 1. **Authentication Errors**: Verify Azure DevOps PAT and organization URL
-2. **Project ID Missing**: Ensure AZDO_PROJECT_ID points to an existing project
-3. **Resource Conflicts**: Ensure unique pool and queue naming
-4. **Timeout Issues**: Increase test timeouts for larger orgs
+2. **Resource Conflicts**: Ensure unique pool naming
+3. **Timeout Issues**: Increase test timeouts for larger orgs
 
 ### Getting Help
 

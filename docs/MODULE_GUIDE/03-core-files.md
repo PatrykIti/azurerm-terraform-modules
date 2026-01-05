@@ -20,6 +20,7 @@ terraform {
 }
 ```
 Add other providers only when the module uses them directly (avoid adding providers for examples or tests).
+For Azure DevOps modules, use the repo standard `microsoft/azuredevops` provider version (currently `1.12.2`).
 
 ---
 
@@ -32,6 +33,7 @@ This file defines the inputs for the module. All variables must have a descripti
 - **Complex Objects**: Use `object()` types for complex, structured inputs (e.g., `network_profile`). This improves clarity over generic `map(any)`.
 - **Validation**: Use `validation` blocks to enforce rules on inputs (e.g., length, regex patterns, allowed values). This provides fast feedback to the user.
 - **Defaults**: Provide sensible, secure-by-default values where possible.
+- **Avoid double-defaulting**: If a nested object should always be present, use `default = {}` with `nullable = false` so callers can omit it without `try()`/`coalesce()` in locals.
 
 **Template:**
 ```hcl
@@ -101,7 +103,10 @@ This is where the primary resources are defined.
 - **Resource Naming**: Use descriptive, consistent names aligned with AKS, e.g., `azurerm_kubernetes_cluster.kubernetes_cluster` or `azurerm_resource_group.resource_group`.
 - **Lifecycle Preconditions**: Use `lifecycle` blocks with `precondition` checks to validate complex inter-variable dependencies that cannot be handled in `variables.tf`.
 - **Dynamic Blocks**: Use `dynamic` blocks to conditionally create nested configuration blocks within a single resource (e.g., for optional features).
+- **Provider-required blocks**: If the provider requires a nested block, keep it always present and drive behavior via defaults + validations (do not use a dynamic block).
+- **Explicit dependencies**: Add `depends_on` only when a provider has implicit dependency gaps (for example, child resources that must wait for the main resource).
 - **Sub-Resource Creation**: For creating multiple instances of a sub-resource (e.g., storage containers, extra node pools), use a `list(object)` variable and iterate over it with a `for_each` meta-argument on the resource block. This is the standard pattern for managing zero-to-many child resources.
+- **Single optional resources**: Use `count` for 0/1 resources; use `for_each` for lists. If list items need stable identities, enforce unique `name` keys in `variables.tf`.
 
 **Main Resource Template (`main.tf`):**
 ```hcl
@@ -153,6 +158,31 @@ resource "azurerm_storage_container" "storage_container" {
   container_access_type = each.value.container_access_type
 }
 ```
+
+**Flattening nested lists for `for_each`:**
+```hcl
+# In variables.tf: list(object({ name = string, policies = list(object({ name = string, ... })) }))
+
+locals {
+  policy_by_name = {
+    for item in flatten([
+      for parent in var.parents : [
+        for policy in parent.policies : {
+          parent = parent
+          policy = policy
+        }
+      ]
+    ]) : item.policy.name => item
+  }
+}
+
+resource "example_policy" "policy" {
+  for_each = local.policy_by_name
+
+  # Use each.value.parent + each.value.policy
+}
+```
+Use this only when list policies can repeat per parent; otherwise prefer a simple map keyed by `parent.name`.
 
 ---
 

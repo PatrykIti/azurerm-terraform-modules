@@ -109,7 +109,7 @@ module "virtual_network" {
 
 # After release (automatically updated)
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.2.0"
 }
 ```
 
@@ -117,7 +117,7 @@ module "virtual_network" {
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| VNv1.0.x | >= 1.3.0 | 4.43.0 (pinned) | TBD |
+| VNv1.0.x | >= 1.3.0 | 4.57.0 (pinned) | TBD |
 
 **Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
 

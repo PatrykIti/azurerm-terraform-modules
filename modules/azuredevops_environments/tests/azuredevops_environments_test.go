@@ -107,7 +107,7 @@ func TestAzuredevopsEnvironmentsValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "check_approvals.target_resource_type must be one of")
+	assert.Contains(t, err.Error(), "check_approvals.name must be a non-empty string")
 }
 
 // Helper function to get terraform options

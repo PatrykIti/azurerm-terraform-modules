@@ -12,26 +12,28 @@ The `README.md` is the front page of the module. It should provide all the essen
 
 **Required Sections:**
 - **Header**: A description of the module's purpose, pulled from `main.tf`.
-- **Usage**: A simple, copy-pasteable usage example, embedded from the `basic` example.
-- **Examples**: A list of links to the different examples (`basic`, `complete`, etc.).
-- **Module Documentation**: Static section linking to `docs/README.md` and `docs/IMPORT.md`.
-- **Inputs**: Auto-generated table of all input variables.
-- **Outputs**: Auto-generated table of all module outputs.
-- **Requirements**: Auto-generated.
-- **Providers**: Auto-generated.
-- **Resources**: Auto-generated.
-- **Security Considerations**: A custom section detailing the security posture of the module, its default settings, and any important security-related information.
+- **Version marker**: `<!-- BEGIN_VERSION -->` / `<!-- END_VERSION -->` for automation updates.
+- **Usage**: A simple, copy-pasteable usage example.
+- **Examples list**: `<!-- BEGIN_EXAMPLES -->` / `<!-- END_EXAMPLES -->` markers for automation updates.
+- **Module Documentation**: Static section linking to `docs/README.md` (if present) and `docs/IMPORT.md`.
+- **Inputs/Outputs/Requirements/Providers/Resources**: Auto-generated inside `<!-- BEGIN_TF_DOCS -->`.
+- **Notes**: Optional section for module-specific rules (for example, policy keying rules or provider-required defaults).
 
 ---
 
 ## `docs/README.md`
 
-This file is the module-specific documentation hub. Use it for guidance that does not belong in the auto-generated README, such as design notes, operational guidance, or additional usage patterns.
+This file is optional but recommended for complex modules (Azure DevOps modules use it). Use it for guidance that does not belong in the auto-generated README, such as design notes, operational guidance, or additional usage patterns.
 
-**Required Sections:**
-- **Overview**: Short description of what extra documentation lives here.
-- **Contents**: Bullet list of the docs available (add more files as needed).
-- **Contributing**: Link back to `CONTRIBUTING.md`.
+**Recommended Sections (Azure DevOps pattern):**
+- **Overview**
+- **Managed Resources**
+- **Usage Notes**
+- **Inputs (Grouped)**
+- **Outputs (Highlights)**
+- **Import Existing <Resource>**
+- **Troubleshooting**
+- **Related Docs**
 
 ---
 
@@ -45,6 +47,7 @@ This file documents how to import existing resources into the module using Terra
 - **Import blocks**: Exact resource addressing for the module outputs.
 - **Verification**: `plan`/`state` checks and clean-up guidance.
 - **Common errors**: Typical drift causes and fixes.
+- **ID collection**: Provide provider-appropriate CLI commands (Azure CLI or Azure DevOps CLI) to fetch IDs used in import blocks.
 
 **Source references**:
 - Use the module `tag_prefix` from `module.json` when setting `source = "...?ref=<TAG_PREFIX><version>"`.

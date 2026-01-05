@@ -33,7 +33,7 @@ variable "account_tier" {
 variable "account_replication_type" {
   description = "Defines the type of replication to use for this storage account."
   type        = string
-  default     = "ZRS"
+  default     = "LRS"
 
   validation {
     condition     = contains(["LRS", "GRS", "RAGRS", "ZRS", "GZRS", "RAGZRS"], var.account_replication_type)
@@ -73,7 +73,7 @@ variable "security_settings" {
     allow_nested_items_to_be_public   = optional(bool, false)
     infrastructure_encryption_enabled = optional(bool, true)
     enable_advanced_threat_protection = optional(bool, true)
-    public_network_access_enabled     = optional(bool, false)
+    public_network_access_enabled     = optional(bool, true)
   })
   default = {}
 
@@ -83,15 +83,100 @@ variable "security_settings" {
   }
 }
 
+# Diagnostic Settings (Storage Account + Services)
+variable "diagnostic_settings" {
+  description = <<-EOT
+    Diagnostic settings for the storage account and services (blob/queue/file/table/dfs).
+
+    Each entry creates a separate azurerm_monitor_diagnostic_setting for the selected scope.
+    Use areas to group categories (read/write/delete/transaction/capacity) or provide explicit
+    log_categories / metric_categories. Entries with no available categories are skipped and
+    reported in diagnostic_settings_skipped.
+  EOT
+
+  type = list(object({
+    name                           = string
+    scope                          = optional(string, "storage_account")
+    areas                          = optional(list(string))
+    log_categories                 = optional(list(string))
+    metric_categories              = optional(list(string))
+    log_analytics_workspace_id     = optional(string)
+    log_analytics_destination_type = optional(string)
+    storage_account_id             = optional(string)
+    eventhub_authorization_rule_id = optional(string)
+    eventhub_name                  = optional(string)
+  }))
+
+  default = []
+
+  validation {
+    condition = alltrue([
+      for scope in distinct([for ds in var.diagnostic_settings : try(ds.scope, "storage_account")]) :
+      length([for ds in var.diagnostic_settings : ds if try(ds.scope, "storage_account") == scope]) <= 5
+    ])
+    error_message = "Azure allows a maximum of 5 diagnostic settings per target resource scope."
+  }
+
+  validation {
+    condition     = length(distinct([for ds in var.diagnostic_settings : ds.name])) == length(var.diagnostic_settings)
+    error_message = "Each diagnostic_settings entry must have a unique name."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.log_analytics_workspace_id != null || ds.storage_account_id != null || ds.eventhub_authorization_rule_id != null
+    ])
+    error_message = "Each diagnostic_settings entry must specify at least one destination: log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.eventhub_authorization_rule_id == null || (ds.eventhub_name != null && ds.eventhub_name != "")
+    ])
+    error_message = "eventhub_name is required when eventhub_authorization_rule_id is set."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.log_analytics_destination_type == null || contains(["Dedicated", "AzureDiagnostics"], ds.log_analytics_destination_type)
+    ])
+    error_message = "log_analytics_destination_type must be either Dedicated or AzureDiagnostics."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      contains(["storage_account", "blob", "queue", "file", "table", "dfs"], try(ds.scope, "storage_account"))
+    ])
+    error_message = "scope must be one of: storage_account, blob, queue, file, table, dfs."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([
+        for area in coalescelist(try(ds.areas, null), ["all"]) :
+        contains(["all", "read", "write", "delete", "transaction", "capacity", "metrics"], area)
+      ])
+    ])
+    error_message = "areas may contain only: all, read, write, delete, transaction, capacity, metrics."
+  }
+}
+
 # Network Security
 variable "network_rules" {
   description = <<-EOT
     Network access control rules for the storage account.
 
     When ip_rules or virtual_network_subnet_ids are specified, only those sources will have access (default_action will be "Deny").
-    When both are empty/null, all public access will be denied (default_action will be "Deny").
+    When both are empty/null, all public access will be allowed (default_action will be "Allow").
+    If default_action is set to "Allow" or "Deny", it overrides the automatic behavior.
 
-    To allow all public access, set this entire variable to null.
+    To allow all public access, set this variable to null, set default_action to "Allow",
+    or leave ip_rules and virtual_network_subnet_ids empty.
 
     bypass: Azure services that should bypass network rules (default: ["AzureServices"])
     ip_rules: Set of public IP addresses or CIDR blocks that should have access
@@ -100,6 +185,7 @@ variable "network_rules" {
   EOT
 
   type = object({
+    default_action             = optional(string)
     bypass                     = optional(set(string), ["AzureServices"])
     ip_rules                   = optional(set(string), [])
     virtual_network_subnet_ids = optional(set(string), [])
@@ -111,7 +197,15 @@ variable "network_rules" {
 
   default = {
     bypass = ["AzureServices"]
-    # Empty ip_rules and virtual_network_subnet_ids means no public access (secure by default)
+    # Empty ip_rules and virtual_network_subnet_ids means public access is allowed
+  }
+
+  validation {
+    condition = var.network_rules == null || (
+      var.network_rules.default_action == null ||
+      contains(["Allow", "Deny"], var.network_rules.default_action)
+    )
+    error_message = "network_rules.default_action must be null, \"Allow\", or \"Deny\"."
   }
 }
 

@@ -1,123 +1,71 @@
 # CI/CD Integration
 
-Automating tests within a CI/CD pipeline is crucial for ensuring the quality and security of modules. We use GitHub Actions to orchestrate the entire process.
+Automated tests run in GitHub Actions via two workflows:
 
-## Workflow Structure
+1) **PR Validation** (`.github/workflows/pr-validation.yml`)  
+   Fast checks for affected modules:
+   - `terraform fmt -check -recursive`
+   - `terraform init -backend=false` + `terraform validate`
+   - `terraform test -test-directory=tests/unit`
 
-The main workflow (`.github/workflows/module-ci.yml`) is designed to dynamically detect changes in modules and run the appropriate test suites for them in parallel.
+2) **Module CI** (`.github/workflows/module-ci.yml`)  
+   Full module validation, integration tests, and security scanning:
+   - `validate` action (fmt, validate, tflint, example validation)
+   - `test` action (Go-based Terratest via `go test`)
+   - `security` action (tfsec + checkov in Docker, SARIF upload)
 
-```yaml
-# .github/workflows/module-ci.yml
-name: Module CI
+---
 
-on:
-  pull_request:
-    paths:
-      - 'modules/**'
-  push:
-    branches: [ main, release/** ]
+## Module Detection
 
-jobs:
-  detect-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      modules: ${{ steps.filter.outputs.changes }}
-    steps:
-      - uses: actions/checkout@v5
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          filters: |
-            kubernetes_cluster: modules/azurerm_kubernetes_cluster/**
-            # ... other modules
+Both workflows detect modules dynamically:
 
-  unit-test:
-    needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.modules != '[]' }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        module: ${{ fromJson(needs.detect-changes.outputs.modules) }}
-    steps:
-      - name: Run unit tests
-        run: |
-          cd modules/azurerm_${{ matrix.module }}
-          terraform test -test-directory=tests/unit
+- **PR title scope**: uses `commit_scope` from `module.json` to map scopes to modules.
+- **Path changes**: uses generated filters from `modules/*` to select changed modules.
 
-  integration-test:
-    needs: [detect-changes, unit-test]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        module: ${{ fromJson(needs.detect-changes.outputs.modules) }}
-    steps:
-      - name: Run integration tests
-        run: |
-          cd modules/azurerm_${{ matrix.module }}/tests
-          make test-junit
-```
+If your PR title uses a new `commit_scope`, add it to the allowlist in
+`.github/workflows/pr-validation.yml` to satisfy title validation.
 
-### Key Workflow Elements
+---
 
-1.  **`detect-changes`**: This job uses the `dorny/paths-filter` action to identify which module directories have been modified in a given commit or pull request. The result is passed to subsequent jobs as a matrix.
-2.  **`strategy: matrix`**: Allows for the dynamic creation of jobs for each changed module. If 3 modules are changed, GitHub Actions will run 3 parallel `unit-test` jobs and 3 `integration-test` jobs.
-3.  **Parallelism**: Thanks to the matrix, tests for different modules do not block each other, which drastically reduces the waiting time for results.
-4.  **Dependencies (`needs`)**: The `integration-test` job depends on `unit-test`, ensuring that expensive integration tests are only run if the fast unit tests succeed.
+## Module CI Execution Details
 
-## Authentication in Azure
+Module CI uses the composite action `./.github/actions/module-runner`:
 
-In CI/CD, we use **OpenID Connect (OIDC)** for secure authentication in Azure without storing static secrets.
+- **validate**: `terraform fmt`, `terraform init`, `terraform validate`, `tflint`,
+  and example validation.
+- **test**: runs `go test -v -timeout 30m` in the module `tests/` directory if Go tests exist.
+- **security**: runs `tfsec` and `checkov` via Docker and uploads SARIF.
 
-```yaml
-# Step in the integration-test job
-- name: Azure Login
-  uses: azure/login@v1
-  with:
-    client-id: ${{ secrets.AZURE_CLIENT_ID }}
-    tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-    subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+`workflow_dispatch` supports inputs (`test_type`, `module`), but the current
+module-runner always runs full `go test` when invoked.
 
-# Environment variables passed to Go tests
-env:
-  ARM_USE_OIDC: true
-  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-```
--   The `azure/login@v1` action obtains a temporary access token.
--   The `ARM_USE_OIDC: true` variable informs the Terraform provider and our Go helpers to use OIDC authentication.
+---
 
-## Reporting Test Results
+## Authentication
 
-To get clear test results, especially in case of failures, we generate reports in JUnit XML format.
+### AzureRM modules
 
-### Generating the Report
+`module-ci.yml` uses `azure/login@v2` with OIDC and passes Azure credentials
+to tests via environment variables:
 
-The `Makefile` contains a `test-junit` target that:
-1.  Installs the `go-junit-report` tool.
-2.  Runs `go test`.
-3.  Redirects standard output and errors to `go-junit-report`, which converts them to XML format.
+- `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_CLIENT_SECRET`
+- `ARM_CLIENT_ID`, `ARM_TENANT_ID`, `ARM_SUBSCRIPTION_ID`, `ARM_CLIENT_SECRET`
+- `ARM_USE_OIDC` (true when no client secret is supplied)
 
-```makefile
-# Makefile
-test-junit: check-env deps
-	@echo "Running tests with JUnit output..."
-	go install github.com/jstemmer/go-junit-report/v2@latest
-	go test -v -timeout $(TIMEOUT) ./... 2>&1 | go-junit-report -set-exit-code > test-results.xml
-```
+### Azure DevOps modules
 
-### Publishing the Report in GitHub Actions
+Azure DevOps tests rely on:
 
-Then, in the CI/CD workflow, we use an action to publish these results.
+- `AZDO_ORG_SERVICE_URL`
+- `AZDO_PERSONAL_ACCESS_TOKEN`
+- `AZDO_PROJECT_ID`
 
-```yaml
-# Step in the integration-test job
-- name: Publish Test Results
-  uses: EnricoMi/publish-unit-test-result-action@v2
-  if: always() # Always run this step, even if tests failed
-  with:
-    files: |
-      **/test-results.xml
-```
--   `if: always()`: Guarantees that the report will be published, which is crucial for analyzing failures.
--   The action automatically parses the XML files and displays a summary directly in the GitHub Actions interface, as well as in the pull request.
+These are provided via GitHub secrets in `module-ci.yml` and consumed by test helpers.
+
+---
+
+## Reporting
+
+Module CI does not generate JUnit reports by default. Test results are visible in
+job logs. If you need JUnit output, use your module `tests/Makefile` locally.

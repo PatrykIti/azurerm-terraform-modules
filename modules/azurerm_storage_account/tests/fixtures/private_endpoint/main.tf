@@ -1,9 +1,9 @@
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = ">= 1.12.2"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
   }
 }
@@ -59,11 +59,13 @@ module "storage_account" {
 
   # Enable shared access key for tests
   security_settings = {
-    shared_access_key_enabled = true
+    shared_access_key_enabled     = true
+    public_network_access_enabled = false
   }
 
   # Network rules - deny all public access
   network_rules = {
+    default_action             = "Deny"
     ip_rules                   = []
     virtual_network_subnet_ids = []
     bypass                     = [] # No bypass, completely private

@@ -6,7 +6,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
   }
 }
@@ -17,13 +17,13 @@ provider "azurerm" {
 
 # Create a resource group for this example
 resource "azurerm_resource_group" "example" {
-  name     = "rg-subnet-complete-example"
+  name     = var.resource_group_name
   location = var.location
 }
 
 # Create a Virtual Network for the subnet
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-subnet-complete-example"
+  name                = var.virtual_network_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   address_space       = ["10.0.0.0/16"]
@@ -37,7 +37,7 @@ resource "azurerm_virtual_network" "example" {
 
 # Create Network Security Group
 resource "azurerm_network_security_group" "example" {
-  name                = "nsg-subnet-complete-example"
+  name                = var.network_security_group_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -75,7 +75,7 @@ resource "azurerm_network_security_group" "example" {
 
 # Create Route Table
 resource "azurerm_route_table" "example" {
-  name                = "rt-subnet-complete-example"
+  name                = var.route_table_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -95,7 +95,7 @@ resource "azurerm_route_table" "example" {
 
 # Create Storage Account for service endpoint policy
 resource "azurerm_storage_account" "example" {
-  name                     = "stsubnetcompleteexample"
+  name                     = var.storage_account_name
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -109,7 +109,7 @@ resource "azurerm_storage_account" "example" {
 
 # Create Service Endpoint Policy
 resource "azurerm_subnet_service_endpoint_storage_policy" "example" {
-  name                = "sep-storage-example"
+  name                = var.service_endpoint_policy_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
@@ -117,9 +117,7 @@ resource "azurerm_subnet_service_endpoint_storage_policy" "example" {
     name        = "AllowSpecificStorage"
     description = "Allow access to specific storage account"
     service_resources = [
-      azurerm_storage_account.example.id,
-      "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/*/providers/Microsoft.Storage/storageAccounts/account1",
-      "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/*/providers/Microsoft.Storage/storageAccounts/account2"
+      azurerm_storage_account.example.id
     ]
   }
 
@@ -131,9 +129,9 @@ resource "azurerm_subnet_service_endpoint_storage_policy" "example" {
 
 # Complete Subnet configuration with all features
 module "subnet" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
+  source = "../.."
 
-  name                 = "subnet-complete-example"
+  name                 = var.subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24", "10.0.2.0/24"]
@@ -156,21 +154,12 @@ module "subnet" {
   private_endpoint_network_policies_enabled     = true
   private_link_service_network_policies_enabled = true
 
-  depends_on = [azurerm_virtual_network.example]
-}
-
-# Associate Network Security Group with Subnet
-resource "azurerm_subnet_network_security_group_association" "example" {
-  subnet_id                 = module.subnet.id
-  network_security_group_id = azurerm_network_security_group.example.id
-
-  depends_on = [module.subnet]
-}
-
-# Associate Route Table with Subnet
-resource "azurerm_subnet_route_table_association" "example" {
-  subnet_id      = module.subnet.id
-  route_table_id = azurerm_route_table.example.id
-
-  depends_on = [module.subnet]
+  associations = {
+    network_security_group = {
+      id = azurerm_network_security_group.example.id
+    }
+    route_table = {
+      id = azurerm_route_table.example.id
+    }
+  }
 }

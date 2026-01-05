@@ -422,6 +422,11 @@ output "static_website_id" {
   value       = try(azurerm_storage_account_static_website.static_website[0].id, null)
 }
 
+output "diagnostic_settings_skipped" {
+  description = "Diagnostic settings entries skipped because no categories were available after filtering."
+  value       = local.diagnostic_settings_skipped
+}
+
 
 output "account_tier" {
   description = "The Tier of the storage account"
@@ -517,4 +522,3 @@ output "sftp_enabled" {
   description = "Is SFTP enabled for the storage account"
   value       = try(azurerm_storage_account.storage_account.sftp_enabled, null)
 }
-

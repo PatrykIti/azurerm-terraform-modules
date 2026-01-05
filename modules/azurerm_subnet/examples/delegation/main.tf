@@ -6,7 +6,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
   }
 }
@@ -17,13 +17,13 @@ provider "azurerm" {
 
 # Create a resource group for this example
 resource "azurerm_resource_group" "example" {
-  name     = "rg-subnet-delegation-example"
+  name     = var.resource_group_name
   location = var.location
 }
 
 # Create a Virtual Network for subnet delegation
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-subnet-delegation-example"
+  name                = var.virtual_network_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   address_space       = ["10.0.0.0/16"]
@@ -37,9 +37,9 @@ resource "azurerm_virtual_network" "example" {
 
 # Subnet delegated to Azure Container Instances
 module "subnet_container_instances" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
+  source = "../.."
 
-  name                 = "subnet-container-instances"
+  name                 = var.container_instances_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
@@ -73,9 +73,9 @@ module "subnet_container_instances" {
 
 # Subnet delegated to Azure Database for PostgreSQL Flexible Server
 module "subnet_postgresql" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
+  source = "../.."
 
-  name                 = "subnet-postgresql"
+  name                 = var.postgresql_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.2.0/24"]
@@ -105,9 +105,9 @@ module "subnet_postgresql" {
 
 # Subnet delegated to Azure App Service (Web Apps)
 module "subnet_app_service" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
+  source = "../.."
 
-  name                 = "subnet-app-service"
+  name                 = var.app_service_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.3.0/24"]
@@ -141,9 +141,9 @@ module "subnet_app_service" {
 
 # Subnet delegated to Azure Batch
 module "subnet_batch" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
+  source = "../.."
 
-  name                 = "subnet-batch"
+  name                 = var.batch_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.4.0/24"]
@@ -175,9 +175,9 @@ module "subnet_batch" {
 
 # Regular subnet for comparison (no delegation)
 module "subnet_regular" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_subnet?ref=SNv1.0.0"
+  source = "../.."
 
-  name                 = "subnet-regular"
+  name                 = var.regular_subnet_name
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.5.0/24"]
@@ -195,7 +195,7 @@ module "subnet_regular" {
 
 # Example: Create a Container Instance in the delegated subnet
 resource "azurerm_container_group" "example" {
-  name                = "aci-delegation-example"
+  name                = var.container_group_name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   ip_address_type     = "Private"

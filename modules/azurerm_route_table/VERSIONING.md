@@ -109,7 +109,7 @@ module "route_table" {
 
 # After release (automatically updated)
 module "route_table" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.2.0"
 }
 ```
 
@@ -117,7 +117,7 @@ module "route_table" {
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| RTv1.0.x | >= 1.3.0 | 4.43.0 (pinned) | TBD |
+| RTv1.0.x | >= 1.3.0 | 4.57.0 (pinned) | TBD |
 
 **Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
 

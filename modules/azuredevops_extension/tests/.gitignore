@@ -22,7 +22,8 @@ override.tf.json
 terraform.rc
 
 # Test output and reports
-test_outputs/
+test_outputs/*
+!test_outputs/.gitkeep
 test-results/
 test-results.xml
 coverage.out

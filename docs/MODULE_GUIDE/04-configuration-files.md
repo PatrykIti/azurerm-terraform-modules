@@ -83,11 +83,10 @@ This file controls the generation of the module's `README.md` file using `terraf
 
 **Best Practices:**
 - **Header**: Use `header-from: main.tf` to pull the module's main description from the top of the `main.tf` file.
-- **Custom Content**: Add sections for `Usage`, `Examples`, and `Security Considerations` to provide context beyond the auto-generated inputs and outputs.
-- **Examples**: Use `{{ include "examples/basic/main.tf" }}` to embed a real, working example directly in the `README.md`.
+- **Minimal content**: Keep terraform-docs content focused on requirements/providers/resources/inputs/outputs. Put `Usage`, `Examples`, and `Notes` outside `<!-- BEGIN_TF_DOCS -->` markers in `README.md`.
 - **Markers**: Use the standard `<!-- BEGIN_TF_DOCS -->` and `<!-- END_TF_DOCS -->` markers to define where the generated content should be injected.
 
-**Template (`.terraform-docs.yml`):**
+**Template (`.terraform-docs.yml`, AKS-aligned):**
 ```yaml
 formatter: "markdown table"
 
@@ -107,18 +106,6 @@ sections:
 content: |-
   {{ .Header }}
 
-  ## Usage
-
-  ```hcl
-  {{ include "examples/basic/main.tf" }}
-  ```
-
-  ## Examples
-
-  <!-- This section can be manually maintained or updated by a script -->
-  - [Basic](./examples/basic) - A basic deployment of the module.
-  - [Complete](./examples/complete) - A deployment with all features enabled.
-
   {{ .Requirements }}
 
   {{ .Providers }}
@@ -131,12 +118,7 @@ content: |-
 
   {{ .Outputs }}
 
-  ## Security Considerations
-
-  Detail any security-specific information here.
-
 output:
-  file: README.md
   mode: inject
   template: |-
     <!-- BEGIN_TF_DOCS -->

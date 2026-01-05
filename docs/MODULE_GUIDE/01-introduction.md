@@ -27,3 +27,10 @@ Note: The repository name may still reference AzureRM. Azure DevOps modules are 
 
 - **Correct**: `azurerm_storage_account`, `azurerm_virtual_network`, `azuredevops_project`, `azuredevops_repository`
 - **Incorrect**: `storage`, `vnet_module`, `Azure-AKS`, `azdo_project`
+
+## Primary Resource Requirement
+
+Each module must manage its primary/root resource in `main.tf`. Sub-resources
+(child resources) belong in the same module only when they are attached to that
+primary resource. Do not create modules that manage only sub-resources without
+the primary resource.

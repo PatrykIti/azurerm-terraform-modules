@@ -113,7 +113,7 @@ module.exports = {
     [
       '@semantic-release/changelog',
       {
-        changelogFile: `modules/${MODULE_NAME}/CHANGELOG.md`,
+        changelogFile: 'CHANGELOG.md',
         changelogTitle: `# Changelog
 
 All notable changes to the ${MODULE_TITLE} Terraform module will be documented in this file.
@@ -127,18 +127,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       '@semantic-release/exec',
       {
         prepareCmd: `
+          sed_in_place() {
+            file="$1"
+            shift
+            tmp="$file.tmp.$$"
+            sed "$@" "$file" > "$tmp" && mv "$tmp" "$file"
+          }
+
           CONFIG_FILE="modules/${MODULE_NAME}/.github/module-config.yml"
           if [ -f "$CONFIG_FILE" ]; then
-            sed -i "s/^version: .*/version: \${nextRelease.version}/" "$CONFIG_FILE"
+            sed_in_place "$CONFIG_FILE" -e "s/^version: .*/version: \${nextRelease.version}/"
           fi
 
-          # Update only module source references in examples (not provider sources or other fields)
-          find "modules/${MODULE_NAME}/examples" -name "*.tf" -type f -exec sed -i '/^module /,/^}/ s|source[[:space:]]*=[[:space:]]*"\.\./.*"|source = "${SOURCE_URL}"|g' {} +
+          find "modules/${MODULE_NAME}/examples" -name "*.tf" -type f -print | while IFS= read -r tf_file; do
+            sed_in_place "$tf_file" \
+              -e 's|^\\([[:space:]]*source[[:space:]]*=[[:space:]]*\\)"\\.\\.\\(/\\.\\.\\)\\{1,2\\}/\\{0,1\\}"|\\1"${SOURCE_URL}"|g' \
+              -e 's|^\\([[:space:]]*source[[:space:]]*=[[:space:]]*\\)"\\(\\(git::\\)\\{0,1\\}https://\\)\\{0,1\\}github.com/[^/]\\{1,\\}/[^/]\\{1,\\}//modules/${MODULE_NAME}[^"]*"|\\1"${SOURCE_URL}"|g'
+          done
 
-          find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../../"|source = "${SOURCE_URL}"|g' {} +
-          find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's|source = "../"|source = "${SOURCE_URL}"|g' {} +
-          find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's| ../../ | ${SOURCE_URL} |g' {} +
-          find "modules/${MODULE_NAME}" -name "README.md" -type f -exec sed -i 's| ../.. | ${SOURCE_URL} |g' {} +
+          find "modules/${MODULE_NAME}" -name "README.md" -type f -print | while IFS= read -r readme; do
+            sed_in_place "$readme" \
+              -e 's|source = "\\.\\./\\.\\./"|source = "${SOURCE_URL}"|g' \
+              -e 's|source = "\\.\\./\\.\\./\\.\\./"|source = "${SOURCE_URL}"|g' \
+              -e 's|source = "\\.\\./\\.\\."|source = "${SOURCE_URL}"|g' \
+              -e 's|source = "\\.\\./"|source = "${SOURCE_URL}"|g' \
+              -e 's| \\.\\./\\.\\./ | ${SOURCE_URL} |g' \
+              -e 's| \\.\\./\\.\\./\\.\\./ | ${SOURCE_URL} |g' \
+              -e 's| \\.\\./\\.\\. | ${SOURCE_URL} |g'
+          done
 
           if [ -x "./scripts/update-module-version.sh" ]; then
             ./scripts/update-module-version.sh "modules/${MODULE_NAME}" "\${nextRelease.version}"
@@ -148,8 +164,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
             ./scripts/update-examples-list.sh "modules/${MODULE_NAME}"
           fi
 
-          if command -v terraform-docs > /dev/null 2>&1; then
-            terraform-docs --config "$(pwd)/modules/${MODULE_NAME}/.terraform-docs.yml" --output-file "$(pwd)/modules/${MODULE_NAME}/README.md" --output-mode inject "$(pwd)/modules/${MODULE_NAME}"
+          # Use our safe wrapper script instead of terraform-docs directly
+          # This ensures root README is never overwritten
+          if [ -x "./scripts/update-module-docs.sh" ]; then
+            ./scripts/update-module-docs.sh "${MODULE_NAME}"
           fi
 
           if [ -x "./scripts/update-root-readme.sh" ]; then

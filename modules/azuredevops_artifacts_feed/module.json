@@ -2,6 +2,6 @@
   "name": "azuredevops_artifacts_feed",
   "title": "Azure DevOps Artifacts Feed",
   "commit_scope": "azuredevops-artifacts-feed",
-  "tag_prefix": "ADOAF",
+  "tag_prefix": "ADOAFv",
   "description": "Azure DevOps artifacts feed module for managing a feed, retention policies, and permissions"
 }

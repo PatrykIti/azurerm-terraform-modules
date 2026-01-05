@@ -88,9 +88,8 @@ resource "azurerm_monitor_diagnostic_setting" "main" {
   #   }
   # }
 
-  metric {
+  enabled_metric {
     category = "AllMetrics"
-    enabled  = var.diagnostic_settings.metrics.enabled
 
     retention_policy {
       enabled = true

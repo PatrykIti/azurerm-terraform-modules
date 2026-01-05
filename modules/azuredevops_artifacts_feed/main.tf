@@ -1,26 +1,24 @@
 locals {
-  create_feed = var.name != null && var.project_id != null
-  feed_id     = local.create_feed ? azuredevops_feed.feed[0].id : null
+  # Normalize list inputs into stable maps for for_each addressing.
   feed_permissions = {
-    for permission in var.feed_permissions :
-    coalesce(permission.key, permission.identity_descriptor) => permission
+    for feed_permission in var.feed_permissions :
+    coalesce(feed_permission.key, feed_permission.identity_descriptor) => feed_permission
   }
+  # Ensure retention policy resources keep stable addresses across reorders.
   feed_retention_policies = {
-    for policy in var.feed_retention_policies :
+    for retention_policy in var.feed_retention_policies :
     coalesce(
-      policy.key,
+      retention_policy.key,
       format(
         "%s-%s",
-        policy.count_limit,
-        policy.days_to_keep_recently_downloaded_packages
+        retention_policy.count_limit,
+        retention_policy.days_to_keep_recently_downloaded_packages
       )
-    ) => policy
+    ) => retention_policy
   }
 }
 
 resource "azuredevops_feed" "feed" {
-  count = local.create_feed ? 1 : 0
-
   name       = var.name
   project_id = var.project_id
 
@@ -36,32 +34,18 @@ resource "azuredevops_feed" "feed" {
 resource "azuredevops_feed_permission" "feed_permission" {
   for_each = local.feed_permissions
 
-  feed_id             = each.value.feed_id != null ? each.value.feed_id : local.feed_id
+  feed_id             = azuredevops_feed.feed.id
   identity_descriptor = each.value.identity_descriptor
   role                = lower(each.value.role)
-  project_id          = each.value.project_id != null ? each.value.project_id : (each.value.feed_id == null ? var.project_id : null)
+  project_id          = var.project_id
   display_name        = try(each.value.display_name, null)
-
-  lifecycle {
-    precondition {
-      condition     = each.value.feed_id != null || local.create_feed
-      error_message = "feed_permissions requires feed_id when the module feed is not created."
-    }
-  }
 }
 
 resource "azuredevops_feed_retention_policy" "feed_retention_policy" {
   for_each = local.feed_retention_policies
 
-  feed_id                                   = each.value.feed_id != null ? each.value.feed_id : local.feed_id
+  feed_id                                   = azuredevops_feed.feed.id
   count_limit                               = each.value.count_limit
   days_to_keep_recently_downloaded_packages = each.value.days_to_keep_recently_downloaded_packages
-  project_id                                = each.value.project_id != null ? each.value.project_id : (each.value.feed_id == null ? var.project_id : null)
-
-  lifecycle {
-    precondition {
-      condition     = each.value.feed_id != null || local.create_feed
-      error_message = "feed_retention_policies requires feed_id when the module feed is not created."
-    }
-  }
+  project_id                                = var.project_id
 }

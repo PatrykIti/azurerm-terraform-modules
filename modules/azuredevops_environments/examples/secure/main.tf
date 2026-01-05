@@ -15,7 +15,7 @@ data "azuredevops_group" "project_collection_admins" {
 }
 
 module "azuredevops_environments" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_environments?ref=ADOE1.0.0"
+  source = "../.."
 
   project_id  = var.project_id
   name        = "ado-env-secure-example"
@@ -23,8 +23,7 @@ module "azuredevops_environments" {
 
   check_approvals = [
     {
-      key                   = "security-approval"
-      target_resource_type  = "environment"
+      name                  = "security-approval"
       approvers             = [data.azuredevops_group.project_collection_admins.origin_id]
       requester_can_approve = false
     }
@@ -32,26 +31,24 @@ module "azuredevops_environments" {
 
   check_exclusive_locks = [
     {
-      key                  = "exclusive-lock"
-      target_resource_type = "environment"
-      timeout              = 43200
+      name    = "exclusive-lock"
+      timeout = 43200
     }
   ]
 
   check_business_hours = [
     {
-      display_name         = "Business hours gate"
-      target_resource_type = "environment"
-      start_time           = "08:00"
-      end_time             = "18:00"
-      time_zone            = "UTC"
-      monday               = true
-      tuesday              = true
-      wednesday            = true
-      thursday             = true
-      friday               = true
-      saturday             = false
-      sunday               = false
+      name       = "Business hours gate"
+      start_time = "08:00"
+      end_time   = "18:00"
+      time_zone  = "UTC"
+      monday     = true
+      tuesday    = true
+      wednesday  = true
+      thursday   = true
+      friday     = true
+      saturday   = false
+      sunday     = false
     }
   ]
 }

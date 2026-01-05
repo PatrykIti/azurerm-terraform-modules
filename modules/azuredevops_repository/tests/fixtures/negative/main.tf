@@ -15,10 +15,17 @@ module "azuredevops_repository" {
   source = "../../../"
 
   project_id = "00000000-0000-0000-0000-000000000000"
+  name       = "invalid-repo"
 
   branches = [
     {
-      name = "invalid-branch"
+      name       = "invalid-branch"
+      ref_branch = "refs/heads/main"
+      policies = {
+        min_reviewers = {
+          reviewer_count = 0
+        }
+      }
     }
   ]
 }

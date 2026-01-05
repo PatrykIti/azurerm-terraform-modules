@@ -109,7 +109,7 @@ module "storage_account" {
 
 # After release (automatically updated)
 module "storage_account" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.0"
 }
 ```
 
@@ -121,7 +121,7 @@ module "storage_account" {
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| SAv1.0.x       | >= 1.3.0          | 4.43.0 (pinned)  | 2023-01-01        |
+| SAv1.0.x       | >= 1.3.0          | 4.57.0 (pinned)  | 2023-01-01        |
 
 **Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments. Updates to the provider version are considered carefully and may result in a minor or major version bump depending on the changes.
 

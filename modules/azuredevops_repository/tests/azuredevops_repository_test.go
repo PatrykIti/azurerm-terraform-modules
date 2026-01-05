@@ -102,7 +102,7 @@ func TestAzuredevopsRepositoryValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "branches.repository_id is required when the module repository is not created")
+	assert.Contains(t, err.Error(), "branches.policies.min_reviewers.reviewer_count must be greater than 0")
 }
 
 // Helper function to get terraform options

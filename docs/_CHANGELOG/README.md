@@ -6,6 +6,10 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [054](./054-2026-01-01-testing-guide-alignment.md) | 2026-01-01 | Testing guide alignment (AKS + Azure DevOps) | Maintenance / Documentation |
+| [053](./053-2026-01-01-module-guide-alignment.md) | 2026-01-01 | Module guide alignment (AKS + Azure DevOps patterns) | Maintenance / Documentation |
+| [052](./052-2025-12-31-ado-release-and-docs-alignment.md) | 2025-12-31 | Azure DevOps modules release and docs alignment | Maintenance / Documentation |
+| [051](./051-2025-12-31-ado-repository-policies-count.md) | 2025-12-31 | Azure DevOps Repository policies - count-based repo policies | Breaking Change / Maintenance |
 | [050](./050-2025-12-29-makefile-tests-path-portability.md) | 2025-12-29 | Makefile tests path portability | Fix / Maintenance |
 | [049](./049-2025-12-29-workflow-and-module-docs-alignment.md) | 2025-12-29 | Workflow and module documentation alignment | Maintenance / Documentation |
 | [048](./048-2025-12-28-azuredevops-identity-refactor-alignment.md) | 2025-12-28 | Azure DevOps Identity module refactor alignment | Breaking Change / Maintenance |

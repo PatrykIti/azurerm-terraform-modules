@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
   }
 }
@@ -14,12 +14,55 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "rg-nsg-complete-example"
+  name     = var.resource_group_name
   location = var.location
 }
 
+# Log Analytics workspace for diagnostics
+resource "azurerm_log_analytics_workspace" "example" {
+  name                = var.log_analytics_workspace_name
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
 
-# Create Application Security Groups for demonstration
+# Storage account for diagnostic settings
+resource "azurerm_storage_account" "diagnostics" {
+  name                     = var.storage_account_name
+  location                 = azurerm_resource_group.example.location
+  resource_group_name      = azurerm_resource_group.example.name
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  min_tls_version          = "TLS1_2"
+}
+
+# Event Hub for diagnostic settings (optional destination)
+resource "azurerm_eventhub_namespace" "example" {
+  name                = var.eventhub_namespace_name
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "Standard"
+  capacity            = 1
+}
+
+resource "azurerm_eventhub" "example" {
+  name              = var.eventhub_name
+  namespace_id      = azurerm_eventhub_namespace.example.id
+  partition_count   = 2
+  message_retention = 1
+}
+
+resource "azurerm_eventhub_namespace_authorization_rule" "example" {
+  name                = "nsg-diagnostics"
+  namespace_name      = azurerm_eventhub_namespace.example.name
+  resource_group_name = azurerm_resource_group.example.name
+  send                = true
+  listen              = false
+  manage              = false
+}
+
+# Application Security Groups for demonstration
 resource "azurerm_application_security_group" "web_servers" {
   name                = "asg-web-servers"
   location            = azurerm_resource_group.example.location
@@ -44,12 +87,11 @@ resource "azurerm_application_security_group" "database_servers" {
 
 # Main NSG module with complete configuration
 module "network_security_group" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.0"
+  source = "../.."
 
   name                = "nsg-complete-example"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-
 
   # Comprehensive Security Rules
   security_rules = [

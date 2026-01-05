@@ -30,6 +30,10 @@ variables {
   name                = "testsa123456"
   resource_group_name = "test-rg"
   location            = "northeurope"
+
+  security_settings = {
+    public_network_access_enabled = false
+  }
 }
 
 # Test default security settings
@@ -85,8 +89,8 @@ run "verify_account_defaults" {
 
   # Test default replication type
   assert {
-    condition     = azurerm_storage_account.storage_account.account_replication_type == "ZRS"
-    error_message = "Default replication type should be ZRS"
+    condition     = azurerm_storage_account.storage_account.account_replication_type == "LRS"
+    error_message = "Default replication type should be LRS"
   }
 
   # Test default account kind
@@ -131,7 +135,7 @@ run "verify_blob_properties_defaults" {
   }
 }
 
-# Test network rules default to deny
+# Test network rules default handling
 run "verify_network_rules_defaults" {
   command = plan
 
@@ -145,7 +149,7 @@ run "verify_network_rules_defaults" {
   }
 
   # Network rules are applied via a separate resource in the actual implementation
-  # The default_action is now automatically set to "Deny" for security by default
+  # The default_action is derived from ip_rules and virtual_network_subnet_ids unless overridden
   # Here we verify the network rules structure is valid
   assert {
     condition     = can(var.network_rules.bypass)

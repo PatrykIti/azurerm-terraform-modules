@@ -6,7 +6,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
   }
 }
@@ -49,7 +49,7 @@ resource "azurerm_log_analytics_workspace" "security" {
 
 # Create Storage Account for security logs
 resource "azurerm_storage_account" "security" {
-  name                     = "stvnetsecureexample"
+  name                     = var.storage_account_name
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
@@ -59,7 +59,7 @@ resource "azurerm_storage_account" "security" {
   https_traffic_only_enabled      = true
   min_tls_version                 = "TLS1_2"
   public_network_access_enabled   = false
-  shared_access_key_enabled       = true # Required for flow logs
+  shared_access_key_enabled       = false
   allow_nested_items_to_be_public = false
 
   tags = {
@@ -68,46 +68,9 @@ resource "azurerm_storage_account" "security" {
   }
 }
 
-# Create Network Watcher for flow logs
-resource "azurerm_network_watcher" "example" {
-  name                = "nw-vnet-secure-example-${var.location}"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-
-  tags = {
-    Environment = "Production"
-    Purpose     = "Network Monitoring"
-  }
-}
-
-# Create Network Security Group for additional security
-resource "azurerm_network_security_group" "example" {
-  name                = "nsg-vnet-secure-example"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-
-  # Deny all inbound traffic by default
-  security_rule {
-    name                       = "DenyAllInbound"
-    priority                   = 4096
-    direction                  = "Inbound"
-    access                     = "Deny"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  tags = {
-    Environment = "Production"
-    Purpose     = "Network Security"
-  }
-}
-
 # Secure Virtual Network configuration with enhanced security features
 module "virtual_network" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_virtual_network?ref=VNv1.1.0"
+  source = "../.."
 
   name                = "vnet-secure-example"
   resource_group_name = azurerm_resource_group.example.name
@@ -126,13 +89,11 @@ module "virtual_network" {
     enable = true
   }
 
-  # Encryption Configuration - allow unencrypted (subscription limitation)
+  # Encryption Configuration
   encryption = {
-    enforcement = "AllowUnencrypted"
+    enforcement = "DropUnencrypted"
   }
 
-
-  # Lifecycle Management - prevent accidental deletion
 
   tags = {
     Environment   = "Production"
@@ -143,39 +104,6 @@ module "virtual_network" {
     Owner         = "Security Team"
     CostCenter    = "Security-Infrastructure"
   }
-}
-
-# Network Watcher Flow Log - now managed as separate resource for security monitoring
-resource "azurerm_network_watcher_flow_log" "example" {
-  network_watcher_name = azurerm_network_watcher.example.name
-  resource_group_name  = azurerm_resource_group.example.name
-  name                 = "${module.virtual_network.name}-flowlog"
-  target_resource_id   = azurerm_network_security_group.example.id
-  storage_account_id   = azurerm_storage_account.security.id
-  enabled              = true
-  version              = 2
-
-  retention_policy {
-    enabled = true
-    days    = 90
-  }
-
-  traffic_analytics {
-    enabled               = true
-    workspace_id          = azurerm_log_analytics_workspace.security.workspace_id
-    workspace_region      = azurerm_log_analytics_workspace.security.location
-    workspace_resource_id = azurerm_log_analytics_workspace.security.id
-    interval_in_minutes   = 10
-  }
-
-  tags = {
-    Environment   = "Production"
-    Example       = "Secure"
-    Purpose       = "Security Monitoring"
-    SecurityLevel = "High"
-  }
-
-  depends_on = [module.virtual_network]
 }
 
 # Diagnostic Settings - now managed as separate resource for security monitoring
@@ -191,9 +119,8 @@ resource "azurerm_monitor_diagnostic_setting" "example" {
   }
 
   # Virtual Network Metrics
-  metric {
+  enabled_metric {
     category = "AllMetrics"
-    enabled  = true
   }
 
   depends_on = [module.virtual_network]

@@ -39,7 +39,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "network_security_group" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.0"
+  source = "path/to/azurerm_network_security_group"
 
   # Core configuration
   name                = "nsg-example"
@@ -73,7 +73,7 @@ module "network_security_group" {
 
 ```hcl
 module "network_security_group" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.0"
+  source = "path/to/azurerm_network_security_group"
 
   # Core configuration
   name                = "nsg-production"
@@ -131,7 +131,7 @@ module "network_security_group" {
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates a basic Network Security Group configuration with simple inbound and outbound security rules.
-- [Complete](examples/complete) - This example demonstrates a comprehensive deployment of Azure Network Security Group with all available features including flow logs, traffic analytics, and complex security rule configurations.
+- [Complete](examples/complete) - This example demonstrates a comprehensive deployment of Azure Network Security Group with advanced security rules and diagnostic settings.
 - [Secure](examples/secure) - This example demonstrates a maximum-security Network Security Group configuration suitable for a three-tier application (web, app, db) using a zero-trust approach.
 <!-- END_EXAMPLES -->
 
@@ -143,13 +143,13 @@ module "network_security_group" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.43.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.57.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.43.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.57.0 |
 
 ## Modules
 
@@ -159,8 +159,8 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_network_security_group.network_security_group](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/network_security_group) | resource |
-| [azurerm_network_security_rule.security_rules](https://registry.terraform.io/providers/hashicorp/azurerm/4.43.0/docs/resources/network_security_rule) | resource |
+| [azurerm_network_security_group.network_security_group](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/network_security_group) | resource |
+| [azurerm_network_security_rule.security_rules](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/network_security_rule) | resource |
 
 ## Inputs
 
@@ -199,10 +199,10 @@ For production deployments, see the [secure example](examples/secure) which demo
 
 ## Monitoring and Compliance
 
-The module supports comprehensive monitoring through:
+The module supports monitoring through:
 
-- **Log Analytics Integration** - Centralized logging and alerting
-- **Diagnostic Settings** - Export logs to various destinations
+- **Activity Logs** - Azure platform activity auditing
+- **NSG Flow Logs** - Configure via Network Watcher (outside this module)
 - **Compliance Reporting** - Support for regulatory requirements
 
 ## Best Practices

@@ -22,7 +22,6 @@ module "azuredevops_repository" {
 
   files = [
     {
-      key                 = "readme"
       file                = "README.md"
       content             = "# Repository\n\nManaged by Terraform."
       commit_message      = "Add README"

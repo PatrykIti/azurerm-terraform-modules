@@ -1,12 +1,7 @@
-variable "project_id" {
-  description = "Azure DevOps project ID."
+variable "pool_name" {
+  description = "Name of the agent pool."
   type        = string
-}
-
-variable "pool_name_prefix" {
-  description = "Prefix for the agent pool name."
-  type        = string
-  default     = "ado-agent-pool-complete"
+  default     = "ado-agent-pools-complete-example"
 }
 
 variable "enable_elastic_pool" {
@@ -15,10 +10,10 @@ variable "enable_elastic_pool" {
   default     = false
 }
 
-variable "elastic_pool_name_prefix" {
-  description = "Prefix for the elastic pool name."
+variable "elastic_pool_name" {
+  description = "Name of the elastic pool."
   type        = string
-  default     = "ado-elastic-pool"
+  default     = "ado-elastic-pool-complete-example"
 }
 
 variable "service_endpoint_id" {

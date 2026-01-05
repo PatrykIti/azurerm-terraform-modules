@@ -2,11 +2,11 @@
 # This example demonstrates a comprehensive AKS cluster configuration with advanced features
 
 terraform {
-  required_version = ">= 1.11.2"
+  required_version = ">= 1.12.2"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.43.0"
+      version = ">= 4.57.0"
     }
     time = {
       source  = "hashicorp/time"
@@ -20,7 +20,11 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
 
 # Create a resource group
@@ -96,7 +100,12 @@ module "kubernetes_cluster" {
   }
 
   kubernetes_config = {
-    kubernetes_version = "1.30.5"
+    kubernetes_version = "1.34.1"
+  }
+
+  sku_config = {
+    sku_tier     = "Premium"
+    support_plan = "AKSLongTermSupport"
   }
 
   # Identity configuration
@@ -108,8 +117,8 @@ module "kubernetes_cluster" {
   # Default node pool
   default_node_pool = {
     name           = "default"
-    node_count     = 2
-    vm_size        = "Standard_D2_v2"
+    node_count     = 1
+    vm_size        = "Standard_DS2_v2"
     vnet_subnet_id = azurerm_subnet.test.id
   }
 

@@ -33,7 +33,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_environments" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_environments?ref=ADOE1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_environments?ref=ADOEv1.0.0"
 
   project_id  = "00000000-0000-0000-0000-000000000000"
   name        = "ado-env-import-example"
@@ -60,14 +60,14 @@ import {
 
 ---
 
-## 3) (Optional) Import Kubernetes resources and checks
+## 3) (Optional) Import Kubernetes resources and environment checks
 
-When importing child resources, use the same keys you configured in
+When importing child resources, use the same names you configured in
 `kubernetes_resources` and the `check_*` lists.
 
 ```hcl
 import {
-  to = module.azuredevops_environments.azuredevops_environment_resource_kubernetes.kubernetes_resource["ado-env-import-k8s"]
+  to = module.azuredevops_environments.azuredevops_environment_resource_kubernetes.environment_resource_kubernetes["ado-env-import-k8s"]
   id = "<project_id>/<environment_id>/<kubernetes_resource_id>"
 }
 
@@ -109,5 +109,5 @@ When the plan is clean, you can remove `import.tf`.
 
 ## Additional resources
 
-- Check resources (Kubernetes resources and approvals) can be imported separately
-  if you want Terraform to own them; use the provider docs for the required IDs.
+- Check resources can be imported separately if you want Terraform to own them;
+  use the provider docs for the required IDs.

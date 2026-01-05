@@ -14,11 +14,14 @@ provider "azuredevops" {}
 module "azuredevops_artifacts_feed" {
   source = "../../../"
 
+  name       = "${var.feed_name_prefix}-invalid"
+  project_id = var.project_id
+
   feed_permissions = [
     {
-      key                 = "missing-feed"
+      key                 = "invalid-role"
       identity_descriptor = "vssgp.Uy0xLTktMTIzNDU2"
-      role                = "reader"
+      role                = "owner"
     }
   ]
 }

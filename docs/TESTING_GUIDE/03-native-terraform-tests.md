@@ -12,6 +12,8 @@ Native Terraform tests use `.tftest.hcl` files to define test scenarios with moc
 - ✅ Validating output formatting and structure
 - ✅ Testing complex local value calculations
 
+For Azure DevOps modules, use `mock_provider "azuredevops"` and mock only the resources your tests reference.
+
 ## Test File Structure
 
 ### Basic Test File Template
@@ -502,8 +504,8 @@ run "multiple_additional_node_pools" {
 cd modules/azurerm_kubernetes_cluster
 terraform test
 
-# Run specific test file
-terraform test -test-directory=tests/unit tests/unit/defaults.tftest.hcl
+# Run a specific test run by name (run block)
+terraform test -test-directory=tests/unit -run=verify_default_identity
 
 # Run with verbose output
 terraform test -verbose
@@ -557,7 +559,7 @@ Failure! 1 passed, 1 failed.
 
 ### 1. Mock Provider Configuration
 
-Always mock the Azure provider to avoid real API calls:
+Always mock the provider to avoid real API calls:
 
 ```hcl
 mock_provider "azurerm" {
@@ -576,6 +578,11 @@ mock_provider "azurerm" {
     }
   }
 }
+```
+
+For Azure DevOps modules:
+```hcl
+mock_provider "azuredevops" {}
 ```
 
 ### 2. Comprehensive Assertions
@@ -668,37 +675,7 @@ run "invalid_name_special_chars" {
 
 ## Integration with CI/CD
 
-### GitHub Actions Integration
-
-```yaml
-name: Unit Tests
-
-on:
-  push:
-    paths:
-      - 'modules/*/tests/unit/**'
-      - 'modules/*/*.tf'
-
-jobs:
-  unit-tests:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        module: [kubernetes_cluster, virtual_network, key_vault]
-    
-    steps:
-      - uses: actions/checkout@v5
-      
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.12.2
-      
-      - name: Run Unit Tests
-        run: |
-          cd modules/azurerm_${{ matrix.module }}
-          terraform init
-          terraform test -test-directory=tests/unit
-```
+Unit tests are executed by the PR validation workflow and use `terraform test -test-directory=tests/unit` per affected module.
 
 ### Pre-commit Hook (Optional)
 

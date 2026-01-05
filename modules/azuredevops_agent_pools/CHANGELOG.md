@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial release of the azuredevops_agent_pools module
-- Core functionality for Azure DevOps agent pools module for managing pools, queues, and elastic pools
+- Core functionality for Azure DevOps agent pools module for managing pools and elastic pools
 
 ### Security
 - All security features are enabled by default

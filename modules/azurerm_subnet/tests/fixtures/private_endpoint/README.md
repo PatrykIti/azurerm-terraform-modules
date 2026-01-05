@@ -1,40 +1,16 @@
-# Private Endpoint Subnet Example
+# Private Endpoint Subnet Fixture
 
-This example demonstrates a Subnet configuration with private endpoint connectivity for enhanced security and network isolation.
+This fixture validates subnet configuration for private endpoints.
 
-## Features
+## Coverage
 
-- Creates a subnet with private endpoint access
-- Disables public network access for maximum security
-- Configures virtual network and subnet for private connectivity
-- Demonstrates private DNS integration
-- Network isolation and secure connectivity patterns
-- Enterprise-grade security configuration
-
-## Key Configuration
-
-This example showcases private endpoint implementation with complete network isolation, suitable for enterprise environments requiring secure connectivity without public internet exposure.
-
-## Network Architecture
-
-- Virtual Network with dedicated subnet for private endpoints
-- Private endpoint connection to the subnet
-- DNS resolution for private connectivity
-- Network security group rules (if applicable)
+- Subnet with private endpoint policies disabled.
+- Storage account with public access disabled.
+- Private endpoint connected to the storage account.
 
 ## Usage
 
-```bash
-terraform init
-terraform plan
-terraform apply
-```
-
-## Cleanup
-
-```bash
-terraform destroy
-```
+This fixture is executed by Terratest and is not intended for manual use.
 
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->

@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
   }
 }
@@ -19,7 +19,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "network_security_group" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_network_security_group?ref=NSGv1.0.0"
+  source = "../.."
 
   name                = "nsg-basic-example"
   resource_group_name = azurerm_resource_group.example.name

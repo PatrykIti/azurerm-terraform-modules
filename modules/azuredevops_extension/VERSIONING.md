@@ -109,24 +109,24 @@ module "azuredevops_extension" {
 
 # After release (automatically updated)
 module "azuredevops_extension" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOEXv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOEXv1.2.0"
 }
 ```
 
 ## Version Compatibility Matrix
 
-| Module Version | Terraform Version | AzureRM Provider | Azure API Version |
-|----------------|-------------------|------------------|-------------------|
-| ADOEXv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
+| Module Version | Terraform Version | Azure DevOps Provider | Azure DevOps API Version |
+|----------------|-------------------|-----------------------|--------------------------|
+| ADOEXv1.0.x | >= 1.12.2 | 1.12.2 (pinned) | n/a |
 
-**Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
+**Note**: The Azure DevOps provider version is pinned to ensure consistent behavior across all deployments.
 
 ## Module Versioning in Usage
 
 ### Direct from GitHub (Recommended)
 ```hcl
 module "azuredevops_extension" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOEXv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_extension?ref=ADOEXv1.0.0"
   
   # Module configuration
   # ...

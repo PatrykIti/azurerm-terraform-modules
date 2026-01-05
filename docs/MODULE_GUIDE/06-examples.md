@@ -5,7 +5,7 @@ Examples are one of the most important parts of a module. They provide users wit
 ## Philosophy of Examples
 
 - **Practical**: Examples should represent real-world use cases.
-- **Self-Contained**: Each example should be runnable without requiring complex external setup. It should create its own resource group and other dependencies where feasible.
+- **Self-Contained**: Each example should be runnable without requiring complex external setup. AzureRM examples should create their own resource group and dependencies where feasible. Azure DevOps examples may require an existing project ID and should keep dependencies minimal and explicit.
 - **Documented**: Every example MUST have its own `README.md` explaining its purpose, architecture, and how to run it.
 - **Minimal**: Examples should only contain the code necessary to demonstrate their specific use case.
 
@@ -44,6 +44,16 @@ Each example is a self-contained Terraform configuration and MUST have the follo
 ## Resource Naming Conventions for Examples
 
 All examples MUST follow the naming patterns from `azurerm_kubernetes_cluster`, which is the gold standard for this repository.
+
+### Azure DevOps Modules
+
+Azure DevOps examples should use fixed, deterministic names (no random suffixes) and keep them short.
+Use a consistent prefix like:
+- `ado-<resource>-basic`
+- `ado-<resource>-complete`
+- `ado-<resource>-secure`
+
+If a name must be unique in the org, allow overrides via variables but keep the defaults stable.
 
 ### Standard Naming Pattern
 

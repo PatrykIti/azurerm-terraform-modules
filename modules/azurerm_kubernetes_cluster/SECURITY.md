@@ -2,166 +2,84 @@
 
 ## Overview
 
-This document details the security features and configurations available in the azurerm_kubernetes_cluster Terraform module. The module implements comprehensive security controls following Azure best practices.
+This document describes the security features exposed by the `azurerm_kubernetes_cluster` module and how to configure a hardened AKS deployment. Use this module's security documentation as the baseline for other modules, and document any deviations required by service-specific constraints.
 
-## Security Features
+The `examples/secure` configuration is the reference implementation for hardened deployments. Review and adapt it for your environment.
 
-### 1. **Encryption**
+## Security Controls
 
-#### At Rest
-- **Default**: All data encrypted at rest using Azure-managed keys
-- **Infrastructure Encryption**: Additional layer of encryption when supported
-- **Customer-Managed Keys**: Optional BYOK support (if applicable)
+### Identity and Access
 
-#### In Transit
-- **HTTPS/TLS**: All communications encrypted in transit
-- **Minimum TLS Version**: TLS 1.2 enforced by default
+- **Managed Identity (Preferred)**: Use `identity` (default is SystemAssigned) and avoid `service_principal` unless required for legacy scenarios.
+- **Azure AD RBAC**: Configure `azure_active_directory_role_based_access_control` with `azure_rbac_enabled = true`.
+- **Disable Local Accounts**: Set `features.local_account_disabled = true`.
+- **Workload Identity**: Enable `features.workload_identity_enabled` and `features.oidc_issuer_enabled` for pod identity scenarios.
 
-### 2. **Access Control**
+### Network Security
 
-#### Authentication
-- **Azure AD Integration**: Preferred authentication method
-- **Managed Identity**: Support for system and user-assigned identities
-- **Key-based Access**: Disabled by default where possible
+- **Private Cluster**: Configure `private_cluster_config.private_cluster_enabled = true` and set `private_dns_zone_id` when required.
+- **API Server Access**: Restrict `api_server_access_profile.authorized_ip_ranges`.
+  - Note: authorized IP ranges are mutually exclusive with private cluster mode.
+- **Network Policy**: Use `network_profile.network_policy` (e.g., `azure` or `cilium`) and the appropriate `network_plugin`.
 
-#### Network Security
-- **Private Endpoints**: Support for private connectivity
-- **Network Rules**: Default deny with explicit allow rules
-- **Service Endpoints**: Virtual network integration
+### Encryption and Key Management
 
-### 3. **Monitoring and Compliance**
+- **Disk Encryption Set**: Configure `disk_encryption_set_id` for node disk encryption.
+- **KMS for etcd**: Configure `key_management_service` with a Key Vault key (`key_vault_key_id`) and enforce private access when required (`key_vault_network_access = "Private"`).
 
-#### Audit Logging
-- **Diagnostic Settings**: Comprehensive logging to Log Analytics
-- **Activity Tracking**: All operations logged
-- **Metrics**: Performance and security metrics collected
+### Secrets Management
 
-#### Compliance
-- **Azure Policy**: Compatible with organizational policies
-- **Security Center**: Integration ready
-- **Threat Protection**: Microsoft Defender support where applicable
+- **Key Vault Secrets Provider (CSI)**: Configure `key_vault_secrets_provider` for secret rotation.
+  - If your workload cannot tolerate CSI sync latency, consider alternative secret delivery patterns and document the trade-offs.
 
-## Security Configuration Examples
+### Monitoring and Threat Protection
 
-### Maximum Security Configuration
-```hcl
-module "kubernetes_cluster" {
-  source = "./modules/azurerm_kubernetes_cluster"
+- **Azure Monitor**: Configure `oms_agent` and `diagnostic_settings` for control plane logs and metrics.
+- **Microsoft Defender**: Enable `microsoft_defender` with a Log Analytics workspace.
+- **Metrics Labels/Annotations**: Use `monitor_metrics` only with approved label/annotation allowlists.
 
-  name                = "example-secure"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
+## Secure Example
 
-  # Security settings
-  enable_https_traffic_only = true
-  min_tls_version          = "TLS1_2"
-  
-  # Network isolation
-  network_rules = {
-    default_action = "Deny"
-    ip_rules       = []
-    bypass         = ["AzureServices"]
-  }
+Use the hardened example at:
 
-  # Private endpoint
-  private_endpoints = [{
-    name                 = "example-pe"
-    subnet_id            = azurerm_subnet.private.id
-    private_dns_zone_ids = [azurerm_private_dns_zone.example.id]
-  }]
-
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-  }
-
-  tags = {
-    Environment        = "Production"
-    DataClassification = "Confidential"
-  }
-}
+```
+modules/azurerm_kubernetes_cluster/examples/secure
 ```
 
-## Security Hardening Checklist
+Key hardening actions in that example include:
 
-Before deploying to production:
+- `features.local_account_disabled = true`
+- `features.run_command_enabled = false`
+- `features.workload_identity_enabled = true` and `features.oidc_issuer_enabled = true`
+- `azure_active_directory_role_based_access_control.azure_rbac_enabled = true`
+- `microsoft_defender` and `diagnostic_settings` enabled
+- Restricted `api_server_access_profile.authorized_ip_ranges` (replace placeholder ranges)
+- Optional private cluster configuration (enable when required)
 
-- [ ] Enable all applicable encryption features
-- [ ] Configure network isolation (private endpoints/service endpoints)
-- [ ] Disable public network access where possible
-- [ ] Enable audit logging and monitoring
-- [ ] Apply appropriate RBAC permissions
-- [ ] Configure Azure Policy compliance
-- [ ] Enable threat protection features
-- [ ] Review and apply security tags
-- [ ] Document security exceptions
+## Defaults vs Hardened Configuration
 
-## Common Security Mistakes to Avoid
+Some security features require explicit enablement. Review defaults in `variables.tf` and set these for hardened deployments:
 
-1. **Leaving Public Access Enabled**
-   ```hcl
-   # ❌ AVOID
-   public_network_access_enabled = true
-   ```
+- `features.local_account_disabled`
+- `features.azure_policy_enabled`
+- `features.run_command_enabled` (disable for hardened posture)
+- `private_cluster_config.private_cluster_enabled`
+- `api_server_access_profile.authorized_ip_ranges`
+- `microsoft_defender` and `diagnostic_settings`
 
-2. **Using Weak TLS Versions**
-   ```hcl
-   # ❌ AVOID
-   min_tls_version = "TLS1_0"
-   ```
+## Common Misconfigurations
 
-3. **Overly Permissive Network Rules**
-   ```hcl
-   # ❌ AVOID
-   network_rules = {
-     default_action = "Allow"
-   }
-   ```
+- **Wide-open API server**: Leaving `authorized_ip_ranges` as `0.0.0.0/0`.
+- **Public cluster without restrictions**: Using non-private clusters without a restricted API server profile.
+- **Legacy identity**: Using `service_principal` when managed identity is supported.
+- **Missing diagnostics**: Skipping `diagnostic_settings` and Defender for Cloud integration.
 
-## Incident Response
+## Reporting Security Issues
 
-If a security incident occurs:
+Report security vulnerabilities through your organization's approved private channel. Do NOT create public issues for security reports.
 
-1. **Immediate Actions**
-   - Review audit logs
-   - Check for unauthorized access
-   - Apply additional network restrictions
+## References
 
-2. **Investigation**
-   - Use Log Analytics queries
-   - Review security alerts
-   - Check configuration compliance
-
-3. **Remediation**
-   - Apply security patches
-   - Update configurations
-   - Document lessons learned
-
-## Compliance Mapping
-
-### SOC 2 Controls
-| Control | Implementation |
-|---------|---------------|
-| CC6.1 | RBAC and Azure AD |
-| CC6.6 | Encryption at rest/transit |
-| CC7.2 | Diagnostic logging |
-
-### ISO 27001 Controls
-| Control | Implementation |
-|---------|---------------|
-| A.10.1.1 | Cryptographic controls |
-| A.9.1.2 | Network access controls |
-| A.12.4.1 | Event logging |
-
-## Additional Resources
-
-- [Azure Security Best Practices](https://docs.microsoft.com/en-us/azure/security/fundamentals/best-practices-and-patterns)
-- [Azure Security Center](https://docs.microsoft.com/en-us/azure/security-center/)
-- [Azure Policy](https://docs.microsoft.com/en-us/azure/governance/policy/)
-
----
-
-**Module Version**: 1.0.0  
-**Last Updated**: 2025-07-16  
-**Security Contact**: patryk.ciechanski@patrykiti.pl
+- Azure AKS security baseline documentation
+- Azure Policy for Kubernetes
+- Microsoft Defender for Cloud (Containers)

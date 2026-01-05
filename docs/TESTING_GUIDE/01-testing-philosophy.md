@@ -9,8 +9,7 @@ We implement a comprehensive testing pyramid that validates infrastructure at di
 
 - **Static Analysis** - Catch syntax and security issues before deployment
 - **Unit Tests** - Validate module logic without deploying resources
-- **Integration Tests** - Test real Azure resource deployment and configuration
-- **End-to-End Tests** - Validate complete scenarios across multiple modules
+- **Integration Tests** - Test real Azure/Azure DevOps resource deployment and configuration (end-to-end for a single module)
 
 ### 2. Fail Fast
 Early detection of issues saves time and reduces costs:
@@ -46,22 +45,17 @@ Security testing is embedded throughout the testing pipeline:
 
 ## The Testing Pyramid
 
-Our testing pyramid consists of four distinct levels, each serving a specific purpose:
+Our testing pyramid consists of three distinct levels, each serving a specific purpose:
 
 ```
-    ┌─────────────────────────────────────┐
-    │         E2E Tests (Level 4)         │  ← Slowest, Most Expensive
-    │     Multi-module compositions       │     30-60 minutes
-    │        Nightly/Release only         │     Higher Azure costs
-    └─────────────────────────────────────┘
            ┌─────────────────────────────┐
            │   Integration Tests (L3)    │  ← Slower, Costs Money
-           │    Real Azure resources     │     5-30 minutes per module
+           │    Real Azure/ADO resources │     5-30 minutes per module
            │      Pull requests          │     Minimal Azure costs
            └─────────────────────────────┘
                   ┌─────────────────┐
                   │ Unit Tests (L2) │  ← Fast, Free
-                  │  Mocked Azure   │     < 2 minutes
+                  │  Mocked providers │   < 2 minutes
                   │   Every push    │     No Azure costs
                   └─────────────────┘
                          ┌─────┐
@@ -201,94 +195,15 @@ func TestBasicKubernetesCluster(t *testing.T) {
 }
 ```
 
-### Level 4: End-to-End Tests (Slowest & Most Expensive)
-
-**Purpose**: Validate complete scenarios across multiple modules
-
-**Tools**: Terratest with multi-module compositions
-
-**When**: Nightly builds or before releases
-
-**Duration**: 30-60 minutes
-
-**Cost**: Higher (tests full infrastructure stacks)
-
-**What to Test**:
-- Multi-module integration scenarios
-- Cross-module dependencies
-- Complete application deployments
-- Disaster recovery scenarios
-- Performance at scale
-
-**Example Scenario**:
-```go
-func TestCompleteInfrastructure(t *testing.T) {
-    // Stage 1: Deploy networking
-    networkOptions := deployNetworking(t)
-    defer terraform.Destroy(t, networkOptions)
-    
-    // Stage 2: Deploy storage with private endpoint
-    storageOptions := deployStorage(t, networkOptions)
-    defer terraform.Destroy(t, storageOptions)
-    
-    // Stage 3: Deploy application
-    appOptions := deployApplication(t, networkOptions, storageOptions)
-    defer terraform.Destroy(t, appOptions)
-    
-    // Validate end-to-end connectivity
-    validateConnectivity(t, appOptions, storageOptions)
-}
-```
-
 ## Test Execution Strategy
 
-### Branch-Based Testing
+### CI/CD Execution
 
-Different branches trigger different levels of testing:
+Current repository workflows run:
 
-#### Feature Branches
-```yaml
-# Triggered on: Push to feature/* branches
-tests:
-  - Static Analysis (Level 1)
-  - Unit Tests (Level 2)
-  - Basic Integration Tests (Level 3 - subset)
-duration: < 15 minutes
-cost: Minimal
-```
-
-#### Pull Requests
-```yaml
-# Triggered on: Pull request creation/updates
-tests:
-  - All Level 1 & 2 tests
-  - Full Integration Tests (Level 3)
-  - Security compliance validation
-duration: < 30 minutes
-cost: Low
-```
-
-#### Main Branch
-```yaml
-# Triggered on: Merge to main branch
-tests:
-  - All Level 1, 2, & 3 tests
-  - Performance benchmarks
-  - Extended security testing
-duration: < 45 minutes
-cost: Moderate
-```
-
-#### Release Branches
-```yaml
-# Triggered on: Release preparation
-tests:
-  - All levels including E2E (Level 4)
-  - Full compliance validation
-  - Performance regression testing
-duration: < 90 minutes
-cost: Higher
-```
+- **PR validation**: formatting, `terraform validate`, and `terraform test` for affected modules.
+- **Module CI**: module validation, Go-based integration tests, and security scans.
+- **Workflow dispatch**: allows running Module CI for a specific module (inputs exist even if not all are currently wired to selective test runs).
 
 ### Parallel Execution
 
@@ -322,10 +237,7 @@ Each level serves as a quality gate that must pass before proceeding:
 - **Blocker**: Deployment failures, configuration errors, security issues
 - **Action**: Fix module implementation before merge
 
-### Gate 4: E2E Tests (Release Only)
-- **Requirement**: All E2E scenarios pass
-- **Blocker**: Cross-module issues, performance regressions
-- **Action**: Fix integration issues before release
+There is no separate E2E tier in CI today; integration tests are the end-to-end validation for a module.
 
 ## Cost Optimization Strategies
 
@@ -460,7 +372,7 @@ Now that you understand the testing philosophy and pyramid structure, proceed to
 
 1. **[Test Organization](02-test-organization.md)** - Learn how to structure your test files
 2. **[Native Terraform Tests](03-native-terraform-tests.md)** - Implement unit tests
-3. **[Terratest Framework](05-terratest-framework.md)** - Add integration tests
+3. **[Terratest Go File Structure](05-terratest-file-structure.md)** - Add integration tests
 
 ---
 

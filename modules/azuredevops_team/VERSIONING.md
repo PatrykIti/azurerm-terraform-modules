@@ -109,7 +109,7 @@ module "azuredevops_team" {
 
 # After release (automatically updated)
 module "azuredevops_team" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_team?ref=ADOTv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_team?ref=ADOTv1.2.0"
 }
 ```
 
@@ -126,7 +126,7 @@ module "azuredevops_team" {
 ### Direct from GitHub (Recommended)
 ```hcl
 module "azuredevops_team" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_team?ref=ADOTv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_team?ref=ADOTv1.0.0"
   
   # Module configuration
   # ...

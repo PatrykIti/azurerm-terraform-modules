@@ -32,31 +32,26 @@ module "azuredevops_repository" {
     init_type = "Clean"
   }
 
-  branch_policy_min_reviewers = [
+  branches = [
     {
-      reviewer_count = 2
-      scope = [
-        {
-          match_type = "DefaultBranch"
+      name = "main"
+      ref_branch = "refs/heads/main"
+      policies = {
+        min_reviewers = {
+          reviewer_count = 2
         }
-      ]
+        status_check = [
+          {
+            name = "security-check"
+          }
+        ]
+      }
     }
   ]
 
-  branch_policy_status_check = [
-    {
-      name = "security-check"
-      scope = [
-        {
-          match_type = "DefaultBranch"
-        }
-      ]
-    }
-  ]
-
-  repository_policy_reserved_names = [
-    {}
-  ]
+  policies = {
+    reserved_names = {}
+  }
 
 }
 ```

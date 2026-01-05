@@ -1,33 +1,17 @@
-# Complete Subnet Example
+# Complete Subnet Fixture
 
-This example demonstrates a comprehensive deployment of Subnet with all available features and configurations.
+This fixture exercises multiple subnet features for integration tests.
 
-## Features
+## Coverage
 
-- Full subnet configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
-
-## Key Configuration
-
-This comprehensive example showcases all available features of the subnet module, demonstrating enterprise-grade capabilities suitable for production environments.
+- Service endpoints and service endpoint policy.
+- Delegation configuration.
+- NSG and route table associations.
+- Network policy settings.
 
 ## Usage
 
-```bash
-terraform init
-terraform plan
-terraform apply
-```
-
-## Cleanup
-
-```bash
-terraform destroy
-```
+This fixture is executed by Terratest and is not intended for manual use.
 
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->

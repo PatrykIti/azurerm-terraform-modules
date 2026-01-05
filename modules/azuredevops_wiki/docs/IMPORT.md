@@ -33,7 +33,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_wiki" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_wiki?ref=ADOWI1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_wiki?ref=ADOWIv1.0.0"
 
   project_id = "00000000-0000-0000-0000-000000000000"
 

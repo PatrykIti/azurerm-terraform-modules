@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_project" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_project?ref=ADOP1.1.1"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_project?ref=ADOP1.1.1"
 
   name               = var.project_name
   description        = "Complete Azure DevOps project managed by Terraform"

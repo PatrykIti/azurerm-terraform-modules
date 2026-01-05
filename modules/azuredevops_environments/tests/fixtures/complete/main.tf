@@ -67,10 +67,17 @@ module "azuredevops_environments" {
 
   check_approvals = [
     {
-      key                   = "integration-approval"
-      target_resource_type  = "environment"
+      name                  = "integration-approval"
       approvers             = [data.azuredevops_group.project_collection_admins.origin_id]
       requester_can_approve = false
+    }
+  ]
+
+  check_branch_controls = [
+    {
+      name                     = "env-branch-control"
+      allowed_branches         = "refs/heads/main"
+      verify_branch_protection = true
     }
   ]
 }

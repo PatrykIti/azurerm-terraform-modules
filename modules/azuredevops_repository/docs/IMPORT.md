@@ -14,6 +14,18 @@ files, permissions, and policies into `modules/azuredevops_repository` using Ter
 
 ---
 
+## Azure CLI setup (optional)
+
+These commands use the Azure DevOps CLI extension to fetch IDs used in import blocks.
+
+```bash
+az extension add --name azure-devops
+az devops configure --defaults organization=https://dev.azure.com/<ORG> project=<PROJECT>
+az devops login --organization https://dev.azure.com/<ORG>
+```
+
+---
+
 ## 1) Minimal module configuration
 
 Create `main.tf` with a minimal module block and fill it with the **current**
@@ -34,20 +46,25 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_repository" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_repository?ref=ADOR1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_repository?ref=ADORv1.0.0"
 
   project_id = "00000000-0000-0000-0000-000000000000"
   name       = "existing-repo-name"
 
-  initialization = {
-    init_type = "Clean"
-  }
+  # Optional: repository initialization
+  # initialization = {
+  #   init_type = "Clean"
+  # }
+  # Defaults to init_type = "Uninitialized" when omitted.
+  # For init_type = "Import", set source_type = "Git", source_url, and auth.
 
   # Optional: manage branches/files/permissions/policies
   # branches = [
   #   {
-  #     key  = "develop"
   #     name = "develop"
+  #     ref_branch = "refs/heads/main"
+  #     # policies defaults to {} and must not be null
+  #     # policies = {}
   #   }
   # ]
 }
@@ -61,18 +78,36 @@ Create `import.tf`:
 
 ```hcl
 import {
-  to = module.azuredevops_repository.azuredevops_git_repository.git_repository[0]
+  to = module.azuredevops_repository.azuredevops_git_repository.git_repository
   id = "<repository_id>"
 }
 ```
 
 Use the repository ID from Azure DevOps (UI or API).
 
+Get repository ID with Azure CLI:
+
+```bash
+az repos show --repository <repo-name> --query id -o tsv
+```
+
+List repositories with IDs (handy for lookups):
+
+```bash
+az repos list --query "[].{name:name,id:id,defaultBranch:defaultBranch}" -o table
+```
+
+Get project ID with Azure CLI (module input):
+
+```bash
+az devops project show --project <PROJECT> --query id -o tsv
+```
+
 ---
 
 ## 3) Import branches (optional)
 
-If you manage branches, ensure each branch has a stable `key` and then add:
+Branch resources are keyed by branch name:
 
 ```hcl
 import {
@@ -85,47 +120,168 @@ The branch import ID format depends on the provider (commonly a repository ID
 and branch name). Follow the Azure DevOps provider documentation for the exact
 format.
 
+Module input requires exactly one of `ref_branch`, `ref_tag`, or `ref_commit_id`
+for each branch. For existing branches, use `ref_branch = "refs/heads/<name>"`
+to match the current ref.
+
+Get branch refs with Azure CLI:
+
+```bash
+az repos ref list --repository <repo-name-or-id> --filter heads/ --query "[].name" -o tsv
+```
+
+Get branch refs with object IDs (useful for matching existing refs):
+
+```bash
+az repos ref list --repository <repo-name-or-id> --filter heads/ \
+  --query "[].{name:name,objectId:objectId}" -o table
+```
+
+List tag refs (if you use `ref_tag` in inputs):
+
+```bash
+az repos ref list --repository <repo-name-or-id> --filter tags/ --query "[].name" -o tsv
+```
+
 ---
 
 ## 4) Import files (optional)
 
-If you manage repository files, use stable keys:
+File resources are keyed by `<file_path>:<branch>` where `<branch>` is `default`
+when the branch is not set.
 
 ```hcl
 import {
-  to = module.azuredevops_repository.azuredevops_git_repository_file.git_repository_file["readme"]
+  to = module.azuredevops_repository.azuredevops_git_repository_file.git_repository_file["README.md:default"]
   id = "<file_import_id>"
 }
 ```
+
+When `files[*].branch` is omitted, the module uses `default_branch` at apply time,
+but the import key still uses `default`.
+
+List repository files (paths) with Azure CLI:
+
+```bash
+az devops invoke --http-method GET \
+  --uri "https://dev.azure.com/<ORG>/<PROJECT>/_apis/git/repositories/<REPO_ID>/items?scopePath=/&recursionLevel=Full&api-version=7.1-preview.1" \
+  --query "value[].path" -o tsv
+```
+
+List files for a specific branch (include metadata to help with matching):
+
+```bash
+az devops invoke --http-method GET \
+  --uri "https://dev.azure.com/<ORG>/<PROJECT>/_apis/git/repositories/<REPO_ID>/items?scopePath=/&recursionLevel=Full&includeContentMetadata=true&versionDescriptor.versionType=branch&versionDescriptor.version=<BRANCH>&api-version=7.1-preview.1" \
+  --query "value[].{path:path,objectId:objectId}" -o table
+```
+
+File import IDs are provider-specific; you typically combine repository ID,
+branch, and file path. Use the provider docs for the exact import ID format.
 
 ---
 
 ## 5) Import permissions (optional)
 
+Permission resources are keyed by `<branch_name>:<principal>` where
+`branch_name` is `root` when not set.
+
 ```hcl
 import {
-  to = module.azuredevops_repository.azuredevops_git_permissions.git_permissions["main-contributors"]
+  to = module.azuredevops_repository.azuredevops_git_permissions.git_permissions["root:group-1"]
   id = "<permissions_import_id>"
 }
 ```
+
+Get principal descriptors with Azure CLI:
+
+```bash
+az devops security group list --project <PROJECT> -o table
+az devops user list --organization https://dev.azure.com/<ORG> -o table
+```
+
+List group descriptors explicitly:
+
+```bash
+az devops security group list --project <PROJECT> \
+  --query "graphGroups[].{name:displayName,descriptor:descriptor}" -o table
+```
+
+List user descriptors explicitly:
+
+```bash
+az devops user list --organization https://dev.azure.com/<ORG> \
+  --query "members[].{name:principalName,descriptor:descriptor}" -o table
+```
+
+Permission import IDs are provider-specific; you typically combine project ID,
+repository ID, branch name, and principal descriptor. Use the provider docs for
+the exact import ID format.
 
 ---
 
 ## 6) Import policies (optional)
 
+Branch policies are keyed by:
+- **single policies**: `<branch_name>`
+- **list policies**: `<policy_name>` (must be unique across all branches for a given policy type)
+
+Repository policies use `count` and are addressed with `[0]` when enabled.
+
+Examples:
+
 ```hcl
 import {
-  to = module.azuredevops_repository.azuredevops_branch_policy_min_reviewers.branch_policy_min_reviewers["min-reviewers"]
+  to = module.azuredevops_repository.azuredevops_branch_policy_min_reviewers.branch_policy_min_reviewers["develop"]
   id = "<branch_policy_import_id>"
 }
 
 import {
-  to = module.azuredevops_repository.azuredevops_repository_policy_reserved_names.repository_policy_reserved_names["reserved-names"]
+  to = module.azuredevops_repository.azuredevops_branch_policy_build_validation.branch_policy_build_validation["ci"]
+  id = "<branch_policy_import_id>"
+}
+
+import {
+  to = module.azuredevops_repository.azuredevops_repository_policy_reserved_names.repository_policy_reserved_names[0]
   id = "<repository_policy_import_id>"
 }
 ```
 
-Repeat for other branch/repository policy resources as needed.
+Repeat for other policy resources as needed.
+
+Get policy configuration IDs with Azure CLI:
+
+```bash
+az repos policy list --project <PROJECT> -o table
+```
+
+List policy config IDs with scope details:
+
+```bash
+az repos policy list --project <PROJECT> \
+  --query "[].{id:id,type:type.displayName,repo:settings.scope[0].repositoryId,ref:settings.scope[0].refName}" -o table
+```
+
+If your CLI does not support `az repos policy`, use the REST API via `az devops invoke`:
+
+```bash
+az devops invoke --http-method GET \
+  --uri "https://dev.azure.com/<ORG>/<PROJECT>/_apis/policy/configurations?api-version=7.1-preview.1"
+```
+
+Get build definition IDs (used in build validation inputs):
+
+```bash
+az pipelines build definition list --project <PROJECT> \
+  --query "[].{name:name,id:id}" -o table
+```
+
+Get service connection IDs (used for import initialization auth):
+
+```bash
+az devops service-endpoint list --project <PROJECT> \
+  --query "[].{name:name,id:id,type:type}" -o table
+```
 
 ---
 

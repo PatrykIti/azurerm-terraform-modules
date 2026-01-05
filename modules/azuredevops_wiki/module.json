@@ -2,6 +2,6 @@
   "name": "azuredevops_wiki",
   "title": "Azure DevOps Wiki",
   "commit_scope": "azuredevops-wiki",
-  "tag_prefix": "ADOWI",
+  "tag_prefix": "ADOWIv",
   "description": "Azure DevOps wiki module for managing wikis and pages"
 }

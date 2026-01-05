@@ -1,6 +1,6 @@
 # Complete Azure DevOps Environments Example
 
-This example demonstrates an environment with a Kubernetes resource, approval checks, and branch control.
+This example demonstrates an environment with a Kubernetes resource and environment-level approvals and branch control.
 
 ## Features
 
@@ -42,7 +42,7 @@ terraform destroy
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_azuredevops_environments"></a> [azuredevops\_environments](#module\_azuredevops\_environments) | ../../ | n/a |
+| <a name="module_azuredevops_environments"></a> [azuredevops\_environments](#module\_azuredevops\_environments) | git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_environments | ADOEv1.0.0 |
 
 ## Resources
 

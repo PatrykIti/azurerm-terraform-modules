@@ -1,4 +1,14 @@
 # Network integration test fixture
+terraform {
+  required_version = ">= 1.12.2"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "4.57.0"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
 }
@@ -20,7 +30,6 @@ resource "azurerm_virtual_network" "test_vnet" {
   }
 }
 
-# Test with network security group association
 resource "azurerm_network_security_group" "test" {
   name                = "nsg-subnet-network-${var.random_suffix}"
   location            = azurerm_resource_group.test.location
@@ -44,27 +53,24 @@ resource "azurerm_network_security_group" "test" {
   }
 }
 
-# Test with service endpoints
 module "subnet" {
   source = "../../../"
 
-  name                 = "subnet-network-${var.random_suffix}"
+  name                 = "snet-subnet-network-${var.random_suffix}"
   resource_group_name  = azurerm_resource_group.test.name
   virtual_network_name = azurerm_virtual_network.test_vnet.name
   address_prefixes     = var.subnet_address_prefix
 
-  # Service endpoints for network testing
   service_endpoints = [
     "Microsoft.Storage",
     "Microsoft.KeyVault"
   ]
 
-  # Network policies
   private_endpoint_network_policies_enabled     = true
   private_link_service_network_policies_enabled = true
 }
 
-# Associate NSG with subnet
+# External association to validate compatibility with wrapper-managed NSGs
 resource "azurerm_subnet_network_security_group_association" "test" {
   subnet_id                 = module.subnet.id
   network_security_group_id = azurerm_network_security_group.test.id

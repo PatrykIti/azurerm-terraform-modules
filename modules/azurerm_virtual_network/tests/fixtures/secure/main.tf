@@ -6,7 +6,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
   }
 }
@@ -45,10 +45,12 @@ resource "azurerm_storage_account" "security" {
   account_replication_type = "GRS" # Geo-redundant for security logs
 
   # Security settings
-  https_traffic_only_enabled      = true
-  min_tls_version                 = "TLS1_2"
-  public_network_access_enabled   = false
-  shared_access_key_enabled       = true # Required for flow logs
+  https_traffic_only_enabled = true
+  min_tls_version            = "TLS1_2"
+  # Required for tests from public networks.
+  public_network_access_enabled = true
+  # Required for provider data plane reads during tests.
+  shared_access_key_enabled       = true
   allow_nested_items_to_be_public = false
 
   tags = {
@@ -136,9 +138,8 @@ resource "azurerm_monitor_diagnostic_setting" "test" {
   }
 
   # Virtual Network Metrics
-  metric {
+  enabled_metric {
     category = "AllMetrics"
-    enabled  = true
   }
 
   depends_on = [module.virtual_network]

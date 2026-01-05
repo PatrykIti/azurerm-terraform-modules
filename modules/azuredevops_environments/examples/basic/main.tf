@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_environments" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_environments?ref=ADOE1.0.0"
+  source = "../.."
 
   project_id  = var.project_id
   name        = "ado-env-basic-example"

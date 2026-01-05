@@ -63,7 +63,7 @@ Types:
 1. All changes must include tests
 2. Run tests locally before submitting PR:
    ```bash
-   cd modules/azurerm_network_security_group/tests
+   cd tests
    make test
    ```
 3. Ensure all tests pass

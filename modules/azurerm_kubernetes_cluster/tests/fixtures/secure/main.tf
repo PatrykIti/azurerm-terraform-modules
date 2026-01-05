@@ -1,9 +1,9 @@
 terraform {
-  required_version = ">= 1.11.2"
+  required_version = ">= 1.12.2"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.43.0"
+      version = ">= 4.57.0"
     }
     time = {
       source  = "hashicorp/time"
@@ -17,7 +17,11 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
 
 resource "azurerm_resource_group" "test" {
@@ -78,7 +82,7 @@ module "kubernetes_cluster" {
   default_node_pool = {
     name           = "default"
     node_count     = 1
-    vm_size        = "Standard_D2_v2"
+    vm_size        = "Standard_D2_v3"
     vnet_subnet_id = azurerm_subnet.test.id
   }
 

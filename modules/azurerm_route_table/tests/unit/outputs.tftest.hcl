@@ -104,13 +104,13 @@ run "verify_routes_output" {
   }
 
   assert {
-    condition     = can(output.routes["route1"])
-    error_message = "Output 'routes' should be accessible by route name"
+    condition     = contains(keys(output.routes), "route1")
+    error_message = "Output 'routes' should include key 'route1'"
   }
 
   assert {
-    condition     = can(output.routes["route2"])
-    error_message = "Output 'routes' should be accessible by route name"
+    condition     = contains(keys(output.routes), "route2")
+    error_message = "Output 'routes' should include key 'route2'"
   }
 }
 

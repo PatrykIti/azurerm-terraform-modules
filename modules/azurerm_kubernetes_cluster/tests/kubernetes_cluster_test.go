@@ -12,8 +12,6 @@ import (
 
 // Test basic AKS cluster creation
 func TestBasicKubernetesCluster(t *testing.T) {
-	t.Parallel()
-
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -45,8 +43,6 @@ func TestBasicKubernetesCluster(t *testing.T) {
 
 // Test a more complete AKS cluster configuration
 func TestCompleteKubernetesCluster(t *testing.T) {
-	t.Parallel()
-
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -80,8 +76,6 @@ func TestCompleteKubernetesCluster(t *testing.T) {
 
 // Test a security-hardened AKS cluster
 func TestSecureKubernetesCluster(t *testing.T) {
-	t.Parallel()
-
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -112,8 +106,6 @@ func TestSecureKubernetesCluster(t *testing.T) {
 
 // Test AKS cluster with advanced network configuration
 func TestNetworkKubernetesCluster(t *testing.T) {
-	t.Parallel()
-
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/network")
 
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -147,8 +139,6 @@ func TestNetworkKubernetesCluster(t *testing.T) {
 
 // Negative test cases for validation rules
 func TestKubernetesClusterValidationRules(t *testing.T) {
-	t.Parallel()
-
 	testCases := []struct {
 		name          string
 		vars          map[string]interface{}
@@ -166,8 +156,6 @@ func TestKubernetesClusterValidationRules(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc // capture range variable
 		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-
 			testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/negative")
 			
 			// Merge the random_suffix with the test case variables

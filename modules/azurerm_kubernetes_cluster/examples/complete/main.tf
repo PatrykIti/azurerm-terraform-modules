@@ -7,7 +7,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
   }
 }
@@ -89,7 +89,7 @@ resource "azurerm_user_assigned_identity" "example" {
 
 # Create the AKS cluster with comprehensive configuration
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.0"
+  source = "../.."
 
   # Core configuration
   name                = var.aks_cluster_name
@@ -126,7 +126,7 @@ module "kubernetes_cluster" {
   # Comprehensive default node pool configuration
   default_node_pool = {
     name                 = "system"
-    vm_size              = "Standard_B2s"
+    vm_size              = "Standard_DS2_v2"
     node_count           = 1
     auto_scaling_enabled = true
     min_count            = 1

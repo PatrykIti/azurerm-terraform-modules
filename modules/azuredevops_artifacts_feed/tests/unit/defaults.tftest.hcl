@@ -2,12 +2,17 @@
 
 mock_provider "azuredevops" {}
 
+variables {
+  name       = "example-feed"
+  project_id = "00000000-0000-0000-0000-000000000000"
+}
+
 run "defaults_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_feed.feed) == 0
-    error_message = "No feed should be created when name/project_id are unset."
+    condition     = azuredevops_feed.feed.name == "example-feed"
+    error_message = "Feed name should default to the provided name."
   }
 
   assert {

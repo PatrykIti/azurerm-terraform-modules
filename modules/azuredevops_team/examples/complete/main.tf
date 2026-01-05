@@ -36,7 +36,7 @@ locals {
 }
 
 module "azuredevops_team" {
-  source   = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_team?ref=ADOT1.0.0"
+  source   = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_team?ref=ADOTv1.0.0"
   for_each = local.teams
 
   project_id  = var.project_id

@@ -32,8 +32,8 @@ This document details the security features and configurations available in the 
 ### 3. **Monitoring and Compliance**
 
 #### Audit Logging
-- **Diagnostic Settings**: Comprehensive logging to Log Analytics
-- **Activity Tracking**: All operations logged
+- **Activity Logs**: All operations logged in Azure Activity Log
+- **NSG Flow Logs**: Configure via Network Watcher (outside this module)
 - **Metrics**: Performance and security metrics collected
 
 #### Compliance
@@ -69,12 +69,6 @@ module "network_security_group" {
     subnet_id            = azurerm_subnet.private.id
     private_dns_zone_ids = [azurerm_private_dns_zone.example.id]
   }]
-
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-  }
 
   tags = {
     Environment        = "Production"
@@ -145,7 +139,7 @@ If a security incident occurs:
 |---------|---------------|
 | CC6.1 | RBAC and Azure AD |
 | CC6.6 | Encryption at rest/transit |
-| CC7.2 | Diagnostic logging |
+| CC7.2 | Activity logs / NSG flow logs |
 
 ### ISO 27001 Controls
 | Control | Implementation |

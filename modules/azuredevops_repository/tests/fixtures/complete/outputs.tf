@@ -9,7 +9,7 @@ output "repository_url" {
 }
 
 output "branch_ids" {
-  description = "Map of branch IDs keyed by branch key."
+  description = "Map of branch IDs keyed by branch name."
   value       = module.azuredevops_repository.branch_ids
 }
 

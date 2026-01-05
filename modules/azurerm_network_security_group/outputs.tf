@@ -55,4 +55,3 @@ output "security_rules" {
     }
   }
 }
-

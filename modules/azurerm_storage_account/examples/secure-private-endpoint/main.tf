@@ -7,7 +7,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
   }
 }
@@ -274,7 +274,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # Secure Storage Account Module
 module "secure_storage" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.0"
+  source = "../.."
 
   name                = "stsecureprivateendpoint"
   resource_group_name = azurerm_resource_group.example.name
@@ -292,9 +292,8 @@ module "secure_storage" {
     shared_access_key_enabled         = true # Required for Terraform to manage the resource
     infrastructure_encryption_enabled = var.enable_infrastructure_encryption
     allow_nested_items_to_be_public   = false
+    public_network_access_enabled     = false
   }
-
-  # Note: public_network_access_enabled = false would be set here if the module supported it
 
   # Encryption settings
   encryption = {
@@ -353,6 +352,22 @@ module "secure_storage" {
       quota            = 100
       access_tier      = "Hot"
       enabled_protocol = "SMB"
+    }
+  ]
+
+  # Diagnostic settings (storage account + blob service)
+  diagnostic_settings = [
+    {
+      name                       = "diag-storage"
+      scope                      = "storage_account"
+      areas                      = ["transaction", "capacity"]
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+    },
+    {
+      name                       = "diag-blob"
+      scope                      = "blob"
+      areas                      = ["read", "write", "delete", "transaction", "capacity"]
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
     }
   ]
 
@@ -458,46 +473,4 @@ resource "azurerm_private_endpoint" "table" {
   tags = merge(var.tags, {
     Purpose = "Table storage private access"
   })
-}
-
-# Diagnostic settings for comprehensive logging
-resource "azurerm_monitor_diagnostic_setting" "storage_account" {
-  name                       = "${module.secure_storage.name}-diag"
-  target_resource_id         = module.secure_storage.id
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-
-  # Storage account level only has metrics, no logs
-  metric {
-    category = "Transaction"
-  }
-
-  metric {
-    category = "Capacity"
-  }
-}
-
-resource "azurerm_monitor_diagnostic_setting" "blob_service" {
-  name                       = "${module.secure_storage.name}-blob-diag"
-  target_resource_id         = "${module.secure_storage.id}/blobServices/default"
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-
-  enabled_log {
-    category = "StorageRead"
-  }
-
-  enabled_log {
-    category = "StorageWrite"
-  }
-
-  enabled_log {
-    category = "StorageDelete"
-  }
-
-  metric {
-    category = "Transaction"
-  }
-
-  metric {
-    category = "Capacity"
-  }
 }

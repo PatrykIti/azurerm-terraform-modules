@@ -24,9 +24,19 @@ This guide provides solutions to common issues encountered while running Terrate
 
 2.  **Verify Service Principal Permissions**: The Service Principal used for testing must have the `Contributor` role on the target Azure subscription.
 
-3.  **Check for Local Azure CLI Login**: If you are running tests locally without setting the environment variables, make sure you are logged in with the Azure CLI (`az login`) and have selected the correct subscription (`az account set --subscription <subscription_id>`).
+3.  **Check for Local Azure CLI Login**: If you are running AzureRM tests locally without setting the environment variables, make sure you are logged in with the Azure CLI (`az login`) and have selected the correct subscription (`az account set --subscription <subscription_id>`).
 
-### 2. Resource Naming Conflicts
+### 2. Azure DevOps Authentication Errors
+
+**Symptom:** Azure DevOps module tests are skipped or fail with auth errors.
+
+**Solution:**
+
+1.  Ensure `AZDO_ORG_SERVICE_URL`, `AZDO_PERSONAL_ACCESS_TOKEN`, and `AZDO_PROJECT_ID` are set.
+2.  Verify the PAT scopes (Code + Project Admin are typical for repository module tests).
+3.  Re-run tests after sourcing your local `test_env.local.sh`.
+
+### 3. Resource Naming Conflicts
 
 **Symptom:** `terraform apply` fails with an error indicating that a resource with a given name already exists.
 
@@ -39,7 +49,7 @@ This guide provides solutions to common issues encountered while running Terrate
 1.  **Run Cleanup**: The tests are designed to use a `random_suffix` to prevent this, but interrupted test runs can leave orphaned resources. Run `make clean` to delete local temporary files.
 2.  **Manual Azure Cleanup**: If the conflict is with a resource in Azure that was not properly deleted, you may need to manually delete the resource or the entire test resource group from the Azure portal. Test resource groups are typically named `rg-dpc-<scenario>-<random_suffix>`.
 
-### 3. Test Timeouts
+### 4. Test Timeouts
 
 **Symptom:** The test fails with a timeout error, often during a long `terraform apply` or `destroy` operation.
 
@@ -51,7 +61,7 @@ This guide provides solutions to common issues encountered while running Terrate
     make test TIMEOUT=45m
     ```
 
-### 4. Terraform State Lock Errors
+### 5. Terraform State Lock Errors
 
 **Symptom:** `terraform apply` fails with an error about failing to acquire a state lock.
 

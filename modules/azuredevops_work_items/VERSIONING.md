@@ -109,7 +109,7 @@ module "azuredevops_work_items" {
 
 # After release (automatically updated)
 module "azuredevops_work_items" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_work_items?ref=ADOWKv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_work_items?ref=ADOWKv1.2.0"
 }
 ```
 
@@ -126,7 +126,7 @@ module "azuredevops_work_items" {
 ### Direct from GitHub (Recommended)
 ```hcl
 module "azuredevops_work_items" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_work_items?ref=ADOWKv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_work_items?ref=ADOWKv1.0.0"
   
   # Module configuration
   # ...

@@ -20,7 +20,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_azuredevops_artifacts_feed"></a> [azuredevops\_artifacts\_feed](#module\_azuredevops\_artifacts\_feed) | ../../ | n/a |
+| <a name="module_azuredevops_artifacts_feed"></a> [azuredevops\_artifacts\_feed](#module\_azuredevops\_artifacts\_feed) | git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_artifacts_feed | ADOAFv1.0.0 |
 
 ## Resources
 

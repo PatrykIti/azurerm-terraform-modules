@@ -14,8 +14,8 @@ tests/
 │   ├── basic/                   # Minimal, basic configuration
 │   ├── complete/                # Configuration with all features
 │   ├── secure/                  # Security-focused configuration
-│   ├── network/                 # Network scenarios
-│   ├── negative/                # Scenarios intended to fail (e.g., invalid names)
+│   ├── network/                 # Network scenarios (optional)
+│   ├── negative/                # Scenarios intended to fail (optional)
 │   └── <feature-specific>/      # Optional feature scenarios
 ├── unit/                        # Native Terraform tests (`.tftest.hcl`)
 │   ├── node_pools.tftest.hcl    # Conditional logic for sub-resources
@@ -29,11 +29,11 @@ tests/
 ├── go.sum                       # Dependency checksums
 ├── Makefile                     # Helper scripts for running tests
 ├── kubernetes_cluster_test.go   # Main tests for basic scenarios (e.g., basic, complete)
-├── integration_test.go          # More complex integration and lifecycle tests
-├── performance_test.go          # Performance tests and benchmarks
+├── integration_test.go          # More complex integration and lifecycle tests (optional)
+├── performance_test.go          # Performance tests and benchmarks (optional)
 ├── test_helpers.go              # Helper functions, validation, and Azure SDK clients
 ├── test_config.yaml             # Test suite configuration for CI/CD
-├── test_env.sh                  # Script for setting local environment variables
+├── test_env.sh                  # Template for setting local environment variables
 ├── run_tests_parallel.sh        # Script for running tests in parallel with reporting
 ├── run_tests_sequential.sh      # Script for running tests sequentially with reporting
 └── test_outputs/                # Directory for test results (ignored by Git)
@@ -60,7 +60,7 @@ Located in `tests/unit/`, these files use the `terraform test` command to valida
 
 ### Terratest Go Files (Integration Tests)
 
-Located in the root of `tests/`, these files use the Go testing framework and Terratest to deploy and validate real Azure infrastructure.
+Located in the root of `tests/`, these files use the Go testing framework and Terratest to deploy and validate real Azure or Azure DevOps infrastructure.
 
 | File | Purpose |
 |------|---------|
@@ -143,7 +143,7 @@ func TestBasicKubernetesCluster(t *testing.T) {
     t.Parallel()
 
     // 1. Setup: Copy the fixture to a temp folder
-    testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+    testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 
     // 2. Defer Cleanup: Ensure destroy is always called
     defer test_structure.RunTestStage(t, "cleanup", func() {

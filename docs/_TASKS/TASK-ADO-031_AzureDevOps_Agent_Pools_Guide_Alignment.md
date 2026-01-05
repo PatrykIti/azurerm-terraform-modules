@@ -1,0 +1,110 @@
+# TASK-ADO-031: Azure DevOps Agent Pools module - MODULE_GUIDE alignment (examples + main.tf + docs)
+# FileName: TASK-ADO-031_AzureDevOps_Agent_Pools_Guide_Alignment.md
+
+**Priority:** Medium
+**Category:** Azure DevOps Modules / Documentation
+**Estimated Effort:** Small
+**Dependencies:** TASK-ADO-015
+**Status:** ✅ **Done** (2026-01-01)
+
+---
+
+## Overview
+
+Bring `modules/azuredevops_agent_pools` into full compliance with `docs/MODULE_GUIDE`,
+covering example naming rules, main.tf patterns, documentation consistency, and
+moving `agent_queues` out of this module (queues are project-scoped).
+
+---
+
+## Current Gaps (Summary)
+
+- Examples use random suffixes and the `random` provider, which violates
+  `docs/MODULE_GUIDE/06-examples.md` for Azure DevOps modules (fixed names only).
+- Example READMEs mention random suffixes, which contradicts guide expectations.
+- Example README terraform-docs output shows `../../` sources while `main.tf` uses
+  `git::https` sources; docs were not regenerated after recent changes and after
+  `.releaserc.js` source-pattern updates.
+- `azuredevops_elastic_pool` uses `try(...)` on every attribute; `count = 0`
+  already prevents evaluation when the object is null. Remove `try` and rely on
+  direct access + validations, keeping `count`.
+- `agent_queues` are project-scoped and do not logically belong in
+  `azuredevops_agent_pools`; they should be removed from this module.
+
+---
+
+## Scope
+
+1) **Main module (elastic pool + queue removal)**
+   - Keep `count`, remove `try(...)` in `azuredevops_elastic_pool`, and use
+     direct access to `var.elastic_pool.*`.
+   - Update outputs to use a conditional guard instead of `try(...)`.
+   - Remove `agent_queues` inputs, locals, resources, outputs, and tests.
+   - Update examples to show only agent pool + optional elastic pool usage.
+
+**Note:** Terraform does not evaluate resource arguments when `count = 0`, so
+direct access to an optional object is safe inside the resource. Outputs and
+other references still need conditional guards.
+
+2) **Examples: naming + inputs**
+   - Replace random suffix logic with deterministic names in:
+     - `examples/basic`
+     - `examples/complete`
+     - `examples/secure`
+   - Remove `random` provider and `random_string` resource from all examples.
+   - Use fixed defaults that follow guide patterns, e.g.
+     `ado-agent-pools-basic-example`, `ado-agent-pools-complete-example`,
+     `ado-agent-pools-secure-example`.
+   - Keep override variables for uniqueness when required by org policy.
+
+3) **Examples: README content**
+   - Update features/notes to remove any "random suffix" wording.
+   - Ensure example descriptions match the deterministic naming behavior.
+
+4) **Docs regeneration**
+   - Re-run module and example terraform-docs so tables match `main.tf`.
+   - Ensure README source entries are consistent with the `git::https` pattern
+     and compatible with the updated `.releaserc.js` replacements.
+
+---
+
+## Docs to Update
+
+### In-module docs
+- `modules/azuredevops_agent_pools/README.md` (examples list + terraform-docs refresh)
+- `modules/azuredevops_agent_pools/examples/basic/README.md`
+- `modules/azuredevops_agent_pools/examples/complete/README.md`
+- `modules/azuredevops_agent_pools/examples/secure/README.md`
+- `modules/azuredevops_agent_pools/docs/README.md` (only if naming guidance is added)
+
+### Outside the module (if required)
+- `docs/_TASKS/README.md` (update status after completion)
+- `docs/_CHANGELOG/*` (only if release/changelog policy requires it)
+
+---
+
+## Acceptance Criteria
+
+- All three examples use fixed, deterministic names with guide-aligned defaults.
+- No `random` provider or `random_string` resource appears in examples.
+- Example READMEs reflect deterministic names and contain no random-suffix language.
+- terraform-docs output matches example `main.tf` sources (no stale `../../` entries).
+- `azuredevops_elastic_pool` no longer uses `try(...)`; direct inputs are used
+  with `count` and validations, and outputs are conditionally guarded.
+- `agent_queues` inputs/resources/outputs are removed from this module.
+
+---
+
+## Implementation Checklist
+
+- [x] Update `main.tf` to keep `count`, remove `try(...)`, and access
+  `var.elastic_pool.*` directly.
+- [x] Update outputs to use a conditional guard instead of `try(...)`.
+- [x] Remove `agent_queues` variables, locals, resources, outputs, examples, and tests.
+- [x] Update example `main.tf` files to remove random suffixes and providers.
+- [x] Adjust example `variables.tf` defaults to fixed names per guide patterns.
+- [x] Update example `README.md` text to match deterministic naming.
+- [x] Re-run docs:
+  - `./scripts/update-module-docs.sh azuredevops_agent_pools`
+  - `./scripts/update-examples-list.sh azuredevops_agent_pools`
+- [x] Verify example README module sources match `git::https` and are release-safe.

@@ -9,12 +9,12 @@ output "repository_url" {
 }
 
 output "file_ids" {
-  description = "Map of file IDs keyed by file key."
+  description = "Map of file IDs keyed by file path and branch."
   value       = module.azuredevops_repository.file_ids
 }
 
 output "branch_ids" {
-  description = "Map of branch IDs keyed by branch key."
+  description = "Map of branch IDs keyed by branch name."
   value       = module.azuredevops_repository.branch_ids
 }
 

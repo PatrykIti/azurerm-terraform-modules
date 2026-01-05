@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 11 tasks
+- **To Do:** 14 tasks
 - **In Progress:** 0
-- **Done:** 28 tasks
+- **Done:** 34 tasks
 
 ---
 
@@ -14,8 +14,11 @@ Task board for module work. Update statuses in markdown files.
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
+| [TASK-014](./TASK-014_Virtual_Network_Module_Alignment.md) | **Virtual Network module alignment (docs + examples + tests)** | High | Medium | `modules/azurerm_virtual_network/` |
 | [TASK-ADO-017](./TASK-ADO-017_AzureDevOps_Environments_Module_Refactor.md) | **Azure DevOps Environments module refactor** | High | Medium | Re-opened; `modules/azuredevops_environments/` |
 | [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_artifacts_feed/` |
+| [TASK-ADO-032](./TASK-ADO-032_AzureDevOps_Artifacts_Feed_Module_Audit_Fixes.md) | **Azure DevOps Artifacts Feed module audit fixes** | Medium | Small | Docs + artifact cleanup; `modules/azuredevops_artifacts_feed/` |
+| [TASK-ADO-034](./TASK-ADO-034_AzureDevOps_Environments_Module_Compliance_Fixes.md) | **Azure DevOps Environments module compliance fixes** | High | Medium | `modules/azuredevops_environments/` |
 | [TASK-ADO-020](./TASK-ADO-020_AzureDevOps_Extension_Module_Refactor.md) | **Azure DevOps Extension module refactor** | Medium | Small | Re-opened; `modules/azuredevops_extension/` |
 | [TASK-ADO-021](./TASK-ADO-021_AzureDevOps_Pipelines_Module_Refactor.md) | **Azure DevOps Pipelines module refactor** | High | Medium | Re-opened; `modules/azuredevops_pipelines/` |
 | [TASK-ADO-022](./TASK-ADO-022_AzureDevOps_ServiceEndpoint_Module_Refactor.md) | **Azure DevOps Service Endpoint module refactor** | High | Large | Re-opened; `modules/azuredevops_serviceendpoint/` |
@@ -37,8 +40,11 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-ADO-033](./TASK-ADO-033_AzureDevOps_Extension_Compliance_Alignment.md) | **Azure DevOps Extension compliance alignment** | Medium | Small | `modules/azuredevops_extension/` |
 | [TASK-010](./TASK-010_Workflow_and_Module_Docs_Alignment.md) | **Workflow and module documentation alignment** | Medium | Medium | `docs/WORKFLOWS.md`, `docs/MODULE_GUIDE/*`, ADO docs |
 | [TASK-011](./TASK-011_Terratest_Fixture_Path_Portability.md) | **Terratest fixture path portability** | Medium | Medium | Remove hardcoded `tests/fixtures` paths |
+| [TASK-012](./TASK-012_Module_Guide_Alignment.md) | **Module guide alignment (AKS + ADO patterns)** | Medium | Medium | `docs/MODULE_GUIDE/*` |
+| [TASK-013](./TASK-013_Testing_Guide_Alignment.md) | **Testing guide alignment (AKS + ADO patterns)** | Medium | Medium | `docs/TESTING_GUIDE/*` |
 | [TASK-009](./TASK-009_Workflow_and_Scripts_Audit.md) | **Workflow + scripts audit (docs/examples/source updates)** | High | Medium | CI/CD + release automations |
 | [TASK-001](./TASK-001_AKS_Module_Fixes.md) | **AKS module – walidacje, SP/MI UX, docs i bump wersji** | High | Medium | `modules/azurerm_kubernetes_cluster/` |
 | [TASK-003](./TASK-003_Module_Scaffold_Fix.md) | **Generator scaffoldu – naprawa i zgodnosc z AKS** | High | Medium | `scripts/create-new-module.sh` + `scripts/templates/` |
@@ -62,6 +68,9 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-016](./TASK-ADO-016_AzureDevOps_Project_Permissions_Verification.md) | **Azure DevOps Project Permissions module – verification & alignment** | Medium | Small | `modules/azuredevops_project_permissions/` |
 | [TASK-ADO-018](./TASK-ADO-018_AzureDevOps_Identity_Module_Refactor.md) | **Azure DevOps Identity module refactor** | High | Medium | Re-opened; `modules/azuredevops_identity/` |
 | [TASK-ADO-028](./TASK-ADO-028_AzureDevOps_Contributing_Docs_Alignment.md) | **Azure DevOps CONTRIBUTING docs alignment** | Medium | Small | `modules/azuredevops_*/CONTRIBUTING.md`, `scripts/templates/CONTRIBUTING.md` |
+| [TASK-ADO-030](./TASK-ADO-030_AzureDevOps_Project_Docs_and_Release_Alignment.md) | **Azure DevOps docs and release alignment** | Medium | Small | `modules/azuredevops_*` docs + release config |
+| [TASK-ADO-031](./TASK-ADO-031_AzureDevOps_Agent_Pools_Guide_Alignment.md) | **Azure DevOps Agent Pools module guide alignment (examples + main.tf + docs)** | Medium | Small | `modules/azuredevops_agent_pools/` |
+| [TASK-ADO-029](./TASK-ADO-029_AzureDevOps_Repository_Policies_Restructure.md) | **Azure DevOps Repository policies restructure** | High | Large | New nested policy inputs for `modules/azuredevops_repository/` |
 | [TASK-006](./TASK-006_NSG_Observability_and_Documentation.md) | **NSG observability + docs alignment (diagnostic settings)** | High | Large | `modules/azurerm_network_security_group/` + repo docs |
 | [TASK-007](./TASK-007_Route_Table_Module_Alignment.md) | **Route Table module – alignment z guide (docs, examples, tests)** | High | Medium | `modules/azurerm_route_table/` |
 | [TASK-008](./TASK-008_Storage_Account_Module_Alignment.md) | **Storage Account module – alignment z guide (docs, examples, tests)** | High | Large | `modules/azurerm_storage_account/` |

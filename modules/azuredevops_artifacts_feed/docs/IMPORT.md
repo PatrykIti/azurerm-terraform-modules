@@ -34,7 +34,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_artifacts_feed" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_artifacts_feed?ref=ADOAF1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_artifacts_feed?ref=ADOAFv1.0.0"
 
   name       = "existing-feed-name"
   project_id = "00000000-0000-0000-0000-000000000000"
@@ -67,7 +67,7 @@ Create `import.tf`:
 
 ```hcl
 import {
-  to = module.azuredevops_artifacts_feed.azuredevops_feed.feed[0]
+  to = module.azuredevops_artifacts_feed.azuredevops_feed.feed
   id = "<feed_id>"
 }
 ```
@@ -90,6 +90,35 @@ import {
 The permission import ID format depends on the provider. Follow the Azure DevOps
 provider documentation for the exact format.
 
+### Permission Key Derivation
+
+The `for_each` key is:
+- `key` when provided
+- otherwise `identity_descriptor`
+
+Example config and resulting addresses:
+
+```hcl
+feed_permissions = [
+  {
+    key                 = "project-reader"
+    identity_descriptor = "vssgp.Uy0xLTktMTIzNDU2"
+    role                = "reader"
+  },
+  {
+    identity_descriptor = "vssgp.Uy0xLTktNjU0MzIx"
+    role                = "contributor"
+  }
+]
+```
+
+Import addresses:
+
+```hcl
+module.azuredevops_artifacts_feed.azuredevops_feed_permission.feed_permission["project-reader"]
+module.azuredevops_artifacts_feed.azuredevops_feed_permission.feed_permission["vssgp.Uy0xLTktNjU0MzIx"]
+```
+
 ---
 
 ## 4) Import retention policies (optional)
@@ -104,6 +133,35 @@ import {
 ```
 
 Use the retention policy ID format from the provider documentation.
+
+### Retention Policy Key Derivation
+
+The `for_each` key is:
+- `key` when provided
+- otherwise `${count_limit}-${days_to_keep_recently_downloaded_packages}`
+
+Example config and resulting addresses:
+
+```hcl
+feed_retention_policies = [
+  {
+    key                                       = "short-retention"
+    count_limit                               = 10
+    days_to_keep_recently_downloaded_packages = 14
+  },
+  {
+    count_limit                               = 30
+    days_to_keep_recently_downloaded_packages = 90
+  }
+]
+```
+
+Import addresses:
+
+```hcl
+module.azuredevops_artifacts_feed.azuredevops_feed_retention_policy.feed_retention_policy["short-retention"]
+module.azuredevops_artifacts_feed.azuredevops_feed_retention_policy.feed_retention_policy["30-90"]
+```
 
 ---
 

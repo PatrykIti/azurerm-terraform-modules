@@ -37,7 +37,7 @@ This document details the security features and configurations available in the 
 - **SAS Tokens**: Use Azure AD when possible
 
 #### Network Security
-- **Default Deny**: Network rules deny access by default
+- **Conditional Default Action**: When IP rules or subnet IDs are provided, access is allow-listed (default_action = "Deny"); when both are empty, public access is allowed. Set default_action to "Allow" or "Deny" to override this behavior.
   ```hcl
   network_rules = {
     default_action = "Deny"
@@ -126,7 +126,7 @@ diagnostic_settings = {
 ### 1. **Maximum Security Configuration**
 ```hcl
 module "storage_account" {
-  source = "./modules/storage_account"
+  source = "./modules/azurerm_storage_account"
 
   name                = "mystorageaccount"
   resource_group_name = azurerm_resource_group.main.name
@@ -217,7 +217,7 @@ module "storage_account" {
 ### 2. **Development Environment Configuration**
 ```hcl
 module "storage_account_dev" {
-  source = "./modules/storage_account"
+  source = "./modules/azurerm_storage_account"
 
   name                = "devstorageaccount"
   resource_group_name = azurerm_resource_group.dev.name

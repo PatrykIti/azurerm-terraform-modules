@@ -41,7 +41,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_azuredevops_repository"></a> [azuredevops\_repository](#module\_azuredevops\_repository) | ../../ | n/a |
+| <a name="module_azuredevops_repository"></a> [azuredevops\_repository](#module\_azuredevops\_repository) | git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_repository | ADORv1.0.0 |
 
 ## Resources
 
@@ -60,7 +60,7 @@ No resources.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_branch_ids"></a> [branch\_ids](#output\_branch\_ids) | Map of branch IDs keyed by branch key. |
+| <a name="output_branch_ids"></a> [branch\_ids](#output\_branch\_ids) | Map of branch IDs keyed by branch name. |
 | <a name="output_policy_ids"></a> [policy\_ids](#output\_policy\_ids) | Map of policy IDs grouped by policy type. |
 | <a name="output_repository_id"></a> [repository\_id](#output\_repository\_id) | Repository ID. |
 | <a name="output_repository_url"></a> [repository\_url](#output\_repository\_url) | Repository web URL. |

@@ -49,7 +49,7 @@ EOT
 }
 
 module "azuredevops_environments" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_environments?ref=ADOE1.0.0"
+  source = "../.."
 
   project_id  = var.project_id
   name        = "ado-env-complete-example"
@@ -66,8 +66,7 @@ module "azuredevops_environments" {
 
   check_approvals = [
     {
-      key                   = "primary-approval"
-      target_resource_type  = "environment"
+      name                  = "primary-approval"
       approvers             = [data.azuredevops_group.project_collection_admins.origin_id]
       requester_can_approve = false
     }
@@ -75,8 +74,7 @@ module "azuredevops_environments" {
 
   check_branch_controls = [
     {
-      display_name             = "Require protected branches"
-      target_resource_type     = "environment"
+      name                     = "Require protected branches"
       allowed_branches         = "refs/heads/main"
       verify_branch_protection = true
     }

@@ -187,6 +187,12 @@ output "microsoft_defender" {
   }, null)
 }
 
+# Diagnostic Settings
+output "diagnostic_settings_skipped" {
+  description = "Diagnostic settings entries skipped because no categories were available after filtering."
+  value       = local.diagnostic_settings_skipped
+}
+
 # Network Profile
 output "network_profile" {
   description = "The network profile of the Kubernetes Cluster."
@@ -290,4 +296,3 @@ output "extensions" {
     }
   ]
 }
-

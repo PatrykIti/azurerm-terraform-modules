@@ -1,9 +1,48 @@
 # Makefile for Terratest execution, aligned with project standards.
+SHELL := /bin/bash
 
 # Variables
 TIMEOUT ?= 30m
 PARALLEL ?= 8
 TEST_NAME ?= ""
+LOG_DIR ?= test_outputs
+LOG_TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)
+
+define run_with_log
+	@mkdir -p $(LOG_DIR)
+	@echo "Saving test output to $(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"
+	@bash -c 'set -o pipefail; $(2) 2>&1 | tee "$(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"'
+endef
+
+# Normalize credential environment variables (ARM_ <-> AZURE_)
+ifdef AZURE_SUBSCRIPTION_ID
+ARM_SUBSCRIPTION_ID ?= $(AZURE_SUBSCRIPTION_ID)
+endif
+ifdef AZURE_TENANT_ID
+ARM_TENANT_ID ?= $(AZURE_TENANT_ID)
+endif
+ifdef AZURE_CLIENT_ID
+ARM_CLIENT_ID ?= $(AZURE_CLIENT_ID)
+endif
+ifdef AZURE_CLIENT_SECRET
+ARM_CLIENT_SECRET ?= $(AZURE_CLIENT_SECRET)
+endif
+
+ifdef ARM_SUBSCRIPTION_ID
+AZURE_SUBSCRIPTION_ID ?= $(ARM_SUBSCRIPTION_ID)
+endif
+ifdef ARM_TENANT_ID
+AZURE_TENANT_ID ?= $(ARM_TENANT_ID)
+endif
+ifdef ARM_CLIENT_ID
+AZURE_CLIENT_ID ?= $(ARM_CLIENT_ID)
+endif
+ifdef ARM_CLIENT_SECRET
+AZURE_CLIENT_SECRET ?= $(ARM_CLIENT_SECRET)
+endif
+
+export ARM_SUBSCRIPTION_ID ARM_TENANT_ID ARM_CLIENT_ID ARM_CLIENT_SECRET
+export AZURE_SUBSCRIPTION_ID AZURE_TENANT_ID AZURE_CLIENT_ID AZURE_CLIENT_SECRET
 
 # Environment check
 check-env:
@@ -17,69 +56,77 @@ check-env:
 # Default target
 all: test
 
+# Install dependencies
+deps:
+	@echo "Installing Go dependencies..."
+	go mod download
+	go mod tidy
+
 # Run all Go tests in parallel. This is the default command for a full test run.
-test: check-env
+test: check-env deps
 	@echo "Running all Go tests..."
-	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...
+	$(call run_with_log,all,go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...)
 
 # Run a single, specific test function. Useful for debugging.
 # Example: make test-single TEST_NAME=TestSimpleNetworkSecurityGroup
-test-single: check-env
+test-single: check-env deps
 	@echo "Running single test: $(TEST_NAME)..."
-	go test -v -timeout $(TIMEOUT) -run "^$(TEST_NAME)$$" ./...
+	$(call run_with_log,single,go test -v -timeout $(TIMEOUT) -run "^$(TEST_NAME)$$" ./...)
 
 # Run unit tests only (skip integration tests)
-test-unit: check-env
+test-unit: check-env deps
 	@echo "Running unit tests only..."
-	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) -short ./...
+	$(call run_with_log,unit,go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) -short ./...)
 
 # Run integration tests only
-test-integration: check-env
+test-integration: check-env deps
 	@echo "Running integration tests only..."
-	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) -run "TestNetworkSecurityGroupLifecycle|TestSecureNetworkSecurityGroup" ./...
+	$(call run_with_log,integration,go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) -run "TestNetworkSecurityGroupLifecycle|TestSecureNetworkSecurityGroup" ./...)
 
 # Run test for simple fixture
-test-simple: check-env
+test-simple: check-env deps
 	@echo "Running test for simple fixture..."
-	go test -v -timeout $(TIMEOUT) -run TestSimpleNetworkSecurityGroup ./...
+	$(call run_with_log,simple,go test -v -timeout $(TIMEOUT) -run TestSimpleNetworkSecurityGroup ./...)
 
 # Run test for complete fixture
-test-complete: check-env
+test-complete: check-env deps
 	@echo "Running test for complete fixture..."
-	go test -v -timeout $(TIMEOUT) -run TestCompleteNetworkSecurityGroup ./...
+	$(call run_with_log,complete,go test -v -timeout $(TIMEOUT) -run TestCompleteNetworkSecurityGroup ./...)
 
 # Run test for security fixture
-test-security: check-env
+test-security: check-env deps
 	@echo "Running test for security fixture..."
-	go test -v -timeout $(TIMEOUT) -run TestSecureNetworkSecurityGroup ./...
+	$(call run_with_log,security,go test -v -timeout $(TIMEOUT) -run TestSecureNetworkSecurityGroup ./...)
 
 # Run test for network fixture
-test-network: check-env
+test-network: check-env deps
 	@echo "Running test for network fixture..."
-	go test -v -timeout $(TIMEOUT) -run TestNetworkNetworkSecurityGroup ./...
+	$(call run_with_log,network,go test -v -timeout $(TIMEOUT) -run TestNetworkNetworkSecurityGroup ./...)
 
 # Run test for negative fixture
-test-negative: check-env
+test-negative: check-env deps
 	@echo "Running test for negative fixture..."
-	go test -v -timeout $(TIMEOUT) -run TestNetworkSecurityGroupValidationRules ./...
+	$(call run_with_log,negative,go test -v -timeout $(TIMEOUT) -run TestNetworkSecurityGroupValidationRules ./...)
 
 # Run all performance benchmarks.
-benchmark:
+benchmark: check-env deps
 	@echo "Running performance benchmarks..."
-	go test -run=^$ -bench=.
+	$(call run_with_log,bench,go test -run=^$ -bench=.)
 
 # Run tests and generate an HTML code coverage report.
-test-coverage: check-env
+test-coverage: check-env deps
 	@echo "Running tests with coverage..."
-	go test -v -coverprofile=coverage.out -covermode=atomic ./...
+	$(call run_with_log,coverage,go test -v -coverprofile=coverage.out -covermode=atomic ./...)
 	go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report generated: coverage.html"
 
 # Run tests and generate a JUnit XML report for CI/CD integration.
-test-junit: check-env
+test-junit: check-env deps
 	@echo "Running tests and generating JUnit report..."
 	go install github.com/jstemmer/go-junit-report/v2@latest
-	go test -v ./... 2>&1 | go-junit-report -set-exit-code > test-results.xml
+	@mkdir -p $(LOG_DIR)
+	@echo "Saving test output to $(LOG_DIR)/junit_$(LOG_TIMESTAMP).log"
+	@bash -c 'set -o pipefail; go test -v ./... 2>&1 | tee "$(LOG_DIR)/junit_$(LOG_TIMESTAMP).log" | go-junit-report -set-exit-code > test-results.xml'
 	@echo "JUnit report generated: test-results.xml"
 
 # Format all Go code using gofmt.
@@ -130,4 +177,4 @@ help:
 	@echo "  make ci                - Run a full CI pipeline simulation (fmt, lint, coverage, junit)."
 	@echo "  make help              - Show this help message."
 
-.PHONY: all test test-unit test-integration test-single test-simple test-complete test-security test-network test-negative benchmark test-coverage test-junit fmt lint clean ci help
+.PHONY: all check-env deps test test-unit test-integration test-single test-simple test-complete test-security test-network test-negative benchmark test-coverage test-junit fmt lint clean ci help

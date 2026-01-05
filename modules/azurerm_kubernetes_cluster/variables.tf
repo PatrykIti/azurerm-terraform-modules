@@ -23,16 +23,16 @@ variable "location" {
 variable "dns_config" {
   description = <<-EOT
     DNS configuration for the Kubernetes cluster.
-    
-    dns_prefix: DNS prefix specified when creating the managed cluster. Required for public clusters.
-    dns_prefix_private_cluster: DNS prefix to use with private clusters. Required for private clusters.
-    
-    Note: You must define either dns_prefix or dns_prefix_private_cluster, but not both.
+
+    dns_prefix: DNS prefix specified when creating the managed cluster. Typically used for public clusters.
+    dns_prefix_private_cluster: DNS prefix to use with private clusters.
+
+    Note: You must define exactly one: either dns_prefix or dns_prefix_private_cluster, but not both.
   EOT
 
   type = object({
-    dns_prefix                 = optional(string)
-    dns_prefix_private_cluster = optional(string)
+    dns_prefix                 = optional(string, null)
+    dns_prefix_private_cluster = optional(string, null)
   })
 
   default = {}
@@ -42,13 +42,13 @@ variable "dns_config" {
       (var.dns_config.dns_prefix != null && var.dns_config.dns_prefix_private_cluster == null) ||
       (var.dns_config.dns_prefix == null && var.dns_config.dns_prefix_private_cluster != null)
     )
-    error_message = "You must define either dns_prefix or dns_prefix_private_cluster, but not both."
+    error_message = "You must define exactly one: either dns_prefix or dns_prefix_private_cluster, but not both."
   }
 
   validation {
     condition = var.dns_config.dns_prefix == null || (
       try(length(var.dns_config.dns_prefix), 0) >= 1 && try(length(var.dns_config.dns_prefix), 0) <= 54 &&
-      can(regex("^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$", try(var.dns_config.dns_prefix, "")))
+      can(regex("^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$", try(var.dns_config.dns_prefix, "")))
     )
     error_message = "DNS prefix must begin and end with a letter or number, contain only letters, numbers, and hyphens and be between 1 and 54 characters in length."
   }
@@ -126,7 +126,9 @@ variable "default_node_pool" {
     - name: The name which should be used for the default Kubernetes Node Pool.
     - vm_size: The size of the Virtual Machine, such as Standard_DS2_v2.
     
-    Optional fields include node count, availability zones, max pods, OS disk configuration, and more.
+    Notes:
+    - When auto_scaling_enabled is false, node_count is required.
+    - When auto_scaling_enabled is true, node_count is optional (defaults to min_count).
   EOT
 
   type = object({
@@ -232,7 +234,7 @@ variable "default_node_pool" {
 
     max_count  = optional(number)
     min_count  = optional(number)
-    node_count = optional(number, 1)
+    node_count = optional(number)
   })
 
   validation {
@@ -256,12 +258,26 @@ variable "default_node_pool" {
     condition     = !var.default_node_pool.auto_scaling_enabled || (var.default_node_pool.min_count != null && var.default_node_pool.max_count != null)
     error_message = "When auto_scaling_enabled is true, both min_count and max_count must be specified."
   }
+
+  validation {
+    condition     = var.default_node_pool.auto_scaling_enabled || var.default_node_pool.node_count != null
+    error_message = "When auto_scaling_enabled is false, node_count must be specified."
+  }
+
+  validation {
+    condition = !var.default_node_pool.auto_scaling_enabled || (
+      var.default_node_pool.min_count != null &&
+      var.default_node_pool.max_count != null &&
+      var.default_node_pool.min_count <= var.default_node_pool.max_count
+    )
+    error_message = "When auto_scaling_enabled is true, min_count must be less than or equal to max_count."
+  }
 }
 
 # Identity Configuration
 variable "identity" {
   description = <<-EOT
-    An identity block. One of either identity or service_principal must be specified.
+    An identity block (optional). If not set and service_principal is not provided, the module will use a SystemAssigned identity by default.
     
     type: Specifies the type of Managed Service Identity. Possible values are SystemAssigned or UserAssigned.
     identity_ids: Specifies a list of User Assigned Managed Identity IDs.
@@ -272,12 +288,10 @@ variable "identity" {
     identity_ids = optional(list(string))
   })
 
-  default = {
-    type = "SystemAssigned"
-  }
+  default = null
 
   validation {
-    condition     = contains(["SystemAssigned", "UserAssigned"], var.identity.type)
+    condition     = var.identity == null || contains(["SystemAssigned", "UserAssigned"], var.identity.type)
     error_message = "The identity type must be either SystemAssigned or UserAssigned."
   }
 
@@ -287,19 +301,16 @@ variable "identity" {
   }
 
   validation {
-    condition = (
-      (var.identity != null && var.service_principal == null) ||
-      (var.identity == null && var.service_principal != null)
-    )
-    error_message = "You must define either identity or service_principal, but not both."
+    condition     = !(var.identity != null && var.service_principal != null)
+    error_message = "Do not set both identity and service_principal. Omit identity to use the default SystemAssigned identity."
   }
 }
 
 # Service Principal Configuration (Alternative to Identity)
 variable "service_principal" {
   description = <<-EOT
-    A service_principal block. One of either identity or service_principal must be specified.
-    Note: A migration scenario from service_principal to identity is supported.
+    A service_principal block (optional). If set, this will be used instead of managed identity.
+    Note: A migration scenario from service_principal to identity is supported (switch configuration over time).
   EOT
 
   type = object({
@@ -390,7 +401,9 @@ variable "api_server_access_profile" {
   EOT
 
   type = object({
-    authorized_ip_ranges = optional(list(string))
+    authorized_ip_ranges                = optional(list(string))
+    subnet_id                           = optional(string)
+    virtual_network_integration_enabled = optional(bool, false)
   })
 
   default = null
@@ -424,11 +437,6 @@ variable "private_cluster_config" {
   default = {
     private_cluster_enabled             = false
     private_cluster_public_fqdn_enabled = false
-  }
-
-  validation {
-    condition     = var.private_cluster_config.private_cluster_enabled == false || try(var.dns_config.dns_prefix_private_cluster, null) != null
-    error_message = "When private_cluster_enabled is true, dns_prefix_private_cluster must be specified."
   }
 }
 
@@ -695,6 +703,87 @@ variable "monitor_metrics" {
   default = null
 }
 
+# Diagnostic Settings (Control Plane)
+variable "diagnostic_settings" {
+  description = <<-EOT
+    Diagnostic settings for AKS control plane (API plane) logs and metrics.
+
+    Each item creates a separate azurerm_monitor_diagnostic_setting for the cluster.
+    Use areas to group categories (api_plane, audit, metrics, etc.) or provide explicit
+    log_categories / metric_categories. At least one destination is required.
+  EOT
+
+  type = list(object({
+    name                           = string
+    areas                          = optional(list(string))
+    log_categories                 = optional(list(string))
+    metric_categories              = optional(list(string))
+    log_analytics_workspace_id     = optional(string)
+    log_analytics_destination_type = optional(string)
+    storage_account_id             = optional(string)
+    eventhub_authorization_rule_id = optional(string)
+    eventhub_name                  = optional(string)
+  }))
+
+  default = []
+
+  validation {
+    condition     = length(var.diagnostic_settings) <= 5
+    error_message = "Azure allows a maximum of 5 diagnostic settings per AKS resource."
+  }
+
+  validation {
+    condition     = length(distinct([for ds in var.diagnostic_settings : ds.name])) == length(var.diagnostic_settings)
+    error_message = "Each diagnostic_settings entry must have a unique name."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.log_analytics_workspace_id != null || ds.storage_account_id != null || ds.eventhub_authorization_rule_id != null
+    ])
+    error_message = "Each diagnostic_settings entry must specify at least one destination: log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.eventhub_authorization_rule_id == null || (ds.eventhub_name != null && ds.eventhub_name != "")
+    ])
+    error_message = "eventhub_name is required when eventhub_authorization_rule_id is set."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.log_analytics_destination_type == null || contains(["Dedicated", "AzureDiagnostics"], ds.log_analytics_destination_type)
+    ])
+    error_message = "log_analytics_destination_type must be either Dedicated or AzureDiagnostics."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([
+        for area in(ds.areas != null ? ds.areas : ["all"]) :
+        contains([
+          "all",
+          "api_plane",
+          "audit",
+          "controller_manager",
+          "scheduler",
+          "autoscaler",
+          "guard",
+          "csi",
+          "cloud_controller",
+          "metrics"
+        ], area)
+      ])
+    ])
+    error_message = "areas may contain only: all, api_plane, audit, controller_manager, scheduler, autoscaler, guard, csi, cloud_controller, metrics."
+  }
+}
+
 # Service Mesh
 variable "service_mesh_profile" {
   description = <<-EOT
@@ -945,6 +1034,10 @@ variable "node_pools" {
     
     Each node pool supports the same configuration options as the default node pool,
     plus additional options for spot instances and taints.
+
+    Notes:
+    - When auto_scaling_enabled is false, node_count is required.
+    - When auto_scaling_enabled is true, node_count is optional (defaults to min_count).
   EOT
 
   type = list(object({
@@ -953,7 +1046,7 @@ variable "node_pools" {
     vm_size = string
 
     # Node Count Configuration
-    node_count           = optional(number, 1)
+    node_count           = optional(number)
     auto_scaling_enabled = optional(bool, false)
     min_count            = optional(number)
     max_count            = optional(number)
@@ -1076,6 +1169,26 @@ variable "node_pools" {
 
   default = []
 
+  validation {
+    condition = alltrue([
+      for p in var.node_pools :
+      p.auto_scaling_enabled ? (p.min_count != null && p.max_count != null) : (p.node_count != null)
+    ])
+    error_message = "For each node pool: when auto_scaling_enabled is true, min_count and max_count must be specified; otherwise node_count must be specified."
+  }
+
+  validation {
+    condition = alltrue([
+      for p in var.node_pools :
+      !p.auto_scaling_enabled || (
+        p.min_count != null &&
+        p.max_count != null &&
+        p.min_count <= p.max_count
+      )
+    ])
+    error_message = "For each node pool: when auto_scaling_enabled is true, min_count must be less than or equal to max_count."
+  }
+
   # Validate node pool names are unique (required for for_each in main.tf)
   validation {
     condition     = length(distinct([for p in var.node_pools : p.name])) == length(var.node_pools)
@@ -1115,5 +1228,3 @@ variable "extensions" {
 
   default = []
 }
-
-

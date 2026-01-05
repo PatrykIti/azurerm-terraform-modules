@@ -49,7 +49,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_azuredevops_project_permissions"></a> [azuredevops\_project\_permissions](#module\_azuredevops\_project\_permissions) | github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_project_permissions | ADOPP1.1.1 |
+| <a name="module_azuredevops_project_permissions"></a> [azuredevops\_project\_permissions](#module\_azuredevops\_project\_permissions) | github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_project_permissions | ADOPPv1.1.1 |
 
 ## Resources
 

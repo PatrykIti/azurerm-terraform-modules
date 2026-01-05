@@ -1,16 +1,16 @@
 output "feed_id" {
   description = "The ID of the Azure DevOps feed."
-  value       = try(azuredevops_feed.feed[0].id, null)
+  value       = azuredevops_feed.feed.id
 }
 
 output "feed_name" {
   description = "The name of the Azure DevOps feed."
-  value       = try(azuredevops_feed.feed[0].name, null)
+  value       = azuredevops_feed.feed.name
 }
 
 output "feed_project_id" {
   description = "The project ID associated with the Azure DevOps feed."
-  value       = try(azuredevops_feed.feed[0].project_id, null)
+  value       = azuredevops_feed.feed.project_id
 }
 
 output "feed_permission_ids" {

@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_repository" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_repository?ref=ADOR1.0.0"
+  source = "../.."
 
   project_id = var.project_id
   name       = "ado-repo-basic"
@@ -22,7 +22,6 @@ module "azuredevops_repository" {
 
   files = [
     {
-      key                 = "readme"
       file                = "README.md"
       content             = "# Repository\n\nManaged by Terraform."
       commit_message      = "Add README"

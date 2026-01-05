@@ -27,7 +27,6 @@ variables {
 
   kubernetes_resources = [
     {
-      key                 = "dev-k8s"
       service_endpoint_id = "00000000-0000-0000-0000-000000000000"
       name                = "dev-k8s"
       namespace           = "default"
@@ -36,9 +35,8 @@ variables {
 
   check_approvals = [
     {
-      key                  = "approval-1"
-      target_resource_type = "environment"
-      approvers            = ["00000000-0000-0000-0000-000000000000"]
+      name      = "approval-1"
+      approvers = ["00000000-0000-0000-0000-000000000000"]
     }
   ]
 }
@@ -57,7 +55,7 @@ run "outputs_apply" {
   }
 
   assert {
-    condition     = length(keys(output.check_ids.approvals)) == 1
+    condition     = length(keys(output.check_ids.environment.approvals)) == 1
     error_message = "check_ids should include configured approvals."
   }
 }

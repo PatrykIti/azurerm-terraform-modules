@@ -2,16 +2,43 @@
 
 ## Overview
 
-This directory contains additional documentation for the Azure DevOps Agent Pools module.
+This module manages Azure DevOps agent pools resources and related configuration.
 
-## Contents
+## Managed Resources
 
-- [IMPORT.md](IMPORT.md) - Import instructions for existing agent pools, queues, and elastic pools
-- Architecture diagrams (coming soon)
-- Best practices guide (coming soon)
-- Troubleshooting guide (coming soon)
-- Migration guides (coming soon)
+- `azuredevops_agent_pool`
+- `azuredevops_elastic_pool`
 
-## Contributing
+## Usage Notes
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines on adding documentation.
+- Use `git::https://...//modules/azuredevops_agent_pools?ref=ADOAPvX.Y.Z` for module source.
+- Optional child resources are created only when corresponding inputs are set.
+- Agent queues are project-scoped; manage them in the Azure DevOps project module.
+
+## Inputs (Highlights)
+
+- Required: `name`
+- Optional: see `../README.md` and `../variables.tf`.
+
+## Outputs (Highlights)
+
+- `agent_pool_id`
+- `elastic_pool_id`
+
+## Import Existing Resources
+
+See [IMPORT.md](./IMPORT.md) for import blocks and IDs.
+
+## Troubleshooting
+
+- **Permission errors**: ensure the PAT has rights for the target resource scope.
+- **Plan drift**: align inputs with existing state or leave optional inputs unset.
+- **Duplicate keys**: ensure list/object inputs use unique keys or names.
+
+## Related Docs
+
+- [README.md](../README.md) - module usage and inputs/outputs
+- [IMPORT.md](./IMPORT.md) - import guide
+- [VERSIONING.md](../VERSIONING.md) - tag format and release flow
+- [SECURITY.md](../SECURITY.md) - security guidance
+- [CONTRIBUTING.md](../CONTRIBUTING.md) - contribution rules

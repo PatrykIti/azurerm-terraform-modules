@@ -1,5 +1,5 @@
 # Terraform Azure Virtual Network Module
-# Manages Azure Virtual Network with comprehensive configuration options
+# Manages a single Azure Virtual Network resource
 
 # Main Virtual Network Resource
 resource "azurerm_virtual_network" "virtual_network" {
@@ -38,14 +38,6 @@ resource "azurerm_virtual_network" "virtual_network" {
   }
 
   tags = var.tags
-
-  # lifecycle {
-  #   # Prevent destruction of VNet if it contains subnets
-  #   # Note: prevent_destroy must be a literal value, not a variable
-  #   prevent_destroy = true
-  # }
 }
-
-
 
 

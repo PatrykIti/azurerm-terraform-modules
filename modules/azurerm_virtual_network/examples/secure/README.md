@@ -1,26 +1,23 @@
 # Secure Virtual Network Example
 
-This example demonstrates a maximum-security Virtual Network configuration suitable for highly sensitive data and regulated environments.
+This example demonstrates a security-focused Virtual Network configuration suitable for sensitive environments.
 
 ## Features
 
-- Maximum security configuration with all security features enabled
-- Network isolation and private endpoints
-- Advanced threat protection
-- Comprehensive audit logging and monitoring
-- Encryption at rest and in transit
-- Compliance-ready configuration
+- DDoS protection plan association
+- Encryption enforcement for the VNet
+- Diagnostic settings for monitoring (external resource)
+- Secure storage account settings for diagnostics
 
 ## Key Configuration
 
-This example implements defense-in-depth security principles with multiple layers of protection suitable for highly regulated industries and sensitive workloads.
+This example focuses on VNet-level security controls and shows how to attach monitoring outside the module.
 
 ## Security Considerations
 
-- All public access is disabled by default
-- Network access is restricted to specific IP ranges
-- All data is encrypted at rest and in transit
-- Audit logging captures all access and modifications
+- DDoS plan is required for protection at the VNet level
+- Encryption enforcement is enabled on the VNet
+- Monitoring is configured with diagnostic settings outside the module
 
 ## Usage
 
@@ -35,6 +32,11 @@ terraform apply
 ```bash
 terraform destroy
 ```
+
+## Notes
+
+- `storage_account_name` must be globally unique. Override the default if needed.
+- Azure allows one DDoS plan per region. Use an existing plan if one already exists.
 
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->

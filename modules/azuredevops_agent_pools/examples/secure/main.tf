@@ -10,25 +10,10 @@ terraform {
 
 provider "azuredevops" {}
 
-provider "random" {}
-
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 module "azuredevops_agent_pools" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_agent_pools?ref=ADOAP1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_agent_pools?ref=ADOAP1.0.0"
 
-  name           = "${var.pool_name_prefix}-${random_string.suffix.result}"
+  name           = var.pool_name
   auto_provision = false
   auto_update    = false
-
-  agent_queues = [
-    {
-      key        = "locked"
-      project_id = var.project_id
-    }
-  ]
 }

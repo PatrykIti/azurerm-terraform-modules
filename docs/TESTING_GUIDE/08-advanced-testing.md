@@ -2,7 +2,7 @@
 
 Beyond validating the initial creation of resources, a robust test suite must cover advanced scenarios such as resource updates (lifecycle), compliance with security rules, disaster recovery capabilities, and performance. These tests are typically longer-running and are located in `integration_test.go` and `performance_test.go`.
 
-**Note**: All advanced tests must be skippable in CI/CD for pull requests by including the `testing.Short()` check.
+**Note**: Advanced tests should use `testing.Short()` to allow local opt-out. CI currently runs `go test` without `-short`, so only add long-running tests if they are acceptable in CI or gate them with explicit env checks.
 
 > Note: Legacy modules may still reference `fixtures/simple` or `fixtures/security`. New modules should use `fixtures/basic` and `fixtures/secure`.
 
@@ -35,7 +35,7 @@ func TestKubernetesClusterLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
 	defer terraform.Destroy(t, terraformOptions)

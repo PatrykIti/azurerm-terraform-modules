@@ -6,7 +6,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -70,7 +70,7 @@ resource "azurerm_subnet" "example" {
 
 # Create the AKS cluster with workload identity
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.0.0"
+  source = "../.."
 
   # Basic cluster configuration
   name                = var.cluster_name
@@ -169,8 +169,8 @@ resource "azurerm_key_vault" "example" {
 
   sku_name = "standard"
 
-  enable_rbac_authorization = true
-  purge_protection_enabled  = false # Disabled for easy cleanup in examples
+  rbac_authorization_enabled = true
+  purge_protection_enabled   = false # Disabled for easy cleanup in examples
 }
 
 # Grant the workload identity access to the Key Vault

@@ -125,11 +125,18 @@ resource "azurerm_storage_account" "storage_account" {
   dynamic "network_rules" {
     for_each = var.network_rules != null ? [var.network_rules] : []
     content {
-      # Automatically determine default_action:
+      # Automatically determine default_action unless explicitly set:
       # - If any IP rules or subnet IDs are specified: Deny all except those (most common scenario)
-      # - If both are empty: Deny all public access (secure by default)
-      # This means you only specify what SHOULD have access, everything else is blocked
-      default_action = "Deny"
+      # - If both are empty: Allow public access
+      # This means you only specify what SHOULD have access; otherwise public access remains open
+      # If default_action is set, it overrides the automatic behavior
+      default_action = coalesce(
+        network_rules.value.default_action,
+        (
+          try(length(network_rules.value.ip_rules), 0) > 0 ||
+          try(length(network_rules.value.virtual_network_subnet_ids), 0) > 0
+        ) ? "Deny" : "Allow"
+      )
 
       bypass                     = network_rules.value.bypass
       ip_rules                   = network_rules.value.ip_rules
@@ -298,9 +305,9 @@ resource "azurerm_storage_container" "storage_container" {
 resource "azurerm_storage_queue" "storage_queue" {
   for_each = { for queue in var.queues : queue.name => queue }
 
-  name                 = each.value.name
-  storage_account_name = azurerm_storage_account.storage_account.name
-  metadata             = each.value.metadata
+  name               = each.value.name
+  storage_account_id = azurerm_storage_account.storage_account.id
+  metadata           = each.value.metadata
 
   depends_on = [
     azurerm_storage_account.storage_account

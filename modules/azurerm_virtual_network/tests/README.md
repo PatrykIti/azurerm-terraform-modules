@@ -5,7 +5,7 @@ This directory contains automated tests for the Virtual Network Terraform module
 ## Prerequisites
 
 1. **Go**: Version 1.21 or later
-2. **Terraform**: Version 1.3.0 or later
+2. **Terraform**: Version 1.12.2 or later
 3. **Azure CLI**: Authenticated with appropriate permissions
 4. **Azure Service Principal**: With Contributor access to the test subscription
 
@@ -31,6 +31,9 @@ make deps
 
 # Run all tests
 make test
+
+# Run unit tests (Terraform native)
+make test-unit
 
 # Run specific test
 make test-single TEST_NAME=TestVirtualNetworkBasic
@@ -66,6 +69,9 @@ make clean
 # Run all tests
 go test -v -timeout 30m ./...
 
+# Run unit tests directly (from module root)
+terraform test -test-directory=tests/unit
+
 # Run specific test
 go test -v -timeout 30m -run TestVirtualNetworkBasic ./...
 
@@ -77,9 +83,9 @@ go test -v -race ./...
 
 ### Test Files
 
-- `module_test.go` - Main module functionality tests
+- `unit/*.tftest.hcl` - Terraform native unit tests
 - `virtual_network_test.go` - Consolidated test suite with staged execution
-- `integration_test.go` - Integration tests (peering, DNS, flow logs)
+- `integration_test.go` - Integration tests (peering, DNS, validation)
 - `performance_test.go` - Performance benchmarks and scaling tests
 - `test_helpers.go` - Common test utilities and Azure client helpers
 - `test_config.yaml` - CI/CD test configuration
@@ -114,17 +120,15 @@ The `fixtures/` directory contains Terraform configurations for different test s
 
 ### Security Tests (`TestVirtualNetworkSecure`)
 
-- DDoS Protection Plan (with automatic detection)
-- Network Watcher Flow Logs (with automatic detection)
+- DDoS Protection Plan (when available)
 - Encryption configuration
-- Security monitoring
+- Diagnostic settings and monitoring
 
 ### Network Tests (`TestVirtualNetworkWithPeering`)
 
 - Hub-spoke network topology
 - Bidirectional peering
 - DNS configuration
-- Network flow logs
 
 ### Validation Tests (`TestVirtualNetworkValidationRules`)
 

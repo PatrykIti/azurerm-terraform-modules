@@ -7,7 +7,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.43.0"
+      version = "4.57.0"
     }
   }
 }
@@ -18,7 +18,6 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
-  subscription_id = "df86479f-16c4-4326-984c-14929d7899e3"
 }
 
 # Create a resource group
@@ -45,7 +44,7 @@ resource "azurerm_subnet" "example" {
 
 # Create the Route Table
 module "route_table" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_route_table?ref=RTv1.0.0"
+  source = "../.."
 
   name                = var.route_table_name
   resource_group_name = azurerm_resource_group.example.name

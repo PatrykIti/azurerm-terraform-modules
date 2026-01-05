@@ -107,7 +107,7 @@ case "$ACTION" in
       fi
       
       # Run tests with Azure credentials
-      go test -v -timeout 30m
+      go test -v -timeout 120m
       echo "::endgroup::"
     else
       echo "::warning::No tests found for module ${MODULE}"

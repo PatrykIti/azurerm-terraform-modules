@@ -16,4 +16,3 @@ output "application_security_group_ids" {
     db_tier  = azurerm_application_security_group.db_tier.id
   }
 }
-

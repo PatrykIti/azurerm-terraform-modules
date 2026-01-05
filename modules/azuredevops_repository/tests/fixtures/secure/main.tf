@@ -22,29 +22,20 @@ module "azuredevops_repository" {
 
   branches = [
     {
-      key  = "develop"
-      name = "develop"
-    }
-  ]
-
-  branch_policy_min_reviewers = [
-    {
-      key            = "min-reviewers"
-      reviewer_count = 2
-      blocking       = true
-      scope = [
-        {
-          match_type     = "Exact"
-          repository_ref = "refs/heads/develop"
+      name       = "develop"
+      ref_branch = "refs/heads/main"
+      policies = {
+        min_reviewers = {
+          reviewer_count = 2
+          blocking       = true
         }
-      ]
+      }
     }
   ]
 
-  repository_policy_reserved_names = [
-    {
-      key      = "reserved-names"
+  policies = {
+    reserved_names = {
       blocking = true
     }
-  ]
+  }
 }

@@ -109,7 +109,7 @@ module "azuredevops_servicehooks" {
 
 # After release (automatically updated)
 module "azuredevops_servicehooks" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_servicehooks?ref=ADOSHv1.2.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_servicehooks?ref=ADOSHv1.2.0"
 }
 ```
 
@@ -126,7 +126,7 @@ module "azuredevops_servicehooks" {
 ### Direct from GitHub (Recommended)
 ```hcl
 module "azuredevops_servicehooks" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_servicehooks?ref=ADOSHv1.0.0"
+  source = "git::https://github.com/yourusername/azurerm-terraform-modules//modules/azuredevops_servicehooks?ref=ADOSHv1.0.0"
   
   # Module configuration
   # ...
