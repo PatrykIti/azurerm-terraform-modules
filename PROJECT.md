@@ -51,7 +51,7 @@ Each module follows a standardized structure:
 - **Single responsibility**: Each module manages one Azure resource type
 - **Composable**: Modules can be combined for complex architectures
 - **Self-contained**: All module dependencies are explicit
-- **Atomic scope**: Cross-resource glue (private endpoints, RBAC/role assignments, budgets) lives in dedicated modules or higher-level environment configs; diagnostic settings stay inline per module even if duplicated.
+- **Atomic modules**: Cross-resource glue (private endpoints, RBAC/role assignments, budgets) lives in dedicated modules or higher-level environment configs; diagnostic settings stay inline per module even if duplicated.
 
 ### CI/CD Architecture
 
