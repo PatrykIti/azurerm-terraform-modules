@@ -33,6 +33,8 @@
 
 A comprehensive collection of production-ready Terraform modules for Azure and Azure DevOps, aligned with HashiCorp best practices and security-first defaults.
 
+Modules are **atomic primitives**: each module manages a single primary resource with no nested modules. Cross-resource glue such as private endpoints, RBAC/role assignments, or budgets lives in dedicated modules or higher-level environment configurations. Diagnostic settings stay inline in each module (duplication is intentional to avoid coupling releases). Cross-module compositions will be published in the root `examples/` catalog as it grows.
+
 ## 📚 Quick Navigation
 
 - [**Repository Standards**](./AGENTS.md) - Module layout, naming, and security-first conventions
@@ -67,6 +69,7 @@ Each module includes usage documentation and ready-to-run examples:
 1. **Browse modules** in the [`modules/`](./modules/) directory
 2. **Read module documentation** - Each module has its own README and `docs/IMPORT.md` where applicable
 3. **Start with examples** - Every module includes `examples/basic`, `examples/complete`, and `examples/secure`
+4. **See compositions** - Cross-module compositions will be added under the root [`examples/`](./examples/) catalog as it expands
 
 Azure DevOps modules use the `azuredevops` provider and typically require a PAT or service connection.
 

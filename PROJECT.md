@@ -51,6 +51,7 @@ Each module follows a standardized structure:
 - **Single responsibility**: Each module manages one Azure resource type
 - **Composable**: Modules can be combined for complex architectures
 - **Self-contained**: All module dependencies are explicit
+- **Atomic scope**: Cross-resource glue (private endpoints, RBAC/role assignments, budgets) lives in dedicated modules or higher-level environment configs; diagnostic settings stay inline per module even if duplicated.
 
 ### CI/CD Architecture
 
@@ -64,7 +65,7 @@ The repository uses a sophisticated GitHub Actions architecture:
 
 ### 1. Security Features
 - **Secure defaults**: All security settings enabled by default
-- **Network isolation**: Private endpoint support for all applicable resources
+- **Network isolation**: Modules expose hooks for dedicated private endpoint modules rather than bundling PE creation
 - **Encryption**: At-rest and in-transit encryption enforced
 - **Identity-based access**: Managed identities preferred over keys
 - **Compliance scanning**: Automated security checks in CI/CD
@@ -73,7 +74,7 @@ The repository uses a sophisticated GitHub Actions architecture:
 - **Comprehensive variable validation**: Prevents misconfiguration
 - **Flexible configuration**: Support for simple to complex deployments
 - **Rich examples**: Multiple examples per module (basic, secure, complete)
-- **Enterprise features**: Diagnostic settings, monitoring, backup, DR
+- **Enterprise features**: Diagnostic settings (inline per module), monitoring, backup, DR
 
 ### 3. Development Features
 - **AI-assisted development**: Integrated with Claude and TaskMaster
@@ -147,7 +148,7 @@ The repository uses a sophisticated GitHub Actions architecture:
 ### Production Ready Modules
 1. **Storage Account** (SAv1.0.0)
    - Comprehensive Azure Storage with enterprise features
-   - Support for Data Lake Gen2, SFTP, private endpoints
+   - Support for Data Lake Gen2, SFTP, and integration points for private endpoints via dedicated modules
    - Advanced lifecycle management and security policies
 
 ### Planned Modules (Roadmap)

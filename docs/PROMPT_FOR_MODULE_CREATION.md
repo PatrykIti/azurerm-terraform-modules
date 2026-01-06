@@ -81,5 +81,8 @@ Ensure all contributors follow `@AGENTS.md` and `docs/MODULE_GUIDE/`.
 
 ## 🚫 NOT IN SCOPE
 - Do NOT implement `vnet`/`nsg`/`route` linking logic here – this will be part of the `azurerm_networking` wrapper
+- Do NOT bundle private endpoints, role assignments/RBAC, or budgets here – these live in dedicated modules or higher-level environment configs
+- Do NOT create nested/submodules or “solution modules” – each module must stay atomic around a single primary resource
+- Diagnostic settings belong inline in the module (duplication is fine); do not factor them into shared submodules
 - Do NOT hardcode naming conventions or globals – inherit via input variables only
 - Everything for terraform module creation is described in the @AGENTS.md and referenced files

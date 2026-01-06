@@ -10,6 +10,12 @@ This summary is based on `docs/MODULE_GUIDE/*` plus existing repo conventions fo
 - **Security-first**: secure defaults are the easiest path; document risks explicitly.
 - **Consistency**: consistent structure, naming, and patterns across all modules.
 
+## Design Philosophy (Atomic Modules)
+
+- **Atomic, single-resource modules**: one primary resource per module, no submodules/nesting; composition happens in environment/config repositories.
+- **No bundled cross-resource glue**: private endpoints, role assignments/RBAC, budgets, and networking glue live in dedicated modules or higher-level configs.
+- **Diagnostic settings inline**: keep diag settings inside each module (duplication accepted) instead of a shared submodule to avoid coupling releases across modules.
+
 ## Required Module Layout
 
 ```

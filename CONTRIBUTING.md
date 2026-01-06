@@ -2,6 +2,13 @@
 
 Thank you for your interest in contributing to our Azure Terraform Modules repository! This guide will help you get started with contributing to any module in this repository.
 
+## 🧭 Architecture Boundaries (Atomic Modules)
+
+- Modules are atomic: one primary resource per module, no nested modules or submodules.
+- Do not bundle cross-resource glue (private endpoints, role assignments/RBAC, budgets, networking links) inside a module; use dedicated modules or higher-level environment configs for that.
+- Keep diagnostic settings inline within each module (duplication is acceptable to avoid coupling releases).
+- Cross-module compositions will live under the root `examples/` catalog as it grows.
+
 ## 🏗️ Repository Structure
 
 ```
