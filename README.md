@@ -33,7 +33,7 @@
 
 A comprehensive collection of production-ready Terraform modules for Azure and Azure DevOps, aligned with HashiCorp best practices and security-first defaults.
 
-Modules are **atomic primitives**: each module manages a single primary resource with no nested modules. Cross-resource glue such as private endpoints, RBAC/role assignments, or budgets lives in dedicated modules or higher-level environment configurations. Diagnostic settings stay inline in each module (duplication is intentional to avoid coupling releases). Cross-module compositions will be published in the root `examples/` catalog as it grows.
+Modules are **atomic**: each module manages a single primary resource with no nested modules. Cross-resource glue such as private endpoints, RBAC/role assignments, or budgets lives in dedicated modules or higher-level environment configurations. Diagnostic settings stay inline in each module (duplication is intentional to avoid coupling releases). Cross-module compositions will be published in the root `examples/` catalog as it grows.
 
 ## 📚 Quick Navigation
 
