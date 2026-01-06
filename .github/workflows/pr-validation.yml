@@ -108,7 +108,8 @@ jobs:
       - name: Generate path filters
         id: generate-filters
         run: |
-          FILTERS=""
+          # Docs-only changes should not trigger module jobs
+          FILTERS="docs:\n  - 'docs/**'\n"
           for module_dir in modules/*/; do
             if [ -d "$module_dir" ]; then
               module_name=$(basename "$module_dir")
@@ -134,8 +135,11 @@ jobs:
           echo "Modules from PR title: $PR_MODULES"
           
           # Get modules from path changes
-          PATH_MODULES='${{ steps.filter.outputs.changes }}'
-          echo "Modules from path changes: $PATH_MODULES"
+          PATH_MODULES_RAW='${{ steps.filter.outputs.changes }}'
+          DOCS_CHANGED='${{ steps.filter.outputs.docs }}'
+          # Remove docs marker from path-based modules list
+          PATH_MODULES=$(echo "$PATH_MODULES_RAW" | jq -c 'map(select(. != "docs"))')
+          echo "Modules from path changes (docs removed): $PATH_MODULES"
           
           # Prefer PR title scopes to avoid running unrelated modules
           if [[ "$PR_MODULES" != "[]" ]]; then
@@ -147,6 +151,9 @@ jobs:
                 echo "⚠️  Path changes include additional modules not in PR title: $EXTRA_MODULES"
               fi
             fi
+          elif [[ "$DOCS_CHANGED" == "true" && "$PATH_MODULES" == "[]" ]]; then
+            echo "Docs-only changes detected; skipping module validation matrix"
+            MODULES="[]"
           elif [[ "$PATH_MODULES" != "[]" ]]; then
             MODULES="$PATH_MODULES"
             echo "Using modules from path changes only"
