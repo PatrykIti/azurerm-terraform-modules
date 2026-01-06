@@ -117,26 +117,6 @@ jobs:
           fi
       
       # Dynamically generate filters based on existing modules
-      - name: Generate path filters
-        id: generate-filters
-        run: |
-          FILTERS=""
-          for module_dir in modules/*/; do
-            if [ -d "$module_dir" ]; then
-              module_name=$(basename "$module_dir")
-              # Include all module files, tests, fixtures, and examples
-              FILTERS="${FILTERS}${module_name}:\n  - 'modules/${module_name}/**'\n  - 'modules/${module_name}/tests/**'\n  - 'modules/${module_name}/examples/**'\n  - '!modules/${module_name}/**/.terraform/**'\n  - '!modules/${module_name}/**/.terraform.lock.hcl'\n  - '!modules/${module_name}/**/.terraform.tfstate.lock.info'\n  - '!modules/${module_name}/**/terraform.tfstate*'\n  - '!modules/${module_name}/**/*.tfplan'\n  - '!modules/${module_name}/**/crash.log'\n  - '!modules/${module_name}/**/crash.*.log'\n  - 'shared/**'\n"
-            fi
-          done
-          echo -e "$FILTERS" > .github/filters.yml
-          echo "Generated filters:"
-          cat .github/filters.yml
-      
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: .github/filters.yml
-      
       - id: set-matrix
         run: |
           # For manual runs with specific module
@@ -145,37 +125,23 @@ jobs:
             echo "Manual workflow dispatch for module: ${{ github.event.inputs.module }}"
           # For PRs - merge modules from title and path detection
           elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "=== Module Detection for PR ==="
+            echo "=== Module Detection for PR (title only) ==="
             
             # Get modules from PR title
             PR_MODULES='${{ steps.pr-module.outputs.modules }}'
             echo "Modules from PR title: $PR_MODULES"
             
-            # Get modules from path changes
-            PATH_MODULES='${{ steps.filter.outputs.changes }}'
-            echo "Modules from path changes: $PATH_MODULES"
-            
-            # Prefer PR title scopes to avoid running unrelated modules
-            if [[ "$PR_MODULES" != "[]" ]]; then
+            if [[ "$PR_MODULES" != "" && "$PR_MODULES" != "[]" ]]; then
               MODULES="$PR_MODULES"
               echo "Using modules from PR title only"
-              if [[ "$PATH_MODULES" != "[]" ]]; then
-                EXTRA_MODULES=$(jq -n --argjson pr "$PR_MODULES" --argjson path "$PATH_MODULES" '$path - $pr')
-                if [[ "$EXTRA_MODULES" != "[]" ]]; then
-                  echo "⚠️  Path changes include additional modules not in PR title: $EXTRA_MODULES"
-                fi
-              fi
-            elif [[ "$PATH_MODULES" != "[]" ]]; then
-              MODULES="$PATH_MODULES"
-              echo "Using modules from path changes only"
             else
               MODULES="[]"
-              echo "No modules detected from PR title or path changes"
+              echo "No modules detected from PR title"
             fi
           # For push events - use path-based detection
           else
-            MODULES='${{ steps.filter.outputs.changes }}'
-            echo "Push event - using path-based detection: $MODULES"
+            MODULES="[]"
+            echo "Non-PR event without explicit module; no modules to test"
           fi
           
           echo "=== Final modules to test: $MODULES ==="

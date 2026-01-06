@@ -1,6 +1,6 @@
 # Modules Index
 
-This directory contains all Terraform modules published from this repository. Each module has its own README, examples, and changelog.
+This directory contains all Terraform modules published from this repository. Each module has its own README, examples, and changelog. Modules are atomic and manage a single primary resource; cross-resource glue (private endpoints, RBAC, budgets) lives in dedicated modules or higher-level compositions.
 
 - Naming convention: `azurerm_<resource>` for AzureRM and `azuredevops_<resource>` for Azure DevOps.
 - Release tag prefixes come from each module's `module.json` (for example: `SAv1.2.2`).

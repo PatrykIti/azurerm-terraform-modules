@@ -7,38 +7,33 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
-[![Virtual Network](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=VNv*&label=Virtual%20Network&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=VNv)
-[![Subnet](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SNv*&label=Subnet&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=SNv)
-[![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=SAv)
-[![Route Table](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=RTv*&label=Route%20Table&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=RTv)
-[![Network Security Group](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=NSGv*&label=Network%20Security%20Group&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=NSGv)
-[![Kubernetes Secrets](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AKSS*&label=Kubernetes%20Secrets&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=AKSS)
-[![Kubernetes Cluster](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AKSv*&label=Kubernetes%20Cluster&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=AKSv)
-[![Azure DevOps Repository](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADORv*&label=Azure%20DevOps%20Repository&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADORv)
-[![Azure DevOps Project Permissions](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOPPv*&label=Azure%20DevOps%20Project%20Permissions&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOPPv)
-[![Azure DevOps Project](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOPv*&label=Azure%20DevOps%20Project&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOPv)
-[![Azure DevOps Extension](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOEXv*&label=Azure%20DevOps%20Extension&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOEXv)
-[![Azure DevOps Environments](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOEv*&label=Azure%20DevOps%20Environments&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOEv)
-[![Azure DevOps Artifacts Feed](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAFv*&label=Azure%20DevOps%20Artifacts%20Feed&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOAFv)
-[![Azure DevOps Agent Pools](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAPv*&label=Azure%20DevOps%20Agent%20Pools&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOAPv)
-[![Azure DevOps Work Items](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOWK*&label=Azure%20DevOps%20Work%20Items&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOWK)
-[![Azure DevOps Wiki](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOWI*&label=Azure%20DevOps%20Wiki&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOWI)
-[![Azure DevOps Variable Groups](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOVG*&label=Azure%20DevOps%20Variable%20Groups&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOVG)
-[![Azure DevOps Team](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOT*&label=Azure%20DevOps%20Team&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOT)
-[![Azure DevOps Service Hooks](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOSH*&label=Azure%20DevOps%20Service%20Hooks&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOSH)
-[![Azure DevOps Service Endpoints](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOSE*&label=Azure%20DevOps%20Service%20Endpoints&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOSE)
-[![Azure DevOps Repository](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOR*&label=Azure%20DevOps%20Repository&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOR)
-[![Azure DevOps Pipelines](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOPI*&label=Azure%20DevOps%20Pipelines&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOPI)
-[![Azure DevOps Identity](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOI*&label=Azure%20DevOps%20Identity&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOI)
-[![Azure DevOps Extension](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOEX*&label=Azure%20DevOps%20Extension&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOEX)
-[![Azure DevOps Environments](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOE*&label=Azure%20DevOps%20Environments&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOE)
-[![Azure DevOps Artifacts Feed](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAF*&label=Azure%20DevOps%20Artifacts%20Feed&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOAF)
-[![Azure DevOps Agent Pools](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAP*&label=Azure%20DevOps%20Agent%20Pools&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOAP)
-[![Azure DevOps Project Permissions](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOPP*&label=Azure%20DevOps%20Project%20Permissions&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOPP)
-[![Azure DevOps Project](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOP*&label=Azure%20DevOps%20Project&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases?q=ADOP)
+[![Virtual Network](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=VNv*&label=Virtual%20Network&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/VNv1.2.0)
+[![Subnet](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SNv*&label=Subnet&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SNv1.1.0)
+[![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv1.3.0)
+[![Route Table](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=RTv*&label=Route%20Table&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.1.0)
+[![Network Security Group](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=NSGv*&label=Network%20Security%20Group&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.1.0)
+[![Kubernetes Secrets](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AKSS*&label=Kubernetes%20Secrets&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSS1.0.0)
+[![Kubernetes Cluster](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AKSv*&label=Kubernetes%20Cluster&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.1.0)
+[![Azure DevOps Repository](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADORv*&label=Azure%20DevOps%20Repository&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADORv1.0.0)
+[![Azure DevOps Project Permissions](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOPPv*&label=Azure%20DevOps%20Project%20Permissions&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPPv1.0.0)
+[![Azure DevOps Project](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOPv*&label=Azure%20DevOps%20Project&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPv1.0.0)
+[![Azure DevOps Extension](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOEXv*&label=Azure%20DevOps%20Extension&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOEXv1.0.0)
+[![Azure DevOps Environments](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOEv*&label=Azure%20DevOps%20Environments&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOEv1.0.0)
+[![Azure DevOps Artifacts Feed](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAFv*&label=Azure%20DevOps%20Artifacts%20Feed&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAFv1.0.0)
+[![Azure DevOps Agent Pools](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAPv*&label=Azure%20DevOps%20Agent%20Pools&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAPv1.0.0)
+[![Azure DevOps Work Items](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOWK*&label=Azure%20DevOps%20Work%20Items&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOWK1.0.0)
+[![Azure DevOps Wiki](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOWI*&label=Azure%20DevOps%20Wiki&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOWI1.0.0)
+[![Azure DevOps Variable Groups](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOVG*&label=Azure%20DevOps%20Variable%20Groups&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOVG1.0.0)
+[![Azure DevOps Team](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOT*&label=Azure%20DevOps%20Team&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOT1.0.0)
+[![Azure DevOps Service Hooks](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOSH*&label=Azure%20DevOps%20Service%20Hooks&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOSH1.0.0)
+[![Azure DevOps Service Endpoints](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOSE*&label=Azure%20DevOps%20Service%20Endpoints&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOSE1.0.0)
+[![Azure DevOps Pipelines](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOPI*&label=Azure%20DevOps%20Pipelines&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPI1.0.0)
+[![Azure DevOps Identity](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOI*&label=Azure%20DevOps%20Identity&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOI1.0.0)
 <!-- MODULE BADGES END -->
 
 A comprehensive collection of production-ready Terraform modules for Azure and Azure DevOps, aligned with HashiCorp best practices and security-first defaults.
+
+Modules are **atomic**: each module manages a single primary resource with no nested modules. Cross-resource glue such as private endpoints, RBAC/role assignments, or budgets lives in dedicated modules or higher-level environment configurations. Diagnostic settings stay inline in each module (duplication is intentional to avoid coupling releases). Cross-module compositions will be published in the root `examples/` catalog as it grows.
 
 ## 📚 Quick Navigation
 
@@ -74,6 +69,7 @@ Each module includes usage documentation and ready-to-run examples:
 1. **Browse modules** in the [`modules/`](./modules/) directory
 2. **Read module documentation** - Each module has its own README and `docs/IMPORT.md` where applicable
 3. **Start with examples** - Every module includes `examples/basic`, `examples/complete`, and `examples/secure`
+4. **See compositions** - Cross-module compositions will be added under the root [`examples/`](./examples/) catalog as it expands
 
 Azure DevOps modules use the `azuredevops` provider and typically require a PAT or service connection.
 

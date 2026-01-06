@@ -6,6 +6,7 @@ This guide provides a comprehensive overview of the philosophy and standards for
 
 - **Comprehensive & Flexible**: Our goal is to build the world's leading repository of Terraform modules for Azure. Each module should be designed to be maximally flexible, exposing the full set of configuration options available for the underlying Azure resource(s). This ensures they can satisfy the widest possible range of use cases, from simple deployments to complex, enterprise-grade scenarios.
 - **Consistency**: All modules should have a similar structure, file organization, and coding style. This makes them easier to understand, use, and maintain.
+- **Atomic & Composable**: Each module wraps a single primary resource with no submodules or nested modules. Cross-resource glue (private endpoints, RBAC/role assignments, budgets) belongs in dedicated modules or higher-level environment configs. Diagnostic settings stay inline per module (duplication accepted) to avoid coupling releases. Cross-module compositions live outside modules (see root `examples/` when available).
 - **AKS as Baseline**: `azurerm_kubernetes_cluster` is the reference layout, but other resources may require deviations. Document and justify any differences in module docs.
 - **Security-First**: Modules must implement security best practices by default. Secure configurations should be the easiest to deploy.
 - **Production-Ready**: Every module should be robust enough for production use, with comprehensive testing, documentation, and examples.

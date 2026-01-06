@@ -82,15 +82,15 @@ if ! grep -q "<!-- MODULE BADGES START -->" "$TMP_FILE"; then
 <!-- MODULE BADGES END -->" "$TMP_FILE"
 fi
 
-# Remove existing badge for this module if it exists
-sed -i.bak "/\[${ESCAPED_MODULE_DISPLAY_NAME}\].*img.shields.io.*${ESCAPED_TAG_PREFIX}/d" "$TMP_FILE"
+# Remove existing badge(s) for this module (regardless of prefix)
+sed -i.bak "/\[${ESCAPED_MODULE_DISPLAY_NAME}\].*img.shields.io/d" "$TMP_FILE"
 
 # URL encode the module display name for the badge label
 URL_ENCODED_NAME=$(echo "$MODULE_DISPLAY_NAME" | sed 's/ /%20/g')
 
 # Add the new badge in the badges section
 sed -i.bak "/<!-- MODULE BADGES START -->/a\\
-[![${MODULE_DISPLAY_NAME}](https://img.shields.io/github/v/tag/${REPO_OWNER}/${REPO_NAME}?filter=${TAG_PREFIX}*&label=${URL_ENCODED_NAME}&color=success)](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases?q=${TAG_PREFIX})" "$TMP_FILE"
+[![${MODULE_DISPLAY_NAME}](https://img.shields.io/github/v/tag/${REPO_OWNER}/${REPO_NAME}?filter=${TAG_PREFIX}*&label=${URL_ENCODED_NAME}&color=success)](https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/tag/${VERSION_TAG})" "$TMP_FILE"
 
 # Update the example module reference with correct source path
 echo "Updating example module reference"

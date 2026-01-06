@@ -1,6 +1,6 @@
 # Documentation Index
 
-This directory contains repository-wide documentation for building, testing, and releasing Terraform modules. For repository standards and contribution guidelines, see [AGENTS.md](../AGENTS.md) and [CONTRIBUTING.md](../CONTRIBUTING.md).
+This directory contains repository-wide documentation for building, testing, and releasing Terraform modules. Modules here are atomic (one primary resource per module, no submodules); cross-module compositions will be documented under the root `examples/` catalog as it grows. For repository standards and contribution guidelines, see [AGENTS.md](../AGENTS.md) and [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ## Core Guides
 
