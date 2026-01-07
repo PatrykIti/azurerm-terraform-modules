@@ -23,9 +23,6 @@ func TestAzuredevopsGroupFullIntegration(t *testing.T) {
 
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(t, testFolder)
-		if userPrincipal := os.Getenv("AZDO_TEST_USER_PRINCIPAL_NAME"); userPrincipal != "" {
-			terraformOptions.Vars["user_principal_name"] = userPrincipal
-		}
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})

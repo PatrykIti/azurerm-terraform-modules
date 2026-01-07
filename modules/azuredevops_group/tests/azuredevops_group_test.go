@@ -24,9 +24,6 @@ func TestBasicAzuredevopsGroup(t *testing.T) {
 
 	test_structure.RunTestStage(t, "deploy", func() {
 		terraformOptions := getTerraformOptions(t, testFolder)
-		if userPrincipal := os.Getenv("AZDO_TEST_USER_PRINCIPAL_NAME"); userPrincipal != "" {
-			terraformOptions.Vars["user_principal_name"] = userPrincipal
-		}
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
@@ -109,7 +106,7 @@ func TestAzuredevopsGroupValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "group_memberships.group_descriptor is required")
+	assert.Contains(t, err.Error(), "group_memberships.group_descriptor must be a non-empty string")
 }
 
 // Helper function to get terraform options
