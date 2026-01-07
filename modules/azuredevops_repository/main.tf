@@ -1,6 +1,17 @@
 # Azure DevOps Repository
 
 locals {
+  initialization = coalesce(
+    var.initialization,
+    {
+      init_type             = "Uninitialized"
+      source_type           = null
+      source_url            = null
+      service_connection_id = null
+      username              = null
+      password              = null
+    }
+  )
 
   files_by_key = {
     for file in var.files : format("%s:%s", file.file, coalesce(file.branch, "default")) => file
@@ -77,7 +88,7 @@ resource "azuredevops_git_repository" "git_repository" {
   disabled             = var.disabled
 
   dynamic "initialization" {
-    for_each = var.initialization == null ? [] : [var.initialization]
+    for_each = [local.initialization]
     content {
       init_type             = initialization.value.init_type
       source_type           = initialization.value.source_type
