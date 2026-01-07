@@ -75,16 +75,19 @@ resource "azuredevops_git_repository" "git_repository" {
   parent_repository_id = var.parent_repository_id
   disabled             = var.disabled
 
-  dynamic "initialization" {
-    for_each = var.initialization == null ? [] : [var.initialization]
-    content {
-      init_type             = initialization.value.init_type
-      source_type           = initialization.value.source_type
-      source_url            = initialization.value.source_url
-      service_connection_id = initialization.value.service_connection_id
-      username              = initialization.value.username
-      password              = initialization.value.password
-    }
+  initialization {
+    init_type             = var.initialization.init_type
+    source_type           = var.initialization.source_type
+    source_url            = var.initialization.source_url
+    service_connection_id = var.initialization.service_connection_id
+    username              = var.initialization.username
+    password              = var.initialization.password
+  }
+
+  lifecycle {
+    ignore_changes = [
+      initialization,
+    ]
   }
 }
 
