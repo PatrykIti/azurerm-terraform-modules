@@ -12,7 +12,7 @@ Azure DevOps repository module for managing a Git repository, branches, permissi
 
 ## Notes
 
-- `initialization` defaults to `{ init_type = "Uninitialized" }` and must be provided (provider requires the block); changes are ignored after creation (lifecycle ignore_changes).
+- `initialization` is a required block for the provider. This module ensures it's always present, defaulting to an 'Uninitialized' type; changes are ignored after creation (lifecycle ignore_changes).
 - For `init_type = "Import"`, set `source_type = "Git"`, `source_url`, and one auth method.
 - `branches[*].policies` defaults to `{}` and must not be `null`; omit it or use `{}`.
 - `files[*].branch` defaults to `default_branch` when omitted.
