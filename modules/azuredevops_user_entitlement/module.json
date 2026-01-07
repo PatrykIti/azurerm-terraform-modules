@@ -1,0 +1,7 @@
+{
+  "name": "azuredevops_user_entitlement",
+  "title": "Azure DevOps User Entitlement",
+  "commit_scope": "azuredevops-user-entitlement",
+  "tag_prefix": "ADOUv",
+  "description": "Azure DevOps module for managing user entitlements"
+}

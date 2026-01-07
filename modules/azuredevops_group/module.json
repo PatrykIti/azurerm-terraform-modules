@@ -1,0 +1,7 @@
+{
+  "name": "azuredevops_group",
+  "title": "Azure DevOps Group",
+  "commit_scope": "azuredevops-group",
+  "tag_prefix": "ADOGv",
+  "description": "Azure DevOps group module for managing groups, memberships, and group entitlements"
+}

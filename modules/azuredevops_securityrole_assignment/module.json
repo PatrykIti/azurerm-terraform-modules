@@ -1,0 +1,7 @@
+{
+  "name": "azuredevops_securityrole_assignment",
+  "title": "Azure DevOps Security Role Assignment",
+  "commit_scope": "azuredevops-securityrole-assignment",
+  "tag_prefix": "ADOSRAv",
+  "description": "Azure DevOps module for managing security role assignments"
+}

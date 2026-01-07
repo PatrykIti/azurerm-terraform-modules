@@ -1,0 +1,7 @@
+{
+  "name": "azuredevops_service_principal_entitlement",
+  "title": "Azure DevOps Service Principal Entitlement",
+  "commit_scope": "azuredevops-service-principal-entitlement",
+  "tag_prefix": "ADOSPEv",
+  "description": "Azure DevOps module for managing service principal entitlements"
+}

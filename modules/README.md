@@ -25,7 +25,10 @@ This directory contains all Terraform modules published from this repository. Ea
 | [Azure DevOps Artifacts Feed](./azuredevops_artifacts_feed/) (`azuredevops_artifacts_feed`) | `ADOAF` | Azure DevOps artifacts feed module for managing a feed, retention policies, and permissions |
 | [Azure DevOps Environments](./azuredevops_environments/) (`azuredevops_environments`) | `ADOE` | Azure DevOps environments module for a single environment with optional resources and checks |
 | [Azure DevOps Extension](./azuredevops_extension/) (`azuredevops_extension`) | `ADOEX` | Azure DevOps extension module for managing a single Marketplace extension |
-| [Azure DevOps Identity](./azuredevops_identity/) (`azuredevops_identity`) | `ADOI` | Azure DevOps identity module for managing groups, entitlements, memberships, and role assignments |
+| [Azure DevOps Group](./azuredevops_group/) (`azuredevops_group`) | `ADOG` | Azure DevOps group module for managing groups, memberships, and group entitlements |
+| [Azure DevOps Security Role Assignment](./azuredevops_securityrole_assignment/) (`azuredevops_securityrole_assignment`) | `ADOSRA` | Azure DevOps module for managing security role assignments |
+| [Azure DevOps Service Principal Entitlement](./azuredevops_service_principal_entitlement/) (`azuredevops_service_principal_entitlement`) | `ADOSPE` | Azure DevOps module for managing service principal entitlements |
+| [Azure DevOps User Entitlement](./azuredevops_user_entitlement/) (`azuredevops_user_entitlement`) | `ADOU` | Azure DevOps module for managing user entitlements |
 | [Azure DevOps Pipelines](./azuredevops_pipelines/) (`azuredevops_pipelines`) | `ADOPI` | Azure DevOps pipelines module for managing a build definition with folders, permissions, and authorizations |
 | [Azure DevOps Project](./azuredevops_project/) (`azuredevops_project`) | `ADOP` | Azure DevOps project module for managing project settings, tags, and dashboards |
 | [Azure DevOps Project Permissions](./azuredevops_project_permissions/) (`azuredevops_project_permissions`) | `ADOPP` | Azure DevOps project permissions module for assigning group permissions |
