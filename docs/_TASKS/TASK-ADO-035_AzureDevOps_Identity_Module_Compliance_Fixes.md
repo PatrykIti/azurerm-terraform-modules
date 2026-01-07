@@ -83,3 +83,10 @@ module "azuredevops_group" {
 ```
 
 If a resource has no dependency on the module-managed group, move it to a dedicated module instead of managing it here.
+
+## Documentation & Changelog Updates
+
+- **Renamed module (`azuredevops_group`):** Update `README.md` (version/examples/tf-docs markers), `docs/IMPORT.md`, `docs/README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `VERSIONING.md`, `.terraform-docs.yml` output injection, `module.json`, `.releaserc.js`, `CHANGELOG.md` (via semantic-release after scope rename), `generate-docs.sh`.
+- **New modules:** Add `README.md`, `docs/IMPORT.md`, `docs/README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `VERSIONING.md`, `.terraform-docs.yml`, `module.json`, `.releaserc.js`, `CHANGELOG.md` for `azuredevops_service_principal_entitlement` and `azuredevops_securityrole_assignment` (and optionally `azuredevops_user_entitlement` if split).
+- **Examples/fixtures:** Update example READMEs and `.terraform-docs.yml` outputs for determinism and new version pinning; align Terratest fixture READMEs where present.
+- **Repo-level references:** Adjust `docs/_TASKS/README.md` entry (if needed), workflow scope lists (PR validation, CI, release), and any root docs linking to the old module name.
