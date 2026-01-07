@@ -3,8 +3,9 @@
 mock_provider "azuredevops" {}
 
 variables {
-  project_id = "00000000-0000-0000-0000-000000000000"
-  name       = "default-repo"
+  project_id     = "00000000-0000-0000-0000-000000000000"
+  name           = "default-repo"
+  initialization = {}
 }
 
 run "defaults_plan" {

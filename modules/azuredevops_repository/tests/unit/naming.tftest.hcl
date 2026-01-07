@@ -3,8 +3,9 @@
 mock_provider "azuredevops" {}
 
 variables {
-  project_id = "00000000-0000-0000-0000-000000000000"
-  name       = "core"
+  project_id     = "00000000-0000-0000-0000-000000000000"
+  name           = "core"
+  initialization = {}
 }
 
 run "repository_plan" {
