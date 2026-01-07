@@ -3,12 +3,13 @@ variable "project_id" {
   type        = string
 }
 
-variable "reader_identity_id" {
-  description = "Identity ID for Reader role assignment."
+variable "identity_id" {
+  description = "Identity ID for the role assignment."
   type        = string
 }
 
-variable "contributor_identity_id" {
-  description = "Identity ID for Contributor role assignment."
+variable "role_name" {
+  description = "Role name to assign."
   type        = string
+  default     = "Reader"
 }

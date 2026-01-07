@@ -13,20 +13,8 @@ provider "azuredevops" {}
 module "azuredevops_securityrole_assignment" {
   source = "../../"
 
-  securityrole_assignments = [
-    {
-      key         = "project-reader"
-      scope       = "project"
-      resource_id = var.project_id
-      role_name   = "Reader"
-      identity_id = var.reader_identity_id
-    },
-    {
-      key         = "project-contributor"
-      scope       = "project"
-      resource_id = var.project_id
-      role_name   = "Contributor"
-      identity_id = var.contributor_identity_id
-    }
-  ]
+  scope       = "project"
+  resource_id = var.project_id
+  role_name   = var.role_name
+  identity_id = var.identity_id
 }

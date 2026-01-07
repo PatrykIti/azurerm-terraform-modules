@@ -73,13 +73,16 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_securityrole_assignments"></a> [securityrole\_assignments](#input\_securityrole\_assignments) | List of security role assignments to manage. | <pre>list(object({<br/>    key         = optional(string)<br/>    scope       = string<br/>    resource_id = string<br/>    role_name   = string<br/>    identity_id = string<br/>  }))</pre> | `[]` | no |
+| <a name="input_identity_id"></a> [identity\_id](#input\_identity\_id) | Identity descriptor/ID to assign the role to. | `string` | n/a | yes |
+| <a name="input_resource_id"></a> [resource\_id](#input\_resource\_id) | Target resource ID for the security role assignment (e.g., project ID). | `string` | n/a | yes |
+| <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Role name to assign (e.g., Reader, Contributor). | `string` | n/a | yes |
+| <a name="input_scope"></a> [scope](#input\_scope) | Scope for the Azure DevOps security role assignment (for example, project). | `string` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_securityrole_assignment_ids"></a> [securityrole\_assignment\_ids](#output\_securityrole\_assignment\_ids) | Map of security role assignment IDs keyed by assignment key. |
+| <a name="output_securityrole_assignment_id"></a> [securityrole\_assignment\_id](#output\_securityrole\_assignment\_id) | The security role assignment ID. |
 <!-- END_TF_DOCS -->
 
 ## Additional Documentation

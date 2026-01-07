@@ -1,4 +1,4 @@
-# Test defaults for Azure DevOps security role assignments
+# Test defaults for Azure DevOps security role assignment
 
 mock_provider "azuredevops" {
   mock_resource "azuredevops_securityrole_assignment" {
@@ -11,9 +11,19 @@ mock_provider "azuredevops" {
 run "no_assignments_by_default" {
   command = plan
 
-  assert {
-    condition     = length(azuredevops_securityrole_assignment.securityrole_assignment) == 0
-    error_message = "No security role assignments should be created by default."
+  # Expect the plan to fail due to missing required inputs
+  expect_failures = [
+    var.scope,
+    var.resource_id,
+    var.role_name,
+    var.identity_id,
+  ]
+
+  variables {
+    scope       = null
+    resource_id = null
+    role_name   = null
+    identity_id = null
   }
 }
 
@@ -21,19 +31,14 @@ run "assignment_keys" {
   command = apply
 
   variables {
-    securityrole_assignments = [
-      {
-        key         = "reader"
-        scope       = "project"
-        resource_id = "00000000-0000-0000-0000-000000000000"
-        role_name   = "Reader"
-        identity_id = "11111111-1111-1111-1111-111111111111"
-      }
-    ]
+    scope       = "project"
+    resource_id = "00000000-0000-0000-0000-000000000000"
+    role_name   = "Reader"
+    identity_id = "11111111-1111-1111-1111-111111111111"
   }
 
   assert {
-    condition     = contains(keys(azuredevops_securityrole_assignment.securityrole_assignment), "reader")
-    error_message = "securityrole_assignments should be keyed by the provided key."
+    condition     = azuredevops_securityrole_assignment.securityrole_assignment.id != ""
+    error_message = "securityrole_assignment should be created when inputs are provided."
   }
 }

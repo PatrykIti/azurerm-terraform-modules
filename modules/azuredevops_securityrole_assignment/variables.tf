@@ -1,65 +1,43 @@
 # -----------------------------------------------------------------------------
-# Security Role Assignments
+# Security Role Assignment (single)
 # -----------------------------------------------------------------------------
 
-variable "securityrole_assignments" {
-  description = "List of security role assignments to manage."
-  type = list(object({
-    key         = optional(string)
-    scope       = string
-    resource_id = string
-    role_name   = string
-    identity_id = string
-  }))
-  default = []
+variable "scope" {
+  description = "Scope for the Azure DevOps security role assignment (for example, project)."
+  type        = string
 
   validation {
-    condition = alltrue([
-      for assignment in var.securityrole_assignments :
-      assignment.key == null || trimspace(assignment.key) != ""
-    ])
-    error_message = "securityrole_assignments.key must be a non-empty string when set."
+    condition     = trimspace(var.scope) != ""
+    error_message = "scope must be a non-empty string."
   }
+}
+
+variable "resource_id" {
+  description = "Target resource ID for the security role assignment (e.g., project ID)."
+  type        = string
 
   validation {
-    condition = alltrue([
-      for assignment in var.securityrole_assignments :
-      trimspace(assignment.scope) != ""
-    ])
-    error_message = "securityrole_assignments.scope must be a non-empty string."
+    condition     = trimspace(var.resource_id) != ""
+    error_message = "resource_id must be a non-empty string."
   }
+}
+
+variable "role_name" {
+  description = "Role name to assign (e.g., Reader, Contributor)."
+  type        = string
 
   validation {
-    condition = alltrue([
-      for assignment in var.securityrole_assignments :
-      trimspace(assignment.resource_id) != ""
-    ])
-    error_message = "securityrole_assignments.resource_id must be a non-empty string."
+    condition     = trimspace(var.role_name) != ""
+    error_message = "role_name must be a non-empty string."
   }
+}
+
+variable "identity_id" {
+  description = "Identity descriptor/ID to assign the role to."
+  type        = string
 
   validation {
-    condition = alltrue([
-      for assignment in var.securityrole_assignments :
-      trimspace(assignment.role_name) != ""
-    ])
-    error_message = "securityrole_assignments.role_name must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for assignment in var.securityrole_assignments :
-      trimspace(assignment.identity_id) != ""
-    ])
-    error_message = "securityrole_assignments.identity_id must be a non-empty string."
-  }
-
-  validation {
-    condition = length(distinct([
-      for assignment in var.securityrole_assignments : coalesce(
-        assignment.key,
-        "${assignment.scope}/${assignment.resource_id}/${assignment.role_name}/${assignment.identity_id}"
-      )
-    ])) == length(var.securityrole_assignments)
-    error_message = "securityrole_assignments keys must be unique (derived from key or scope/resource/role/identity)."
+    condition     = trimspace(var.identity_id) != ""
+    error_message = "identity_id must be a non-empty string."
   }
 }
