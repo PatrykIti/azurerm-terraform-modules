@@ -29,15 +29,6 @@ module "azuredevops_group" {
     }
   ]
 
-  user_entitlements = var.user_principal_name != "" ? [
-    {
-      key                  = "user-entitlement"
-      principal_name       = var.user_principal_name
-      account_license_type = "basic"
-      licensing_source     = "account"
-    }
-  ] : []
-
   group_entitlements = var.aad_group_display_name != "" ? [
     {
       key                  = "group-entitlement"

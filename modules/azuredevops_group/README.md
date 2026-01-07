@@ -26,9 +26,9 @@ module "azuredevops_group" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - Minimal Azure DevOps group configuration.
-- [Complete](examples/complete) - Group with membership and optional group entitlement.
-- [Secure](examples/secure) - Security-focused group with explicit membership.
+- [Basic](examples/basic) - This example demonstrates a minimal Azure DevOps identity configuration.
+- [Complete](examples/complete) - This example demonstrates a group, memberships, and optional entitlements.
+- [Secure](examples/secure) - This example demonstrates a security-focused identity configuration with explicit memberships and minimal entitlements.
 <!-- END_EXAMPLES -->
 
 ## Module Documentation
