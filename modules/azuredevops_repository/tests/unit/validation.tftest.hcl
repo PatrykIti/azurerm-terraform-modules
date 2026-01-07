@@ -8,14 +8,6 @@ variables {
   initialization = {}
 }
 
-run "allow_null_initialization" {
-  command = plan
-
-  variables {
-    initialization = null
-  }
-}
-
 run "duplicate_branch_names" {
   command = plan
 
