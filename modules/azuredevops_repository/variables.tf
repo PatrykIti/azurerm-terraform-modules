@@ -72,7 +72,7 @@ variable "initialization" {
     username              = optional(string)
     password              = optional(string)
   })
-  default   = null
+  default   = {}
   sensitive = true
 
   validation {
