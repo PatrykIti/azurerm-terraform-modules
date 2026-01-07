@@ -76,7 +76,7 @@ variable "initialization" {
   sensitive = true
 
   validation {
-    condition = (
+    condition = var.initialization == null || (
       var.initialization.init_type != null &&
       contains(["Uninitialized", "Clean", "Import"], var.initialization.init_type)
     )
@@ -84,39 +84,51 @@ variable "initialization" {
   }
 
   validation {
-    condition = var.initialization.init_type == "Import" ? (
-      var.initialization.source_type != null &&
-      var.initialization.source_type == "Git"
-    ) : var.initialization.source_type == null
+    condition = var.initialization == null || (
+      var.initialization.init_type == "Import"
+      ? (
+        var.initialization.source_type != null &&
+        var.initialization.source_type == "Git"
+      )
+      : var.initialization.source_type == null
+    )
     error_message = "initialization.source_type must be Git when init_type is Import, and null otherwise."
   }
 
   validation {
-    condition = var.initialization.init_type == "Import" ? (
-      var.initialization.source_url != null &&
-      length(trimspace(var.initialization.source_url)) > 0
-    ) : var.initialization.source_url == null
+    condition = var.initialization == null || (
+      var.initialization.init_type == "Import"
+      ? (
+        var.initialization.source_url != null &&
+        length(trimspace(var.initialization.source_url)) > 0
+      )
+      : var.initialization.source_url == null
+    )
     error_message = "initialization.source_url is required when init_type is Import and must be null otherwise."
   }
 
   validation {
-    condition = var.initialization.init_type == "Import" ? (
-      (
-        var.initialization.service_connection_id != null &&
-        length(trimspace(var.initialization.service_connection_id)) > 0 &&
+    condition = var.initialization == null || (
+      var.initialization.init_type == "Import"
+      ? (
+        (
+          var.initialization.service_connection_id != null &&
+          length(trimspace(var.initialization.service_connection_id)) > 0 &&
+          var.initialization.username == null &&
+          var.initialization.password == null
+          ) || (
+          var.initialization.service_connection_id == null &&
+          var.initialization.username != null &&
+          length(trimspace(var.initialization.username)) > 0 &&
+          var.initialization.password != null &&
+          length(trimspace(var.initialization.password)) > 0
+        )
+      )
+      : (
+        var.initialization.service_connection_id == null &&
         var.initialization.username == null &&
         var.initialization.password == null
-        ) || (
-        var.initialization.service_connection_id == null &&
-        var.initialization.username != null &&
-        length(trimspace(var.initialization.username)) > 0 &&
-        var.initialization.password != null &&
-        length(trimspace(var.initialization.password)) > 0
       )
-      ) : (
-      var.initialization.service_connection_id == null &&
-      var.initialization.username == null &&
-      var.initialization.password == null
     )
     error_message = "initialization Import requires service_connection_id or username/password (exactly one), and auth fields are only allowed when init_type is Import."
   }

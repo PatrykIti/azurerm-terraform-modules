@@ -1,7 +1,6 @@
 # Azure DevOps Repository
 
 locals {
-
   files_by_key = {
     for file in var.files : format("%s:%s", file.file, coalesce(file.branch, "default")) => file
   }
