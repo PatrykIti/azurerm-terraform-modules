@@ -3,7 +3,7 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 14 tasks
+- **To Do:** 15 tasks
 - **In Progress:** 0
 - **Done:** 34 tasks
 
@@ -27,6 +27,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-025](./TASK-ADO-025_AzureDevOps_Variable_Groups_Module_Refactor.md) | **Azure DevOps Variable Groups module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_variable_groups/` |
 | [TASK-ADO-026](./TASK-ADO-026_AzureDevOps_Work_Items_Module_Refactor.md) | **Azure DevOps Work Items module refactor** | High | Medium | Re-opened; `modules/azuredevops_work_items/` |
 | [TASK-ADO-027](./TASK-ADO-027_AzureDevOps_Team_Module_Refactor.md) | **Azure DevOps Team module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_team/` |
+| [TASK-ADO-036](./TASK-ADO-036_AzureDevOps_Service_Principal_Entitlement_Module_Compliance_Alignment.md) | **Azure DevOps Service Principal Entitlement module compliance alignment** | High | Medium | `modules/azuredevops_service_principal_entitlement/` |
 
 ---
 

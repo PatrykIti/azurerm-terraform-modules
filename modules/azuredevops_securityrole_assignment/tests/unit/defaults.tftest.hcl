@@ -20,10 +20,10 @@ run "no_assignments_by_default" {
   ]
 
   variables {
-    scope       = null
-    resource_id = null
-    role_name   = null
-    identity_id = null
+    scope       = ""
+    resource_id = ""
+    role_name   = ""
+    identity_id = ""
   }
 }
 
