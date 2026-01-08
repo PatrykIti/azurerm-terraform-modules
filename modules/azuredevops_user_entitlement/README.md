@@ -9,6 +9,7 @@ Current version: **0.1.0**
 ## Description
 
 Manages Azure DevOps user entitlements.
+This module operates at the Azure DevOps organization scope: it assigns an entitlement to an existing Entra ID (Azure AD) user. It does not create users in Entra ID and does not manage project/group/team membership.
 
 ## Usage
 

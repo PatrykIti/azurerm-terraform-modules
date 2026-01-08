@@ -14,15 +14,16 @@ func TestAzuredevopsUserEntitlementFullIntegration(t *testing.T) {
 		t.Skip("Skipping integration test in short mode")
 	}
 
-	requireADOEnv(t)
+	fixtureName := "complete"
+	requireADOEnv(t, fixtureName)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraform.Destroy(t, getTerraformOptions(t, testFolder, fixtureName))
 	})
 
 	test_structure.RunTestStage(t, "setup", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
+		terraformOptions := getTerraformOptions(t, testFolder, fixtureName)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 	})
 

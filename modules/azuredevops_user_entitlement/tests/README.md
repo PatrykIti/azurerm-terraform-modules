@@ -20,6 +20,15 @@ export AZDO_USER_ORIGIN_ID="00000000-0000-0000-0000-000000000000"
 export AZDO_USER_ORIGIN="aad"
 ```
 
+You can override user selectors per fixture by suffixing the variable with the fixture name (e.g. `_BASIC`, `_SECURE`, `_COMPLETE`, `_NEGATIVE`). The tests fall back to the generic variables if a fixture-specific one is not set.
+
+```bash
+export AZDO_USER_PRINCIPAL_NAME_BASIC="basic.user@example.com"
+export AZDO_USER_PRINCIPAL_NAME_SECURE="secure.user@example.com"
+export AZDO_USER_ORIGIN_ID_COMPLETE="11111111-1111-1111-1111-111111111111"
+export AZDO_USER_ORIGIN_COMPLETE="aad"
+```
+
 ## Running Tests
 
 ### Install Dependencies

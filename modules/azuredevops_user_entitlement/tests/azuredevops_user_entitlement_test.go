@@ -12,15 +12,16 @@ import (
 // Test basic user entitlement creation
 func TestBasicAzuredevopsUserEntitlement(t *testing.T) {
 	t.Parallel()
-	requireADOEnv(t)
+	fixtureName := "basic"
+	requireADOEnv(t, fixtureName)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraform.Destroy(t, getTerraformOptions(t, testFolder, fixtureName))
 	})
 
 	test_structure.RunTestStage(t, "setup", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
+		terraformOptions := getTerraformOptions(t, testFolder, fixtureName)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 	})
 
@@ -45,15 +46,16 @@ func TestBasicAzuredevopsUserEntitlement(t *testing.T) {
 // Test complete user entitlement configuration
 func TestCompleteAzuredevopsUserEntitlement(t *testing.T) {
 	t.Parallel()
-	requireADOEnv(t)
+	fixtureName := "complete"
+	requireADOEnv(t, fixtureName)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraform.Destroy(t, getTerraformOptions(t, testFolder, fixtureName))
 	})
 
 	test_structure.RunTestStage(t, "setup", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
+		terraformOptions := getTerraformOptions(t, testFolder, fixtureName)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 	})
 
@@ -78,15 +80,16 @@ func TestCompleteAzuredevopsUserEntitlement(t *testing.T) {
 // Test secure user entitlement configuration
 func TestSecureAzuredevopsUserEntitlement(t *testing.T) {
 	t.Parallel()
-	requireADOEnv(t)
+	fixtureName := "secure"
+	requireADOEnv(t, fixtureName)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraform.Destroy(t, getTerraformOptions(t, testFolder, fixtureName))
 	})
 
 	test_structure.RunTestStage(t, "setup", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
+		terraformOptions := getTerraformOptions(t, testFolder, fixtureName)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 	})
 
@@ -111,10 +114,11 @@ func TestSecureAzuredevopsUserEntitlement(t *testing.T) {
 // Validate selector rules
 func TestAzuredevopsUserEntitlementValidationRules(t *testing.T) {
 	t.Parallel()
-	requireADOEnv(t)
+	fixtureName := "negative"
+	requireADOEnv(t, fixtureName)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/negative")
-	terraformOptions := getTerraformOptions(t, testFolder)
+	terraformOptions := getTerraformOptions(t, testFolder, fixtureName)
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
