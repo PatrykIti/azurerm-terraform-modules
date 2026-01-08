@@ -40,6 +40,7 @@ No resources.
 | <a name="input_identity_id"></a> [identity\_id](#input\_identity\_id) | Identity ID for the role assignment. | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID for role assignments. | `string` | n/a | yes |
 | <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Role name to assign. | `string` | `"Reader"` | no |
+| <a name="input_scope"></a> [scope](#input\_scope) | Security role scope ID. | `string` | n/a | yes |
 
 ## Outputs
 

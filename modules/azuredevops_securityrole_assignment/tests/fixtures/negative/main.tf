@@ -14,7 +14,7 @@ provider "azuredevops" {}
 module "azuredevops_securityrole_assignment" {
   source = "../../../"
 
-  scope       = "project"
+  scope       = "00000000-0000-0000-0000-000000000000"
   resource_id = "00000000-0000-0000-0000-000000000000"
   role_name   = "Reader"
   identity_id = ""

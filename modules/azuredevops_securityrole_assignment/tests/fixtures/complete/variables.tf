@@ -3,10 +3,15 @@ variable "resource_id" {
   type        = string
 }
 
-variable "role_name" {
-  description = "Role name to assign."
+variable "scope" {
+  description = "Security role scope ID."
   type        = string
-  default     = "Contributor"
+}
+
+variable "role_name" {
+  description = "Role name to assign. Allowed values: Administrator, Reader, User; for scope distributedtask.library, Creator is also allowed."
+  type        = string
+  default     = "Reader"
 }
 
 variable "identity_id" {

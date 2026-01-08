@@ -12,6 +12,7 @@ This module manages Azure DevOps security role assignments.
 
 - Use `git::https://...//modules/azuredevops_securityrole_assignment?ref=ADOSRAvX.Y.Z` for module source.
 - Use stable identity and resource IDs to avoid plan drift.
+- `scope` expects a security role scope ID (not an OAuth scope). Known working scope IDs observed in the UI include `distributedtask.globalagentpoolrole`, `distributedtask.variablegroup`, `distributedtask.machinegrouprole`, `distributedtask.library`, `distributedtask.environmentreferencerole`, and `distributedtask.securefile`. Match `resource_id` to the target resource for that scope. For other scopes, inspect Azure DevOps UI network calls for `_apis/securityroles/scopes/{scopeId}`.
 
 ## Inputs (Highlights)
 

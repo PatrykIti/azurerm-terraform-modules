@@ -38,8 +38,8 @@ provider "azuredevops" {}
 module "azuredevops_securityrole_assignment" {
   source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_securityrole_assignment?ref=ADOSRAv1.0.0"
 
-  scope       = "project"
-  resource_id = "<project_id>"
+  scope       = "<scope_id>"
+  resource_id = "<resource_id>"
   role_name   = "Reader"
   identity_id = "<group_or_identity_id>"
 }

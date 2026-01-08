@@ -9,7 +9,7 @@ mock_provider "azuredevops" {
 }
 
 variables {
-  scope       = "project"
+  scope       = "00000000-0000-0000-0000-000000000000"
   resource_id = "00000000-0000-0000-0000-000000000000"
   role_name   = "Reader"
   identity_id = "11111111-1111-1111-1111-111111111111"

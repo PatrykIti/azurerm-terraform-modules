@@ -18,11 +18,11 @@ func TestAzuredevopsSecurityroleAssignmentFullIntegration(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder, getIdentityIDComplete(t)))
+		terraform.Destroy(t, getTerraformOptions(t, testFolder, getScopeIDComplete(t), getResourceIDComplete(t), getIdentityIDComplete(t)))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder, getIdentityIDComplete(t))
+		terraformOptions := getTerraformOptions(t, testFolder, getScopeIDComplete(t), getResourceIDComplete(t), getIdentityIDComplete(t))
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})

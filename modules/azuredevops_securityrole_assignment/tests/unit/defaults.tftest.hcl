@@ -8,22 +8,48 @@ mock_provider "azuredevops" {
   }
 }
 
-run "missing_required_inputs" {
+run "missing_scope" {
   command = plan
 
-  # Expect the plan to fail due to missing required inputs
   expect_failures = [
     var.scope,
-    var.resource_id,
-    var.role_name,
-    var.identity_id,
   ]
 
   variables {
     scope       = ""
+    resource_id = "00000000-0000-0000-0000-000000000000"
+    role_name   = "Reader"
+    identity_id = "11111111-1111-1111-1111-111111111111"
+  }
+}
+
+run "missing_resource_id" {
+  command = plan
+
+  expect_failures = [
+    var.resource_id,
+  ]
+
+  variables {
+    scope       = "00000000-0000-0000-0000-000000000000"
     resource_id = ""
+    role_name   = "Reader"
+    identity_id = "11111111-1111-1111-1111-111111111111"
+  }
+}
+
+run "missing_role_name" {
+  command = plan
+
+  expect_failures = [
+    var.role_name,
+  ]
+
+  variables {
+    scope       = "00000000-0000-0000-0000-000000000000"
+    resource_id = "00000000-0000-0000-0000-000000000000"
     role_name   = ""
-    identity_id = ""
+    identity_id = "11111111-1111-1111-1111-111111111111"
   }
 }
 
@@ -31,7 +57,7 @@ run "creates_assignment" {
   command = apply
 
   variables {
-    scope       = "project"
+    scope       = "00000000-0000-0000-0000-000000000000"
     resource_id = "00000000-0000-0000-0000-000000000000"
     role_name   = "Reader"
     identity_id = "11111111-1111-1111-1111-111111111111"

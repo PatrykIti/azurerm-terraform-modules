@@ -15,8 +15,8 @@ This module manages Azure DevOps security role assignments. Use least privilege 
 module "azuredevops_securityrole_assignment" {
   source = "./modules/azuredevops_securityrole_assignment"
 
-  scope       = "project"
-  resource_id = "00000000-0000-0000-0000-000000000000"
+  scope       = "<scope_id>"
+  resource_id = "<resource_id>"
   role_name   = "Reader"
   identity_id = "11111111-1111-1111-1111-111111111111"
 }

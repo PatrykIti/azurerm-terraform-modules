@@ -39,6 +39,7 @@ No resources.
 |------|-------------|------|---------|:--------:|
 | <a name="input_identity_id"></a> [identity\_id](#input\_identity\_id) | Identity ID for the secure assignment. | `string` | n/a | yes |
 | <a name="input_resource_id"></a> [resource\_id](#input\_resource\_id) | Target resource ID for the secure assignment. | `string` | n/a | yes |
+| <a name="input_scope"></a> [scope](#input\_scope) | Security role scope ID. | `string` | n/a | yes |
 
 ## Outputs
 

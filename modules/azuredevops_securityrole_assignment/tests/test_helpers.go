@@ -40,6 +40,66 @@ func getProjectID(t testing.TB) string {
 	return os.Getenv("AZDO_PROJECT_ID")
 }
 
+func getScopeIDBasic(t testing.TB) string {
+	t.Helper()
+
+	if scopeID := os.Getenv("AZDO_SECURITYROLE_ASSIGNMENT_SCOPE_ID_BASIC"); scopeID != "" {
+		return scopeID
+	}
+
+	return getProjectID(t)
+}
+
+func getScopeIDComplete(t testing.TB) string {
+	t.Helper()
+
+	if scopeID := os.Getenv("AZDO_SECURITYROLE_ASSIGNMENT_SCOPE_ID_COMPLETE"); scopeID != "" {
+		return scopeID
+	}
+
+	return getProjectID(t)
+}
+
+func getScopeIDSecure(t testing.TB) string {
+	t.Helper()
+
+	if scopeID := os.Getenv("AZDO_SECURITYROLE_ASSIGNMENT_SCOPE_ID_SECURE"); scopeID != "" {
+		return scopeID
+	}
+
+	return getProjectID(t)
+}
+
+func getResourceIDBasic(t testing.TB) string {
+	t.Helper()
+
+	if resourceID := os.Getenv("AZDO_SECURITYROLE_ASSIGNMENT_RESOURCE_ID_BASIC"); resourceID != "" {
+		return resourceID
+	}
+
+	return getProjectID(t)
+}
+
+func getResourceIDComplete(t testing.TB) string {
+	t.Helper()
+
+	if resourceID := os.Getenv("AZDO_SECURITYROLE_ASSIGNMENT_RESOURCE_ID_COMPLETE"); resourceID != "" {
+		return resourceID
+	}
+
+	return getProjectID(t)
+}
+
+func getResourceIDSecure(t testing.TB) string {
+	t.Helper()
+
+	if resourceID := os.Getenv("AZDO_SECURITYROLE_ASSIGNMENT_RESOURCE_ID_SECURE"); resourceID != "" {
+		return resourceID
+	}
+
+	return getProjectID(t)
+}
+
 func getIdentityIDBasic(t testing.TB) string {
 	t.Helper()
 
@@ -58,13 +118,14 @@ func getIdentityIDSecure(t testing.TB) string {
 	return os.Getenv("AZDO_SECURITYROLE_ASSIGNMENT_IDENTITY_ID_SECURE")
 }
 
-func getTerraformOptions(t testing.TB, terraformDir string, identityID string) *terraform.Options {
+func getTerraformOptions(t testing.TB, terraformDir string, scopeID string, resourceID string, identityID string) *terraform.Options {
 	t.Helper()
 
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
-			"resource_id": getProjectID(t),
+			"resource_id": resourceID,
+			"scope":       scopeID,
 			"identity_id": identityID,
 		},
 		NoColor: true,
