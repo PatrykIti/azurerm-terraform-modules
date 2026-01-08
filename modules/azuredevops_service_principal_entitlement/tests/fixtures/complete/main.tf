@@ -15,6 +15,6 @@ module "azuredevops_service_principal_entitlement" {
 
   origin_id            = var.service_principal_origin_id
   origin               = "aad"
-  account_license_type = "basic"
+  account_license_type = "stakeholder"
   licensing_source     = "account"
 }
