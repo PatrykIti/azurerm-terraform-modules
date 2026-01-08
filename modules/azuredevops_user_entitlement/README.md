@@ -33,9 +33,9 @@ For multiple entitlements, iterate at the caller level (`for_each` on the module
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - Minimal user entitlement assignment.
-- [Complete](examples/complete) - Module iteration with principal and origin selectors.
-- [Secure](examples/secure) - Stakeholder license example.
+- [Basic](examples/basic) - This example assigns a single entitlement to an Azure DevOps user.
+- [Complete](examples/complete) - This example assigns two entitlements and demonstrates module iteration.
+- [Secure](examples/secure) - This example assigns a stakeholder license to an Azure DevOps user.
 <!-- END_EXAMPLES -->
 
 ## Module Documentation
@@ -73,7 +73,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_user_entitlement"></a> [user\_entitlement](#input\_user\_entitlement) | User entitlement configuration. Provide either principal_name or origin+origin_id. | <pre>object({<br/>    key                  = optional(string)<br/>    principal_name       = optional(string)<br/>    origin_id            = optional(string)<br/>    origin               = optional(string)<br/>    account_license_type = optional(string, "express")<br/>    licensing_source     = optional(string, "account")<br/>  })</pre> | n/a | yes |
+| <a name="input_user_entitlement"></a> [user\_entitlement](#input\_user\_entitlement) | User entitlement configuration. Provide either principal\_name or origin+origin\_id. | <pre>object({<br/>    key                  = optional(string)<br/>    principal_name       = optional(string)<br/>    origin_id            = optional(string)<br/>    origin               = optional(string)<br/>    account_license_type = optional(string, "express")<br/>    licensing_source     = optional(string, "account")<br/>  })</pre> | n/a | yes |
 
 ## Outputs
 
@@ -81,7 +81,7 @@ No modules.
 |------|-------------|
 | <a name="output_user_entitlement_descriptor"></a> [user\_entitlement\_descriptor](#output\_user\_entitlement\_descriptor) | The descriptor of the Azure DevOps user entitlement managed by the module. |
 | <a name="output_user_entitlement_id"></a> [user\_entitlement\_id](#output\_user\_entitlement\_id) | The ID of the Azure DevOps user entitlement managed by the module. |
-| <a name="output_user_entitlement_key"></a> [user\_entitlement\_key](#output\_user\_entitlement\_key) | Derived key for the entitlement (key, principal_name, or origin_id). |
+| <a name="output_user_entitlement_key"></a> [user\_entitlement\_key](#output\_user\_entitlement\_key) | Derived key for the entitlement (key, principal\_name, or origin\_id). |
 <!-- END_TF_DOCS -->
 
 ## Additional Documentation
