@@ -96,6 +96,8 @@ module "storage_account" {
 
 ### Azure DevOps Modules
 
+Note: `azuredevops_identity` has been split into `azuredevops_group`, `azuredevops_user_entitlement`, `azuredevops_service_principal_entitlement`, and `azuredevops_securityrole_assignment`.
+
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
 | [Azure DevOps Agent Pools](./modules/azuredevops_agent_pools/) | ✅ Completed | [ADOAPv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAPv1.0.0) | Azure DevOps agent pools module for managing pools, queues, and elastic pools |

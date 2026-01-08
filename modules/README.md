@@ -19,6 +19,8 @@ This directory contains all Terraform modules published from this repository. Ea
 
 ## Azure DevOps Modules
 
+Note: `azuredevops_identity` has been split into `azuredevops_group`, `azuredevops_user_entitlement`, `azuredevops_service_principal_entitlement`, and `azuredevops_securityrole_assignment`.
+
 | Module | Tag Prefix | Description |
 | --- | --- | --- |
 | [Azure DevOps Agent Pools](./azuredevops_agent_pools/) (`azuredevops_agent_pools`) | `ADOAP` | Azure DevOps agent pools module for managing pools, queues, and elastic pools |
