@@ -16,6 +16,7 @@ Bring `modules/azuredevops_service_principal_entitlement` to full repository sta
 ## Current Gaps
 
 - Examples missing `.terraform-docs.yml`.
+- Main resource uses `for_each` over a list input; this module should manage a single entitlement resource (iteration belongs in the caller, aligned with `modules/azuredevops_group`).
 - Tests layout incomplete: only `fixtures/basic`, no `complete`/`secure`, missing `test_outputs/` and `.gitignore`.
 - Go tests are placeholders (`t.Skip`) and do not follow test-structure stages.
 - Unit tests only cover defaults/validation; missing `naming` and `outputs`.
@@ -40,6 +41,7 @@ Bring `modules/azuredevops_service_principal_entitlement` to full repository sta
 
 ## Work Items
 
+- **Module API:** remove `for_each` from the primary `azuredevops_service_principal_entitlement` resource and switch to a single entitlement input object (caller iterates across modules as needed), matching the `azuredevops_group` pattern. Update README, inputs, outputs, and examples accordingly.
 - **Examples:** add `.terraform-docs.yml` to `examples/basic|complete|secure`; ensure example READMEs include usage + cleanup and ADO prerequisites.
 - **Fixtures:** add `tests/fixtures/complete` and `tests/fixtures/secure` (and `negative` if needed for validation), each with `main.tf`, `variables.tf`, `outputs.tf`. Use local module source and deterministic naming. Use dedicated service principal object IDs per scenario to avoid collisions.
 - **Unit tests:** add `tests/unit/naming.tftest.hcl` (derived key logic) and `tests/unit/outputs.tftest.hcl` (map outputs, `try()` usage). Expand validation tests to cover invalid license types and empty `origin_id`.
@@ -61,6 +63,7 @@ Bring `modules/azuredevops_service_principal_entitlement` to full repository sta
 ## Acceptance Criteria
 
 - Module layout matches MODULE_GUIDE and TESTING_GUIDE for Azure DevOps modules.
+- Primary resource is single-instance (no `for_each` on the main resource block); iteration happens in consuming configs, consistent with `modules/azuredevops_group`.
 - `examples/*` include `.terraform-docs.yml` and updated READMEs.
 - `tests/` includes `fixtures/basic|complete|secure`, `unit/defaults|naming|outputs|validation`, `.gitignore`, `test_outputs/`.
 - Go tests run against real ADO with test-structure stages and validate outputs.
