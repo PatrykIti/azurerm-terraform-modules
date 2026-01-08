@@ -3,7 +3,7 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 16 tasks
+- **To Do:** 17 tasks
 - **In Progress:** 0
 - **Done:** 34 tasks
 
@@ -29,6 +29,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-027](./TASK-ADO-027_AzureDevOps_Team_Module_Refactor.md) | **Azure DevOps Team module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_team/` |
 | [TASK-ADO-036](./TASK-ADO-036_AzureDevOps_Service_Principal_Entitlement_Module_Compliance_Alignment.md) | **Azure DevOps Service Principal Entitlement module compliance alignment** | High | Medium | `modules/azuredevops_service_principal_entitlement/` |
 | [TASK-ADO-037](./TASK-ADO-037_AzureDevOps_SecurityRole_Assignment_Docs_and_Tests_Alignment.md) | **Azure DevOps Security Role Assignment docs/tests alignment** | Medium | Medium | `modules/azuredevops_securityrole_assignment/` |
+| [TASK-ADO-038](./TASK-ADO-038_AzureDevOps_User_Entitlement_Module_Compliance_Fixes.md) | **Azure DevOps User Entitlement module compliance fixes** | High | Medium | `modules/azuredevops_user_entitlement/` |
 
 ---
 
