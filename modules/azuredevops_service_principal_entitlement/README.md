@@ -8,7 +8,8 @@ Current version: **0.1.0**
 
 ## Description
 
-Manages Azure DevOps service principal entitlements.
+Manages a single Azure DevOps service principal entitlement. Iterate in the consuming configuration if you need multiple entitlements.
+This module is organization-scoped and does not require a project ID.
 
 ## Usage
 
@@ -27,15 +28,15 @@ module "azuredevops_service_principal_entitlement" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - Minimal service principal entitlement assignment.
-- [Complete](examples/complete) - Service principal entitlement with explicit license settings.
-- [Secure](examples/secure) - Example with stakeholder license.
+- [Basic](examples/basic) - This example assigns a single entitlement to an Azure DevOps service principal.
+- [Complete](examples/complete) - This example assigns a service principal entitlement with explicit license settings.
+- [Secure](examples/secure) - This example assigns a stakeholder license to a service principal.
 <!-- END_EXAMPLES -->
 
 ## Module Documentation
 
 - [docs/README.md](docs/README.md) - Module-specific documentation overview
-- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps service principal entitlements into the module
+- [docs/IMPORT.md](docs/IMPORT.md) - Import an existing Azure DevOps service principal entitlement into the module
 
 <!-- BEGIN_TF_DOCS -->
 

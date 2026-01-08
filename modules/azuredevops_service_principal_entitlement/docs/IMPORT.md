@@ -1,10 +1,23 @@
-# Import existing Azure DevOps service principal entitlements into the module
+# Import existing Azure DevOps service principal entitlement into the module
 
-This guide shows how to import existing Azure DevOps service principal entitlements into
+This guide shows how to import an existing Azure DevOps service principal entitlement into
 `modules/azuredevops_service_principal_entitlement` using Terraform **import blocks**.
 
 The flow is based on the **basic example** and keeps only the **module block**
 in the configuration.
+This module is organization-scoped and does not require a project ID.
+
+---
+
+## Table of Contents
+
+- [Requirements](#requirements)
+- [1) Minimal module configuration](#1-minimal-module-configuration)
+- [2) Add import blocks](#2-add-import-blocks)
+- [3) Run the import](#3-run-the-import)
+- [4) Verify and clean up](#4-verify-and-clean-up)
+- [Common errors and fixes](#common-errors-and-fixes)
+- [Helpful CLI commands (Azure AD / Azure DevOps)](#helpful-cli-commands-azure-ad--azure-devops)
 
 ---
 
@@ -44,6 +57,9 @@ module "azuredevops_service_principal_entitlement" {
 }
 ```
 
+Use the service principal **object ID** (not appId/clientId) for `origin_id`.
+See the CLI commands section for quick lookups.
+
 ---
 
 ## 2) Add import blocks
@@ -71,7 +87,7 @@ terraform apply
 ```
 
 Expected output:
-- one **import** action for each resource
+- one **import** action for the entitlement resource
 - no additional changes
 
 ---
@@ -89,7 +105,7 @@ When the plan is clean, remove `import.tf`.
 
 ## Common errors and fixes
 
-- **Plan shows changes after import**: input values do not match existing settings. Align entitlements with current Azure DevOps state.
+- **Plan shows changes after import**: input values do not match existing settings. Align the entitlement with current Azure DevOps state.
 - **Import ID not found**: verify the descriptor or ID in the Azure DevOps UI or API.
 
 ## Helpful CLI commands (Azure AD / Azure DevOps)

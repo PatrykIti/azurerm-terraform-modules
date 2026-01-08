@@ -2,13 +2,13 @@
 
 ## Overview
 
-This module manages Azure DevOps service principal entitlements. Keep entitlements minimal and scoped.
+This module manages a single Azure DevOps service principal entitlement. Keep entitlement assignments minimal and scoped.
 
 ## Security Features
 
 - Enforces explicit `origin_id` for each service principal.
 - Validates license types and licensing sources.
-- Stable keys avoid accidental address churn.
+- Explicit inputs reduce entitlement drift.
 
 ## Security Configuration Example
 
@@ -25,7 +25,7 @@ module "azuredevops_service_principal_entitlement" {
 ## Security Hardening Checklist
 
 - [ ] Grant the lowest license required for the service principal.
-- [ ] Review entitlements regularly and remove stale identities.
+- [ ] Review entitlement assignments regularly and remove stale identities.
 - [ ] Track changes through PR reviews and approvals.
 
 ## Common Security Mistakes to Avoid

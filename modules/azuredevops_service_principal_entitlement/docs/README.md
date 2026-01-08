@@ -2,7 +2,7 @@
 
 ## Overview
 
-This module manages Azure DevOps service principal entitlements.
+This module manages a single Azure DevOps service principal entitlement.
 
 ## Managed Resources
 
@@ -12,6 +12,7 @@ This module manages Azure DevOps service principal entitlements.
 
 - Use `git::https://...//modules/azuredevops_service_principal_entitlement?ref=ADOSPEvX.Y.Z` for module source.
 - This module manages a single entitlement resource; iterate in the consuming configuration when you need multiple service principals.
+- This module is organization-scoped and does not require a project ID.
 
 ## Inputs (Highlights)
 
