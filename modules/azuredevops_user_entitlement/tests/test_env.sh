@@ -9,6 +9,7 @@ export AZDO_USER_ORIGIN="aad"
 # Optional per-fixture overrides
 # export AZDO_USER_PRINCIPAL_NAME_BASIC="basic.user@example.com"
 # export AZDO_USER_PRINCIPAL_NAME_SECURE="secure.user@example.com"
+# export AZDO_USER_PRINCIPAL_NAME_COMPLETE="complete.user@example.com"
 # export AZDO_USER_ORIGIN_ID_COMPLETE="11111111-1111-1111-1111-111111111111"
 # export AZDO_USER_ORIGIN_COMPLETE="aad"
 # export AZDO_USER_PRINCIPAL_NAME_NEGATIVE="negative.user@example.com"

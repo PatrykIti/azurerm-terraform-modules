@@ -33,8 +33,9 @@ func requireADOEnv(t testing.TB, fixtureName string) {
 			missing = append(missing, formatFixtureEnv("AZDO_USER_PRINCIPAL_NAME", normalizedFixture))
 		}
 	case "complete":
-		if getFixtureEnv(normalizedFixture, "AZDO_USER_ORIGIN_ID") == "" {
-			missing = append(missing, formatFixtureEnv("AZDO_USER_ORIGIN_ID", normalizedFixture))
+		if getFixtureEnv(normalizedFixture, "AZDO_USER_PRINCIPAL_NAME") == "" &&
+			getFixtureEnv(normalizedFixture, "AZDO_USER_ORIGIN_ID") == "" {
+			missing = append(missing, formatFixtureEnv("AZDO_USER_PRINCIPAL_NAME", normalizedFixture)+" or "+formatFixtureEnv("AZDO_USER_ORIGIN_ID", normalizedFixture))
 		}
 	}
 
@@ -56,15 +57,20 @@ func getTerraformOptions(t testing.TB, terraformDir string, fixtureName string) 
 			vars["user_principal_name"] = principal
 		}
 	case "complete":
-		originID := getFixtureEnv(normalizedFixture, "AZDO_USER_ORIGIN_ID")
-		if originID != "" {
-			vars["user_origin_id"] = originID
+		principal := getFixtureEnv(normalizedFixture, "AZDO_USER_PRINCIPAL_NAME")
+		if principal != "" {
+			vars["user_principal_name"] = principal
+		} else {
+			originID := getFixtureEnv(normalizedFixture, "AZDO_USER_ORIGIN_ID")
+			if originID != "" {
+				vars["user_origin_id"] = originID
+			}
+			userOrigin := getFixtureEnv(normalizedFixture, "AZDO_USER_ORIGIN")
+			if userOrigin == "" {
+				userOrigin = "aad"
+			}
+			vars["user_origin"] = userOrigin
 		}
-		userOrigin := getFixtureEnv(normalizedFixture, "AZDO_USER_ORIGIN")
-		if userOrigin == "" {
-			userOrigin = "aad"
-		}
-		vars["user_origin"] = userOrigin
 	case "negative":
 		principal := getFixtureEnv(normalizedFixture, "AZDO_USER_PRINCIPAL_NAME")
 		if principal != "" {

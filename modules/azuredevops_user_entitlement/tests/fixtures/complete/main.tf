@@ -10,13 +10,18 @@ terraform {
 
 provider "azuredevops" {}
 
+locals {
+  use_principal_name = var.user_principal_name != null && trimspace(var.user_principal_name) != ""
+}
+
 module "azuredevops_user_entitlement" {
   source = "../../../"
 
   user_entitlement = {
     key                  = "fixture-complete-user"
-    origin               = var.user_origin
-    origin_id            = var.user_origin_id
+    principal_name       = local.use_principal_name ? var.user_principal_name : null
+    origin               = local.use_principal_name ? null : var.user_origin
+    origin_id            = local.use_principal_name ? null : var.user_origin_id
     account_license_type = "basic"
     licensing_source     = "account"
   }
