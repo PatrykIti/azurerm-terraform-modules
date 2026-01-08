@@ -6,6 +6,8 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [056](./056-2026-01-09-azuredevops-user-entitlement-compliance-fixes.md) | 2026-01-09 | Azure DevOps User Entitlement module compliance fixes | Breaking Change / Maintenance |
+| [055](./055-2026-01-08-azuredevops-service-principal-entitlement-alignment.md) | 2026-01-08 | Azure DevOps Service Principal Entitlement module compliance alignment | Breaking Change / Maintenance |
 | [054](./054-2026-01-01-testing-guide-alignment.md) | 2026-01-01 | Testing guide alignment (AKS + Azure DevOps) | Maintenance / Documentation |
 | [053](./053-2026-01-01-module-guide-alignment.md) | 2026-01-01 | Module guide alignment (AKS + Azure DevOps patterns) | Maintenance / Documentation |
 | [052](./052-2025-12-31-ado-release-and-docs-alignment.md) | 2025-12-31 | Azure DevOps modules release and docs alignment | Maintenance / Documentation |

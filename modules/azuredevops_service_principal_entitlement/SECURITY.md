@@ -16,14 +16,9 @@ This module manages Azure DevOps service principal entitlements. Keep entitlemen
 module "azuredevops_service_principal_entitlement" {
   source = "./modules/azuredevops_service_principal_entitlement"
 
-  service_principal_entitlements = [
-    {
-      key                  = "platform-sp"
-      origin_id            = "00000000-0000-0000-0000-000000000000"
-      account_license_type = "basic"
-      licensing_source     = "account"
-    }
-  ]
+  origin_id            = "00000000-0000-0000-0000-000000000000"
+  account_license_type = "basic"
+  licensing_source     = "account"
 }
 ```
 
@@ -37,7 +32,7 @@ module "azuredevops_service_principal_entitlement" {
 
 1. Assigning high-privilege licenses to broadly used service principals.
 2. Leaving unused service principals licensed.
-3. Reusing the same key across different entitlements.
+3. Reusing the same service principal entitlement across multiple configs without coordination.
 
 ---
 

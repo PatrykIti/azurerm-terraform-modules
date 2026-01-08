@@ -1,6 +1,6 @@
 # Complete Security Role Assignment Example
 
-This example assigns multiple roles within a project scope.
+This example assigns a role within a project scope with explicit input values.
 
 ## Usage
 
@@ -37,13 +37,13 @@ No resources.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_contributor_identity_id"></a> [contributor\_identity\_id](#input\_contributor\_identity\_id) | Identity ID for Contributor role assignment. | `string` | n/a | yes |
+| <a name="input_identity_id"></a> [identity\_id](#input\_identity\_id) | Identity ID for the role assignment. | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID for role assignments. | `string` | n/a | yes |
-| <a name="input_reader_identity_id"></a> [reader\_identity\_id](#input\_reader\_identity\_id) | Identity ID for Reader role assignment. | `string` | n/a | yes |
+| <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Role name to assign. | `string` | `"Reader"` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_securityrole_assignment_ids"></a> [securityrole\_assignment\_ids](#output\_securityrole\_assignment\_ids) | Map of security role assignment IDs keyed by assignment key. |
+| <a name="output_securityrole_assignment_id"></a> [securityrole\_assignment\_id](#output\_securityrole\_assignment\_id) | Security role assignment ID. |
 <!-- END_TF_DOCS -->

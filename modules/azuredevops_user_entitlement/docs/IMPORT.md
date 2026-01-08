@@ -38,30 +38,37 @@ provider "azuredevops" {}
 module "azuredevops_user_entitlement" {
   source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_user_entitlement?ref=ADOUv1.0.0"
 
-  user_entitlements = [
-    {
-      key                  = "user-entitlement"
-      principal_name       = "<user_principal_name>"
-      account_license_type = "basic"
-      licensing_source     = "account"
-    }
-  ]
+  user_entitlement = {
+    key                  = "user-entitlement"
+    principal_name       = "<user_principal_name>"
+    account_license_type = "basic"
+    licensing_source     = "account"
+  }
 }
 ```
 
-When using list inputs, derived keys default to `key`, `principal_name`, or `origin_id`. Set an explicit
-`key` to keep a stable import address.
+When iterating with `for_each` at the module level, keep module keys stable. The module derives its
+`user_entitlement_key` from `key`, `principal_name`, or `origin_id`.
 
 ---
 
 ## 2) Add import blocks
 
 Create `import.tf` and add import blocks for each resource.
-Use the **module address** with the stable key that matches your inputs.
+Use the **module address**. If you use `for_each`, include the module instance key.
 
 ```hcl
 import {
-  to = module.azuredevops_user_entitlement.azuredevops_user_entitlement.user_entitlement["user-entitlement"]
+  to = module.azuredevops_user_entitlement.azuredevops_user_entitlement.user_entitlement
+  id = "<user_entitlement_id>"
+}
+```
+
+If you use `for_each` on the module:
+
+```hcl
+import {
+  to = module.azuredevops_user_entitlement["user-entitlement"].azuredevops_user_entitlement.user_entitlement
   id = "<user_entitlement_id>"
 }
 ```
@@ -98,9 +105,9 @@ When the plan is clean, remove `import.tf`.
 ## Common errors and fixes
 
 - **Plan shows changes after import**: input values do not match existing settings. Align entitlements with current Azure DevOps state.
-- **Unknown key errors**: ensure the derived keys match your list inputs or set explicit `key` values.
+- **Unknown key errors**: ensure the module instance key matches your `for_each` map keys.
 - **Import ID not found**: verify the descriptor or ID in the Azure DevOps UI or API.
-- **Duplicate key validation**: list inputs must have unique derived keys or explicit `key` values.
+- **Duplicate key validation**: `for_each` keys must be unique when iterating.
 
 ## Helpful CLI commands (Azure AD / Azure DevOps)
 

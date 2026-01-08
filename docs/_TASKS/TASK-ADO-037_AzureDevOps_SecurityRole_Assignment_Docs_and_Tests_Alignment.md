@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules  
 **Estimated Effort:** Medium  
 **Dependencies:** docs/MODULE_GUIDE, docs/TESTING_GUIDE, docs/TERRAFORM_BEST_PRACTICES_GUIDE.md, modules/azuredevops_group (tests baseline)  
-**Status:** 🟡 To Do
+**Status:** ✅ **Done** (2026-01-08)
 
 ---
 
@@ -61,8 +61,8 @@ Ujednolić dokumentację i testy modułu `modules/azuredevops_securityrole_assig
 
 ## Implementation Checklist
 
-- [ ] Zaktualizować moduł README + docs/README + docs/IMPORT do pojedynczego API.
-- [ ] Uporządkować README przykładów i zregenerować terraform-docs (module + examples).
-- [ ] Dodać fixtures `complete`/`secure` (opcjonalnie `negative`) i rozbudować unit tests (walidacje, outputy).
-- [ ] Zaimplementować/ustawić Terratesty + stage’y test-structure; ujednolicić Makefile/skrypty/test_config/.gitignore/test_outputs.
-- [ ] Zaktualizować `docs/_TASKS/README.md` (statystyki + wpis To Do).
+- [x] Zaktualizować moduł README + docs/README + docs/IMPORT do pojedynczego API.
+- [x] Uporządkować README przykładów i zregenerować terraform-docs (module + examples).
+- [x] Dodać fixtures `complete`/`secure` (opcjonalnie `negative`) i rozbudować unit tests (walidacje, outputy).
+- [x] Zaimplementować/ustawić Terratesty + stage’y test-structure; ujednolicić Makefile/skrypty/test_config/.gitignore/test_outputs.
+- [x] Zaktualizować `docs/_TASKS/README.md` (statystyki + wpis To Do).

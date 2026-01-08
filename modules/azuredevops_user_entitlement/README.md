@@ -18,23 +18,23 @@ provider "azuredevops" {}
 module "azuredevops_user_entitlement" {
   source = "path/to/azuredevops_user_entitlement"
 
-  user_entitlements = [
-    {
-      key                  = "demo-user"
-      principal_name       = "user@example.com"
-      account_license_type = "basic"
-      licensing_source     = "account"
-    }
-  ]
+  user_entitlement = {
+    key                  = "demo-user"
+    principal_name       = "user@example.com"
+    account_license_type = "basic"
+    licensing_source     = "account"
+  }
 }
 ```
+
+For multiple entitlements, iterate at the caller level (`for_each` on the module) and pass a single `user_entitlement` per module instance.
 
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - Minimal user entitlement assignment.
-- [Complete](examples/complete) - Two user entitlements with explicit keys.
-- [Secure](examples/secure) - Example with stakeholder license for a user.
+- [Complete](examples/complete) - Module iteration with principal and origin selectors.
+- [Secure](examples/secure) - Stakeholder license example.
 <!-- END_EXAMPLES -->
 
 ## Module Documentation
@@ -72,14 +72,15 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_user_entitlements"></a> [user\_entitlements](#input\_user\_entitlements) | List of user entitlements to manage. | <pre>list(object({<br/>    key                  = optional(string)<br/>    principal_name       = optional(string)<br/>    origin_id            = optional(string)<br/>    origin               = optional(string)<br/>    account_license_type = optional(string, "express")<br/>    licensing_source     = optional(string, "account")<br/>  }))</pre> | `[]` | no |
+| <a name="input_user_entitlement"></a> [user\_entitlement](#input\_user\_entitlement) | User entitlement configuration. Provide either principal_name or origin+origin_id. | <pre>object({<br/>    key                  = optional(string)<br/>    principal_name       = optional(string)<br/>    origin_id            = optional(string)<br/>    origin               = optional(string)<br/>    account_license_type = optional(string, "express")<br/>    licensing_source     = optional(string, "account")<br/>  })</pre> | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_user_entitlement_descriptors"></a> [user\_entitlement\_descriptors](#output\_user\_entitlement\_descriptors) | Map of user entitlement descriptors keyed by entitlement key. |
-| <a name="output_user_entitlement_ids"></a> [user\_entitlement\_ids](#output\_user\_entitlement\_ids) | Map of user entitlement IDs keyed by entitlement key. |
+| <a name="output_user_entitlement_descriptor"></a> [user\_entitlement\_descriptor](#output\_user\_entitlement\_descriptor) | The descriptor of the Azure DevOps user entitlement managed by the module. |
+| <a name="output_user_entitlement_id"></a> [user\_entitlement\_id](#output\_user\_entitlement\_id) | The ID of the Azure DevOps user entitlement managed by the module. |
+| <a name="output_user_entitlement_key"></a> [user\_entitlement\_key](#output\_user\_entitlement\_key) | Derived key for the entitlement (key, principal_name, or origin_id). |
 <!-- END_TF_DOCS -->
 
 ## Additional Documentation

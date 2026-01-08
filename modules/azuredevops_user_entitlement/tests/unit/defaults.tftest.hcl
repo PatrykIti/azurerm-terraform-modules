@@ -9,31 +9,22 @@ mock_provider "azuredevops" {
   }
 }
 
-run "no_entitlements_by_default" {
+run "default_license_values" {
   command = plan
 
-  assert {
-    condition     = length(azuredevops_user_entitlement.user_entitlement) == 0
-    error_message = "No user entitlements should be created by default."
-  }
-}
-
-run "entitlement_keys" {
-  command = apply
-
   variables {
-    user_entitlements = [
-      {
-        key                  = "platform-user"
-        principal_name       = "user@example.com"
-        account_license_type = "basic"
-        licensing_source     = "account"
-      }
-    ]
+    user_entitlement = {
+      principal_name = "user@example.com"
+    }
   }
 
   assert {
-    condition     = contains(keys(azuredevops_user_entitlement.user_entitlement), "platform-user")
-    error_message = "user_entitlements should be keyed by the provided key."
+    condition     = azuredevops_user_entitlement.user_entitlement.account_license_type == "express"
+    error_message = "account_license_type should default to express."
+  }
+
+  assert {
+    condition     = azuredevops_user_entitlement.user_entitlement.licensing_source == "account"
+    error_message = "licensing_source should default to account."
   }
 }

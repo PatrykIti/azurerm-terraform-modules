@@ -13,12 +13,7 @@ provider "azuredevops" {}
 module "azuredevops_service_principal_entitlement" {
   source = "../../"
 
-  service_principal_entitlements = [
-    {
-      key                  = "secure-sp"
-      origin_id            = var.service_principal_origin_id
-      account_license_type = "stakeholder"
-      licensing_source     = "account"
-    }
-  ]
+  origin_id            = var.service_principal_origin_id
+  account_license_type = "stakeholder"
+  licensing_source     = "account"
 }

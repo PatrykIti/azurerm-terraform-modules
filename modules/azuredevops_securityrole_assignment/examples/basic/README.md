@@ -44,5 +44,5 @@ No resources.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_securityrole_assignment_ids"></a> [securityrole\_assignment\_ids](#output\_securityrole\_assignment\_ids) | Map of security role assignment IDs keyed by assignment key. |
+| <a name="output_securityrole_assignment_id"></a> [securityrole\_assignment\_id](#output\_securityrole\_assignment\_id) | Security role assignment ID. |
 <!-- END_TF_DOCS -->

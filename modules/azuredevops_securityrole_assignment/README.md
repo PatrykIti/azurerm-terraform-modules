@@ -18,24 +18,19 @@ provider "azuredevops" {}
 module "azuredevops_securityrole_assignment" {
   source = "path/to/azuredevops_securityrole_assignment"
 
-  securityrole_assignments = [
-    {
-      key         = "project-reader"
-      scope       = "project"
-      resource_id = "00000000-0000-0000-0000-000000000000"
-      role_name   = "Reader"
-      identity_id = "11111111-1111-1111-1111-111111111111"
-    }
-  ]
+  scope       = "project"
+  resource_id = "00000000-0000-0000-0000-000000000000"
+  role_name   = "Reader"
+  identity_id = "11111111-1111-1111-1111-111111111111"
 }
 ```
 
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - Minimal security role assignment.
-- [Complete](examples/complete) - Multiple assignments with explicit keys.
-- [Secure](examples/secure) - Security-focused assignment using stakeholder-like scope.
+- [Basic](examples/basic) - This example assigns a Reader role to a provided identity within a project scope.
+- [Complete](examples/complete) - This example assigns a role within a project scope with explicit input values.
+- [Secure](examples/secure) - This example assigns a minimal Reader role to a specified identity.
 <!-- END_EXAMPLES -->
 
 ## Module Documentation

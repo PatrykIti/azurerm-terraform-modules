@@ -13,12 +13,5 @@ provider "azuredevops" {}
 module "azuredevops_service_principal_entitlement" {
   source = "../../"
 
-  service_principal_entitlements = [
-    {
-      key                  = "basic-sp"
-      origin_id            = var.service_principal_origin_id
-      account_license_type = "basic"
-      licensing_source     = "account"
-    }
-  ]
+  origin_id = var.service_principal_origin_id
 }

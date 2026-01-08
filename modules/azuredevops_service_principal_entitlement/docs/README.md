@@ -11,17 +11,17 @@ This module manages Azure DevOps service principal entitlements.
 ## Usage Notes
 
 - Use `git::https://...//modules/azuredevops_service_principal_entitlement?ref=ADOSPEvX.Y.Z` for module source.
-- Use stable keys and unique names for list/object inputs to avoid address churn.
+- This module manages a single entitlement resource; iterate in the consuming configuration when you need multiple service principals.
 
 ## Inputs (Highlights)
 
-- Required: `service_principal_entitlements.origin_id`
+- Required: `origin_id`
 - Optional: see `../README.md` and `../variables.tf`.
 
 ## Outputs (Highlights)
 
-- `service_principal_entitlement_ids`
-- `service_principal_entitlement_descriptors`
+- `service_principal_entitlement_id`
+- `service_principal_entitlement_descriptor`
 
 ## Import Existing Resources
 
@@ -31,7 +31,6 @@ See [IMPORT.md](./IMPORT.md) for import blocks and IDs.
 
 - **Permission errors**: ensure the PAT has rights for entitlement operations.
 - **Plan drift**: align inputs with existing state or leave optional inputs unset.
-- **Duplicate keys**: ensure list/object inputs use unique keys or names.
 
 ## Related Docs
 

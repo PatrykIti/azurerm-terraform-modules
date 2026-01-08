@@ -43,5 +43,5 @@ No resources.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_service_principal_entitlement_ids"></a> [service\_principal\_entitlement\_ids](#output\_service\_principal\_entitlement\_ids) | Map of service principal entitlement IDs keyed by entitlement key. |
+| <a name="output_service_principal_entitlement_id"></a> [service\_principal\_entitlement\_id](#output\_service\_principal\_entitlement\_id) | The ID of the service principal entitlement. |
 <!-- END_TF_DOCS -->

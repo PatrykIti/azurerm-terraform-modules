@@ -13,12 +13,10 @@ provider "azuredevops" {}
 module "azuredevops_user_entitlement" {
   source = "../../"
 
-  user_entitlements = [
-    {
-      key                  = "secure-user"
-      principal_name       = var.user_principal_name
-      account_license_type = "stakeholder"
-      licensing_source     = "account"
-    }
-  ]
+  user_entitlement = {
+    key                  = "secure-user"
+    principal_name       = var.user_principal_name
+    account_license_type = "stakeholder"
+    licensing_source     = "account"
+  }
 }

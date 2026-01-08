@@ -1,6 +1,6 @@
 # Complete Service Principal Entitlement Example
 
-This example assigns two service principals with different license types.
+This example assigns a service principal entitlement with explicit license settings.
 
 ## Usage
 
@@ -37,12 +37,11 @@ No resources.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_automation_service_principal_origin_id"></a> [automation\_service\_principal\_origin\_id](#input\_automation\_service\_principal\_origin\_id) | Service principal object ID for the automation entitlement. | `string` | n/a | yes |
-| <a name="input_platform_service_principal_origin_id"></a> [platform\_service\_principal\_origin\_id](#input\_platform\_service\_principal\_origin\_id) | Service principal object ID for the platform entitlement. | `string` | n/a | yes |
+| <a name="input_service_principal_origin_id"></a> [service\_principal\_origin\_id](#input\_service\_principal\_origin\_id) | Service principal object ID for the entitlement. | `string` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_service_principal_entitlement_ids"></a> [service\_principal\_entitlement\_ids](#output\_service\_principal\_entitlement\_ids) | Map of service principal entitlement IDs keyed by entitlement key. |
+| <a name="output_service_principal_entitlement_id"></a> [service\_principal\_entitlement\_id](#output\_service\_principal\_entitlement\_id) | The ID of the service principal entitlement. |
 <!-- END_TF_DOCS -->

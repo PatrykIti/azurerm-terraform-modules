@@ -6,7 +6,7 @@ This module manages Azure DevOps user entitlements. Keep entitlements minimal an
 
 ## Security Features
 
-- Requires explicit `principal_name` or `origin_id` for each user.
+- Requires `principal_name` or `origin` + `origin_id` for each user.
 - Validates license types and licensing sources.
 - Stable keys avoid accidental address churn.
 
@@ -16,14 +16,12 @@ This module manages Azure DevOps user entitlements. Keep entitlements minimal an
 module "azuredevops_user_entitlement" {
   source = "./modules/azuredevops_user_entitlement"
 
-  user_entitlements = [
-    {
-      key                  = "platform-user"
-      principal_name       = "user@example.com"
-      account_license_type = "basic"
-      licensing_source     = "account"
-    }
-  ]
+  user_entitlement = {
+    key                  = "platform-user"
+    principal_name       = "user@example.com"
+    account_license_type = "basic"
+    licensing_source     = "account"
+  }
 }
 ```
 
@@ -42,5 +40,5 @@ module "azuredevops_user_entitlement" {
 ---
 
 **Module Version**: 0.1.0  
-**Last Updated**: 2025-12-28  
+**Last Updated**: 2026-01-09  
 **Security Contact**: patryk.ciechanski@patrykiti.pl

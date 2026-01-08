@@ -3,7 +3,13 @@ variable "platform_user_principal_name" {
   type        = string
 }
 
-variable "automation_user_principal_name" {
-  description = "User principal name for the automation entitlement."
+variable "automation_user_origin_id" {
+  description = "Origin ID for the automation entitlement."
   type        = string
+}
+
+variable "automation_user_origin" {
+  description = "Origin for the automation entitlement."
+  type        = string
+  default     = "aad"
 }

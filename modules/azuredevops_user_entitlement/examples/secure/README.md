@@ -1,4 +1,4 @@
-# Secure Service Principal Entitlement Example
+# Secure User Entitlement Example
 
 This example assigns a stakeholder license to an Azure DevOps user.
 
@@ -7,6 +7,12 @@ This example assigns a stakeholder license to an Azure DevOps user.
 ```bash
 terraform init
 terraform apply
+```
+
+## Cleanup
+
+```bash
+terraform destroy
 ```
 
 <!-- BEGIN_TF_DOCS -->
@@ -43,5 +49,5 @@ No resources.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_user_entitlement_ids"></a> [user\_entitlement\_ids](#output\_user\_entitlement\_ids) | Map of user entitlement IDs keyed by entitlement key. |
+| <a name="output_user_entitlement_id"></a> [user\_entitlement\_id](#output\_user\_entitlement\_id) | ID of the user entitlement. |
 <!-- END_TF_DOCS -->

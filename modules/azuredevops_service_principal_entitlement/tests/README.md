@@ -1,38 +1,102 @@
-# Azure DevOps Service Principal Entitlement Tests
+# Azure DevOps Service Principal Entitlement Module Tests
 
-This directory contains unit tests for the module using `terraform test`.
+This directory contains automated tests for the Azure DevOps service principal entitlement Terraform module using [Terratest](https://terratest.gruntwork.io/) and native Terraform unit tests.
 
 ## Prerequisites
 
-- Terraform 1.12.2+
-- Azure DevOps provider 1.12.2+
+1. **Go**: Version 1.21 or later
+2. **Terraform**: Version 1.12.2 or later
+3. **Azure DevOps Organization**: Access with a Personal Access Token (PAT)
 
-## Environment
+## Environment Variables
 
-Set required Azure DevOps variables before running tests (if needed for future integration tests):
+Set the following environment variables before running tests:
 
 ```bash
 export AZDO_ORG_SERVICE_URL="https://dev.azure.com/your-org"
 export AZDO_PERSONAL_ACCESS_TOKEN="your-pat"
+export AZDO_SERVICE_PRINCIPAL_ORIGIN_ID_BASIC="<sp-object-id-basic>"
+export AZDO_SERVICE_PRINCIPAL_ORIGIN_ID_COMPLETE="<sp-object-id-complete>"
+export AZDO_SERVICE_PRINCIPAL_ORIGIN_ID_SECURE="<sp-object-id-secure>"
 ```
 
-## Running tests
+## Running Tests
+
+### Install Dependencies
 
 ```bash
-terraform test -test-directory=./unit
+go mod download
 ```
 
-or
+### Run All Tests
 
 ```bash
 make test
 ```
 
-## Structure
+### Run Basic Tests Only
 
-- `unit/` – native Terraform unit tests (`.tftest.hcl`).
-- `fixtures/` – Terraform fixtures for future integration tests (none required yet).
+```bash
+make test-basic
+```
 
-## Notes
+### Run Integration Tests Only
 
-No Go-based Terratest integration is provided for this module; extend as needed following the repo template.
+```bash
+make test-integration
+```
+
+### Run Terraform Unit Tests
+
+```bash
+make unit
+```
+
+## Test Structure
+
+### Test Files
+
+- `azuredevops_service_principal_entitlement_test.go` - Basic, complete, secure, and validation tests
+- `integration_test.go` - Full apply test using the complete fixture
+- `performance_test.go` - Benchmarks are disabled by default
+
+### Test Fixtures
+
+The `fixtures/` directory contains Terraform configurations for different test scenarios:
+
+- `fixtures/basic/` - Basic module configuration
+- `fixtures/complete/` - Explicit license settings
+- `fixtures/secure/` - Security-focused configuration
+- `fixtures/negative/` - Negative test cases
+
+## Debugging Tests
+
+### Verbose Output
+
+```bash
+go test -v -run TestBasicAzuredevopsServicePrincipalEntitlement
+```
+
+### Keep Resources After Test Failure
+
+Set the `SKIP_TEARDOWN` environment variable:
+
+```bash
+export SKIP_TEARDOWN=true
+go test -v -run TestBasicAzuredevopsServicePrincipalEntitlement
+```
+
+## Continuous Integration
+
+Tests are automatically run in CI/CD pipelines:
+
+- **Pull Requests**: Short tests only
+- **Main Branch**: All tests including integration
+
+## Contributing
+
+When adding new tests:
+
+1. Follow the existing test structure and naming conventions
+2. Add appropriate fixtures in the `fixtures/` directory
+3. Keep tests idempotent and clean up resources

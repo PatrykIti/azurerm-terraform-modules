@@ -11,16 +11,16 @@ This module manages Azure DevOps security role assignments.
 ## Usage Notes
 
 - Use `git::https://...//modules/azuredevops_securityrole_assignment?ref=ADOSRAvX.Y.Z` for module source.
-- Use stable keys and unique names for list/object inputs to avoid address churn.
+- Use stable identity and resource IDs to avoid plan drift.
 
 ## Inputs (Highlights)
 
-- Required: `securityrole_assignments.identity_id`, `scope`, `resource_id`, `role_name`
+- Required: `identity_id`, `scope`, `resource_id`, `role_name`
 - Optional: see `../README.md` and `../variables.tf`.
 
 ## Outputs (Highlights)
 
-- `securityrole_assignment_ids`
+- `securityrole_assignment_id`
 
 ## Import Existing Resources
 
@@ -29,8 +29,8 @@ See [IMPORT.md](./IMPORT.md) for import blocks and IDs.
 ## Troubleshooting
 
 - **Permission errors**: ensure the PAT has rights for assignments.
-- **Plan drift**: align inputs with existing state or leave optional inputs unset.
-- **Duplicate keys**: ensure list/object inputs use unique keys or names.
+- **Plan drift**: align inputs with existing state and use stable identity IDs.
+- **Invalid IDs**: verify `resource_id` and `identity_id` from Azure DevOps APIs.
 
 ## Related Docs
 

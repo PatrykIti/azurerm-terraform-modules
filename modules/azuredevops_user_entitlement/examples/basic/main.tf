@@ -13,12 +13,10 @@ provider "azuredevops" {}
 module "azuredevops_user_entitlement" {
   source = "../../"
 
-  user_entitlements = [
-    {
-      key                  = "basic-user"
-      principal_name       = var.user_principal_name
-      account_license_type = "basic"
-      licensing_source     = "account"
-    }
-  ]
+  user_entitlement = {
+    key                  = "basic-user"
+    principal_name       = var.user_principal_name
+    account_license_type = "basic"
+    licensing_source     = "account"
+  }
 }

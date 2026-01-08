@@ -8,7 +8,7 @@ mock_provider "azuredevops" {
   }
 }
 
-run "no_assignments_by_default" {
+run "missing_required_inputs" {
   command = plan
 
   # Expect the plan to fail due to missing required inputs
@@ -27,7 +27,7 @@ run "no_assignments_by_default" {
   }
 }
 
-run "assignment_keys" {
+run "creates_assignment" {
   command = apply
 
   variables {

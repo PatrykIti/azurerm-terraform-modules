@@ -1,4 +1,4 @@
-output "service_principal_entitlement_ids" {
-  description = "Map of service principal entitlement IDs keyed by entitlement key."
-  value       = module.azuredevops_service_principal_entitlement.service_principal_entitlement_ids
+output "service_principal_entitlement_id" {
+  description = "The ID of the service principal entitlement."
+  value       = module.azuredevops_service_principal_entitlement.service_principal_entitlement_id
 }

@@ -38,31 +38,23 @@ provider "azuredevops" {}
 module "azuredevops_securityrole_assignment" {
   source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_securityrole_assignment?ref=ADOSRAv1.0.0"
 
-  securityrole_assignments = [
-    {
-      key         = "project-reader"
-      scope       = "project"
-      resource_id = "<project_id>"
-      role_name   = "Reader"
-      identity_id = "<group_or_identity_id>"
-    }
-  ]
+  scope       = "project"
+  resource_id = "<project_id>"
+  role_name   = "Reader"
+  identity_id = "<group_or_identity_id>"
 }
 ```
-
-When using list inputs, derived keys default to `key` or a combination of scope/resource/role/identity. Set an explicit
-`key` to keep a stable import address.
 
 ---
 
 ## 2) Add import blocks
 
 Create `import.tf` and add import blocks for each resource.
-Use the **module address** with the stable key that matches your inputs.
+Use the **module address** that matches the single assignment.
 
 ```hcl
 import {
-  to = module.azuredevops_securityrole_assignment.azuredevops_securityrole_assignment.securityrole_assignment["project-reader"]
+  to = module.azuredevops_securityrole_assignment.azuredevops_securityrole_assignment.securityrole_assignment
   id = "<security_role_assignment_id>"
 }
 ```
@@ -99,9 +91,8 @@ When the plan is clean, remove `import.tf`.
 ## Common errors and fixes
 
 - **Plan shows changes after import**: input values do not match existing settings. Align assignments with current Azure DevOps state.
-- **Unknown key errors**: ensure the derived keys match your list inputs or set explicit `key` values.
 - **Import ID not found**: verify the ID in the Azure DevOps UI or API.
-- **Duplicate key validation**: list inputs must have unique derived keys or explicit `key` values.
+- **Scope mismatch**: ensure `scope` and `resource_id` match the imported assignment.
 
 ## Helpful CLI commands (Azure DevOps / Azure AD)
 

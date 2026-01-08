@@ -1,76 +1,61 @@
 # -----------------------------------------------------------------------------
-# Service Principal Entitlements
+# Service Principal Entitlement
 # -----------------------------------------------------------------------------
 
-variable "service_principal_entitlements" {
-  description = "List of service principal entitlements to manage."
-  type = list(object({
-    key                  = optional(string)
-    origin_id            = string
-    origin               = optional(string, "aad")
-    account_license_type = optional(string, "express")
-    licensing_source     = optional(string, "account")
-  }))
-  default = []
+variable "origin_id" {
+  description = "Service principal object ID used to create the entitlement."
+  type        = string
 
   validation {
-    condition = alltrue([
-      for entitlement in var.service_principal_entitlements :
-      entitlement.key == null || trimspace(entitlement.key) != ""
-    ])
-    error_message = "service_principal_entitlements.key must be a non-empty string when set."
+    condition     = trimspace(var.origin_id) != ""
+    error_message = "origin_id must be a non-empty string."
   }
+}
+
+variable "origin" {
+  description = "Origin for the service principal. Only \"aad\" is supported."
+  type        = string
+  default     = "aad"
 
   validation {
-    condition = alltrue([
-      for entitlement in var.service_principal_entitlements :
-      trimspace(entitlement.origin_id) != ""
-    ])
-    error_message = "service_principal_entitlements.origin_id must be a non-empty string."
+    condition     = var.origin == "aad"
+    error_message = "origin must be \"aad\"."
   }
+}
+
+variable "account_license_type" {
+  description = "License type to assign to the service principal."
+  type        = string
+  default     = "express"
 
   validation {
-    condition = alltrue([
-      for entitlement in var.service_principal_entitlements : (
-        entitlement.origin == null || entitlement.origin == "aad"
-      )
-    ])
-    error_message = "service_principal_entitlements.origin must be \"aad\" when set."
+    condition = contains([
+      "advanced",
+      "earlyAdopter",
+      "express",
+      "none",
+      "professional",
+      "stakeholder",
+      "basic"
+    ], var.account_license_type)
+    error_message = "account_license_type must be a valid Azure DevOps license type."
   }
+}
+
+variable "licensing_source" {
+  description = "Licensing source for the service principal entitlement."
+  type        = string
+  default     = "account"
 
   validation {
-    condition = alltrue([
-      for entitlement in var.service_principal_entitlements : contains([
-        "advanced",
-        "earlyAdopter",
-        "express",
-        "none",
-        "professional",
-        "stakeholder",
-        "basic"
-      ], entitlement.account_license_type)
-    ])
-    error_message = "service_principal_entitlements.account_license_type must be a valid Azure DevOps license type."
-  }
-
-  validation {
-    condition = alltrue([
-      for entitlement in var.service_principal_entitlements : contains([
-        "account",
-        "auto",
-        "msdn",
-        "none",
-        "profile",
-        "trial"
-      ], entitlement.licensing_source)
-    ])
-    error_message = "service_principal_entitlements.licensing_source must be a valid licensing source."
-  }
-
-  validation {
-    condition = length(distinct([
-      for entitlement in var.service_principal_entitlements : coalesce(entitlement.key, entitlement.origin_id)
-    ])) == length(var.service_principal_entitlements)
-    error_message = "service_principal_entitlements keys must be unique (derived from key or origin_id)."
+    condition = contains([
+      "account",
+      "auto",
+      "msdn",
+      "none",
+      "profile",
+      "trial"
+    ], var.licensing_source)
+    error_message = "licensing_source must be a valid licensing source."
   }
 }

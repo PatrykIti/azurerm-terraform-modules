@@ -38,30 +38,22 @@ provider "azuredevops" {}
 module "azuredevops_service_principal_entitlement" {
   source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_service_principal_entitlement?ref=ADOSPEv1.0.0"
 
-  service_principal_entitlements = [
-    {
-      key                  = "service-principal-entitlement"
-      origin_id            = "<service_principal_object_id>"
-      account_license_type = "basic"
-      licensing_source     = "account"
-    }
-  ]
+  origin_id            = "<service_principal_object_id>"
+  account_license_type = "basic"
+  licensing_source     = "account"
 }
 ```
-
-When using list inputs, derived keys default to `key` or `origin_id`. Set an explicit
-`key` to keep a stable import address.
 
 ---
 
 ## 2) Add import blocks
 
 Create `import.tf` and add import blocks for each resource.
-Use the **module address** with the stable key that matches your inputs.
+Use the **module address** for the single entitlement resource.
 
 ```hcl
 import {
-  to = module.azuredevops_service_principal_entitlement.azuredevops_service_principal_entitlement.service_principal_entitlement["service-principal-entitlement"]
+  to = module.azuredevops_service_principal_entitlement.azuredevops_service_principal_entitlement.service_principal_entitlement
   id = "<service_principal_entitlement_id>"
 }
 ```
@@ -98,9 +90,7 @@ When the plan is clean, remove `import.tf`.
 ## Common errors and fixes
 
 - **Plan shows changes after import**: input values do not match existing settings. Align entitlements with current Azure DevOps state.
-- **Unknown key errors**: ensure the derived keys match your list inputs or set explicit `key` values.
 - **Import ID not found**: verify the descriptor or ID in the Azure DevOps UI or API.
-- **Duplicate key validation**: list inputs must have unique derived keys or explicit `key` values.
 
 ## Helpful CLI commands (Azure AD / Azure DevOps)
 

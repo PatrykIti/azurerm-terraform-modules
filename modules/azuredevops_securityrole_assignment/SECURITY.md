@@ -2,13 +2,12 @@
 
 ## Overview
 
-This module manages Azure DevOps security role assignments. Use least privilege and stable keys.
+This module manages Azure DevOps security role assignments. Use least privilege and stable identity IDs.
 
 ## Security Features
 
 - Requires explicit identity IDs for every assignment.
 - Validates scope, resource, and role names are non-empty.
-- Enforces unique keys per assignment to avoid accidental overwrites.
 
 ## Security Configuration Example
 
@@ -16,15 +15,10 @@ This module manages Azure DevOps security role assignments. Use least privilege 
 module "azuredevops_securityrole_assignment" {
   source = "./modules/azuredevops_securityrole_assignment"
 
-  securityrole_assignments = [
-    {
-      key         = "project-reader"
-      scope       = "project"
-      resource_id = "00000000-0000-0000-0000-000000000000"
-      role_name   = "Reader"
-      identity_id = "11111111-1111-1111-1111-111111111111"
-    }
-  ]
+  scope       = "project"
+  resource_id = "00000000-0000-0000-0000-000000000000"
+  role_name   = "Reader"
+  identity_id = "11111111-1111-1111-1111-111111111111"
 }
 ```
 
@@ -38,10 +32,10 @@ module "azuredevops_securityrole_assignment" {
 
 1. Over-privileging shared identities.
 2. Leaving stale assignments active.
-3. Using non-deterministic keys that cause address churn.
+3. Reusing broad roles where least-privilege would be sufficient.
 
 ---
 
 **Module Version**: 0.1.0  
-**Last Updated**: 2025-12-28  
+**Last Updated**: 2026-01-08  
 **Security Contact**: patryk.ciechanski@patrykiti.pl

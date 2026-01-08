@@ -18,14 +18,9 @@ provider "azuredevops" {}
 module "azuredevops_service_principal_entitlement" {
   source = "path/to/azuredevops_service_principal_entitlement"
 
-  service_principal_entitlements = [
-    {
-      key                  = "demo-sp"
-      origin_id            = "00000000-0000-0000-0000-000000000000"
-      account_license_type = "basic"
-      licensing_source     = "account"
-    }
-  ]
+  origin_id            = "00000000-0000-0000-0000-000000000000"
+  account_license_type = "basic"
+  licensing_source     = "account"
 }
 ```
 
@@ -33,7 +28,7 @@ module "azuredevops_service_principal_entitlement" {
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - Minimal service principal entitlement assignment.
-- [Complete](examples/complete) - Service principal entitlement with explicit key.
+- [Complete](examples/complete) - Service principal entitlement with explicit license settings.
 - [Secure](examples/secure) - Example with stakeholder license.
 <!-- END_EXAMPLES -->
 
@@ -72,14 +67,17 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_service_principal_entitlements"></a> [service\_principal\_entitlements](#input\_service\_principal\_entitlements) | List of service principal entitlements to manage. | <pre>list(object({<br/>    key                  = optional(string)<br/>    origin_id            = string<br/>    origin               = optional(string, "aad")<br/>    account_license_type = optional(string, "express")<br/>    licensing_source     = optional(string, "account")<br/>  }))</pre> | `[]` | no |
+| <a name="input_account_license_type"></a> [account\_license\_type](#input\_account\_license\_type) | License type to assign to the service principal. | `string` | `"express"` | no |
+| <a name="input_licensing_source"></a> [licensing\_source](#input\_licensing\_source) | Licensing source for the service principal entitlement. | `string` | `"account"` | no |
+| <a name="input_origin"></a> [origin](#input\_origin) | Origin for the service principal. Only "aad" is supported. | `string` | `"aad"` | no |
+| <a name="input_origin_id"></a> [origin\_id](#input\_origin\_id) | Service principal object ID used to create the entitlement. | `string` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_service_principal_entitlement_descriptors"></a> [service\_principal\_entitlement\_descriptors](#output\_service\_principal\_entitlement\_descriptors) | Map of service principal entitlement descriptors keyed by entitlement key. |
-| <a name="output_service_principal_entitlement_ids"></a> [service\_principal\_entitlement\_ids](#output\_service\_principal\_entitlement\_ids) | Map of service principal entitlement IDs keyed by entitlement key. |
+| <a name="output_service_principal_entitlement_descriptor"></a> [service\_principal\_entitlement\_descriptor](#output\_service\_principal\_entitlement\_descriptor) | The descriptor of the service principal entitlement. |
+| <a name="output_service_principal_entitlement_id"></a> [service\_principal\_entitlement\_id](#output\_service\_principal\_entitlement\_id) | The ID of the service principal entitlement. |
 <!-- END_TF_DOCS -->
 
 ## Additional Documentation
