@@ -23,21 +23,21 @@ Note: `azuredevops_identity` has been split into `azuredevops_group`, `azuredevo
 
 | Module | Tag Prefix | Description |
 | --- | --- | --- |
-| [Azure DevOps Agent Pools](./azuredevops_agent_pools/) (`azuredevops_agent_pools`) | `ADOAP` | Azure DevOps agent pools module for managing pools, queues, and elastic pools |
-| [Azure DevOps Artifacts Feed](./azuredevops_artifacts_feed/) (`azuredevops_artifacts_feed`) | `ADOAF` | Azure DevOps artifacts feed module for managing a feed, retention policies, and permissions |
-| [Azure DevOps Environments](./azuredevops_environments/) (`azuredevops_environments`) | `ADOE` | Azure DevOps environments module for a single environment with optional resources and checks |
-| [Azure DevOps Extension](./azuredevops_extension/) (`azuredevops_extension`) | `ADOEX` | Azure DevOps extension module for managing a single Marketplace extension |
-| [Azure DevOps Group](./azuredevops_group/) (`azuredevops_group`) | `ADOG` | Azure DevOps group module for managing groups, memberships, and group entitlements |
-| [Azure DevOps Security Role Assignment](./azuredevops_securityrole_assignment/) (`azuredevops_securityrole_assignment`) | `ADOSRA` | Azure DevOps module for managing security role assignments |
-| [Azure DevOps Service Principal Entitlement](./azuredevops_service_principal_entitlement/) (`azuredevops_service_principal_entitlement`) | `ADOSPE` | Azure DevOps module for managing service principal entitlements |
-| [Azure DevOps User Entitlement](./azuredevops_user_entitlement/) (`azuredevops_user_entitlement`) | `ADOU` | Azure DevOps module for managing user entitlements |
-| [Azure DevOps Pipelines](./azuredevops_pipelines/) (`azuredevops_pipelines`) | `ADOPI` | Azure DevOps pipelines module for managing a build definition with folders, permissions, and authorizations |
-| [Azure DevOps Project](./azuredevops_project/) (`azuredevops_project`) | `ADOP` | Azure DevOps project module for managing project settings, tags, and dashboards |
-| [Azure DevOps Project Permissions](./azuredevops_project_permissions/) (`azuredevops_project_permissions`) | `ADOPP` | Azure DevOps project permissions module for assigning group permissions |
-| [Azure DevOps Repository](./azuredevops_repository/) (`azuredevops_repository`) | `ADOR` | Azure DevOps repository module for managing a Git repository, branches, permissions, and policies |
-| [Azure DevOps Service Endpoints](./azuredevops_serviceendpoint/) (`azuredevops_serviceendpoint`) | `ADOSE` | Azure DevOps service endpoints module for managing a single service connection and permissions |
-| [Azure DevOps Service Hooks](./azuredevops_servicehooks/) (`azuredevops_servicehooks`) | `ADOSH` | Azure DevOps service hooks module for managing single webhook/storage queue subscriptions and permissions (use module-level for_each for multiples) |
-| [Azure DevOps Team](./azuredevops_team/) (`azuredevops_team`) | `ADOT` | Azure DevOps team module for managing a team, members, and administrators |
-| [Azure DevOps Variable Groups](./azuredevops_variable_groups/) (`azuredevops_variable_groups`) | `ADOVG` | Azure DevOps variable groups module for managing variables, permissions, and optional Key Vault integration |
-| [Azure DevOps Wiki](./azuredevops_wiki/) (`azuredevops_wiki`) | `ADOWI` | Azure DevOps wiki module for managing wikis and pages |
-| [Azure DevOps Work Items](./azuredevops_work_items/) (`azuredevops_work_items`) | `ADOWK` | Azure DevOps work items module for managing work items, processes, queries, and permissions |
+| [Azure DevOps Agent Pools](./azuredevops_agent_pools/) (`azuredevops_agent_pools`) | `ADOAPv` | Azure DevOps agent pools module for managing pools and elastic pools |
+| [Azure DevOps Artifacts Feed](./azuredevops_artifacts_feed/) (`azuredevops_artifacts_feed`) | `ADOAFv` | Azure DevOps artifacts feed module for managing a feed, retention policies, and permissions |
+| [Azure DevOps Environments](./azuredevops_environments/) (`azuredevops_environments`) | `ADOEv` | Azure DevOps environments module for a single environment with optional resources and checks |
+| [Azure DevOps Extension](./azuredevops_extension/) (`azuredevops_extension`) | `ADOEXv` | Azure DevOps extension module for managing a single Marketplace extension |
+| [Azure DevOps Group](./azuredevops_group/) (`azuredevops_group`) | `ADOGv` | Azure DevOps group module for managing groups, memberships, and group entitlements |
+| [Azure DevOps Security Role Assignment](./azuredevops_securityrole_assignment/) (`azuredevops_securityrole_assignment`) | `ADOSRAv` | Azure DevOps module for managing security role assignments |
+| [Azure DevOps Service Principal Entitlement](./azuredevops_service_principal_entitlement/) (`azuredevops_service_principal_entitlement`) | `ADOSPEv` | Azure DevOps module for managing a service principal entitlement |
+| [Azure DevOps User Entitlement](./azuredevops_user_entitlement/) (`azuredevops_user_entitlement`) | `ADOUv` | Azure DevOps module for managing user entitlements |
+| [Azure DevOps Pipelines](./azuredevops_pipelines/) (`azuredevops_pipelines`) | `ADOPIv` | Azure DevOps pipelines module for managing a build definition with folders, permissions, and authorizations |
+| [Azure DevOps Project](./azuredevops_project/) (`azuredevops_project`) | `ADOPv` | Azure DevOps project module for managing project settings, tags, and dashboards |
+| [Azure DevOps Project Permissions](./azuredevops_project_permissions/) (`azuredevops_project_permissions`) | `ADOPPv` | Azure DevOps project permissions module for assigning group permissions |
+| [Azure DevOps Repository](./azuredevops_repository/) (`azuredevops_repository`) | `ADORv` | Azure DevOps repository module for managing a Git repository, branches, permissions, and policies |
+| [Azure DevOps Service Endpoints](./azuredevops_serviceendpoint/) (`azuredevops_serviceendpoint`) | `ADOSEv` | Azure DevOps service endpoints module for managing a single service connection and permissions |
+| [Azure DevOps Service Hooks](./azuredevops_servicehooks/) (`azuredevops_servicehooks`) | `ADOSHv` | Azure DevOps service hooks module for managing single webhook/storage queue subscriptions and permissions (use module-level for_each for multiples) |
+| [Azure DevOps Team](./azuredevops_team/) (`azuredevops_team`) | `ADOTv` | Azure DevOps team module for managing a team, members, and administrators |
+| [Azure DevOps Variable Groups](./azuredevops_variable_groups/) (`azuredevops_variable_groups`) | `ADOVGv` | Azure DevOps variable groups module for managing variables, permissions, and optional Key Vault integration |
+| [Azure DevOps Wiki](./azuredevops_wiki/) (`azuredevops_wiki`) | `ADOWIv` | Azure DevOps wiki module for managing wikis and pages |
+| [Azure DevOps Work Items](./azuredevops_work_items/) (`azuredevops_work_items`) | `ADOWKv` | Azure DevOps work items module for managing work items, processes, queries, and permissions |
