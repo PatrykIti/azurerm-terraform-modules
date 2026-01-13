@@ -1,9 +1,8 @@
 # Azure DevOps Group
 
 locals {
-  # Descriptor/ID of the module-managed group (anchor for all sub-resources)
+  # Descriptor of the module-managed group (anchor for all sub-resources)
   group_descriptor = azuredevops_group.group.descriptor
-  group_id         = azuredevops_group.group.group_id
 
   # Normalized map of memberships keyed by explicit key or descriptor; defaults to module group
   group_memberships = {
