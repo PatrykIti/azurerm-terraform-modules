@@ -16,7 +16,7 @@ resource "azuredevops_group" "member" {
 }
 
 module "azuredevops_group" {
-  source = "../../"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_group?ref=ADOGv1.0.0"
 
   group_display_name = "${var.group_name_prefix}-security"
   group_description  = "Security reviewers"

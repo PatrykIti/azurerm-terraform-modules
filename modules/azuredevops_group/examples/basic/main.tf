@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_group" {
-  source = "../../"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_group?ref=ADOGv1.0.0"
 
   group_display_name = var.group_name_prefix
   group_description  = "Read-only group for demos"
