@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Azure DevOps User Entitlement](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOUv*&label=Azure%20DevOps%20User%20Entitlement&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOUv1.0.0)
 [![Azure DevOps Security Role Assignment](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOSRAv*&label=Azure%20DevOps%20Security%20Role%20Assignment&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOSRAv1.0.0)
 [![Azure DevOps Service Principal Entitlement](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOSPEv*&label=Azure%20DevOps%20Service%20Principal%20Entitlement&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOSPEv1.0.0)
 [![Azure DevOps Group](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOGv*&label=Azure%20DevOps%20Group&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOGv1.0.0)
@@ -110,7 +111,7 @@ Note: `azuredevops_identity` has been split into `azuredevops_group`, `azuredevo
 | [Azure DevOps Group](./modules/azuredevops_group/) | ✅ Completed | [ADOGv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOGv1.0.0) | Azure DevOps group module for managing groups, memberships, and group entitlements |
 | [Azure DevOps Security Role Assignment](./modules/azuredevops_securityrole_assignment/) | ✅ Completed | [ADOSRAv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOSRAv1.0.0) | Azure DevOps module for managing security role assignments |
 | [Azure DevOps Service Principal Entitlement](./modules/azuredevops_service_principal_entitlement/) | ✅ Completed | [ADOSPEv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOSPEv1.0.0) | Azure DevOps module for managing service principal entitlements |
-| [Azure DevOps User Entitlement](./modules/azuredevops_user_entitlement/) | 🚧 In Progress | - | Azure DevOps module for managing user entitlements |
+| [Azure DevOps User Entitlement](./modules/azuredevops_user_entitlement/) | ✅ Completed | [ADOUv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOUv1.0.0) | Azure DevOps module for managing user entitlements |
 | [Azure DevOps Pipelines](./modules/azuredevops_pipelines/) | ✅ Completed | [ADOPI1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPI1.0.0) | Azure DevOps pipelines module for managing build definitions, folders, permissions, and authorizations |
 | [Azure DevOps Project](./modules/azuredevops_project/) | ✅ Completed | [ADOPv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPv1.0.0) | Azure DevOps project module for managing project settings, tags, and dashboards |
 | [Azure DevOps Project Permissions](./modules/azuredevops_project_permissions/) | ✅ Completed | [ADOPPv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPPv1.0.0) | Azure DevOps project permissions module for assigning group permissions |

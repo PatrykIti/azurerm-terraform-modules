@@ -27,7 +27,7 @@ locals {
 }
 
 module "azuredevops_user_entitlement" {
-  source   = "../../"
+  source   = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_user_entitlement?ref=ADOUv1.0.0"
   for_each = local.user_entitlements
 
   user_entitlement = merge(each.value, { key = each.key })
