@@ -106,7 +106,7 @@ func TestAzuredevopsGroupValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "group_memberships.group_descriptor must be a non-empty string")
+	assert.Contains(t, err.Error(), "group_memberships.group_descriptor must be a non-empty string when set.")
 }
 
 // Helper function to get terraform options
