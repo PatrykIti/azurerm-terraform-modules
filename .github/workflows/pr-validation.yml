@@ -170,7 +170,11 @@ jobs:
             azuredevops-artifacts-feed
             azuredevops-environments
             azuredevops-extension
-            azuredevops-identity
+            # Azure DevOps identity split scopes
+            azuredevops-group
+            azuredevops-service-principal-entitlement
+            azuredevops-securityrole-assignment
+            azuredevops-user-entitlement
             azuredevops-pipelines
             azuredevops-project
             azuredevops-project-permissions

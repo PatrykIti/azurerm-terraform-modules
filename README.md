@@ -28,7 +28,6 @@
 [![Azure DevOps Service Hooks](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOSH*&label=Azure%20DevOps%20Service%20Hooks&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOSH1.0.0)
 [![Azure DevOps Service Endpoints](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOSE*&label=Azure%20DevOps%20Service%20Endpoints&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOSE1.0.0)
 [![Azure DevOps Pipelines](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOPI*&label=Azure%20DevOps%20Pipelines&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPI1.0.0)
-[![Azure DevOps Identity](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOI*&label=Azure%20DevOps%20Identity&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOI1.0.0)
 <!-- MODULE BADGES END -->
 
 A comprehensive collection of production-ready Terraform modules for Azure and Azure DevOps, aligned with HashiCorp best practices and security-first defaults.
@@ -97,13 +96,18 @@ module "storage_account" {
 
 ### Azure DevOps Modules
 
+Note: `azuredevops_identity` has been split into `azuredevops_group`, `azuredevops_user_entitlement`, `azuredevops_service_principal_entitlement`, and `azuredevops_securityrole_assignment`.
+
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
 | [Azure DevOps Agent Pools](./modules/azuredevops_agent_pools/) | ✅ Completed | [ADOAPv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAPv1.0.0) | Azure DevOps agent pools module for managing pools, queues, and elastic pools |
 | [Azure DevOps Artifacts Feed](./modules/azuredevops_artifacts_feed/) | ✅ Completed | [ADOAFv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAFv1.0.0) | Azure DevOps artifacts feed module for managing feeds, retention, and permissions |
 | [Azure DevOps Environments](./modules/azuredevops_environments/) | ✅ Completed | [ADOEv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOEv1.0.0) | Azure DevOps environments module for managing environments, resources, and checks |
 | [Azure DevOps Extension](./modules/azuredevops_extension/) | ✅ Completed | [ADOEXv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOEXv1.0.0) | Azure DevOps extension module for managing Marketplace extensions |
-| [Azure DevOps Identity](./modules/azuredevops_identity/) | ✅ Completed | [ADOI1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOI1.0.0) | Azure DevOps identity module for managing groups, entitlements, memberships, and role assignments |
+| [Azure DevOps Group](./modules/azuredevops_group/) | 🚧 In Progress | - | Azure DevOps group module for managing groups, memberships, and group entitlements |
+| [Azure DevOps Security Role Assignment](./modules/azuredevops_securityrole_assignment/) | 🚧 In Progress | - | Azure DevOps module for managing security role assignments |
+| [Azure DevOps Service Principal Entitlement](./modules/azuredevops_service_principal_entitlement/) | 🚧 In Progress | - | Azure DevOps module for managing service principal entitlements |
+| [Azure DevOps User Entitlement](./modules/azuredevops_user_entitlement/) | 🚧 In Progress | - | Azure DevOps module for managing user entitlements |
 | [Azure DevOps Pipelines](./modules/azuredevops_pipelines/) | ✅ Completed | [ADOPI1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPI1.0.0) | Azure DevOps pipelines module for managing build definitions, folders, permissions, and authorizations |
 | [Azure DevOps Project](./modules/azuredevops_project/) | ✅ Completed | [ADOPv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPv1.0.0) | Azure DevOps project module for managing project settings, tags, and dashboards |
 | [Azure DevOps Project Permissions](./modules/azuredevops_project_permissions/) | ✅ Completed | [ADOPPv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPPv1.0.0) | Azure DevOps project permissions module for assigning group permissions |

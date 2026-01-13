@@ -135,6 +135,7 @@ azurerm-terraform-modules/
 - Uses `amannn/action-semantic-pull-request@v6`.
 - Enforces conventional commit style.
 - Scopes include module names and core tooling scopes (manually maintained).
+- Identity split scopes added: `azuredevops-group`, `azuredevops-user-entitlement`, `azuredevops-service-principal-entitlement`, `azuredevops-securityrole-assignment`.
 
 #### `terraform-fmt` (matrix)
 - Runs `terraform fmt -check -recursive` across module subdirs containing `.tf`.
