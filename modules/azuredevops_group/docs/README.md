@@ -18,7 +18,8 @@ This module manages Azure DevOps groups with memberships and group entitlements.
 
 ## Inputs (Highlights)
 
-- Required: None.
+- Required: exactly one of `group_display_name`, `group_origin_id`, or `group_mail`.
+- `group_scope` is valid only when `group_display_name` is set.
 - Optional: see `../README.md` and `../variables.tf`.
 
 ## Outputs (Highlights)

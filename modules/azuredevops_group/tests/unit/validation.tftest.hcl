@@ -1,4 +1,4 @@
-# Test variable validation for Azure DevOps Identity
+# Test variable validation for Azure DevOps Group
 
 mock_provider "azuredevops" {}
 

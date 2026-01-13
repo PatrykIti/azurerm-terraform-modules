@@ -23,6 +23,8 @@ module "azuredevops_group" {
 }
 ```
 
+Select exactly one group selector: `group_display_name` (create new) or `group_origin_id`/`group_mail` (attach existing). `group_scope` applies only when creating a new group.
+
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
@@ -70,7 +72,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_group_description"></a> [group\_description](#input\_group\_description) | Optional description for the Azure DevOps group; stored only when creating a new group with display\_name. | `string` | `null` | no |
-| <a name="input_group_display_name"></a> [group\_display\_name](#input\_group\_display\_name) | Display name (logical name) for the Azure DevOps group. Required for group creation and used as the anchor when group\_descriptor is not provided elsewhere. | `string` | n/a | yes |
+| <a name="input_group_display_name"></a> [group\_display\_name](#input\_group\_display\_name) | Display name (logical name) for a new Azure DevOps group. Exactly one of group\_display\_name, group\_origin\_id, or group\_mail must be set. | `string` | `null` | no |
 | <a name="input_group_entitlements"></a> [group\_entitlements](#input\_group\_entitlements) | List of group entitlements to manage for the target group. Each item must select by display\_name or origin+origin\_id; stable keys recommended. | <pre>list(object({<br/>    key                  = optional(string)<br/>    display_name         = optional(string)<br/>    origin               = optional(string)<br/>    origin_id            = optional(string)<br/>    account_license_type = optional(string, "express")<br/>    licensing_source     = optional(string, "account")<br/>  }))</pre> | `[]` | no |
 | <a name="input_group_mail"></a> [group\_mail](#input\_group\_mail) | Mail address selector for an existing external group to attach instead of creating a new group (mutually exclusive with display\_name/origin\_id). | `string` | `null` | no |
 | <a name="input_group_memberships"></a> [group\_memberships](#input\_group\_memberships) | List of group membership assignments. Defaults to the module-managed group when group\_descriptor is omitted; each item must include at least one member\_descriptor and a stable key/descriptor. | <pre>list(object({<br/>    key                = optional(string)<br/>    group_descriptor   = optional(string)<br/>    member_descriptors = optional(list(string), [])<br/>    mode               = optional(string, "add")<br/>  }))</pre> | `[]` | no |

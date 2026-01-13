@@ -3,12 +3,22 @@
 # -----------------------------------------------------------------------------
 
 variable "group_display_name" {
-  description = "Display name (logical name) for the Azure DevOps group. Required for group creation and used as the anchor when group_descriptor is not provided elsewhere."
+  description = "Display name (logical name) for a new Azure DevOps group. Exactly one of group_display_name, group_origin_id, or group_mail must be set."
   type        = string
+  default     = null
 
   validation {
-    condition     = trimspace(var.group_display_name) != ""
-    error_message = "group_display_name must be a non-empty string."
+    condition     = var.group_display_name == null || trimspace(var.group_display_name) != ""
+    error_message = "group_display_name must be a non-empty string when set."
+  }
+
+  validation {
+    condition = length([
+      for selector in [var.group_display_name, var.group_origin_id, var.group_mail] :
+      selector
+      if selector != null && trimspace(selector) != ""
+    ]) == 1
+    error_message = "Exactly one of group_display_name, group_origin_id, or group_mail must be set."
   }
 }
 

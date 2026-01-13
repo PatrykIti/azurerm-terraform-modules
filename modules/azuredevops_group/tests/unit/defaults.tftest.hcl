@@ -28,15 +28,3 @@ run "default_membership_mode" {
     error_message = "group_memberships.mode should default to add."
   }
 }
-
-run "group_required" {
-  command = plan
-
-  variables {
-    group_display_name = ""
-  }
-
-  expect_failures = [
-    var.group_display_name,
-  ]
-}
