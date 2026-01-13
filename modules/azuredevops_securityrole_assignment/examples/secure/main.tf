@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_securityrole_assignment" {
-  source = "../../"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_securityrole_assignment?ref=ADOSRAv1.0.0"
 
   scope       = var.scope
   resource_id = var.resource_id
