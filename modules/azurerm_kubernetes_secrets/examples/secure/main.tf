@@ -184,7 +184,7 @@ resource "helm_release" "external_secrets" {
 }
 
 module "kubernetes_secrets" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_secrets?ref=AKSS1.0.0"
+  source = "../.."
 
   strategy  = "eso"
   namespace = kubernetes_namespace_v1.app.metadata[0].name
