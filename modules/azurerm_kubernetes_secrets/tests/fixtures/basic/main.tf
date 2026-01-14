@@ -121,14 +121,12 @@ module "kubernetes_secrets" {
   name      = "app-secrets"
 
   manual = {
-    key_vault_id           = azurerm_key_vault.test.id
     kubernetes_secret_type = "Opaque"
     secrets = [
       {
-        name                     = "db-password"
-        key_vault_secret_name    = azurerm_key_vault_secret.db_password.name
-        key_vault_secret_version = null
-        kubernetes_secret_key    = "DB_PASSWORD"
+        name                  = "db-password"
+        kubernetes_secret_key = "DB_PASSWORD"
+        value                 = azurerm_key_vault_secret.db_password.value
       }
     ]
   }

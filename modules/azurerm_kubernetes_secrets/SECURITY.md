@@ -13,9 +13,10 @@ Each strategy has different security implications. Choose based on your threat m
 ## Strategy Security Notes
 
 ### Manual (KV → TF → K8s Secret)
+- **Caller-provided values**: the module does not read from Key Vault; fetch or generate secrets in your root config.
 - **Secrets in Terraform state**: values are stored in state; use a secure backend and strict RBAC.
 - **Plan output**: avoid logging or sharing plan output if it contains sensitive values.
-- **Rotation**: manual rotation by updating `key_vault_secret_version` and applying.
+- **Rotation**: update the provided secret value (for example by pinning a new Key Vault version in the caller) and apply.
 
 ### CSI (SecretProviderClass)
 - **Runtime access**: secrets are retrieved at runtime; state does **not** contain values.
@@ -50,7 +51,7 @@ Each strategy has different security implications. Choose based on your threat m
 If a secret is suspected to be compromised:
 
 1. Rotate in Key Vault.
-2. For manual: update `key_vault_secret_version` and apply.
+2. For manual: update the provided value (or its source) and apply.
 3. For CSI/ESO: refresh/sync and redeploy workloads.
 4. Audit access logs and update RBAC policies.
 

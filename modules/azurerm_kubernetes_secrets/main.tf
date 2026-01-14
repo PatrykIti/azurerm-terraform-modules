@@ -65,16 +65,8 @@ locals {
 }
 
 # -----------------------------------------------------------------------------
-# Manual Strategy (KV -> TF -> K8s Secret)
+# Manual Strategy (caller-provided values -> K8s Secret)
 # -----------------------------------------------------------------------------
-
-data "azurerm_key_vault_secret" "manual" {
-  for_each = local.manual_secrets
-
-  name         = each.value.key_vault_secret_name
-  key_vault_id = try(var.manual.key_vault_id, null)
-  version      = try(each.value.key_vault_secret_version, null)
-}
 
 resource "kubernetes_secret_v1" "manual" {
   count = local.is_manual ? 1 : 0
@@ -90,7 +82,7 @@ resource "kubernetes_secret_v1" "manual" {
 
   data = local.is_manual ? {
     for key, secret in local.manual_secrets :
-    secret.kubernetes_secret_key => data.azurerm_key_vault_secret.manual[key].value
+    secret.kubernetes_secret_key => secret.value
   } : {}
 }
 
