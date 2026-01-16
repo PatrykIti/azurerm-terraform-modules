@@ -71,21 +71,18 @@ variable "annotations" {
 
 variable "manual" {
   description = <<-EOT
-    Manual strategy configuration (KV -> Terraform -> Kubernetes Secret).
+    Manual strategy configuration (caller-provided values -> Kubernetes Secret).
 
-    key_vault_id: Key Vault ID to read secrets from.
     kubernetes_secret_type: Kubernetes Secret type (default: Opaque).
-    secrets: List of mappings from Key Vault secrets to Kubernetes Secret keys.
+    secrets: List of mappings from provided values to Kubernetes Secret keys.
   EOT
 
   type = object({
-    key_vault_id           = string
     kubernetes_secret_type = optional(string, "Opaque")
     secrets = list(object({
-      name                     = string
-      key_vault_secret_name    = string
-      key_vault_secret_version = optional(string)
-      kubernetes_secret_key    = string
+      name                  = string
+      kubernetes_secret_key = string
+      value                 = string
     }))
   })
 

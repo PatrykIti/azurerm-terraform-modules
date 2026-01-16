@@ -1,12 +1,12 @@
 # Basic AKS Secrets Example (manual)
 
-This example demonstrates the **manual** strategy: Key Vault → Terraform → Kubernetes Secret.
+This example demonstrates the **manual** strategy with caller-provided values: Key Vault → Terraform → Kubernetes Secret.
 
 ## Features
 
 - Creates a minimal AKS cluster
-- Reads a secret from Azure Key Vault
-- Creates a Kubernetes Secret via Terraform
+- Reads a secret from Azure Key Vault in the root configuration
+- Passes the secret value into the module to create a Kubernetes Secret
 
 ## Notes
 

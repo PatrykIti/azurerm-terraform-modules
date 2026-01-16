@@ -2,6 +2,6 @@
   "name": "azurerm_kubernetes_secrets",
   "title": "Kubernetes Secrets",
   "commit_scope": "kubernetes-secrets",
-  "tag_prefix": "AKSS",
+  "tag_prefix": "AKSSv",
   "description": "Azure Kubernetes Secrets Terraform module with enterprise-grade features"
 }
