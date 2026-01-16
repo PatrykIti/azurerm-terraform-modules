@@ -118,7 +118,7 @@ resource "azurerm_key_vault_secret" "db_password" {
 }
 
 module "kubernetes_secrets" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_secrets?ref=AKSSv1.0.0"
 
   strategy  = "manual"
   namespace = kubernetes_namespace_v1.app.metadata[0].name
