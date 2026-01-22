@@ -16,7 +16,7 @@ func BenchmarkPostgresqlFlexibleServerCreationSimple(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 		b.StartTimer()
@@ -49,7 +49,7 @@ func BenchmarkPostgresqlFlexibleServerCreationWithFeatures(b *testing.B) {
 		b.Run(fc.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 				terraformOptions.Vars["sku_name"] = fc.skuName
 				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -84,7 +84,7 @@ func BenchmarkPostgresqlFlexibleServerParallelCreation(b *testing.B) {
 			b.RunParallel(func(pb *testing.PB) {
 				i := 0
 				for pb.Next() {
-					testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+					testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 					terraformOptions := getTerraformOptions(b, testFolder)
 					terraformOptions.Vars["random_suffix"] = fmt.Sprintf("par%d%d%s", parallel, i, terraformOptions.Vars["random_suffix"].(string)[:5])
 
@@ -109,7 +109,7 @@ func TestPostgresqlFlexibleServerCreationTime(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	defer terraform.Destroy(t, terraformOptions)
 
@@ -134,7 +134,7 @@ func TestPostgresqlFlexibleServerScaling(t *testing.T) {
 	creationTimes := make([]time.Duration, instanceCount)
 
 	for i := 0; i < instanceCount; i++ {
-		testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(t, testFolder)
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("scale%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 
@@ -166,7 +166,7 @@ func TestPostgresqlFlexibleServerUpdatePerformance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	defer terraform.Destroy(t, terraformOptions)
 
@@ -212,7 +212,7 @@ func TestPostgresqlFlexibleServerDestroyPerformance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	terraform.InitAndApply(t, terraformOptions)
