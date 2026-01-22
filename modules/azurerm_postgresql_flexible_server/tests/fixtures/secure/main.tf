@@ -111,7 +111,7 @@ module "postgresql_flexible_server" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  sku_name           = "Standard_D2s_v3"
+  sku_name           = "GP_Standard_D2s_v3"
   postgresql_version = "15"
 
   administrator_login    = "pgfsadmin"

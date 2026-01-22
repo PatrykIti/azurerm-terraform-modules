@@ -29,9 +29,10 @@ locals {
   identity_ids               = try(var.identity.identity_ids, null)
   identity_has_user_assigned = local.identity_type == "UserAssigned" || local.identity_type == "SystemAssigned, UserAssigned"
 
-  active_directory_tenant_id = coalesce(
-    try(var.active_directory_administrator.tenant_id, null),
-    try(local.authentication.tenant_id, null)
+  active_directory_tenant_id = try(
+    var.active_directory_administrator.tenant_id,
+    local.authentication.tenant_id,
+    null
   )
 }
 

@@ -19,7 +19,7 @@ variable "server_name" {
 variable "sku_name" {
   description = "SKU name for the PostgreSQL Flexible Server."
   type        = string
-  default     = "Standard_D2s_v3"
+  default     = "GP_Standard_D2s_v3"
 }
 
 variable "postgresql_version" {

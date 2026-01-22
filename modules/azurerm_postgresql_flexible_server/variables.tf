@@ -20,7 +20,7 @@ variable "location" {
 }
 
 variable "sku_name" {
-  description = "The SKU name for the PostgreSQL Flexible Server (e.g., Standard_D2s_v3)."
+  description = "The SKU name for the PostgreSQL Flexible Server (e.g., GP_Standard_D2s_v3)."
   type        = string
 
   validation {

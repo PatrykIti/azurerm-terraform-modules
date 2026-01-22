@@ -58,7 +58,7 @@ Create `terraform.tfvars` with real values:
 server_name          = "pgfs-prod"
 resource_group_name  = "rg-database-prod"
 location             = "westeurope"
-sku_name             = "Standard_D2s_v3"
+sku_name             = "GP_Standard_D2s_v3"
 postgresql_version   = "15"
 administrator_login  = "pgfsadmin"
 administrator_password = "<secret>"

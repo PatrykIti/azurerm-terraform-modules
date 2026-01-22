@@ -41,8 +41,8 @@ func BenchmarkPostgresqlFlexibleServerCreationWithFeatures(b *testing.B) {
 		name    string
 		skuName string
 	}{
-		{name: "Standard_D2s_v3", skuName: "Standard_D2s_v3"},
-		{name: "Standard_D4s_v3", skuName: "Standard_D4s_v3"},
+		{name: "GP_Standard_D2s_v3", skuName: "GP_Standard_D2s_v3"},
+		{name: "GP_Standard_D4s_v3", skuName: "GP_Standard_D4s_v3"},
 	}
 
 	for _, fc := range featureConfigs {
