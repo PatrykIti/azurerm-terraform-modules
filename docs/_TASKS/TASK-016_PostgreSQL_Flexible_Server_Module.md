@@ -33,6 +33,8 @@ udokumentowane.
 - `azurerm_postgresql_flexible_server_configuration`
 - `azurerm_postgresql_flexible_server_firewall_rule`
 - `azurerm_postgresql_flexible_server_active_directory_administrator`
+- `azurerm_postgresql_flexible_server_virtual_endpoint`
+- `azurerm_postgresql_flexible_server_backup_threat_detection_policy` (nazwa do potwierdzenia)
 - `azurerm_monitor_diagnostic_setting`
 
 **Potwierdzone w providerze (azurerm 4.57.0, scan binarki):**
@@ -41,8 +43,8 @@ udokumentowane.
 - `azurerm_postgresql_flexible_server_configuration`
 - `azurerm_postgresql_flexible_server_firewall_rule`
 - `azurerm_postgresql_flexible_server_database` (out-of-scope, osobny modul)
-- `azurerm_postgresql_flexible_server_virtual_endpoint` (out-of-scope)
-- `azurerm_postgresql_flexible_server_backup_threat_detection_policy` (nazwa do potwierdzenia; binarka wskazuje `backupthreat`, out-of-scope)
+- `azurerm_postgresql_flexible_server_virtual_endpoint`
+- `azurerm_postgresql_flexible_server_backup_threat_detection_policy` (nazwa do potwierdzenia; binarka wskazuje `backupthreat`)
 
 ---
 
@@ -50,8 +52,9 @@ udokumentowane.
 
 1) **Atomic scope**  
    Modul zarzadza jednym serwerem jako primary resource. Dodatkowe zasoby tylko
-   wtedy, gdy sa bezposrednio zwiazane z serwerem: konfiguracje, firewall, AAD admin,
-   diagnostic settings. Bazy sa osobnym modulem.
+   wtedy, gdy sa zwiazane z serwerem: konfiguracje, firewall, AAD admin,
+   virtual endpoint, backup threat detection policy, diagnostic settings.
+   Bazy sa osobnym modulem.
 
 2) **Brak cross-resource glue**  
    Poza modulem: private endpoints, VNet links, RBAC/role assignments, Key Vault,
@@ -73,6 +76,7 @@ udokumentowane.
 - Compute/Version/SKU (tier/size)
 - Storage (size, tier, auto-grow/iops jesli wspierane)
 - Backup (retention, geo-redundant backup)
+- Backup threat detection policy (jesli wspierane)
 - High availability (mode + standby zone)
 - Maintenance window
 - Network (public access toggle, delegated subnet, private DNS zone)
@@ -82,6 +86,7 @@ udokumentowane.
 - Customer managed keys (primary + geo backup)
 - Create modes (Default / PointInTimeRestore / GeoRestore / Replica)
 - Configurations, firewall rules, AAD admin
+- Virtual endpoint (replica routing / read-only, jesli wspierane)
 - Diagnostic settings (log/metric categories, filters)
 - Tags i timeouts
 
@@ -99,6 +104,7 @@ udokumentowane.
 - Potwierdzic dokladne nazwy oraz status wsparcia dla:
   - `azurerm_postgresql_flexible_server_virtual_endpoint`
   - `azurerm_postgresql_flexible_server_backup_threat_detection_policy`
+- Potwierdzic, ze oba resource'y sa server-scope (nie database-scope).
 - Spisac finalny zestaw pol i ograniczen (allowed values, required combos).
 - Zaktualizowac listy walidacji, preconditions i examples na bazie realnych pol.
 
@@ -114,7 +120,7 @@ udokumentowane.
 - [ ] `module.json`:
   - name: `azurerm_postgresql_flexible_server`
   - commit_scope: `postgresql-flexible-server`
-  - tag_prefix: np. `PGFv` (potwierdzic)
+  - tag_prefix: `PGFSv`
 - [ ] `versions.tf` z `azurerm` 4.57.0 + TF >= 1.12.2.
 - [ ] `.releaserc.js`, `.terraform-docs.yml`, `Makefile`, `generate-docs.sh`
       zgodne z AKS.
@@ -170,7 +176,7 @@ udokumentowane.
 
 ---
 
-### TASK-016-4: Sub-resources (configurations, firewall, AAD admin)
+### TASK-016-4: Sub-resources (configurations, firewall, AAD admin, virtual endpoint, backup threat detection)
 
 **Cel:** Pelne wsparcie sub-resources zwiazanych z serwerem.
 
@@ -180,11 +186,14 @@ udokumentowane.
 - `active_directory_administrator`: object({
     principal_name, object_id, principal_type, tenant_id
   }) lub list (jesli provider wspiera)
+- `virtual_endpoints`: object lub list (zgodnie z provider schema)
+- `backup_threat_detection_policy`: object (zgodnie z provider schema)
 
 **Wymagania:**
 - `for_each` po `name` + walidacja unikalnosci.
 - Walidacje zakresow (np. IP, nazw DB).
 - AAD admin tylko gdy `authentication.active_directory_auth_enabled = true`.
+- Walidacje i preconditions dla virtual endpoint / threat detection zgodnie z schema.
 
 ---
 
@@ -235,6 +244,8 @@ udokumentowane.
 - `examples/firewall-rules` (public)
 - `examples/aad-auth`
 - `examples/customer-managed-key`
+- `examples/virtual-endpoint`
+- `examples/backup-threat-detection-policy`
 
 **Wymagania wspolne:**
 - `source = "../.."`, stale nazwy, `README.md` + `.terraform-docs.yml`.
@@ -255,7 +266,8 @@ udokumentowane.
 
 **Integration / Terratest:**
 - fixtures: `basic`, `complete`, `secure`, `aad-auth`, `configurations`,
-  `diagnostic-settings`, `replica`, `point-in-time-restore`.
+  `diagnostic-settings`, `replica`, `point-in-time-restore`,
+  `virtual-endpoint`, `backup-threat-detection-policy`.
 - weryfikacja:
   - stan serwera (HA, backup, network, version)
   - configs + firewall rules
