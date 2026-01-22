@@ -1,19 +1,17 @@
 # Complete PostgreSQL Flexible Server Example
 
-This example demonstrates a comprehensive deployment of PostgreSQL Flexible Server with all available features and configurations.
+This example demonstrates a comprehensive PostgreSQL Flexible Server
+configuration with diagnostics, HA, maintenance window, firewall rules, and
+server configurations.
 
 ## Features
 
-- Full postgresql_flexible_server configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
-
-## Key Configuration
-
-This comprehensive example showcases all available features of the postgresql_flexible_server module, demonstrating enterprise-grade capabilities suitable for production environments.
+- Zone-redundant high availability.
+- Maintenance window scheduling.
+- Storage tier and backup tuning.
+- Firewall rules for public access.
+- Diagnostic settings streamed to Log Analytics.
+- Example server configurations.
 
 ## Usage
 

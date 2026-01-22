@@ -2,166 +2,87 @@
 
 ## Overview
 
-This document details the security features and configurations available in the azurerm_postgresql_flexible_server Terraform module. The module implements comprehensive security controls following Azure best practices.
+This document describes the security controls supported by the
+`azurerm_postgresql_flexible_server` module and recommended hardening options.
 
 ## Security Features
 
-### 1. **Encryption**
+### 1) Network Isolation
 
-#### At Rest
-- **Default**: All data encrypted at rest using Azure-managed keys
-- **Infrastructure Encryption**: Additional layer of encryption when supported
-- **Customer-Managed Keys**: Optional BYOK support (if applicable)
+- **Private access**: Use `network.public_network_access_enabled = false` and
+  supply `network.delegated_subnet_id` plus `network.private_dns_zone_id`.
+- **Firewall rules**: When public access is enabled, restrict inbound access via
+  `firewall_rules` using explicit allow-list IP ranges.
 
-#### In Transit
-- **HTTPS/TLS**: All communications encrypted in transit
-- **Minimum TLS Version**: TLS 1.2 enforced by default
+### 2) Authentication and Identity
 
-### 2. **Access Control**
+- **Password authentication**: Enabled by default; provide secure credentials.
+- **Microsoft Entra ID (Azure AD)**: Enable with
+  `authentication.active_directory_auth_enabled = true` and configure
+  `active_directory_administrator`.
+- **Managed identity**: Supports system and user-assigned identities to access
+  external services (for example, Key Vault for CMK).
 
-#### Authentication
-- **Azure AD Integration**: Preferred authentication method
-- **Managed Identity**: Support for system and user-assigned identities
-- **Key-based Access**: Disabled by default where possible
+### 3) Customer-Managed Keys (CMK)
 
-#### Network Security
-- **Private Endpoints**: Support for private connectivity
-- **Network Rules**: Default deny with explicit allow rules
-- **Service Endpoints**: Virtual network integration
+- **BYOK support**: Configure `customer_managed_key` with a Key Vault key URL.
+- **User-assigned identity required**: The identity must have access to the key.
 
-### 3. **Monitoring and Compliance**
+### 4) Backup and Resilience
 
-#### Audit Logging
-- **Diagnostic Settings**: Comprehensive logging to Log Analytics
-- **Activity Tracking**: All operations logged
-- **Metrics**: Performance and security metrics collected
+- **Retention**: `backup.retention_days` supports 7-35 days.
+- **Geo-redundant backups**: Enable with `backup.geo_redundant_backup_enabled`.
 
-#### Compliance
-- **Azure Policy**: Compatible with organizational policies
-- **Security Center**: Integration ready
-- **Threat Protection**: Microsoft Defender support where applicable
+### 5) Monitoring and Auditing
 
-## Security Configuration Examples
+- **Diagnostic settings**: Stream logs and metrics to Log Analytics, Storage, or
+  Event Hub with `diagnostic_settings`.
 
-### Maximum Security Configuration
-```hcl
-module "postgresql_flexible_server" {
-  source = "./modules/azurerm_postgresql_flexible_server"
+## Secure Configuration Example
 
-  name                = "example-secure"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-
-  # Security settings
-  enable_https_traffic_only = true
-  min_tls_version          = "TLS1_2"
-  
-  # Network isolation
-  network_rules = {
-    default_action = "Deny"
-    ip_rules       = []
-    bypass         = ["AzureServices"]
-  }
-
-  # Private endpoint
-  private_endpoints = [{
-    name                 = "example-pe"
-    subnet_id            = azurerm_subnet.private.id
-    private_dns_zone_ids = [azurerm_private_dns_zone.example.id]
-  }]
-
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-  }
-
-  tags = {
-    Environment        = "Production"
-    DataClassification = "Confidential"
-  }
-}
-```
+A hardened deployment is provided in `examples/secure`, which includes:
+- Private networking (delegated subnet + private DNS zone)
+- Entra ID authentication
+- Customer-managed key encryption
+- Geo-redundant backups
 
 ## Security Hardening Checklist
 
 Before deploying to production:
 
-- [ ] Enable all applicable encryption features
-- [ ] Configure network isolation (private endpoints/service endpoints)
-- [ ] Disable public network access where possible
-- [ ] Enable audit logging and monitoring
-- [ ] Apply appropriate RBAC permissions
-- [ ] Configure Azure Policy compliance
-- [ ] Enable threat protection features
-- [ ] Review and apply security tags
-- [ ] Document security exceptions
+- [ ] Disable public network access or restrict firewall rules to known IPs
+- [ ] Enable Entra ID authentication and configure an admin principal
+- [ ] Use a strong administrator password and rotate regularly
+- [ ] Enable CMK encryption where required
+- [ ] Configure diagnostic settings and retain logs centrally
+- [ ] Set backup retention and geo-redundant backups according to policy
 
 ## Common Security Mistakes to Avoid
 
-1. **Leaving Public Access Enabled**
+1) **Public access without firewall rules**
    ```hcl
-   # ❌ AVOID
-   public_network_access_enabled = true
-   ```
-
-2. **Using Weak TLS Versions**
-   ```hcl
-   # ❌ AVOID
-   min_tls_version = "TLS1_0"
-   ```
-
-3. **Overly Permissive Network Rules**
-   ```hcl
-   # ❌ AVOID
-   network_rules = {
-     default_action = "Allow"
+   # Avoid leaving public access open with no firewall rules
+   network = {
+     public_network_access_enabled = true
    }
    ```
 
-## Incident Response
+2) **Entra ID auth without admin**
+   ```hcl
+   # Avoid enabling AAD without active_directory_administrator
+   authentication = {
+     active_directory_auth_enabled = true
+   }
+   ```
 
-If a security incident occurs:
-
-1. **Immediate Actions**
-   - Review audit logs
-   - Check for unauthorized access
-   - Apply additional network restrictions
-
-2. **Investigation**
-   - Use Log Analytics queries
-   - Review security alerts
-   - Check configuration compliance
-
-3. **Remediation**
-   - Apply security patches
-   - Update configurations
-   - Document lessons learned
-
-## Compliance Mapping
-
-### SOC 2 Controls
-| Control | Implementation |
-|---------|---------------|
-| CC6.1 | RBAC and Azure AD |
-| CC6.6 | Encryption at rest/transit |
-| CC7.2 | Diagnostic logging |
-
-### ISO 27001 Controls
-| Control | Implementation |
-|---------|---------------|
-| A.10.1.1 | Cryptographic controls |
-| A.9.1.2 | Network access controls |
-| A.12.4.1 | Event logging |
-
-## Additional Resources
-
-- [Azure Security Best Practices](https://docs.microsoft.com/en-us/azure/security/fundamentals/best-practices-and-patterns)
-- [Azure Security Center](https://docs.microsoft.com/en-us/azure/security-center/)
-- [Azure Policy](https://docs.microsoft.com/en-us/azure/governance/policy/)
+3) **CMK without identity access**
+   ```hcl
+   # Avoid setting CMK without a user-assigned identity
+   customer_managed_key = {
+     key_vault_key_id = "https://.../keys/key/version"
+   }
+   ```
 
 ---
 
-**Module Version**: 1.0.0  
-**Last Updated**: 2026-01-22  
-**Security Contact**: security@yourorganization.com
+**Module Version**: vUnreleased

@@ -1,74 +1,64 @@
 output "id" {
-  description = "The ID of the PostgreSQL Flexible Server"
-  value       = try(azurerm_postgresql_flexible_server.main.id, null)
+  description = "The ID of the PostgreSQL Flexible Server."
+  value       = try(azurerm_postgresql_flexible_server.postgresql_flexible_server.id, null)
 }
 
 output "name" {
-  description = "The name of the PostgreSQL Flexible Server"
-  value       = try(azurerm_postgresql_flexible_server.main.name, null)
+  description = "The name of the PostgreSQL Flexible Server."
+  value       = try(azurerm_postgresql_flexible_server.postgresql_flexible_server.name, null)
 }
 
 output "location" {
-  description = "The primary location of the postgresql_flexible_server"
-  value       = try(azurerm_postgresql_flexible_server.main.location, null)
+  description = "The location of the PostgreSQL Flexible Server."
+  value       = try(azurerm_postgresql_flexible_server.postgresql_flexible_server.location, null)
 }
 
 output "resource_group_name" {
-  description = "The name of the resource group containing the PostgreSQL Flexible Server"
-  value       = try(azurerm_postgresql_flexible_server.main.resource_group_name, null)
+  description = "The name of the resource group containing the PostgreSQL Flexible Server."
+  value       = try(azurerm_postgresql_flexible_server.postgresql_flexible_server.resource_group_name, null)
 }
 
-# TODO: Add specific outputs based on the resource type
-# Example outputs for common Azure resources:
-
-# output "primary_endpoint" {
-#   description = "The endpoint URL for the primary location"
-#   value       = try(azurerm_postgresql_flexible_server.main.primary_endpoint, null)
-# }
-
-# output "secondary_endpoint" {
-#   description = "The endpoint URL for the secondary location"
-#   value       = try(azurerm_postgresql_flexible_server.main.secondary_endpoint, null)
-# }
-
-# output "primary_access_key" {
-#   description = "The primary access key for the postgresql_flexible_server"
-#   value       = try(azurerm_postgresql_flexible_server.main.primary_access_key, null)
-#   sensitive   = true
-# }
-
-# output "secondary_access_key" {
-#   description = "The secondary access key for the postgresql_flexible_server"
-#   value       = try(azurerm_postgresql_flexible_server.main.secondary_access_key, null)
-#   sensitive   = true
-# }
-
-# output "connection_string" {
-#   description = "The connection string for the postgresql_flexible_server"
-#   value       = try(azurerm_postgresql_flexible_server.main.primary_connection_string, null)
-#   sensitive   = true
-# }
-
-# Private Endpoint Outputs
-output "private_endpoints" {
-  description = "Information about the created private endpoints"
-  value = {
-    for idx, pe in azurerm_private_endpoint.main : pe.name => {
-      id                 = pe.id
-      name               = pe.name
-      private_ip_address = pe.private_service_connection[0].private_ip_address
-      fqdn               = try(pe.custom_dns_configs[0].fqdn, null)
-    }
-  }
+output "fqdn" {
+  description = "The FQDN of the PostgreSQL Flexible Server."
+  value       = try(azurerm_postgresql_flexible_server.postgresql_flexible_server.fqdn, null)
 }
 
-# Network Rules Output
-output "network_rules" {
-  description = "The network rules configuration applied to the postgresql_flexible_server"
-  value = var.network_rules != null ? {
-    default_action             = var.network_rules.default_action
-    bypass                     = var.network_rules.bypass
-    ip_rules                   = var.network_rules.ip_rules
-    virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
-  } : null
+output "public_network_access_enabled" {
+  description = "Whether public network access is enabled for the PostgreSQL Flexible Server."
+  value       = try(azurerm_postgresql_flexible_server.postgresql_flexible_server.public_network_access_enabled, null)
+}
+
+output "configurations" {
+  description = "Map of PostgreSQL server configurations keyed by name."
+  value       = azurerm_postgresql_flexible_server_configuration.configurations
+}
+
+output "firewall_rules" {
+  description = "Map of PostgreSQL firewall rules keyed by name."
+  value       = azurerm_postgresql_flexible_server_firewall_rule.firewall_rules
+}
+
+output "active_directory_administrator" {
+  description = "Active Directory administrator configuration for the PostgreSQL Flexible Server."
+  value       = try(azurerm_postgresql_flexible_server_active_directory_administrator.active_directory_administrator[0], null)
+}
+
+output "virtual_endpoints" {
+  description = "Map of PostgreSQL Flexible Server virtual endpoints keyed by name."
+  value       = azurerm_postgresql_flexible_server_virtual_endpoint.virtual_endpoints
+}
+
+output "backups" {
+  description = "Map of PostgreSQL Flexible Server backups keyed by name."
+  value       = azurerm_postgresql_flexible_server_backup.backups
+}
+
+output "diagnostic_settings_skipped" {
+  description = "Diagnostic settings entries skipped because no categories were available after filtering."
+  value       = local.diagnostic_settings_skipped
+}
+
+output "tags" {
+  description = "The tags assigned to the PostgreSQL Flexible Server."
+  value       = try(azurerm_postgresql_flexible_server.postgresql_flexible_server.tags, null)
 }

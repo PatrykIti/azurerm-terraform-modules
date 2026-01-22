@@ -1,39 +1,33 @@
 # Secure PostgreSQL Flexible Server Example
 
-This example demonstrates a maximum-security PostgreSQL Flexible Server configuration suitable for highly sensitive data and regulated environments.
+This example demonstrates a hardened PostgreSQL Flexible Server deployment with
+private networking, Microsoft Entra ID authentication, and customer-managed keys.
 
 ## Features
 
-- Maximum security configuration with all security features enabled
-- Network isolation and private endpoints
-- Advanced threat protection
-- Comprehensive audit logging and monitoring
-- Encryption at rest and in transit
-- Compliance-ready configuration
-
-## Key Configuration
-
-This example implements defense-in-depth security principles with multiple layers of protection suitable for highly regulated industries and sensitive workloads.
-
-## Security Considerations
-
-- All public access is disabled by default
-- Network access is restricted to specific IP ranges
-- All data is encrypted at rest and in transit
-- Audit logging captures all access and modifications
+- Private network access using a delegated subnet and private DNS zone.
+- Microsoft Entra ID (Azure AD) authentication with an administrator assignment.
+- Customer-managed key encryption using a user-assigned identity.
+- Geo-redundant backups enabled.
 
 ## Usage
 
 ```bash
 terraform init
-terraform plan
-terraform apply
+terraform plan \
+  -var="aad_admin_object_id=<object-id>" \
+  -var="aad_admin_principal_name=<principal-name>"
+terraform apply \
+  -var="aad_admin_object_id=<object-id>" \
+  -var="aad_admin_principal_name=<principal-name>"
 ```
 
 ## Cleanup
 
 ```bash
-terraform destroy
+terraform destroy \
+  -var="aad_admin_object_id=<object-id>" \
+  -var="aad_admin_principal_name=<principal-name>"
 ```
 
 <!-- BEGIN_TF_DOCS -->

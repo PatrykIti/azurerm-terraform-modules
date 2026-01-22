@@ -5,7 +5,7 @@
 **Category:** New Module / Database  
 **Estimated Effort:** Large  
 **Dependencies:** -  
-**Status:** To Do
+**Status:** Done
 
 ---
 
@@ -34,7 +34,7 @@ udokumentowane.
 - `azurerm_postgresql_flexible_server_firewall_rule`
 - `azurerm_postgresql_flexible_server_active_directory_administrator`
 - `azurerm_postgresql_flexible_server_virtual_endpoint`
-- `azurerm_postgresql_flexible_server_backup_threat_detection_policy` (nazwa do potwierdzenia)
+- `azurerm_postgresql_flexible_server_backup`
 - `azurerm_monitor_diagnostic_setting`
 
 **Potwierdzone w providerze (azurerm 4.57.0, scan binarki):**
@@ -44,7 +44,7 @@ udokumentowane.
 - `azurerm_postgresql_flexible_server_firewall_rule`
 - `azurerm_postgresql_flexible_server_database` (out-of-scope, osobny modul)
 - `azurerm_postgresql_flexible_server_virtual_endpoint`
-- `azurerm_postgresql_flexible_server_backup_threat_detection_policy` (nazwa do potwierdzenia; binarka wskazuje `backupthreat`)
+- `azurerm_postgresql_flexible_server_backup`
 
 ---
 
@@ -53,7 +53,7 @@ udokumentowane.
 1) **Atomic scope**  
    Modul zarzadza jednym serwerem jako primary resource. Dodatkowe zasoby tylko
    wtedy, gdy sa zwiazane z serwerem: konfiguracje, firewall, AAD admin,
-   virtual endpoint, backup threat detection policy, diagnostic settings.
+   virtual endpoint, backup, diagnostic settings.
    Bazy sa osobnym modulem.
 
 2) **Brak cross-resource glue**  
@@ -76,7 +76,7 @@ udokumentowane.
 - Compute/Version/SKU (tier/size)
 - Storage (size, tier, auto-grow/iops jesli wspierane)
 - Backup (retention, geo-redundant backup)
-- Backup threat detection policy (jesli wspierane)
+- Manual backups (azurerm_postgresql_flexible_server_backup)
 - High availability (mode + standby zone)
 - Maintenance window
 - Network (public access toggle, delegated subnet, private DNS zone)
@@ -103,7 +103,7 @@ udokumentowane.
   dla `azurerm_postgresql_flexible_server` i sub-resources serwerowych.
 - Potwierdzic dokladne nazwy oraz status wsparcia dla:
   - `azurerm_postgresql_flexible_server_virtual_endpoint`
-  - `azurerm_postgresql_flexible_server_backup_threat_detection_policy`
+  - `azurerm_postgresql_flexible_server_backup`
 - Potwierdzic, ze oba resource'y sa server-scope (nie database-scope).
 - Spisac finalny zestaw pol i ograniczen (allowed values, required combos).
 - Zaktualizowac listy walidacji, preconditions i examples na bazie realnych pol.
@@ -176,7 +176,7 @@ udokumentowane.
 
 ---
 
-### TASK-016-4: Sub-resources (configurations, firewall, AAD admin, virtual endpoint, backup threat detection)
+### TASK-016-4: Sub-resources (configurations, firewall, AAD admin, virtual endpoint, backups)
 
 **Cel:** Pelne wsparcie sub-resources zwiazanych z serwerem.
 
@@ -187,7 +187,7 @@ udokumentowane.
     principal_name, object_id, principal_type, tenant_id
   }) lub list (jesli provider wspiera)
 - `virtual_endpoints`: object lub list (zgodnie z provider schema)
-- `backup_threat_detection_policy`: object (zgodnie z provider schema)
+- `backups`: list(object({ name }))
 
 **Wymagania:**
 - `for_each` po `name` + walidacja unikalnosci.
@@ -245,7 +245,7 @@ udokumentowane.
 - `examples/aad-auth`
 - `examples/customer-managed-key`
 - `examples/virtual-endpoint`
-- `examples/backup-threat-detection-policy`
+- `examples/backup`
 
 **Wymagania wspolne:**
 - `source = "../.."`, stale nazwy, `README.md` + `.terraform-docs.yml`.
@@ -267,7 +267,7 @@ udokumentowane.
 **Integration / Terratest:**
 - fixtures: `basic`, `complete`, `secure`, `aad-auth`, `configurations`,
   `diagnostic-settings`, `replica`, `point-in-time-restore`,
-  `virtual-endpoint`, `backup-threat-detection-policy`.
+  `virtual-endpoint`, `backup`.
 - weryfikacja:
   - stan serwera (HA, backup, network, version)
   - configs + firewall rules

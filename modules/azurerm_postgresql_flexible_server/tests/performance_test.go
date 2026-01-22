@@ -18,7 +18,6 @@ func BenchmarkPostgresqlFlexibleServerCreationSimple(b *testing.B) {
 		b.StopTimer()
 		testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
-		// Override the random_suffix for benchmarking
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 		b.StartTimer()
 
@@ -34,39 +33,16 @@ func BenchmarkPostgresqlFlexibleServerCreationSimple(b *testing.B) {
 	}
 }
 
-// BenchmarkPostgresqlFlexibleServerCreationWithFeatures benchmarks postgresql_flexible_server with various features
+// BenchmarkPostgresqlFlexibleServerCreationWithFeatures benchmarks different SKU sizes
 func BenchmarkPostgresqlFlexibleServerCreationWithFeatures(b *testing.B) {
 	b.ReportAllocs()
 
-	// Define different feature configurations to benchmark
 	featureConfigs := []struct {
-		name   string
-		config map[string]interface{}
+		name    string
+		skuName string
 	}{
-		{
-			name:   "Basic",
-			config: map[string]interface{}{},
-		},
-		{
-			name: "WithSecurity",
-			config: map[string]interface{}{
-				"enable_advanced_security": true,
-			},
-		},
-		{
-			name: "WithMonitoring",
-			config: map[string]interface{}{
-				"enable_monitoring": true,
-			},
-		},
-		{
-			name: "Complete",
-			config: map[string]interface{}{
-				"enable_advanced_security": true,
-				"enable_monitoring":        true,
-				"enable_backup":            true,
-			},
-		},
+		{name: "Standard_D2s_v3", skuName: "Standard_D2s_v3"},
+		{name: "Standard_D4s_v3", skuName: "Standard_D4s_v3"},
 	}
 
 	for _, fc := range featureConfigs {
@@ -75,13 +51,7 @@ func BenchmarkPostgresqlFlexibleServerCreationWithFeatures(b *testing.B) {
 				b.StopTimer()
 				testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
-
-				// Apply feature configuration
-				for k, v := range fc.config {
-					terraformOptions.Vars[k] = v
-				}
-				
-				// Override the random_suffix for benchmarking
+				terraformOptions.Vars["sku_name"] = fc.skuName
 				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 				b.StartTimer()
 
@@ -99,41 +69,9 @@ func BenchmarkPostgresqlFlexibleServerCreationWithFeatures(b *testing.B) {
 	}
 }
 
-// BenchmarkPostgresqlFlexibleServerCreationWithScale benchmarks with different scale configurations
+// BenchmarkPostgresqlFlexibleServerCreationWithScale benchmarks scaling scenarios
 func BenchmarkPostgresqlFlexibleServerCreationWithScale(b *testing.B) {
-	b.ReportAllocs()
-
-	// Define different scale configurations
-	scaleCounts := []int{1, 5, 10, 20}
-
-	for _, count := range scaleCounts {
-		b.Run(fmt.Sprintf("Scale_%d", count), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
-				terraformOptions := getTerraformOptions(b, testFolder)
-
-				// Configure scale parameters based on resource type
-				// This is a placeholder - adjust based on actual resource scaling capabilities
-				terraformOptions.Vars["instance_count"] = count
-				
-				// Override the random_suffix for benchmarking
-				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
-				b.StartTimer()
-
-				start := time.Now()
-				terraform.InitAndApply(b, terraformOptions)
-				creationTime := time.Since(start)
-
-				b.StopTimer()
-				terraform.Destroy(b, terraformOptions)
-				b.StartTimer()
-
-				b.ReportMetric(float64(creationTime.Milliseconds()), "creation_ms")
-				b.ReportMetric(float64(count), "scale_count")
-			}
-		})
-	}
+	b.Skip("Scaling benchmarks are not applicable for a single-server resource")
 }
 
 // BenchmarkPostgresqlFlexibleServerParallelCreation benchmarks parallel creation of postgresql_flexible_server
@@ -148,7 +86,6 @@ func BenchmarkPostgresqlFlexibleServerParallelCreation(b *testing.B) {
 				for pb.Next() {
 					testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
 					terraformOptions := getTerraformOptions(b, testFolder)
-					// Override the random_suffix for parallel testing
 					terraformOptions.Vars["random_suffix"] = fmt.Sprintf("par%d%d%s", parallel, i, terraformOptions.Vars["random_suffix"].(string)[:5])
 
 					start := time.Now()
@@ -174,15 +111,12 @@ func TestPostgresqlFlexibleServerCreationTime(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
-
 	defer terraform.Destroy(t, terraformOptions)
 
 	start := time.Now()
 	terraform.InitAndApply(t, terraformOptions)
 	duration := time.Since(start)
 
-	// postgresql_flexible_server creation should complete within 5 minutes
-	// Adjust this based on the actual expected creation time for the resource
 	maxDuration := 5 * time.Minute
 	require.LessOrEqual(t, duration, maxDuration,
 		"PostgreSQL Flexible Server creation took %v, expected less than %v", duration, maxDuration)
@@ -199,24 +133,20 @@ func TestPostgresqlFlexibleServerScaling(t *testing.T) {
 	instanceCount := 3
 	creationTimes := make([]time.Duration, instanceCount)
 
-	// Create multiple instances sequentially
 	for i := 0; i < instanceCount; i++ {
 		testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 		terraformOptions := getTerraformOptions(t, testFolder)
-		// Override the random_suffix for each iteration
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("scale%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 
 		start := time.Now()
 		terraform.InitAndApply(t, terraformOptions)
 		creationTimes[i] = time.Since(start)
 
-		// Cleanup immediately to avoid hitting limits
 		terraform.Destroy(t, terraformOptions)
 
 		t.Logf("PostgreSQL Flexible Server instance %d created in %v", i, creationTimes[i])
 	}
 
-	// Calculate average creation time
 	var totalTime time.Duration
 	for _, duration := range creationTimes {
 		totalTime += duration
@@ -225,8 +155,6 @@ func TestPostgresqlFlexibleServerScaling(t *testing.T) {
 
 	t.Logf("Average creation time for %d postgresql_flexible_server instances: %v", instanceCount, avgTime)
 
-	// Ensure average time is reasonable (under 3 minutes)
-	// Adjust based on expected resource creation time
 	require.LessOrEqual(t, avgTime, 3*time.Minute,
 		"Average creation time %v exceeds maximum of 3 minutes", avgTime)
 }
@@ -240,13 +168,10 @@ func TestPostgresqlFlexibleServerUpdatePerformance(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
-
 	defer terraform.Destroy(t, terraformOptions)
 
-	// Initial deployment
 	terraform.InitAndApply(t, terraformOptions)
 
-	// Measure update times for different changes
 	updateScenarios := []struct {
 		name   string
 		update map[string]interface{}
@@ -260,18 +185,10 @@ func TestPostgresqlFlexibleServerUpdatePerformance(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "UpdateConfiguration",
-			update: map[string]interface{}{
-				"enable_monitoring": true,
-			},
-		},
-		// Add more update scenarios specific to postgresql_flexible_server
 	}
 
 	for _, scenario := range updateScenarios {
 		t.Run(scenario.name, func(t *testing.T) {
-			// Apply update
 			for k, v := range scenario.update {
 				terraformOptions.Vars[k] = v
 			}
@@ -282,7 +199,6 @@ func TestPostgresqlFlexibleServerUpdatePerformance(t *testing.T) {
 
 			t.Logf("%s completed in %v", scenario.name, updateTime)
 
-			// Updates should complete within 2 minutes
 			require.LessOrEqual(t, updateTime, 2*time.Minute,
 				"%s took %v, expected less than 2 minutes", scenario.name, updateTime)
 		})
@@ -299,17 +215,14 @@ func TestPostgresqlFlexibleServerDestroyPerformance(t *testing.T) {
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
-	// Create resource
 	terraform.InitAndApply(t, terraformOptions)
 
-	// Measure destroy time
 	start := time.Now()
 	terraform.Destroy(t, terraformOptions)
 	destroyTime := time.Since(start)
 
 	t.Logf("PostgreSQL Flexible Server destroyed in %v", destroyTime)
 
-	// Destroy should complete within 3 minutes
 	require.LessOrEqual(t, destroyTime, 3*time.Minute,
 		"Destroy took %v, expected less than 3 minutes", destroyTime)
 }

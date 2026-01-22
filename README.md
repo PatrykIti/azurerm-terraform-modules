@@ -16,6 +16,7 @@
 [![Virtual Network](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=VNv*&label=Virtual%20Network&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/VNv1.2.0)
 [![Subnet](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SNv*&label=Subnet&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SNv1.1.0)
 [![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv1.3.0)
+[![PostgreSQL Flexible Server](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PGFSv*&label=PostgreSQL%20Flexible%20Server&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases)
 [![Route Table](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=RTv*&label=Route%20Table&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.1.0)
 [![Network Security Group](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=NSGv*&label=Network%20Security%20Group&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.1.0)
 [![Kubernetes Cluster](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AKSv*&label=Kubernetes%20Cluster&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.1.0)
@@ -95,6 +96,7 @@ module "storage_account" {
 | [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.1.0) | Manages Azure Network Security Groups with comprehensive security rules configuration |
 | [Route Table](./modules/azurerm_route_table/) | ✅ Completed | [RTv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.1.0) | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
 | [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv1.3.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv1.3.0) | Azure Storage Account Terraform module with enterprise-grade security features |
+| [PostgreSQL Flexible Server](./modules/azurerm_postgresql_flexible_server/) | 🚧 Development | Unreleased | Azure PostgreSQL Flexible Server Terraform module with enterprise-grade features |
 | [Subnet](./modules/azurerm_subnet/) | ✅ Completed | [SNv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SNv1.1.0) | Azure Subnet Terraform module for managing subnets with service endpoints, delegations, network policies, and enterprise-grade security features |
 | [Virtual Network](./modules/azurerm_virtual_network/) | ✅ Completed | [VNv1.2.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/VNv1.2.0) | Azure Virtual Network Terraform module with advanced networking features |
 

@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 16 tasks
+- **To Do:** 15 tasks
 - **In Progress:** 0
-- **Done:** 37 tasks
+- **Done:** 38 tasks
 
 ---
 
@@ -15,7 +15,6 @@ Task board for module work. Update statuses in markdown files.
 |----|-------|----------|--------|-------|
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
 | [TASK-014](./TASK-014_Virtual_Network_Module_Alignment.md) | **Virtual Network module alignment (docs + examples + tests)** | High | Medium | `modules/azurerm_virtual_network/` |
-| [TASK-016](./TASK-016_PostgreSQL_Flexible_Server_Module.md) | **PostgreSQL Flexible Server module (full feature scope)** | High | Large | `modules/azurerm_postgresql_flexible_server/` |
 | [TASK-ADO-017](./TASK-ADO-017_AzureDevOps_Environments_Module_Refactor.md) | **Azure DevOps Environments module refactor** | High | Medium | Re-opened; `modules/azuredevops_environments/` |
 | [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_artifacts_feed/` |
 | [TASK-ADO-032](./TASK-ADO-032_AzureDevOps_Artifacts_Feed_Module_Audit_Fixes.md) | **Azure DevOps Artifacts Feed module audit fixes** | Medium | Small | Docs + artifact cleanup; `modules/azuredevops_artifacts_feed/` |
@@ -42,6 +41,7 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-016](./TASK-016_PostgreSQL_Flexible_Server_Module.md) | **PostgreSQL Flexible Server module (full feature scope)** | High | Large | `modules/azurerm_postgresql_flexible_server/` |
 | [TASK-015](./TASK-015_AKS_Secrets_Remove_Module_Data_Sources.md) | **AKS secrets – remove Key Vault data sources from module** | High | Medium | `modules/azurerm_kubernetes_secrets/` |
 | [TASK-ADO-038](./TASK-ADO-038_AzureDevOps_User_Entitlement_Module_Compliance_Fixes.md) | **Azure DevOps User Entitlement module compliance fixes** | High | Medium | `modules/azuredevops_user_entitlement/` |
 | [TASK-ADO-037](./TASK-ADO-037_AzureDevOps_SecurityRole_Assignment_Docs_and_Tests_Alignment.md) | **Azure DevOps Security Role Assignment docs/tests alignment** | Medium | Medium | `modules/azuredevops_securityrole_assignment/` |

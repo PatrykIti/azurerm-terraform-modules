@@ -8,20 +8,58 @@ Current version: **vUnreleased**
 
 ## Description
 
-Azure PostgreSQL Flexible Server Terraform module with enterprise-grade security features
+Azure PostgreSQL Flexible Server Terraform module with server-scoped features,
+including configurations, firewall rules, Entra ID admin, virtual endpoints,
+backups, and diagnostic settings.
 
 ## Usage
 
 ```hcl
-module "azurerm_postgresql_flexible_server" {
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "4.57.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.6.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "example" {
+  name     = "rg-pgfs-example"
+  location = "westeurope"
+}
+
+resource "random_password" "admin" {
+  length      = 20
+  min_lower   = 1
+  min_upper   = 1
+  min_numeric = 1
+  special     = false
+}
+
+module "postgresql_flexible_server" {
   source = "path/to/azurerm_postgresql_flexible_server"
 
-  # Required variables
-  name                = "example-azurerm_postgresql_flexible_server"
+  name                = "pgfsexample001"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  # Optional configuration
+  sku_name            = "Standard_D2s_v3"
+  postgresql_version  = "15"
+
+  administrator_login    = "pgfsadmin"
+  administrator_password = random_password.admin.result
+
   tags = {
     Environment = "Development"
     Project     = "Example"
@@ -45,3 +83,5 @@ module "azurerm_postgresql_flexible_server" {
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [docs/README.md](docs/README.md) - Extended documentation and scope notes
+- [docs/IMPORT.md](docs/IMPORT.md) - Importing existing resources

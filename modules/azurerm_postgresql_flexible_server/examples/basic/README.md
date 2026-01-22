@@ -1,21 +1,14 @@
 # Basic PostgreSQL Flexible Server Example
 
-This example demonstrates a basic PostgreSQL Flexible Server configuration using secure defaults and minimal setup.
+This example demonstrates a minimal PostgreSQL Flexible Server deployment using
+password authentication and public network access.
 
 ## Features
 
-- Creates a basic postgresql_flexible_server with standard configuration
-- Uses secure defaults following Azure best practices
-- Creates a dedicated resource group
-- Demonstrates basic module usage patterns
-- Uses variables for configuration flexibility
-
-## Key Configuration
-
-This example uses secure defaults and demonstrates:
-- Basic resource creation with minimal configuration
-- Using variables for easy configuration customization
-- Following security best practices by default
+- Creates a PostgreSQL Flexible Server with a standard SKU and version.
+- Uses a generated administrator password.
+- Creates a dedicated resource group.
+- Uses secure defaults provided by the module.
 
 ## Usage
 
