@@ -42,7 +42,7 @@ udokumentowane.
 - `azurerm_postgresql_flexible_server_firewall_rule`
 - `azurerm_postgresql_flexible_server_database` (out-of-scope, osobny modul)
 - `azurerm_postgresql_flexible_server_virtual_endpoint` (out-of-scope)
-- `azurerm_postgresql_flexible_server_backup_threat_detection_policy` (nazwa do potwierdzenia, out-of-scope)
+- `azurerm_postgresql_flexible_server_backup_threat_detection_policy` (nazwa do potwierdzenia; binarka wskazuje `backupthreat`, out-of-scope)
 
 ---
 
@@ -261,6 +261,8 @@ udokumentowane.
   - configs + firewall rules
   - AAD admin (jesli enabled)
   - diag settings (log/metric categories)
+- opcjonalnie: w fixtures utworzyc `azurerm_postgresql_flexible_server_database`
+  jako zasob pomocniczy do walidacji polaczenia (poza modulem).
 - scenariusze restore/replica uruchamiane sekwencyjnie.
 
 **Negatywne:**
@@ -289,3 +291,13 @@ udokumentowane.
 - README/SECURITY/IMPORT/CONTRIBUTING/VERSIONING kompletne i spojne.
 - Examples basic/complete/secure + feature-specific gotowe i uruchamialne.
 - Testy unit + integration + negative przechodza lokalnie.
+
+---
+
+## Docs to Update After Completion
+
+- `docs/_TASKS/README.md` (status + statystyki)
+- `docs/_CHANGELOG/README.md`
+- `docs/_CHANGELOG/NNN-YYYY-MM-DD-postgresql-flexible-server.md`
+- `modules/README.md` (nowy modul w tabeli AzureRM)
+- `README.md` (badges + tabela "Available Modules")
