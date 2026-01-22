@@ -19,12 +19,12 @@ mock_provider "azurerm" {
 }
 
 variables {
-  name                = "pgfsunit"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
-  sku_name            = "Standard_D2s_v3"
-  postgresql_version             = "15"
-  administrator_login = "pgfsadmin"
+  name                   = "pgfsunit"
+  resource_group_name    = "test-rg"
+  location               = "northeurope"
+  sku_name               = "Standard_D2s_v3"
+  postgresql_version     = "15"
+  administrator_login    = "pgfsadmin"
   administrator_password = "Password1234"
 }
 

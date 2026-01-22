@@ -10,8 +10,8 @@ locals {
   postgresql_diag_metric_categories = local.diagnostics_enabled ? data.azurerm_monitor_diagnostic_categories.postgresql_flexible_server[0].metrics : []
 
   postgresql_area_log_map = {
-    all   = local.postgresql_diag_log_categories
-    logs  = local.postgresql_diag_log_categories
+    all  = local.postgresql_diag_log_categories
+    logs = local.postgresql_diag_log_categories
   }
 
   postgresql_area_metric_map = {
@@ -55,7 +55,7 @@ locals {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
-  for_each           = local.diagnostic_settings_for_each
+  for_each = local.diagnostic_settings_for_each
 
   name               = each.value.name
   target_resource_id = azurerm_postgresql_flexible_server.postgresql_flexible_server.id

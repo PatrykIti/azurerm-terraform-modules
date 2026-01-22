@@ -25,12 +25,12 @@ module "postgresql_flexible_server" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  sku_name = var.sku_name
+  sku_name           = var.sku_name
   postgresql_version = var.postgresql_version
 
   create_mode = {
-    mode                            = "PointInTimeRestore"
-    source_server_id                = var.source_server_id
+    mode                              = "PointInTimeRestore"
+    source_server_id                  = var.source_server_id
     point_in_time_restore_time_in_utc = var.restore_time_utc
   }
 

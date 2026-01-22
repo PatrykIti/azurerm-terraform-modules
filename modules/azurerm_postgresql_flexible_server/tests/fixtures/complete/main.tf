@@ -45,8 +45,8 @@ module "postgresql_flexible_server" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  sku_name = "Standard_D4s_v3"
-  version  = "15"
+  sku_name           = "Standard_D4s_v3"
+  postgresql_version = "15"
 
   administrator_login    = "pgfsadmin"
   administrator_password = random_password.admin.result

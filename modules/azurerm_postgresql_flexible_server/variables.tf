@@ -100,7 +100,7 @@ variable "storage" {
 variable "backup" {
   description = "Backup configuration for the PostgreSQL Flexible Server."
   type = object({
-    retention_days              = optional(number, 7)
+    retention_days               = optional(number, 7)
     geo_redundant_backup_enabled = optional(bool, false)
   })
   default = {}
@@ -147,8 +147,8 @@ variable "authentication" {
 variable "high_availability" {
   description = "High availability configuration for the PostgreSQL Flexible Server."
   type = object({
-    mode                       = string
-    standby_availability_zone  = optional(string)
+    mode                      = string
+    standby_availability_zone = optional(string)
   })
   default = null
 
@@ -166,8 +166,8 @@ variable "high_availability" {
 variable "maintenance_window" {
   description = "Maintenance window configuration for the PostgreSQL Flexible Server."
   type = object({
-    day_of_week = number
-    start_hour  = number
+    day_of_week  = number
+    start_hour   = number
     start_minute = number
   })
   default = null
@@ -202,12 +202,12 @@ variable "identity" {
   }
 
   validation {
-    condition = var.identity == null || try(length(var.identity.identity_ids), 0) == 0 || contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type)
+    condition     = var.identity == null || try(length(var.identity.identity_ids), 0) == 0 || contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type)
     error_message = "identity.identity_ids can only be set when identity.type includes UserAssigned."
   }
 
   validation {
-    condition = var.identity == null || !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type) || (var.identity.identity_ids != null && length(var.identity.identity_ids) > 0)
+    condition     = var.identity == null || !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type) || (var.identity.identity_ids != null && length(var.identity.identity_ids) > 0)
     error_message = "identity.identity_ids must be provided when identity.type includes UserAssigned."
   }
 }
@@ -215,9 +215,9 @@ variable "identity" {
 variable "customer_managed_key" {
   description = "Customer-managed key configuration for the PostgreSQL Flexible Server. key_vault_key_id must be a Key Vault key URL."
   type = object({
-    key_vault_key_id                  = string
-    primary_user_assigned_identity_id = string
-    geo_backup_key_vault_key_id       = optional(string)
+    key_vault_key_id                     = string
+    primary_user_assigned_identity_id    = string
+    geo_backup_key_vault_key_id          = optional(string)
     geo_backup_user_assigned_identity_id = optional(string)
   })
   default = null
@@ -231,8 +231,8 @@ variable "customer_managed_key" {
 variable "create_mode" {
   description = "Create mode configuration for the PostgreSQL Flexible Server."
   type = object({
-    mode                            = optional(string)
-    source_server_id                = optional(string)
+    mode                              = optional(string)
+    source_server_id                  = optional(string)
     point_in_time_restore_time_in_utc = optional(string)
   })
   default = {}
@@ -325,10 +325,10 @@ variable "active_directory_administrator" {
 variable "virtual_endpoints" {
   description = "List of virtual endpoints to create for PostgreSQL Flexible Server replicas."
   type = list(object({
-    name             = string
+    name              = string
     source_server_id  = optional(string)
     replica_server_id = optional(string)
-    type             = optional(string, "ReadWrite")
+    type              = optional(string, "ReadWrite")
   }))
   default = []
 

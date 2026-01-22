@@ -25,8 +25,8 @@ locals {
 
   create_mode = coalesce(try(var.create_mode.mode, null), "Default")
 
-  identity_type             = try(var.identity.type, null)
-  identity_ids              = try(var.identity.identity_ids, null)
+  identity_type              = try(var.identity.type, null)
+  identity_ids               = try(var.identity.identity_ids, null)
   identity_has_user_assigned = local.identity_type == "UserAssigned" || local.identity_type == "SystemAssigned, UserAssigned"
 
   active_directory_tenant_id = coalesce(
@@ -58,9 +58,9 @@ resource "azurerm_postgresql_flexible_server" "postgresql_flexible_server" {
 
   zone = var.zone
 
-  create_mode                        = local.create_mode
-  source_server_id                   = try(var.create_mode.source_server_id, null)
-  point_in_time_restore_time_in_utc  = try(var.create_mode.point_in_time_restore_time_in_utc, null)
+  create_mode                       = local.create_mode
+  source_server_id                  = try(var.create_mode.source_server_id, null)
+  point_in_time_restore_time_in_utc = try(var.create_mode.point_in_time_restore_time_in_utc, null)
 
   dynamic "authentication" {
     for_each = [local.authentication]
@@ -99,9 +99,9 @@ resource "azurerm_postgresql_flexible_server" "postgresql_flexible_server" {
   dynamic "customer_managed_key" {
     for_each = var.customer_managed_key != null ? [var.customer_managed_key] : []
     content {
-      key_vault_key_id                  = customer_managed_key.value.key_vault_key_id
-      primary_user_assigned_identity_id = customer_managed_key.value.primary_user_assigned_identity_id
-      geo_backup_key_vault_key_id       = customer_managed_key.value.geo_backup_key_vault_key_id
+      key_vault_key_id                     = customer_managed_key.value.key_vault_key_id
+      primary_user_assigned_identity_id    = customer_managed_key.value.primary_user_assigned_identity_id
+      geo_backup_key_vault_key_id          = customer_managed_key.value.geo_backup_key_vault_key_id
       geo_backup_user_assigned_identity_id = customer_managed_key.value.geo_backup_user_assigned_identity_id
     }
   }
@@ -166,12 +166,12 @@ resource "azurerm_postgresql_flexible_server" "postgresql_flexible_server" {
     }
 
     precondition {
-      condition = !contains(["Replica", "PointInTimeRestore", "GeoRestore", "ReviveDropped"], local.create_mode) || try(var.create_mode.source_server_id, null) != null
+      condition     = !contains(["Replica", "PointInTimeRestore", "GeoRestore", "ReviveDropped"], local.create_mode) || try(var.create_mode.source_server_id, null) != null
       error_message = "source_server_id is required when create_mode is Replica, PointInTimeRestore, GeoRestore, or ReviveDropped."
     }
 
     precondition {
-      condition = local.create_mode != "PointInTimeRestore" || try(var.create_mode.point_in_time_restore_time_in_utc, null) != null
+      condition     = local.create_mode != "PointInTimeRestore" || try(var.create_mode.point_in_time_restore_time_in_utc, null) != null
       error_message = "point_in_time_restore_time_in_utc is required when create_mode is PointInTimeRestore."
     }
 
@@ -225,10 +225,10 @@ resource "azurerm_postgresql_flexible_server_active_directory_administrator" "ac
 resource "azurerm_postgresql_flexible_server_virtual_endpoint" "virtual_endpoints" {
   for_each = { for ve in var.virtual_endpoints : ve.name => ve }
 
-  name             = each.value.name
-  source_server_id = coalesce(each.value.source_server_id, azurerm_postgresql_flexible_server.postgresql_flexible_server.id)
+  name              = each.value.name
+  source_server_id  = coalesce(each.value.source_server_id, azurerm_postgresql_flexible_server.postgresql_flexible_server.id)
   replica_server_id = coalesce(each.value.replica_server_id, azurerm_postgresql_flexible_server.postgresql_flexible_server.id)
-  type             = each.value.type
+  type              = each.value.type
 }
 
 resource "azurerm_postgresql_flexible_server_backup" "backups" {

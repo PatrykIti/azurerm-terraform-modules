@@ -37,7 +37,7 @@ module "primary" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  sku_name = var.sku_name
+  sku_name           = var.sku_name
   postgresql_version = var.postgresql_version
 
   administrator_login    = var.administrator_login
@@ -56,7 +56,7 @@ module "replica" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  sku_name = var.sku_name
+  sku_name           = var.sku_name
   postgresql_version = var.postgresql_version
 
   administrator_login    = var.administrator_login
