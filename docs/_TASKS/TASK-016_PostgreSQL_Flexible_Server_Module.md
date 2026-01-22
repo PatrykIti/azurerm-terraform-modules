@@ -18,7 +18,7 @@ Stworzyc nowy modul `modules/azurerm_postgresql_flexible_server` zgodny z:
 - `docs/SECURITY.md`
 
 Modul ma pokrywac wszystkie funkcje dostepne w `azurerm_postgresql_flexible_server`
-oraz powiazanych sub-resources w providerze (wersja zgodna z `versions.tf`).
+oraz powiazane sub-resources serwerowe (wersja zgodna z `versions.tf`).
 AKS jest wzorcem struktury i testow; wszystkie odstepstwa musza byc jawnie
 udokumentowane.
 
@@ -30,15 +30,19 @@ udokumentowane.
 - `azurerm_postgresql_flexible_server`
 
 **Powiazane zasoby (w module):**
-- `azurerm_postgresql_flexible_server_database`
 - `azurerm_postgresql_flexible_server_configuration`
 - `azurerm_postgresql_flexible_server_firewall_rule`
 - `azurerm_postgresql_flexible_server_active_directory_administrator`
 - `azurerm_monitor_diagnostic_setting`
 
-**Do weryfikacji w providerze (jesli wspierane):**
-- `azurerm_postgresql_flexible_server_virtual_endpoint` (routing/replica)
-- inne sub-resources wprowadzone w nowszych wersjach `azurerm`
+**Potwierdzone w providerze (azurerm 4.57.0, scan binarki):**
+- `azurerm_postgresql_flexible_server`
+- `azurerm_postgresql_flexible_server_active_directory_administrator`
+- `azurerm_postgresql_flexible_server_configuration`
+- `azurerm_postgresql_flexible_server_firewall_rule`
+- `azurerm_postgresql_flexible_server_database` (out-of-scope, osobny modul)
+- `azurerm_postgresql_flexible_server_virtual_endpoint` (out-of-scope)
+- `azurerm_postgresql_flexible_server_backup_threat_detection_policy` (nazwa do potwierdzenia, out-of-scope)
 
 ---
 
@@ -46,7 +50,8 @@ udokumentowane.
 
 1) **Atomic scope**  
    Modul zarzadza jednym serwerem jako primary resource. Dodatkowe zasoby tylko
-   wtedy, gdy sa bezposrednio zwiazane z tym serwerem (DB, konfiguracje, firewall).
+   wtedy, gdy sa bezposrednio zwiazane z serwerem: konfiguracje, firewall, AAD admin,
+   diagnostic settings. Bazy sa osobnym modulem.
 
 2) **Brak cross-resource glue**  
    Poza modulem: private endpoints, VNet links, RBAC/role assignments, Key Vault,
@@ -76,7 +81,7 @@ udokumentowane.
 - Identity (SystemAssigned/UserAssigned)
 - Customer managed keys (primary + geo backup)
 - Create modes (Default / PointInTimeRestore / GeoRestore / Replica)
-- Databases, configurations, firewall rules, AAD admin
+- Configurations, firewall rules, AAD admin
 - Diagnostic settings (log/metric categories, filters)
 - Tags i timeouts
 
@@ -90,7 +95,10 @@ udokumentowane.
 
 **Do zrobienia:**
 - Sprawdzic schema provider `azurerm` (doc lub `terraform providers schema -json`)
-  dla `azurerm_postgresql_flexible_server` i sub-resources.
+  dla `azurerm_postgresql_flexible_server` i sub-resources serwerowych.
+- Potwierdzic dokladne nazwy oraz status wsparcia dla:
+  - `azurerm_postgresql_flexible_server_virtual_endpoint`
+  - `azurerm_postgresql_flexible_server_backup_threat_detection_policy`
 - Spisac finalny zestaw pol i ograniczen (allowed values, required combos).
 - Zaktualizowac listy walidacji, preconditions i examples na bazie realnych pol.
 
@@ -102,7 +110,7 @@ udokumentowane.
 
 **Checklist:**
 - [ ] `modules/azurerm_postgresql_flexible_server/` utworzony przez
-      `scripts/create-new-module.sh` lub recznie (AKS layout).
+      `scripts/create-new-module.sh` (wymagane).
 - [ ] `module.json`:
   - name: `azurerm_postgresql_flexible_server`
   - commit_scope: `postgresql-flexible-server`
@@ -162,12 +170,11 @@ udokumentowane.
 
 ---
 
-### TASK-016-4: Sub-resources (databases, configurations, firewall, AAD admin)
+### TASK-016-4: Sub-resources (configurations, firewall, AAD admin)
 
 **Cel:** Pelne wsparcie sub-resources zwiazanych z serwerem.
 
 **Inputs:**
-- `databases`: list(object({ name, charset, collation }))
 - `configurations`: list(object({ name, value, source? }))
 - `firewall_rules`: list(object({ name, start_ip_address, end_ip_address }))
 - `active_directory_administrator`: object({
@@ -216,7 +223,7 @@ udokumentowane.
 **Cel:** Przyklady zgodne z guide, uruchamialne lokalnie.
 
 **Wymagane:**
-- `examples/basic`: public access, minimal config, jedna DB.
+- `examples/basic`: public access, minimal config.
 - `examples/complete`: HA + maintenance window + configs + diag settings.
 - `examples/secure`: private access + AAD auth + CMK (jesli wspierane) + brak public.
 
@@ -251,7 +258,7 @@ udokumentowane.
   `diagnostic-settings`, `replica`, `point-in-time-restore`.
 - weryfikacja:
   - stan serwera (HA, backup, network, version)
-  - DB list + configs + firewall rules
+  - configs + firewall rules
   - AAD admin (jesli enabled)
   - diag settings (log/metric categories)
 - scenariusze restore/replica uruchamiane sekwencyjnie.
