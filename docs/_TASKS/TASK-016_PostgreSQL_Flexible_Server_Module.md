@@ -273,8 +273,10 @@ udokumentowane.
   - configs + firewall rules
   - AAD admin (jesli enabled)
   - diag settings (log/metric categories)
-- opcjonalnie: w fixtures utworzyc `azurerm_postgresql_flexible_server_database`
-  jako zasob pomocniczy do walidacji polaczenia (poza modulem).
+- public fixtures: utworzyc `azurerm_postgresql_flexible_server_database`
+  jako zasob pomocniczy do walidacji polaczenia (poza modulem). Jesli
+  wykonalne, wykonac proste `SELECT 1` (psql/pgx). Dla private scenariuszy
+  pominac testy polaczenia (brak VPN/huba).
 - scenariusze restore/replica uruchamiane sekwencyjnie.
 
 **Negatywne:**
