@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/postgresql/armpostgresqlflexibleservers/v4"
 	"github.com/gruntwork-io/terratest/modules/random"
+	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/require"
 )
 
@@ -158,4 +160,12 @@ func ValidateServerTags(t *testing.T, server armpostgresqlflexibleservers.Server
 		require.NotNil(t, actual, "Tag %s should not be nil", key)
 		require.Equal(t, value, *actual, "Tag %s should match", key)
 	}
+}
+
+// OutputBool reads a Terraform output and parses it as a boolean.
+func OutputBool(t testing.TB, terraformOptions *terraform.Options, name string) bool {
+	value := terraform.Output(t, terraformOptions, name)
+	parsed, err := strconv.ParseBool(strings.TrimSpace(value))
+	require.NoError(t, err, "Failed to parse output %q as bool", name)
+	return parsed
 }

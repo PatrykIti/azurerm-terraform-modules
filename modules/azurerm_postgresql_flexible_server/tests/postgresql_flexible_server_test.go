@@ -69,7 +69,7 @@ func TestCompletePostgresqlFlexibleServer(t *testing.T) {
 		resourceID := terraform.Output(t, terraformOptions, "postgresql_flexible_server_id")
 		resourceName := terraform.Output(t, terraformOptions, "postgresql_flexible_server_name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
-		publicAccess := terraform.OutputBool(t, terraformOptions, "public_network_access_enabled")
+		publicAccess := OutputBool(t, terraformOptions, "public_network_access_enabled")
 
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, resourceName)
@@ -106,7 +106,7 @@ func TestSecurePostgresqlFlexibleServer(t *testing.T) {
 		resourceID := terraform.Output(t, terraformOptions, "postgresql_flexible_server_id")
 		resourceName := terraform.Output(t, terraformOptions, "postgresql_flexible_server_name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
-		publicAccess := terraform.OutputBool(t, terraformOptions, "public_network_access_enabled")
+		publicAccess := OutputBool(t, terraformOptions, "public_network_access_enabled")
 
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, resourceName)
