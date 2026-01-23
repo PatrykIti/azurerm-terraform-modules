@@ -60,6 +60,15 @@ variable "administrator_password" {
     condition     = var.administrator_password == null || (length(var.administrator_password) >= 8 && length(var.administrator_password) <= 128)
     error_message = "administrator_password must be between 8 and 128 characters when set."
   }
+
+  validation {
+    condition = (
+      (var.create_mode != null && var.create_mode.mode != null ? var.create_mode.mode : "Default") != "Default" ||
+      (var.authentication == null ? true : !var.authentication.password_auth_enabled) ||
+      (var.administrator_login != null && var.administrator_login != "" && var.administrator_password != null && var.administrator_password != "")
+    )
+    error_message = "administrator_login and administrator_password are required when create_mode is Default and password authentication is enabled."
+  }
 }
 
 variable "storage" {
@@ -123,6 +132,26 @@ variable "network" {
     private_dns_zone_id           = optional(string)
   })
   default = {}
+
+  validation {
+    condition = var.network == null ? true : (
+      (var.network.public_network_access_enabled == false ||
+        var.network.delegated_subnet_id != null ||
+        var.network.private_dns_zone_id != null
+      )
+      ? (var.network.delegated_subnet_id != null && var.network.private_dns_zone_id != null)
+      : true
+    )
+    error_message = "network.delegated_subnet_id and network.private_dns_zone_id are required when public_network_access_enabled is false or when private networking is configured."
+  }
+
+  validation {
+    condition = var.network == null ? true : (
+      var.network.public_network_access_enabled != true ||
+      (var.network.delegated_subnet_id == null && var.network.private_dns_zone_id == null)
+    )
+    error_message = "network.delegated_subnet_id/private_dns_zone_id require public_network_access_enabled = false."
+  }
 }
 
 variable "authentication" {
@@ -142,8 +171,22 @@ variable "authentication" {
   }
 
   validation {
-    condition     = var.authentication == null ? true : (!var.authentication.active_directory_auth_enabled || var.authentication.tenant_id != null)
-    error_message = "authentication.tenant_id is required when active_directory_auth_enabled is true."
+    condition = var.authentication == null ? true : (
+      !var.authentication.active_directory_auth_enabled ||
+      (
+        var.active_directory_administrator != null &&
+        (
+          (var.authentication.tenant_id != null && var.authentication.tenant_id != "") ||
+          (var.active_directory_administrator.tenant_id != null && var.active_directory_administrator.tenant_id != "")
+        )
+      )
+    )
+    error_message = "active_directory_administrator and authentication.tenant_id or active_directory_administrator.tenant_id are required when active_directory_auth_enabled is true."
+  }
+
+  validation {
+    condition     = var.active_directory_administrator == null || (var.authentication != null && var.authentication.active_directory_auth_enabled)
+    error_message = "active_directory_administrator requires authentication.active_directory_auth_enabled = true."
   }
 }
 
@@ -232,6 +275,22 @@ variable "customer_managed_key" {
   default = null
 
   validation {
+    condition = var.customer_managed_key == null || (
+      var.identity != null && contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type)
+    )
+    error_message = "customer_managed_key requires identity.type to include UserAssigned."
+  }
+
+  validation {
+    condition = var.customer_managed_key == null || (
+      var.identity != null &&
+      var.identity.identity_ids != null &&
+      contains(var.identity.identity_ids, var.customer_managed_key.primary_user_assigned_identity_id)
+    )
+    error_message = "customer_managed_key.primary_user_assigned_identity_id must be included in identity.identity_ids."
+  }
+
+  validation {
     condition     = var.customer_managed_key == null || var.customer_managed_key.geo_backup_key_vault_key_id == null || var.customer_managed_key.geo_backup_user_assigned_identity_id != null
     error_message = "customer_managed_key.geo_backup_user_assigned_identity_id is required when geo_backup_key_vault_key_id is set."
   }
@@ -258,6 +317,41 @@ variable "create_mode" {
       ], var.create_mode.mode)
     )
     error_message = "create_mode.mode must be one of: Default, PointInTimeRestore, Replica, ReviveDropped, GeoRestore, Update."
+  }
+
+  validation {
+    condition = (var.create_mode != null && var.create_mode.mode != null ? var.create_mode.mode : "Default") != "Default" || (
+      (var.create_mode == null || var.create_mode.source_server_id == null) &&
+      (var.create_mode == null || var.create_mode.point_in_time_restore_time_in_utc == null)
+    )
+    error_message = "source_server_id and point_in_time_restore_time_in_utc must be null when create_mode is Default."
+  }
+
+  validation {
+    condition = !contains([
+      "Replica",
+      "PointInTimeRestore",
+      "GeoRestore",
+      "ReviveDropped"
+      ], (var.create_mode != null && var.create_mode.mode != null ? var.create_mode.mode : "Default")) || (
+      var.create_mode != null && var.create_mode.source_server_id != null
+    )
+    error_message = "source_server_id is required when create_mode is Replica, PointInTimeRestore, GeoRestore, or ReviveDropped."
+  }
+
+  validation {
+    condition = (var.create_mode != null && var.create_mode.mode != null ? var.create_mode.mode : "Default") != "PointInTimeRestore" || (
+      var.create_mode != null && var.create_mode.point_in_time_restore_time_in_utc != null
+    )
+    error_message = "point_in_time_restore_time_in_utc is required when create_mode is PointInTimeRestore."
+  }
+
+  validation {
+    condition = (
+      (var.create_mode == null || var.create_mode.point_in_time_restore_time_in_utc == null) ||
+      (var.create_mode != null && var.create_mode.mode != null ? var.create_mode.mode : "Default") == "PointInTimeRestore"
+    )
+    error_message = "point_in_time_restore_time_in_utc is only valid when create_mode is PointInTimeRestore."
   }
 }
 
@@ -314,6 +408,20 @@ variable "firewall_rules" {
       can(regex("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", rule.end_ip_address))
     ])
     error_message = "firewall_rules start_ip_address and end_ip_address must be valid IPv4 addresses."
+  }
+
+  validation {
+    condition = length(var.firewall_rules) == 0 || (
+      var.network == null ? true : (
+        var.network.public_network_access_enabled != null
+        ? var.network.public_network_access_enabled
+        : !(
+          (var.network.delegated_subnet_id != null) ||
+          (var.network.private_dns_zone_id != null)
+        )
+      )
+    )
+    error_message = "firewall_rules require public_network_access_enabled = true."
   }
 }
 
