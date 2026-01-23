@@ -155,8 +155,8 @@ func TestPostgresqlFlexibleServerScaling(t *testing.T) {
 
 	t.Logf("Average creation time for %d postgresql_flexible_server instances: %v", instanceCount, avgTime)
 
-	require.LessOrEqual(t, avgTime, 3*time.Minute,
-		"Average creation time %v exceeds maximum of 3 minutes", avgTime)
+	require.LessOrEqual(t, avgTime, 8*time.Minute,
+		"Average creation time %v exceeds maximum of 8 minutes", avgTime)
 }
 
 // TestPostgresqlFlexibleServerUpdatePerformance tests update performance

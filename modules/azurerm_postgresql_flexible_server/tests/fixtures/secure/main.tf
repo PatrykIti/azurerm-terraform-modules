@@ -71,36 +71,21 @@ resource "azurerm_key_vault" "postgresql" {
   resource_group_name        = azurerm_resource_group.example.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   sku_name                   = "standard"
+  enable_rbac_authorization  = true
   purge_protection_enabled   = true
   soft_delete_retention_days = 7
 }
 
-resource "azurerm_key_vault_access_policy" "current" {
-  key_vault_id = azurerm_key_vault.postgresql.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = data.azurerm_client_config.current.object_id
-
-  key_permissions = [
-    "Create",
-    "Delete",
-    "Get",
-    "List",
-    "Purge",
-    "Recover"
-  ]
+resource "azurerm_role_assignment" "current_user_kv" {
+  scope                = azurerm_key_vault.postgresql.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = data.azurerm_client_config.current.object_id
 }
 
-resource "azurerm_key_vault_access_policy" "postgresql_identity" {
-  key_vault_id = azurerm_key_vault.postgresql.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = azurerm_user_assigned_identity.postgresql.principal_id
-
-  key_permissions = [
-    "Get",
-    "List",
-    "WrapKey",
-    "UnwrapKey"
-  ]
+resource "azurerm_role_assignment" "postgresql_identity_kv" {
+  scope                = azurerm_key_vault.postgresql.id
+  role_definition_name = "Key Vault Crypto Service Encryption User"
+  principal_id         = azurerm_user_assigned_identity.postgresql.principal_id
 }
 
 resource "azurerm_key_vault_key" "postgresql" {
@@ -111,8 +96,7 @@ resource "azurerm_key_vault_key" "postgresql" {
   key_opts     = ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
 
   depends_on = [
-    azurerm_key_vault_access_policy.current,
-    azurerm_key_vault_access_policy.postgresql_identity
+    azurerm_role_assignment.current_user_kv
   ]
 }
 
@@ -162,4 +146,8 @@ module "postgresql_flexible_server" {
     Environment = "Test"
     Example     = "Secure"
   }
+
+  depends_on = [
+    azurerm_role_assignment.postgresql_identity_kv
+  ]
 }
