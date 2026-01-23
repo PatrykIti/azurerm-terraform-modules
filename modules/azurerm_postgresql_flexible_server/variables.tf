@@ -1,6 +1,9 @@
 # Core PostgreSQL Flexible Server Variables
 variable "name" {
-  description = "The name of the PostgreSQL Flexible Server. Must be globally unique."
+  description = <<-EOT
+    Name of the PostgreSQL Flexible Server.
+    Must be globally unique. 3-63 chars, lowercase letters, numbers, and hyphens.
+  EOT
   type        = string
 
   validation {
@@ -10,17 +13,26 @@ variable "name" {
 }
 
 variable "resource_group_name" {
-  description = "The name of the resource group in which to create the PostgreSQL Flexible Server."
+  description = <<-EOT
+    Resource group name where the server and server-scoped resources are created.
+    The resource group must already exist.
+  EOT
   type        = string
 }
 
 variable "location" {
-  description = "The Azure Region where the PostgreSQL Flexible Server should exist."
+  description = <<-EOT
+    Azure region for the server and all resources created by this module.
+    Typically match the resource group location.
+  EOT
   type        = string
 }
 
 variable "sku_name" {
-  description = "The SKU name for the PostgreSQL Flexible Server (e.g., GP_Standard_D2s_v3)."
+  description = <<-EOT
+    SKU for the server (e.g. GP_Standard_D2s_v3).
+    Must be supported in the selected region and for the chosen version.
+  EOT
   type        = string
 
   validation {
@@ -30,7 +42,10 @@ variable "sku_name" {
 }
 
 variable "postgresql_version" {
-  description = "The PostgreSQL version for the server."
+  description = <<-EOT
+    PostgreSQL major version for the server.
+    Allowed values are validated; choose a version supported in the region.
+  EOT
   type        = string
 
   validation {
@@ -40,7 +55,10 @@ variable "postgresql_version" {
 }
 
 variable "administrator_login" {
-  description = "The administrator login for the PostgreSQL Flexible Server. Required when create_mode is Default."
+  description = <<-EOT
+    Local administrator login for password authentication.
+    Required when create_mode is Default and password_auth_enabled is true.
+  EOT
   type        = string
   default     = null
 
@@ -51,7 +69,10 @@ variable "administrator_login" {
 }
 
 variable "administrator_password" {
-  description = "The administrator password for the PostgreSQL Flexible Server. Required when create_mode is Default and password authentication is enabled."
+  description = <<-EOT
+    Local administrator password for password authentication.
+    Required when create_mode is Default and password_auth_enabled is true.
+  EOT
   type        = string
   default     = null
   sensitive   = true
@@ -72,7 +93,10 @@ variable "administrator_password" {
 }
 
 variable "storage" {
-  description = "Storage configuration for the PostgreSQL Flexible Server."
+  description = <<-EOT
+    Storage settings for the server.
+    Leave empty to use Azure defaults. storage_mb is in MB; storage_tier must be valid.
+  EOT
   type = object({
     storage_mb   = optional(number)
     storage_tier = optional(string)
@@ -111,7 +135,10 @@ variable "storage" {
 }
 
 variable "backup" {
-  description = "Backup configuration for the PostgreSQL Flexible Server."
+  description = <<-EOT
+    Backup settings for the server.
+    retention_days must be 7-35. geo_redundant_backup_enabled controls GRS backups.
+  EOT
   type = object({
     retention_days               = optional(number, 7)
     geo_redundant_backup_enabled = optional(bool, false)
@@ -125,7 +152,12 @@ variable "backup" {
 }
 
 variable "network" {
-  description = "Network configuration for the PostgreSQL Flexible Server."
+  description = <<-EOT
+    Network settings for the server.
+    By default public access is enabled. For private access set
+    public_network_access_enabled = false and provide both delegated_subnet_id
+    and private_dns_zone_id.
+  EOT
   type = object({
     public_network_access_enabled = optional(bool)
     delegated_subnet_id           = optional(string)
@@ -155,7 +187,12 @@ variable "network" {
 }
 
 variable "authentication" {
-  description = "Authentication configuration for the PostgreSQL Flexible Server."
+  description = <<-EOT
+    Authentication settings for the server.
+    At least one method must be enabled. For Entra ID (AAD) set
+    active_directory_auth_enabled = true and provide active_directory_administrator
+    plus tenant_id (here or in the admin block).
+  EOT
   type = object({
     active_directory_auth_enabled = optional(bool, false)
     password_auth_enabled         = optional(bool, true)
@@ -191,7 +228,12 @@ variable "authentication" {
 }
 
 variable "high_availability" {
-  description = "High availability configuration for the PostgreSQL Flexible Server."
+  description = <<-EOT
+    High availability settings.
+    mode can be ZoneRedundant or SameZone. When ZoneRedundant,
+    standby_availability_zone is optional; if omitted Azure chooses the zone
+    and may update it after failover.
+  EOT
   type = object({
     mode                      = string
     standby_availability_zone = optional(string)
@@ -210,7 +252,10 @@ variable "high_availability" {
 }
 
 variable "maintenance_window" {
-  description = "Maintenance window configuration for the PostgreSQL Flexible Server."
+  description = <<-EOT
+    Maintenance window in UTC.
+    day_of_week is 0-6, start_hour is 0-23, start_minute is 0-59.
+  EOT
   type = object({
     day_of_week  = number
     start_hour   = number
@@ -229,13 +274,20 @@ variable "maintenance_window" {
 }
 
 variable "zone" {
-  description = "The availability zone for the PostgreSQL Flexible Server."
+  description = <<-EOT
+    Availability zone for the primary server.
+    Optional; if null Azure selects a zone.
+  EOT
   type        = string
   default     = null
 }
 
 variable "identity" {
-  description = "Managed identity configuration for the PostgreSQL Flexible Server."
+  description = <<-EOT
+    Managed identity configuration.
+    type can be SystemAssigned, UserAssigned, or both. When UserAssigned is
+    included, identity_ids must be provided.
+  EOT
   type = object({
     type         = string
     identity_ids = optional(list(string))
@@ -265,7 +317,12 @@ variable "identity" {
 }
 
 variable "customer_managed_key" {
-  description = "Customer-managed key configuration for the PostgreSQL Flexible Server. key_vault_key_id must be a Key Vault key URL."
+  description = <<-EOT
+    Customer-managed key configuration using Azure Key Vault.
+    Requires a user-assigned identity and a Key Vault key ID.
+    primary_user_assigned_identity_id must be included in identity.identity_ids.
+    Geo backup key and identity are optional.
+  EOT
   type = object({
     key_vault_key_id                     = string
     primary_user_assigned_identity_id    = string
@@ -297,7 +354,12 @@ variable "customer_managed_key" {
 }
 
 variable "create_mode" {
-  description = "Create mode configuration for the PostgreSQL Flexible Server."
+  description = <<-EOT
+    Create mode for the server.
+    Use Default for new servers. Replica/GeoRestore/ReviveDropped/PointInTimeRestore
+    require source_server_id, and PointInTimeRestore requires
+    point_in_time_restore_time_in_utc.
+  EOT
   type = object({
     mode                              = optional(string)
     source_server_id                  = optional(string)
@@ -356,7 +418,10 @@ variable "create_mode" {
 }
 
 variable "timeouts" {
-  description = "Timeout configuration for the PostgreSQL Flexible Server."
+  description = <<-EOT
+    Custom timeouts for create, update, delete (e.g. "60m").
+    Leave null to use provider defaults.
+  EOT
   type = object({
     create = optional(string)
     update = optional(string)
@@ -366,7 +431,10 @@ variable "timeouts" {
 }
 
 variable "configurations" {
-  description = "List of PostgreSQL server configurations to apply."
+  description = <<-EOT
+    List of server configuration name/value pairs.
+    Names must be unique.
+  EOT
   type = list(object({
     name  = string
     value = string
@@ -388,7 +456,10 @@ variable "configurations" {
 }
 
 variable "firewall_rules" {
-  description = "List of firewall rules to create for the PostgreSQL Flexible Server (public access only)."
+  description = <<-EOT
+    Firewall rules for public access.
+    Only valid when public network access is enabled. Provide start and end IPv4 addresses.
+  EOT
   type = list(object({
     name             = string
     start_ip_address = string
@@ -426,7 +497,11 @@ variable "firewall_rules" {
 }
 
 variable "active_directory_administrator" {
-  description = "Active Directory administrator configuration for the PostgreSQL Flexible Server."
+  description = <<-EOT
+    Entra ID administrator settings.
+    Required when authentication.active_directory_auth_enabled = true. Provide
+    principal_name, object_id, principal_type, and optionally tenant_id.
+  EOT
   type = object({
     principal_name = string
     object_id      = string
@@ -442,7 +517,10 @@ variable "active_directory_administrator" {
 }
 
 variable "virtual_endpoints" {
-  description = "List of virtual endpoints to create for PostgreSQL Flexible Server replicas."
+  description = <<-EOT
+    Virtual endpoints for replicas.
+    Each entry must include source_server_id or replica_server_id. type is ReadWrite.
+  EOT
   type = list(object({
     name              = string
     source_server_id  = optional(string)
@@ -474,7 +552,10 @@ variable "virtual_endpoints" {
 }
 
 variable "backups" {
-  description = "List of manual backups to create for the PostgreSQL Flexible Server."
+  description = <<-EOT
+    Manual backup definitions.
+    Each entry creates a server-scoped backup with a unique name.
+  EOT
   type = list(object({
     name = string
   }))
@@ -490,10 +571,10 @@ variable "backups" {
 variable "diagnostic_settings" {
   description = <<-EOT
     Diagnostic settings for PostgreSQL Flexible Server logs and metrics.
-
     Each item creates a separate azurerm_monitor_diagnostic_setting for the server.
-    Provide explicit log_categories and/or metric_categories. At least one
-    destination is required.
+    Provide explicit log_categories and/or metric_categories and at least one
+    destination (Log Analytics, Storage, or Event Hub). Categories must be
+    supported by Azure Monitor for this resource.
   EOT
 
   type = list(object({
@@ -555,7 +636,10 @@ variable "diagnostic_settings" {
 
 # Tags
 variable "tags" {
-  description = "A mapping of tags to assign to the PostgreSQL Flexible Server."
+  description = <<-EOT
+    Tags to apply to the server.
+    Provide a map of string keys and values.
+  EOT
   type        = map(string)
   default     = {}
 }

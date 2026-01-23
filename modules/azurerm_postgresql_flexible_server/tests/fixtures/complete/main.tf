@@ -66,8 +66,7 @@ module "postgresql_flexible_server" {
   }
 
   high_availability = {
-    mode                      = "ZoneRedundant"
-    standby_availability_zone = "2"
+    mode = "ZoneRedundant"
   }
 
   maintenance_window = {

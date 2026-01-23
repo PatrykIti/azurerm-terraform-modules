@@ -75,6 +75,21 @@ resource "azurerm_key_vault" "postgresql" {
   soft_delete_retention_days = 7
 }
 
+resource "azurerm_key_vault_access_policy" "current" {
+  key_vault_id = azurerm_key_vault.postgresql.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = data.azurerm_client_config.current.object_id
+
+  key_permissions = [
+    "Create",
+    "Delete",
+    "Get",
+    "List",
+    "Purge",
+    "Recover"
+  ]
+}
+
 resource "azurerm_key_vault_access_policy" "postgresql_identity" {
   key_vault_id = azurerm_key_vault.postgresql.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
@@ -94,6 +109,11 @@ resource "azurerm_key_vault_key" "postgresql" {
   key_type     = "RSA"
   key_size     = 2048
   key_opts     = ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
+
+  depends_on = [
+    azurerm_key_vault_access_policy.current,
+    azurerm_key_vault_access_policy.postgresql_identity
+  ]
 }
 
 resource "random_password" "admin" {
