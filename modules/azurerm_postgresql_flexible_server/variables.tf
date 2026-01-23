@@ -71,28 +71,32 @@ variable "storage" {
   default = {}
 
   validation {
-    condition = var.storage.storage_mb == null || (
-      var.storage.storage_mb >= 32768 &&
-      var.storage.storage_mb <= 33553408 &&
-      var.storage.storage_mb == floor(var.storage.storage_mb)
+    condition = var.storage == null ? true : (
+      var.storage.storage_mb == null || (
+        var.storage.storage_mb >= 32768 &&
+        var.storage.storage_mb <= 33553408 &&
+        var.storage.storage_mb == floor(var.storage.storage_mb)
+      )
     )
     error_message = "storage.storage_mb must be an integer between 32768 and 33553408 when set."
   }
 
   validation {
-    condition = var.storage.storage_tier == null || contains([
-      "P4",
-      "P6",
-      "P10",
-      "P15",
-      "P20",
-      "P30",
-      "P40",
-      "P50",
-      "P60",
-      "P70",
-      "P80"
-    ], var.storage.storage_tier)
+    condition = var.storage == null ? true : (
+      var.storage.storage_tier == null || contains([
+        "P4",
+        "P6",
+        "P10",
+        "P15",
+        "P20",
+        "P30",
+        "P40",
+        "P50",
+        "P60",
+        "P70",
+        "P80"
+      ], var.storage.storage_tier)
+    )
     error_message = "storage.storage_tier must be one of: P4, P6, P10, P15, P20, P30, P40, P50, P60, P70, P80."
   }
 }
@@ -106,7 +110,7 @@ variable "backup" {
   default = {}
 
   validation {
-    condition     = var.backup.retention_days >= 7 && var.backup.retention_days <= 35
+    condition     = var.backup == null ? true : (var.backup.retention_days >= 7 && var.backup.retention_days <= 35)
     error_message = "backup.retention_days must be between 7 and 35."
   }
 }
@@ -131,15 +135,14 @@ variable "authentication" {
   default = {}
 
   validation {
-    condition = !(
-      try(var.authentication.active_directory_auth_enabled, false) == false &&
-      try(var.authentication.password_auth_enabled, true) == false
+    condition = var.authentication == null ? true : (
+      var.authentication.active_directory_auth_enabled || var.authentication.password_auth_enabled
     )
     error_message = "At least one authentication method must be enabled (active_directory_auth_enabled or password_auth_enabled)."
   }
 
   validation {
-    condition     = try(var.authentication.active_directory_auth_enabled, false) == false || try(var.authentication.tenant_id, null) != null
+    condition     = var.authentication == null ? true : (!var.authentication.active_directory_auth_enabled || var.authentication.tenant_id != null)
     error_message = "authentication.tenant_id is required when active_directory_auth_enabled is true."
   }
 }
@@ -202,12 +205,18 @@ variable "identity" {
   }
 
   validation {
-    condition     = var.identity == null || try(length(var.identity.identity_ids), 0) == 0 || contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type)
+    condition = var.identity == null ? true : (
+      var.identity.identity_ids == null || length(var.identity.identity_ids) == 0 ||
+      contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type)
+    )
     error_message = "identity.identity_ids can only be set when identity.type includes UserAssigned."
   }
 
   validation {
-    condition     = var.identity == null || !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type) || (var.identity.identity_ids != null && length(var.identity.identity_ids) > 0)
+    condition = var.identity == null ? true : (
+      !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type) ||
+      (var.identity.identity_ids != null && length(var.identity.identity_ids) > 0)
+    )
     error_message = "identity.identity_ids must be provided when identity.type includes UserAssigned."
   }
 }
@@ -238,14 +247,16 @@ variable "create_mode" {
   default = {}
 
   validation {
-    condition = try(var.create_mode.mode, null) == null || contains([
-      "Default",
-      "PointInTimeRestore",
-      "Replica",
-      "ReviveDropped",
-      "GeoRestore",
-      "Update"
-    ], var.create_mode.mode)
+    condition = var.create_mode == null ? true : (
+      var.create_mode.mode == null || contains([
+        "Default",
+        "PointInTimeRestore",
+        "Replica",
+        "ReviveDropped",
+        "GeoRestore",
+        "Update"
+      ], var.create_mode.mode)
+    )
     error_message = "create_mode.mode must be one of: Default, PointInTimeRestore, Replica, ReviveDropped, GeoRestore, Update."
   }
 }
@@ -373,13 +384,12 @@ variable "diagnostic_settings" {
     Diagnostic settings for PostgreSQL Flexible Server logs and metrics.
 
     Each item creates a separate azurerm_monitor_diagnostic_setting for the server.
-    Use areas to group categories (all, logs, metrics) or provide explicit
-    log_categories / metric_categories. At least one destination is required.
+    Provide explicit log_categories and/or metric_categories. At least one
+    destination is required.
   EOT
 
   type = list(object({
     name                           = string
-    areas                          = optional(list(string))
     log_categories                 = optional(list(string))
     metric_categories              = optional(list(string))
     log_analytics_workspace_id     = optional(string)
@@ -428,12 +438,10 @@ variable "diagnostic_settings" {
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      alltrue([
-        for area in coalescelist(try(ds.areas, null), ["all"]) :
-        contains(["all", "logs", "metrics"], area)
-      ])
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""])
     ])
-    error_message = "areas may contain only: all, logs, metrics."
+    error_message = "log_categories and metric_categories must not contain empty strings."
   }
 }
 

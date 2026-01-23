@@ -21,13 +21,6 @@ mock_provider "azurerm" {
   mock_resource "azurerm_postgresql_flexible_server_virtual_endpoint" {}
   mock_resource "azurerm_postgresql_flexible_server_backup" {}
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types = ["PostgreSQLLogs"]
-      metrics            = ["AllMetrics"]
-    }
-  }
 }
 
 variables {

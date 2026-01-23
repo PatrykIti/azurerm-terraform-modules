@@ -9,13 +9,6 @@ mock_provider "azurerm" {
   }
 
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types = ["PostgreSQLLogs"]
-      metrics            = ["AllMetrics"]
-    }
-  }
 }
 
 variables {
@@ -35,7 +28,8 @@ run "diagnostic_settings_valid" {
     diagnostic_settings = [
       {
         name                       = "pgfs-diag"
-        areas                      = ["all"]
+        log_categories             = ["PostgreSQLLogs"]
+        metric_categories          = ["AllMetrics"]
         log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
       }
     ]

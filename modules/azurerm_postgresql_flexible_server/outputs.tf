@@ -54,8 +54,18 @@ output "backups" {
 }
 
 output "diagnostic_settings_skipped" {
-  description = "Diagnostic settings entries skipped because no categories were available after filtering."
-  value       = local.diagnostic_settings_skipped
+  description = "Diagnostic settings entries skipped because no log or metric categories were supplied."
+  value = [
+    for ds in var.diagnostic_settings : {
+      name              = ds.name
+      log_categories    = ds.log_categories
+      metric_categories = ds.metric_categories
+    }
+    if(
+      (ds.log_categories == null ? 0 : length(ds.log_categories)) +
+      (ds.metric_categories == null ? 0 : length(ds.metric_categories))
+    ) == 0
+  ]
 }
 
 output "tags" {
