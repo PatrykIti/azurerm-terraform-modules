@@ -71,7 +71,7 @@ resource "azurerm_key_vault" "postgresql" {
   resource_group_name        = azurerm_resource_group.example.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   sku_name                   = "standard"
-  enable_rbac_authorization  = true
+  rbac_authorization_enabled = true
   purge_protection_enabled   = true
   soft_delete_retention_days = 7
 }
@@ -139,7 +139,7 @@ module "postgresql_flexible_server" {
 
   backup = {
     retention_days               = 30
-    geo_redundant_backup_enabled = true
+    geo_redundant_backup_enabled = false
   }
 
   tags = {

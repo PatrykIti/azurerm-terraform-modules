@@ -71,21 +71,21 @@ resource "azurerm_key_vault" "postgresql" {
   resource_group_name        = azurerm_resource_group.example.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   sku_name                   = "standard"
+  rbac_authorization_enabled = true
   purge_protection_enabled   = true
   soft_delete_retention_days = 7
 }
 
-resource "azurerm_key_vault_access_policy" "postgresql_identity" {
-  key_vault_id = azurerm_key_vault.postgresql.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = azurerm_user_assigned_identity.postgresql.principal_id
+resource "azurerm_role_assignment" "current_user_kv" {
+  scope                = azurerm_key_vault.postgresql.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
 
-  key_permissions = [
-    "Get",
-    "List",
-    "WrapKey",
-    "UnwrapKey"
-  ]
+resource "azurerm_role_assignment" "postgresql_identity_kv" {
+  scope                = azurerm_key_vault.postgresql.id
+  role_definition_name = "Key Vault Crypto Service Encryption User"
+  principal_id         = azurerm_user_assigned_identity.postgresql.principal_id
 }
 
 resource "azurerm_key_vault_key" "postgresql" {
@@ -94,6 +94,10 @@ resource "azurerm_key_vault_key" "postgresql" {
   key_type     = "RSA"
   key_size     = 2048
   key_opts     = ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
+
+  depends_on = [
+    azurerm_role_assignment.current_user_kv
+  ]
 }
 
 resource "random_password" "admin" {
@@ -147,11 +151,15 @@ module "postgresql_flexible_server" {
 
   backup = {
     retention_days               = 30
-    geo_redundant_backup_enabled = true
+    geo_redundant_backup_enabled = false
   }
 
   tags = {
     Environment = "Production"
     Example     = "Secure"
   }
+
+  depends_on = [
+    azurerm_role_assignment.postgresql_identity_kv
+  ]
 }

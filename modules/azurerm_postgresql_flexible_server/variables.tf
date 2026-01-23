@@ -138,6 +138,7 @@ variable "backup" {
   description = <<-EOT
     Backup settings for the server.
     retention_days must be 7-35. geo_redundant_backup_enabled controls GRS backups.
+    When using customer-managed keys with GRS, provide geo backup key and identity.
   EOT
   type = object({
     retention_days               = optional(number, 7)
@@ -148,6 +149,18 @@ variable "backup" {
   validation {
     condition     = var.backup == null ? true : (var.backup.retention_days >= 7 && var.backup.retention_days <= 35)
     error_message = "backup.retention_days must be between 7 and 35."
+  }
+
+  validation {
+    condition = var.backup == null ? true : (
+      !var.backup.geo_redundant_backup_enabled ||
+      var.customer_managed_key == null ||
+      (
+        var.customer_managed_key.geo_backup_key_vault_key_id != null &&
+        var.customer_managed_key.geo_backup_user_assigned_identity_id != null
+      )
+    )
+    error_message = "geo_redundant_backup_enabled with customer_managed_key requires geo_backup_key_vault_key_id and geo_backup_user_assigned_identity_id."
   }
 }
 
