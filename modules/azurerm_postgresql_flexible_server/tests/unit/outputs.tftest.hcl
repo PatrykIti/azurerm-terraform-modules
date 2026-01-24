@@ -25,13 +25,19 @@ mock_provider "azurerm" {
 }
 
 variables {
-  name                   = "pgfsunit"
-  resource_group_name    = "test-rg"
-  location               = "northeurope"
-  sku_name               = "GP_Standard_D2s_v3"
-  postgresql_version     = "15"
-  administrator_login    = "pgfsadmin"
-  administrator_password = "Password1234"
+  name                = "pgfsunit"
+  resource_group_name = "test-rg"
+  location            = "northeurope"
+  server = {
+    sku_name           = "GP_Standard_D2s_v3"
+    postgresql_version = "15"
+  }
+  authentication = {
+    administrator = {
+      login    = "pgfsadmin"
+      password = "Password1234"
+    }
+  }
   tags = {
     Environment = "Test"
     Module      = "Pgfs"

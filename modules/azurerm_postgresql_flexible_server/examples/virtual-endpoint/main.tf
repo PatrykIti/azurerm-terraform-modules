@@ -37,11 +37,17 @@ module "primary" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  sku_name           = var.sku_name
-  postgresql_version = var.postgresql_version
+  server = {
+    sku_name           = var.sku_name
+    postgresql_version = var.postgresql_version
+  }
 
-  administrator_login    = var.administrator_login
-  administrator_password = random_password.admin.result
+  authentication = {
+    administrator = {
+      login    = var.administrator_login
+      password = random_password.admin.result
+    }
+  }
 
   tags = {
     Environment = "Development"
@@ -56,24 +62,31 @@ module "replica" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  sku_name           = var.sku_name
-  postgresql_version = var.postgresql_version
-
-  administrator_login    = var.administrator_login
-  administrator_password = random_password.admin.result
-
-  create_mode = {
-    mode             = "Replica"
-    source_server_id = module.primary.id
+  server = {
+    sku_name           = var.sku_name
+    postgresql_version = var.postgresql_version
+    create_mode = {
+      mode             = "Replica"
+      source_server_id = module.primary.id
+    }
   }
 
-  virtual_endpoints = [
-    {
-      name             = "primary-replica-endpoint"
-      source_server_id = module.primary.id
-      type             = "ReadWrite"
+  authentication = {
+    administrator = {
+      login    = var.administrator_login
+      password = random_password.admin.result
     }
-  ]
+  }
+
+  features = {
+    virtual_endpoints = [
+      {
+        name             = "primary-replica-endpoint"
+        source_server_id = module.primary.id
+        type             = "ReadWrite"
+      }
+    ]
+  }
 
   tags = {
     Environment = "Development"

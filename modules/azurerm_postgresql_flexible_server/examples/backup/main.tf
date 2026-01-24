@@ -37,17 +37,25 @@ module "postgresql_flexible_server" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  sku_name           = var.sku_name
-  postgresql_version = var.postgresql_version
+  server = {
+    sku_name           = var.sku_name
+    postgresql_version = var.postgresql_version
+  }
 
-  administrator_login    = var.administrator_login
-  administrator_password = random_password.admin.result
-
-  backups = [
-    {
-      name = "manual-backup-001"
+  authentication = {
+    administrator = {
+      login    = var.administrator_login
+      password = random_password.admin.result
     }
-  ]
+  }
+
+  features = {
+    backups = [
+      {
+        name = "manual-backup-001"
+      }
+    ]
+  }
 
   tags = {
     Environment = "Development"

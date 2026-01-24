@@ -76,20 +76,25 @@ module "postgresql_flexible_server" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  sku_name           = var.sku_name
-  postgresql_version = var.postgresql_version
+  server = {
+    sku_name           = var.sku_name
+    postgresql_version = var.postgresql_version
+    encryption = {
+      key_vault_key_id                  = azurerm_key_vault_key.example.id
+      primary_user_assigned_identity_id = azurerm_user_assigned_identity.example.id
+    }
+  }
 
-  administrator_login    = var.administrator_login
-  administrator_password = random_password.admin.result
+  authentication = {
+    administrator = {
+      login    = var.administrator_login
+      password = random_password.admin.result
+    }
+  }
 
   identity = {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.example.id]
-  }
-
-  customer_managed_key = {
-    key_vault_key_id                  = azurerm_key_vault_key.example.id
-    primary_user_assigned_identity_id = azurerm_user_assigned_identity.example.id
   }
 
   tags = {

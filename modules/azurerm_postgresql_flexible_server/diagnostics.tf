@@ -1,6 +1,6 @@
 resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
   for_each = {
-    for ds in var.diagnostic_settings : ds.name => ds
+    for ds in local.monitoring.diagnostic_settings : ds.name => ds
     if(
       (ds.log_categories != null && length(ds.log_categories) > 0) ||
       (ds.metric_categories != null && length(ds.metric_categories) > 0)

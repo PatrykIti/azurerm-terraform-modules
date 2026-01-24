@@ -115,11 +115,25 @@ module "postgresql_flexible_server" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  sku_name           = "GP_Standard_D2s_v3"
-  postgresql_version = "15"
+  server = {
+    sku_name           = "GP_Standard_D2s_v3"
+    postgresql_version = "15"
+    backup = {
+      retention_days               = 30
+      geo_redundant_backup_enabled = false
+    }
+    encryption = {
+      key_vault_key_id                  = azurerm_key_vault_key.postgresql.id
+      primary_user_assigned_identity_id = azurerm_user_assigned_identity.postgresql.id
+    }
+  }
 
-  administrator_login    = "pgfsadmin"
-  administrator_password = random_password.admin.result
+  authentication = {
+    administrator = {
+      login    = "pgfsadmin"
+      password = random_password.admin.result
+    }
+  }
 
   network = {
     public_network_access_enabled = false
@@ -130,16 +144,6 @@ module "postgresql_flexible_server" {
   identity = {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.postgresql.id]
-  }
-
-  customer_managed_key = {
-    key_vault_key_id                  = azurerm_key_vault_key.postgresql.id
-    primary_user_assigned_identity_id = azurerm_user_assigned_identity.postgresql.id
-  }
-
-  backup = {
-    retention_days               = 30
-    geo_redundant_backup_enabled = false
   }
 
   tags = {

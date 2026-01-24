@@ -38,11 +38,17 @@ module "postgresql_flexible_server" {
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
 
-  sku_name           = "GP_Standard_D2s_v3"
-  postgresql_version = "15"
+  server = {
+    sku_name           = "GP_Standard_D2s_v3"
+    postgresql_version = "15"
+  }
 
-  administrator_login    = "pgfsadmin"
-  administrator_password = random_password.admin.result
+  authentication = {
+    administrator = {
+      login    = "pgfsadmin"
+      password = random_password.admin.result
+    }
+  }
 
   tags = {
     Environment = "Test"

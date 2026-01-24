@@ -44,11 +44,17 @@ module "postgresql_flexible_server" {
   resource_group_name = var.resource_group_name
   location            = var.location
 
-  sku_name            = var.sku_name
-  postgresql_version  = var.postgresql_version
+  server = {
+    sku_name           = var.sku_name
+    postgresql_version = var.postgresql_version
+  }
 
-  administrator_login    = var.administrator_login
-  administrator_password = var.administrator_password
+  authentication = {
+    administrator = {
+      login    = var.administrator_login
+      password = var.administrator_password
+    }
+  }
 }
 ```
 

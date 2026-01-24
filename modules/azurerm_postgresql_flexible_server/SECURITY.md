@@ -12,7 +12,7 @@ This document describes the security controls supported by the
 - **Private access**: Use `network.public_network_access_enabled = false` and
   supply `network.delegated_subnet_id` plus `network.private_dns_zone_id`.
 - **Firewall rules**: When public access is enabled, restrict inbound access via
-  `firewall_rules` using explicit allow-list IP ranges.
+  `network.firewall_rules` using explicit allow-list IP ranges.
 
 ### 2) Authentication and Identity
 
@@ -25,18 +25,18 @@ This document describes the security controls supported by the
 
 ### 3) Customer-Managed Keys (CMK)
 
-- **BYOK support**: Configure `customer_managed_key` with a Key Vault key URL.
+- **BYOK support**: Configure `server.encryption` with a Key Vault key URL.
 - **User-assigned identity required**: The identity must have access to the key.
 
 ### 4) Backup and Resilience
 
-- **Retention**: `backup.retention_days` supports 7-35 days.
-- **Geo-redundant backups**: Enable with `backup.geo_redundant_backup_enabled`.
+- **Retention**: `server.backup.retention_days` supports 7-35 days.
+- **Geo-redundant backups**: Enable with `server.backup.geo_redundant_backup_enabled`.
 
 ### 5) Monitoring and Auditing
 
 - **Diagnostic settings**: Stream logs and metrics to Log Analytics, Storage, or
-  Event Hub with `diagnostic_settings`.
+  Event Hub with `monitoring.diagnostic_settings`.
 
 ## Secure Configuration Example
 
@@ -78,8 +78,10 @@ Before deploying to production:
 3) **CMK without identity access**
    ```hcl
    # Avoid setting CMK without a user-assigned identity
-   customer_managed_key = {
-     key_vault_key_id = "https://.../keys/key/version"
+   server = {
+     encryption = {
+       key_vault_key_id = "https://.../keys/key/version"
+     }
    }
    ```
 

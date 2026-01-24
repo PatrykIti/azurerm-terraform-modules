@@ -1,5 +1,7 @@
 # Terraform gitignore - Based on HashiCorp recommendations
 
+info.sh
+
 # Local .terraform directories
 **/.terraform/*
 
