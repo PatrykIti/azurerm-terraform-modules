@@ -271,6 +271,7 @@ variable "authentication" {
     }))
   })
 
+  nullable  = false
   default   = {}
   sensitive = true
 
@@ -346,7 +347,7 @@ variable "network" {
   EOT
 
   type = object({
-    public_network_access_enabled = optional(bool)
+    public_network_access_enabled = optional(bool, true)
     delegated_subnet_id           = optional(string)
     private_dns_zone_id           = optional(string)
     firewall_rules = optional(list(object({
@@ -356,6 +357,7 @@ variable "network" {
     })), [])
   })
 
+  nullable = false
   default = {}
 
   validation {
@@ -474,6 +476,7 @@ variable "features" {
     })), [])
   })
 
+  nullable = false
   default = {}
 
   validation {
@@ -537,6 +540,7 @@ variable "monitoring" {
     eventhub_name                  = optional(string)
   }))
 
+  nullable = false
   default = []
 
   validation {

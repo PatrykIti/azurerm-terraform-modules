@@ -56,7 +56,7 @@ output "backups" {
 output "diagnostic_settings_skipped" {
   description = "Diagnostic settings entries skipped because no log or metric categories were supplied."
   value = [
-    for ds in local.monitoring : {
+    for ds in var.monitoring : {
       name              = ds.name
       log_categories    = ds.log_categories
       metric_categories = ds.metric_categories
