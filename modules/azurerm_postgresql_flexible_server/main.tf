@@ -21,6 +21,10 @@ resource "azurerm_postgresql_flexible_server" "postgresql_flexible_server" {
 
   zone = var.server.zone
 
+  lifecycle {
+    ignore_changes = var.server.zone == null ? [zone] : []
+  }
+
   create_mode                       = var.server.create_mode != null && var.server.create_mode.mode != null ? var.server.create_mode.mode : "Default"
   source_server_id                  = var.server.create_mode == null ? null : var.server.create_mode.source_server_id
   point_in_time_restore_time_in_utc = var.server.create_mode == null ? null : var.server.create_mode.point_in_time_restore_time_in_utc
