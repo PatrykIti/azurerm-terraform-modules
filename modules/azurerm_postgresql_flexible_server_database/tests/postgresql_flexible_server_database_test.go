@@ -90,7 +90,7 @@ func TestSecurePostgresqlFlexibleServerDatabase(t *testing.T) {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
 		resourceID := terraform.Output(t, terraformOptions, "postgresql_flexible_server_database_id")
-		publicAccess := terraform.OutputBool(t, terraformOptions, "public_network_access_enabled")
+		publicAccess := OutputBool(t, terraformOptions, "public_network_access_enabled")
 
 		assert.NotEmpty(t, resourceID)
 		assert.False(t, publicAccess)
