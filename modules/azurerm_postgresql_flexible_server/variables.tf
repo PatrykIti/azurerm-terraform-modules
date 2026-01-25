@@ -358,7 +358,7 @@ variable "network" {
   })
 
   nullable = false
-  default = {}
+  default  = {}
 
   validation {
     condition = var.network == null ? true : (
@@ -477,7 +477,7 @@ variable "features" {
   })
 
   nullable = false
-  default = {}
+  default  = {}
 
   validation {
     condition     = length(try(var.features.configurations, [])) == length(distinct([for cfg in try(var.features.configurations, []) : cfg.name]))
@@ -541,7 +541,7 @@ variable "monitoring" {
   }))
 
   nullable = false
-  default = []
+  default  = []
 
   validation {
     condition     = length(var.monitoring) <= 5
@@ -580,8 +580,8 @@ variable "monitoring" {
   validation {
     condition = alltrue([
       for ds in var.monitoring :
-      alltrue([for c in (ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
-      alltrue([for c in (ds.metric_categories == null ? [] : ds.metric_categories) : c != ""])
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""])
     ])
     error_message = "log_categories and metric_categories must not contain empty strings."
   }
