@@ -28,7 +28,7 @@ locals {
   }
 
   monitoring = {
-    diagnostic_settings = try(var.monitoring.diagnostic_settings, [])
+    diagnostic_settings = try(var.monitoring.diagnostic_settings, {})
   }
 
   public_network_access_enabled = (

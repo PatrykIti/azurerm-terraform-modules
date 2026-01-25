@@ -221,12 +221,11 @@ run "diagnostic_settings_missing_destination" {
 
   variables {
     monitoring = {
-      diagnostic_settings = [
-        {
-          name           = "missing-destination"
+      diagnostic_settings = {
+        "missing-destination" = {
           log_categories = ["PostgreSQLLogs"]
         }
-      ]
+      }
     }
   }
 
@@ -240,13 +239,12 @@ run "diagnostic_settings_missing_eventhub_name" {
 
   variables {
     monitoring = {
-      diagnostic_settings = [
-        {
-          name                           = "missing-eventhub-name"
+      diagnostic_settings = {
+        "missing-eventhub-name" = {
           metric_categories              = ["AllMetrics"]
           eventhub_authorization_rule_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.EventHub/namespaces/ns/authorizationRules/rule"
         }
-      ]
+      }
     }
   }
 

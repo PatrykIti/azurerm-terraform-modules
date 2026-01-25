@@ -1,13 +1,13 @@
 resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
   for_each = {
-    for ds in local.monitoring.diagnostic_settings : ds.name => ds
+    for name, ds in local.monitoring.diagnostic_settings : name => ds
     if(
       (ds.log_categories != null && length(ds.log_categories) > 0) ||
       (ds.metric_categories != null && length(ds.metric_categories) > 0)
     )
   }
 
-  name               = each.value.name
+  name               = each.key
   target_resource_id = azurerm_postgresql_flexible_server.postgresql_flexible_server.id
 
   log_analytics_workspace_id     = each.value.log_analytics_workspace_id
