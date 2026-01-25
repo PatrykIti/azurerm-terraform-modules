@@ -1,0 +1,83 @@
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "4.57.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.6.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "example" {
+  name     = "rg-pgfsdb-complete-${var.random_suffix}"
+  location = var.location
+}
+
+resource "random_password" "admin" {
+  length      = 24
+  min_lower   = 1
+  min_upper   = 1
+  min_numeric = 1
+  special     = false
+}
+
+module "postgresql_flexible_server" {
+  source = "../../../../azurerm_postgresql_flexible_server"
+
+  name                = "pgfsdbcomplete${var.random_suffix}"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+
+  server = {
+    sku_name           = var.sku_name
+    postgresql_version = var.postgresql_version
+    storage = {
+      storage_mb   = 65536
+      storage_tier = "P20"
+    }
+    backup = {
+      retention_days               = 14
+      geo_redundant_backup_enabled = false
+    }
+    maintenance_window = {
+      day_of_week  = 0
+      start_hour   = 2
+      start_minute = 0
+    }
+  }
+
+  authentication = {
+    administrator = {
+      login    = "pgfsadmin"
+      password = random_password.admin.result
+    }
+  }
+
+  tags = {
+    Environment = "Test"
+    Example     = "Complete"
+  }
+}
+
+module "postgresql_flexible_server_database" {
+  source = "../../../"
+
+  server = {
+    id = module.postgresql_flexible_server.id
+  }
+
+  database = {
+    name      = "appdb${var.random_suffix}"
+    charset   = "UTF8"
+    collation = "en_US.utf8"
+  }
+}
