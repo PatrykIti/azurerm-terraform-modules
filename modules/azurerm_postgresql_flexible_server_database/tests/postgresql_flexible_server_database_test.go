@@ -17,7 +17,7 @@ import (
 func TestBasicPostgresqlFlexibleServerDatabase(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_postgresql_flexible_server_database/tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -45,7 +45,7 @@ func TestBasicPostgresqlFlexibleServerDatabase(t *testing.T) {
 func TestCompletePostgresqlFlexibleServerDatabase(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_postgresql_flexible_server_database/tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -75,7 +75,7 @@ func TestCompletePostgresqlFlexibleServerDatabase(t *testing.T) {
 func TestSecurePostgresqlFlexibleServerDatabase(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_postgresql_flexible_server_database/tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -118,7 +118,7 @@ func TestPostgresqlFlexibleServerDatabaseValidationRules(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", fmt.Sprintf("tests/fixtures/%s", tc.fixtureFile))
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fmt.Sprintf("azurerm_postgresql_flexible_server_database/tests/fixtures/%s", tc.fixtureFile))
 			terraformOptions := &terraform.Options{
 				TerraformDir: testFolder,
 				NoColor:      true,

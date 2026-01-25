@@ -15,7 +15,7 @@ func TestPostgresqlFlexibleServerDatabaseFullIntegration(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_postgresql_flexible_server_database/tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 		terraform.Destroy(t, terraformOptions)
@@ -49,7 +49,7 @@ func TestPostgresqlFlexibleServerDatabaseLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_postgresql_flexible_server_database/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	defer terraform.Destroy(t, terraformOptions)
 

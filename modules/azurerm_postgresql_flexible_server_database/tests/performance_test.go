@@ -17,7 +17,7 @@ func BenchmarkPostgresqlFlexibleServerDatabaseCreation(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_postgresql_flexible_server_database/tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		b.StartTimer()
 
@@ -35,7 +35,7 @@ func TestPostgresqlFlexibleServerDatabaseCreationTime(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_postgresql_flexible_server_database/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	defer terraform.Destroy(t, terraformOptions)
 
