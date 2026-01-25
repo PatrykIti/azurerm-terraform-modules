@@ -5,7 +5,7 @@
 **Category:** New Module / Database  
 **Estimated Effort:** Medium  
 **Dependencies:** TASK-016  
-**Status:** To Do
+**Status:** Done
 
 ---
 
@@ -168,4 +168,3 @@ Server. Serwer jest poza zakresem modulu.
 - `module.json` + `.releaserc.js` poprawne scope i tag prefix.
 - `generate-docs.sh` i `.terraform-docs.yml` dla modulu i examples.
 - Aktualizacja listy examples przez `./scripts/update-examples-list.sh`.
-

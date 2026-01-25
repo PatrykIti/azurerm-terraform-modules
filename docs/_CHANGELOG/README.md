@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [059](./059-2026-01-25-postgresql-flexible-server-database-module.md) | 2026-01-25 | PostgreSQL Flexible Server Database module | Feature |
 | [058](./058-2026-01-22-postgresql-flexible-server-module.md) | 2026-01-22 | PostgreSQL Flexible Server module (full feature scope) | Feature |
 | [057](./057-2026-01-14-aks-secrets-manual-inputs.md) | 2026-01-14 | AKS secrets manual strategy input refactor | Breaking Change / Maintenance |
 | [056](./056-2026-01-09-azuredevops-user-entitlement-compliance-fixes.md) | 2026-01-09 | Azure DevOps User Entitlement module compliance fixes | Breaking Change / Maintenance |
