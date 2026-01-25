@@ -13,25 +13,19 @@ mock_provider "azurerm" {
 }
 
 variables {
-  server = {
-    id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgfsunit"
-  }
-  database = {
-    name = "appdbunit"
-  }
+  server_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgfsunit"
+  name      = "appdbunit"
 }
 
 run "missing_server_id" {
   command = plan
 
   variables {
-    server = {
-      id = ""
-    }
+    server_id = ""
   }
 
   expect_failures = [
-    var.server
+    var.server_id
   ]
 }
 
@@ -39,14 +33,12 @@ run "empty_charset" {
   command = plan
 
   variables {
-    database = {
-      name    = "appdbunit"
-      charset = ""
-    }
+    name    = "appdbunit"
+    charset = ""
   }
 
   expect_failures = [
-    var.database
+    var.charset
   ]
 }
 
@@ -54,13 +46,11 @@ run "empty_collation" {
   command = plan
 
   variables {
-    database = {
-      name      = "appdbunit"
-      collation = ""
-    }
+    name      = "appdbunit"
+    collation = ""
   }
 
   expect_failures = [
-    var.database
+    var.collation
   ]
 }

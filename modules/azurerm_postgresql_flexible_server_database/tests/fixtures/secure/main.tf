@@ -99,11 +99,6 @@ module "postgresql_flexible_server" {
 module "postgresql_flexible_server_database" {
   source = "../../../"
 
-  server = {
-    id = module.postgresql_flexible_server.id
-  }
-
-  database = {
-    name = "appdb${var.random_suffix}"
-  }
+  server_id = module.postgresql_flexible_server.id
+  name      = "appdb${var.random_suffix}"
 }

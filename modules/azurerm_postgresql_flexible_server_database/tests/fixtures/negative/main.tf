@@ -16,11 +16,6 @@ provider "azurerm" {
 module "postgresql_flexible_server_database" {
   source = "../../../"
 
-  server = {
-    id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgfsunit"
-  }
-
-  database = {
-    name = "INVALID_NAME"
-  }
+  server_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgfsunit"
+  name      = "INVALID_NAME"
 }

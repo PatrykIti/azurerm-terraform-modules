@@ -1,8 +1,8 @@
 resource "azurerm_postgresql_flexible_server_database" "database" {
-  name      = var.database.name
-  server_id = var.server.id
+  name      = var.name
+  server_id = var.server_id
 
-  charset   = var.database.charset
-  collation = var.database.collation
+  charset   = var.charset
+  collation = var.collation
 
 }

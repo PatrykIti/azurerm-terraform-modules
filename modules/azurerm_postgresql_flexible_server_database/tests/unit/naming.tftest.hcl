@@ -13,25 +13,19 @@ mock_provider "azurerm" {
 }
 
 variables {
-  server = {
-    id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgfsunit"
-  }
-  database = {
-    name = "appdbunit"
-  }
+  server_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgfsunit"
+  name      = "appdbunit"
 }
 
 run "invalid_name_uppercase" {
   command = plan
 
   variables {
-    database = {
-      name = "INVALID_NAME"
-    }
+    name = "INVALID_NAME"
   }
 
   expect_failures = [
-    var.database
+    var.name
   ]
 }
 
@@ -39,13 +33,11 @@ run "invalid_name_too_long" {
   command = plan
 
   variables {
-    database = {
-      name = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    }
+    name = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   }
 
   expect_failures = [
-    var.database
+    var.name
   ]
 }
 
@@ -53,12 +45,10 @@ run "invalid_name_invalid_char" {
   command = plan
 
   variables {
-    database = {
-      name = "bad.name"
-    }
+    name = "bad.name"
   }
 
   expect_failures = [
-    var.database
+    var.name
   ]
 }

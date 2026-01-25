@@ -13,14 +13,10 @@ mock_provider "azurerm" {
 }
 
 variables {
-  server = {
-    id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgfsunit"
-  }
-  database = {
-    name      = "appdbunit"
-    charset   = "UTF8"
-    collation = "en_US.utf8"
-  }
+  server_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgfsunit"
+  name      = "appdbunit"
+  charset   = "UTF8"
+  collation = "en_US.utf8"
 }
 
 run "verify_basic_outputs" {

@@ -15,13 +15,8 @@ module state.
 module "postgresql_flexible_server_database" {
   source = "github.com/<org>/<repo>//modules/azurerm_postgresql_flexible_server_database?ref=PGFSDBv1.0.0"
 
-  server = {
-    id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgfs-example"
-  }
-
-  database = {
-    name = "appdb"
-  }
+  server_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgfs-example"
+  name      = "appdb"
 }
 ```
 
@@ -43,6 +38,6 @@ After running `terraform plan`, verify that:
 
 ## Common Errors
 
-- **Invalid server ID**: Ensure `server.id` points to the hosting flexible server.
-- **Mismatched database name**: `database.name` must match the database segment
+- **Invalid server ID**: Ensure `server_id` points to the hosting flexible server.
+- **Mismatched database name**: `name` must match the database segment
   in the import ID.

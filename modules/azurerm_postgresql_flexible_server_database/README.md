@@ -68,13 +68,8 @@ module "postgresql_flexible_server" {
 module "postgresql_flexible_server_database" {
   source = "path/to/azurerm_postgresql_flexible_server_database"
 
-  server = {
-    id = module.postgresql_flexible_server.id
-  }
-
-  database = {
-    name = "appdb"
-  }
+  server_id = module.postgresql_flexible_server.id
+  name      = "appdb"
 }
 ```
 
@@ -83,7 +78,7 @@ module "postgresql_flexible_server_database" {
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates a basic PostgreSQL Flexible Server Database configuration using secure defaults and minimal setup.
 - [Complete](examples/complete) - This example demonstrates a comprehensive deployment of PostgreSQL Flexible Server Database with all available features and configurations.
-- [Secure](examples/secure) - This example demonstrates a maximum-security PostgreSQL Flexible Server Database configuration suitable for highly sensitive data and regulated environments.
+- [Secure](examples/secure) - This example demonstrates a private-networked PostgreSQL Flexible Server with a database created through the module.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
@@ -116,8 +111,10 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_database"></a> [database](#input\_database) | PostgreSQL database configuration.<br/><br/>name: Database name.<br/>charset: Optional database charset (e.g. UTF8).<br/>collation: Optional database collation (e.g. en\_US.utf8). | <pre>object({<br/>    name      = string<br/>    charset   = optional(string)<br/>    collation = optional(string)<br/>  })</pre> | n/a | yes |
-| <a name="input_server"></a> [server](#input\_server) | PostgreSQL Flexible Server configuration for the database.<br/><br/>id: Resource ID of the PostgreSQL Flexible Server hosting the database. | <pre>object({<br/>    id = string<br/>  })</pre> | n/a | yes |
+| <a name="input_charset"></a> [charset](#input\_charset) | Optional database charset (e.g. UTF8). | `string` | `null` | no |
+| <a name="input_collation"></a> [collation](#input\_collation) | Optional database collation (e.g. en\_US.utf8). | `string` | `null` | no |
+| <a name="input_name"></a> [name](#input\_name) | PostgreSQL database name. | `string` | n/a | yes |
+| <a name="input_server_id"></a> [server\_id](#input\_server\_id) | Resource ID of the PostgreSQL Flexible Server hosting the database. | `string` | n/a | yes |
 
 ## Outputs
 

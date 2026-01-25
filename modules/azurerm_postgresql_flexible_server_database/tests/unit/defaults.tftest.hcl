@@ -11,24 +11,20 @@ mock_provider "azurerm" {
 }
 
 variables {
-  server = {
-    id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgfsunit"
-  }
-  database = {
-    name = "appdbunit"
-  }
+  server_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgfsunit"
+  name      = "appdbunit"
 }
 
 run "verify_optional_defaults" {
   command = plan
 
   assert {
-    condition     = var.database.charset == null
-    error_message = "database.charset should default to null when not set."
+    condition     = var.charset == null
+    error_message = "charset should default to null when not set."
   }
 
   assert {
-    condition     = var.database.collation == null
-    error_message = "database.collation should default to null when not set."
+    condition     = var.collation == null
+    error_message = "collation should default to null when not set."
   }
 }

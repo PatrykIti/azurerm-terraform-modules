@@ -13,7 +13,7 @@ cross-resource glue.
 ## Usage Notes
 
 - **Server dependency**: The database is created on an existing server by
-  providing `server.id`.
+  providing `server_id`.
 - **Charset and collation**: Optional fields for database-level configuration.
   When set, ensure they are valid for the chosen PostgreSQL version.
 

@@ -43,7 +43,7 @@ Server. Serwer jest poza zakresem modulu.
    jest tworzony jako osobny zasob.
 
 3) **Spojny UX**  
-   Zmienne pogrupowane obiektami (`server`, `database`). Walidacje w
+   Zmienne jawne (`server_id`, `name`, `charset`, `collation`). Walidacje w
    `variables.tf`, brak defaultow w `locals`.
 
 4) **Security-first**  
@@ -89,18 +89,15 @@ Server. Serwer jest poza zakresem modulu.
 
 **Cel:** Implementacja API zasobu + walidacje.
 
-**Proponowany UX (grupowanie):**
-- `server`: object({ id = string })
-- `database`: object({
-    name      = string
-    charset   = optional(string)
-    collation = optional(string)
-  })
-- `timeouts`: optional(object({ create, update, delete }))
+**Proponowany UX:**
+- `server_id`: string
+- `name`: string
+- `charset`: optional(string)
+- `collation`: optional(string)
 
 **Walidacje (must-have):**
-- `server.id` niepusty.
-- `database.name` niepusty, zgodny z zasadami nazewnictwa (po discovery).
+- `server_id` niepusty.
+- `name` niepusty, zgodny z zasadami nazewnictwa (po discovery).
 - `charset` i `collation` niepuste gdy ustawione (opcjonalnie: whitelist).
 
 **Outputs:**

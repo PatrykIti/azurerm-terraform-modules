@@ -109,7 +109,7 @@ func TestPostgresqlFlexibleServerDatabaseValidationRules(t *testing.T) {
 		{
 			name:          "InvalidName",
 			fixtureFile:   "negative",
-			expectedError: "database",
+			expectedError: "name",
 		},
 	}
 
