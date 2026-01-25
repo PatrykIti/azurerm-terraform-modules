@@ -214,6 +214,7 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 			".*ResourceGroupNotFound.*": "Resource group not found - retrying",
 			".*AlreadyExists.*":         "Resource already exists - retrying",
 			".*TooManyRequests.*":       "Too many requests - retrying",
+			".*ServerDropping.*":        "Server is in dropping state - retrying",
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,

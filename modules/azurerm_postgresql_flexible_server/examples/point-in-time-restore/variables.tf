@@ -16,6 +16,12 @@ variable "server_name" {
   default     = "pgfspitrexample001"
 }
 
+variable "administrator_login" {
+  description = "Administrator login for the PostgreSQL Flexible Server."
+  type        = string
+  default     = "pgfsadmin"
+}
+
 variable "sku_name" {
   description = "SKU name for the PostgreSQL Flexible Server."
   type        = string
