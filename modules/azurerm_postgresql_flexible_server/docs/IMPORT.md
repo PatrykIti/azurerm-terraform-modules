@@ -103,7 +103,7 @@ after defining the matching inputs:
 **Configurations**
 ```hcl
 import {
-  to = module.postgresql_flexible_server.azurerm_postgresql_flexible_server_configuration.configurations["log_connections"]
+  to = module.postgresql_flexible_server.azurerm_postgresql_flexible_server_configuration.postgresql_flexible_server_configuration["log_connections"]
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.DBforPostgreSQL/flexibleServers/<server>/configurations/log_connections"
 }
 ```
@@ -111,7 +111,7 @@ import {
 **Firewall rules**
 ```hcl
 import {
-  to = module.postgresql_flexible_server.azurerm_postgresql_flexible_server_firewall_rule.firewall_rules["office-range"]
+  to = module.postgresql_flexible_server.azurerm_postgresql_flexible_server_firewall_rule.postgresql_flexible_server_firewall_rule["office-range"]
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.DBforPostgreSQL/flexibleServers/<server>/firewallRules/office-range"
 }
 ```
@@ -119,7 +119,7 @@ import {
 **Active Directory administrator**
 ```hcl
 import {
-  to = module.postgresql_flexible_server.azurerm_postgresql_flexible_server_active_directory_administrator.active_directory_administrator[0]
+  to = module.postgresql_flexible_server.azurerm_postgresql_flexible_server_active_directory_administrator.postgresql_flexible_server_active_directory_administrator[0]
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.DBforPostgreSQL/flexibleServers/<server>/administrators/<principal_name>"
 }
 ```
@@ -127,7 +127,7 @@ import {
 **Virtual endpoints**
 ```hcl
 import {
-  to = module.postgresql_flexible_server.azurerm_postgresql_flexible_server_virtual_endpoint.virtual_endpoints["primary-replica-endpoint"]
+  to = module.postgresql_flexible_server.azurerm_postgresql_flexible_server_virtual_endpoint.postgresql_flexible_server_virtual_endpoint["primary-replica-endpoint"]
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.DBforPostgreSQL/flexibleServers/<server>/virtualEndpoints/primary-replica-endpoint"
 }
 ```
@@ -135,7 +135,7 @@ import {
 **Backups**
 ```hcl
 import {
-  to = module.postgresql_flexible_server.azurerm_postgresql_flexible_server_backup.backups["manual-backup-001"]
+  to = module.postgresql_flexible_server.azurerm_postgresql_flexible_server_backup.postgresql_flexible_server_backup["manual-backup-001"]
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.DBforPostgreSQL/flexibleServers/<server>/backups/manual-backup-001"
 }
 ```

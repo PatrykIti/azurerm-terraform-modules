@@ -82,7 +82,7 @@ resource "azurerm_postgresql_flexible_server" "postgresql_flexible_server" {
 
 }
 
-resource "azurerm_postgresql_flexible_server_configuration" "configurations" {
+resource "azurerm_postgresql_flexible_server_configuration" "postgresql_flexible_server_configuration" {
   for_each = { for cfg in var.features.configurations : cfg.name => cfg }
 
   name      = each.value.name
@@ -90,7 +90,7 @@ resource "azurerm_postgresql_flexible_server_configuration" "configurations" {
   value     = each.value.value
 }
 
-resource "azurerm_postgresql_flexible_server_firewall_rule" "firewall_rules" {
+resource "azurerm_postgresql_flexible_server_firewall_rule" "postgresql_flexible_server_firewall_rule" {
   for_each = { for rule in var.network.firewall_rules : rule.name => rule }
 
   name             = each.value.name
@@ -99,7 +99,7 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "firewall_rules" {
   end_ip_address   = each.value.end_ip_address
 }
 
-resource "azurerm_postgresql_flexible_server_active_directory_administrator" "active_directory_administrator" {
+resource "azurerm_postgresql_flexible_server_active_directory_administrator" "postgresql_flexible_server_active_directory_administrator" {
   count = var.authentication.active_directory_administrator != null ? 1 : 0
 
   server_name         = azurerm_postgresql_flexible_server.postgresql_flexible_server.name
@@ -113,7 +113,7 @@ resource "azurerm_postgresql_flexible_server_active_directory_administrator" "ac
   principal_type = try(var.authentication.active_directory_administrator.principal_type, null)
 }
 
-resource "azurerm_postgresql_flexible_server_virtual_endpoint" "virtual_endpoints" {
+resource "azurerm_postgresql_flexible_server_virtual_endpoint" "postgresql_flexible_server_virtual_endpoint" {
   for_each = { for ve in var.features.virtual_endpoints : ve.name => ve }
 
   name              = each.value.name
@@ -122,7 +122,7 @@ resource "azurerm_postgresql_flexible_server_virtual_endpoint" "virtual_endpoint
   type              = each.value.type
 }
 
-resource "azurerm_postgresql_flexible_server_backup" "backups" {
+resource "azurerm_postgresql_flexible_server_backup" "postgresql_flexible_server_backup" {
   for_each = { for backup in var.features.backups : backup.name => backup }
 
   name      = each.value.name

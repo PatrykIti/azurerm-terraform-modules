@@ -116,11 +116,11 @@ No modules.
 |------|------|
 | [azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_postgresql_flexible_server.postgresql_flexible_server](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/postgresql_flexible_server) | resource |
-| [azurerm_postgresql_flexible_server_active_directory_administrator.active_directory_administrator](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/postgresql_flexible_server_active_directory_administrator) | resource |
-| [azurerm_postgresql_flexible_server_backup.backups](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/postgresql_flexible_server_backup) | resource |
-| [azurerm_postgresql_flexible_server_configuration.configurations](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/postgresql_flexible_server_configuration) | resource |
-| [azurerm_postgresql_flexible_server_firewall_rule.firewall_rules](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/postgresql_flexible_server_firewall_rule) | resource |
-| [azurerm_postgresql_flexible_server_virtual_endpoint.virtual_endpoints](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/postgresql_flexible_server_virtual_endpoint) | resource |
+| [azurerm_postgresql_flexible_server_active_directory_administrator.postgresql_flexible_server_active_directory_administrator](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/postgresql_flexible_server_active_directory_administrator) | resource |
+| [azurerm_postgresql_flexible_server_backup.postgresql_flexible_server_backup](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/postgresql_flexible_server_backup) | resource |
+| [azurerm_postgresql_flexible_server_configuration.postgresql_flexible_server_configuration](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/postgresql_flexible_server_configuration) | resource |
+| [azurerm_postgresql_flexible_server_firewall_rule.postgresql_flexible_server_firewall_rule](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/postgresql_flexible_server_firewall_rule) | resource |
+| [azurerm_postgresql_flexible_server_virtual_endpoint.postgresql_flexible_server_virtual_endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/postgresql_flexible_server_virtual_endpoint) | resource |
 
 ## Inputs
 

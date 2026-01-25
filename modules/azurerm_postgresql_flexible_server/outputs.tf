@@ -30,27 +30,27 @@ output "public_network_access_enabled" {
 
 output "configurations" {
   description = "Map of PostgreSQL server configurations keyed by name."
-  value       = azurerm_postgresql_flexible_server_configuration.configurations
+  value       = azurerm_postgresql_flexible_server_configuration.postgresql_flexible_server_configuration
 }
 
 output "firewall_rules" {
   description = "Map of PostgreSQL firewall rules keyed by name."
-  value       = azurerm_postgresql_flexible_server_firewall_rule.firewall_rules
+  value       = azurerm_postgresql_flexible_server_firewall_rule.postgresql_flexible_server_firewall_rule
 }
 
 output "active_directory_administrator" {
   description = "Active Directory administrator configuration for the PostgreSQL Flexible Server."
-  value       = try(azurerm_postgresql_flexible_server_active_directory_administrator.active_directory_administrator[0], null)
+  value       = try(azurerm_postgresql_flexible_server_active_directory_administrator.postgresql_flexible_server_active_directory_administrator[0], null)
 }
 
 output "virtual_endpoints" {
   description = "Map of PostgreSQL Flexible Server virtual endpoints keyed by name."
-  value       = azurerm_postgresql_flexible_server_virtual_endpoint.virtual_endpoints
+  value       = azurerm_postgresql_flexible_server_virtual_endpoint.postgresql_flexible_server_virtual_endpoint
 }
 
 output "backups" {
   description = "Map of PostgreSQL Flexible Server backups keyed by name."
-  value       = azurerm_postgresql_flexible_server_backup.backups
+  value       = azurerm_postgresql_flexible_server_backup.postgresql_flexible_server_backup
 }
 
 output "diagnostic_settings_skipped" {
