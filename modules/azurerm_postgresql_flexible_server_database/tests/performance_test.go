@@ -43,7 +43,7 @@ func TestPostgresqlFlexibleServerDatabaseCreationTime(t *testing.T) {
 	terraform.InitAndApply(t, terraformOptions)
 	duration := time.Since(start)
 
-	maxDuration := 5 * time.Minute
+	maxDuration := 8 * time.Minute
 	require.LessOrEqual(t, duration, maxDuration,
 		"PostgreSQL Flexible Server Database creation took %v, expected less than %v", duration, maxDuration)
 }

@@ -152,6 +152,8 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 			".*AlreadyExists.*":         "Resource already exists - retrying",
 			".*TooManyRequests.*":       "Too many requests - retrying",
 			".*ServerDropping.*":        "Server is in dropping state - retrying",
+			".*InternalServerError.*":   "Azure internal server error - retrying",
+			".*unexpected error occured.*": "Azure service error - retrying",
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,

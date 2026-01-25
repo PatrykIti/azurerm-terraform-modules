@@ -58,7 +58,10 @@ func TestPostgresqlFlexibleServerDatabaseLifecycle(t *testing.T) {
 	resourceID := terraform.Output(t, terraformOptions, "postgresql_flexible_server_database_id")
 	assert.NotEmpty(t, resourceID)
 
-	terraform.Apply(t, terraformOptions)
+	// Target only the database module to avoid server drift (e.g. computed zone).
+	targetedOptions := *terraformOptions
+	targetedOptions.Targets = []string{"module.postgresql_flexible_server_database"}
+	terraform.Apply(t, &targetedOptions)
 	updatedResourceID := terraform.Output(t, terraformOptions, "postgresql_flexible_server_database_id")
 	assert.Equal(t, resourceID, updatedResourceID)
 }
