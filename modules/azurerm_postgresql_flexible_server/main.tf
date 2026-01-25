@@ -27,9 +27,7 @@ locals {
     backups         = try(var.features.backups, [])
   }
 
-  monitoring = {
-    diagnostic_settings = try(var.monitoring.diagnostic_settings, {})
-  }
+  monitoring = try(var.monitoring, [])
 
   public_network_access_enabled = (
     local.network.public_network_access_enabled != null

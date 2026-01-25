@@ -521,41 +521,45 @@ variable "monitoring" {
   description = <<-EOT
     Monitoring configuration for PostgreSQL Flexible Server.
 
-    diagnostic_settings: Diagnostic settings for logs and metrics, keyed by name.
-    Provide explicit log_categories and/or metric_categories and at least one
-    destination (Log Analytics, Storage, or Event Hub).
+    Diagnostic settings for logs and metrics. Provide explicit log_categories
+    and/or metric_categories and at least one destination (Log Analytics,
+    Storage, or Event Hub).
   EOT
 
-  type = object({
-    diagnostic_settings = optional(map(object({
-      log_categories                 = optional(list(string))
-      metric_categories              = optional(list(string))
-      log_analytics_workspace_id     = optional(string)
-      log_analytics_destination_type = optional(string)
-      storage_account_id             = optional(string)
-      eventhub_authorization_rule_id = optional(string)
-      eventhub_name                  = optional(string)
-    })), {})
-  })
+  type = list(object({
+    name                           = string
+    log_categories                 = optional(list(string))
+    metric_categories              = optional(list(string))
+    log_analytics_workspace_id     = optional(string)
+    log_analytics_destination_type = optional(string)
+    storage_account_id             = optional(string)
+    eventhub_authorization_rule_id = optional(string)
+    eventhub_name                  = optional(string)
+  }))
 
-  default = {}
+  default = []
 
   validation {
-    condition     = length(try(var.monitoring.diagnostic_settings, {})) <= 5
+    condition     = length(var.monitoring) <= 5
     error_message = "Azure allows a maximum of 5 diagnostic settings per PostgreSQL Flexible Server."
   }
 
   validation {
-    condition = alltrue([
-      for _, ds in try(var.monitoring.diagnostic_settings, {}) :
-      ds.log_analytics_workspace_id != null || ds.storage_account_id != null || ds.eventhub_authorization_rule_id != null
-    ])
-    error_message = "Each monitoring.diagnostic_settings entry must specify at least one destination: log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id."
+    condition     = length(distinct([for ds in var.monitoring : ds.name])) == length(var.monitoring)
+    error_message = "Each monitoring entry must have a unique name."
   }
 
   validation {
     condition = alltrue([
-      for _, ds in try(var.monitoring.diagnostic_settings, {}) :
+      for ds in var.monitoring :
+      ds.log_analytics_workspace_id != null || ds.storage_account_id != null || ds.eventhub_authorization_rule_id != null
+    ])
+    error_message = "Each monitoring entry must specify at least one destination: log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.monitoring :
       ds.eventhub_authorization_rule_id == null || (ds.eventhub_name != null && ds.eventhub_name != "")
     ])
     error_message = "eventhub_name is required when eventhub_authorization_rule_id is set."
@@ -563,7 +567,7 @@ variable "monitoring" {
 
   validation {
     condition = alltrue([
-      for _, ds in try(var.monitoring.diagnostic_settings, {}) :
+      for ds in var.monitoring :
       ds.log_analytics_destination_type == null || contains(["Dedicated", "AzureDiagnostics"], ds.log_analytics_destination_type)
     ])
     error_message = "log_analytics_destination_type must be either Dedicated or AzureDiagnostics."
@@ -571,7 +575,7 @@ variable "monitoring" {
 
   validation {
     condition = alltrue([
-      for _, ds in try(var.monitoring.diagnostic_settings, {}) :
+      for ds in var.monitoring :
       alltrue([for c in (ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
       alltrue([for c in (ds.metric_categories == null ? [] : ds.metric_categories) : c != ""])
     ])

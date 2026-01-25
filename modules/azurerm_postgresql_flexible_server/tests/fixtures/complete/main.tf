@@ -97,15 +97,14 @@ module "postgresql_flexible_server" {
     ]
   }
 
-  monitoring = {
-    diagnostic_settings = {
-      "postgresql-complete" = {
-        log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-        log_categories             = ["PostgreSQLLogs"]
-        metric_categories          = ["AllMetrics"]
-      }
+  monitoring = [
+    {
+      name                       = "postgresql-complete"
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+      log_categories             = ["PostgreSQLLogs"]
+      metric_categories          = ["AllMetrics"]
     }
-  }
+  ]
 
   tags = {
     Environment = "Test"

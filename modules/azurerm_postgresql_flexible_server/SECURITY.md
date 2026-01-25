@@ -36,7 +36,7 @@ This document describes the security controls supported by the
 ### 5) Monitoring and Auditing
 
 - **Diagnostic settings**: Stream logs and metrics to Log Analytics, Storage, or
-  Event Hub with `monitoring.diagnostic_settings`.
+  Event Hub with `monitoring`.
 
 ## Secure Configuration Example
 

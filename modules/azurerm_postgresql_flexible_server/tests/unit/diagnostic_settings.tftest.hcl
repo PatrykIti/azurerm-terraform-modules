@@ -31,15 +31,14 @@ run "diagnostic_settings_valid" {
   command = apply
 
   variables {
-    monitoring = {
-      diagnostic_settings = {
-        "pgfs-diag" = {
-          log_categories             = ["PostgreSQLLogs"]
-          metric_categories          = ["AllMetrics"]
-          log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
-        }
+    monitoring = [
+      {
+        name                       = "pgfs-diag"
+        log_categories             = ["PostgreSQLLogs"]
+        metric_categories          = ["AllMetrics"]
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
       }
-    }
+    ]
   }
 
   assert {
@@ -52,15 +51,14 @@ run "diagnostic_settings_skips_empty_categories" {
   command = apply
 
   variables {
-    monitoring = {
-      diagnostic_settings = {
-        "empty-categories" = {
-          log_categories             = []
-          metric_categories          = []
-          log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
-        }
+    monitoring = [
+      {
+        name                       = "empty-categories"
+        log_categories             = []
+        metric_categories          = []
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
       }
-    }
+    ]
   }
 
   assert {
