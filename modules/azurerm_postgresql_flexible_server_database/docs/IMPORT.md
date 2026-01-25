@@ -24,7 +24,7 @@ module "postgresql_flexible_server_database" {
 
 ```hcl
 import {
-  to = module.postgresql_flexible_server_database.azurerm_postgresql_flexible_server_database.database
+  to = module.postgresql_flexible_server_database.azurerm_postgresql_flexible_server_database.postgresql_flexible_server_database
   id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.DBforPostgreSQL/flexibleServers/pgfs-example/databases/appdb"
 }
 ```

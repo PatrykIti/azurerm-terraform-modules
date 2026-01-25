@@ -105,7 +105,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_postgresql_flexible_server_database.database](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/postgresql_flexible_server_database) | resource |
+| [azurerm_postgresql_flexible_server_database.postgresql_flexible_server_database](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/postgresql_flexible_server_database) | resource |
 
 ## Inputs
 
