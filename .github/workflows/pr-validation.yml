@@ -160,6 +160,8 @@ jobs:
             revert
           scopes: |
             storage-account
+            postgresql-flexible-server-database
+            postgresql-flexible-server
             virtual-network
             kubernetes-cluster
             kubernetes-secrets
