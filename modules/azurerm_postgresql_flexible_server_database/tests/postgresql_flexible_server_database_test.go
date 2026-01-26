@@ -154,6 +154,8 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 			".*ServerDropping.*":        "Server is in dropping state - retrying",
 			".*InternalServerError.*":   "Azure internal server error - retrying",
 			".*unexpected error occured.*": "Azure service error - retrying",
+			".*ServerIsBusy.*":             "Server is busy processing another operation - retrying",
+			".*busy processing another operation.*": "Server is busy processing another operation - retrying",
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,
