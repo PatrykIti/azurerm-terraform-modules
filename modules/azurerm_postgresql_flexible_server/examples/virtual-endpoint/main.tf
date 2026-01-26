@@ -31,7 +31,7 @@ resource "random_password" "admin" {
 }
 
 module "primary" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_postgresql_flexible_server?ref=PGFSv1.0.0"
 
   name                = var.primary_server_name
   resource_group_name = azurerm_resource_group.example.name
@@ -56,7 +56,7 @@ module "primary" {
 }
 
 module "replica" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_postgresql_flexible_server?ref=PGFSv1.0.0"
 
   name                = var.replica_server_name
   resource_group_name = azurerm_resource_group.example.name

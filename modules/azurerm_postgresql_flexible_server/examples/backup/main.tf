@@ -31,7 +31,7 @@ resource "random_password" "admin" {
 }
 
 module "postgresql_flexible_server" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_postgresql_flexible_server?ref=PGFSv1.0.0"
 
   name                = var.server_name
   resource_group_name = azurerm_resource_group.example.name
