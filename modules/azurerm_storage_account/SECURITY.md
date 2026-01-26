@@ -75,17 +75,14 @@ This document details the security features and configurations available in the 
 
 #### Diagnostic Logging
 ```hcl
-diagnostic_settings = {
-  name                       = "storage-diagnostics"
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-  logs = [
-    { category = "StorageRead" },
-    { category = "StorageWrite" },
-    { category = "StorageDelete" }
-  ]
-  metrics = [
-    { category = "Transaction" },
-    { category = "Capacity" }
+monitoring = {
+  storage_account = [
+    {
+      name                       = "storage-diagnostics"
+      log_categories             = ["StorageRead", "StorageWrite", "StorageDelete"]
+      metric_categories          = ["Transaction", "Capacity"]
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+    }
   ]
 }
 ```
@@ -188,17 +185,14 @@ module "storage_account" {
   }
 
   # Monitoring
-  diagnostic_settings = {
-    name                       = "${var.name}-diag"
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-    logs = [
-      { category = "StorageRead" },
-      { category = "StorageWrite" },
-      { category = "StorageDelete" }
-    ]
-    metrics = [
-      { category = "Transaction" },
-      { category = "Capacity" }
+  monitoring = {
+    storage_account = [
+      {
+        name                       = "${var.name}-diag"
+        log_categories             = ["StorageRead", "StorageWrite", "StorageDelete"]
+        metric_categories          = ["Transaction", "Capacity"]
+        log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+      }
     ]
   }
 
@@ -231,15 +225,14 @@ module "storage_account_dev" {
   }
 
   # Basic monitoring
-  diagnostic_settings = {
-    name                       = "${var.name}-diag"
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.dev.id
-    logs = [
-      { category = "StorageWrite" },
-      { category = "StorageDelete" }
-    ]
-    metrics = [
-      { category = "Transaction" }
+  monitoring = {
+    storage_account = [
+      {
+        name                       = "${var.name}-diag"
+        log_categories             = ["StorageWrite", "StorageDelete"]
+        metric_categories          = ["Transaction"]
+        log_analytics_workspace_id = azurerm_log_analytics_workspace.dev.id
+      }
     ]
   }
 

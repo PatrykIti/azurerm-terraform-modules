@@ -231,7 +231,7 @@ The storage account's managed identity can access other services:
 
 1. **Network Security**: Combine identity-based access with network restrictions
 2. **Encryption**: Use customer-managed keys with Key Vault integration
-3. **Monitoring**: Enable diagnostic settings and alerts for suspicious activity
+3. **Monitoring**: Enable monitoring settings and alerts for suspicious activity
 4. **Compliance**: Identity-based access helps meet many compliance requirements
 
 ## Additional Resources

@@ -6,7 +6,7 @@ This example demonstrates configuring AKS control plane diagnostic settings with
 
 - Creates a resource group, virtual network, subnet, and Log Analytics workspace
 - Deploys an AKS cluster with system-assigned identity and Azure CNI
-- Enables diagnostic settings for API server, audit, and metrics categories
+- Enables diagnostic settings for control plane log and metric categories
 - Shows how to route diagnostic logs and metrics to Log Analytics
 
 ## Architecture
@@ -23,8 +23,8 @@ Resource Group
 ## Key Configuration
 
 This example demonstrates:
-- Control plane diagnostic settings using the `diagnostic_settings` input
-- Multiple diagnostic areas in a single settings entry (api_plane, audit, metrics)
+- Control plane diagnostic settings using the `monitoring` input
+- Explicit log and metric category selection
 - Log Analytics as the diagnostics destination
 
 ## Prerequisites

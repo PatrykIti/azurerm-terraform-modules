@@ -25,12 +25,6 @@ mock_provider "azurerm" {
     }
   }
 
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types = ["StorageRead", "StorageWrite", "StorageDelete"]
-      metrics            = ["Transaction", "Capacity"]
-    }
-  }
 }
 
 variables {
@@ -230,150 +224,120 @@ run "invalid_identity_type" {
 }
 
 # Diagnostic settings validation: missing destination
-run "diagnostic_settings_missing_destination" {
+run "monitoring_missing_destination" {
   command = plan
 
   variables {
     name = "validstorageaccount"
-    diagnostic_settings = [
-      {
-        name  = "missing-destination"
-        scope = "storage_account"
-        areas = ["read"]
-      }
-    ]
+    monitoring = {
+      storage_account = [
+        {
+          name           = "missing-destination"
+          log_categories = ["StorageRead"]
+        }
+      ]
+    }
   }
 
   expect_failures = [
-    var.diagnostic_settings,
+    var.monitoring,
   ]
 }
 
-# Diagnostic settings validation: missing Event Hub name
-run "diagnostic_settings_missing_eventhub_name" {
+# Monitoring validation: missing Event Hub name
+run "monitoring_missing_eventhub_name" {
   command = plan
 
   variables {
     name = "validstorageaccount"
-    diagnostic_settings = [
-      {
-        name                           = "missing-eventhub-name"
-        scope                          = "storage_account"
-        eventhub_authorization_rule_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.EventHub/namespaces/ns/authorizationRules/auth"
-      }
-    ]
+    monitoring = {
+      storage_account = [
+        {
+          name                           = "missing-eventhub-name"
+          metric_categories              = ["Transaction"]
+          eventhub_authorization_rule_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.EventHub/namespaces/ns/authorizationRules/auth"
+        }
+      ]
+    }
   }
 
   expect_failures = [
-    var.diagnostic_settings,
+    var.monitoring,
   ]
 }
 
-# Diagnostic settings validation: invalid destination type
-run "diagnostic_settings_invalid_destination_type" {
+# Monitoring validation: invalid destination type
+run "monitoring_invalid_destination_type" {
   command = plan
 
   variables {
     name = "validstorageaccount"
-    diagnostic_settings = [
-      {
-        name                           = "invalid-destination-type"
-        scope                          = "storage_account"
-        log_analytics_workspace_id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
-        log_analytics_destination_type = "InvalidType"
-      }
-    ]
+    monitoring = {
+      storage_account = [
+        {
+          name                           = "invalid-destination-type"
+          log_categories                 = ["StorageRead"]
+          log_analytics_workspace_id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+          log_analytics_destination_type = "InvalidType"
+        }
+      ]
+    }
   }
 
   expect_failures = [
-    var.diagnostic_settings,
+    var.monitoring,
   ]
 }
 
-# Diagnostic settings validation: invalid scope
-run "diagnostic_settings_invalid_scope" {
+# Monitoring validation: duplicate names
+run "monitoring_duplicate_names" {
   command = plan
 
   variables {
     name = "validstorageaccount"
-    diagnostic_settings = [
-      {
-        name                       = "invalid-scope"
-        scope                      = "invalid"
-        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
-      }
-    ]
+    monitoring = {
+      storage_account = [
+        {
+          name                       = "duplicate"
+          log_categories             = ["StorageRead"]
+          log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+        }
+      ]
+      blob = [
+        {
+          name                       = "duplicate"
+          log_categories             = ["StorageRead"]
+          log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+        }
+      ]
+    }
   }
 
   expect_failures = [
-    var.diagnostic_settings,
+    var.monitoring,
   ]
 }
 
-# Diagnostic settings validation: invalid area
-run "diagnostic_settings_invalid_area" {
+# Monitoring validation: per-scope limit exceeded
+run "monitoring_scope_limit_exceeded" {
   command = plan
 
   variables {
     name = "validstorageaccount"
-    diagnostic_settings = [
-      {
-        name                       = "invalid-area"
-        scope                      = "storage_account"
-        areas                      = ["invalid"]
-        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
-      }
-    ]
+    monitoring = {
+      storage_account = [
+        { name = "ds-1", log_categories = ["StorageRead"], log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law" },
+        { name = "ds-2", log_categories = ["StorageRead"], log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law" },
+        { name = "ds-3", log_categories = ["StorageRead"], log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law" },
+        { name = "ds-4", log_categories = ["StorageRead"], log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law" },
+        { name = "ds-5", log_categories = ["StorageRead"], log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law" },
+        { name = "ds-6", log_categories = ["StorageRead"], log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law" }
+      ]
+    }
   }
 
   expect_failures = [
-    var.diagnostic_settings,
-  ]
-}
-
-# Diagnostic settings validation: duplicate names
-run "diagnostic_settings_duplicate_names" {
-  command = plan
-
-  variables {
-    name = "validstorageaccount"
-    diagnostic_settings = [
-      {
-        name                       = "duplicate"
-        scope                      = "storage_account"
-        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
-      },
-      {
-        name                       = "duplicate"
-        scope                      = "storage_account"
-        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.diagnostic_settings,
-  ]
-}
-
-# Diagnostic settings validation: per-scope limit exceeded
-run "diagnostic_settings_scope_limit_exceeded" {
-  command = plan
-
-  variables {
-    name = "validstorageaccount"
-    diagnostic_settings = [
-      { name = "ds-1", scope = "storage_account", log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law" },
-      { name = "ds-2", scope = "storage_account", log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law" },
-      { name = "ds-3", scope = "storage_account", log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law" },
-      { name = "ds-4", scope = "storage_account", log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law" },
-      { name = "ds-5", scope = "storage_account", log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law" },
-      { name = "ds-6", scope = "storage_account", log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law" }
-    ]
-  }
-
-  expect_failures = [
-    var.diagnostic_settings,
+    var.monitoring,
   ]
 }
 

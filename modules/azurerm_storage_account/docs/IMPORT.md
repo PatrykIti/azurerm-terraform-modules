@@ -178,4 +178,4 @@ import {
 ## Notes
 
 - This guide covers only the **storage account** resource. Optional resources must be imported explicitly.
-- Diagnostic settings are managed via the `diagnostic_settings` input; add import blocks for those if already configured.
+- Diagnostic settings are managed via the `monitoring` input; add import blocks for those if already configured.

@@ -26,7 +26,7 @@ resource "azurerm_resource_group" "example" {
   location = var.location
 }
 
-# Log Analytics workspace for diagnostic settings
+# Log Analytics workspace for monitoring
 resource "azurerm_log_analytics_workspace" "example" {
   name                = var.log_analytics_workspace_name
   location            = azurerm_resource_group.example.location
@@ -93,10 +93,11 @@ module "kubernetes_cluster" {
     dns_service_ip = "172.16.0.10"   # Must be within service_cidr
   }
 
-  diagnostic_settings = [
+  monitoring = [
     {
       name                       = "aks-control-plane"
-      areas                      = ["api_plane", "audit", "metrics"]
+      log_categories             = ["kube-apiserver", "kube-audit"]
+      metric_categories          = ["AllMetrics"]
       log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
     }
   ]

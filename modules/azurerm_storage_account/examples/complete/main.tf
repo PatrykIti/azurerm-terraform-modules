@@ -435,20 +435,24 @@ module "storage_account" {
   ]
 
   # Diagnostic settings (storage account + blob service)
-  diagnostic_settings = [
-    {
-      name                       = "diag-storage"
-      scope                      = "storage_account"
-      areas                      = ["transaction", "capacity"]
-      log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    },
-    {
-      name                       = "diag-blob"
-      scope                      = "blob"
-      areas                      = ["read", "write", "delete", "transaction", "capacity"]
-      log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    }
-  ]
+  monitoring = {
+    storage_account = [
+      {
+        name                       = "diag-storage"
+        log_categories             = ["StorageRead", "StorageWrite", "StorageDelete"]
+        metric_categories          = ["Transaction", "Capacity"]
+        log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+      }
+    ]
+    blob = [
+      {
+        name                       = "diag-blob"
+        log_categories             = ["StorageRead", "StorageWrite", "StorageDelete"]
+        metric_categories          = ["Transaction", "Capacity"]
+        log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+      }
+    ]
+  }
 
 
   tags = {

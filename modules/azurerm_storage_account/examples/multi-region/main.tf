@@ -408,14 +408,18 @@ module "replication_metadata" {
   ]
 
   # Diagnostic settings for metadata monitoring
-  diagnostic_settings = var.enable_monitoring_alerts ? [
-    {
-      name                       = "diag-metadata"
-      scope                      = "storage_account"
-      areas                      = ["read", "write", "delete", "transaction", "capacity"]
-      log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
-    }
-  ] : []
+  monitoring = var.enable_monitoring_alerts ? {
+    storage_account = [
+      {
+        name                       = "diag-metadata"
+        log_categories             = ["StorageRead", "StorageWrite", "StorageDelete"]
+        metric_categories          = ["Transaction", "Capacity"]
+        log_analytics_workspace_id = azurerm_log_analytics_workspace.shared.id
+      }
+    ]
+  } : {
+    storage_account = []
+  }
 
   tags = merge(var.tags, {
     Environment = "Production"

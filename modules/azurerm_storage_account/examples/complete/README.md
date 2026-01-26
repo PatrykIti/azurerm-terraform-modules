@@ -185,7 +185,7 @@ terraform apply
 1. **Lifecycle Policies**: Automatically move or delete old data to reduce costs
 2. **Access Tiers**: Use Cool tier for infrequently accessed data
 3. **Replication**: Choose appropriate replication based on availability requirements
-4. **Monitoring**: Use diagnostic settings to track and optimize usage
+4. **Monitoring**: Use monitoring settings to track and optimize usage
 
 ## Next Steps
 

@@ -423,7 +423,7 @@ output "static_website_id" {
 }
 
 output "diagnostic_settings_skipped" {
-  description = "Diagnostic settings entries skipped because no categories were available after filtering."
+  description = "Diagnostic settings entries skipped because no log or metric categories were supplied."
   value       = local.diagnostic_settings_skipped
 }
 

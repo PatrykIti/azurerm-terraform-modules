@@ -9,21 +9,6 @@ mock_provider "azurerm" {
   }
 
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types = [
-        "kube-apiserver",
-        "kube-audit",
-        "kube-audit-admin",
-        "kube-scheduler",
-        "cluster-autoscaler",
-        "guard",
-        "cloud-controller-manager"
-      ]
-      metrics = ["AllMetrics"]
-    }
-  }
 }
 
 variables {
@@ -109,105 +94,85 @@ run "single_character_dns_prefix_passes" {
 }
 
 # Diagnostic settings validation: missing destination
-run "diagnostic_settings_missing_destination" {
+run "monitoring_missing_destination" {
   command = plan
 
   variables {
     name = "validname"
-    diagnostic_settings = [
+    monitoring = [
       {
-        name  = "missing-destination"
-        areas = ["api_plane"]
+        name           = "missing-destination"
+        log_categories = ["kube-apiserver"]
       }
     ]
   }
 
   expect_failures = [
-    var.diagnostic_settings,
+    var.monitoring,
   ]
 }
 
-# Diagnostic settings validation: Event Hub name required
-run "diagnostic_settings_missing_eventhub_name" {
+# Monitoring validation: Event Hub name required
+run "monitoring_missing_eventhub_name" {
   command = plan
 
   variables {
     name = "validname"
-    diagnostic_settings = [
+    monitoring = [
       {
         name                           = "eventhub-missing-name"
-        areas                          = ["metrics"]
+        metric_categories              = ["AllMetrics"]
         eventhub_authorization_rule_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.EventHub/namespaces/ns/authorizationRules/rule"
       }
     ]
   }
 
   expect_failures = [
-    var.diagnostic_settings,
+    var.monitoring,
   ]
 }
 
-# Diagnostic settings validation: invalid area
-run "diagnostic_settings_invalid_area" {
+# Monitoring validation: duplicate names
+run "monitoring_duplicate_names" {
   command = plan
 
   variables {
     name = "validname"
-    diagnostic_settings = [
-      {
-        name                       = "invalid-area"
-        areas                      = ["pods"]
-        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.diagnostic_settings,
-  ]
-}
-
-# Diagnostic settings validation: duplicate names
-run "diagnostic_settings_duplicate_names" {
-  command = plan
-
-  variables {
-    name = "validname"
-    diagnostic_settings = [
+    monitoring = [
       {
         name                       = "duplicate"
-        areas                      = ["api_plane"]
+        log_categories             = ["kube-apiserver"]
         log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
       },
       {
         name                       = "duplicate"
-        areas                      = ["metrics"]
+        metric_categories          = ["AllMetrics"]
         log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
       }
     ]
   }
 
   expect_failures = [
-    var.diagnostic_settings,
+    var.monitoring,
   ]
 }
 
-# Diagnostic settings validation: limit exceeded
-run "diagnostic_settings_limit_exceeded" {
+# Monitoring validation: limit exceeded
+run "monitoring_limit_exceeded" {
   command = plan
 
   variables {
     name = "validname"
-    diagnostic_settings = [
+    monitoring = [
       for idx in range(6) : {
         name                       = "diag-${idx}"
-        areas                      = ["api_plane"]
+        log_categories             = ["kube-apiserver"]
         log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
       }
     ]
   }
 
   expect_failures = [
-    var.diagnostic_settings,
+    var.monitoring,
   ]
 }
