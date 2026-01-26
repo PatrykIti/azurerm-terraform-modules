@@ -19,7 +19,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "storage_account" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv2.0.0"
 
   name                     = var.storage_account_name
   resource_group_name      = azurerm_resource_group.example.name

@@ -49,7 +49,7 @@ resource "azurerm_log_analytics_workspace" "shared" {
 
 # Primary Region Storage Account (GRS with failover capability)
 module "primary_storage" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv2.0.0"
 
   name                = "stprimarymultiregionex"
   resource_group_name = azurerm_resource_group.primary.name
@@ -179,7 +179,7 @@ module "primary_storage" {
 
 # Secondary Region Storage Account (Zone redundant)
 module "secondary_storage" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv2.0.0"
 
   name                = "stsecondmultiregionex"
   resource_group_name = azurerm_resource_group.secondary.name
@@ -273,7 +273,7 @@ module "secondary_storage" {
 
 # Disaster Recovery Storage Account (Archive focused)
 module "dr_storage" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv2.0.0"
 
   name                = "stdrmultiregionexample"
   resource_group_name = azurerm_resource_group.dr.name
@@ -364,7 +364,7 @@ module "dr_storage" {
 
 # Storage account for cross-region replication metadata
 module "replication_metadata" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv2.0.0"
 
   name                = "strepmetamultiregionex"
   resource_group_name = azurerm_resource_group.primary.name

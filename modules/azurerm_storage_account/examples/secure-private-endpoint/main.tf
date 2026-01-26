@@ -274,7 +274,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 
 # Secure Storage Account Module
 module "secure_storage" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv2.0.0"
 
   name                = "stsecureprivateendpoint"
   resource_group_name = azurerm_resource_group.example.name

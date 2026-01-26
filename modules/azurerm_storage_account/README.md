@@ -3,7 +3,7 @@
 ## Module Version
 
 <!-- BEGIN_VERSION -->
-Current version: **1.3.0**
+Current version: **2.0.0**
 <!-- END_VERSION -->
 
 ## Description

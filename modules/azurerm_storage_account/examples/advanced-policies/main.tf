@@ -81,7 +81,7 @@ locals {
 
 # Storage Account with Advanced Policies
 module "storage_account" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv2.0.0"
 
   # Basic configuration
   name                     = "stadvancedpoliciesex"
