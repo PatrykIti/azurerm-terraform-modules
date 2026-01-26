@@ -70,7 +70,7 @@ resource "azurerm_subnet" "example" {
 
 # Create the AKS cluster with workload identity
 module "kubernetes_cluster" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv2.0.0"
 
   # Basic cluster configuration
   name                = var.cluster_name
