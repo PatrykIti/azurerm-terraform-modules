@@ -26,7 +26,7 @@ resource "azurerm_resource_group" "example" {
   location = var.location
 }
 
-# Log Analytics workspace for diagnostic settings
+# Log Analytics workspace for monitoring
 resource "azurerm_log_analytics_workspace" "example" {
   name                = var.log_analytics_workspace_name
   location            = azurerm_resource_group.example.location
@@ -53,7 +53,7 @@ resource "azurerm_subnet" "example" {
 
 # Create the AKS cluster
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv1.1.0"
+  source = "../.."
 
   # Basic cluster configuration
   name                = var.cluster_name
@@ -93,10 +93,11 @@ module "kubernetes_cluster" {
     dns_service_ip = "172.16.0.10"   # Must be within service_cidr
   }
 
-  diagnostic_settings = [
+  monitoring = [
     {
       name                       = "aks-control-plane"
-      areas                      = ["api_plane", "audit", "metrics"]
+      log_categories             = ["kube-apiserver", "kube-audit"]
+      metric_categories          = ["AllMetrics"]
       log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
     }
   ]

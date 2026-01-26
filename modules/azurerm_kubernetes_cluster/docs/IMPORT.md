@@ -224,5 +224,5 @@ Fix: match `tags` to the existing AKS tags, or remove `tags` from inputs if you 
   If you want to manage:
   - **additional node pools**
   - **extensions**
-  - **diagnostic settings**
+  - **monitoring (diagnostic settings)**
   you must add those inputs and import blocks separately.

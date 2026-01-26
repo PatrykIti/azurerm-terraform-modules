@@ -1,4 +1,4 @@
-# Diagnostic settings unit tests for Kubernetes Cluster module
+# Monitoring diagnostic settings unit tests for Kubernetes Cluster module
 
 mock_provider "azurerm" {
   mock_resource "azurerm_kubernetes_cluster" {
@@ -9,21 +9,6 @@ mock_provider "azurerm" {
   }
 
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types = [
-        "kube-apiserver",
-        "kube-audit",
-        "kube-audit-admin",
-        "kube-scheduler",
-        "cluster-autoscaler",
-        "guard",
-        "cloud-controller-manager"
-      ]
-      metrics = ["AllMetrics"]
-    }
-  }
 }
 
 variables {
@@ -40,14 +25,15 @@ variables {
   }
 }
 
-run "diagnostic_settings_valid" {
+run "monitoring_valid" {
   command = apply
 
   variables {
-    diagnostic_settings = [
+    monitoring = [
       {
         name                       = "api-plane"
-        areas                      = ["api_plane", "audit", "metrics"]
+        log_categories             = ["kube-apiserver", "kube-audit"]
+        metric_categories          = ["AllMetrics"]
         log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
       }
     ]
@@ -59,11 +45,11 @@ run "diagnostic_settings_valid" {
   }
 }
 
-run "diagnostic_settings_skips_empty_categories" {
+run "monitoring_skips_empty_categories" {
   command = apply
 
   variables {
-    diagnostic_settings = [
+    monitoring = [
       {
         name                       = "empty-categories"
         log_categories             = []

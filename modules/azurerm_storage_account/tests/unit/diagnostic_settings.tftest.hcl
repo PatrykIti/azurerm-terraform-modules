@@ -1,4 +1,4 @@
-# Diagnostic settings unit tests for Storage Account module
+# Monitoring diagnostic settings unit tests for Storage Account module
 
 mock_provider "azurerm" {
   mock_resource "azurerm_storage_account" {
@@ -15,13 +15,6 @@ mock_provider "azurerm" {
   }
 
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types = ["StorageRead", "StorageWrite", "StorageDelete"]
-      metrics            = ["Transaction", "Capacity"]
-    }
-  }
 }
 
 variables {
@@ -30,18 +23,20 @@ variables {
   location            = "northeurope"
 }
 
-run "diagnostic_settings_valid" {
+run "monitoring_valid" {
   command = apply
 
   variables {
-    diagnostic_settings = [
-      {
-        name                       = "storage-all"
-        scope                      = "storage_account"
-        areas                      = ["read", "transaction"]
-        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
-      }
-    ]
+    monitoring = {
+      storage_account = [
+        {
+          name                       = "storage-all"
+          log_categories             = ["StorageRead", "StorageWrite", "StorageDelete"]
+          metric_categories          = ["Transaction", "Capacity"]
+          log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+        }
+      ]
+    }
   }
 
   assert {
@@ -50,18 +45,20 @@ run "diagnostic_settings_valid" {
   }
 }
 
-run "diagnostic_settings_skips_empty_categories" {
+run "monitoring_skips_empty_categories" {
   command = apply
 
   variables {
-    diagnostic_settings = [
-      {
-        name                       = "empty-categories"
-        log_categories             = []
-        metric_categories          = []
-        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
-      }
-    ]
+    monitoring = {
+      storage_account = [
+        {
+          name                       = "empty-categories"
+          log_categories             = []
+          metric_categories          = []
+          log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+        }
+      ]
+    }
   }
 
   assert {

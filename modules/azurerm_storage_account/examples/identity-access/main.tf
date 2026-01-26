@@ -40,7 +40,7 @@ resource "azurerm_key_vault" "example" {
   tenant_id           = data.azurerm_client_config.current.tenant_id
   sku_name            = "premium"
 
-  enable_rbac_authorization       = true
+  rbac_authorization_enabled      = true
   enabled_for_disk_encryption     = true
   enabled_for_deployment          = true
   enabled_for_template_deployment = true
@@ -97,7 +97,7 @@ resource "azurerm_role_assignment" "uai_kv_crypto_user" {
 # ==============================================================================
 
 module "storage_system_assigned" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.3.0"
+  source = "../.."
 
   name                     = "stsysidentityexample"
   resource_group_name      = azurerm_resource_group.example.name
@@ -152,7 +152,7 @@ resource "azurerm_role_assignment" "system_identity_kv_access" {
 # ==============================================================================
 
 module "storage_user_assigned" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.3.0"
+  source = "../.."
 
   name                     = "stuseridentityexample"
   resource_group_name      = azurerm_resource_group.example.name
@@ -212,7 +212,7 @@ module "storage_user_assigned" {
 # ==============================================================================
 
 module "storage_combined" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.3.0"
+  source = "../.."
 
   name                     = "stcombidentityexample"
   resource_group_name      = azurerm_resource_group.example.name

@@ -34,7 +34,7 @@ The `examples/secure` configuration is the reference implementation for hardened
 
 ### Monitoring and Threat Protection
 
-- **Azure Monitor**: Configure `oms_agent` and `diagnostic_settings` for control plane logs and metrics.
+- **Azure Monitor**: Configure `oms_agent` and `monitoring` for control plane logs and metrics.
 - **Microsoft Defender**: Enable `microsoft_defender` with a Log Analytics workspace.
 - **Metrics Labels/Annotations**: Use `monitor_metrics` only with approved label/annotation allowlists.
 
@@ -52,7 +52,7 @@ Key hardening actions in that example include:
 - `features.run_command_enabled = false`
 - `features.workload_identity_enabled = true` and `features.oidc_issuer_enabled = true`
 - `azure_active_directory_role_based_access_control.azure_rbac_enabled = true`
-- `microsoft_defender` and `diagnostic_settings` enabled
+- `microsoft_defender` and `monitoring` enabled
 - Restricted `api_server_access_profile.authorized_ip_ranges` (replace placeholder ranges)
 - Optional private cluster configuration (enable when required)
 
@@ -65,14 +65,14 @@ Some security features require explicit enablement. Review defaults in `variable
 - `features.run_command_enabled` (disable for hardened posture)
 - `private_cluster_config.private_cluster_enabled`
 - `api_server_access_profile.authorized_ip_ranges`
-- `microsoft_defender` and `diagnostic_settings`
+- `microsoft_defender` and `monitoring`
 
 ## Common Misconfigurations
 
 - **Wide-open API server**: Leaving `authorized_ip_ranges` as `0.0.0.0/0`.
 - **Public cluster without restrictions**: Using non-private clusters without a restricted API server profile.
 - **Legacy identity**: Using `service_principal` when managed identity is supported.
-- **Missing diagnostics**: Skipping `diagnostic_settings` and Defender for Cloud integration.
+- **Missing diagnostics**: Skipping `monitoring` and Defender for Cloud integration.
 
 ## Reporting Security Issues
 

@@ -703,19 +703,18 @@ variable "monitor_metrics" {
   default = null
 }
 
-# Diagnostic Settings (Control Plane)
-variable "diagnostic_settings" {
+# Monitoring (Control Plane)
+variable "monitoring" {
   description = <<-EOT
-    Diagnostic settings for AKS control plane (API plane) logs and metrics.
+    Monitoring configuration for AKS control plane logs and metrics.
 
-    Each item creates a separate azurerm_monitor_diagnostic_setting for the cluster.
-    Use areas to group categories (api_plane, audit, metrics, etc.) or provide explicit
-    log_categories / metric_categories. At least one destination is required.
+    Diagnostic settings for logs and metrics. Provide explicit log_categories
+    and/or metric_categories and at least one destination (Log Analytics,
+    Storage, or Event Hub).
   EOT
 
   type = list(object({
     name                           = string
-    areas                          = optional(list(string))
     log_categories                 = optional(list(string))
     metric_categories              = optional(list(string))
     log_analytics_workspace_id     = optional(string)
@@ -725,29 +724,30 @@ variable "diagnostic_settings" {
     eventhub_name                  = optional(string)
   }))
 
-  default = []
+  nullable = false
+  default  = []
 
   validation {
-    condition     = length(var.diagnostic_settings) <= 5
+    condition     = length(var.monitoring) <= 5
     error_message = "Azure allows a maximum of 5 diagnostic settings per AKS resource."
   }
 
   validation {
-    condition     = length(distinct([for ds in var.diagnostic_settings : ds.name])) == length(var.diagnostic_settings)
-    error_message = "Each diagnostic_settings entry must have a unique name."
+    condition     = length(distinct([for ds in var.monitoring : ds.name])) == length(var.monitoring)
+    error_message = "Each monitoring entry must have a unique name."
   }
 
   validation {
     condition = alltrue([
-      for ds in var.diagnostic_settings :
+      for ds in var.monitoring :
       ds.log_analytics_workspace_id != null || ds.storage_account_id != null || ds.eventhub_authorization_rule_id != null
     ])
-    error_message = "Each diagnostic_settings entry must specify at least one destination: log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id."
+    error_message = "Each monitoring entry must specify at least one destination: log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id."
   }
 
   validation {
     condition = alltrue([
-      for ds in var.diagnostic_settings :
+      for ds in var.monitoring :
       ds.eventhub_authorization_rule_id == null || (ds.eventhub_name != null && ds.eventhub_name != "")
     ])
     error_message = "eventhub_name is required when eventhub_authorization_rule_id is set."
@@ -755,7 +755,7 @@ variable "diagnostic_settings" {
 
   validation {
     condition = alltrue([
-      for ds in var.diagnostic_settings :
+      for ds in var.monitoring :
       ds.log_analytics_destination_type == null || contains(["Dedicated", "AzureDiagnostics"], ds.log_analytics_destination_type)
     ])
     error_message = "log_analytics_destination_type must be either Dedicated or AzureDiagnostics."
@@ -763,24 +763,11 @@ variable "diagnostic_settings" {
 
   validation {
     condition = alltrue([
-      for ds in var.diagnostic_settings :
-      alltrue([
-        for area in(ds.areas != null ? ds.areas : ["all"]) :
-        contains([
-          "all",
-          "api_plane",
-          "audit",
-          "controller_manager",
-          "scheduler",
-          "autoscaler",
-          "guard",
-          "csi",
-          "cloud_controller",
-          "metrics"
-        ], area)
-      ])
+      for ds in var.monitoring :
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""])
     ])
-    error_message = "areas may contain only: all, api_plane, audit, controller_manager, scheduler, autoscaler, guard, csi, cloud_controller, metrics."
+    error_message = "log_categories and metric_categories must not contain empty strings."
   }
 }
 
