@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_postgresql_flexible_server",
+  "title": "PostgreSQL Flexible Server",
+  "commit_scope": "postgresql-flexible-server",
+  "tag_prefix": "PGFSv",
+  "description": "Azure PostgreSQL Flexible Server Terraform module with enterprise-grade features"
+}

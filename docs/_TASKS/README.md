@@ -5,7 +5,7 @@ Task board for module work. Update statuses in markdown files.
 ## Statistics
 - **To Do:** 15 tasks
 - **In Progress:** 0
-- **Done:** 37 tasks
+- **Done:** 39 tasks
 
 ---
 
@@ -41,6 +41,8 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-016](./TASK-016_PostgreSQL_Flexible_Server_Module.md) | **PostgreSQL Flexible Server module (full feature scope)** | High | Large | `modules/azurerm_postgresql_flexible_server/` |
+| [TASK-017](./TASK-017_PostgreSQL_Flexible_Server_Database_Module.md) | **PostgreSQL Flexible Server Database module** | Medium | Medium | `modules/azurerm_postgresql_flexible_server_database/` |
 | [TASK-015](./TASK-015_AKS_Secrets_Remove_Module_Data_Sources.md) | **AKS secrets – remove Key Vault data sources from module** | High | Medium | `modules/azurerm_kubernetes_secrets/` |
 | [TASK-ADO-038](./TASK-ADO-038_AzureDevOps_User_Entitlement_Module_Compliance_Fixes.md) | **Azure DevOps User Entitlement module compliance fixes** | High | Medium | `modules/azuredevops_user_entitlement/` |
 | [TASK-ADO-037](./TASK-ADO-037_AzureDevOps_SecurityRole_Assignment_Docs_and_Tests_Alignment.md) | **Azure DevOps Security Role Assignment docs/tests alignment** | Medium | Medium | `modules/azuredevops_securityrole_assignment/` |

@@ -12,6 +12,8 @@ This directory contains all Terraform modules published from this repository. Ea
 | [Kubernetes Cluster](./azurerm_kubernetes_cluster/) (`azurerm_kubernetes_cluster`) | `AKSv` | Azure Kubernetes Service (AKS) Terraform module for managing clusters with node pools, addons, and enterprise-grade security features |
 | [Kubernetes Secrets](./azurerm_kubernetes_secrets/) (`azurerm_kubernetes_secrets`) | `AKSSv` | Azure Kubernetes Secrets Terraform module with enterprise-grade features |
 | [Network Security Group](./azurerm_network_security_group/) (`azurerm_network_security_group`) | `NSGv` | Manages Azure Network Security Groups with comprehensive security rules configuration |
+| [PostgreSQL Flexible Server](./azurerm_postgresql_flexible_server/) (`azurerm_postgresql_flexible_server`) | `PGFSv` | Azure PostgreSQL Flexible Server Terraform module with enterprise-grade features |
+| [PostgreSQL Flexible Server Database](./azurerm_postgresql_flexible_server_database/) (`azurerm_postgresql_flexible_server_database`) | `PGFSDBv` | Manages a PostgreSQL Flexible Server database on an existing server |
 | [Route Table](./azurerm_route_table/) (`azurerm_route_table`) | `RTv` | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
 | [Storage Account](./azurerm_storage_account/) (`azurerm_storage_account`) | `SAv` | Azure Storage Account Terraform module with enterprise-grade security features |
 | [Subnet](./azurerm_subnet/) (`azurerm_subnet`) | `SNv` | Azure Subnet Terraform module for managing subnets with service endpoints, delegations, network policies, and enterprise-grade security features |
