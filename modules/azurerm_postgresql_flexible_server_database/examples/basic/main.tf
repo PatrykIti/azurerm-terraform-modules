@@ -60,7 +60,7 @@ module "postgresql_flexible_server" {
 }
 
 module "postgresql_flexible_server_database" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_postgresql_flexible_server_database?ref=PGFSDBv1.0.0"
 
   server_id = module.postgresql_flexible_server.id
   name      = var.database_name

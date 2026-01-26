@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![PostgreSQL Flexible Server Database](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PGFSDBv*&label=PostgreSQL%20Flexible%20Server%20Database&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSDBv1.0.0)
 [![PostgreSQL Flexible Server](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PGFSv*&label=PostgreSQL%20Flexible%20Server&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSv1.0.0)
 [![Kubernetes Secrets](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AKSSv*&label=Kubernetes%20Secrets&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSSv1.0.0)
 [![Azure DevOps User Entitlement](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOUv*&label=Azure%20DevOps%20User%20Entitlement&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOUv1.0.0)
@@ -17,7 +18,6 @@
 [![Virtual Network](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=VNv*&label=Virtual%20Network&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/VNv1.2.0)
 [![Subnet](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SNv*&label=Subnet&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SNv1.1.0)
 [![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv1.3.0)
-[![PostgreSQL Flexible Server Database](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PGFSDBv*&label=PostgreSQL%20Flexible%20Server%20Database&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases)
 [![Route Table](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=RTv*&label=Route%20Table&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.1.0)
 [![Network Security Group](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=NSGv*&label=Network%20Security%20Group&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.1.0)
 [![Kubernetes Cluster](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AKSv*&label=Kubernetes%20Cluster&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv1.1.0)
@@ -98,7 +98,7 @@ module "storage_account" {
 | [Route Table](./modules/azurerm_route_table/) | ✅ Completed | [RTv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.1.0) | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
 | [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv1.3.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv1.3.0) | Azure Storage Account Terraform module with enterprise-grade security features |
 | [PostgreSQL Flexible Server](./modules/azurerm_postgresql_flexible_server/) | ✅ Completed | [PGFSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSv1.0.0) | Azure PostgreSQL Flexible Server Terraform module with enterprise-grade features |
-| [PostgreSQL Flexible Server Database](./modules/azurerm_postgresql_flexible_server_database/) | 🚧 Development | Unreleased | PostgreSQL Flexible Server Database module for managing databases on an existing server |
+| [PostgreSQL Flexible Server Database](./modules/azurerm_postgresql_flexible_server_database/) | ✅ Completed | [PGFSDBv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSDBv1.0.0) | PostgreSQL Flexible Server Database module for managing databases on an existing server |
 | [Subnet](./modules/azurerm_subnet/) | ✅ Completed | [SNv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SNv1.1.0) | Azure Subnet Terraform module for managing subnets with service endpoints, delegations, network policies, and enterprise-grade security features |
 | [Virtual Network](./modules/azurerm_virtual_network/) | ✅ Completed | [VNv1.2.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/VNv1.2.0) | Azure Virtual Network Terraform module with advanced networking features |
 
