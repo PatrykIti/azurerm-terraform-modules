@@ -513,14 +513,75 @@ variable "oms_agent" {
     
     log_analytics_workspace_id: The ID of the Log Analytics Workspace which the OMS Agent should send data to.
     msi_auth_for_monitoring_enabled: Is managed identity authentication for monitoring enabled?
+    ampls_resource_id: The Resource ID of the Azure Monitor Private Link Scope (AMPLS).
+    data_collection_settings: Optional Container Insights log collection settings.
+      interval: Collection interval (e.g., "1m").
+      namespace_filtering_mode: Off, Include, or Exclude.
+      namespaces: Namespaces to include or exclude (when filtering is enabled).
+      enable_container_log_v2: Enable ContainerLogV2 schema.
+      streams: List of streams to collect (e.g., Microsoft-Perf, Microsoft-ContainerLogV2).
   EOT
 
   type = object({
     log_analytics_workspace_id      = string
     msi_auth_for_monitoring_enabled = optional(bool, true)
+    ampls_resource_id               = optional(string)
+    data_collection_settings = optional(object({
+      interval                 = optional(string)
+      namespace_filtering_mode = optional(string)
+      namespaces               = optional(list(string))
+      enable_container_log_v2  = optional(bool)
+      streams                  = optional(list(string))
+    }))
   })
 
+  validation {
+    condition = var.oms_agent == null || var.oms_agent.ampls_resource_id == null || can(regex("^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.Insights/privateLinkScopes/[^/]+$", var.oms_agent.ampls_resource_id))
+    error_message = "When set, oms_agent.ampls_resource_id must be a valid Azure Monitor Private Link Scope resource ID."
+  }
+
+  validation {
+    condition = var.oms_agent == null || var.oms_agent.data_collection_settings == null || try(var.oms_agent.data_collection_settings.namespace_filtering_mode, null) == null || contains(["Off", "Include", "Exclude"], var.oms_agent.data_collection_settings.namespace_filtering_mode)
+    error_message = "oms_agent.data_collection_settings.namespace_filtering_mode must be one of: Off, Include, Exclude."
+  }
+
+  validation {
+    condition = var.oms_agent == null || var.oms_agent.data_collection_settings == null || try(var.oms_agent.data_collection_settings.namespace_filtering_mode, null) == null || !contains(["Include", "Exclude"], var.oms_agent.data_collection_settings.namespace_filtering_mode) || (try(length(var.oms_agent.data_collection_settings.namespaces), 0) > 0)
+    error_message = "oms_agent.data_collection_settings.namespaces must be set when namespace_filtering_mode is Include or Exclude."
+  }
+
+  validation {
+    condition = var.oms_agent == null || var.oms_agent.data_collection_settings == null || var.oms_agent.data_collection_settings.streams == null || (length(var.oms_agent.data_collection_settings.streams) > 0 && alltrue([for stream in var.oms_agent.data_collection_settings.streams : trimspace(stream) != ""]))
+    error_message = "oms_agent.data_collection_settings.streams, if provided, must be a non-empty list of non-empty strings."
+  }
+
   default = null
+}
+
+# Optional AzAPI patch for AKS ManagedCluster
+variable "aks_azapi_patch" {
+  description = <<-EOT
+    Optional AzAPI patch configuration for the AKS ManagedCluster.
+
+    enabled: Whether to apply the custom patch.
+    api_version: API version for Microsoft.ContainerService/managedClusters.
+    body: Request body for the patch (merged with module-generated patch data).
+  EOT
+
+  type = object({
+    enabled     = optional(bool, false)
+    api_version = optional(string)
+    body        = optional(map(any))
+  })
+
+  default = {
+    enabled = false
+  }
+
+  validation {
+    condition     = var.aks_azapi_patch.enabled == false || (var.aks_azapi_patch.api_version != null && var.aks_azapi_patch.body != null && length(var.aks_azapi_patch.body) > 0)
+    error_message = "When aks_azapi_patch.enabled is true, api_version and a non-empty body are required."
+  }
 }
 
 variable "ingress_application_gateway" {

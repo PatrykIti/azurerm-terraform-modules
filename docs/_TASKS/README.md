@@ -3,7 +3,7 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 17 tasks
+- **To Do:** 18 tasks
 - **In Progress:** 0
 - **Done:** 39 tasks
 
@@ -13,6 +13,7 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-020](./TASK-020_AKS_Monitoring_Addon_AMPLS_AzAPI.md) | **AKS monitoring add-on (Container Insights) + AMPLS via AzAPI** | High | Medium | `modules/azurerm_kubernetes_cluster/` |
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
 | [TASK-014](./TASK-014_Virtual_Network_Module_Alignment.md) | **Virtual Network module alignment (docs + examples + tests)** | High | Medium | `modules/azurerm_virtual_network/` |
 | [TASK-018](./TASK-018_Diagnostic_Settings_Alignment.md) | **Diagnostic settings alignment (AKS + Storage)** | Medium | Medium | `modules/azurerm_kubernetes_cluster/`, `modules/azurerm_storage_account/` |

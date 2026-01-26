@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_monitor_data_collection_rule",
+  "title": "Monitor Data Collection Rule",
+  "commit_scope": "monitor-dcr",
+  "tag_prefix": "DCRv",
+  "description": "Azure Monitor Data Collection Rule Terraform module with enterprise-grade features"
+}
