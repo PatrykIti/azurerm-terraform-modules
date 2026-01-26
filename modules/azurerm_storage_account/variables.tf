@@ -181,7 +181,7 @@ variable "monitoring" {
         try(var.monitoring.table, []),
         try(var.monitoring.dfs, [])
       ) : ds.name
-    ])) == length(concat(
+      ])) == length(concat(
       try(var.monitoring.storage_account, []),
       try(var.monitoring.blob, []),
       try(var.monitoring.queue, []),
