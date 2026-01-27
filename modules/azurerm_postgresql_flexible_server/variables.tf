@@ -376,8 +376,8 @@ variable "authentication" {
         var.authentication.administrator != null &&
         var.authentication.administrator.login != "" &&
         (
-          try(var.authentication.administrator.password, "") != "" ||
-          try(var.authentication.administrator.password_wo, "") != ""
+          (var.authentication.administrator.password != null && var.authentication.administrator.password != "") ||
+          (var.authentication.administrator.password_wo != null && var.authentication.administrator.password_wo != "")
         )
       )
     )
