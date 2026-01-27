@@ -11,6 +11,8 @@ mock_provider "azurerm" {
   mock_resource "azurerm_monitor_diagnostic_setting" {}
 }
 
+mock_provider "azapi" {}
+
 variables {
   resource_group_name = "test-rg"
   location            = "northeurope"
@@ -22,6 +24,40 @@ variables {
     vm_size    = "Standard_D2_v2"
     node_count = 1
   }
+}
+
+# OMS Agent validation: invalid collection_profile
+run "oms_agent_invalid_collection_profile" {
+  command = plan
+
+  variables {
+    name = "validname"
+    oms_agent = {
+      log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+      collection_profile         = "unsupported"
+    }
+  }
+
+  expect_failures = [
+    var.oms_agent,
+  ]
+}
+
+# OMS Agent validation: invalid AMPLS resource ID
+run "oms_agent_invalid_ampls_resource_id" {
+  command = plan
+
+  variables {
+    name = "validname"
+    oms_agent = {
+      log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+      ampls_resource_id          = "invalid-ampls-id"
+    }
+  }
+
+  expect_failures = [
+    var.oms_agent,
+  ]
 }
 
 # Test invalid cluster name with uppercase letters
