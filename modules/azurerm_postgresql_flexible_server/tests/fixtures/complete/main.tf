@@ -53,7 +53,6 @@ module "postgresql_flexible_server" {
       storage_tier      = "P20"
       auto_grow_enabled = true
     }
-    replication_role = "None"
     backup = {
       retention_days               = 30
       geo_redundant_backup_enabled = true

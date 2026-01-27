@@ -263,6 +263,22 @@ run "invalid_replication_role" {
   ]
 }
 
+run "replication_role_requires_update_mode" {
+  command = plan
+
+  variables {
+    server = {
+      sku_name           = "GP_Standard_D2s_v3"
+      postgresql_version = "15"
+      replication_role   = "None"
+    }
+  }
+
+  expect_failures = [
+    var.server
+  ]
+}
+
 run "invalid_firewall_ip" {
   command = plan
 

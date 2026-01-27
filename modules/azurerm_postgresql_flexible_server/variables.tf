@@ -43,7 +43,7 @@ variable "server" {
     high_availability: High availability settings.
     maintenance_window: Maintenance window in UTC.
     create_mode: Create/restore/replica mode settings.
-    replication_role: Replication role for the server.
+    replication_role: Replication role for the server (set only with create_mode = Update).
     timeouts: Custom timeouts for create, update, delete.
   EOT
 
@@ -139,6 +139,13 @@ variable "server" {
   validation {
     condition     = var.server.replication_role == null || contains(["None"], var.server.replication_role)
     error_message = "server.replication_role must be \"None\" when set."
+  }
+
+  validation {
+    condition = var.server.replication_role == null || (
+      (var.server.create_mode != null && var.server.create_mode.mode != null ? var.server.create_mode.mode : "Default") == "Update"
+    )
+    error_message = "server.replication_role can only be set when create_mode is Update."
   }
 
   validation {
