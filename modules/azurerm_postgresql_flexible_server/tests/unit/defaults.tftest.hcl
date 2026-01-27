@@ -48,6 +48,21 @@ run "verify_public_network_default" {
   }
 }
 
+run "allow_private_endpoint_only" {
+  command = plan
+
+  variables {
+    network = {
+      public_network_access_enabled = false
+    }
+  }
+
+  assert {
+    condition     = azurerm_postgresql_flexible_server.postgresql_flexible_server.public_network_access_enabled == false
+    error_message = "public_network_access_enabled should allow false without delegated subnet or private DNS."
+  }
+}
+
 run "verify_backup_defaults" {
   command = plan
 

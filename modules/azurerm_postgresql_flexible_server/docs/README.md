@@ -22,8 +22,11 @@ is atomic and intentionally avoids cross-resource glue.
 - **Authentication**: Password auth is enabled by default. Enable Entra ID
   authentication by setting `authentication.active_directory_auth_enabled = true`
   and providing `active_directory_administrator` details.
-- **Private networking**: Set `network.public_network_access_enabled = false`
-  and provide both `network.delegated_subnet_id` and `network.private_dns_zone_id`.
+- **Private networking**: Set `network.public_network_access_enabled = false`.
+  For delegated subnet private access, provide both
+  `network.delegated_subnet_id` and `network.private_dns_zone_id`. You can also
+  disable public access without delegated networking and manage private
+  endpoints outside this module.
 - **Customer-managed keys**: Requires a user-assigned identity and a Key Vault
   key URL. The user-assigned identity must have access to the key.
 - **Create modes**: Restore/replica modes require `create_mode.source_server_id`.

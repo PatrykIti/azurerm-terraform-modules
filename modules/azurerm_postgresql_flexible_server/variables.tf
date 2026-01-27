@@ -339,9 +339,10 @@ variable "authentication" {
 variable "network" {
   description = <<-EOT
     Network settings for the server.
-    By default public access is enabled. For private access set
-    public_network_access_enabled = false and provide both delegated_subnet_id
-    and private_dns_zone_id.
+    By default public access is enabled. Set public_network_access_enabled = false
+    to disable public access. When using delegated subnet private access, provide
+    both delegated_subnet_id and private_dns_zone_id (they must be set together).
+    Private endpoints can be managed externally when public access is disabled.
 
     firewall_rules are only valid when public network access is enabled.
   EOT
@@ -362,20 +363,16 @@ variable "network" {
 
   validation {
     condition = var.network == null ? true : (
-      (var.network.public_network_access_enabled == false ||
-        var.network.delegated_subnet_id != null ||
-        var.network.private_dns_zone_id != null
-      )
-      ? (var.network.delegated_subnet_id != null && var.network.private_dns_zone_id != null)
-      : true
+      (var.network.delegated_subnet_id == null && var.network.private_dns_zone_id == null) ||
+      (var.network.delegated_subnet_id != null && var.network.private_dns_zone_id != null)
     )
-    error_message = "network.delegated_subnet_id and network.private_dns_zone_id are required when public_network_access_enabled is false or when private networking is configured."
+    error_message = "network.delegated_subnet_id and network.private_dns_zone_id must be set together."
   }
 
   validation {
     condition = var.network == null ? true : (
-      var.network.public_network_access_enabled != true ||
-      (var.network.delegated_subnet_id == null && var.network.private_dns_zone_id == null)
+      (var.network.delegated_subnet_id == null && var.network.private_dns_zone_id == null) ||
+      var.network.public_network_access_enabled == false
     )
     error_message = "network.delegated_subnet_id/private_dns_zone_id require public_network_access_enabled = false."
   }
