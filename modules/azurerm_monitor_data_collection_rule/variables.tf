@@ -62,11 +62,11 @@ variable "destinations" {
       name = string
     }))
     event_hub = optional(list(object({
-      name        = string
+      name         = string
       event_hub_id = string
     })), [])
     event_hub_direct = optional(list(object({
-      name        = string
+      name         = string
       event_hub_id = string
     })), [])
     log_analytics = optional(list(object({
@@ -107,7 +107,7 @@ variable "destinations" {
       [for d in try(var.destinations.storage_blob, []) : d.name],
       [for d in try(var.destinations.storage_blob_direct, []) : d.name],
       [for d in try(var.destinations.storage_table_direct, []) : d.name]
-    ))) == length(concat(
+      ))) == length(concat(
       var.destinations.azure_monitor_metrics == null ? [] : [var.destinations.azure_monitor_metrics.name],
       [for d in try(var.destinations.event_hub, []) : d.name],
       [for d in try(var.destinations.event_hub_direct, []) : d.name],
@@ -224,8 +224,8 @@ variable "data_sources" {
       streams        = list(string)
     })), [])
     windows_event_log = optional(list(object({
-      name          = string
-      streams       = list(string)
+      name           = string
+      streams        = list(string)
       x_path_queries = list(string)
     })), [])
     windows_firewall_log = optional(list(object({
@@ -247,7 +247,7 @@ variable "data_sources" {
       [for d in try(var.data_sources.syslog, []) : d.name],
       [for d in try(var.data_sources.windows_event_log, []) : d.name],
       [for d in try(var.data_sources.windows_firewall_log, []) : d.name]
-    ))) == length(concat(
+      ))) == length(concat(
       try([var.data_sources.data_import.event_hub_data_source.name], []),
       [for d in try(var.data_sources.extension, []) : d.name],
       [for d in try(var.data_sources.iis_log, []) : d.name],

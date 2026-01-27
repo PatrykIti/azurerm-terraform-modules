@@ -122,8 +122,8 @@ run "password_wo_only" {
     authentication = {
       password_auth_enabled = true
       administrator = {
-        login       = "pgfsadmin"
-        password_wo = "Password1234"
+        login               = "pgfsadmin"
+        password_wo         = "Password1234"
         password_wo_version = 1
       }
     }

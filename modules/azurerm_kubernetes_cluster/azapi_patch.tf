@@ -1,5 +1,18 @@
+locals {
+  oms_agent_collection_profile = var.oms_agent != null ? try(var.oms_agent.collection_profile, "basic") : "basic"
+  oms_agent_collection_streams = local.oms_agent_collection_profile == "advanced" ? [
+    "Microsoft-Perf",
+    "Microsoft-ContainerLogV2",
+    "Microsoft-KubeEvents",
+    "Microsoft-KubePodInventory",
+    ] : [
+    "Microsoft-Perf",
+    "Microsoft-ContainerLogV2",
+  ]
+}
+
 resource "azapi_update_resource" "kubernetes_cluster_oms_agent_patch" {
-  count = var.oms_agent != null && (try(var.oms_agent.ampls_resource_id, null) != null || try(var.oms_agent.data_collection_settings, null) != null) ? 1 : 0
+  count = var.oms_agent != null && try(var.oms_agent.ampls_resource_id, null) != null ? 1 : 0
 
   type        = "Microsoft.ContainerService/managedClusters@2023-11-01"
   resource_id = azurerm_kubernetes_cluster.kubernetes_cluster.id
@@ -7,23 +20,16 @@ resource "azapi_update_resource" "kubernetes_cluster_oms_agent_patch" {
     properties = {
       addonProfiles = {
         omsagent = {
-          config = merge(
-            try(var.oms_agent.ampls_resource_id, null) != null ? {
-              useAzureMonitorPrivateLinkScope        = tostring(true)
-              azureMonitorPrivateLinkScopeResourceId = var.oms_agent.ampls_resource_id
-            } : {},
-            try(var.oms_agent.data_collection_settings, null) != null ? {
-              dataCollectionSettings = jsonencode({
-                for key, value in {
-                  interval               = try(var.oms_agent.data_collection_settings.interval, null)
-                  namespaceFilteringMode = try(var.oms_agent.data_collection_settings.namespace_filtering_mode, null)
-                  namespaces             = try(var.oms_agent.data_collection_settings.namespaces, null)
-                  enableContainerLogV2   = try(var.oms_agent.data_collection_settings.enable_container_log_v2, null)
-                  streams                = try(var.oms_agent.data_collection_settings.streams, null)
-                } : key => value if value != null
-              })
-            } : {}
-          )
+          config = {
+            useAzureMonitorPrivateLinkScope        = tostring(true)
+            azureMonitorPrivateLinkScopeResourceId = var.oms_agent.ampls_resource_id
+            dataCollectionSettings = jsonencode({
+              interval               = "1m"
+              namespaceFilteringMode = "Off"
+              enableContainerLogV2   = true
+              streams                = local.oms_agent_collection_streams
+            })
+          }
         }
       }
     }

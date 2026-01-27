@@ -77,14 +77,14 @@ run "monitoring_duplicate_names" {
   variables {
     monitoring = [
       {
-        name                           = "diag"
-        log_categories                 = ["AuditLogs"]
-        log_analytics_workspace_id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/ws"
+        name                       = "diag"
+        log_categories             = ["AuditLogs"]
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/ws"
       },
       {
-        name                           = "diag"
-        metric_categories              = ["AllMetrics"]
-        log_analytics_workspace_id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/ws"
+        name                       = "diag"
+        metric_categories          = ["AllMetrics"]
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/ws"
       }
     ]
   }

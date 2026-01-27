@@ -3,14 +3,14 @@
 mock_provider "azurerm" {
   mock_resource "azurerm_monitor_data_collection_endpoint" {
     defaults = {
-      id                           = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Insights/dataCollectionEndpoints/dceunit"
-      name                         = "dceunit"
-      location                     = "northeurope"
-      resource_group_name          = "test-rg"
+      id                            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Insights/dataCollectionEndpoints/dceunit"
+      name                          = "dceunit"
+      location                      = "northeurope"
+      resource_group_name           = "test-rg"
       configuration_access_endpoint = "https://config.example"
-      logs_ingestion_endpoint      = "https://logs.example"
-      metrics_ingestion_endpoint   = "https://metrics.example"
-      immutable_id                 = "00000000-0000-0000-0000-000000000000"
+      logs_ingestion_endpoint       = "https://logs.example"
+      metrics_ingestion_endpoint    = "https://metrics.example"
+      immutable_id                  = "00000000-0000-0000-0000-000000000000"
       tags = {
         Environment = "Test"
         Module      = "DCE"

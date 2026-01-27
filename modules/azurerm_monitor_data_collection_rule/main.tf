@@ -207,8 +207,8 @@ resource "azurerm_monitor_data_collection_rule" "monitor_data_collection_rule" {
       dynamic "windows_event_log" {
         for_each = try(data_sources.value.windows_event_log, [])
         content {
-          name          = windows_event_log.value.name
-          streams       = windows_event_log.value.streams
+          name           = windows_event_log.value.name
+          streams        = windows_event_log.value.streams
           x_path_queries = windows_event_log.value.x_path_queries
         }
       }

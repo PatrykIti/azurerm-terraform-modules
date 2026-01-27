@@ -36,30 +36,18 @@ ktore nadal wskazuja `az aks enable-addons --addon monitoring --ampls-resource-i
 
 2) **AzAPI patch tylko gdy potrzebny**
    - Patch jest wlaczany tylko, gdy `var.oms_agent != null` oraz
-     (`var.oms_agent.ampls_resource_id != null` lub
-     `var.oms_agent.data_collection_settings != null`).
+     `var.oms_agent.ampls_resource_id != null`.
 
-3) **Data collection settings dla streamow**
-   - Dodajemy `oms_agent.data_collection_settings` i mapujemy na
-     `dataCollectionSettings` w patchu (np. `enableContainerLogV2`, `streams`).
-   - `streams` to jawny input (list(string)).
+3) **Collection profile (bez dziwnych parametrow)**
+   - Dodajemy `oms_agent.collection_profile` (domyslnie `basic`).
+   - Patch sam generuje `dataCollectionSettings` na podstawie profilu.
+   - Uzytkownik nie podaje JSON ani streamow.
 
 4) **Mapowanie wg docs (dataCollectionSettings.json)**
-   - `interval` -> `dataCollectionSettings.interval`
-   - `namespace_filtering_mode` -> `dataCollectionSettings.namespaceFilteringMode`
-   - `namespaces` -> `dataCollectionSettings.namespaces`
-   - `enable_container_log_v2` -> `dataCollectionSettings.enableContainerLogV2`
-   - `streams` -> `dataCollectionSettings.streams`
-
-   Minimalny przyklad z docs (dla odniesienia):
-   ```
-   {
-     "interval": "1m",
-     "namespaceFilteringMode": "Off",
-     "enableContainerLogV2": true,
-     "streams": ["Microsoft-Perf", "Microsoft-ContainerLogV2"]
-   }
-   ```
+   - Wartosci sa hardcoded wg profilu:
+     - `basic`: `interval=1m`, `namespaceFilteringMode=Off`,
+       `enableContainerLogV2=true`, `streams=[Microsoft-Perf, Microsoft-ContainerLogV2]`
+     - `advanced`: `basic` + `Microsoft-KubeEvents`, `Microsoft-KubePodInventory`
    - W patchu AKS addon config `dataCollectionSettings` powinno byc zapisane
      jako JSON string (mapa `addonProfiles.omsagent.config` to map[string]string).
 
@@ -76,7 +64,7 @@ ktore nadal wskazuja `az aks enable-addons --addon monitoring --ampls-resource-i
 
 ### TASK-020-1: Discovery / potwierdzenie API
 
-**Cel:** Potwierdzic faktyczne pole/polaczenie AMPLS i dataCollectionSettings w ManagedCluster.
+**Cel:** Potwierdzic faktyczne pole/polaczenie AMPLS i mapowanie dataCollectionSettings w ManagedCluster.
 
 **Do zrobienia:**
 - Zweryfikowac nazwe pola w ARM/AKS API dla AMPLS (np. w addon config).
@@ -84,49 +72,41 @@ ktore nadal wskazuja `az aks enable-addons --addon monitoring --ampls-resource-i
   - `az aks enable-addons --addon monitoring --ampls-resource-id`
   - parametry `useAzureMonitorPrivateLinkScope` i
     `azureMonitorPrivateLinkScopeResourceId` w szablonach.
-- Potwierdzic pola dla `--data-collection-settings`:
-  - gdzie w API trafia `enableContainerLogV2`
-  - gdzie w API trafia `streams` (np. `Microsoft-Perf`, `Microsoft-ContainerLogV2`)
+- Potwierdzic mapowanie `--data-collection-settings` (profil basic/advanced).
 - Potwierdzic docelowy `api_version` dla `Microsoft.ContainerService/managedClusters`.
 
 ---
 
 ### TASK-020-2: Rozszerzenie inputow `oms_agent`
 
-**Cel:** Dodac opcjonalne inputy AMPLS + data collection settings do add-onu.
+**Cel:** Dodac opcjonalny input AMPLS + wybor profilu zbierania danych.
 
 **Do zrobienia:**
 - `variables.tf`: dodac:
   - `ampls_resource_id = optional(string)`
-  - `data_collection_settings = optional(object({ ... }))`
-    - `interval = optional(string)`
-    - `namespace_filtering_mode = optional(string)`
-    - `namespaces = optional(list(string))`
-    - `enable_container_log_v2 = optional(bool)`
-    - `streams = optional(list(string))`
+  - `collection_profile = optional(string, "basic")`
 - Walidacja:
   - `ampls_resource_id` tylko gdy `oms_agent != null`.
   - format Resource ID (prosta walidacja regex).
-  - `streams` tylko gdy `data_collection_settings != null`.
-  - `streams` niepuste i jako lista stringow.
+  - `collection_profile` tylko `basic` lub `advanced`.
 - `README.md`: zaktualizowac opis `oms_agent`.
- - Przyklad minimalny (docs): interval + namespaceFilteringMode + enableContainerLogV2 + streams.
+- Przyklad profilu `basic` wg docs (interval + namespaceFilteringMode + enableContainerLogV2 + streams).
 
 ---
 
 ### TASK-020-3: AzAPI patch (AMPLS)
 
-**Cel:** Zastosowac patch do AKS, gdy `ampls_resource_id` lub `data_collection_settings` sa ustawione.
+**Cel:** Zastosowac patch do AKS, gdy `ampls_resource_id` jest ustawione (profil w patchu).
 
 **Do zrobienia:**
 - `versions.tf`: dodac provider `azapi` (wersja zgodna z repo standardem).
 - `main.tf`:
   - dodac `azapi_update_resource` dla `managedClusters`.
-  - budowac `body` tylko gdy `ampls_resource_id` lub `data_collection_settings` ustawione.
+  - budowac `body` tylko gdy `ampls_resource_id` ustawione.
   - `depends_on` na `azurerm_kubernetes_cluster.kubernetes_cluster`.
   - zastosowac `ignore_missing_property` jesli konieczne.
 - Uwaga: patch musi byc idempotentny i nie resetowac innych pol.
- - Uwaga: `data_collection_settings` dotyczy streamow i `enableContainerLogV2`
+ - Uwaga: `dataCollectionSettings` dotyczy streamow i `enableContainerLogV2`
    (nie jest to Diagnostic Settings).
 
 ---
@@ -152,9 +132,7 @@ variable "aks_azapi_patch" {
 **Do zrobienia:**
 - Walidacja: gdy `enabled = true`, wymagaj `api_version` i niepusty `body`.
 - Patch aplikowany do `azurerm_kubernetes_cluster.kubernetes_cluster.id`.
-- Polaczenie z AMPLS: finalny patch body = merge(AMPLS patch, aks_azapi_patch.body).
- - Polaczenie z dataCollectionSettings: finalny patch body = merge(AMPLS patch,
-   dataCollectionSettings patch, aks_azapi_patch.body).
+- Osobny resource od patcha `oms_agent` (brak merge).
 
 ---
 
@@ -176,11 +154,10 @@ variable "aks_azapi_patch" {
 **Do zrobienia:**
 - Przynajmniej jeden example:
   - `examples/secure` lub nowy `examples/monitoring-ampls` z
-    `oms_agent.ampls_resource_id` i `oms_agent.data_collection_settings`.
+    `oms_agent.ampls_resource_id` i `oms_agent.collection_profile`.
 - Unit tests:
   - `ampls_resource_id` bez `oms_agent` -> fail.
-  - `data_collection_settings` bez `oms_agent` -> fail.
-  - `streams` puste -> fail.
+  - `collection_profile` spoza `basic/advanced` -> fail.
   - `aks_azapi_patch.enabled=true` bez `api_version` lub `body` -> fail.
 - Integration tests opcjonalne (wymaga realnego AMPLS).
 
@@ -190,7 +167,7 @@ variable "aks_azapi_patch" {
 
 - Modul wspiera `oms_agent.ampls_resource_id` i stosuje AzAPI patch tylko wtedy,
   gdy jest podany.
-- Modul wspiera `oms_agent.data_collection_settings` (streams + enableContainerLogV2).
+- Modul wspiera `oms_agent.collection_profile` (basic/advanced).
 - Dodany jest generyczny `aks_azapi_patch` z walidacjami i dokumentacja.
 - README/SECURITY sa zaktualizowane.
 - Unit tests pokrywaja nowe walidacje.
