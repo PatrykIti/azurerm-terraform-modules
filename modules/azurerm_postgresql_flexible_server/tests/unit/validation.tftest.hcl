@@ -124,9 +124,28 @@ run "password_wo_only" {
       administrator = {
         login       = "pgfsadmin"
         password_wo = "Password1234"
+        password_wo_version = 1
       }
     }
   }
+}
+
+run "password_wo_missing_version" {
+  command = plan
+
+  variables {
+    authentication = {
+      password_auth_enabled = true
+      administrator = {
+        login       = "pgfsadmin"
+        password_wo = "Password1234"
+      }
+    }
+  }
+
+  expect_failures = [
+    var.authentication
+  ]
 }
 
 run "password_wo_version_requires_password_wo" {

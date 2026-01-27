@@ -360,6 +360,14 @@ variable "authentication" {
   }
 
   validation {
+    condition = var.authentication == null || var.authentication.administrator == null || (
+      var.authentication.administrator.password_wo == null ||
+      var.authentication.administrator.password_wo_version != null
+    )
+    error_message = "authentication.administrator.password_wo requires authentication.administrator.password_wo_version to be set."
+  }
+
+  validation {
     condition = var.authentication == null || var.authentication.administrator == null || !(
       var.authentication.administrator.password != null &&
       var.authentication.administrator.password_wo != null
