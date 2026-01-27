@@ -44,8 +44,9 @@ module "postgresql_flexible_server" {
 
   authentication = {
     administrator = {
-      login    = "pgfsadmin"
-      password = random_password.admin.result
+      login               = "pgfsadmin"
+      password_wo         = random_password.admin.result
+      password_wo_version = 1
     }
   }
 

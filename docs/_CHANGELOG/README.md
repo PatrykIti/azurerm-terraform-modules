@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [060](./060-2026-01-27-postgresql-flexible-server-public-network-access.md) | 2026-01-27 | PostgreSQL Flexible Server public network access toggle | Fix / Maintenance |
 | [059](./059-2026-01-25-postgresql-flexible-server-database-module.md) | 2026-01-25 | PostgreSQL Flexible Server Database module | Feature |
 | [058](./058-2026-01-22-postgresql-flexible-server-module.md) | 2026-01-22 | PostgreSQL Flexible Server module (full feature scope) | Feature |
 | [057](./057-2026-01-14-aks-secrets-manual-inputs.md) | 2026-01-14 | AKS secrets manual strategy input refactor | Breaking Change / Maintenance |

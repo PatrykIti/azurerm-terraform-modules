@@ -5,7 +5,7 @@ Task board for module work. Update statuses in markdown files.
 ## Statistics
 - **To Do:** 18 tasks
 - **In Progress:** 0
-- **Done:** 40 tasks
+- **Done:** 41 tasks
 
 ---
 
@@ -44,6 +44,7 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-022](./TASK-022_PostgreSQL_Flexible_Server_Missing_Arguments.md) | **PostgreSQL Flexible Server missing provider arguments** | Medium | Medium | `modules/azurerm_postgresql_flexible_server/` |
 | [TASK-021](./TASK-021_PostgreSQL_Flexible_Server_Public_Network_Access.md) | **PostgreSQL Flexible Server - public network access toggle** | High | Small | `modules/azurerm_postgresql_flexible_server/` |
 | [TASK-016](./TASK-016_PostgreSQL_Flexible_Server_Module.md) | **PostgreSQL Flexible Server module (full feature scope)** | High | Large | `modules/azurerm_postgresql_flexible_server/` |
 | [TASK-017](./TASK-017_PostgreSQL_Flexible_Server_Database_Module.md) | **PostgreSQL Flexible Server Database module** | Medium | Medium | `modules/azurerm_postgresql_flexible_server_database/` |

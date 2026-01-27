@@ -37,12 +37,13 @@ variable "server" {
     postgresql_version: PostgreSQL major version for the server.
     zone: Availability zone for the primary server.
 
-    storage: Storage settings for the server.
+    storage: Storage settings for the server (storage_mb, storage_tier, auto_grow_enabled).
     backup: Backup retention and geo-redundancy settings.
     encryption: Customer-managed key settings for the server.
     high_availability: High availability settings.
     maintenance_window: Maintenance window in UTC.
     create_mode: Create/restore/replica mode settings.
+    replication_role: Replication role for the server.
     timeouts: Custom timeouts for create, update, delete.
   EOT
 
@@ -52,8 +53,9 @@ variable "server" {
     zone               = optional(string)
 
     storage = optional(object({
-      storage_mb   = optional(number)
-      storage_tier = optional(string)
+      storage_mb        = optional(number)
+      storage_tier      = optional(string)
+      auto_grow_enabled = optional(bool)
     }), {})
 
     backup = optional(object({
@@ -84,6 +86,8 @@ variable "server" {
       source_server_id                  = optional(string)
       point_in_time_restore_time_in_utc = optional(string)
     }), {})
+
+    replication_role = optional(string)
 
     timeouts = optional(object({
       create = optional(string)
@@ -130,6 +134,11 @@ variable "server" {
       ], var.server.storage.storage_tier)
     )
     error_message = "server.storage.storage_tier must be one of: P4, P6, P10, P15, P20, P30, P40, P50, P60, P70, P80."
+  }
+
+  validation {
+    condition     = var.server.replication_role == null || contains(["None"], var.server.replication_role)
+    error_message = "server.replication_role must be \"None\" when set."
   }
 
   validation {
@@ -246,7 +255,7 @@ variable "authentication" {
     At least one method must be enabled.
 
     password_auth_enabled: Enable local password authentication.
-    administrator: Administrator login and password for password auth.
+    administrator: Administrator login and password for password auth (password or password_wo).
 
     active_directory_auth_enabled: Enable Entra ID authentication.
     tenant_id: Tenant ID for Entra ID (can be specified here or in the admin block).
@@ -259,8 +268,10 @@ variable "authentication" {
     tenant_id                     = optional(string)
 
     administrator = optional(object({
-      login    = string
-      password = string
+      login               = string
+      password            = optional(string)
+      password_wo         = optional(string)
+      password_wo_version = optional(number)
     }))
 
     active_directory_administrator = optional(object({
@@ -315,9 +326,45 @@ variable "authentication" {
 
   validation {
     condition = var.authentication == null || var.authentication.administrator == null || (
-      length(var.authentication.administrator.password) >= 8 && length(var.authentication.administrator.password) <= 128
+      var.authentication.administrator.password == null ||
+      (length(var.authentication.administrator.password) >= 8 && length(var.authentication.administrator.password) <= 128)
     )
     error_message = "authentication.administrator.password must be between 8 and 128 characters when set."
+  }
+
+  validation {
+    condition = var.authentication == null || var.authentication.administrator == null || (
+      var.authentication.administrator.password_wo == null ||
+      (length(var.authentication.administrator.password_wo) >= 8 && length(var.authentication.administrator.password_wo) <= 128)
+    )
+    error_message = "authentication.administrator.password_wo must be between 8 and 128 characters when set."
+  }
+
+  validation {
+    condition = var.authentication == null || var.authentication.administrator == null || (
+      var.authentication.administrator.password_wo_version == null ||
+      (
+        var.authentication.administrator.password_wo_version >= 0 &&
+        var.authentication.administrator.password_wo_version == floor(var.authentication.administrator.password_wo_version)
+      )
+    )
+    error_message = "authentication.administrator.password_wo_version must be a non-negative integer when set."
+  }
+
+  validation {
+    condition = var.authentication == null || var.authentication.administrator == null || (
+      var.authentication.administrator.password_wo_version == null ||
+      var.authentication.administrator.password_wo != null
+    )
+    error_message = "authentication.administrator.password_wo_version requires authentication.administrator.password_wo to be set."
+  }
+
+  validation {
+    condition = var.authentication == null || var.authentication.administrator == null || !(
+      var.authentication.administrator.password != null &&
+      var.authentication.administrator.password_wo != null
+    )
+    error_message = "authentication.administrator.password and authentication.administrator.password_wo cannot both be set."
   }
 
   validation {
@@ -328,10 +375,13 @@ variable "authentication" {
         var.authentication != null &&
         var.authentication.administrator != null &&
         var.authentication.administrator.login != "" &&
-        var.authentication.administrator.password != ""
+        (
+          try(var.authentication.administrator.password, "") != "" ||
+          try(var.authentication.administrator.password_wo, "") != ""
+        )
       )
     )
-    error_message = "authentication.administrator.login and authentication.administrator.password are required when create_mode is Default and password authentication is enabled."
+    error_message = "authentication.administrator.login and password/password_wo are required when create_mode is Default and password authentication is enabled."
   }
 }
 
