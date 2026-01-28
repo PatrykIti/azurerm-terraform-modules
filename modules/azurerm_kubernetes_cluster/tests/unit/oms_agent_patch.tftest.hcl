@@ -49,7 +49,7 @@ run "oms_agent_ampls_patch_applied" {
       ampls_settings = {
         id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.Insights/privateLinkScopes/test-ampls"
       }
-      collection_profile          = "advanced"
+      collection_profile = "advanced"
     }
   }
 

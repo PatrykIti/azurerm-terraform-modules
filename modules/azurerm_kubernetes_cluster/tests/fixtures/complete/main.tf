@@ -150,7 +150,7 @@ module "kubernetes_cluster" {
     ampls_settings = {
       id = azurerm_monitor_private_link_scope.test.id
     }
-    collection_profile         = "advanced"
+    collection_profile = "advanced"
   }
 
 

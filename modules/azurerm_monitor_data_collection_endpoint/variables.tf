@@ -3,8 +3,8 @@ variable "name" {
   type        = string
 
   validation {
-    condition     = can(regex("^[A-Za-z0-9-]{1,64}$", var.name))
-    error_message = "Data Collection Endpoint name must be 1-64 characters and contain only letters, numbers, and hyphens."
+    condition     = can(regex("^[A-Za-z0-9-]{1,63}$", var.name))
+    error_message = "Data Collection Endpoint name must be 1-63 characters and contain only letters, numbers, and hyphens."
   }
 }
 
@@ -32,7 +32,7 @@ variable "kind" {
 variable "public_network_access_enabled" {
   description = "Whether public network access is enabled for the Data Collection Endpoint."
   type        = bool
-  default     = null
+  default     = true
 }
 
 variable "description" {

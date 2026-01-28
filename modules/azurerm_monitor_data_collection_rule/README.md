@@ -33,6 +33,8 @@ module "azurerm_monitor_data_collection_rule" {
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates a basic Monitor Data Collection Rule configuration using secure defaults and minimal setup.
+- [AKS Basic](examples/aks-basic) - This example demonstrates an AKS Container Insights DCR configuration using the basic stream profile.
+- [AKS Advanced](examples/aks-advanced) - This example demonstrates an AKS Container Insights DCR configuration using the advanced stream profile.
 - [Complete](examples/complete) - This example demonstrates a comprehensive deployment of Monitor Data Collection Rule with all available features and configurations.
 - [Secure](examples/secure) - This example demonstrates a DCR configured to use a dedicated Data Collection Endpoint with public access disabled on the endpoint.
 - [Syslog](examples/syslog) - This example demonstrates a Data Collection Rule configured for Linux syslog data.

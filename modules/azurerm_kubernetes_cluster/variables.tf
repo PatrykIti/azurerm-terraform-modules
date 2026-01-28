@@ -523,11 +523,11 @@ variable "oms_agent" {
   type = object({
     log_analytics_workspace_id      = string
     msi_auth_for_monitoring_enabled = optional(bool, true)
-    ampls_settings                  = optional(object({
+    ampls_settings = optional(object({
       id = string
     }))
-    collection_profile              = optional(string, "basic")
-    namespaceFilteringMode          = optional(string, "Off")
+    collection_profile     = optional(string, "basic")
+    namespaceFilteringMode = optional(string, "Off")
   })
 
   validation {
