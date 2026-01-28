@@ -39,6 +39,11 @@ variable "data_collection_endpoint_id" {
   description = "The resource ID of the Data Collection Endpoint this rule can be used with."
   type        = string
   default     = null
+
+  validation {
+    condition     = var.data_sources == null || var.data_collection_endpoint_id != null
+    error_message = "data_collection_endpoint_id is required when data_sources is configured."
+  }
 }
 
 variable "identity" {

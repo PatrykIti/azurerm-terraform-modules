@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [062](./062-2026-01-28-ampls-module.md) | 2026-01-28 | Azure Monitor Private Link Scope (AMPLS) module | Feature |
 | [061](./061-2026-01-27-aks-monitoring-addon-ampls-azapi.md) | 2026-01-27 | AKS monitoring add-on AMPLS patch via AzAPI | Feature / Maintenance |
 | [060](./060-2026-01-27-postgresql-flexible-server-public-network-access.md) | 2026-01-27 | PostgreSQL Flexible Server public network access toggle | Fix / Maintenance |
 | [059](./059-2026-01-25-postgresql-flexible-server-database-module.md) | 2026-01-25 | PostgreSQL Flexible Server Database module | Feature |

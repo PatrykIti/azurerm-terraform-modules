@@ -16,6 +16,12 @@ variable "data_collection_rule_name" {
   default     = "dcrcompleteexample001"
 }
 
+variable "data_collection_endpoint_name" {
+  description = "Data Collection Endpoint name (must be globally unique)."
+  type        = string
+  default     = "dcecompleteexample001"
+}
+
 variable "log_analytics_workspace_name" {
   description = "Log Analytics workspace name for the example."
   type        = string

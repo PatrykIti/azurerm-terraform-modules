@@ -13,13 +13,51 @@ Manages Azure Monitor Data Collection Rules
 ## Usage
 
 ```hcl
+module "azurerm_monitor_data_collection_endpoint" {
+  source = "path/to/azurerm_monitor_data_collection_endpoint"
+
+  name                = "example-dce"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+}
+
 module "azurerm_monitor_data_collection_rule" {
   source = "path/to/azurerm_monitor_data_collection_rule"
 
-  # Required variables
-  name                = "example-azurerm_monitor_data_collection_rule"
+  # Required variables and minimum configuration
+  name                = "example-dcr"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
+  kind                = "Windows"
+
+  # Required when data_sources are configured
+  data_collection_endpoint_id = module.azurerm_monitor_data_collection_endpoint.id
+
+  destinations = {
+    log_analytics = [
+      {
+        name                  = "log-analytics"
+        workspace_resource_id = azurerm_log_analytics_workspace.example.id
+      }
+    ]
+  }
+
+  data_sources = {
+    windows_event_log = [
+      {
+        name           = "windows-events"
+        streams        = ["Microsoft-WindowsEvent"]
+        x_path_queries = ["Application!*[System[(Level=1 or Level=2)]]"]
+      }
+    ]
+  }
+
+  data_flows = [
+    {
+      streams      = ["Microsoft-WindowsEvent"]
+      destinations = ["log-analytics"]
+    }
+  ]
 
   # Optional configuration
   tags = {

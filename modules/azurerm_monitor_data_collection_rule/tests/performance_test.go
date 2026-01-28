@@ -15,7 +15,7 @@ func TestMonitorDataCollectionRuleCreationTime(t *testing.T) {
 		t.Skip("Skipping performance test in short mode")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_monitor_data_collection_rule/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	start := time.Now()

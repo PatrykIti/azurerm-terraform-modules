@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 21 tasks
+- **To Do:** 20 tasks
 - **In Progress:** 0
-- **Done:** 41 tasks
+- **Done:** 42 tasks
 
 ---
 
@@ -20,7 +20,6 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-019](./TASK-019_DCR_DCE_Modules.md) | **Azure Monitor DCR + DCE modules** | Medium | Large | `modules/azurerm_monitor_data_collection_rule/`, `modules/azurerm_monitor_data_collection_endpoint/` |
 | [TASK-023](./TASK-023_Log_Analytics_Workspace_Module.md) | **Log Analytics Workspace module (full feature scope)** | High | Large | `modules/azurerm_log_analytics_workspace/` |
 | [TASK-024](./TASK-024_Application_Insights_Module.md) | **Application Insights module (full feature scope)** | High | Large | `modules/azurerm_application_insights/` |
-| [TASK-025](./TASK-025_AMPLS_Module.md) | **Azure Monitor Private Link Scope (AMPLS) module** | High | Medium | `modules/azurerm_monitor_private_link_scope/` |
 | [TASK-ADO-017](./TASK-ADO-017_AzureDevOps_Environments_Module_Refactor.md) | **Azure DevOps Environments module refactor** | High | Medium | Re-opened; `modules/azuredevops_environments/` |
 | [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_artifacts_feed/` |
 | [TASK-ADO-032](./TASK-ADO-032_AzureDevOps_Artifacts_Feed_Module_Audit_Fixes.md) | **Azure DevOps Artifacts Feed module audit fixes** | Medium | Small | Docs + artifact cleanup; `modules/azuredevops_artifacts_feed/` |
@@ -47,6 +46,7 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-025](./TASK-025_AMPLS_Module.md) | **Azure Monitor Private Link Scope (AMPLS) module** | High | Medium | `modules/azurerm_monitor_private_link_scope/` |
 | [TASK-022](./TASK-022_PostgreSQL_Flexible_Server_Missing_Arguments.md) | **PostgreSQL Flexible Server missing provider arguments** | Medium | Medium | `modules/azurerm_postgresql_flexible_server/` |
 | [TASK-021](./TASK-021_PostgreSQL_Flexible_Server_Public_Network_Access.md) | **PostgreSQL Flexible Server - public network access toggle** | High | Small | `modules/azurerm_postgresql_flexible_server/` |
 | [TASK-016](./TASK-016_PostgreSQL_Flexible_Server_Module.md) | **PostgreSQL Flexible Server module (full feature scope)** | High | Large | `modules/azurerm_postgresql_flexible_server/` |

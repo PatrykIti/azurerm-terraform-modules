@@ -16,6 +16,7 @@ This directory contains all Terraform modules published from this repository. Ea
 | [PostgreSQL Flexible Server Database](./azurerm_postgresql_flexible_server_database/) (`azurerm_postgresql_flexible_server_database`) | `PGFSDBv` | Manages a PostgreSQL Flexible Server database on an existing server |
 | [Route Table](./azurerm_route_table/) (`azurerm_route_table`) | `RTv` | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
 | [Storage Account](./azurerm_storage_account/) (`azurerm_storage_account`) | `SAv` | Azure Storage Account Terraform module with enterprise-grade security features |
+| [Monitor Private Link Scope](./azurerm_monitor_private_link_scope/) (`azurerm_monitor_private_link_scope`) | `AMPLSv` | Azure Monitor Private Link Scope module with scoped services and diagnostic settings |
 | [Subnet](./azurerm_subnet/) (`azurerm_subnet`) | `SNv` | Azure Subnet Terraform module for managing subnets with service endpoints, delegations, network policies, and enterprise-grade security features |
 | [Virtual Network](./azurerm_virtual_network/) (`azurerm_virtual_network`) | `VNv` | Azure Virtual Network Terraform module with advanced networking features |
 

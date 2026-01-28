@@ -12,7 +12,7 @@ locals {
 }
 
 resource "azapi_update_resource" "kubernetes_cluster_oms_agent_patch" {
-  count = var.oms_agent != null && can(var.oms_agent.ampls_settings.id) ? 1 : 0
+  count = var.oms_agent != null && var.oms_agent.ampls_settings != null && try(var.oms_agent.ampls_settings.enabled, true) ? 1 : 0
 
   type        = "Microsoft.ContainerService/managedClusters@2023-11-01"
   resource_id = azurerm_kubernetes_cluster.kubernetes_cluster.id

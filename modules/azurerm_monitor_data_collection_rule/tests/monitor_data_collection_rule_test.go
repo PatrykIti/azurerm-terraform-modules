@@ -16,7 +16,7 @@ import (
 func TestBasicMonitorDataCollectionRule(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_monitor_data_collection_rule/tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -44,7 +44,7 @@ func TestBasicMonitorDataCollectionRule(t *testing.T) {
 func TestCompleteMonitorDataCollectionRule(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_monitor_data_collection_rule/tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -70,7 +70,7 @@ func TestCompleteMonitorDataCollectionRule(t *testing.T) {
 func TestSecureMonitorDataCollectionRule(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_monitor_data_collection_rule/tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -96,7 +96,7 @@ func TestSecureMonitorDataCollectionRule(t *testing.T) {
 func TestMonitorDataCollectionRuleValidationRules(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/negative")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_monitor_data_collection_rule/tests/fixtures/negative")
 	terraformOptions := &terraform.Options{
 		TerraformDir: testFolder,
 		Vars: map[string]interface{}{
@@ -113,7 +113,7 @@ func TestMonitorDataCollectionRuleValidationRules(t *testing.T) {
 // Benchmark test for performance
 func BenchmarkMonitorDataCollectionRuleCreation(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_monitor_data_collection_rule/tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%03d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 

@@ -26,6 +26,19 @@ resource "azurerm_log_analytics_workspace" "example" {
   retention_in_days   = 30
 }
 
+module "monitor_data_collection_endpoint" {
+  source = "../../../../azurerm_monitor_data_collection_endpoint"
+
+  name                = "dcebasic${var.random_suffix}"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+
+  tags = {
+    Environment = "Test"
+    Example     = "Basic"
+  }
+}
+
 module "monitor_data_collection_rule" {
   source = "../../../"
 
@@ -33,6 +46,8 @@ module "monitor_data_collection_rule" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   kind                = "Windows"
+
+  data_collection_endpoint_id = module.monitor_data_collection_endpoint.id
 
   destinations = {
     log_analytics = [

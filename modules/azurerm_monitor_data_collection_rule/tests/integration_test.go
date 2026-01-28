@@ -15,7 +15,7 @@ func TestMonitorDataCollectionRuleFullIntegration(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_monitor_data_collection_rule/tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 		terraform.Destroy(t, terraformOptions)
@@ -45,7 +45,7 @@ func TestMonitorDataCollectionRuleSecurityConfiguration(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_monitor_data_collection_rule/tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 		terraform.Destroy(t, terraformOptions)

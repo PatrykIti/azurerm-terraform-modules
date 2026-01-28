@@ -40,6 +40,25 @@ run "oms_agent_without_ampls_no_patch" {
   }
 }
 
+run "oms_agent_ampls_disabled_no_patch" {
+  command = plan
+
+  variables {
+    oms_agent = {
+      log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
+      ampls_settings = {
+        id      = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.Insights/privateLinkScopes/test-ampls"
+        enabled = false
+      }
+    }
+  }
+
+  assert {
+    condition     = length(azapi_update_resource.kubernetes_cluster_oms_agent_patch) == 0
+    error_message = "OMS agent patch should be skipped when ampls_settings.enabled is false."
+  }
+}
+
 run "oms_agent_ampls_patch_applied" {
   command = plan
 

@@ -515,6 +515,7 @@ variable "oms_agent" {
     msi_auth_for_monitoring_enabled: Is managed identity authentication for monitoring enabled?
     ampls_settings: Azure Monitor Private Link Scope (AMPLS) settings.
       id: The Resource ID of the Azure Monitor Private Link Scope (AMPLS).
+      enabled: Whether to apply the AMPLS patch (default: true).
     collection_profile: Collection profile for Container Insights streams.
       basic: Microsoft-Perf + Microsoft-ContainerLogV2.
       advanced: basic + Microsoft-KubeEvents + Microsoft-KubePodInventory.
@@ -524,7 +525,8 @@ variable "oms_agent" {
     log_analytics_workspace_id      = string
     msi_auth_for_monitoring_enabled = optional(bool, true)
     ampls_settings = optional(object({
-      id = string
+      id      = string
+      enabled = optional(bool, true)
     }))
     collection_profile     = optional(string, "basic")
     namespaceFilteringMode = optional(string, "Off")

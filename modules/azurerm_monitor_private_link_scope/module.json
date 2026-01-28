@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_monitor_private_link_scope",
+  "title": "Monitor Private Link Scope",
+  "commit_scope": "monitor-private-link-scope",
+  "tag_prefix": "AMPLS",
+  "description": "Azure Monitor Private Link Scope Terraform module with enterprise-grade features"
+}

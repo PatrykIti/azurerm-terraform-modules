@@ -26,6 +26,19 @@ resource "azurerm_log_analytics_workspace" "example" {
   retention_in_days   = 30
 }
 
+module "monitor_data_collection_endpoint" {
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_monitor_data_collection_endpoint?ref=DCEv1.0.0"
+
+  name                = var.data_collection_endpoint_name
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+
+  tags = {
+    Environment = "Development"
+    Example     = "Complete"
+  }
+}
+
 module "monitor_data_collection_rule" {
   source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_monitor_data_collection_rule?ref=DCRv1.0.0"
 
@@ -34,6 +47,8 @@ module "monitor_data_collection_rule" {
   location            = azurerm_resource_group.example.location
   description         = var.description
   kind                = var.kind
+
+  data_collection_endpoint_id = module.monitor_data_collection_endpoint.id
 
   identity = {
     type = "SystemAssigned"
