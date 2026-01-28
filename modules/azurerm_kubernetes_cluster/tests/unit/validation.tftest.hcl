@@ -51,7 +51,9 @@ run "oms_agent_invalid_ampls_resource_id" {
     name = "validname"
     oms_agent = {
       log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
-      ampls_resource_id          = "invalid-ampls-id"
+      ampls_settings = {
+        id = "invalid-ampls-id"
+      }
     }
   }
 

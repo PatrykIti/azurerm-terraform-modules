@@ -32,11 +32,11 @@ ktore nadal wskazuja `az aks enable-addons --addon monitoring --ampls-resource-i
 
 1) **Add-on = oms_agent**
    - Add-on "monitoring" dla AKS mapujemy na `oms_agent`.
-   - Dodajemy opcjonalne `ampls_resource_id` w obiekcie `oms_agent`.
+   - Dodajemy opcjonalne `ampls_settings` w obiekcie `oms_agent`.
 
 2) **AzAPI patch tylko gdy potrzebny**
    - Patch jest wlaczany tylko, gdy `var.oms_agent != null` oraz
-     `var.oms_agent.ampls_resource_id != null`.
+     `var.oms_agent.ampls_settings != null`.
 
 3) **Collection profile (bez dziwnych parametrow)**
    - Dodajemy `oms_agent.collection_profile` (domyslnie `basic`).
@@ -83,10 +83,10 @@ ktore nadal wskazuja `az aks enable-addons --addon monitoring --ampls-resource-i
 
 **Do zrobienia:**
 - `variables.tf`: dodac:
-  - `ampls_resource_id = optional(string)`
+  - `ampls_settings = optional(object({ id = string }))`
   - `collection_profile = optional(string, "basic")`
 - Walidacja:
-  - `ampls_resource_id` tylko gdy `oms_agent != null`.
+  - `ampls_settings.id` tylko gdy `oms_agent != null`.
   - format Resource ID (prosta walidacja regex).
   - `collection_profile` tylko `basic` lub `advanced`.
 - `README.md`: zaktualizowac opis `oms_agent`.
@@ -96,13 +96,13 @@ ktore nadal wskazuja `az aks enable-addons --addon monitoring --ampls-resource-i
 
 ### TASK-020-3: AzAPI patch (AMPLS)
 
-**Cel:** Zastosowac patch do AKS, gdy `ampls_resource_id` jest ustawione (profil w patchu).
+**Cel:** Zastosowac patch do AKS, gdy `ampls_settings` jest ustawione (profil w patchu).
 
 **Do zrobienia:**
 - `versions.tf`: dodac provider `azapi` (wersja zgodna z repo standardem).
 - `main.tf`:
   - dodac `azapi_update_resource` dla `managedClusters`.
-  - budowac `body` tylko gdy `ampls_resource_id` ustawione.
+  - budowac `body` tylko gdy `ampls_settings` ustawione.
   - `depends_on` na `azurerm_kubernetes_cluster.kubernetes_cluster`.
   - zastosowac `ignore_missing_property` jesli konieczne.
 - Uwaga: patch musi byc idempotentny i nie resetowac innych pol.
@@ -141,7 +141,8 @@ variable "aks_azapi_patch" {
 **Cel:** Udokumentowac nowa sciezke i ryzyka.
 
 **Do zrobienia:**
-- `README.md`: opis `oms_agent.ampls_resource_id` + `aks_azapi_patch`.
+- `README.md`: opis `oms_agent.ampls_settings.id` + `aks_azapi_patch`.
+- `README.md`: opis `oms_agent.ampls_settings.id` + `aks_azapi_patch`.
 - `SECURITY.md`: wzmianka o Private Link i wymaganiu AMPLS dla workspace.
 - Podkreslic, ze patch jest opcjonalny i nie zastapi konfiguracji AMPLS.
 
@@ -154,9 +155,9 @@ variable "aks_azapi_patch" {
 **Do zrobienia:**
 - Przynajmniej jeden example:
   - `examples/secure` lub nowy `examples/monitoring-ampls` z
-    `oms_agent.ampls_resource_id` i `oms_agent.collection_profile`.
+    `oms_agent.ampls_settings.id` i `oms_agent.collection_profile`.
 - Unit tests:
-  - `ampls_resource_id` bez `oms_agent` -> fail.
+  - `ampls_settings.id` bez `oms_agent` -> fail.
   - `collection_profile` spoza `basic/advanced` -> fail.
   - `aks_azapi_patch.enabled=true` bez `api_version` lub `body` -> fail.
 - Integration tests opcjonalne (wymaga realnego AMPLS).
@@ -165,7 +166,7 @@ variable "aks_azapi_patch" {
 
 ## Acceptance Criteria
 
-- Modul wspiera `oms_agent.ampls_resource_id` i stosuje AzAPI patch tylko wtedy,
+- Modul wspiera `oms_agent.ampls_settings.id` i stosuje AzAPI patch tylko wtedy,
   gdy jest podany.
 - Modul wspiera `oms_agent.collection_profile` (basic/advanced).
 - Dodany jest generyczny `aks_azapi_patch` z walidacjami i dokumentacja.

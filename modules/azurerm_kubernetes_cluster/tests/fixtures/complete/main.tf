@@ -147,7 +147,9 @@ module "kubernetes_cluster" {
   # Enable addons
   oms_agent = {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
-    ampls_resource_id          = azurerm_monitor_private_link_scope.test.id
+    ampls_settings = {
+      id = azurerm_monitor_private_link_scope.test.id
+    }
     collection_profile         = "advanced"
   }
 

@@ -9,9 +9,9 @@ plus expanded unit and integration test coverage.
 ## Changes
 
 - Added AzAPI patch resource that injects AMPLS settings and
-  `dataCollectionSettings` for OMS agent when `oms_agent.ampls_resource_id` is
+  `dataCollectionSettings` for OMS agent when `oms_agent.ampls_settings.id` is
   provided (`modules/azurerm_kubernetes_cluster/azapi_patch.tf`).
-- Extended `oms_agent` inputs with `ampls_resource_id` and `collection_profile`
+- Extended `oms_agent` inputs with `ampls_settings.id` and `collection_profile`
   (default `basic`) and added validations (`modules/azurerm_kubernetes_cluster/variables.tf`).
 - Added AzAPI provider pin for the AKS module (`modules/azurerm_kubernetes_cluster/versions.tf`).
 - Expanded unit tests with AzAPI mocks and OMS agent patch assertions
@@ -27,7 +27,7 @@ plus expanded unit and integration test coverage.
 ## Impact
 
 - Container Insights can be wired to AMPLS automatically when
-  `oms_agent.ampls_resource_id` is set, without requiring custom JSON input.
+  `oms_agent.ampls_settings.id` is set, without requiring custom JSON input.
 - Data collection defaults to the `basic` profile, with an `advanced` option
   for expanded streams.
 - Tests now cover AMPLS configuration, AzAPI patching behavior, and data

@@ -36,7 +36,7 @@ run "oms_agent_without_ampls_no_patch" {
 
   assert {
     condition     = length(azapi_update_resource.kubernetes_cluster_oms_agent_patch) == 0
-    error_message = "OMS agent patch should be skipped when ampls_resource_id is not provided."
+    error_message = "OMS agent patch should be skipped when ampls_settings is not provided."
   }
 }
 
@@ -46,14 +46,16 @@ run "oms_agent_ampls_patch_applied" {
   variables {
     oms_agent = {
       log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
-      ampls_resource_id           = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.Insights/privateLinkScopes/test-ampls"
+      ampls_settings = {
+        id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.Insights/privateLinkScopes/test-ampls"
+      }
       collection_profile          = "advanced"
     }
   }
 
   assert {
     condition     = length(azapi_update_resource.kubernetes_cluster_oms_agent_patch) == 1
-    error_message = "OMS agent patch should be created when ampls_resource_id is set."
+    error_message = "OMS agent patch should be created when ampls_settings is set."
   }
 
   assert {

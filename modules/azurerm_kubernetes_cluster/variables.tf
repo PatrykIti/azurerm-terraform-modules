@@ -513,7 +513,8 @@ variable "oms_agent" {
     
     log_analytics_workspace_id: The ID of the Log Analytics Workspace which the OMS Agent should send data to.
     msi_auth_for_monitoring_enabled: Is managed identity authentication for monitoring enabled?
-    ampls_resource_id: The Resource ID of the Azure Monitor Private Link Scope (AMPLS).
+    ampls_settings: Azure Monitor Private Link Scope (AMPLS) settings.
+      id: The Resource ID of the Azure Monitor Private Link Scope (AMPLS).
     collection_profile: Collection profile for Container Insights streams.
       basic: Microsoft-Perf + Microsoft-ContainerLogV2.
       advanced: basic + Microsoft-KubeEvents + Microsoft-KubePodInventory.
@@ -522,13 +523,15 @@ variable "oms_agent" {
   type = object({
     log_analytics_workspace_id      = string
     msi_auth_for_monitoring_enabled = optional(bool, true)
-    ampls_resource_id               = optional(string)
+    ampls_settings                  = optional(object({
+      id = string
+    }))
     collection_profile              = optional(string, "basic")
   })
 
   validation {
-    condition     = var.oms_agent == null || var.oms_agent.ampls_resource_id == null || can(regex("^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.Insights/privateLinkScopes/[^/]+$", var.oms_agent.ampls_resource_id))
-    error_message = "When set, oms_agent.ampls_resource_id must be a valid Azure Monitor Private Link Scope resource ID."
+    condition     = var.oms_agent == null || var.oms_agent.ampls_settings == null || can(regex("^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.Insights/privateLinkScopes/[^/]+$", var.oms_agent.ampls_settings.id))
+    error_message = "When set, oms_agent.ampls_settings.id must be a valid Azure Monitor Private Link Scope resource ID."
   }
 
   validation {
