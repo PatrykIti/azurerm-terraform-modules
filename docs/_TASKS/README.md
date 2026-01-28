@@ -3,7 +3,7 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 18 tasks
+- **To Do:** 20 tasks
 - **In Progress:** 0
 - **Done:** 41 tasks
 
@@ -18,6 +18,8 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-014](./TASK-014_Virtual_Network_Module_Alignment.md) | **Virtual Network module alignment (docs + examples + tests)** | High | Medium | `modules/azurerm_virtual_network/` |
 | [TASK-018](./TASK-018_Diagnostic_Settings_Alignment.md) | **Diagnostic settings alignment (AKS + Storage)** | Medium | Medium | `modules/azurerm_kubernetes_cluster/`, `modules/azurerm_storage_account/` |
 | [TASK-019](./TASK-019_DCR_DCE_Modules.md) | **Azure Monitor DCR + DCE modules** | Medium | Large | `modules/azurerm_monitor_data_collection_rule/`, `modules/azurerm_monitor_data_collection_endpoint/` |
+| [TASK-023](./TASK-023_Log_Analytics_Workspace_Module.md) | **Log Analytics Workspace module (full feature scope)** | High | Large | `modules/azurerm_log_analytics_workspace/` |
+| [TASK-024](./TASK-024_Application_Insights_Module.md) | **Application Insights module (full feature scope)** | High | Large | `modules/azurerm_application_insights/` |
 | [TASK-ADO-017](./TASK-ADO-017_AzureDevOps_Environments_Module_Refactor.md) | **Azure DevOps Environments module refactor** | High | Medium | Re-opened; `modules/azuredevops_environments/` |
 | [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_artifacts_feed/` |
 | [TASK-ADO-032](./TASK-ADO-032_AzureDevOps_Artifacts_Feed_Module_Audit_Fixes.md) | **Azure DevOps Artifacts Feed module audit fixes** | Medium | Small | Docs + artifact cleanup; `modules/azuredevops_artifacts_feed/` |
