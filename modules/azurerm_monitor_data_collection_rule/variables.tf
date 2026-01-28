@@ -3,8 +3,8 @@ variable "name" {
   type        = string
 
   validation {
-    condition     = can(regex("^[A-Za-z0-9-]{1,64}$", var.name))
-    error_message = "Data Collection Rule name must be 1-64 characters and contain only letters, numbers, and hyphens."
+    condition     = can(regex("^[A-Za-z0-9-]{1,63}$", var.name))
+    error_message = "Data Collection Rule name must be 1-63 characters and contain only letters, numbers, and hyphens."
   }
 }
 
