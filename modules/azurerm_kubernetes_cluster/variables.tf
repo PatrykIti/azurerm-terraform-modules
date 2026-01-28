@@ -527,6 +527,7 @@ variable "oms_agent" {
       id = string
     }))
     collection_profile              = optional(string, "basic")
+    namespaceFilteringMode          = optional(string, "Off")
   })
 
   validation {

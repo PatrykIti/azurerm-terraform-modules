@@ -27,7 +27,7 @@ resource "azapi_update_resource" "kubernetes_cluster_oms_agent_patch" {
             azureMonitorPrivateLinkScopeResourceId = var.oms_agent.ampls_settings.id
             dataCollectionSettings = jsonencode({
               interval               = "1m"
-              namespaceFilteringMode = "Off"
+              namespaceFilteringMode = var.oms_agent.namespaceFilteringMode
               enableContainerLogV2   = true
               streams                = local.oms_agent_collection_streams
             })
