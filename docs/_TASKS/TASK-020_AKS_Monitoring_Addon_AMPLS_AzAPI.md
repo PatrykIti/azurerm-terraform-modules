@@ -5,7 +5,7 @@
 **Category:** AKS Module / Monitoring  
 **Estimated Effort:** Medium  
 **Dependencies:** azurerm provider + azapi provider (new)  
-**Status:** Planned
+**Status:** Done
 
 ---
 
@@ -35,8 +35,9 @@ ktore nadal wskazuja `az aks enable-addons --addon monitoring --ampls-resource-i
    - Dodajemy opcjonalne `ampls_settings` w obiekcie `oms_agent`.
 
 2) **AzAPI patch tylko gdy potrzebny**
-   - Patch jest wlaczany tylko, gdy `var.oms_agent != null` oraz
-     `var.oms_agent.ampls_settings != null`.
+   - Patch jest wlaczany tylko, gdy `var.oms_agent != null`,
+     `var.oms_agent.ampls_settings != null` oraz
+     `try(var.oms_agent.ampls_settings.enabled, true) == true`.
 
 3) **Collection profile (bez dziwnych parametrow)**
    - Dodajemy `oms_agent.collection_profile` (domyslnie `basic`).

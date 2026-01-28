@@ -11,6 +11,8 @@ plus expanded unit and integration test coverage.
 - Added AzAPI patch resource that injects AMPLS settings and
   `dataCollectionSettings` for OMS agent when `oms_agent.ampls_settings.id` is
   provided (`modules/azurerm_kubernetes_cluster/azapi_patch.tf`).
+- Updated AMPLS patch gating to honor `oms_agent.ampls_settings.enabled` to
+  avoid plan-time unknown count issues and allow explicit disablement.
 - Extended `oms_agent` inputs with `ampls_settings.id` (and optional `enabled`)
   plus `collection_profile` (default `basic`) and added validations
   (`modules/azurerm_kubernetes_cluster/variables.tf`).
