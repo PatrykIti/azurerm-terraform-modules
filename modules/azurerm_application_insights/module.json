@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_application_insights",
+  "title": "Application Insights",
+  "commit_scope": "application-insights",
+  "tag_prefix": "APPINSv",
+  "description": "Azure Application Insights Terraform module with enterprise-grade features"
+}
