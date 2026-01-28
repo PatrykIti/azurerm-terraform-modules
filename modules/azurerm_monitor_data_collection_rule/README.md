@@ -19,6 +19,7 @@ module "azurerm_monitor_data_collection_endpoint" {
   name                = "example-dce"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
+  kind                = "Windows"
 }
 
 module "azurerm_monitor_data_collection_rule" {

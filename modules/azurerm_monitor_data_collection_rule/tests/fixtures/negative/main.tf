@@ -32,6 +32,7 @@ module "monitor_data_collection_endpoint" {
   name                = "dcenegative${var.random_suffix}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
+  kind                = "Windows"
 }
 
 # Invalid name (underscore is not allowed by module validation)

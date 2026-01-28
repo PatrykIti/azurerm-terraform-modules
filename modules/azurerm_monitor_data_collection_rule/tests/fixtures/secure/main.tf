@@ -32,6 +32,7 @@ module "monitor_data_collection_endpoint" {
   name                = "dcesecure${var.random_suffix}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
+  kind                = "Windows"
 
   public_network_access_enabled = false
   description                   = "Secure DCE for DCR fixture."
