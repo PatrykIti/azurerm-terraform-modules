@@ -21,6 +21,8 @@ resource "azapi_update_resource" "kubernetes_cluster_oms_agent_patch" {
       addonProfiles = {
         omsagent = {
           config = {
+            logAnalyticsWorkspaceResourceID        = var.oms_agent.log_analytics_workspace_id
+            useAADAuth                              = tostring(var.oms_agent.msi_auth_for_monitoring_enabled)
             useAzureMonitorPrivateLinkScope        = tostring(true)
             azureMonitorPrivateLinkScopeResourceId = var.oms_agent.ampls_settings.id
             dataCollectionSettings = jsonencode({

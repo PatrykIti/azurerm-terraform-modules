@@ -83,7 +83,7 @@ ktore nadal wskazuja `az aks enable-addons --addon monitoring --ampls-resource-i
 
 **Do zrobienia:**
 - `variables.tf`: dodac:
-  - `ampls_settings = optional(object({ id = string }))`
+  - `ampls_settings = optional(object({ id = string, enabled = optional(bool, true) }))`
   - `collection_profile = optional(string, "basic")`
 - Walidacja:
   - `ampls_settings.id` tylko gdy `oms_agent != null`.
@@ -141,7 +141,7 @@ variable "aks_azapi_patch" {
 **Cel:** Udokumentowac nowa sciezke i ryzyka.
 
 **Do zrobienia:**
-- `README.md`: opis `oms_agent.ampls_settings.id` + `aks_azapi_patch`.
+- `README.md`: opis `oms_agent.ampls_settings.id` + `oms_agent.ampls_settings.enabled` + `aks_azapi_patch`.
 - `README.md`: opis `oms_agent.ampls_settings.id` + `aks_azapi_patch`.
 - `SECURITY.md`: wzmianka o Private Link i wymaganiu AMPLS dla workspace.
 - Podkreslic, ze patch jest opcjonalny i nie zastapi konfiguracji AMPLS.
