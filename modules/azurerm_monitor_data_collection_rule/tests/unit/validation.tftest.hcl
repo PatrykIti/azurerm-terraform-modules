@@ -86,7 +86,7 @@ run "linux_with_windows_event_log" {
       windows_event_log = [
         {
           name           = "windows-events"
-          streams        = ["Microsoft-WindowsEvent"]
+          streams        = ["Microsoft-Event"]
           x_path_queries = ["Application!*[System[(Level=1 or Level=2)]]"]
         }
       ]

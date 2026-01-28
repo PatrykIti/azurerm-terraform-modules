@@ -95,7 +95,7 @@ module "monitor_data_collection_rule" {
    data_sources = {
      windows_event_log = [{
        name           = "windows"
-       streams        = ["Microsoft-WindowsEvent"]
+       streams        = ["Microsoft-Event"]
        x_path_queries = ["Application!*"]
      }]
    }

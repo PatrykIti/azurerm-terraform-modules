@@ -261,9 +261,10 @@ func TestMonitorPrivateLinkScopeUpdatePerformance(t *testing.T) {
 			},
 		},
 		{
-			name: "UpdateConfiguration",
+			name: "UpdateAccessModes",
 			update: map[string]interface{}{
-				"enable_monitoring": true,
+				"ingestion_access_mode": "Open",
+				"query_access_mode":     "Open",
 			},
 		},
 		// Add more update scenarios specific to monitor_private_link_scope

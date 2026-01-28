@@ -47,7 +47,7 @@ module "azurerm_monitor_data_collection_rule" {
     windows_event_log = [
       {
         name           = "windows-events"
-        streams        = ["Microsoft-WindowsEvent"]
+        streams        = ["Microsoft-Event"]
         x_path_queries = ["Application!*[System[(Level=1 or Level=2)]]"]
       }
     ]
@@ -55,7 +55,7 @@ module "azurerm_monitor_data_collection_rule" {
 
   data_flows = [
     {
-      streams      = ["Microsoft-WindowsEvent"]
+      streams      = ["Microsoft-Event"]
       destinations = ["log-analytics"]
     }
   ]
