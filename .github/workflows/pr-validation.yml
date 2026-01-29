@@ -165,11 +165,11 @@ jobs:
             virtual-network
             kubernetes-cluster
             kubernetes-secrets
-            application_insights
-            log_analytics_workspace
-            monitor_data_collection_endpoint
-            monitor_data_collection_rule
-            monitor_private_link_scope
+            application-insights
+            log-analytics-workspace
+            monitor-data-collection-endpoint
+            monitor-data-collection-rule
+            monitor-private-link-scope
             network-security-group
             route-table
             subnet
