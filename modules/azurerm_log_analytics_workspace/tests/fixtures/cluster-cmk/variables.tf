@@ -9,6 +9,12 @@ variable "location" {
   default     = "westeurope"
 }
 
+variable "cluster_location" {
+  description = "Azure region for the Log Analytics cluster."
+  type        = string
+  default     = "westeurope"
+}
+
 variable "tags" {
   description = "Tags to apply to Log Analytics Workspace."
   type        = map(string)

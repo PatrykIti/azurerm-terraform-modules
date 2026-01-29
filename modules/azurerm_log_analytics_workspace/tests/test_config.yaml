@@ -16,8 +16,6 @@ test_suites:
       - TestLogAnalyticsWindowsPerformanceCounters
       - TestLogAnalyticsStorageInsights
       - TestLogAnalyticsLinkedServices
-      - TestLogAnalyticsClusters
-      - TestLogAnalyticsClusterCustomerManagedKey
     parallel: true
     timeout: 30m
     
@@ -50,6 +48,14 @@ test_suites:
     parallel: false
     timeout: 60m
     benchmark: true
+
+  # Long running tests (dedicated clusters may require regional capacity/allowlisting)
+  - name: "Long Running Tests"
+    tests:
+      - TestLogAnalyticsClusters
+      - TestLogAnalyticsClusterCustomerManagedKey
+    parallel: false
+    timeout: 180m
 
 # Test environment requirements
 environment:

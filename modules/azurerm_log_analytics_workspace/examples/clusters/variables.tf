@@ -4,6 +4,12 @@ variable "location" {
   default     = "westeurope"
 }
 
+variable "cluster_location" {
+  description = "Azure region for the Log Analytics cluster."
+  type        = string
+  default     = "westeurope"
+}
+
 variable "resource_group_name" {
   description = "Resource group name for the example."
   type        = string

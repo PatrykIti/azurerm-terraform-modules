@@ -10,6 +10,8 @@ Current version: **vUnreleased**
 
 Manages Azure Log Analytics workspaces
 
+> **Dedicated cluster note:** Log Analytics clusters can require regional capacity/allowlisting and may take a long time to provision. Treat cluster tests as long-running and enable them only when your subscription/region is ready.
+
 ## Usage
 
 ```hcl

@@ -29,7 +29,8 @@ module "log_analytics_workspace" {
 
   clusters = [
     {
-      name = var.cluster_name
+      name     = var.cluster_name
+      location = var.cluster_location
       identity = {
         type = "SystemAssigned"
       }

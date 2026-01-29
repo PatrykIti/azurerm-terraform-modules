@@ -41,6 +41,7 @@ terraform apply
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_cluster_location"></a> [cluster\_location](#input\_cluster\_location) | Azure region for the Log Analytics cluster. | `string` | `"westeurope"` | no |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Log Analytics cluster name. | `string` | `"law-cluster-example"` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region for resources. | `string` | `"westeurope"` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Resource group name for the example. | `string` | `"rg-law-cluster-example"` | no |

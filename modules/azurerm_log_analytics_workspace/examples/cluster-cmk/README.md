@@ -46,6 +46,7 @@ terraform apply
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_cluster_location"></a> [cluster\_location](#input\_cluster\_location) | Azure region for the Log Analytics cluster. | `string` | `"westeurope"` | no |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Log Analytics cluster name. | `string` | `"law-cmk-cluster"` | no |
 | <a name="input_key_vault_name"></a> [key\_vault\_name](#input\_key\_vault\_name) | Key Vault name for CMK. | `string` | `"kvlawcmkexample"` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region for resources. | `string` | `"westeurope"` | no |

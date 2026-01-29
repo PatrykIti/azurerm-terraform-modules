@@ -29,7 +29,8 @@ module "log_analytics_workspace" {
 
   clusters = [
     {
-      name = "law-cluster-${var.random_suffix}"
+      name     = "law-cluster-${var.random_suffix}"
+      location = var.cluster_location
       identity = {
         type = "SystemAssigned"
       }
