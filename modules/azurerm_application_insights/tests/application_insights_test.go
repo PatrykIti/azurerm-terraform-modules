@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -110,11 +109,11 @@ func TestSecureApplicationInsights(t *testing.T) {
 	})
 }
 
-// Test network access controls
-func TestNetworkApplicationInsights(t *testing.T) {
+// Test API keys
+func TestApplicationInsightsApiKeys(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/network")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/api-keys")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -129,24 +128,15 @@ func TestNetworkApplicationInsights(t *testing.T) {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
 		resourceID := terraform.Output(t, terraformOptions, "application_insights_id")
-		
-		// Validate network rules
 		assert.NotEmpty(t, resourceID)
-		
-		// Add network-specific validations
-		// Validate IP rules, subnet restrictions, private endpoints, etc.
 	})
 }
 
-// Test private endpoint configuration
-func TestApplicationInsightsPrivateEndpoint(t *testing.T) {
+// Test analytics items
+func TestApplicationInsightsAnalyticsItems(t *testing.T) {
 	t.Parallel()
 
-	if _, err := os.Stat("fixtures/private_endpoint"); os.IsNotExist(err) {
-		t.Skip("Private endpoint fixture not found; skipping test")
-	}
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/private_endpoint")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/analytics-items")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -161,14 +151,99 @@ func TestApplicationInsightsPrivateEndpoint(t *testing.T) {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
 		resourceID := terraform.Output(t, terraformOptions, "application_insights_id")
-		privateEndpointID := terraform.Output(t, terraformOptions, "private_endpoint_id")
-
-		// Validate private endpoint was created
 		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, privateEndpointID)
-		
-		// Validate public network access is disabled
-		// Add additional private endpoint validations
+	})
+}
+
+// Test classic web tests
+func TestApplicationInsightsWebTests(t *testing.T) {
+	t.Parallel()
+
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/web-tests")
+	defer test_structure.RunTestStage(t, "cleanup", func() {
+		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+	})
+
+	test_structure.RunTestStage(t, "deploy", func() {
+		terraformOptions := getTerraformOptions(t, testFolder)
+		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
+		terraform.InitAndApply(t, terraformOptions)
+	})
+
+	test_structure.RunTestStage(t, "validate", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+
+		resourceID := terraform.Output(t, terraformOptions, "application_insights_id")
+		assert.NotEmpty(t, resourceID)
+	})
+}
+
+// Test standard web tests
+func TestApplicationInsightsStandardWebTests(t *testing.T) {
+	t.Parallel()
+
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/standard-web-tests")
+	defer test_structure.RunTestStage(t, "cleanup", func() {
+		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+	})
+
+	test_structure.RunTestStage(t, "deploy", func() {
+		terraformOptions := getTerraformOptions(t, testFolder)
+		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
+		terraform.InitAndApply(t, terraformOptions)
+	})
+
+	test_structure.RunTestStage(t, "validate", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+
+		resourceID := terraform.Output(t, terraformOptions, "application_insights_id")
+		assert.NotEmpty(t, resourceID)
+	})
+}
+
+// Test workbooks
+func TestApplicationInsightsWorkbooks(t *testing.T) {
+	t.Parallel()
+
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/workbooks")
+	defer test_structure.RunTestStage(t, "cleanup", func() {
+		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+	})
+
+	test_structure.RunTestStage(t, "deploy", func() {
+		terraformOptions := getTerraformOptions(t, testFolder)
+		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
+		terraform.InitAndApply(t, terraformOptions)
+	})
+
+	test_structure.RunTestStage(t, "validate", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+
+		resourceID := terraform.Output(t, terraformOptions, "application_insights_id")
+		assert.NotEmpty(t, resourceID)
+	})
+}
+
+// Test smart detection rules
+func TestApplicationInsightsSmartDetectionRules(t *testing.T) {
+	t.Parallel()
+
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/smart-detection-rules")
+	defer test_structure.RunTestStage(t, "cleanup", func() {
+		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+	})
+
+	test_structure.RunTestStage(t, "deploy", func() {
+		terraformOptions := getTerraformOptions(t, testFolder)
+		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
+		terraform.InitAndApply(t, terraformOptions)
+	})
+
+	test_structure.RunTestStage(t, "validate", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+
+		resourceID := terraform.Output(t, terraformOptions, "application_insights_id")
+		assert.NotEmpty(t, resourceID)
 	})
 }
 

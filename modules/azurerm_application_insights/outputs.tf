@@ -1,74 +1,118 @@
 output "id" {
-  description = "The ID of the Application Insights"
-  value       = try(azurerm_application_insights.main.id, null)
+  description = "The ID of the Application Insights resource."
+  value       = try(azurerm_application_insights.application_insights.id, null)
 }
 
 output "name" {
-  description = "The name of the Application Insights"
-  value       = try(azurerm_application_insights.main.name, null)
+  description = "The name of the Application Insights resource."
+  value       = try(azurerm_application_insights.application_insights.name, null)
 }
 
 output "location" {
-  description = "The primary location of the application_insights"
-  value       = try(azurerm_application_insights.main.location, null)
+  description = "The Azure region where Application Insights is deployed."
+  value       = try(azurerm_application_insights.application_insights.location, null)
 }
 
 output "resource_group_name" {
-  description = "The name of the resource group containing the Application Insights"
-  value       = try(azurerm_application_insights.main.resource_group_name, null)
+  description = "The resource group name for Application Insights."
+  value       = try(azurerm_application_insights.application_insights.resource_group_name, null)
 }
 
-# TODO: Add specific outputs based on the resource type
-# Example outputs for common Azure resources:
+output "application_type" {
+  description = "The application type for Application Insights."
+  value       = try(azurerm_application_insights.application_insights.application_type, null)
+}
 
-# output "primary_endpoint" {
-#   description = "The endpoint URL for the primary location"
-#   value       = try(azurerm_application_insights.main.primary_endpoint, null)
-# }
+output "workspace_id" {
+  description = "The workspace ID linked to Application Insights (if workspace-based)."
+  value       = try(azurerm_application_insights.application_insights.workspace_id, null)
+}
 
-# output "secondary_endpoint" {
-#   description = "The endpoint URL for the secondary location"
-#   value       = try(azurerm_application_insights.main.secondary_endpoint, null)
-# }
+output "app_id" {
+  description = "The Application Insights app ID."
+  value       = try(azurerm_application_insights.application_insights.app_id, null)
+}
 
-# output "primary_access_key" {
-#   description = "The primary access key for the application_insights"
-#   value       = try(azurerm_application_insights.main.primary_access_key, null)
-#   sensitive   = true
-# }
+output "instrumentation_key" {
+  description = "The Application Insights instrumentation key."
+  value       = try(azurerm_application_insights.application_insights.instrumentation_key, null)
+  sensitive   = true
+}
 
-# output "secondary_access_key" {
-#   description = "The secondary access key for the application_insights"
-#   value       = try(azurerm_application_insights.main.secondary_access_key, null)
-#   sensitive   = true
-# }
+output "connection_string" {
+  description = "The Application Insights connection string."
+  value       = try(azurerm_application_insights.application_insights.connection_string, null)
+  sensitive   = true
+}
 
-# output "connection_string" {
-#   description = "The connection string for the application_insights"
-#   value       = try(azurerm_application_insights.main.primary_connection_string, null)
-#   sensitive   = true
-# }
-
-# Private Endpoint Outputs
-output "private_endpoints" {
-  description = "Information about the created private endpoints"
+output "api_keys" {
+  description = "API keys created for Application Insights."
   value = {
-    for idx, pe in azurerm_private_endpoint.main : pe.name => {
-      id                 = pe.id
-      name               = pe.name
-      private_ip_address = pe.private_service_connection[0].private_ip_address
-      fqdn               = try(pe.custom_dns_configs[0].fqdn, null)
+    for name, key in azurerm_application_insights_api_key.api_keys : name => {
+      id                = key.id
+      api_key           = key.api_key
+      read_permissions  = key.read_permissions
+      write_permissions = key.write_permissions
+    }
+  }
+  sensitive = true
+}
+
+output "analytics_items" {
+  description = "Analytics items created for Application Insights."
+  value = {
+    for name, item in azurerm_application_insights_analytics_item.analytics_items : name => {
+      id    = item.id
+      name  = item.name
+      type  = item.type
+      scope = item.scope
     }
   }
 }
 
-# Network Rules Output
-output "network_rules" {
-  description = "The network rules configuration applied to the application_insights"
-  value = var.network_rules != null ? {
-    default_action             = var.network_rules.default_action
-    bypass                     = var.network_rules.bypass
-    ip_rules                   = var.network_rules.ip_rules
-    virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
-  } : null
+output "web_tests" {
+  description = "Classic web tests created for Application Insights."
+  value = {
+    for name, test in azurerm_application_insights_web_test.web_tests : name => {
+      id   = test.id
+      name = test.name
+    }
+  }
+}
+
+output "standard_web_tests" {
+  description = "Standard web tests created for Application Insights."
+  value = {
+    for name, test in azurerm_application_insights_standard_web_test.standard_web_tests : name => {
+      id   = test.id
+      name = test.name
+    }
+  }
+}
+
+output "workbooks" {
+  description = "Workbooks created for Application Insights."
+  value = {
+    for name, wb in azurerm_application_insights_workbook.workbooks : name => {
+      id           = wb.id
+      name         = wb.name
+      display_name = wb.display_name
+    }
+  }
+}
+
+output "smart_detection_rules" {
+  description = "Smart detection rules created for Application Insights."
+  value = {
+    for name, rule in azurerm_application_insights_smart_detection_rule.smart_detection_rules : name => {
+      id      = rule.id
+      name    = rule.name
+      enabled = rule.enabled
+    }
+  }
+}
+
+output "diagnostic_settings_skipped" {
+  description = "Diagnostic settings entries skipped because no log or metric categories were supplied."
+  value       = local.diagnostic_settings_skipped
 }

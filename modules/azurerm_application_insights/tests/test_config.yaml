@@ -10,8 +10,12 @@ test_suites:
     tests:
       - TestCompleteApplicationInsights
       - TestSecureApplicationInsights
-      - TestNetworkApplicationInsights
-      - TestApplicationInsightsPrivateEndpoint
+      - TestApplicationInsightsApiKeys
+      - TestApplicationInsightsAnalyticsItems
+      - TestApplicationInsightsWebTests
+      - TestApplicationInsightsStandardWebTests
+      - TestApplicationInsightsWorkbooks
+      - TestApplicationInsightsSmartDetectionRules
     parallel: true
     timeout: 30m
     
@@ -24,8 +28,6 @@ test_suites:
   - name: "Integration Tests"
     tests:
       - TestApplicationInsightsFullIntegration
-      - TestApplicationInsightsWithNetworkRules
-      - TestApplicationInsightsPrivateEndpointIntegration
       - TestApplicationInsightsSecurityConfiguration
       - TestApplicationInsightsLifecycle
       - TestApplicationInsightsCompliance

@@ -1,19 +1,14 @@
 # Complete Application Insights Example
 
-This example demonstrates a comprehensive deployment of Application Insights with all available features and configurations.
+This example demonstrates a full Application Insights configuration with
+workspace integration, retention settings, sampling, and diagnostics.
 
 ## Features
 
-- Full application_insights configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
-
-## Key Configuration
-
-This comprehensive example showcases all available features of the application_insights module, demonstrating enterprise-grade capabilities suitable for production environments.
+- Workspace-based Application Insights
+- Retention and sampling configuration
+- Daily data cap settings
+- Diagnostic settings output to Log Analytics
 
 ## Usage
 
@@ -30,4 +25,47 @@ terraform destroy
 ```
 
 <!-- BEGIN_TF_DOCS -->
+
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.12.2 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.57.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.57.0 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_application_insights"></a> [application\_insights](#module\_application\_insights) | ../../ | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_log_analytics_workspace.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/log_analytics_workspace) | resource |
+| [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/resource_group) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_application_insights_name"></a> [application\_insights\_name](#input\_application\_insights\_name) | Name of the Application Insights component. | `string` | `"appi-complete-example"` | no |
+| <a name="input_location"></a> [location](#input\_location) | Azure region for resources. | `string` | `"westeurope"` | no |
+| <a name="input_log_analytics_workspace_name"></a> [log\_analytics\_workspace\_name](#input\_log\_analytics\_workspace\_name) | Name of the Log Analytics workspace. | `string` | `"law-appins-complete-example"` | no |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group for the example. | `string` | `"rg-appins-complete-example"` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_application_insights_id"></a> [application\_insights\_id](#output\_application\_insights\_id) | The ID of the created Application Insights |
+| <a name="output_application_insights_name"></a> [application\_insights\_name](#output\_application\_insights\_name) | The name of the created Application Insights |
 <!-- END_TF_DOCS -->

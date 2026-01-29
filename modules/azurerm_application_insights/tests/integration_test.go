@@ -2,7 +2,6 @@ package test
 
 import (
 	"context"
-	"os"
 	"testing"
 	"time"
 
@@ -45,10 +44,6 @@ func TestApplicationInsightsFullIntegration(t *testing.T) {
 		validateSecurityFeatures(t, testFolder)
 	})
 
-	test_structure.RunTestStage(t, "validate_network", func() {
-		validateNetworkFeatures(t, testFolder)
-	})
-
 	test_structure.RunTestStage(t, "validate_operations", func() {
 		validateOperationalFeatures(t, testFolder)
 	})
@@ -86,6 +81,8 @@ func validateCoreFeatures(t *testing.T, testFolder string) {
 	}
 	// TODO: Validate tags using helper function
 	// Validateapplication_insightsTags(t, resource, expectedTags)
+	_ = helper
+	_ = expectedTags
 }
 
 // validateSecurityFeatures validates security configurations using SDK
@@ -109,29 +106,9 @@ func validateSecurityFeatures(t *testing.T, testFolder string) {
 	
 	// Validate encryption if applicable
 	// helper.Validateapplication_insightsEncryption(t, resource)
-}
-
-// validateNetworkFeatures validates network configurations using SDK
-func validateNetworkFeatures(t *testing.T, testFolder string) {
-	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-	helper := Newapplication_insightsHelper(t)
-
-	resourceName := terraform.Output(t, terraformOptions, "application_insights_name")
-	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
-	
-	// Get resource from Azure
-	// TODO: Replace with actual SDK call
-	// resource := helper.Getapplication_insightsProperties(t, resourceName, resourceGroupName)
-
-	// Network validations
-	// TODO: Add application_insights specific network validations
-	// Examples:
-	// assert.Equal(t, DefaultActionDeny, *resource.Properties.NetworkRuleSet.DefaultAction)
-	// assert.Equal(t, BypassAzureServices, *resource.Properties.NetworkRuleSet.Bypass)
-	
-	// Validate IP rules and subnet rules if applicable
-	// expectedIPRules := []string{"203.0.113.0/24"}
-	// helper.ValidateNetworkRules(t, resource, expectedIPRules, nil)
+	assert.NotEmpty(t, resourceName)
+	assert.NotEmpty(t, resourceGroupName)
+	_ = helper
 }
 
 // validateOperationalFeatures validates operational features like monitoring
@@ -156,93 +133,6 @@ func validateOperationalFeatures(t *testing.T, testFolder string) {
 	// helper.ValidateDiagnosticSettings(t, resourceID)
 	// helper.ValidateBackupConfiguration(t, resourceName, resourceGroupName)
 	// helper.ValidateMonitoringAlerts(t, resourceID)
-}
-
-// TestApplicationInsightsWithNetworkRules tests network access controls
-func TestApplicationInsightsWithNetworkRules(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode")
-	}
-	t.Parallel()
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/network")
-	
-	// Setup stages
-	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		terraform.Destroy(t, terraformOptions)
-	})
-
-	// Deploy infrastructure
-	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
-		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
-	})
-
-	// Validate network configuration
-	test_structure.RunTestStage(t, "validate", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		helper := Newapplication_insightsHelper(t)
-		
-		resourceName := terraform.Output(t, terraformOptions, "application_insights_name")
-		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
-		
-		// Get resource from Azure
-		// TODO: Replace with actual SDK call
-		// resource := helper.Getapplication_insightsProperties(t, resourceName, resourceGroupName)
-		
-		// Validate network rules
-		// TODO: Add network rule validations
-		_ = helper // Remove when helper is used
-		_ = resourceName
-		_ = resourceGroupName
-	})
-}
-
-// TestApplicationInsightsPrivateEndpointIntegration tests private endpoint configuration
-func TestApplicationInsightsPrivateEndpointIntegration(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test in short mode")
-	}
-	t.Parallel()
-
-	if _, err := os.Stat("fixtures/private_endpoint"); os.IsNotExist(err) {
-		t.Skip("Private endpoint fixture not found; skipping test")
-	}
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/private_endpoint")
-	
-	// Setup stages
-	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		terraform.Destroy(t, terraformOptions)
-	})
-
-	// Deploy infrastructure
-	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
-		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
-	})
-
-	// Validate private endpoint
-	test_structure.RunTestStage(t, "validate", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		
-		// Test outputs
-		resourceID := terraform.Output(t, terraformOptions, "application_insights_id")
-		privateEndpointID := terraform.Output(t, terraformOptions, "private_endpoint_id")
-		
-		// Assertions
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, privateEndpointID)
-		
-		// TODO: Add validations for public network access being disabled
-		// helper := Newapplication_insightsHelper(t)
-		// resource := helper.Getapplication_insightsProperties(t, resourceName, resourceGroupName)
-		// assert.Equal(t, PublicNetworkAccessDisabled, *resource.Properties.PublicNetworkAccess)
-	})
 }
 
 // TestApplicationInsightsSecurityConfiguration tests security features

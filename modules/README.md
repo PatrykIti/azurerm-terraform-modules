@@ -9,9 +9,12 @@ This directory contains all Terraform modules published from this repository. Ea
 
 | Module | Tag Prefix | Description |
 | --- | --- | --- |
+| [Application Insights](./azurerm_application_insights/) (`azurerm_application_insights`) | `APPINSv` | Azure Application Insights module with diagnostics, web tests, workbooks, and smart detection rules |
 | [Kubernetes Cluster](./azurerm_kubernetes_cluster/) (`azurerm_kubernetes_cluster`) | `AKSv` | Azure Kubernetes Service (AKS) Terraform module for managing clusters with node pools, addons, and enterprise-grade security features |
 | [Kubernetes Secrets](./azurerm_kubernetes_secrets/) (`azurerm_kubernetes_secrets`) | `AKSSv` | Azure Kubernetes Secrets Terraform module with enterprise-grade features |
 | [Network Security Group](./azurerm_network_security_group/) (`azurerm_network_security_group`) | `NSGv` | Manages Azure Network Security Groups with comprehensive security rules configuration |
+| [Monitor Data Collection Endpoint](./azurerm_monitor_data_collection_endpoint/) (`azurerm_monitor_data_collection_endpoint`) | `DCEv` | Azure Monitor Data Collection Endpoint module for configuring ingestion endpoints |
+| [Monitor Data Collection Rule](./azurerm_monitor_data_collection_rule/) (`azurerm_monitor_data_collection_rule`) | `DCRv` | Azure Monitor Data Collection Rule module for defining data sources and flows |
 | [PostgreSQL Flexible Server](./azurerm_postgresql_flexible_server/) (`azurerm_postgresql_flexible_server`) | `PGFSv` | Azure PostgreSQL Flexible Server Terraform module with enterprise-grade features |
 | [PostgreSQL Flexible Server Database](./azurerm_postgresql_flexible_server_database/) (`azurerm_postgresql_flexible_server_database`) | `PGFSDBv` | Manages a PostgreSQL Flexible Server database on an existing server |
 | [Route Table](./azurerm_route_table/) (`azurerm_route_table`) | `RTv` | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |

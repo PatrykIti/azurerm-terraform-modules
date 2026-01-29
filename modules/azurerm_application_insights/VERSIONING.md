@@ -154,10 +154,10 @@ fix: resolve validation issue
 ### Writing Good Commit Messages
 ```bash
 # Feature with detailed description
-feat(application-insights): add support for private endpoints
+feat(application-insights): add support for standard web tests
 
-Implements private endpoint configuration for enhanced security.
-Supports multiple endpoints per resource.
+Implements standard web test configuration for availability monitoring.
+Supports request and validation settings.
 
 Closes #156
 

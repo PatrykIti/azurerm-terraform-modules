@@ -5,7 +5,7 @@
 **Category:** New Module / Monitoring  
 **Estimated Effort:** Large  
 **Dependencies:** -  
-**Status:** To Do
+**Status:** Done
 
 ---
 
@@ -174,15 +174,15 @@ udokumentowane.
 
 ---
 
-### TASK-024-5: Diagnostic settings (inline, AKS pattern)
+### TASK-024-5: Diagnostic settings (inline, monitoring pattern)
 
 **Cel:** Wbudowane `azurerm_monitor_diagnostic_setting` dla Application Insights.
 
 **Do zrobienia:**
-- `diagnostic_settings` input (lista obiektow) jak w AKS.
-- `data.azurerm_monitor_diagnostic_categories` + filtracja kategorii.
-- `areas` -> mapowanie na log/metric categories (lub default `all`).
-- `diagnostic_settings_skipped` output jak w AKS.
+- `monitoring` input (lista obiektow) zgodnie z patternem po TASK-018.
+- Brak data source `azurerm_monitor_diagnostic_categories` i brak mapowania `areas`.
+- Uzytkownik podaje jawne `log_categories`/`metric_categories`.
+- `diagnostic_settings_skipped` output jak w AKS/PGFS.
 
 ---
 

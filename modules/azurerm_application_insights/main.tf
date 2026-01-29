@@ -1,99 +1,156 @@
-# Azure Application Insights Module - Initial Release
-resource "azurerm_application_insights" "main" {
+locals {
+  api_keys_by_name               = { for key in var.api_keys : key.name => key }
+  analytics_items_by_name        = { for item in var.analytics_items : item.name => item }
+  web_tests_by_name              = { for test in var.web_tests : test.name => test }
+  standard_web_tests_by_name     = { for test in var.standard_web_tests : test.name => test }
+  workbooks_by_name              = { for wb in var.workbooks : wb.name => wb }
+  smart_detection_rules_by_name  = { for rule in var.smart_detection_rules : rule.name => rule }
+  hidden_link_tag                = { "hidden-link:${azurerm_application_insights.application_insights.id}" = "Resource" }
+}
+
+resource "azurerm_application_insights" "application_insights" {
   name                = var.name
   resource_group_name = var.resource_group_name
   location            = var.location
+  application_type    = var.application_type
 
-  # TODO: Add specific configuration for this resource type
-  # Example configuration based on common Azure resource patterns:
-
-  # Basic configuration
-  # account_tier             = var.account_tier
-  # account_replication_type = var.account_replication_type
-
-  # Security settings
-  # https_traffic_only_enabled = var.security_settings.https_traffic_only_enabled
-  # min_tls_version           = var.security_settings.min_tls_version
-  # public_network_access_enabled = var.security_settings.public_network_access_enabled
+  workspace_id                          = var.workspace_id
+  retention_in_days                     = var.retention_in_days
+  sampling_percentage                   = var.sampling_percentage
+  daily_data_cap_in_gb                  = var.daily_data_cap_in_gb
+  daily_data_cap_notifications_disabled = var.daily_data_cap_notifications_disabled
+  internet_ingestion_enabled            = var.internet_ingestion_enabled
+  internet_query_enabled                = var.internet_query_enabled
+  local_authentication_disabled         = var.local_authentication_disabled
+  disable_ip_masking                    = var.disable_ip_masking
 
   tags = var.tags
-}
 
-# Network Rules (if applicable)
-resource "azurerm_application_insights_network_rules" "main" {
-  count = var.network_rules != null ? 1 : 0
+  dynamic "timeouts" {
+    for_each = (
+      var.timeouts.create != null ||
+      var.timeouts.update != null ||
+      var.timeouts.delete != null ||
+      var.timeouts.read != null
+    ) ? [var.timeouts] : []
 
-  # TODO: Configure network rules based on resource type
-  # storage_account_id = azurerm_application_insights.main.id
-
-  default_action             = var.network_rules.default_action
-  bypass                     = var.network_rules.bypass
-  ip_rules                   = var.network_rules.ip_rules
-  virtual_network_subnet_ids = var.network_rules.virtual_network_subnet_ids
-}
-
-# Private Endpoints
-resource "azurerm_private_endpoint" "main" {
-  count = length(var.private_endpoints)
-
-  name                = var.private_endpoints[count.index].name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  subnet_id           = var.private_endpoints[count.index].subnet_id
-
-  private_service_connection {
-    name                           = coalesce(var.private_endpoints[count.index].private_service_connection_name, "${var.private_endpoints[count.index].name}-psc")
-    private_connection_resource_id = azurerm_application_insights.main.id
-    subresource_names              = var.private_endpoints[count.index].subresource_names
-    is_manual_connection           = var.private_endpoints[count.index].is_manual_connection
-    request_message                = var.private_endpoints[count.index].request_message
-  }
-
-  dynamic "private_dns_zone_group" {
-    for_each = length(var.private_endpoints[count.index].private_dns_zone_ids) > 0 ? [1] : []
     content {
-      name                 = "${var.private_endpoints[count.index].name}-dns-zone-group"
-      private_dns_zone_ids = var.private_endpoints[count.index].private_dns_zone_ids
+      create = try(timeouts.value.create, null)
+      update = try(timeouts.value.update, null)
+      delete = try(timeouts.value.delete, null)
+      read   = try(timeouts.value.read, null)
     }
   }
-
-  tags = merge(var.tags, var.private_endpoints[count.index].tags)
 }
 
-# Diagnostic Settings
-resource "azurerm_monitor_diagnostic_setting" "main" {
-  count = var.diagnostic_settings.enabled ? 1 : 0
+resource "azurerm_application_insights_api_key" "api_keys" {
+  for_each = local.api_keys_by_name
 
-  name                           = "${var.name}-diagnostics"
-  target_resource_id             = azurerm_application_insights.main.id
-  log_analytics_workspace_id     = var.diagnostic_settings.log_analytics_workspace_id
-  storage_account_id             = var.diagnostic_settings.storage_account_id
-  eventhub_authorization_rule_id = var.diagnostic_settings.eventhub_auth_rule_id
+  name                    = each.value.name
+  application_insights_id = azurerm_application_insights.application_insights.id
+  read_permissions        = try(each.value.read_permissions, [])
+  write_permissions       = try(each.value.write_permissions, [])
+}
 
-  # TODO: Configure specific log categories for this resource type
-  # Example log categories (update based on actual resource):
-  # enabled_log {
-  #   category = "StorageRead"
-  #   retention_policy {
-  #     enabled = true
-  #     days    = var.diagnostic_settings.logs.retention_days
-  #   }
-  # }
+resource "azurerm_application_insights_analytics_item" "analytics_items" {
+  for_each = local.analytics_items_by_name
 
-  # enabled_log {
-  #   category = "StorageWrite"
-  #   retention_policy {
-  #     enabled = true
-  #     days    = var.diagnostic_settings.logs.retention_days
-  #   }
-  # }
+  name                    = each.value.name
+  application_insights_id = azurerm_application_insights.application_insights.id
+  content                 = each.value.content
+  scope                   = each.value.scope
+  type                    = each.value.type
+}
 
-  enabled_metric {
-    category = "AllMetrics"
+resource "azurerm_application_insights_web_test" "web_tests" {
+  for_each = local.web_tests_by_name
 
-    retention_policy {
-      enabled = true
-      days    = var.diagnostic_settings.metrics.retention_days
+  name                    = each.value.name
+  location                = var.location
+  resource_group_name     = var.resource_group_name
+  application_insights_id = azurerm_application_insights.application_insights.id
+  kind                    = try(each.value.kind, "ping")
+  frequency               = try(each.value.frequency, 300)
+  timeout                 = try(each.value.timeout, 30)
+  enabled                 = try(each.value.enabled, true)
+  geo_locations           = each.value.geo_locations
+
+  configuration {
+    web_test_xml = each.value.web_test_xml
+  }
+
+  tags = merge(var.tags, try(each.value.tags, {}), local.hidden_link_tag)
+}
+
+resource "azurerm_application_insights_standard_web_test" "standard_web_tests" {
+  for_each = local.standard_web_tests_by_name
+
+  name                    = each.value.name
+  location                = var.location
+  resource_group_name     = var.resource_group_name
+  application_insights_id = azurerm_application_insights.application_insights.id
+  description             = try(each.value.description, null)
+  geo_locations           = each.value.geo_locations
+  frequency               = try(each.value.frequency, 300)
+  timeout                 = try(each.value.timeout, 30)
+  enabled                 = try(each.value.enabled, true)
+
+  request {
+    url                              = each.value.request.url
+    http_verb                        = try(each.value.request.http_verb, null)
+    request_body                     = try(each.value.request.request_body, null)
+    follow_redirects_enabled         = try(each.value.request.follow_redirects_enabled, null)
+    parse_dependent_requests_enabled = try(each.value.request.parse_dependent_requests_enabled, null)
+    headers                          = try(each.value.request.headers, null)
+  }
+
+  dynamic "validation" {
+    for_each = each.value.validation != null ? [each.value.validation] : []
+    content {
+      expected_status_code        = try(validation.value.expected_status_code, null)
+      ssl_check_enabled           = try(validation.value.ssl_check_enabled, null)
+      ssl_cert_remaining_lifetime = try(validation.value.ssl_cert_remaining_lifetime, null)
+
+      dynamic "content_match" {
+        for_each = try(validation.value.content_match, null) != null ? [validation.value.content_match] : []
+        content {
+          content            = content_match.value.content
+          ignore_case        = try(content_match.value.ignore_case, null)
+          pass_if_text_found = try(content_match.value.pass_if_text_found, null)
+        }
+      }
     }
   }
+
+  tags = merge(var.tags, try(each.value.tags, {}), local.hidden_link_tag)
+}
+
+resource "azurerm_application_insights_workbook" "workbooks" {
+  for_each = local.workbooks_by_name
+
+  name                = each.value.name
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  display_name        = each.value.display_name
+  data_json           = each.value.data_json
+  description         = try(each.value.description, null)
+  category            = try(each.value.category, null)
+  source_id           = try(each.value.source_id, null)
+  tags                = merge(var.tags, try(each.value.tags, {}))
+
+  dynamic "identity" {
+    for_each = each.value.identity != null ? [each.value.identity] : []
+    content {
+      type         = identity.value.type
+      identity_ids = try(identity.value.identity_ids, null)
+    }
+  }
+}
+
+resource "azurerm_application_insights_smart_detection_rule" "smart_detection_rules" {
+  for_each = local.smart_detection_rules_by_name
+
+  name                    = each.value.name
+  application_insights_id = azurerm_application_insights.application_insights.id
+  enabled                 = try(each.value.enabled, true)
 }

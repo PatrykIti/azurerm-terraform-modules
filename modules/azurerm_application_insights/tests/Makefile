@@ -6,6 +6,36 @@ TEST_FILTER ?= Test
 PARALLEL ?= 8
 AZURE_LOCATION ?= northeurope
 
+# Normalize credential environment variables (ARM_ <-> AZURE_)
+ifdef AZURE_SUBSCRIPTION_ID
+ARM_SUBSCRIPTION_ID ?= $(AZURE_SUBSCRIPTION_ID)
+endif
+ifdef AZURE_TENANT_ID
+ARM_TENANT_ID ?= $(AZURE_TENANT_ID)
+endif
+ifdef AZURE_CLIENT_ID
+ARM_CLIENT_ID ?= $(AZURE_CLIENT_ID)
+endif
+ifdef AZURE_CLIENT_SECRET
+ARM_CLIENT_SECRET ?= $(AZURE_CLIENT_SECRET)
+endif
+
+ifdef ARM_SUBSCRIPTION_ID
+AZURE_SUBSCRIPTION_ID ?= $(ARM_SUBSCRIPTION_ID)
+endif
+ifdef ARM_TENANT_ID
+AZURE_TENANT_ID ?= $(ARM_TENANT_ID)
+endif
+ifdef ARM_CLIENT_ID
+AZURE_CLIENT_ID ?= $(ARM_CLIENT_ID)
+endif
+ifdef ARM_CLIENT_SECRET
+AZURE_CLIENT_SECRET ?= $(ARM_CLIENT_SECRET)
+endif
+
+export ARM_SUBSCRIPTION_ID ARM_TENANT_ID ARM_CLIENT_ID ARM_CLIENT_SECRET
+export AZURE_SUBSCRIPTION_ID AZURE_TENANT_ID AZURE_CLIENT_ID AZURE_CLIENT_SECRET
+
 # Environment check
 check-env:
 	@echo "Checking required environment variables..."
@@ -46,15 +76,35 @@ test-secure: check-env deps
 	@echo "Running security tests..."
 	go test -v -timeout 30m -run TestSecureApplicationInsights ./...
 
-# Run network tests
-test-network: check-env deps
-	@echo "Running network tests..."
-	go test -v -timeout 20m -run TestNetworkApplicationInsights ./...
+# Run API key tests
+test-api-keys: check-env deps
+	@echo "Running API key tests..."
+	go test -v -timeout 20m -run TestApplicationInsightsApiKeys ./...
 
-# Run private endpoint tests
-test-private-endpoint: check-env deps
-	@echo "Running private endpoint tests..."
-	go test -v -timeout 20m -run TestApplicationInsightsPrivateEndpoint ./...
+# Run analytics items tests
+test-analytics-items: check-env deps
+	@echo "Running analytics items tests..."
+	go test -v -timeout 20m -run TestApplicationInsightsAnalyticsItems ./...
+
+# Run classic web tests
+test-web-tests: check-env deps
+	@echo "Running web tests..."
+	go test -v -timeout 20m -run TestApplicationInsightsWebTests ./...
+
+# Run standard web tests
+test-standard-web-tests: check-env deps
+	@echo "Running standard web tests..."
+	go test -v -timeout 20m -run TestApplicationInsightsStandardWebTests ./...
+
+# Run workbooks tests
+test-workbooks: check-env deps
+	@echo "Running workbook tests..."
+	go test -v -timeout 20m -run TestApplicationInsightsWorkbooks ./...
+
+# Run smart detection rule tests
+test-smart-detection: check-env deps
+	@echo "Running smart detection rule tests..."
+	go test -v -timeout 20m -run TestApplicationInsightsSmartDetectionRules ./...
 
 # Run validation tests
 test-validation: check-env deps
@@ -161,8 +211,12 @@ help:
 	@echo "  make test-basic          - Run basic tests only"
 	@echo "  make test-complete       - Run complete tests"
 	@echo "  make test-secure         - Run security tests"
-	@echo "  make test-network        - Run network tests"
-	@echo "  make test-private-endpoint - Run private endpoint tests"
+	@echo "  make test-api-keys       - Run API key tests"
+	@echo "  make test-analytics-items - Run analytics items tests"
+	@echo "  make test-web-tests      - Run classic web tests"
+	@echo "  make test-standard-web-tests - Run standard web tests"
+	@echo "  make test-workbooks      - Run workbooks tests"
+	@echo "  make test-smart-detection - Run smart detection rule tests"
 	@echo "  make test-validation     - Run validation tests"
 	@echo "  make test-integration    - Run integration tests"
 	@echo "  make test-performance    - Run performance tests"
@@ -179,4 +233,4 @@ help:
 	@echo "  make ci                 - Run CI pipeline"
 	@echo "  make cd                 - Run CD pipeline (includes integration tests)"
 
-.PHONY: check-env deps test test-single test-basic test-complete test-secure test-network test-private-endpoint test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help
+.PHONY: check-env deps test test-single test-basic test-complete test-secure test-api-keys test-analytics-items test-web-tests test-standard-web-tests test-workbooks test-smart-detection test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help

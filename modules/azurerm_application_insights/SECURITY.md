@@ -2,79 +2,56 @@
 
 ## Overview
 
-This document details the security features and configurations available in the azurerm_application_insights Terraform module. The module implements comprehensive security controls following Azure best practices.
+This document outlines security-relevant configuration for the Application Insights module.
+The module manages an Application Insights resource and optional sub-resources
+(API keys, analytics items, web tests, workbooks, smart detection rules, and
+diagnostic settings). Networking glue (private endpoints, Private DNS, RBAC)
+is **out of scope** and must be handled externally.
 
-## Security Features
+## Security Features in This Module
 
-### 1. **Encryption**
+### Public Ingestion and Query Controls
+- **internet_ingestion_enabled** controls public ingestion access.
+- **internet_query_enabled** controls public query access.
+- Disable both for private-only access scenarios.
 
-#### At Rest
-- **Default**: All data encrypted at rest using Azure-managed keys
-- **Infrastructure Encryption**: Additional layer of encryption when supported
-- **Customer-Managed Keys**: Optional BYOK support (if applicable)
+### Local Authentication
+- **local_authentication_disabled** disables local auth to enforce Azure AD only.
 
-#### In Transit
-- **HTTPS/TLS**: All communications encrypted in transit
-- **Minimum TLS Version**: TLS 1.2 enforced by default
+### IP Masking
+- **disable_ip_masking** defaults to false, keeping IP masking enabled.
 
-### 2. **Access Control**
+### API Keys
+- **api_keys** outputs are marked sensitive.
+- Use least-privilege permissions and rotate keys regularly.
 
-#### Authentication
-- **Azure AD Integration**: Preferred authentication method
-- **Managed Identity**: Support for system and user-assigned identities
-- **Key-based Access**: Disabled by default where possible
+### Diagnostic Settings
+- **monitoring** configures diagnostic settings for audit and metrics delivery.
+- Supports Log Analytics, Storage, or Event Hub destinations.
 
-#### Network Security
-- **Private Endpoints**: Support for private connectivity
-- **Network Rules**: Default deny with explicit allow rules
-- **Service Endpoints**: Virtual network integration
+## Example: Security-Focused Configuration
 
-### 3. **Monitoring and Compliance**
-
-#### Audit Logging
-- **Diagnostic Settings**: Comprehensive logging to Log Analytics
-- **Activity Tracking**: All operations logged
-- **Metrics**: Performance and security metrics collected
-
-#### Compliance
-- **Azure Policy**: Compatible with organizational policies
-- **Security Center**: Integration ready
-- **Threat Protection**: Microsoft Defender support where applicable
-
-## Security Configuration Examples
-
-### Maximum Security Configuration
 ```hcl
 module "application_insights" {
   source = "./modules/azurerm_application_insights"
 
-  name                = "example-secure"
+  name                = "appi-secure"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
+  application_type    = "web"
+  workspace_id        = azurerm_log_analytics_workspace.main.id
 
-  # Security settings
-  enable_https_traffic_only = true
-  min_tls_version          = "TLS1_2"
-  
-  # Network isolation
-  network_rules = {
-    default_action = "Deny"
-    ip_rules       = []
-    bypass         = ["AzureServices"]
-  }
+  internet_ingestion_enabled    = false
+  internet_query_enabled        = false
+  local_authentication_disabled = true
 
-  # Private endpoint
-  private_endpoints = [{
-    name                 = "example-pe"
-    subnet_id            = azurerm_subnet.private.id
-    private_dns_zone_ids = [azurerm_private_dns_zone.example.id]
-  }]
-
-  # Monitoring
-  diagnostic_settings = {
-    enabled                    = true
-    log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-  }
+  monitoring = [
+    {
+      name                       = "diag"
+      metric_categories          = ["AllMetrics"]
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+    }
+  ]
 
   tags = {
     Environment        = "Production"
@@ -85,83 +62,25 @@ module "application_insights" {
 
 ## Security Hardening Checklist
 
-Before deploying to production:
+- [ ] Disable public ingestion and query when private access is required
+- [ ] Disable local authentication to enforce Azure AD
+- [ ] Keep IP masking enabled unless explicitly required
+- [ ] Restrict API key permissions and rotate regularly
+- [ ] Configure diagnostic settings to a secure destination
+- [ ] Apply least-privilege RBAC at the resource group and workspace levels
 
-- [ ] Enable all applicable encryption features
-- [ ] Configure network isolation (private endpoints/service endpoints)
-- [ ] Disable public network access where possible
-- [ ] Enable audit logging and monitoring
-- [ ] Apply appropriate RBAC permissions
-- [ ] Configure Azure Policy compliance
-- [ ] Enable threat protection features
-- [ ] Review and apply security tags
-- [ ] Document security exceptions
+## Common Mistakes to Avoid
 
-## Common Security Mistakes to Avoid
-
-1. **Leaving Public Access Enabled**
-   ```hcl
-   # ❌ AVOID
-   public_network_access_enabled = true
-   ```
-
-2. **Using Weak TLS Versions**
-   ```hcl
-   # ❌ AVOID
-   min_tls_version = "TLS1_0"
-   ```
-
-3. **Overly Permissive Network Rules**
-   ```hcl
-   # ❌ AVOID
-   network_rules = {
-     default_action = "Allow"
-   }
-   ```
-
-## Incident Response
-
-If a security incident occurs:
-
-1. **Immediate Actions**
-   - Review audit logs
-   - Check for unauthorized access
-   - Apply additional network restrictions
-
-2. **Investigation**
-   - Use Log Analytics queries
-   - Review security alerts
-   - Check configuration compliance
-
-3. **Remediation**
-   - Apply security patches
-   - Update configurations
-   - Document lessons learned
-
-## Compliance Mapping
-
-### SOC 2 Controls
-| Control | Implementation |
-|---------|---------------|
-| CC6.1 | RBAC and Azure AD |
-| CC6.6 | Encryption at rest/transit |
-| CC7.2 | Diagnostic logging |
-
-### ISO 27001 Controls
-| Control | Implementation |
-|---------|---------------|
-| A.10.1.1 | Cryptographic controls |
-| A.9.1.2 | Network access controls |
-| A.12.4.1 | Event logging |
+1. **Leaving public ingestion/query enabled in production**
+2. **Disabling IP masking without a clear justification**
+3. **Using overly permissive API key permissions**
+4. **Skipping diagnostic settings configuration**
 
 ## Additional Resources
 
-- [Azure Security Best Practices](https://docs.microsoft.com/en-us/azure/security/fundamentals/best-practices-and-patterns)
-- [Azure Security Center](https://docs.microsoft.com/en-us/azure/security-center/)
-- [Azure Policy](https://docs.microsoft.com/en-us/azure/governance/policy/)
+- Azure Application Insights documentation
+- Azure Monitor diagnostic settings guidance
 
 ---
 
-**Module Version**: 1.0.0  
-**Last Updated**: 2026-01-28  
-**Security Contact**: security@yourorganization.com
+**Last Updated**: 2026-01-28

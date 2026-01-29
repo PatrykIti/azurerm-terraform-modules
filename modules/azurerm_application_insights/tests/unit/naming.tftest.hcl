@@ -1,16 +1,24 @@
-# Placeholder naming test for Application Insights
+# Naming validation tests for Application Insights module
+
+mock_provider "azurerm" {
+  mock_resource "azurerm_application_insights" {}
+  mock_resource "azurerm_monitor_diagnostic_setting" {}
+}
 
 variables {
-  name                = "example-application_insights"
+  name                = "appinsunit"
   resource_group_name = "test-rg"
   location            = "northeurope"
 }
 
-run "naming_plan" {
+run "invalid_name" {
   command = plan
 
-  assert {
-    condition     = true
-    error_message = "Update naming tests for Application Insights."
+  variables {
+    name = "invalid name with spaces"
   }
+
+  expect_failures = [
+    var.name
+  ]
 }

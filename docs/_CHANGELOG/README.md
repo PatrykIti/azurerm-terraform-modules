@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [065](./065-2026-01-28-application-insights-module.md) | 2026-01-28 | Application Insights module | Feature |
 | [064](./064-2026-01-28-dcr-dce-modules.md) | 2026-01-28 | Azure Monitor DCR + DCE modules | Feature |
 | [063](./063-2026-01-28-diagnostic-settings-alignment.md) | 2026-01-28 | Diagnostic settings alignment (AKS + Storage) | Breaking Change / Maintenance |
 | [062](./062-2026-01-28-ampls-module.md) | 2026-01-28 | Azure Monitor Private Link Scope (AMPLS) module | Feature |

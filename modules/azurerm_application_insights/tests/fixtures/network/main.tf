@@ -1,29 +1,33 @@
-# Network integration test fixture
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "4.57.0"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
 }
 
 resource "azurerm_resource_group" "test" {
-  name     = "rg-application_insights-network-test"
-  location = "West Europe"
+  name     = "rg-appins-extra-${var.random_suffix}"
+  location = var.location
 }
 
-# Test with network rules
 module "application_insights" {
-  source = "../../../"
+  source = "../../.."
 
-  name                = "applicationinsightsnetworktest"
+  name                = "appi-extra-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
-
-  network_rules = {
-    default_action = "Deny"
-    ip_rules       = ["203.0.113.0/24"]
-    bypass         = ["AzureServices"]
-  }
+  application_type    = "web"
 
   tags = {
     Environment = "Test"
-    Scenario    = "Network"
+    Scenario    = "Extra"
   }
 }
