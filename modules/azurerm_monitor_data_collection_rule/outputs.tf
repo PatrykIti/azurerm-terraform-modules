@@ -62,6 +62,18 @@ output "diagnostic_settings_skipped" {
   ]
 }
 
+output "associations" {
+  description = "Data Collection Rule associations created by the module."
+  value = {
+    for name, assoc in azurerm_monitor_data_collection_rule_association.monitor_data_collection_rule_association :
+    name => {
+      id                 = assoc.id
+      name               = assoc.name
+      target_resource_id = assoc.target_resource_id
+    }
+  }
+}
+
 output "tags" {
   description = "The tags assigned to the Data Collection Rule."
   value       = azurerm_monitor_data_collection_rule.monitor_data_collection_rule.tags

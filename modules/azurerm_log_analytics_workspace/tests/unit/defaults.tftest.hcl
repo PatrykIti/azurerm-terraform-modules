@@ -3,14 +3,14 @@
 mock_provider "azurerm" {
   mock_resource "azurerm_log_analytics_workspace" {
     defaults = {
-      id                  = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/lawunit"
-      name                = "lawunit"
-      location            = "northeurope"
-      resource_group_name = "test-rg"
-      sku                 = "PerGB2018"
-      retention_in_days   = 30
-      workspace_id        = "00000000-0000-0000-0000-000000000000"
-      primary_shared_key  = "primary-key"
+      id                   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/lawunit"
+      name                 = "lawunit"
+      location             = "northeurope"
+      resource_group_name  = "test-rg"
+      sku                  = "PerGB2018"
+      retention_in_days    = 30
+      workspace_id         = "00000000-0000-0000-0000-000000000000"
+      primary_shared_key   = "primary-key"
       secondary_shared_key = "secondary-key"
     }
   }

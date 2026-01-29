@@ -45,7 +45,7 @@ module "application_insights" {
         ssl_check_enabled           = true
         ssl_cert_remaining_lifetime = 7
         content = {
-          content_match     = "Example Domain"
+          content_match      = "Example Domain"
           ignore_case        = true
           pass_if_text_found = true
         }

@@ -113,3 +113,19 @@ terraform state list | rg monitor_data_collection_rule
 ```
 
 If the plan is clean, you can **remove the import block** (`import.tf`).
+
+---
+
+## Data Collection Rule Association (optional)
+
+If you manage DCR associations via the module, import them by association ID.
+
+```hcl
+import {
+  to = module.monitor_data_collection_rule.azurerm_monitor_data_collection_rule_association.monitor_data_collection_rule_association["<assoc-name>"]
+  id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Insights/dataCollectionRuleAssociations/<assoc-name>"
+}
+```
+
+Get the **exact association ID** from the Azure portal or Azure CLI, then update
+the import block with the real ID.

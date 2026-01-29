@@ -44,8 +44,8 @@ module "log_analytics_workspace" {
 
   monitoring = [
     {
-      name              = "diag"
-      metric_categories = ["AllMetrics"]
+      name               = "diag"
+      metric_categories  = ["AllMetrics"]
       storage_account_id = azurerm_storage_account.diagnostics.id
     }
   ]

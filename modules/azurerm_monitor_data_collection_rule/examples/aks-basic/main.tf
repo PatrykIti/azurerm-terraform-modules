@@ -150,14 +150,15 @@ module "monitor_data_collection_rule" {
     }
   ]
 
+  associations = [
+    {
+      name               = "${var.cluster_name}-dcr-assoc"
+      target_resource_id = module.kubernetes_cluster.id
+    }
+  ]
+
   tags = {
     Environment = "Development"
     Example     = "AKS Basic"
   }
-}
-
-resource "azurerm_monitor_data_collection_rule_association" "example" {
-  name                    = "${var.cluster_name}-dcr-assoc"
-  target_resource_id      = module.kubernetes_cluster.id
-  data_collection_rule_id = module.monitor_data_collection_rule.id
 }

@@ -215,7 +215,7 @@ variable "standard_web_tests" {
       ssl_check_enabled           = optional(bool)
       ssl_cert_remaining_lifetime = optional(number)
       content = optional(object({
-        content_match     = string
+        content_match      = string
         ignore_case        = optional(bool, true)
         pass_if_text_found = optional(bool, true)
       }))

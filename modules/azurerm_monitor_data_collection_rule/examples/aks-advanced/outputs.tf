@@ -15,5 +15,5 @@ output "monitor_data_collection_endpoint_id" {
 
 output "monitor_data_collection_rule_association_id" {
   description = "The Data Collection Rule association ID."
-  value       = azurerm_monitor_data_collection_rule_association.example.id
+  value       = module.monitor_data_collection_rule.associations["${var.cluster_name}-dcr-assoc"].id
 }

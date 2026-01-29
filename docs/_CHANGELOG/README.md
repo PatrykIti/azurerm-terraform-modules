@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [069](./069-2026-01-29-dcr-association-support.md) | 2026-01-29 | DCR association support | Feature / Maintenance |
 | [068](./068-2026-01-29-log-analytics-workspace-module-inputs-refactor.md) | 2026-01-29 | Log Analytics Workspace module inputs refactor | Breaking Change / Maintenance |
 | [067](./067-2026-01-29-log-analytics-workspace-module.md) | 2026-01-29 | Log Analytics Workspace module | Feature |
 | [066](./066-2026-01-29-application-insights-module-fixes.md) | 2026-01-29 | Application Insights module fixes | Fix / Maintenance |

@@ -34,14 +34,14 @@ variable "workspace" {
   EOT
 
   type = object({
-    sku                               = optional(string, "PerGB2018")
-    retention_in_days                 = optional(number, 30)
-    daily_quota_gb                    = optional(number)
+    sku                                = optional(string, "PerGB2018")
+    retention_in_days                  = optional(number, 30)
+    daily_quota_gb                     = optional(number)
     reservation_capacity_in_gb_per_day = optional(number)
-    internet_ingestion_enabled        = optional(bool, true)
-    internet_query_enabled            = optional(bool, true)
-    local_authentication_enabled      = optional(bool, true)
-    allow_resource_only_permissions   = optional(bool)
+    internet_ingestion_enabled         = optional(bool, true)
+    internet_query_enabled             = optional(bool, true)
+    local_authentication_enabled       = optional(bool, true)
+    allow_resource_only_permissions    = optional(bool)
     timeouts = optional(object({
       create = optional(string)
       update = optional(string)
@@ -106,7 +106,7 @@ variable "identity" {
   }
 
   validation {
-    condition = var.identity == null || !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type) || length(var.identity.identity_ids) > 0
+    condition     = var.identity == null || !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type) || length(var.identity.identity_ids) > 0
     error_message = "identity.identity_ids must be provided when identity.type includes UserAssigned."
   }
 }
@@ -122,9 +122,9 @@ variable "features" {
     solutions = optional(list(object({
       name = string
       plan = object({
-        publisher       = string
-        product         = string
-        promotion_code  = optional(string)
+        publisher      = string
+        product        = string
+        promotion_code = optional(string)
       })
       tags = optional(map(string), {})
     })), [])
@@ -345,8 +345,8 @@ variable "monitoring" {
   validation {
     condition = alltrue([
       for ds in var.monitoring :
-      alltrue([for c in (ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
-      alltrue([for c in (ds.metric_categories == null ? [] : ds.metric_categories) : c != ""])
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""])
     ])
     error_message = "log_categories and metric_categories must not contain empty strings."
   }

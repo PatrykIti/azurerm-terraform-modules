@@ -16,6 +16,10 @@ VNet integration, RBAC) is **out of scope** and must be handled externally.
 - **data_collection_endpoint_id** can bind the rule to a DCE that enforces network policies.
 - This module does not create DCEs or networking resources.
 
+### Associations to Target Resources (Optional)
+- **associations** link the DCR to target resources (AKS, VMs, etc.).
+- Ensure the association scope is intentional and aligns with least-privilege access.
+
 ### Diagnostic Settings
 - **monitoring** allows configuring Azure Monitor diagnostic settings for the DCR.
 - Supports Log Analytics, Storage, or Event Hub destinations.

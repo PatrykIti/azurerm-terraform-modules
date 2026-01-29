@@ -1,7 +1,7 @@
 locals {
-  api_keys_by_name              = { for key in var.api_keys : key.name => key }
-  analytics_items_by_name       = { for item in var.analytics_items : item.name => item }
-  web_tests_by_name             = { for test in var.web_tests : test.name => test }
+  api_keys_by_name        = { for key in var.api_keys : key.name => key }
+  analytics_items_by_name = { for item in var.analytics_items : item.name => item }
+  web_tests_by_name       = { for test in var.web_tests : test.name => test }
   standard_web_tests_by_name = {
     for test in var.standard_web_tests : test.name => merge(test, {
       request = merge(test.request, {
@@ -135,7 +135,7 @@ resource "azurerm_application_insights_standard_web_test" "application_insights_
       dynamic "content" {
         for_each = try(validation_rules.value.content, null) != null ? [validation_rules.value.content] : []
         content {
-          content_match     = content.value.content_match
+          content_match      = content.value.content_match
           ignore_case        = try(content.value.ignore_case, null)
           pass_if_text_found = try(content.value.pass_if_text_found, null)
         }

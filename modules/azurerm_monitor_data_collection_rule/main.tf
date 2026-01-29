@@ -9,6 +9,8 @@ locals {
     [for d in try(var.destinations.storage_blob_direct, []) : d.name],
     [for d in try(var.destinations.storage_table_direct, []) : d.name]
   ))
+
+  associations_by_name = { for assoc in var.associations : assoc.name => assoc }
 }
 
 resource "azurerm_monitor_data_collection_rule" "monitor_data_collection_rule" {
@@ -246,4 +248,13 @@ resource "azurerm_monitor_data_collection_rule" "monitor_data_collection_rule" {
       error_message = "Each data_flow destination must reference a name defined in destinations."
     }
   }
+}
+
+resource "azurerm_monitor_data_collection_rule_association" "monitor_data_collection_rule_association" {
+  for_each = local.associations_by_name
+
+  name                    = each.value.name
+  target_resource_id      = each.value.target_resource_id
+  data_collection_rule_id = azurerm_monitor_data_collection_rule.monitor_data_collection_rule.id
+  description             = try(each.value.description, null)
 }

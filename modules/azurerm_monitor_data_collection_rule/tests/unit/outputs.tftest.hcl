@@ -15,6 +15,7 @@ mock_provider "azurerm" {
     }
   }
 
+  mock_resource "azurerm_monitor_data_collection_rule_association" {}
   mock_resource "azurerm_monitor_diagnostic_setting" {}
 }
 

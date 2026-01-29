@@ -143,5 +143,5 @@ resource "azurerm_log_analytics_cluster_customer_managed_key" "log_analytics_clu
     try(each.value.log_analytics_cluster_id, null),
     try(azurerm_log_analytics_cluster.log_analytics_cluster[each.value.cluster_name].id, null)
   )
-  key_vault_key_id         = each.value.key_vault_key_id
+  key_vault_key_id = each.value.key_vault_key_id
 }

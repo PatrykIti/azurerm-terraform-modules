@@ -282,6 +282,36 @@ variable "data_sources" {
   }
 }
 
+variable "associations" {
+  description = <<-EOT
+    Associations between this Data Collection Rule and target resources.
+
+    Each entry links the rule to a target resource (for example, AKS or a VM).
+  EOT
+
+  type = list(object({
+    name               = string
+    target_resource_id = string
+    description        = optional(string)
+  }))
+
+  nullable = false
+  default  = []
+
+  validation {
+    condition     = length(distinct([for assoc in var.associations : assoc.name])) == length(var.associations)
+    error_message = "associations names must be unique."
+  }
+
+  validation {
+    condition = alltrue([
+      for assoc in var.associations :
+      length(trimspace(assoc.name)) > 0 && length(trimspace(assoc.target_resource_id)) > 0
+    ])
+    error_message = "associations entries require non-empty name and target_resource_id."
+  }
+}
+
 variable "monitoring" {
   description = <<-EOT
     Monitoring configuration for the Data Collection Rule.
