@@ -27,7 +27,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 }
 
 module "monitor_data_collection_endpoint" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_monitor_data_collection_endpoint?ref=DCEv1.0.0"
+  source = "../../../azurerm_monitor_data_collection_endpoint"
 
   name                = var.data_collection_endpoint_name
   resource_group_name = azurerm_resource_group.example.name
@@ -43,7 +43,7 @@ module "monitor_data_collection_endpoint" {
 }
 
 module "monitor_data_collection_rule" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_monitor_data_collection_rule?ref=DCRv1.0.0"
+  source = "../.."
 
   name                = var.data_collection_rule_name
   resource_group_name = azurerm_resource_group.example.name
