@@ -53,6 +53,17 @@ make test-integration
 go test -v -run TestBasicLogAnalyticsWorkspace -timeout 30m
 ```
 
+### Run Cluster Tests
+
+Log Analytics dedicated clusters can take a long time to provision and may
+require regional capacity/allowlisting. Cluster tests are disabled by default.
+
+```bash
+export RUN_LOG_ANALYTICS_CLUSTER_TESTS=true
+go test -v -run TestLogAnalyticsClusters -timeout 180m
+go test -v -run TestLogAnalyticsClusterCustomerManagedKey -timeout 180m
+```
+
 ## Test Structure
 
 ### Test Files
@@ -104,6 +115,14 @@ Enable Terraform debug logging:
 ```bash
 export TF_LOG=DEBUG
 go test -v -run TestBasicLogAnalyticsWorkspace
+```
+
+### Cleanup Orphaned Test Resources
+
+If a test run is interrupted or times out, you can clean up leftover resources:
+
+```bash
+make cleanup-orphans
 ```
 
 ## Troubleshooting

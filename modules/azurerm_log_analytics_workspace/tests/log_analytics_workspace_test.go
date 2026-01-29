@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -12,6 +13,19 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func requireClusterTestsEnabled(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping Log Analytics cluster tests in short mode")
+	}
+
+	switch strings.ToLower(strings.TrimSpace(os.Getenv("RUN_LOG_ANALYTICS_CLUSTER_TESTS"))) {
+	case "1", "true", "yes":
+		return
+	default:
+		t.Skip("Skipping Log Analytics cluster tests; set RUN_LOG_ANALYTICS_CLUSTER_TESTS=true to enable")
+	}
+}
 
 func TestBasicLogAnalyticsWorkspace(t *testing.T) {
 	t.Parallel()
@@ -216,6 +230,7 @@ func TestLogAnalyticsLinkedServices(t *testing.T) {
 
 func TestLogAnalyticsClusters(t *testing.T) {
 	t.Parallel()
+	requireClusterTestsEnabled(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/clusters")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -237,6 +252,7 @@ func TestLogAnalyticsClusters(t *testing.T) {
 
 func TestLogAnalyticsClusterCustomerManagedKey(t *testing.T) {
 	t.Parallel()
+	requireClusterTestsEnabled(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/cluster-cmk")
 	defer test_structure.RunTestStage(t, "cleanup", func() {

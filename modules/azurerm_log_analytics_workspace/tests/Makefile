@@ -118,12 +118,12 @@ test-linked-services: check-env deps
 # Run clusters tests
 test-clusters: check-env deps
 	@echo "Running clusters tests..."
-	$(call run_with_log,clusters,go test -v -timeout 30m -run TestLogAnalyticsClusters ./...)
+	$(call run_with_log,clusters,RUN_LOG_ANALYTICS_CLUSTER_TESTS=true go test -v -timeout 180m -run TestLogAnalyticsClusters ./...) || ./cleanup_orphaned.sh
 
 # Run cluster CMK tests
 test-cluster-cmk: check-env deps
 	@echo "Running cluster CMK tests..."
-	$(call run_with_log,cluster-cmk,go test -v -timeout 30m -run TestLogAnalyticsClusterCustomerManagedKey ./...)
+	$(call run_with_log,cluster-cmk,RUN_LOG_ANALYTICS_CLUSTER_TESTS=true go test -v -timeout 180m -run TestLogAnalyticsClusterCustomerManagedKey ./...) || ./cleanup_orphaned.sh
 
 # Run validation tests
 test-validation: check-env deps
@@ -240,6 +240,7 @@ help:
 	@echo "  make test-linked-services - Run linked services tests"
 	@echo "  make test-clusters        - Run clusters tests"
 	@echo "  make test-cluster-cmk     - Run cluster CMK tests"
+	@echo "  make cleanup-orphans      - Destroy resources from orphaned test runs"
 	@echo "  make test-validation      - Run validation tests"
 	@echo "  make test-integration     - Run integration tests"
 	@echo "  make test-performance     - Run performance tests"
@@ -256,4 +257,8 @@ help:
 	@echo "  make ci                   - Run CI pipeline"
 	@echo "  make cd                   - Run CD pipeline (includes integration tests)"
 
-.PHONY: check-env deps test test-single test-basic test-complete test-secure test-solutions test-data-export test-windows-event test-windows-performance test-storage-insights test-linked-services test-clusters test-cluster-cmk test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help
+.PHONY: check-env deps test test-single test-basic test-complete test-secure test-solutions test-data-export test-windows-event test-windows-performance test-storage-insights test-linked-services test-clusters test-cluster-cmk test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help cleanup-orphans
+
+cleanup-orphans:
+	@echo "Cleaning up orphaned test resources..."
+	./cleanup_orphaned.sh
