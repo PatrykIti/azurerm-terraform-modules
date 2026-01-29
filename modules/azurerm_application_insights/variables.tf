@@ -148,9 +148,11 @@ variable "web_tests" {
   type = list(object({
     name          = string
     kind          = optional(string, "ping")
+    description   = optional(string)
     frequency     = optional(number, 300)
     timeout       = optional(number, 30)
     enabled       = optional(bool, true)
+    retry_enabled = optional(bool)
     geo_locations = list(string)
     web_test_xml  = string
     tags          = optional(map(string), {})
@@ -173,6 +175,13 @@ variable "web_tests" {
 
   validation {
     condition = alltrue([
+      for wt in var.web_tests : contains([300, 600, 900], wt.frequency)
+    ])
+    error_message = "web_tests.frequency must be one of: 300, 600, 900."
+  }
+
+  validation {
+    condition = alltrue([
       for wt in var.web_tests : contains(["ping", "multistep"], wt.kind)
     ])
     error_message = "web_tests.kind must be one of: ping, multistep."
@@ -187,21 +196,26 @@ variable "standard_web_tests" {
     frequency     = optional(number, 300)
     timeout       = optional(number, 30)
     enabled       = optional(bool, true)
+    retry_enabled = optional(bool)
     geo_locations = list(string)
     request = object({
       url                              = string
+      body                             = optional(string)
       http_verb                        = optional(string, "GET")
-      request_body                     = optional(string)
       follow_redirects_enabled         = optional(bool, true)
       parse_dependent_requests_enabled = optional(bool, true)
-      headers                          = optional(map(string))
+      header = optional(list(object({
+        name  = string
+        value = string
+      })))
+      headers = optional(map(string))
     })
-    validation = optional(object({
+    validation_rules = optional(object({
       expected_status_code        = optional(number)
       ssl_check_enabled           = optional(bool)
       ssl_cert_remaining_lifetime = optional(number)
-      content_match = optional(object({
-        content            = string
+      content = optional(object({
+        content_match     = string
         ignore_case        = optional(bool, true)
         pass_if_text_found = optional(bool, true)
       }))
@@ -222,6 +236,13 @@ variable "standard_web_tests" {
       wt.frequency > 0 && wt.timeout > 0 && length(wt.geo_locations) > 0
     ])
     error_message = "standard_web_tests require positive frequency/timeout and at least one geo location."
+  }
+
+  validation {
+    condition = alltrue([
+      for wt in var.standard_web_tests : contains([300, 600, 900], wt.frequency)
+    ])
+    error_message = "standard_web_tests.frequency must be one of: 300, 600, 900."
   }
 
   validation {

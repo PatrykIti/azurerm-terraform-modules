@@ -2,7 +2,21 @@ locals {
   api_keys_by_name              = { for key in var.api_keys : key.name => key }
   analytics_items_by_name       = { for item in var.analytics_items : item.name => item }
   web_tests_by_name             = { for test in var.web_tests : test.name => test }
-  standard_web_tests_by_name    = { for test in var.standard_web_tests : test.name => test }
+  standard_web_tests_by_name = {
+    for test in var.standard_web_tests : test.name => merge(test, {
+      request = merge(test.request, {
+        header = (
+          try(length(test.request.header), 0) > 0 ? test.request.header :
+          try(length(keys(test.request.headers)), 0) > 0 ? [
+            for name, value in test.request.headers : {
+              name  = name
+              value = value
+            }
+          ] : []
+        )
+      })
+    })
+  }
   workbooks_by_name             = { for wb in var.workbooks : wb.name => wb }
   smart_detection_rules_by_name = { for rule in var.smart_detection_rules : rule.name => rule }
   hidden_link_tag               = { "hidden-link:${azurerm_application_insights.application_insights.id}" = "Resource" }
@@ -43,7 +57,7 @@ resource "azurerm_application_insights" "application_insights" {
   }
 }
 
-resource "azurerm_application_insights_api_key" "application_insights_api_key" {
+resource "azurerm_application_insights_api_key" "api_keys" {
   for_each = local.api_keys_by_name
 
   name                    = each.value.name
@@ -52,7 +66,7 @@ resource "azurerm_application_insights_api_key" "application_insights_api_key" {
   write_permissions       = try(each.value.write_permissions, [])
 }
 
-resource "azurerm_application_insights_analytics_item" "application_insights_analytics_item" {
+resource "azurerm_application_insights_analytics_item" "analytics_items" {
   for_each = local.analytics_items_by_name
 
   name                    = each.value.name
@@ -62,7 +76,7 @@ resource "azurerm_application_insights_analytics_item" "application_insights_ana
   type                    = each.value.type
 }
 
-resource "azurerm_application_insights_web_test" "application_insights_web_test" {
+resource "azurerm_application_insights_web_test" "web_tests" {
   for_each = local.web_tests_by_name
 
   name                    = each.value.name
@@ -70,19 +84,18 @@ resource "azurerm_application_insights_web_test" "application_insights_web_test"
   resource_group_name     = var.resource_group_name
   application_insights_id = azurerm_application_insights.application_insights.id
   kind                    = try(each.value.kind, "ping")
+  description             = try(each.value.description, null)
   frequency               = try(each.value.frequency, 300)
   timeout                 = try(each.value.timeout, 30)
   enabled                 = try(each.value.enabled, true)
+  retry_enabled           = try(each.value.retry_enabled, null)
   geo_locations           = each.value.geo_locations
-
-  configuration {
-    web_test_xml = each.value.web_test_xml
-  }
+  configuration           = each.value.web_test_xml
 
   tags = merge(var.tags, try(each.value.tags, {}), local.hidden_link_tag)
 }
 
-resource "azurerm_application_insights_standard_web_test" "application_insights_standard_web_test" {
+resource "azurerm_application_insights_standard_web_test" "standard_web_tests" {
   for_each = local.standard_web_tests_by_name
 
   name                    = each.value.name
@@ -91,32 +104,40 @@ resource "azurerm_application_insights_standard_web_test" "application_insights_
   application_insights_id = azurerm_application_insights.application_insights.id
   description             = try(each.value.description, null)
   geo_locations           = each.value.geo_locations
+  retry_enabled           = try(each.value.retry_enabled, null)
   frequency               = try(each.value.frequency, 300)
   timeout                 = try(each.value.timeout, 30)
   enabled                 = try(each.value.enabled, true)
 
   request {
     url                              = each.value.request.url
+    body                             = try(each.value.request.body, null)
     http_verb                        = try(each.value.request.http_verb, null)
-    request_body                     = try(each.value.request.request_body, null)
     follow_redirects_enabled         = try(each.value.request.follow_redirects_enabled, null)
     parse_dependent_requests_enabled = try(each.value.request.parse_dependent_requests_enabled, null)
-    headers                          = try(each.value.request.headers, null)
+
+    dynamic "header" {
+      for_each = try(each.value.request.header, [])
+      content {
+        name  = header.value.name
+        value = header.value.value
+      }
+    }
   }
 
-  dynamic "validation" {
-    for_each = each.value.validation != null ? [each.value.validation] : []
+  dynamic "validation_rules" {
+    for_each = each.value.validation_rules != null ? [each.value.validation_rules] : []
     content {
-      expected_status_code        = try(validation.value.expected_status_code, null)
-      ssl_check_enabled           = try(validation.value.ssl_check_enabled, null)
-      ssl_cert_remaining_lifetime = try(validation.value.ssl_cert_remaining_lifetime, null)
+      expected_status_code        = try(validation_rules.value.expected_status_code, null)
+      ssl_check_enabled           = try(validation_rules.value.ssl_check_enabled, null)
+      ssl_cert_remaining_lifetime = try(validation_rules.value.ssl_cert_remaining_lifetime, null)
 
-      dynamic "content_match" {
-        for_each = try(validation.value.content_match, null) != null ? [validation.value.content_match] : []
+      dynamic "content" {
+        for_each = try(validation_rules.value.content, null) != null ? [validation_rules.value.content] : []
         content {
-          content            = content_match.value.content
-          ignore_case        = try(content_match.value.ignore_case, null)
-          pass_if_text_found = try(content_match.value.pass_if_text_found, null)
+          content_match     = content.value.content_match
+          ignore_case        = try(content.value.ignore_case, null)
+          pass_if_text_found = try(content.value.pass_if_text_found, null)
         }
       }
     }
@@ -125,7 +146,7 @@ resource "azurerm_application_insights_standard_web_test" "application_insights_
   tags = merge(var.tags, try(each.value.tags, {}), local.hidden_link_tag)
 }
 
-resource "azurerm_application_insights_workbook" "application_insights_workbook" {
+resource "azurerm_application_insights_workbook" "workbooks" {
   for_each = local.workbooks_by_name
 
   name                = each.value.name
@@ -147,7 +168,7 @@ resource "azurerm_application_insights_workbook" "application_insights_workbook"
   }
 }
 
-resource "azurerm_application_insights_smart_detection_rule" "application_insights_smart_detection_rule" {
+resource "azurerm_application_insights_smart_detection_rule" "smart_detection_rules" {
   for_each = local.smart_detection_rules_by_name
 
   name                    = each.value.name

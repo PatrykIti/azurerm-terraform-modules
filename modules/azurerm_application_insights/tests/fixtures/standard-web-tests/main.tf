@@ -40,12 +40,12 @@ module "application_insights" {
         follow_redirects_enabled         = true
         parse_dependent_requests_enabled = true
       }
-      validation = {
+      validation_rules = {
         expected_status_code        = 200
         ssl_check_enabled           = true
         ssl_cert_remaining_lifetime = 7
-        content_match = {
-          content            = "Example Domain"
+        content = {
+          content_match     = "Example Domain"
           ignore_case        = true
           pass_if_text_found = true
         }
