@@ -24,8 +24,11 @@ module "log_analytics_workspace" {
   name                = "law-basic-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  sku                 = "PerGB2018"
-  retention_in_days   = var.retention_in_days
+
+  workspace = {
+    sku               = "PerGB2018"
+    retention_in_days = var.retention_in_days
+  }
 
   tags = var.tags
 }

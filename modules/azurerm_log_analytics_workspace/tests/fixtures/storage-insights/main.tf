@@ -32,16 +32,21 @@ module "log_analytics_workspace" {
   name                = "law-storage-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
 
-  storage_insights = [
-    {
-      name                = "storage-insight"
-      storage_account_id  = azurerm_storage_account.example.id
-      storage_account_key = azurerm_storage_account.example.primary_access_key
-    }
-  ]
+  workspace = {
+    sku               = "PerGB2018"
+    retention_in_days = 30
+  }
+
+  features = {
+    storage_insights = [
+      {
+        name                = "storage-insight"
+        storage_account_id  = azurerm_storage_account.example.id
+        storage_account_key = azurerm_storage_account.example.primary_access_key
+      }
+    ]
+  }
 
   tags = var.tags
 }

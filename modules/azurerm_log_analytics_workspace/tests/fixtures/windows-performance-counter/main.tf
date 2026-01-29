@@ -24,18 +24,23 @@ module "log_analytics_workspace" {
   name                = "law-perf-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
 
-  windows_performance_counters = [
-    {
-      name             = "perf-cpu"
-      object_name      = "Processor"
-      instance_name    = "*"
-      counter_name     = "% Processor Time"
-      interval_seconds = 10
-    }
-  ]
+  workspace = {
+    sku               = "PerGB2018"
+    retention_in_days = 30
+  }
+
+  features = {
+    windows_performance_counters = [
+      {
+        name             = "perf-cpu"
+        object_name      = "Processor"
+        instance_name    = "*"
+        counter_name     = "% Processor Time"
+        interval_seconds = 10
+      }
+    ]
+  }
 
   tags = var.tags
 }

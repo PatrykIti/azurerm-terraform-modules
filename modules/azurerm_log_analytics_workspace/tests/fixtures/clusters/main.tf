@@ -24,18 +24,23 @@ module "log_analytics_workspace" {
   name                = "law-cluster-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
 
-  clusters = [
-    {
-      name     = "law-cluster-${var.random_suffix}"
-      location = var.cluster_location
-      identity = {
-        type = "SystemAssigned"
+  workspace = {
+    sku               = "PerGB2018"
+    retention_in_days = 30
+  }
+
+  features = {
+    clusters = [
+      {
+        name     = "law-cluster-${var.random_suffix}"
+        location = var.cluster_location
+        identity = {
+          type = "SystemAssigned"
+        }
       }
-    }
-  ]
+    ]
+  }
 
   tags = var.tags
 }

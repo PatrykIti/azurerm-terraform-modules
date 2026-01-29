@@ -1,12 +1,12 @@
 locals {
-  solutions_by_name                     = { for s in var.solutions : s.name => s }
-  data_export_rules_by_name             = { for r in var.data_export_rules : r.name => r }
-  windows_event_datasources_by_name     = { for ds in var.windows_event_datasources : ds.name => ds }
-  windows_performance_counters_by_name  = { for ds in var.windows_performance_counters : ds.name => ds }
-  storage_insights_by_name              = { for si in var.storage_insights : si.name => si }
-  linked_services_by_name               = { for ls in var.linked_services : ls.name => ls }
-  clusters_by_name                      = { for c in var.clusters : c.name => c }
-  cluster_customer_managed_keys_by_name = { for cmk in var.cluster_customer_managed_keys : cmk.name => cmk }
+  solutions_by_name                     = { for s in var.features.solutions : s.name => s }
+  data_export_rules_by_name             = { for r in var.features.data_export_rules : r.name => r }
+  windows_event_datasources_by_name     = { for ds in var.features.windows_event_datasources : ds.name => ds }
+  windows_performance_counters_by_name  = { for ds in var.features.windows_performance_counters : ds.name => ds }
+  storage_insights_by_name              = { for si in var.features.storage_insights : si.name => si }
+  linked_services_by_name               = { for ls in var.features.linked_services : ls.name => ls }
+  clusters_by_name                      = { for c in var.features.clusters : c.name => c }
+  cluster_customer_managed_keys_by_name = { for cmk in var.features.cluster_customer_managed_keys : cmk.name => cmk }
 }
 
 resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
@@ -14,14 +14,14 @@ resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
   location            = var.location
   resource_group_name = var.resource_group_name
 
-  sku                               = var.sku
-  retention_in_days                 = var.retention_in_days
-  daily_quota_gb                    = var.daily_quota_gb
-  reservation_capacity_in_gb_per_day = var.reservation_capacity_in_gb_per_day
-  internet_ingestion_enabled        = var.internet_ingestion_enabled
-  internet_query_enabled            = var.internet_query_enabled
-  local_authentication_enabled      = var.local_authentication_enabled
-  allow_resource_only_permissions   = var.allow_resource_only_permissions
+  sku                                = var.workspace.sku
+  retention_in_days                  = var.workspace.retention_in_days
+  daily_quota_gb                     = try(var.workspace.daily_quota_gb, null)
+  reservation_capacity_in_gb_per_day = try(var.workspace.reservation_capacity_in_gb_per_day, null)
+  internet_ingestion_enabled         = var.workspace.internet_ingestion_enabled
+  internet_query_enabled             = var.workspace.internet_query_enabled
+  local_authentication_enabled       = var.workspace.local_authentication_enabled
+  allow_resource_only_permissions    = try(var.workspace.allow_resource_only_permissions, null)
 
   tags = var.tags
 
@@ -34,12 +34,7 @@ resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
   }
 
   dynamic "timeouts" {
-    for_each = (
-      var.timeouts.create != null ||
-      var.timeouts.update != null ||
-      var.timeouts.delete != null ||
-      var.timeouts.read != null
-    ) ? [var.timeouts] : []
+    for_each = try(var.workspace.timeouts, null) == null ? [] : [var.workspace.timeouts]
 
     content {
       create = try(timeouts.value.create, null)

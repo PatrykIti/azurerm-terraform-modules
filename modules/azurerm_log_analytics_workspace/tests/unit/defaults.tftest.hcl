@@ -28,37 +28,37 @@ run "verify_defaults" {
   command = plan
 
   assert {
-    condition     = var.sku == "PerGB2018"
-    error_message = "sku should default to PerGB2018."
+    condition     = var.workspace.sku == "PerGB2018"
+    error_message = "workspace.sku should default to PerGB2018."
   }
 
   assert {
-    condition     = var.retention_in_days == 30
-    error_message = "retention_in_days should default to 30."
+    condition     = var.workspace.retention_in_days == 30
+    error_message = "workspace.retention_in_days should default to 30."
   }
 
   assert {
-    condition     = var.internet_ingestion_enabled == true
-    error_message = "internet_ingestion_enabled should default to true."
+    condition     = var.workspace.internet_ingestion_enabled == true
+    error_message = "workspace.internet_ingestion_enabled should default to true."
   }
 
   assert {
-    condition     = var.internet_query_enabled == true
-    error_message = "internet_query_enabled should default to true."
+    condition     = var.workspace.internet_query_enabled == true
+    error_message = "workspace.internet_query_enabled should default to true."
   }
 
   assert {
-    condition     = var.local_authentication_enabled == true
-    error_message = "local_authentication_enabled should default to true."
+    condition     = var.workspace.local_authentication_enabled == true
+    error_message = "workspace.local_authentication_enabled should default to true."
   }
 
   assert {
-    condition     = var.daily_quota_gb == null
-    error_message = "daily_quota_gb should default to null."
+    condition     = var.workspace.daily_quota_gb == null
+    error_message = "workspace.daily_quota_gb should default to null."
   }
 
   assert {
-    condition     = var.reservation_capacity_in_gb_per_day == null
-    error_message = "reservation_capacity_in_gb_per_day should default to null."
+    condition     = var.workspace.reservation_capacity_in_gb_per_day == null
+    error_message = "workspace.reservation_capacity_in_gb_per_day should default to null."
   }
 }

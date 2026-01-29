@@ -297,6 +297,7 @@ udokumentowane.
 - Module `modules/azurerm_log_analytics_workspace` with core workspace, sub-resources,
   diagnostics, outputs, and validations aligned to azurerm 4.57.0.
 - Resource naming aligned to provider resource types (local names strip `azurerm_`).
+- Inputs grouped into `workspace` and `features` objects with fixtures/examples/tests updated.
 - Examples (basic/complete/secure + feature-specific) with updated READMEs.
 - Fixtures and Terratest coverage for core and feature scenarios, plus unit tests.
 - Test harness updated to match repo patterns (Makefile logging, run scripts, config).

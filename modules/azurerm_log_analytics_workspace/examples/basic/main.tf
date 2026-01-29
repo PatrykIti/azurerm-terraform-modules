@@ -24,8 +24,11 @@ module "log_analytics_workspace" {
   name                = var.workspace_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
+
+  workspace = {
+    sku               = "PerGB2018"
+    retention_in_days = 30
+  }
 
   tags = {
     Environment = "Development"

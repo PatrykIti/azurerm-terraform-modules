@@ -88,16 +88,21 @@ module "log_analytics_workspace" {
   name                = var.workspace_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
 
-  cluster_customer_managed_keys = [
-    {
-      name                     = "cmk"
-      log_analytics_cluster_id = azurerm_log_analytics_cluster.example.id
-      key_vault_key_id         = azurerm_key_vault_key.example.id
-    }
-  ]
+  workspace = {
+    sku               = "PerGB2018"
+    retention_in_days = 30
+  }
+
+  features = {
+    cluster_customer_managed_keys = [
+      {
+        name                     = "cmk"
+        log_analytics_cluster_id = azurerm_log_analytics_cluster.example.id
+        key_vault_key_id         = azurerm_key_vault_key.example.id
+      }
+    ]
+  }
 
   tags = {
     Environment = "Development"

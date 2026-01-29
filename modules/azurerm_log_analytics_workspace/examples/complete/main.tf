@@ -33,12 +33,14 @@ module "log_analytics_workspace" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  sku                               = "PerGB2018"
-  retention_in_days                 = 90
-  daily_quota_gb                    = 5
-  internet_ingestion_enabled        = true
-  internet_query_enabled            = true
-  local_authentication_enabled     = true
+  workspace = {
+    sku                          = "PerGB2018"
+    retention_in_days            = 90
+    daily_quota_gb               = 5
+    internet_ingestion_enabled   = true
+    internet_query_enabled       = true
+    local_authentication_enabled = true
+  }
 
   monitoring = [
     {

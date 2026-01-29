@@ -11,17 +11,17 @@ Private DNS, RBAC) is **out of scope** and must be handled externally.
 ## Security Features in This Module
 
 ### Public Ingestion and Query Controls
-- **internet_ingestion_enabled** controls public ingestion access.
-- **internet_query_enabled** controls public query access.
+- **workspace.internet_ingestion_enabled** controls public ingestion access.
+- **workspace.internet_query_enabled** controls public query access.
 - Disable both for private-only access scenarios.
 
 ### Local Authentication
-- **local_authentication_enabled** controls workspace key authentication.
+- **workspace.local_authentication_enabled** controls workspace key authentication.
 - Set to `false` to enforce Azure AD only.
 - Shared keys are still available as outputs and are marked `sensitive`.
 
 ### Resource-Only Permissions
-- **allow_resource_only_permissions** controls resource-only permissions behavior.
+- **workspace.allow_resource_only_permissions** controls resource-only permissions behavior.
 - Keep `null` or `false` unless you explicitly require resource-only permissions.
 
 ### Managed Identities
@@ -50,9 +50,11 @@ module "log_analytics_workspace" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
 
-  internet_ingestion_enabled    = false
-  internet_query_enabled        = false
-  local_authentication_enabled = false
+  workspace = {
+    internet_ingestion_enabled   = false
+    internet_query_enabled       = false
+    local_authentication_enabled = false
+  }
 
   monitoring = [
     {

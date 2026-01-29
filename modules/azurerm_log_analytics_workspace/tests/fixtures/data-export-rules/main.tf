@@ -32,17 +32,22 @@ module "log_analytics_workspace" {
   name                = "law-export-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
 
-  data_export_rules = [
-    {
-      name                    = "export-heartbeat"
-      destination_resource_id = azurerm_storage_account.export.id
-      table_names             = ["Heartbeat"]
-      enabled                 = true
-    }
-  ]
+  workspace = {
+    sku               = "PerGB2018"
+    retention_in_days = 30
+  }
+
+  features = {
+    data_export_rules = [
+      {
+        name                    = "export-heartbeat"
+        destination_resource_id = azurerm_storage_account.export.id
+        table_names             = ["Heartbeat"]
+        enabled                 = true
+      }
+    ]
+  }
 
   tags = var.tags
 }

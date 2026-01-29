@@ -24,16 +24,21 @@ module "log_analytics_workspace" {
   name                = var.workspace_name
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
 
-  windows_event_datasources = [
-    {
-      name           = "events-application"
-      event_log_name = "Application"
-      event_types    = ["Error", "Warning"]
-    }
-  ]
+  workspace = {
+    sku               = "PerGB2018"
+    retention_in_days = 30
+  }
+
+  features = {
+    windows_event_datasources = [
+      {
+        name           = "events-application"
+        event_log_name = "Application"
+        event_types    = ["Error", "Warning"]
+      }
+    ]
+  }
 
   tags = {
     Environment = "Development"

@@ -31,15 +31,20 @@ module "log_analytics_workspace" {
   name                = "law-linked-${var.random_suffix}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
 
-  linked_services = [
-    {
-      name           = "automation"
-      read_access_id = azurerm_automation_account.example.id
-    }
-  ]
+  workspace = {
+    sku               = "PerGB2018"
+    retention_in_days = 30
+  }
+
+  features = {
+    linked_services = [
+      {
+        name           = "automation"
+        read_access_id = azurerm_automation_account.example.id
+      }
+    ]
+  }
 
   tags = var.tags
 }
