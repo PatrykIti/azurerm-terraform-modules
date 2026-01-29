@@ -28,7 +28,7 @@ module "application_insights" {
 
   workbooks = [
     {
-      name         = "workbook-basic"
+      name         = "1f5d1f14-3e9c-4a5b-9f1a-9c8e8a8d7d6a"
       display_name = "Application Insights Overview"
       data_json = jsonencode({
         version = "Notebook/1.0"
