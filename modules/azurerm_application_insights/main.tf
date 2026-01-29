@@ -57,7 +57,7 @@ resource "azurerm_application_insights" "application_insights" {
   }
 }
 
-resource "azurerm_application_insights_api_key" "api_keys" {
+resource "azurerm_application_insights_api_key" "application_insights_api_key" {
   for_each = local.api_keys_by_name
 
   name                    = each.value.name
@@ -66,7 +66,7 @@ resource "azurerm_application_insights_api_key" "api_keys" {
   write_permissions       = try(each.value.write_permissions, [])
 }
 
-resource "azurerm_application_insights_analytics_item" "analytics_items" {
+resource "azurerm_application_insights_analytics_item" "application_insights_analytics_item" {
   for_each = local.analytics_items_by_name
 
   name                    = each.value.name
@@ -76,7 +76,7 @@ resource "azurerm_application_insights_analytics_item" "analytics_items" {
   type                    = each.value.type
 }
 
-resource "azurerm_application_insights_web_test" "web_tests" {
+resource "azurerm_application_insights_web_test" "application_insights_web_test" {
   for_each = local.web_tests_by_name
 
   name                    = each.value.name
@@ -95,7 +95,7 @@ resource "azurerm_application_insights_web_test" "web_tests" {
   tags = merge(var.tags, try(each.value.tags, {}), local.hidden_link_tag)
 }
 
-resource "azurerm_application_insights_standard_web_test" "standard_web_tests" {
+resource "azurerm_application_insights_standard_web_test" "application_insights_standard_web_test" {
   for_each = local.standard_web_tests_by_name
 
   name                    = each.value.name
@@ -146,7 +146,7 @@ resource "azurerm_application_insights_standard_web_test" "standard_web_tests" {
   tags = merge(var.tags, try(each.value.tags, {}), local.hidden_link_tag)
 }
 
-resource "azurerm_application_insights_workbook" "workbooks" {
+resource "azurerm_application_insights_workbook" "application_insights_workbook" {
   for_each = local.workbooks_by_name
 
   name                = each.value.name
@@ -168,7 +168,7 @@ resource "azurerm_application_insights_workbook" "workbooks" {
   }
 }
 
-resource "azurerm_application_insights_smart_detection_rule" "smart_detection_rules" {
+resource "azurerm_application_insights_smart_detection_rule" "application_insights_smart_detection_rule" {
   for_each = local.smart_detection_rules_by_name
 
   name                    = each.value.name

@@ -68,12 +68,12 @@ No modules.
 | Name | Type |
 |------|------|
 | [azurerm_application_insights.application_insights](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights) | resource |
-| [azurerm_application_insights_analytics_item.analytics_items](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_analytics_item) | resource |
-| [azurerm_application_insights_api_key.api_keys](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_api_key) | resource |
-| [azurerm_application_insights_smart_detection_rule.smart_detection_rules](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_smart_detection_rule) | resource |
-| [azurerm_application_insights_standard_web_test.standard_web_tests](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_standard_web_test) | resource |
-| [azurerm_application_insights_web_test.web_tests](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_web_test) | resource |
-| [azurerm_application_insights_workbook.workbooks](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_workbook) | resource |
+| [azurerm_application_insights_analytics_item.application_insights_analytics_item](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_analytics_item) | resource |
+| [azurerm_application_insights_api_key.application_insights_api_key](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_api_key) | resource |
+| [azurerm_application_insights_smart_detection_rule.application_insights_smart_detection_rule](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_smart_detection_rule) | resource |
+| [azurerm_application_insights_standard_web_test.application_insights_standard_web_test](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_standard_web_test) | resource |
+| [azurerm_application_insights_web_test.application_insights_web_test](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_web_test) | resource |
+| [azurerm_application_insights_workbook.application_insights_workbook](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_workbook) | resource |
 | [azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
 
 ## Inputs

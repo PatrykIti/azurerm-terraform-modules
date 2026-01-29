@@ -48,7 +48,7 @@ output "connection_string" {
 output "api_keys" {
   description = "API keys created for Application Insights."
   value = {
-    for name, key in azurerm_application_insights_api_key.api_keys : name => {
+    for name, key in azurerm_application_insights_api_key.application_insights_api_key : name => {
       id                = key.id
       api_key           = key.api_key
       read_permissions  = key.read_permissions
@@ -61,7 +61,7 @@ output "api_keys" {
 output "analytics_items" {
   description = "Analytics items created for Application Insights."
   value = {
-    for name, item in azurerm_application_insights_analytics_item.analytics_items : name => {
+    for name, item in azurerm_application_insights_analytics_item.application_insights_analytics_item : name => {
       id    = item.id
       name  = item.name
       type  = item.type
@@ -73,7 +73,7 @@ output "analytics_items" {
 output "web_tests" {
   description = "Classic web tests created for Application Insights."
   value = {
-    for name, test in azurerm_application_insights_web_test.web_tests : name => {
+    for name, test in azurerm_application_insights_web_test.application_insights_web_test : name => {
       id   = test.id
       name = test.name
     }
@@ -83,7 +83,7 @@ output "web_tests" {
 output "standard_web_tests" {
   description = "Standard web tests created for Application Insights."
   value = {
-    for name, test in azurerm_application_insights_standard_web_test.standard_web_tests : name => {
+    for name, test in azurerm_application_insights_standard_web_test.application_insights_standard_web_test : name => {
       id   = test.id
       name = test.name
     }
@@ -93,7 +93,7 @@ output "standard_web_tests" {
 output "workbooks" {
   description = "Workbooks created for Application Insights."
   value = {
-    for name, wb in azurerm_application_insights_workbook.workbooks : name => {
+    for name, wb in azurerm_application_insights_workbook.application_insights_workbook : name => {
       id           = wb.id
       name         = wb.name
       display_name = wb.display_name
@@ -104,7 +104,7 @@ output "workbooks" {
 output "smart_detection_rules" {
   description = "Smart detection rules created for Application Insights."
   value = {
-    for name, rule in azurerm_application_insights_smart_detection_rule.smart_detection_rules : name => {
+    for name, rule in azurerm_application_insights_smart_detection_rule.application_insights_smart_detection_rule : name => {
       id      = rule.id
       name    = rule.name
       enabled = rule.enabled
