@@ -38,7 +38,7 @@ run "verify_basic_outputs" {
   }
 
   assert {
-    condition     = output.name == "appins"
+    condition     = output.name == "appinsunit"
     error_message = "Output 'name' should return the Application Insights name."
   }
 
