@@ -26,8 +26,5 @@ module "application_insights" {
   location            = azurerm_resource_group.test.location
   application_type    = "web"
 
-  tags = {
-    Environment = "Test"
-    Scenario    = "Extra"
-  }
+  tags = var.tags
 }

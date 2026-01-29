@@ -39,8 +39,5 @@ module "application_insights" {
     }
   ]
 
-  tags = {
-    Environment = "Test"
-    Example     = "Analytics Items"
-  }
+  tags = var.tags
 }

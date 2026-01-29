@@ -38,8 +38,5 @@ module "application_insights" {
     }
   ]
 
-  tags = {
-    Environment = "Test"
-    Example     = "API Keys"
-  }
+  tags = var.tags
 }

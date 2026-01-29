@@ -33,8 +33,5 @@ module "application_insights" {
     }
   ]
 
-  tags = {
-    Environment = "Test"
-    Example     = "Smart Detection"
-  }
+  tags = var.tags
 }

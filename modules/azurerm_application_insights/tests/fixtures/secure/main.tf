@@ -40,8 +40,5 @@ module "application_insights" {
   local_authentication_disabled = true
   disable_ip_masking            = false
 
-  tags = {
-    Environment = "Test"
-    Example     = "Secure"
-  }
+  tags = var.tags
 }

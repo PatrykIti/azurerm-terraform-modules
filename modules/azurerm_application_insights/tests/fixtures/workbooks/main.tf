@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.57.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.6.0"
+    }
   }
 }
 
@@ -18,6 +22,8 @@ resource "azurerm_resource_group" "example" {
   location = var.location
 }
 
+resource "random_uuid" "workbook" {}
+
 module "application_insights" {
   source = "../../.."
 
@@ -28,7 +34,7 @@ module "application_insights" {
 
   workbooks = [
     {
-      name         = "workbook-basic"
+      name         = random_uuid.workbook.result
       display_name = "Application Insights Overview"
       data_json = jsonencode({
         version = "Notebook/1.0"
@@ -40,8 +46,5 @@ module "application_insights" {
     }
   ]
 
-  tags = {
-    Environment = "Test"
-    Example     = "Workbooks"
-  }
+  tags = var.tags
 }

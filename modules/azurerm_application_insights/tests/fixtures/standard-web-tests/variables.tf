@@ -8,3 +8,12 @@ variable "location" {
   type        = string
   default     = "westeurope"
 }
+
+variable "tags" {
+  description = "Tags to apply to Application Insights."
+  type        = map(string)
+  default = {
+    Environment = "Test"
+    Example     = "Standard Web Tests"
+  }
+}
