@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 16 tasks
+- **To Do:** 15 tasks
 - **In Progress:** 0
-- **Done:** 46 tasks
+- **Done:** 47 tasks
 
 ---
 
@@ -15,7 +15,6 @@ Task board for module work. Update statuses in markdown files.
 |----|-------|----------|--------|-------|
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
 | [TASK-014](./TASK-014_Virtual_Network_Module_Alignment.md) | **Virtual Network module alignment (docs + examples + tests)** | High | Medium | `modules/azurerm_virtual_network/` |
-| [TASK-023](./TASK-023_Log_Analytics_Workspace_Module.md) | **Log Analytics Workspace module (full feature scope)** | High | Large | `modules/azurerm_log_analytics_workspace/` |
 | [TASK-ADO-017](./TASK-ADO-017_AzureDevOps_Environments_Module_Refactor.md) | **Azure DevOps Environments module refactor** | High | Medium | Re-opened; `modules/azuredevops_environments/` |
 | [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_artifacts_feed/` |
 | [TASK-ADO-032](./TASK-ADO-032_AzureDevOps_Artifacts_Feed_Module_Audit_Fixes.md) | **Azure DevOps Artifacts Feed module audit fixes** | Medium | Small | Docs + artifact cleanup; `modules/azuredevops_artifacts_feed/` |
@@ -43,6 +42,7 @@ Task board for module work. Update statuses in markdown files.
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
 | [TASK-024](./TASK-024_Application_Insights_Module.md) | **Application Insights module (full feature scope)** | High | Large | `modules/azurerm_application_insights/` |
+| [TASK-023](./TASK-023_Log_Analytics_Workspace_Module.md) | **Log Analytics Workspace module (full feature scope)** | High | Large | `modules/azurerm_log_analytics_workspace/` |
 | [TASK-020](./TASK-020_AKS_Monitoring_Addon_AMPLS_AzAPI.md) | **AKS monitoring add-on (Container Insights) + AMPLS via AzAPI** | High | Medium | `modules/azurerm_kubernetes_cluster/` |
 | [TASK-019](./TASK-019_DCR_DCE_Modules.md) | **Azure Monitor DCR + DCE modules** | Medium | Large | `modules/azurerm_monitor_data_collection_rule/`, `modules/azurerm_monitor_data_collection_endpoint/` |
 | [TASK-018](./TASK-018_Diagnostic_Settings_Alignment.md) | **Diagnostic settings alignment (AKS + Storage)** | Medium | Medium | `modules/azurerm_kubernetes_cluster/`, `modules/azurerm_storage_account/` |

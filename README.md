@@ -98,6 +98,7 @@ module "storage_account" {
 | [Route Table](./modules/azurerm_route_table/) | ✅ Completed | [RTv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.1.0) | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
 | [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv2.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv2.0.0) | Azure Storage Account Terraform module with enterprise-grade security features |
 | [Application Insights](./modules/azurerm_application_insights/) | 🧪 In Development | Unreleased | Azure Application Insights module with diagnostics, web tests, workbooks, and smart detection rules |
+| [Log Analytics Workspace](./modules/azurerm_log_analytics_workspace/) | 🧪 In Development | Unreleased | Azure Log Analytics Workspace module with workspace-linked sub-resources and diagnostics |
 | [Monitor Data Collection Endpoint](./modules/azurerm_monitor_data_collection_endpoint/) | 🧪 In Development | Unreleased | Azure Monitor Data Collection Endpoint module for configuring ingestion endpoints |
 | [Monitor Data Collection Rule](./modules/azurerm_monitor_data_collection_rule/) | 🧪 In Development | Unreleased | Azure Monitor Data Collection Rule module for defining data sources and flows |
 | [Monitor Private Link Scope](./modules/azurerm_monitor_private_link_scope/) | 🧪 In Development | Unreleased | Azure Monitor Private Link Scope module with scoped services and diagnostic settings |

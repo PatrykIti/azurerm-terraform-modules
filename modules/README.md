@@ -10,6 +10,7 @@ This directory contains all Terraform modules published from this repository. Ea
 | Module | Tag Prefix | Description |
 | --- | --- | --- |
 | [Application Insights](./azurerm_application_insights/) (`azurerm_application_insights`) | `APPINSv` | Azure Application Insights module with diagnostics, web tests, workbooks, and smart detection rules |
+| [Log Analytics Workspace](./azurerm_log_analytics_workspace/) (`azurerm_log_analytics_workspace`) | `LAWv` | Azure Log Analytics Workspace module with workspace-linked sub-resources and diagnostics |
 | [Kubernetes Cluster](./azurerm_kubernetes_cluster/) (`azurerm_kubernetes_cluster`) | `AKSv` | Azure Kubernetes Service (AKS) Terraform module for managing clusters with node pools, addons, and enterprise-grade security features |
 | [Kubernetes Secrets](./azurerm_kubernetes_secrets/) (`azurerm_kubernetes_secrets`) | `AKSSv` | Azure Kubernetes Secrets Terraform module with enterprise-grade features |
 | [Network Security Group](./azurerm_network_security_group/) (`azurerm_network_security_group`) | `NSGv` | Manages Azure Network Security Groups with comprehensive security rules configuration |

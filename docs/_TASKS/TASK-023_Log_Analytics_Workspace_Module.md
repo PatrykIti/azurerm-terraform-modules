@@ -5,7 +5,7 @@
 **Category:** New Module / Monitoring  
 **Estimated Effort:** Large  
 **Dependencies:** -  
-**Status:** To Do
+**Status:** Done
 
 ---
 
@@ -286,3 +286,21 @@ udokumentowane.
 - `docs/_CHANGELOG/NNN-YYYY-MM-DD-log-analytics-workspace.md`
 - `modules/README.md` (nowy modul w tabeli AzureRM)
 - `README.md` (badges + tabela "Available Modules")
+
+---
+
+## Status Update (2026-01-29)
+
+**Status:** Done
+
+**Deliverables:**
+- Module `modules/azurerm_log_analytics_workspace` with core workspace, sub-resources,
+  diagnostics, outputs, and validations aligned to azurerm 4.57.0.
+- Resource naming aligned to provider resource types (local names strip `azurerm_`).
+- Examples (basic/complete/secure + feature-specific) with updated READMEs.
+- Fixtures and Terratest coverage for core and feature scenarios, plus unit tests.
+- Test harness updated to match repo patterns (Makefile logging, run scripts, config).
+- Documentation updated (`docs/README.md`, `docs/IMPORT.md`, `SECURITY.md`).
+
+**Validation:**
+- Not run in this environment (recommend: `terraform test -test-directory=tests/unit` and `make test`).
