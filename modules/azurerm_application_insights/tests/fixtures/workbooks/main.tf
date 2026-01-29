@@ -31,8 +31,8 @@ module "application_insights" {
       name         = "workbook-basic"
       display_name = "Application Insights Overview"
       data_json = jsonencode({
-        version  = "Notebook/1.0"
-        items    = []
+        version = "Notebook/1.0"
+        items   = []
         metadata = {
           category = "Application Insights"
         }

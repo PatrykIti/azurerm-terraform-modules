@@ -18,7 +18,7 @@ func TestBasicApplicationInsights(t *testing.T) {
 	t.Parallel()
 
 	// Create a folder for this test
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -52,7 +52,7 @@ func TestBasicApplicationInsights(t *testing.T) {
 func TestCompleteApplicationInsights(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -83,7 +83,7 @@ func TestCompleteApplicationInsights(t *testing.T) {
 func TestSecureApplicationInsights(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -113,7 +113,7 @@ func TestSecureApplicationInsights(t *testing.T) {
 func TestApplicationInsightsApiKeys(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/api-keys")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/api-keys")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -136,7 +136,7 @@ func TestApplicationInsightsApiKeys(t *testing.T) {
 func TestApplicationInsightsAnalyticsItems(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/analytics-items")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/analytics-items")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -159,7 +159,7 @@ func TestApplicationInsightsAnalyticsItems(t *testing.T) {
 func TestApplicationInsightsWebTests(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/web-tests")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/web-tests")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -182,7 +182,7 @@ func TestApplicationInsightsWebTests(t *testing.T) {
 func TestApplicationInsightsStandardWebTests(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/standard-web-tests")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/standard-web-tests")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -205,7 +205,7 @@ func TestApplicationInsightsStandardWebTests(t *testing.T) {
 func TestApplicationInsightsWorkbooks(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/workbooks")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/workbooks")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -228,7 +228,7 @@ func TestApplicationInsightsWorkbooks(t *testing.T) {
 func TestApplicationInsightsSmartDetectionRules(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/smart-detection-rules")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/smart-detection-rules")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -269,7 +269,7 @@ func TestApplicationInsightsValidationRules(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", fmt.Sprintf("fixtures/%s", tc.fixtureFile))
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", fmt.Sprintf("tests/fixtures/%s", tc.fixtureFile))
 			
 			// Use minimal terraform options for negative tests (no variables)
 			terraformOptions := &terraform.Options{
@@ -294,7 +294,7 @@ func BenchmarkApplicationInsightsCreation(b *testing.B) {
 		b.Skip("Skipping benchmark in short mode")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(b, testFolder)
 
 	// Cleanup after benchmark

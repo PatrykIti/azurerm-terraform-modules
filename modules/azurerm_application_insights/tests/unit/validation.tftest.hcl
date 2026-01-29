@@ -69,7 +69,7 @@ run "monitoring_missing_destination" {
   variables {
     monitoring = [
       {
-        name           = "diag"
+        name              = "diag"
         metric_categories = ["AllMetrics"]
       }
     ]
@@ -86,8 +86,8 @@ run "web_test_missing_geo" {
   variables {
     web_tests = [
       {
-        name         = "bad-webtest"
-        web_test_xml = "<WebTest></WebTest>"
+        name          = "bad-webtest"
+        web_test_xml  = "<WebTest></WebTest>"
         geo_locations = []
       }
     ]

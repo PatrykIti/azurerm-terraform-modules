@@ -105,8 +105,8 @@ variable "disable_ip_masking" {
 variable "api_keys" {
   description = "Application Insights API keys."
   type = list(object({
-    name             = string
-    read_permissions = optional(list(string), [])
+    name              = string
+    read_permissions  = optional(list(string), [])
     write_permissions = optional(list(string), [])
   }))
 
