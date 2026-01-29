@@ -48,8 +48,8 @@ run "verify_defaults" {
   }
 
   assert {
-    condition     = var.local_authentication_disabled == false
-    error_message = "local_authentication_disabled should default to false."
+    condition     = var.local_authentication_enabled == true
+    error_message = "local_authentication_enabled should default to true."
   }
 
   assert {

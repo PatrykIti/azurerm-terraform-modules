@@ -20,7 +20,7 @@ resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
   reservation_capacity_in_gb_per_day = var.reservation_capacity_in_gb_per_day
   internet_ingestion_enabled        = var.internet_ingestion_enabled
   internet_query_enabled            = var.internet_query_enabled
-  local_authentication_disabled     = var.local_authentication_disabled
+  local_authentication_enabled      = var.local_authentication_enabled
   allow_resource_only_permissions   = var.allow_resource_only_permissions
 
   tags = var.tags

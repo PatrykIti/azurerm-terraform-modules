@@ -38,7 +38,7 @@ module "log_analytics_workspace" {
   daily_quota_gb                    = 5
   internet_ingestion_enabled        = true
   internet_query_enabled            = true
-  local_authentication_disabled     = false
+  local_authentication_enabled     = true
 
   monitoring = [
     {

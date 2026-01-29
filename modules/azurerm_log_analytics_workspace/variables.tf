@@ -88,10 +88,10 @@ variable "internet_query_enabled" {
   default     = true
 }
 
-variable "local_authentication_disabled" {
-  description = "Whether local (workspace key) authentication is disabled."
+variable "local_authentication_enabled" {
+  description = "Whether local (workspace key) authentication is enabled."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "allow_resource_only_permissions" {

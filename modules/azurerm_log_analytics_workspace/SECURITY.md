@@ -16,7 +16,8 @@ Private DNS, RBAC) is **out of scope** and must be handled externally.
 - Disable both for private-only access scenarios.
 
 ### Local Authentication
-- **local_authentication_disabled** disables workspace key auth to enforce Azure AD only.
+- **local_authentication_enabled** controls workspace key authentication.
+- Set to `false` to enforce Azure AD only.
 - Shared keys are still available as outputs and are marked `sensitive`.
 
 ### Resource-Only Permissions
@@ -51,7 +52,7 @@ module "log_analytics_workspace" {
 
   internet_ingestion_enabled    = false
   internet_query_enabled        = false
-  local_authentication_disabled = true
+  local_authentication_enabled = false
 
   monitoring = [
     {
