@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [066](./066-2026-01-29-application-insights-module-fixes.md) | 2026-01-29 | Application Insights module fixes | Fix / Maintenance |
 | [065](./065-2026-01-28-application-insights-module.md) | 2026-01-28 | Application Insights module | Feature |
 | [064](./064-2026-01-28-dcr-dce-modules.md) | 2026-01-28 | Azure Monitor DCR + DCE modules | Feature |
 | [063](./063-2026-01-28-diagnostic-settings-alignment.md) | 2026-01-28 | Diagnostic settings alignment (AKS + Storage) | Breaking Change / Maintenance |

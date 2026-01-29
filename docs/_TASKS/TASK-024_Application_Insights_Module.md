@@ -280,3 +280,25 @@ udokumentowane.
 - `docs/_CHANGELOG/NNN-YYYY-MM-DD-application-insights.md`
 - `modules/README.md` (nowy modul w tabeli AzureRM)
 - `README.md` (badges + tabela "Available Modules")
+
+---
+
+## Status Update (2026-01-29)
+
+**Status:** Done
+
+**Deliverables:**
+- Module `modules/azurerm_application_insights` with core resource, sub-resources,
+  diagnostics, examples, fixtures, and tests aligned to azurerm 4.57.0.
+- Provider schema fixes for web tests and standard web tests (configuration,
+  request/body/header, validation_rules).
+- Test harness and fixtures updated (tags variables, workbook UUID requirement,
+  Makefile logging for test output).
+
+**Validation:**
+- `terraform test -test-directory=tests/unit`
+- `make test` (see `modules/azurerm_application_insights/tests/test_outputs/all_20260129_133439.log`)
+
+**Notes:**
+- `workbooks[*].name` must be a UUID and known at plan time because `for_each`
+  keys are derived from it.
