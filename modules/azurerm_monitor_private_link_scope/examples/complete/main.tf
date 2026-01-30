@@ -41,7 +41,7 @@ resource "azurerm_monitor_data_collection_endpoint" "example" {
 }
 
 module "monitor_private_link_scope" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_monitor_private_link_scope?ref=AMPLSv1.0.0"
 
   name                = var.scope_name
   resource_group_name = azurerm_resource_group.example.name
