@@ -59,8 +59,6 @@ func validateCoreFeatures(t *testing.T, testFolder string) {
 	// Get outputs
 	resourceName := terraform.Output(t, terraformOptions, "cognitive_account_name")
 	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
-	_ = resourceName
-	_ = resourceGroupName
 
 	// Get resource details from Azure using SDK
 	// TODO: Replace with actual SDK call
@@ -118,6 +116,8 @@ func validateNetworkFeatures(t *testing.T, testFolder string) {
 
 	resourceName := terraform.Output(t, terraformOptions, "cognitive_account_name")
 	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+	_ = resourceName
+	_ = resourceGroupName
 
 	// Get resource from Azure
 	// TODO: Replace with actual SDK call
