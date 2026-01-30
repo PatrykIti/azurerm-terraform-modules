@@ -132,7 +132,10 @@ resource "azurerm_subnet" "bastion" {
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = [var.bastion_subnet_prefix]
+}
 
+resource "azurerm_subnet_network_security_group_association" "bastion" {
+  subnet_id                 = azurerm_subnet.bastion.id
   network_security_group_id = azurerm_network_security_group.bastion.id
 }
 

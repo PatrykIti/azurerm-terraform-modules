@@ -39,10 +39,9 @@ locals {
     })
   ]
 
-  diagnostic_settings_effective = [
-    for ds in local.diagnostic_settings_resolved : ds
-    if length(ds.log_categories) + length(ds.metric_categories) > 0
-  ]
+  diagnostic_settings_by_name = {
+    for ds in local.diagnostic_settings_resolved : ds.name => ds
+  }
 
   diagnostic_settings_skipped = [
     for ds in local.diagnostic_settings_resolved : {
@@ -53,12 +52,19 @@ locals {
     }
     if length(ds.log_categories) + length(ds.metric_categories) == 0
   ]
+
+  diagnostic_settings_for_each = {
+    for ds in var.diagnostic_settings : ds.name => ds
+    if(
+      length(coalesce(ds.log_categories, [])) +
+      length(coalesce(ds.metric_categories, [])) +
+      length(coalesce(ds.areas, ["all"]))
+    ) > 0
+  }
 }
 
 resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
-  for_each = {
-    for ds in local.diagnostic_settings_effective : ds.name => ds
-  }
+  for_each = local.diagnostic_settings_for_each
 
   name               = each.value.name
   target_resource_id = azurerm_bastion_host.bastion_host.id
@@ -70,14 +76,14 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
   eventhub_name                  = try(each.value.eventhub_name, null)
 
   dynamic "enabled_log" {
-    for_each = each.value.log_categories
+    for_each = local.diagnostic_settings_by_name[each.key].log_categories
     content {
       category = enabled_log.value
     }
   }
 
   dynamic "enabled_metric" {
-    for_each = each.value.metric_categories
+    for_each = local.diagnostic_settings_by_name[each.key].metric_categories
     content {
       category = enabled_metric.value
     }

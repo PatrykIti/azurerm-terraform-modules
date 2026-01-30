@@ -22,6 +22,7 @@ resource "azurerm_key_vault" "example" {
   tenant_id           = data.azurerm_client_config.current.tenant_id
   sku_name            = "standard"
 
+  enable_rbac_authorization  = false
   purge_protection_enabled   = true
   soft_delete_retention_days = 90
 }
@@ -52,6 +53,11 @@ resource "azurerm_key_vault_key" "ai" {
   key_type     = "RSA"
   key_size     = 2048
   key_opts     = ["wrapKey", "unwrapKey"]
+
+  depends_on = [
+    azurerm_key_vault_access_policy.current,
+    azurerm_key_vault_access_policy.ai
+  ]
 }
 
 resource "azurerm_log_analytics_workspace" "example" {
