@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Application Insights](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=APPINSv*&label=Application%20Insights&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.0.0)
 [![Kubernetes Cluster](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AKSv*&label=Kubernetes%20Cluster&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv2.1.0)
 [![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv2.1.0)
 [![PostgreSQL Flexible Server Database](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PGFSDBv*&label=PostgreSQL%20Flexible%20Server%20Database&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSDBv1.0.0)
@@ -97,7 +98,7 @@ module "storage_account" {
 | [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.1.0) | Manages Azure Network Security Groups with comprehensive security rules configuration |
 | [Route Table](./modules/azurerm_route_table/) | ✅ Completed | [RTv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.1.0) | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
 | [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv2.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv2.1.0) | Azure Storage Account Terraform module with enterprise-grade security features |
-| [Application Insights](./modules/azurerm_application_insights/) | 🧪 In Development | Unreleased | Azure Application Insights module with diagnostics, web tests, workbooks, and smart detection rules |
+| [Application Insights](./modules/azurerm_application_insights/) | ✅ Completed | [APPINSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.0.0) | Azure Application Insights module with diagnostics, web tests, workbooks, and smart detection rules |
 | [Log Analytics Workspace](./modules/azurerm_log_analytics_workspace/) | 🧪 In Development | Unreleased | Azure Log Analytics Workspace module with workspace-linked sub-resources and diagnostics |
 | [Monitor Data Collection Endpoint](./modules/azurerm_monitor_data_collection_endpoint/) | 🧪 In Development | Unreleased | Azure Monitor Data Collection Endpoint module for configuring ingestion endpoints |
 | [Monitor Data Collection Rule](./modules/azurerm_monitor_data_collection_rule/) | 🧪 In Development | Unreleased | Azure Monitor Data Collection Rule module for defining data sources and flows |
