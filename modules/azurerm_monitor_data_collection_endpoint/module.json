@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_monitor_data_collection_endpoint",
+  "title": "Monitor Data Collection Endpoint",
+  "commit_scope": "monitor-dce",
+  "tag_prefix": "DCEv",
+  "description": "Azure Monitor Data Collection Endpoint Terraform module with enterprise-grade features"
+}

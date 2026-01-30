@@ -62,6 +62,7 @@ func TestCompleteKubernetesCluster(t *testing.T) {
 
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 		clusterName := terraform.Output(t, terraformOptions, "kubernetes_cluster_name")
+		amplsResourceID := terraform.Output(t, terraformOptions, "ampls_resource_id")
 
 		cluster := helper.GetKubernetesClusterProperties(t, resourceGroupName, clusterName)
 
@@ -71,6 +72,22 @@ func TestCompleteKubernetesCluster(t *testing.T) {
 		assert.True(t, *cluster.Properties.AddonProfiles["azurepolicy"].Enabled)
 		assert.NotNil(t, cluster.Properties.AddonProfiles["omsagent"])
 		assert.True(t, *cluster.Properties.AddonProfiles["omsagent"].Enabled)
+
+		omsConfig := cluster.Properties.AddonProfiles["omsagent"].Config
+		require.NotNil(t, omsConfig)
+
+		require.Contains(t, omsConfig, "useAzureMonitorPrivateLinkScope")
+		require.NotNil(t, omsConfig["useAzureMonitorPrivateLinkScope"])
+		assert.Equal(t, "true", *omsConfig["useAzureMonitorPrivateLinkScope"])
+
+		require.Contains(t, omsConfig, "azureMonitorPrivateLinkScopeResourceId")
+		require.NotNil(t, omsConfig["azureMonitorPrivateLinkScopeResourceId"])
+		assert.Equal(t, amplsResourceID, *omsConfig["azureMonitorPrivateLinkScopeResourceId"])
+
+		require.Contains(t, omsConfig, "dataCollectionSettings")
+		require.NotNil(t, omsConfig["dataCollectionSettings"])
+		assert.Contains(t, *omsConfig["dataCollectionSettings"], "Microsoft-ContainerLogV2")
+		assert.Contains(t, *omsConfig["dataCollectionSettings"], "Microsoft-KubeEvents")
 	})
 }
 

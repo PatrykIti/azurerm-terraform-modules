@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 16 tasks
+- **To Do:** 15 tasks
 - **In Progress:** 0
-- **Done:** 39 tasks
+- **Done:** 47 tasks
 
 ---
 
@@ -15,7 +15,6 @@ Task board for module work. Update statuses in markdown files.
 |----|-------|----------|--------|-------|
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
 | [TASK-014](./TASK-014_Virtual_Network_Module_Alignment.md) | **Virtual Network module alignment (docs + examples + tests)** | High | Medium | `modules/azurerm_virtual_network/` |
-| [TASK-018](./TASK-018_Diagnostic_Settings_Alignment.md) | **Diagnostic settings alignment (AKS + Storage)** | Medium | Medium | `modules/azurerm_kubernetes_cluster/`, `modules/azurerm_storage_account/` |
 | [TASK-ADO-017](./TASK-ADO-017_AzureDevOps_Environments_Module_Refactor.md) | **Azure DevOps Environments module refactor** | High | Medium | Re-opened; `modules/azuredevops_environments/` |
 | [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_artifacts_feed/` |
 | [TASK-ADO-032](./TASK-ADO-032_AzureDevOps_Artifacts_Feed_Module_Audit_Fixes.md) | **Azure DevOps Artifacts Feed module audit fixes** | Medium | Small | Docs + artifact cleanup; `modules/azuredevops_artifacts_feed/` |
@@ -42,6 +41,14 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-024](./TASK-024_Application_Insights_Module.md) | **Application Insights module (full feature scope)** | High | Large | `modules/azurerm_application_insights/` |
+| [TASK-023](./TASK-023_Log_Analytics_Workspace_Module.md) | **Log Analytics Workspace module (full feature scope)** | High | Large | `modules/azurerm_log_analytics_workspace/` |
+| [TASK-020](./TASK-020_AKS_Monitoring_Addon_AMPLS_AzAPI.md) | **AKS monitoring add-on (Container Insights) + AMPLS via AzAPI** | High | Medium | `modules/azurerm_kubernetes_cluster/` |
+| [TASK-019](./TASK-019_DCR_DCE_Modules.md) | **Azure Monitor DCR + DCE modules** | Medium | Large | `modules/azurerm_monitor_data_collection_rule/`, `modules/azurerm_monitor_data_collection_endpoint/` |
+| [TASK-018](./TASK-018_Diagnostic_Settings_Alignment.md) | **Diagnostic settings alignment (AKS + Storage)** | Medium | Medium | `modules/azurerm_kubernetes_cluster/`, `modules/azurerm_storage_account/` |
+| [TASK-025](./TASK-025_AMPLS_Module.md) | **Azure Monitor Private Link Scope (AMPLS) module** | High | Medium | `modules/azurerm_monitor_private_link_scope/` |
+| [TASK-022](./TASK-022_PostgreSQL_Flexible_Server_Missing_Arguments.md) | **PostgreSQL Flexible Server missing provider arguments** | Medium | Medium | `modules/azurerm_postgresql_flexible_server/` |
+| [TASK-021](./TASK-021_PostgreSQL_Flexible_Server_Public_Network_Access.md) | **PostgreSQL Flexible Server - public network access toggle** | High | Small | `modules/azurerm_postgresql_flexible_server/` |
 | [TASK-016](./TASK-016_PostgreSQL_Flexible_Server_Module.md) | **PostgreSQL Flexible Server module (full feature scope)** | High | Large | `modules/azurerm_postgresql_flexible_server/` |
 | [TASK-017](./TASK-017_PostgreSQL_Flexible_Server_Database_Module.md) | **PostgreSQL Flexible Server Database module** | Medium | Medium | `modules/azurerm_postgresql_flexible_server_database/` |
 | [TASK-015](./TASK-015_AKS_Secrets_Remove_Module_Data_Sources.md) | **AKS secrets – remove Key Vault data sources from module** | High | Medium | `modules/azurerm_kubernetes_secrets/` |

@@ -11,6 +11,8 @@ mock_provider "azurerm" {
   mock_resource "azurerm_monitor_diagnostic_setting" {}
 }
 
+mock_provider "azapi" {}
+
 variables {
   name                = "akstestcluster"
   resource_group_name = "test-rg"

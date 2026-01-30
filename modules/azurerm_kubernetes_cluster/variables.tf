@@ -513,14 +513,62 @@ variable "oms_agent" {
     
     log_analytics_workspace_id: The ID of the Log Analytics Workspace which the OMS Agent should send data to.
     msi_auth_for_monitoring_enabled: Is managed identity authentication for monitoring enabled?
+    ampls_settings: Azure Monitor Private Link Scope (AMPLS) settings.
+      id: The Resource ID of the Azure Monitor Private Link Scope (AMPLS).
+      enabled: Whether to apply the AMPLS patch (default: true).
+    collection_profile: Collection profile for Container Insights streams.
+      basic: Microsoft-Perf + Microsoft-ContainerLogV2.
+      advanced: basic + Microsoft-KubeEvents + Microsoft-KubePodInventory.
   EOT
 
   type = object({
     log_analytics_workspace_id      = string
     msi_auth_for_monitoring_enabled = optional(bool, true)
+    ampls_settings = optional(object({
+      id      = string
+      enabled = optional(bool, true)
+    }))
+    collection_profile     = optional(string, "basic")
+    namespaceFilteringMode = optional(string, "Off")
   })
 
+  validation {
+    condition     = var.oms_agent == null || var.oms_agent.ampls_settings == null || can(regex("^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.Insights/privateLinkScopes/[^/]+$", var.oms_agent.ampls_settings.id))
+    error_message = "When set, oms_agent.ampls_settings.id must be a valid Azure Monitor Private Link Scope resource ID."
+  }
+
+  validation {
+    condition     = var.oms_agent == null || try(var.oms_agent.collection_profile, null) == null || contains(["basic", "advanced"], var.oms_agent.collection_profile)
+    error_message = "oms_agent.collection_profile must be one of: basic, advanced."
+  }
+
   default = null
+}
+
+# Optional AzAPI patch for AKS ManagedCluster
+variable "aks_azapi_patch" {
+  description = <<-EOT
+    Optional AzAPI patch configuration for the AKS ManagedCluster.
+
+    enabled: Whether to apply the custom patch.
+    api_version: API version for Microsoft.ContainerService/managedClusters.
+    body: Request body for the patch (applied as-is).
+  EOT
+
+  type = object({
+    enabled     = optional(bool, false)
+    api_version = optional(string)
+    body        = optional(map(any))
+  })
+
+  default = {
+    enabled = false
+  }
+
+  validation {
+    condition     = var.aks_azapi_patch.enabled == false || (var.aks_azapi_patch.api_version != null && var.aks_azapi_patch.body != null && length(var.aks_azapi_patch.body) > 0)
+    error_message = "When aks_azapi_patch.enabled is true, api_version and a non-empty body are required."
+  }
 }
 
 variable "ingress_application_gateway" {

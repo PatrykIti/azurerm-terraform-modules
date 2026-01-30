@@ -9,8 +9,10 @@ This document describes the security controls supported by the
 
 ### 1) Network Isolation
 
-- **Private access**: Use `network.public_network_access_enabled = false` and
-  supply `network.delegated_subnet_id` plus `network.private_dns_zone_id`.
+- **Private access**: Set `network.public_network_access_enabled = false`.
+  For delegated subnet private access, supply `network.delegated_subnet_id` plus
+  `network.private_dns_zone_id`. You can also disable public access and attach
+  a private endpoint outside this module.
 - **Firewall rules**: When public access is enabled, restrict inbound access via
   `network.firewall_rules` using explicit allow-list IP ranges.
 

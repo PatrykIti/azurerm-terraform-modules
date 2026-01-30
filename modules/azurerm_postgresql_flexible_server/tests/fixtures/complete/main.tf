@@ -49,8 +49,9 @@ module "postgresql_flexible_server" {
     sku_name           = "GP_Standard_D4s_v3"
     postgresql_version = "15"
     storage = {
-      storage_mb   = 65536
-      storage_tier = "P20"
+      storage_mb        = 65536
+      storage_tier      = "P20"
+      auto_grow_enabled = true
     }
     backup = {
       retention_days               = 30

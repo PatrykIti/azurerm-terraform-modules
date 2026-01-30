@@ -6,11 +6,14 @@ resource "azurerm_postgresql_flexible_server" "postgresql_flexible_server" {
   sku_name = var.server.sku_name
   version  = var.server.postgresql_version
 
-  administrator_login    = try(var.authentication.administrator.login, null)
-  administrator_password = try(var.authentication.administrator.password, null)
+  administrator_login               = try(var.authentication.administrator.login, null)
+  administrator_password            = try(var.authentication.administrator.password, null)
+  administrator_password_wo         = try(var.authentication.administrator.password_wo, null)
+  administrator_password_wo_version = try(var.authentication.administrator.password_wo_version, null)
 
-  storage_mb   = var.server.storage == null ? null : var.server.storage.storage_mb
-  storage_tier = var.server.storage == null ? null : var.server.storage.storage_tier
+  storage_mb        = var.server.storage == null ? null : var.server.storage.storage_mb
+  storage_tier      = var.server.storage == null ? null : var.server.storage.storage_tier
+  auto_grow_enabled = var.server.storage == null ? null : var.server.storage.auto_grow_enabled
 
   backup_retention_days        = var.server.backup == null ? null : var.server.backup.retention_days
   geo_redundant_backup_enabled = var.server.backup == null ? null : var.server.backup.geo_redundant_backup_enabled
@@ -28,6 +31,7 @@ resource "azurerm_postgresql_flexible_server" "postgresql_flexible_server" {
   create_mode                       = var.server.create_mode != null && var.server.create_mode.mode != null ? var.server.create_mode.mode : "Default"
   source_server_id                  = var.server.create_mode == null ? null : var.server.create_mode.source_server_id
   point_in_time_restore_time_in_utc = var.server.create_mode == null ? null : var.server.create_mode.point_in_time_restore_time_in_utc
+  replication_role                  = var.server.replication_role
 
   dynamic "authentication" {
     for_each = var.authentication == null ? [] : [var.authentication]

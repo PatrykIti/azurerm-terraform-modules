@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_log_analytics_workspace",
+  "title": "Log Analytics Workspace",
+  "commit_scope": "log-analytics-workspace",
+  "tag_prefix": "LAWv",
+  "description": "Azure Log Analytics Workspace Terraform module with workspace and sub-resource management"
+}

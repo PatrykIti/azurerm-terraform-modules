@@ -42,6 +42,22 @@ resource "azurerm_log_analytics_workspace" "test" {
   retention_in_days   = 30
 }
 
+# Create Azure Monitor Private Link Scope for Container Insights
+resource "azurerm_monitor_private_link_scope" "test" {
+  name                = "ampls-dpc-cmp-${var.random_suffix}"
+  resource_group_name = azurerm_resource_group.test.name
+
+  ingestion_access_mode = "PrivateOnly"
+  query_access_mode     = "Open"
+}
+
+resource "azurerm_monitor_private_link_scoped_service" "log_analytics" {
+  name                = "ampls-law-${var.random_suffix}"
+  resource_group_name = azurerm_resource_group.test.name
+  scope_name          = azurerm_monitor_private_link_scope.test.name
+  linked_resource_id  = azurerm_log_analytics_workspace.test.id
+}
+
 # Create virtual network
 resource "azurerm_virtual_network" "test" {
   name                = "vnet-dpc-cmp-${var.random_suffix}"
@@ -131,6 +147,10 @@ module "kubernetes_cluster" {
   # Enable addons
   oms_agent = {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.test.id
+    ampls_settings = {
+      id = azurerm_monitor_private_link_scope.test.id
+    }
+    collection_profile = "advanced"
   }
 
 
@@ -151,7 +171,8 @@ module "kubernetes_cluster" {
 
   depends_on = [
     azurerm_role_assignment.dns_contributor,
-    azurerm_role_assignment.network_contributor
+    azurerm_role_assignment.network_contributor,
+    azurerm_monitor_private_link_scoped_service.log_analytics
   ]
 }
 

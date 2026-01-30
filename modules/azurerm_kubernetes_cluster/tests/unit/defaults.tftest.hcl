@@ -9,6 +9,8 @@ mock_provider "azurerm" {
   }
 }
 
+mock_provider "azapi" {}
+
 variables {
   name                = "akstestcluster"
   resource_group_name = "test-rg"

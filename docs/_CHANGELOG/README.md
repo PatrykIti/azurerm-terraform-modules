@@ -6,6 +6,16 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [069](./069-2026-01-29-dcr-association-support.md) | 2026-01-29 | DCR association support | Feature / Maintenance |
+| [068](./068-2026-01-29-log-analytics-workspace-module-inputs-refactor.md) | 2026-01-29 | Log Analytics Workspace module inputs refactor | Breaking Change / Maintenance |
+| [067](./067-2026-01-29-log-analytics-workspace-module.md) | 2026-01-29 | Log Analytics Workspace module | Feature |
+| [066](./066-2026-01-29-application-insights-module-fixes.md) | 2026-01-29 | Application Insights module fixes | Fix / Maintenance |
+| [065](./065-2026-01-28-application-insights-module.md) | 2026-01-28 | Application Insights module | Feature |
+| [064](./064-2026-01-28-dcr-dce-modules.md) | 2026-01-28 | Azure Monitor DCR + DCE modules | Feature |
+| [063](./063-2026-01-28-diagnostic-settings-alignment.md) | 2026-01-28 | Diagnostic settings alignment (AKS + Storage) | Breaking Change / Maintenance |
+| [062](./062-2026-01-28-ampls-module.md) | 2026-01-28 | Azure Monitor Private Link Scope (AMPLS) module | Feature |
+| [061](./061-2026-01-27-aks-monitoring-addon-ampls-azapi.md) | 2026-01-27 | AKS monitoring add-on AMPLS patch via AzAPI | Feature / Maintenance |
+| [060](./060-2026-01-27-postgresql-flexible-server-public-network-access.md) | 2026-01-27 | PostgreSQL Flexible Server public network access toggle | Fix / Maintenance |
 | [059](./059-2026-01-25-postgresql-flexible-server-database-module.md) | 2026-01-25 | PostgreSQL Flexible Server Database module | Feature |
 | [058](./058-2026-01-22-postgresql-flexible-server-module.md) | 2026-01-22 | PostgreSQL Flexible Server module (full feature scope) | Feature |
 | [057](./057-2026-01-14-aks-secrets-manual-inputs.md) | 2026-01-14 | AKS secrets manual strategy input refactor | Breaking Change / Maintenance |
