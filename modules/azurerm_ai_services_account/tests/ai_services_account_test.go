@@ -18,7 +18,7 @@ func TestBasicAiServicesAccount(t *testing.T) {
 	t.Parallel()
 
 	// Create a folder for this test
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -52,7 +52,7 @@ func TestBasicAiServicesAccount(t *testing.T) {
 func TestCompleteAiServicesAccount(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -83,7 +83,7 @@ func TestCompleteAiServicesAccount(t *testing.T) {
 func TestSecureAiServicesAccount(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -113,7 +113,7 @@ func TestSecureAiServicesAccount(t *testing.T) {
 func TestNetworkAiServicesAccount(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/network")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/network")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -159,7 +159,7 @@ func TestAiServicesAccountValidationRules(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", fmt.Sprintf("fixtures/%s", tc.fixtureFile))
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", fmt.Sprintf("tests/fixtures/%s", tc.fixtureFile))
 			
 			// Use minimal terraform options for negative tests (no variables)
 			terraformOptions := &terraform.Options{
@@ -184,7 +184,7 @@ func BenchmarkAiServicesAccountCreation(b *testing.B) {
 		b.Skip("Skipping benchmark in short mode")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(b, testFolder)
 
 	// Cleanup after benchmark
