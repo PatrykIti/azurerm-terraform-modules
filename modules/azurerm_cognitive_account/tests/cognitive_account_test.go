@@ -19,7 +19,7 @@ func TestBasicCognitiveAccount(t *testing.T) {
 	t.Parallel()
 
 	// Create a folder for this test
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/openai-basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/openai-basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -53,7 +53,7 @@ func TestBasicCognitiveAccount(t *testing.T) {
 func TestLanguageCognitiveAccount(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/language-basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/language-basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -79,7 +79,7 @@ func TestLanguageCognitiveAccount(t *testing.T) {
 func TestSpeechCognitiveAccount(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/speech-basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/speech-basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -105,7 +105,7 @@ func TestSpeechCognitiveAccount(t *testing.T) {
 func TestCompleteCognitiveAccount(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/openai-complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/openai-complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -136,7 +136,7 @@ func TestCompleteCognitiveAccount(t *testing.T) {
 func TestSecureCognitiveAccount(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/openai-secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/openai-secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -166,7 +166,7 @@ func TestSecureCognitiveAccount(t *testing.T) {
 func TestNetworkCognitiveAccount(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/network")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/network")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -198,7 +198,7 @@ func TestCognitiveAccountPrivateEndpoint(t *testing.T) {
 		t.Skip("Private endpoint fixture not found; skipping test")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/private_endpoint")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/private_endpoint")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -246,7 +246,7 @@ func TestCognitiveAccountValidationRules(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", fmt.Sprintf("fixtures/%s", tc.fixtureFile))
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", fmt.Sprintf("tests/fixtures/%s", tc.fixtureFile))
 
 			// Use minimal terraform options for negative tests (no variables)
 			terraformOptions := &terraform.Options{
@@ -271,7 +271,7 @@ func BenchmarkCognitiveAccountCreation(b *testing.B) {
 		b.Skip("Skipping benchmark in short mode")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/openai-basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/openai-basic")
 	terraformOptions := getTerraformOptions(b, testFolder)
 
 	// Cleanup after benchmark

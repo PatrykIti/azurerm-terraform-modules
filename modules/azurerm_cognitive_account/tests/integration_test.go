@@ -19,7 +19,7 @@ func TestCognitiveAccountFullIntegration(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/openai-complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/openai-complete")
 
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -59,6 +59,8 @@ func validateCoreFeatures(t *testing.T, testFolder string) {
 	// Get outputs
 	resourceName := terraform.Output(t, terraformOptions, "cognitive_account_name")
 	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+	_ = resourceName
+	_ = resourceGroupName
 
 	// Get resource details from Azure using SDK
 	// TODO: Replace with actual SDK call
@@ -92,6 +94,8 @@ func validateSecurityFeatures(t *testing.T, testFolder string) {
 
 	resourceName := terraform.Output(t, terraformOptions, "cognitive_account_name")
 	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
+	_ = resourceName
+	_ = resourceGroupName
 
 	// Get resource from Azure
 	// TODO: Replace with actual SDK call
@@ -161,7 +165,7 @@ func TestCognitiveAccountWithNetworkRules(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/network")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/network")
 
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -205,7 +209,7 @@ func TestCognitiveAccountPrivateEndpointIntegration(t *testing.T) {
 		t.Skip("Private endpoint fixture not found; skipping test")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/private_endpoint")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/private_endpoint")
 
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -246,7 +250,7 @@ func TestCognitiveAccountSecurityConfiguration(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -286,7 +290,7 @@ func TestCognitiveAccountLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -322,7 +326,7 @@ func TestCognitiveAccountLifecycle(t *testing.T) {
 func TestCognitiveAccountCompliance(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)

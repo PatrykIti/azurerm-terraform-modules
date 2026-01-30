@@ -1,3 +1,4 @@
+# Core configuration
 variable "name" {
   description = "The name of the Cognitive Account. Must start with an alphanumeric character and contain only alphanumerics, periods, dashes, or underscores."
   type        = string
@@ -40,6 +41,7 @@ variable "sku_name" {
   }
 }
 
+# Network + authentication
 variable "custom_subdomain_name" {
   description = "The custom subdomain name used for Entra ID token-based authentication. Required when network_acls is set."
   type        = string
@@ -106,12 +108,35 @@ variable "network_acls" {
 
   validation {
     condition = var.network_acls == null || alltrue([
-      for ip in var.network_acls.ip_rules : ip != ""
+      for ip in coalesce(var.network_acls.ip_rules, []) : ip != ""
     ])
     error_message = "network_acls.ip_rules must not contain empty strings."
   }
+
+  validation {
+    condition = var.network_acls == null || alltrue([
+      for rule in coalesce(var.network_acls.virtual_network_rules, []) : rule.subnet_id != ""
+    ])
+    error_message = "network_acls.virtual_network_rules subnet_id must not be empty."
+  }
+
+  validation {
+    condition = var.network_acls == null || (
+      var.custom_subdomain_name != null && var.custom_subdomain_name != ""
+    )
+    error_message = "custom_subdomain_name is required when network_acls is set."
+  }
+
+  validation {
+    condition = var.network_acls == null || var.network_acls.bypass == null || contains(
+      ["OpenAI", "TextAnalytics", "Language"],
+      var.kind
+    )
+    error_message = "network_acls.bypass is only supported for kind OpenAI or TextAnalytics (Language)."
+  }
 }
 
+# Identity + encryption
 variable "identity" {
   description = "Managed identity configuration for the Cognitive Account."
   type = object({
@@ -123,13 +148,16 @@ variable "identity" {
   validation {
     condition = var.identity == null || contains(
       ["SystemAssigned", "UserAssigned", "SystemAssigned, UserAssigned"],
-      try(var.identity.type, "")
+      var.identity.type
     )
     error_message = "identity.type must be SystemAssigned, UserAssigned, or SystemAssigned, UserAssigned."
   }
 
   validation {
-    condition = var.identity == null || !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type) || length(try(var.identity.identity_ids, [])) > 0
+    condition = var.identity == null || (
+      !strcontains(lower(var.identity.type), "userassigned") ||
+      length(var.identity.identity_ids) > 0
+    )
     error_message = "identity.identity_ids is required when identity.type includes UserAssigned."
   }
 }
@@ -137,9 +165,9 @@ variable "identity" {
 variable "customer_managed_key" {
   description = "Customer-managed key configuration for the Cognitive Account."
   type = object({
-    key_vault_key_id        = string
-    identity_client_id      = optional(string)
-    use_separate_resource   = optional(bool, false)
+    key_vault_key_id      = string
+    identity_client_id    = optional(string)
+    use_separate_resource = optional(bool, false)
   })
   default = null
 
@@ -147,8 +175,17 @@ variable "customer_managed_key" {
     condition     = var.customer_managed_key == null || var.customer_managed_key.key_vault_key_id != ""
     error_message = "customer_managed_key.key_vault_key_id must not be empty when set."
   }
+
+  validation {
+    condition = var.customer_managed_key == null || (
+      var.identity != null &&
+      strcontains(lower(var.identity.type), "userassigned")
+    )
+    error_message = "customer_managed_key requires identity.type to include UserAssigned."
+  }
 }
 
+# Storage
 variable "storage" {
   description = "Optional storage configuration for Cognitive Account user-owned storage."
   type = list(object({
@@ -162,8 +199,14 @@ variable "storage" {
     condition     = alltrue([for entry in var.storage : entry.storage_account_id != ""])
     error_message = "storage.storage_account_id must not be empty."
   }
+
+  validation {
+    condition     = var.kind != "OpenAI" || length(var.storage) == 0
+    error_message = "storage is not supported for kind OpenAI."
+  }
 }
 
+# OpenAI sub-resources
 variable "deployments" {
   description = "OpenAI deployments to create when kind is OpenAI."
   type = list(object({
@@ -186,6 +229,11 @@ variable "deployments" {
   }))
   default  = []
   nullable = false
+
+  validation {
+    condition     = var.kind == "OpenAI" || length(var.deployments) == 0
+    error_message = "deployments are only supported when kind is OpenAI."
+  }
 
   validation {
     condition     = length(distinct([for deployment in var.deployments : deployment.name])) == length(var.deployments)
@@ -257,6 +305,11 @@ variable "rai_policies" {
   nullable = false
 
   validation {
+    condition     = var.kind == "OpenAI" || length(var.rai_policies) == 0
+    error_message = "rai_policies are only supported when kind is OpenAI."
+  }
+
+  validation {
     condition     = length(distinct([for policy in var.rai_policies : policy.name])) == length(var.rai_policies)
     error_message = "rai_policies names must be unique."
   }
@@ -301,6 +354,11 @@ variable "rai_blocklists" {
   nullable = false
 
   validation {
+    condition     = var.kind == "OpenAI" || length(var.rai_blocklists) == 0
+    error_message = "rai_blocklists are only supported when kind is OpenAI."
+  }
+
+  validation {
     condition     = length(distinct([for blocklist in var.rai_blocklists : blocklist.name])) == length(var.rai_blocklists)
     error_message = "rai_blocklists names must be unique."
   }
@@ -311,6 +369,7 @@ variable "rai_blocklists" {
   }
 }
 
+# Diagnostics
 variable "diagnostic_settings" {
   description = <<-EOT
     Diagnostic settings configuration for the Cognitive Account.
@@ -370,15 +429,16 @@ variable "diagnostic_settings" {
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
-      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""]) &&
-      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : c != ""]) &&
-      alltrue([for c in(ds.areas == null ? [] : ds.areas) : c != ""])
+      alltrue([for c in (ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
+      alltrue([for c in (ds.metric_categories == null ? [] : ds.metric_categories) : c != ""]) &&
+      alltrue([for c in (ds.log_category_groups == null ? [] : ds.log_category_groups) : c != ""]) &&
+      alltrue([for c in (ds.areas == null ? [] : ds.areas) : c != ""])
     ])
     error_message = "diagnostic_settings categories and areas must not contain empty strings."
   }
 }
 
+# Timeouts
 variable "timeouts" {
   description = "Optional timeouts configuration for the Cognitive Account."
   type = object({
@@ -391,6 +451,7 @@ variable "timeouts" {
   nullable = false
 }
 
+# Tags
 variable "tags" {
   description = "A mapping of tags to assign to the Cognitive Account."
   type        = map(string)

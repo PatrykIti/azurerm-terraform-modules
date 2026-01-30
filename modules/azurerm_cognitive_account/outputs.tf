@@ -73,7 +73,7 @@ output "deployments" {
 output "rai_policies" {
   description = "RAI policies created by the module."
   value = {
-    for name, policy in azurerm_cognitive_account_rai_policy.rai_policy : name => {
+    for name, policy in azurerm_cognitive_account_rai_policy.cognitive_account_rai_policy : name => {
       id   = policy.id
       name = policy.name
     }
@@ -83,7 +83,7 @@ output "rai_policies" {
 output "rai_blocklists" {
   description = "RAI blocklists created by the module."
   value = {
-    for name, blocklist in azurerm_cognitive_account_rai_blocklist.rai_blocklist : name => {
+    for name, blocklist in azurerm_cognitive_account_rai_blocklist.cognitive_account_rai_blocklist : name => {
       id   = blocklist.id
       name = blocklist.name
     }
@@ -92,7 +92,7 @@ output "rai_blocklists" {
 
 output "customer_managed_key_id" {
   description = "The ID of the Customer Managed Key resource when managed separately."
-  value       = try(azurerm_cognitive_account_customer_managed_key.customer_managed_key[0].id, null)
+  value       = try(azurerm_cognitive_account_customer_managed_key.cognitive_account_customer_managed_key[0].id, null)
 }
 
 output "diagnostic_settings_skipped" {

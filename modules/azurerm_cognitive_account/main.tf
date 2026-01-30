@@ -2,7 +2,7 @@ resource "azurerm_cognitive_account" "cognitive_account" {
   name                = var.name
   location            = var.location
   resource_group_name = var.resource_group_name
-  kind                = local.kind_normalized
+  kind                = var.kind == "Language" ? "TextAnalytics" : var.kind
   sku_name            = var.sku_name
 
   custom_subdomain_name           = var.custom_subdomain_name
@@ -37,7 +37,7 @@ resource "azurerm_cognitive_account" "cognitive_account" {
   }
 
   dynamic "customer_managed_key" {
-    for_each = local.customer_managed_key_inline ? [var.customer_managed_key] : []
+    for_each = var.customer_managed_key != null && !try(var.customer_managed_key.use_separate_resource, false) ? [var.customer_managed_key] : []
     content {
       key_vault_key_id   = customer_managed_key.value.key_vault_key_id
       identity_client_id = try(customer_managed_key.value.identity_client_id, null)
@@ -53,7 +53,12 @@ resource "azurerm_cognitive_account" "cognitive_account" {
   }
 
   dynamic "timeouts" {
-    for_each = local.timeouts_enabled ? [var.timeouts] : []
+    for_each = length(compact([
+      try(var.timeouts.create, null),
+      try(var.timeouts.update, null),
+      try(var.timeouts.read, null),
+      try(var.timeouts.delete, null)
+    ])) > 0 ? [var.timeouts] : []
     content {
       create = try(timeouts.value.create, null)
       update = try(timeouts.value.update, null)
@@ -63,37 +68,10 @@ resource "azurerm_cognitive_account" "cognitive_account" {
   }
 
   tags = var.tags
-
-  lifecycle {
-    precondition {
-      condition     = var.network_acls == null || (var.custom_subdomain_name != null && var.custom_subdomain_name != "")
-      error_message = "custom_subdomain_name is required when network_acls is set."
-    }
-
-    precondition {
-      condition     = var.network_acls == null || var.network_acls.bypass == null || contains(["OpenAI", "TextAnalytics"], local.kind_normalized)
-      error_message = "network_acls.bypass is only supported for kind OpenAI or TextAnalytics."
-    }
-
-    precondition {
-      condition     = var.customer_managed_key == null || local.identity_has_user_assigned
-      error_message = "customer_managed_key requires identity.type to include UserAssigned."
-    }
-
-    precondition {
-      condition     = local.kind_normalized != "OpenAI" || length(var.storage) == 0
-      error_message = "storage is not supported for kind OpenAI."
-    }
-
-    precondition {
-      condition     = local.openai_enabled || (length(var.deployments) == 0 && length(var.rai_policies) == 0 && length(var.rai_blocklists) == 0)
-      error_message = "OpenAI sub-resources (deployments, rai_policies, rai_blocklists) require kind = OpenAI."
-    }
-  }
 }
 
 resource "azurerm_cognitive_deployment" "cognitive_deployment" {
-  for_each = local.openai_enabled ? local.deployments_by_name : {}
+  for_each = var.kind == "OpenAI" ? { for deployment in var.deployments : deployment.name => deployment } : {}
 
   name                 = each.value.name
   cognitive_account_id = azurerm_cognitive_account.cognitive_account.id
@@ -117,8 +95,8 @@ resource "azurerm_cognitive_deployment" "cognitive_deployment" {
   version_upgrade_option     = try(each.value.version_upgrade_option, null)
 }
 
-resource "azurerm_cognitive_account_rai_policy" "rai_policy" {
-  for_each = local.openai_enabled ? local.rai_policies_by_name : {}
+resource "azurerm_cognitive_account_rai_policy" "cognitive_account_rai_policy" {
+  for_each = var.kind == "OpenAI" ? { for policy in var.rai_policies : policy.name => policy } : {}
 
   name                 = each.value.name
   cognitive_account_id = azurerm_cognitive_account.cognitive_account.id
@@ -138,16 +116,16 @@ resource "azurerm_cognitive_account_rai_policy" "rai_policy" {
   }
 }
 
-resource "azurerm_cognitive_account_rai_blocklist" "rai_blocklist" {
-  for_each = local.openai_enabled ? local.rai_blocklists_by_name : {}
+resource "azurerm_cognitive_account_rai_blocklist" "cognitive_account_rai_blocklist" {
+  for_each = var.kind == "OpenAI" ? { for blocklist in var.rai_blocklists : blocklist.name => blocklist } : {}
 
   name                 = each.value.name
   cognitive_account_id = azurerm_cognitive_account.cognitive_account.id
   description          = try(each.value.description, null)
 }
 
-resource "azurerm_cognitive_account_customer_managed_key" "customer_managed_key" {
-  count = local.customer_managed_key_resource ? 1 : 0
+resource "azurerm_cognitive_account_customer_managed_key" "cognitive_account_customer_managed_key" {
+  count = var.customer_managed_key != null && try(var.customer_managed_key.use_separate_resource, false) ? 1 : 0
 
   cognitive_account_id = azurerm_cognitive_account.cognitive_account.id
   key_vault_key_id     = var.customer_managed_key.key_vault_key_id

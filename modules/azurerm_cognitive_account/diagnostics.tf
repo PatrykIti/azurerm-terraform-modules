@@ -4,9 +4,9 @@ data "azurerm_monitor_diagnostic_categories" "cognitive_account" {
 }
 
 locals {
-  diagnostic_log_categories    = try(data.azurerm_monitor_diagnostic_categories.cognitive_account[0].log_category_types, [])
-  diagnostic_log_groups        = try(data.azurerm_monitor_diagnostic_categories.cognitive_account[0].log_category_groups, [])
-  diagnostic_metric_categories = try(data.azurerm_monitor_diagnostic_categories.cognitive_account[0].metrics, [])
+  diagnostic_log_categories    = tolist(try(data.azurerm_monitor_diagnostic_categories.cognitive_account[0].log_category_types, []))
+  diagnostic_log_groups        = tolist(try(data.azurerm_monitor_diagnostic_categories.cognitive_account[0].log_category_groups, []))
+  diagnostic_metric_categories = tolist(try(data.azurerm_monitor_diagnostic_categories.cognitive_account[0].metrics, []))
 
   diagnostic_settings_create = {
     for ds in var.diagnostic_settings : ds.name => ds
@@ -69,7 +69,7 @@ locals {
   ]
 }
 
-resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
+resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_setting" {
   for_each = local.monitoring_for_each
 
   name               = each.value.name

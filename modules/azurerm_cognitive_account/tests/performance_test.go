@@ -16,7 +16,7 @@ func BenchmarkCognitiveAccountCreationSimple(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/openai-basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/openai-basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		// Override the random_suffix for benchmarking
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -62,7 +62,7 @@ func BenchmarkCognitiveAccountCreationWithFeatures(b *testing.B) {
 		b.Run(fc.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/openai-basic")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/openai-basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
 				// Apply feature configuration
@@ -99,7 +99,7 @@ func BenchmarkCognitiveAccountCreationWithScale(b *testing.B) {
 		b.Run(fmt.Sprintf("Scale_%d", count), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/openai-basic")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/openai-basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
 				_ = count
@@ -133,7 +133,7 @@ func BenchmarkCognitiveAccountParallelCreation(b *testing.B) {
 			b.RunParallel(func(pb *testing.PB) {
 				i := 0
 				for pb.Next() {
-					testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/openai-basic")
+					testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/openai-basic")
 					terraformOptions := getTerraformOptions(b, testFolder)
 					// Override the random_suffix for parallel testing
 					terraformOptions.Vars["random_suffix"] = fmt.Sprintf("par%d%d%s", parallel, i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -159,7 +159,7 @@ func TestCognitiveAccountCreationTime(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/openai-basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/openai-basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -188,7 +188,7 @@ func TestCognitiveAccountScaling(t *testing.T) {
 
 	// Create multiple instances sequentially
 	for i := 0; i < instanceCount; i++ {
-		testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/openai-basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/openai-basic")
 		terraformOptions := getTerraformOptions(t, testFolder)
 		// Override the random_suffix for each iteration
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("scale%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -225,7 +225,7 @@ func TestCognitiveAccountUpdatePerformance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/openai-basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/openai-basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -277,7 +277,7 @@ func TestCognitiveAccountDestroyPerformance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/openai-basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/openai-basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	// Create resource

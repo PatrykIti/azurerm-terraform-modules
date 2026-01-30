@@ -72,7 +72,7 @@ run "network_acls_requires_custom_subdomain" {
   }
 
   expect_failures = [
-    azurerm_cognitive_account.cognitive_account
+    var.network_acls
   ]
 }
 
@@ -104,7 +104,7 @@ run "cmk_requires_user_assigned_identity" {
   }
 
   expect_failures = [
-    azurerm_cognitive_account.cognitive_account
+    var.customer_managed_key
   ]
 }
 
@@ -128,6 +128,6 @@ run "openai_subresources_require_openai_kind" {
   }
 
   expect_failures = [
-    azurerm_cognitive_account.cognitive_account
+    var.deployments
   ]
 }
