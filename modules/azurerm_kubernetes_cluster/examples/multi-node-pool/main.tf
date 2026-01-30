@@ -44,7 +44,7 @@ resource "azurerm_subnet" "example" {
 
 # Create the AKS cluster with multiple node pools
 module "kubernetes_cluster" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv2.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_kubernetes_cluster?ref=AKSv2.1.0"
 
   # Basic cluster configuration
   name                = var.cluster_name
