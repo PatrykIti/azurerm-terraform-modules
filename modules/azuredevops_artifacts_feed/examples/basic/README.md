@@ -14,7 +14,9 @@ This example demonstrates creating a project-scoped feed.
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_azuredevops"></a> [azuredevops](#provider\_azuredevops) | 1.12.2 |
 
 ## Modules
 
@@ -24,7 +26,9 @@ No providers.
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [azuredevops_group.project_collection_admins](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/data-sources/group) | data source |
 
 ## Inputs
 

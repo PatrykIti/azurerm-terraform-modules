@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_eventhub",
+  "title": "Event Hub",
+  "commit_scope": "eventhub",
+  "tag_prefix": "EHv",
+  "description": "Azure Event Hub Terraform module with enterprise-grade features"
+}

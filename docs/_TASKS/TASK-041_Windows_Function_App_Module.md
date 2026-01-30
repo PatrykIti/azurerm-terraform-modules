@@ -5,7 +5,7 @@
 **Category:** New Module / App Service  
 **Estimated Effort:** Large  
 **Dependencies:** TASK-008 (Storage Account), TASK-024 (Application Insights), TASK-027 (User Assigned Identity) - optional for examples  
-**Status:** To Do
+**Status:** Done
 
 ---
 

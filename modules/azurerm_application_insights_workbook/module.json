@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_application_insights_workbook",
+  "title": "Application Insights Workbook",
+  "commit_scope": "application-insights-workbook",
+  "tag_prefix": "AIWBv",
+  "description": "Azure Application Insights Workbook Terraform module"
+}

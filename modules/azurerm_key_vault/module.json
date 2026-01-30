@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_key_vault",
+  "title": "Key Vault",
+  "commit_scope": "key-vault",
+  "tag_prefix": "KVv",
+  "description": "Azure Key Vault Terraform module with full data-plane coverage"
+}

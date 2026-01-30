@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_linux_function_app",
+  "title": "Linux Function App",
+  "commit_scope": "linux-function-app",
+  "tag_prefix": "LFUNCv",
+  "description": "Azure Linux Function App Terraform module with enterprise-grade features"
+}

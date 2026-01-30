@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Small
 **Dependencies:** None
-**Status:** 🟠 **To Do**
+**Status:** 🟢 **Done**
 
 ---
 
@@ -62,9 +62,9 @@ documentation consistency and cleanup of Terraform/test artifacts.
 
 ## Implementation Checklist
 
-- [ ] Remove `modules/azuredevops_artifacts_feed/.terraform/`.
-- [ ] Remove `modules/azuredevops_artifacts_feed/.terraform.lock.hcl`.
-- [ ] Remove `modules/azuredevops_artifacts_feed/tests/test_outputs/*.log`.
-- [ ] Regenerate docs (`./scripts/update-module-docs.sh azuredevops_artifacts_feed`).
-- [ ] Update VERSIONING compatibility matrix to Azure DevOps provider + Terraform min.
-- [ ] Confirm example READMEs match current example `main.tf`.
+- [x] Remove `modules/azuredevops_artifacts_feed/.terraform/`.
+- [x] Remove `modules/azuredevops_artifacts_feed/.terraform.lock.hcl`.
+- [x] Remove `modules/azuredevops_artifacts_feed/tests/test_outputs/*.log`.
+- [x] Regenerate docs (`./scripts/update-module-docs.sh azuredevops_artifacts_feed`).
+- [x] Update VERSIONING compatibility matrix to Azure DevOps provider + Terraform min.
+- [x] Confirm example READMEs match current example `main.tf`.

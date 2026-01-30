@@ -1,0 +1,59 @@
+# Event Hub Namespace Disaster Recovery Example
+
+terraform {
+  required_version = ">= 1.12.2"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "4.57.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+locals {
+  suffix = var.random_suffix == "" ? "" : "-${var.random_suffix}"
+}
+
+resource "azurerm_resource_group" "example" {
+  name     = "${var.resource_group_name}${local.suffix}"
+  location = var.location
+}
+
+module "secondary_namespace" {
+  source = "../../"
+
+  name                = "${var.secondary_namespace_name}${local.suffix}"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+
+  sku = "Standard"
+
+  tags = {
+    Environment = "Development"
+    Example     = "DisasterRecovery-Secondary"
+  }
+}
+
+module "primary_namespace" {
+  source = "../../"
+
+  name                = "${var.primary_namespace_name}${local.suffix}"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+
+  sku = "Standard"
+
+  disaster_recovery_config = {
+    name                 = "ehns-dr-config${local.suffix}"
+    partner_namespace_id = module.secondary_namespace.id
+  }
+
+  tags = {
+    Environment = "Development"
+    Example     = "DisasterRecovery-Primary"
+  }
+}

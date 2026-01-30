@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_private_endpoint",
+  "title": "Private Endpoint",
+  "commit_scope": "private-endpoint",
+  "tag_prefix": "PEv",
+  "description": "Azure Private Endpoint Terraform module"
+}

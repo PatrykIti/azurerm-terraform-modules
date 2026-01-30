@@ -5,7 +5,7 @@
 **Category:** New Module / Security (RBAC)  
 **Estimated Effort:** Medium  
 **Dependencies:** -  
-**Status:** To Do
+**Status:** Done
 
 ---
 

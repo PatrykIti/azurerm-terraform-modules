@@ -1,0 +1,110 @@
+# Test configuration for CI/CD integration
+
+test_suites:
+  - name: "Basic Tests"
+    tests:
+      - TestBasicKeyVault
+    parallel: true
+    timeout: 15m
+
+  - name: "Complete Feature Tests"
+    tests:
+      - TestCompleteKeyVault
+      - TestSecureKeyVault
+      - TestNetworkKeyVault
+    parallel: true
+    timeout: 30m
+
+  - name: "Validation Tests"
+    tests:
+      - TestKeyVaultValidationRules
+    parallel: true
+    timeout: 10m
+
+  - name: "Integration Tests"
+    tests:
+      - TestKeyVaultCompleteIntegration
+      - TestKeyVaultLifecycle
+    parallel: false
+    timeout: 45m
+
+  - name: "Performance Tests"
+    tests:
+      - BenchmarkKeyVaultCreation
+    parallel: false
+    timeout: 60m
+    benchmark: true
+
+# Test environment requirements
+environment:
+  required_vars:
+    - ARM_SUBSCRIPTION_ID
+    - ARM_TENANT_ID
+    - ARM_CLIENT_ID
+    - ARM_CLIENT_SECRET
+
+  azure_regions:
+    - northeurope
+    - westeurope
+
+  resource_limits:
+    max_concurrent_resources: 10
+    max_resource_groups: 5
+
+# Code coverage settings
+coverage:
+  enabled: true
+  threshold: 80
+  exclude_patterns:
+    - "test_helpers.go"
+    - "*_test.go"
+
+# Test report settings
+reporting:
+  format: junit
+  output_dir: test_outputs/
+  include_logs: true
+  include_metrics: true
+
+# Retry configuration
+retry:
+  max_attempts: 3
+  backoff_seconds: 30
+  retryable_errors:
+    - "ResourceGroupNotFound"
+    - "ResourceNotFound"
+    - "AlreadyExists"
+    - "timeout"
+    - "TooManyRequests"
+    - "ServiceUnavailable"
+    - "InternalServerError"
+
+# Test stages for CI/CD pipelines
+stages:
+  - name: "validation"
+    description: "Validate code and configurations"
+    steps:
+      - "fmt-check"
+      - "lint"
+      - "validate-fixtures"
+      - "security"
+
+  - name: "unit"
+    description: "Run unit and validation tests"
+    test_suites:
+      - "Basic Tests"
+      - "Validation Tests"
+    fail_fast: true
+
+  - name: "integration"
+    description: "Run integration tests"
+    test_suites:
+      - "Complete Feature Tests"
+      - "Integration Tests"
+    fail_fast: false
+
+  - name: "performance"
+    description: "Run performance benchmarks"
+    test_suites:
+      - "Performance Tests"
+    fail_fast: false

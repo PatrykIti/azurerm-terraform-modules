@@ -1,0 +1,156 @@
+# Validation tests for Bastion Host module
+
+mock_provider "azurerm" {
+  mock_resource "azurerm_bastion_host" {
+    defaults = {
+      id                  = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/bastionHosts/bastionunit"
+      name                = "bastionunit"
+      location            = "northeurope"
+      resource_group_name = "test-rg"
+      sku                 = "Basic"
+      dns_name            = "bastionunit.eastus.bastion.azure.com"
+    }
+  }
+
+  mock_resource "azurerm_monitor_diagnostic_setting" {}
+
+  mock_data "azurerm_monitor_diagnostic_categories" {
+    defaults = {
+      log_category_types = ["BastionAuditLogs"]
+      metrics            = ["AllMetrics"]
+    }
+  }
+}
+
+variables {
+  name                = "bastionunit"
+  resource_group_name = "test-rg"
+  location            = "northeurope"
+
+  ip_configuration = [
+    {
+      name                 = "ipconfig"
+      subnet_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/AzureBastionSubnet"
+      public_ip_address_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/publicIPAddresses/pip"
+    }
+  ]
+}
+
+run "invalid_sku" {
+  command = plan
+
+  variables {
+    sku = "Gold"
+  }
+
+  expect_failures = [
+    var.sku
+  ]
+}
+
+run "too_many_ip_configurations" {
+  command = plan
+
+  variables {
+    ip_configuration = [
+      {
+        name                 = "ipconfig-1"
+        subnet_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/AzureBastionSubnet"
+        public_ip_address_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/publicIPAddresses/pip1"
+      },
+      {
+        name                 = "ipconfig-2"
+        subnet_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/AzureBastionSubnet"
+        public_ip_address_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/publicIPAddresses/pip2"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.ip_configuration
+  ]
+}
+
+run "invalid_bastion_subnet_name" {
+  command = plan
+
+  variables {
+    ip_configuration = [
+      {
+        name                 = "ipconfig"
+        subnet_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/vnet/subnets/NotBastionSubnet"
+        public_ip_address_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/publicIPAddresses/pip"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.ip_configuration
+  ]
+}
+
+run "standard_feature_requires_standard_sku" {
+  command = plan
+
+  variables {
+    sku               = "Basic"
+    file_copy_enabled = true
+  }
+
+  expect_failures = [
+    azurerm_bastion_host.bastion_host
+  ]
+}
+
+run "session_recording_requires_premium" {
+  command = plan
+
+  variables {
+    sku                       = "Standard"
+    session_recording_enabled = true
+  }
+
+  expect_failures = [
+    azurerm_bastion_host.bastion_host
+  ]
+}
+
+run "developer_requires_virtual_network_id" {
+  command = plan
+
+  variables {
+    sku                = "Developer"
+    ip_configuration   = []
+    virtual_network_id = null
+  }
+
+  expect_failures = [
+    azurerm_bastion_host.bastion_host
+  ]
+}
+
+run "developer_disallows_ip_configuration" {
+  command = plan
+
+  variables {
+    sku                = "Developer"
+    virtual_network_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/vnet"
+  }
+
+  expect_failures = [
+    azurerm_bastion_host.bastion_host
+  ]
+}
+
+run "scale_units_requires_standard_or_premium" {
+  command = plan
+
+  variables {
+    sku         = "Basic"
+    scale_units = 5
+  }
+
+  expect_failures = [
+    azurerm_bastion_host.bastion_host
+  ]
+}

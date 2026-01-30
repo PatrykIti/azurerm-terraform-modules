@@ -1,0 +1,24 @@
+output "windows_virtual_machine_id" {
+  description = "The ID of the Windows VM"
+  value       = module.windows_virtual_machine.id
+}
+
+output "windows_virtual_machine_name" {
+  description = "The name of the Windows VM"
+  value       = module.windows_virtual_machine.name
+}
+
+output "resource_group_name" {
+  description = "Resource group name"
+  value       = azurerm_resource_group.example.name
+}
+
+output "extensions" {
+  description = "VM extensions"
+  value       = module.windows_virtual_machine.extensions
+}
+
+output "diagnostic_settings_skipped" {
+  description = "Skipped diagnostic settings entries"
+  value       = module.windows_virtual_machine.diagnostic_settings_skipped
+}

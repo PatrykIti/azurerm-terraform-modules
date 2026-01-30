@@ -5,7 +5,7 @@
 **Category:** New Module / Compute  
 **Estimated Effort:** Large  
 **Dependencies:** -  
-**Status:** Planned
+**Status:** Done
 
 ---
 

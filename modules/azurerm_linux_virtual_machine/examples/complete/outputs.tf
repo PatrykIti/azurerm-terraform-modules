@@ -1,0 +1,29 @@
+output "linux_virtual_machine_id" {
+  description = "The ID of the Linux VM"
+  value       = module.linux_virtual_machine.id
+}
+
+output "linux_virtual_machine_name" {
+  description = "The name of the Linux VM"
+  value       = module.linux_virtual_machine.name
+}
+
+output "resource_group_name" {
+  description = "Resource group name"
+  value       = azurerm_resource_group.example.name
+}
+
+output "extensions" {
+  description = "VM extensions created by the module"
+  value       = module.linux_virtual_machine.extensions
+}
+
+output "identity" {
+  description = "Managed identity details"
+  value       = module.linux_virtual_machine.identity
+}
+
+output "diagnostic_settings_skipped" {
+  description = "Diagnostic settings skipped entries"
+  value       = module.linux_virtual_machine.diagnostic_settings_skipped
+}

@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_windows_function_app",
+  "title": "Windows Function App",
+  "commit_scope": "windows-function-app",
+  "tag_prefix": "WFUNCv",
+  "description": "Azure Windows Function App Terraform module with enterprise-grade features"
+}

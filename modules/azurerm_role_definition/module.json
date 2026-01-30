@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_role_definition",
+  "title": "Role Definition",
+  "commit_scope": "role-definition",
+  "tag_prefix": "RDv",
+  "description": "Manages Azure RBAC role definitions"
+}
