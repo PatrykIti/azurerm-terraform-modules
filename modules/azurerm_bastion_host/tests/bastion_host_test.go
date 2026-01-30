@@ -17,7 +17,7 @@ import (
 func TestBasicBastionHost(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -45,7 +45,7 @@ func TestBasicBastionHost(t *testing.T) {
 func TestCompleteBastionHost(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -71,7 +71,7 @@ func TestCompleteBastionHost(t *testing.T) {
 func TestSecureBastionHost(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -92,7 +92,7 @@ func TestSecureBastionHost(t *testing.T) {
 func TestBastionHostIPConnect(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/ip-connect")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/ip-connect")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -113,7 +113,7 @@ func TestBastionHostIPConnect(t *testing.T) {
 func TestBastionHostTunneling(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/tunneling")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/tunneling")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -134,7 +134,7 @@ func TestBastionHostTunneling(t *testing.T) {
 func TestBastionHostShareableLink(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/shareable-link")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/shareable-link")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -155,7 +155,7 @@ func TestBastionHostShareableLink(t *testing.T) {
 func TestBastionHostFileCopy(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/file-copy")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/file-copy")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -176,7 +176,7 @@ func TestBastionHostFileCopy(t *testing.T) {
 func TestBastionHostDiagnosticSettings(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/diagnostic-settings")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/diagnostic-settings")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -214,7 +214,7 @@ func TestBastionHostValidationRules(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", fmt.Sprintf("fixtures/%s", tc.fixtureFile))
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", fmt.Sprintf("tests/fixtures/%s", tc.fixtureFile))
 			terraformOptions := &terraform.Options{
 				TerraformDir: testFolder,
 				NoColor:      true,
@@ -235,7 +235,7 @@ func BenchmarkBastionHostCreation(b *testing.B) {
 		b.Skip("Skipping benchmark in short mode")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(b, testFolder)
 
 	defer terraform.Destroy(b, terraformOptions)

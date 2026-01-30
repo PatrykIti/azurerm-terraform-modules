@@ -33,6 +33,7 @@ variables {
   name                = "bastionunit"
   resource_group_name = "test-rg"
   location            = "northeurope"
+  sku                 = "Standard"
 
   ip_configuration = [
     {
