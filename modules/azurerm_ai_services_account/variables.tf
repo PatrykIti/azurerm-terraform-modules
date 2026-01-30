@@ -113,6 +113,13 @@ variable "network_acls" {
     condition     = var.network_acls == null || alltrue([for ip in coalesce(var.network_acls.ip_rules, []) : ip != ""])
     error_message = "network_acls.ip_rules must not contain empty strings."
   }
+
+  validation {
+    condition = var.network_acls == null || (
+      var.custom_subdomain_name != null && var.custom_subdomain_name != ""
+    )
+    error_message = "custom_subdomain_name is required when network_acls is specified."
+  }
 }
 
 # Identity + encryption
@@ -156,6 +163,16 @@ variable "customer_managed_key" {
       (var.customer_managed_key.managed_hsm_key_id != null ? 1 : 0)
     ) == 1
     error_message = "customer_managed_key requires exactly one of key_vault_key_id or managed_hsm_key_id."
+  }
+
+  validation {
+    condition = var.customer_managed_key == null || (
+      var.identity != null &&
+      strcontains(lower(var.identity.type), "userassigned") &&
+      var.identity.identity_ids != null &&
+      length(var.identity.identity_ids) > 0
+    )
+    error_message = "customer_managed_key requires a user-assigned identity with identity_ids."
   }
 }
 

@@ -31,7 +31,7 @@ variables {
 }
 
 run "outputs_plan" {
-  command = plan
+  command = apply
 
   assert {
     condition     = output.id != ""

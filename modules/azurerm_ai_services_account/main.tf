@@ -1,10 +1,3 @@
-locals {
-  identity_is_user_assigned = var.identity != null && strcontains(lower(var.identity.type), "userassigned")
-  identity_ids_present      = var.identity != null && var.identity.identity_ids != null && length(var.identity.identity_ids) > 0
-  cmk_enabled               = var.customer_managed_key != null
-  network_acls_enabled      = var.network_acls != null
-}
-
 resource "azurerm_ai_services" "ai_services_account" {
   name                = var.name
   resource_group_name = var.resource_group_name
@@ -70,16 +63,4 @@ resource "azurerm_ai_services" "ai_services_account" {
   }
 
   tags = var.tags
-
-  lifecycle {
-    precondition {
-      condition     = !local.network_acls_enabled || (var.custom_subdomain_name != null && var.custom_subdomain_name != "")
-      error_message = "custom_subdomain_name is required when network_acls is specified."
-    }
-
-    precondition {
-      condition     = !local.cmk_enabled || (var.identity != null && local.identity_is_user_assigned && local.identity_ids_present)
-      error_message = "customer_managed_key requires a user-assigned identity with identity_ids."
-    }
-  }
 }
