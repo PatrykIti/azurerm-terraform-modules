@@ -8,6 +8,25 @@ locals {
   diagnostic_log_groups        = try(data.azurerm_monitor_diagnostic_categories.cognitive_account[0].log_category_groups, [])
   diagnostic_metric_categories = try(data.azurerm_monitor_diagnostic_categories.cognitive_account[0].metrics, [])
 
+  diagnostic_settings_create = {
+    for ds in var.diagnostic_settings : ds.name => ds
+    if (
+      (
+        ds.log_categories != null ||
+        ds.metric_categories != null ||
+        ds.log_category_groups != null
+      )
+      ? (
+        length(ds.log_categories == null ? [] : ds.log_categories) +
+        length(ds.metric_categories == null ? [] : ds.metric_categories) +
+        length(ds.log_category_groups == null ? [] : ds.log_category_groups)
+      ) > 0
+      : (
+        ds.areas == null || length(ds.areas) > 0
+      )
+    )
+  }
+
   diagnostic_settings_expanded = [
     for ds in var.diagnostic_settings : merge(ds, {
       areas = ds.areas == null ? ["all"] : [for area in ds.areas : lower(area)]
@@ -29,14 +48,10 @@ locals {
     })
   ]
 
-  diagnostic_settings_effective = [
-    for ds in local.diagnostic_settings_resolved : ds
-    if(
-      (ds.log_categories != null && length(ds.log_categories) > 0) ||
-      (ds.metric_categories != null && length(ds.metric_categories) > 0) ||
-      (ds.log_category_groups != null && length(ds.log_category_groups) > 0)
-    )
-  ]
+  monitoring_for_each = {
+    for ds in local.diagnostic_settings_resolved : ds.name => ds
+    if contains(keys(local.diagnostic_settings_create), ds.name)
+  }
 
   diagnostic_settings_skipped = [
     for ds in local.diagnostic_settings_resolved : {
@@ -55,9 +70,7 @@ locals {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
-  for_each = {
-    for ds in local.diagnostic_settings_effective : ds.name => ds
-  }
+  for_each = local.monitoring_for_each
 
   name               = each.value.name
   target_resource_id = azurerm_cognitive_account.cognitive_account.id

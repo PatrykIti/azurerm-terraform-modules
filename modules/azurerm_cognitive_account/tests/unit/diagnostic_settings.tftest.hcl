@@ -27,7 +27,7 @@ variables {
 }
 
 run "diagnostic_settings_valid" {
-  command = plan
+  command = apply
 
   variables {
     diagnostic_settings = [
@@ -46,7 +46,7 @@ run "diagnostic_settings_valid" {
 }
 
 run "diagnostic_settings_skips_empty" {
-  command = plan
+  command = apply
 
   variables {
     diagnostic_settings = [
