@@ -3,7 +3,7 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 15 tasks
+- **To Do:** 31 tasks
 - **In Progress:** 0
 - **Done:** 47 tasks
 
@@ -15,10 +15,24 @@ Task board for module work. Update statuses in markdown files.
 |----|-------|----------|--------|-------|
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
 | [TASK-014](./TASK-014_Virtual_Network_Module_Alignment.md) | **Virtual Network module alignment (docs + examples + tests)** | High | Medium | `modules/azurerm_virtual_network/` |
+| [TASK-026](./TASK-026_Private_Endpoint_Module.md) | **Private Endpoint module** | High | Large | `modules/azurerm_private_endpoint/` |
+| [TASK-027](./TASK-027_User_Assigned_Identity_Module.md) | **User Assigned Identity module** | Medium | Medium | `modules/azurerm_user_assigned_identity/` |
+| [TASK-028](./TASK-028_Role_Assignment_Module.md) | **Role Assignment module (RBAC) + zaleznosci** | High | Medium | `modules/azurerm_role_assignment/`, `modules/azurerm_role_definition/` |
+| [TASK-029](./TASK-029_Key_Vault_Module.md) | **Key Vault module (full feature scope)** | High | Large | `modules/azurerm_key_vault/` |
+| [TASK-030](./TASK-030_Private_DNS_Zone_Modules.md) | **Private DNS Zone + VNet Link modules** | High | Medium | `modules/azurerm_private_dns_zone/`, `modules/azurerm_private_dns_zone_virtual_network_link/` |
+| [TASK-031](./TASK-031_Azure_Workbook_Module.md) | **Azure Workbook module (azurerm_application_insights_workbook)** | High | Medium | `modules/azurerm_application_insights_workbook/` |
+| [TASK-032](./TASK-032_Container_Registry_Module.md) | **Azure Container Registry module (full feature scope)** | High | Large | `modules/azurerm_container_registry/` |
+| [TASK-033](./TASK-033_Redis_Cache_Module.md) | **Azure Redis Cache module (full feature scope)** | High | Large | `modules/azurerm_redis_cache/` |
+| [TASK-034](./TASK-034_Azure_Bastion_Host_Module.md) | **Azure Bastion Host module (full feature scope)** | High | Medium | `modules/azurerm_bastion_host/` |
+| [TASK-035](./TASK-035_Cognitive_Account_Module.md) | **Azure Cognitive Account module (OpenAI/Language/Speech)** | High | Large | `modules/azurerm_cognitive_account/` |
+| [TASK-036](./TASK-036_Linux_Function_App_Module.md) | **Azure Linux Function App module (full feature scope)** | High | Large | `modules/azurerm_linux_function_app/` |
+| [TASK-037](./TASK-037_Event_Hubs_Modules.md) | **Azure Event Hubs modules (Namespace + Event Hub)** | High | Large | `modules/azurerm_eventhub_namespace/`, `modules/azurerm_eventhub/` |
+| [TASK-038](./TASK-038_Azure_Linux_Virtual_Machine_Module.md) | **Azure Linux Virtual Machine module (full feature scope)** | High | Large | `modules/azurerm_linux_virtual_machine/` |
+| [TASK-039](./TASK-039_Azure_Windows_Virtual_Machine_Module.md) | **Azure Windows Virtual Machine module (full feature scope)** | High | Large | `modules/azurerm_windows_virtual_machine/` |
+| [TASK-040](./TASK-040_AI_Services_Account_Module.md) | **Azure AI Services Account module (azurerm_ai_services_account)** | High | Large | `modules/azurerm_ai_services_account/` |
+| [TASK-041](./TASK-041_Windows_Function_App_Module.md) | **Azure Windows Function App module (full feature scope)** | High | Large | `modules/azurerm_windows_function_app/` |
 | [TASK-ADO-017](./TASK-ADO-017_AzureDevOps_Environments_Module_Refactor.md) | **Azure DevOps Environments module refactor** | High | Medium | Re-opened; `modules/azuredevops_environments/` |
 | [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_artifacts_feed/` |
-| [TASK-ADO-032](./TASK-ADO-032_AzureDevOps_Artifacts_Feed_Module_Audit_Fixes.md) | **Azure DevOps Artifacts Feed module audit fixes** | Medium | Small | Docs + artifact cleanup; `modules/azuredevops_artifacts_feed/` |
-| [TASK-ADO-034](./TASK-ADO-034_AzureDevOps_Environments_Module_Compliance_Fixes.md) | **Azure DevOps Environments module compliance fixes** | High | Medium | `modules/azuredevops_environments/` |
 | [TASK-ADO-020](./TASK-ADO-020_AzureDevOps_Extension_Module_Refactor.md) | **Azure DevOps Extension module refactor** | Medium | Small | Re-opened; `modules/azuredevops_extension/` |
 | [TASK-ADO-021](./TASK-ADO-021_AzureDevOps_Pipelines_Module_Refactor.md) | **Azure DevOps Pipelines module refactor** | High | Medium | Re-opened; `modules/azuredevops_pipelines/` |
 | [TASK-ADO-022](./TASK-ADO-022_AzureDevOps_ServiceEndpoint_Module_Refactor.md) | **Azure DevOps Service Endpoint module refactor** | High | Large | Re-opened; `modules/azuredevops_serviceendpoint/` |
@@ -27,6 +41,8 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-025](./TASK-ADO-025_AzureDevOps_Variable_Groups_Module_Refactor.md) | **Azure DevOps Variable Groups module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_variable_groups/` |
 | [TASK-ADO-026](./TASK-ADO-026_AzureDevOps_Work_Items_Module_Refactor.md) | **Azure DevOps Work Items module refactor** | High | Medium | Re-opened; `modules/azuredevops_work_items/` |
 | [TASK-ADO-027](./TASK-ADO-027_AzureDevOps_Team_Module_Refactor.md) | **Azure DevOps Team module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_team/` |
+| [TASK-ADO-032](./TASK-ADO-032_AzureDevOps_Artifacts_Feed_Module_Audit_Fixes.md) | **Azure DevOps Artifacts Feed module audit fixes** | Medium | Small | Docs + artifact cleanup; `modules/azuredevops_artifacts_feed/` |
+| [TASK-ADO-034](./TASK-ADO-034_AzureDevOps_Environments_Module_Compliance_Fixes.md) | **Azure DevOps Environments module compliance fixes** | High | Medium | `modules/azuredevops_environments/` |
 | [TASK-ADO-036](./TASK-ADO-036_AzureDevOps_Service_Principal_Entitlement_Module_Compliance_Alignment.md) | **Azure DevOps Service Principal Entitlement module compliance alignment** | High | Medium | `modules/azuredevops_service_principal_entitlement/` |
 
 ---
