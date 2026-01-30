@@ -98,10 +98,11 @@ resource "azurerm_subnet" "private_endpoints" {
 module "ai_services_account" {
   source = "../../.."
 
-  name                = "aiservices-secure-${var.random_suffix}"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-  sku_name            = "S0"
+  name                  = "aiservices-secure-${var.random_suffix}"
+  resource_group_name   = azurerm_resource_group.example.name
+  location              = azurerm_resource_group.example.location
+  sku_name              = "S0"
+  custom_subdomain_name = "aiservicessecure${var.random_suffix}"
 
   public_network_access        = "Disabled"
   local_authentication_enabled = false

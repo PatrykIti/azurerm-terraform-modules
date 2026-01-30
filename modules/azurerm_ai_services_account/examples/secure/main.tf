@@ -87,10 +87,11 @@ resource "azurerm_subnet" "private_endpoints" {
 module "ai_services_account" {
   source = "../../"
 
-  name                = var.ai_services_account_name
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-  sku_name            = var.sku_name
+  name                  = var.ai_services_account_name
+  resource_group_name   = azurerm_resource_group.example.name
+  location              = azurerm_resource_group.example.location
+  sku_name              = var.sku_name
+  custom_subdomain_name = var.ai_services_account_name
 
   public_network_access        = "Disabled"
   local_authentication_enabled = false
