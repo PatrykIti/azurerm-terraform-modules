@@ -56,8 +56,8 @@ environment:
     - AZURE_CLIENT_SECRET
   
   azure_regions:
-    - northeurope
-    - westeurope
+    - swedencentral
+    - eastus
   
   resource_limits:
     max_concurrent_resources: 10
@@ -124,8 +124,7 @@ stages:
 # Matrix testing configuration
 matrix:
   azure_regions:
-    - northeurope
-    - westeurope
+    - swedencentral
     - eastus
     - westus2
     

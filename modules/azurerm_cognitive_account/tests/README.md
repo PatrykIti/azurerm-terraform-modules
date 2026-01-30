@@ -18,7 +18,7 @@ export ARM_SUBSCRIPTION_ID="your-subscription-id"
 export ARM_TENANT_ID="your-tenant-id"
 export ARM_CLIENT_ID="your-client-id"
 export ARM_CLIENT_SECRET="your-client-secret"
-export ARM_LOCATION="West Europe"  # Optional, defaults to West Europe
+export ARM_LOCATION="swedencentral"  # Optional, defaults to swedencentral (OpenAI supported region)
 ```
 
 ## Running Tests

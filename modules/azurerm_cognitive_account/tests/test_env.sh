@@ -13,6 +13,6 @@ export ARM_TENANT_ID="${AZURE_TENANT_ID}"
 
 # Additional settings
 export ARM_SKIP_PROVIDER_REGISTRATION=true
-export AZURE_LOCATION="northeurope"
+export AZURE_LOCATION="swedencentral"
 
 echo "Azure credentials set for testing"

@@ -294,12 +294,19 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	timestamp := time.Now().UnixNano() % 1000 // Last 3 digits for more variation
 	baseID := strings.ToLower(random.UniqueId())
 	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
+	location := os.Getenv("ARM_LOCATION")
+	if location == "" {
+		location = os.Getenv("AZURE_LOCATION")
+	}
+	if location == "" {
+		location = "swedencentral"
+	}
 
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
 			"random_suffix": uniqueID,
-			"location":      "northeurope",
+			"location":      location,
 		},
 		NoColor: true,
 		// Retry configuration

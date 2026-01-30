@@ -41,7 +41,10 @@ func GetTestConfig(t *testing.T) *TestConfig {
 
 	location := os.Getenv("ARM_LOCATION")
 	if location == "" {
-		location = "West Europe"
+		location = os.Getenv("AZURE_LOCATION")
+	}
+	if location == "" {
+		location = "swedencentral"
 	}
 
 	uniqueID := strings.ToLower(random.UniqueId())
