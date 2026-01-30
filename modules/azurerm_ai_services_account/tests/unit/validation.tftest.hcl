@@ -62,7 +62,7 @@ run "network_acls_requires_custom_subdomain" {
   }
 
   expect_failures = [
-    azurerm_ai_services.ai_services_account
+    var.network_acls
   ]
 }
 
@@ -76,7 +76,7 @@ run "cmk_requires_user_assigned_identity" {
   }
 
   expect_failures = [
-    azurerm_ai_services.ai_services_account
+    var.customer_managed_key
   ]
 }
 
