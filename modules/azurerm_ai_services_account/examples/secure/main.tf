@@ -33,7 +33,7 @@ resource "azurerm_key_vault_access_policy" "current" {
   object_id    = data.azurerm_client_config.current.object_id
 
   key_permissions = [
-    "Create", "Get", "Delete", "Purge", "Recover", "Update", "List"
+    "Create", "Delete", "Get", "GetRotationPolicy", "List", "Purge", "Recover", "Update"
   ]
 }
 
@@ -43,7 +43,7 @@ resource "azurerm_key_vault_access_policy" "ai" {
   object_id    = azurerm_user_assigned_identity.ai.principal_id
 
   key_permissions = [
-    "Get", "UnwrapKey", "WrapKey"
+    "Get", "GetRotationPolicy", "UnwrapKey", "WrapKey"
   ]
 }
 
