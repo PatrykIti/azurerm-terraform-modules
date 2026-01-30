@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Monitor Data Collection Rule](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=DCRv*&label=Monitor%20Data%20Collection%20Rule&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCRv1.0.0)
 [![Monitor Data Collection Endpoint](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=DCEv*&label=Monitor%20Data%20Collection%20Endpoint&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCEv1.0.0)
 [![Log Analytics Workspace](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=LAWv*&label=Log%20Analytics%20Workspace&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LAWv1.0.0)
 [![Application Insights](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=APPINSv*&label=Application%20Insights&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.0.0)
@@ -103,7 +104,7 @@ module "storage_account" {
 | [Application Insights](./modules/azurerm_application_insights/) | ✅ Completed | [APPINSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.0.0) | Azure Application Insights module with diagnostics, web tests, workbooks, and smart detection rules |
 | [Log Analytics Workspace](./modules/azurerm_log_analytics_workspace/) | ✅ Completed | [LAWv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LAWv1.0.0) | Azure Log Analytics Workspace module with workspace-linked sub-resources and diagnostics |
 | [Monitor Data Collection Endpoint](./modules/azurerm_monitor_data_collection_endpoint/) | ✅ Completed | [DCEv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCEv1.0.0) | Azure Monitor Data Collection Endpoint module for configuring ingestion endpoints |
-| [Monitor Data Collection Rule](./modules/azurerm_monitor_data_collection_rule/) | 🧪 In Development | Unreleased | Azure Monitor Data Collection Rule module for defining data sources and flows |
+| [Monitor Data Collection Rule](./modules/azurerm_monitor_data_collection_rule/) | ✅ Completed | [DCRv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCRv1.0.0) | Azure Monitor Data Collection Rule module for defining data sources and flows |
 | [Monitor Private Link Scope](./modules/azurerm_monitor_private_link_scope/) | 🧪 In Development | Unreleased | Azure Monitor Private Link Scope module with scoped services and diagnostic settings |
 | [PostgreSQL Flexible Server](./modules/azurerm_postgresql_flexible_server/) | ✅ Completed | [PGFSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSv1.0.0) | Azure PostgreSQL Flexible Server Terraform module with enterprise-grade features |
 | [PostgreSQL Flexible Server Database](./modules/azurerm_postgresql_flexible_server_database/) | ✅ Completed | [PGFSDBv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSDBv1.0.0) | PostgreSQL Flexible Server Database module for managing databases on an existing server |
