@@ -135,7 +135,7 @@ variable "capture_description" {
   validation {
     condition = var.capture_description == null || alltrue([
       for token in ["{Namespace}", "{EventHub}", "{PartitionId}", "{Year}", "{Month}", "{Day}", "{Hour}", "{Minute}", "{Second}"] :
-      contains(var.capture_description.destination.archive_name_format, token)
+      strcontains(var.capture_description.destination.archive_name_format, token)
     ])
     error_message = "capture_description.destination.archive_name_format must include all required tokens: {Namespace},{EventHub},{PartitionId},{Year},{Month},{Day},{Hour},{Minute},{Second}."
   }

@@ -190,6 +190,36 @@ variable "namespace_authorization_rules" {
   }
 }
 
+variable "schema_groups" {
+  description = "Schema registry groups for the Event Hub Namespace."
+  type = list(object({
+    name                 = string
+    schema_type          = string
+    schema_compatibility = string
+    timeouts = optional(object({
+      create = optional(string)
+      read   = optional(string)
+      update = optional(string)
+      delete = optional(string)
+    }))
+  }))
+  default  = []
+  nullable = false
+
+  validation {
+    condition     = length(distinct([for group in var.schema_groups : group.name])) == length(var.schema_groups)
+    error_message = "Each schema_groups entry must have a unique name."
+  }
+
+  validation {
+    condition = alltrue([
+      for group in var.schema_groups :
+      group.name != "" && group.schema_type != "" && group.schema_compatibility != ""
+    ])
+    error_message = "schema_groups entries must have non-empty name, schema_type, and schema_compatibility."
+  }
+}
+
 variable "disaster_recovery_config" {
   description = "Optional disaster recovery configuration for the Event Hub Namespace."
   type = object({

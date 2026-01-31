@@ -39,7 +39,7 @@ resource "azurerm_subnet" "eventhub" {
 }
 
 module "eventhub_namespace" {
-  source = "../../"
+  source = "../../../"
 
   name                = "${var.namespace_name}${local.suffix}"
   resource_group_name = azurerm_resource_group.example.name

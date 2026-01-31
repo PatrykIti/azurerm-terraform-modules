@@ -24,7 +24,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "secondary_namespace" {
-  source = "../../"
+  source = "../../../"
 
   name                = "${var.secondary_namespace_name}${local.suffix}"
   resource_group_name = azurerm_resource_group.example.name
@@ -39,7 +39,7 @@ module "secondary_namespace" {
 }
 
 module "primary_namespace" {
-  source = "../../"
+  source = "../../../"
 
   name                = "${var.primary_namespace_name}${local.suffix}"
   resource_group_name = azurerm_resource_group.example.name

@@ -77,6 +77,11 @@ output "authorization_rules" {
   sensitive = true
 }
 
+output "schema_group_ids" {
+  description = "Map of schema group IDs keyed by schema group name."
+  value       = { for name, group in azurerm_eventhub_namespace_schema_group.schema_group : name => group.id }
+}
+
 output "default_primary_connection_string" {
   description = "The primary connection string for RootManageSharedAccessKey, if present."
   value       = azurerm_eventhub_namespace.namespace.default_primary_connection_string

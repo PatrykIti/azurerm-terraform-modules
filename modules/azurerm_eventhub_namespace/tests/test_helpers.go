@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -11,18 +12,20 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/gruntwork-io/terratest/modules/random"
+	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/require"
 )
 
 // TestConfig holds common test configuration
+// NOTE: Keep in sync with test_env.sh and CI secrets.
 type TestConfig struct {
-	SubscriptionID    string
-	TenantID         string
-	ClientID         string
-	ClientSecret     string
-	Location         string
-	ResourceGroup    string
-	UniqueID         string
+	SubscriptionID string
+	TenantID       string
+	ClientID       string
+	ClientSecret   string
+	Location       string
+	ResourceGroup  string
+	UniqueID       string
 }
 
 // GetTestConfig returns a test configuration with required Azure credentials
@@ -41,26 +44,36 @@ func GetTestConfig(t *testing.T) *TestConfig {
 
 	location := os.Getenv("ARM_LOCATION")
 	if location == "" {
-		location = "West Europe"
+		location = "westeurope"
 	}
 
 	uniqueID := strings.ToLower(random.UniqueId())
 
 	return &TestConfig{
 		SubscriptionID: subscriptionID,
-		TenantID:      tenantID,
-		ClientID:      clientID,
-		ClientSecret:  clientSecret,
-		Location:      location,
-		ResourceGroup: fmt.Sprintf("rg-test-eventhub_namespace-%s", uniqueID),
-		UniqueID:      uniqueID,
+		TenantID:       tenantID,
+		ClientID:       clientID,
+		ClientSecret:   clientSecret,
+		Location:       location,
+		ResourceGroup:  fmt.Sprintf("rg-test-eventhub-namespace-%s", uniqueID),
+		UniqueID:       uniqueID,
 	}
 }
 
 // GetAzureCredential returns Azure credentials for SDK calls
 func GetAzureCredential(t *testing.T) azcore.TokenCredential {
+	tenantID := os.Getenv("ARM_TENANT_ID")
+	clientID := os.Getenv("ARM_CLIENT_ID")
+	clientSecret := os.Getenv("ARM_CLIENT_SECRET")
+
+	if tenantID != "" && clientID != "" && clientSecret != "" {
+		cred, err := azidentity.NewClientSecretCredential(tenantID, clientID, clientSecret, nil)
+		require.NoError(t, err, "Failed to create service principal credential")
+		return cred
+	}
+
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
-	require.NoError(t, err, "Failed to create Azure credential")
+	require.NoError(t, err, "Failed to create default Azure credential")
 	return cred
 }
 
@@ -89,12 +102,18 @@ func WaitForResourceDeletion(ctx context.Context, checkFunc func() (bool, error)
 
 // GenerateResourceName generates a unique resource name for testing
 func GenerateResourceName(prefix string, uniqueID string) string {
-	// Ensure the name meets Azure naming requirements
 	name := fmt.Sprintf("%s%s", prefix, uniqueID)
-	// Remove any invalid characters and ensure length limits
 	name = strings.ReplaceAll(name, "-", "")
-	if len(name) > 24 {
-		name = name[:24]
+	if len(name) > 50 {
+		name = name[:50]
 	}
 	return strings.ToLower(name)
+}
+
+// OutputBool reads a Terraform output and parses it as a boolean.
+func OutputBool(t testing.TB, terraformOptions *terraform.Options, name string) bool {
+	value := terraform.Output(t, terraformOptions, name)
+	parsed, err := strconv.ParseBool(strings.TrimSpace(value))
+	require.NoError(t, err, "Failed to parse output %q as bool", name)
+	return parsed
 }

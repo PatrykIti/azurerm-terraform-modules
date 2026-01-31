@@ -108,7 +108,7 @@ resource "azurerm_key_vault_key" "example" {
 }
 
 module "eventhub_namespace" {
-  source = "../../"
+  source = "../../../"
 
   name                = "${var.namespace_name}${local.suffix}"
   resource_group_name = azurerm_resource_group.example.name

@@ -3,6 +3,10 @@ locals {
     for rule in var.namespace_authorization_rules : rule.name => rule
   }
 
+  schema_groups = {
+    for group in var.schema_groups : group.name => group
+  }
+
   network_rulesets = var.network_rule_set == null ? null : [
     {
       default_action                 = var.network_rule_set.default_action
@@ -95,6 +99,25 @@ resource "azurerm_eventhub_namespace_authorization_rule" "authorization_rules" {
   listen = try(each.value.listen, false)
   send   = try(each.value.send, false)
   manage = try(each.value.manage, false)
+}
+
+resource "azurerm_eventhub_namespace_schema_group" "schema_group" {
+  for_each = local.schema_groups
+
+  name                 = each.value.name
+  namespace_id         = azurerm_eventhub_namespace.namespace.id
+  schema_compatibility = each.value.schema_compatibility
+  schema_type          = each.value.schema_type
+
+  dynamic "timeouts" {
+    for_each = try(each.value.timeouts, null) == null ? [] : [each.value.timeouts]
+    content {
+      create = try(timeouts.value.create, null)
+      read   = try(timeouts.value.read, null)
+      update = try(timeouts.value.update, null)
+      delete = try(timeouts.value.delete, null)
+    }
+  }
 }
 
 resource "azurerm_eventhub_namespace_disaster_recovery_config" "disaster_recovery" {

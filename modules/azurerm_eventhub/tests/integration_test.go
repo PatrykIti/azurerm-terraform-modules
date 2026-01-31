@@ -1,10 +1,8 @@
 package test
 
 import (
-	"context"
 	"os"
 	"testing"
-	"time"
 
 	// Azure SDK imports - add specific ones for your resource type
 	// Example: "github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
@@ -21,7 +19,7 @@ func TestEventhubFullIntegration(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -57,7 +55,6 @@ func TestEventhubFullIntegration(t *testing.T) {
 // validateCoreFeatures validates basic eventhub features using SDK
 func validateCoreFeatures(t *testing.T, testFolder string) {
 	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-	helper := NeweventhubHelper(t)
 
 	// Get outputs
 	resourceName := terraform.Output(t, terraformOptions, "eventhub_name")
@@ -86,12 +83,12 @@ func validateCoreFeatures(t *testing.T, testFolder string) {
 	}
 	// TODO: Validate tags using helper function
 	// ValidateeventhubTags(t, resource, expectedTags)
+	_ = expectedTags
 }
 
 // validateSecurityFeatures validates security configurations using SDK
 func validateSecurityFeatures(t *testing.T, testFolder string) {
 	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-	helper := NeweventhubHelper(t)
 
 	resourceName := terraform.Output(t, terraformOptions, "eventhub_name")
 	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
@@ -109,12 +106,13 @@ func validateSecurityFeatures(t *testing.T, testFolder string) {
 	
 	// Validate encryption if applicable
 	// helper.ValidateeventhubEncryption(t, resource)
+	_ = resourceName
+	_ = resourceGroupName
 }
 
 // validateNetworkFeatures validates network configurations using SDK
 func validateNetworkFeatures(t *testing.T, testFolder string) {
 	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-	helper := NeweventhubHelper(t)
 
 	resourceName := terraform.Output(t, terraformOptions, "eventhub_name")
 	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
@@ -132,6 +130,8 @@ func validateNetworkFeatures(t *testing.T, testFolder string) {
 	// Validate IP rules and subnet rules if applicable
 	// expectedIPRules := []string{"203.0.113.0/24"}
 	// helper.ValidateNetworkRules(t, resource, expectedIPRules, nil)
+	_ = resourceName
+	_ = resourceGroupName
 }
 
 // validateOperationalFeatures validates operational features like monitoring
@@ -165,7 +165,7 @@ func TestEventhubWithNetworkRules(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/network")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/network")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -183,8 +183,7 @@ func TestEventhubWithNetworkRules(t *testing.T) {
 	// Validate network configuration
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		helper := NeweventhubHelper(t)
-		
+
 		resourceName := terraform.Output(t, terraformOptions, "eventhub_name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 		
@@ -194,7 +193,6 @@ func TestEventhubWithNetworkRules(t *testing.T) {
 		
 		// Validate network rules
 		// TODO: Add network rule validations
-		_ = helper // Remove when helper is used
 		_ = resourceName
 		_ = resourceGroupName
 	})
@@ -207,11 +205,11 @@ func TestEventhubPrivateEndpointIntegration(t *testing.T) {
 	}
 	t.Parallel()
 
-	if _, err := os.Stat("fixtures/private_endpoint"); os.IsNotExist(err) {
+	if _, err := os.Stat("tests/fixtures/private_endpoint"); os.IsNotExist(err) {
 		t.Skip("Private endpoint fixture not found; skipping test")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/private_endpoint")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/private_endpoint")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -252,7 +250,7 @@ func TestEventhubSecurityConfiguration(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {
@@ -270,8 +268,7 @@ func TestEventhubSecurityConfiguration(t *testing.T) {
 	// Validate security settings
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		helper := NeweventhubHelper(t)
-		
+
 		resourceName := terraform.Output(t, terraformOptions, "eventhub_name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 		
@@ -281,7 +278,6 @@ func TestEventhubSecurityConfiguration(t *testing.T) {
 		
 		// Security assertions
 		// TODO: Add security-specific validations
-		_ = helper // Remove when helper is used
 		_ = resourceName
 		_ = resourceGroupName
 	})
@@ -294,7 +290,7 @@ func TestEventhubLifecycle(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
 	defer terraform.Destroy(t, terraformOptions)
@@ -330,7 +326,7 @@ func TestEventhubLifecycle(t *testing.T) {
 func TestEventhubCompliance(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	
 	defer terraform.Destroy(t, terraformOptions)

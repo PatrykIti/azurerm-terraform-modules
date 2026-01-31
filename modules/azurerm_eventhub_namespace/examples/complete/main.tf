@@ -90,6 +90,14 @@ module "eventhub_namespace" {
     }
   ]
 
+  schema_groups = [
+    {
+      name                 = "schemas-default"
+      schema_type          = "Avro"
+      schema_compatibility = "Backward"
+    }
+  ]
+
   diagnostic_settings = [
     {
       name                       = "diag-logs"

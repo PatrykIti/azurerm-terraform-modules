@@ -47,7 +47,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 }
 
 module "eventhub_namespace" {
-  source = "../../"
+  source = "../../../"
 
   name                = "${var.namespace_name}${local.suffix}"
   resource_group_name = azurerm_resource_group.example.name

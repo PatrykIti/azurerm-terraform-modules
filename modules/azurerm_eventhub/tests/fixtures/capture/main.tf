@@ -25,7 +25,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "eventhub_namespace" {
-  source = "../../../azurerm_eventhub_namespace"
+  source = "../../../../azurerm_eventhub_namespace"
 
   name                = "${var.namespace_name}${local.suffix}"
   resource_group_name = azurerm_resource_group.example.name
@@ -54,7 +54,7 @@ resource "azurerm_storage_container" "capture" {
 }
 
 module "eventhub" {
-  source = "../../"
+  source = "../../../"
 
   name            = "${var.eventhub_name}${local.suffix}"
   namespace_id    = module.eventhub_namespace.id
