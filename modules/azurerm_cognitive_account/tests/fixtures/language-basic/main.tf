@@ -25,8 +25,8 @@ module "cognitive_account" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  kind     = "TextAnalytics"
-  sku_name = "S0"
+  kind     = "Language"
+  sku_name = var.sku_name
 
   public_network_access_enabled = true
   local_auth_enabled            = true

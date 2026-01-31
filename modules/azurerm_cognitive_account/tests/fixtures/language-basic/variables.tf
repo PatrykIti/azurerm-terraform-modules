@@ -9,6 +9,12 @@ variable "location" {
   default     = "westeurope"
 }
 
+variable "sku_name" {
+  description = "SKU name for the Cognitive Account."
+  type        = string
+  default     = "F0"
+}
+
 variable "tags" {
   description = "Tags to apply to the Cognitive Account."
   type        = map(string)

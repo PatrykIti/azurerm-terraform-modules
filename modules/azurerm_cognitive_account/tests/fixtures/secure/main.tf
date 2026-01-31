@@ -32,7 +32,7 @@ resource "azurerm_subnet" "private_endpoint" {
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.50.1.0/24"]
-  private_endpoint_network_policies_enabled = true
+  private_endpoint_network_policies = "Disabled"
 }
 
 resource "azurerm_user_assigned_identity" "example" {
