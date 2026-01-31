@@ -14,7 +14,7 @@ managed outside of this module.
 
 ## Usage Notes
 
-- Prefer `namespace_id` over `namespace_name`/`resource_group_name`.
+ - `namespace_id` is required and must reference an existing Event Hub Namespace.
 - `partition_count` cannot be decreased; increases depend on namespace SKU.
 - Capture requires Blob Storage and a valid archive name format.
 - `message_retention` and `retention_description` are mutually exclusive.

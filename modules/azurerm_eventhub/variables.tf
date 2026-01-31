@@ -9,31 +9,13 @@ variable "name" {
 }
 
 variable "namespace_id" {
-  description = "The ID of the Event Hub Namespace. Prefer this over namespace_name/resource_group_name."
+  description = "The ID of the Event Hub Namespace."
   type        = string
-  default     = null
 
   validation {
-    condition     = var.namespace_id == null || can(regex("(?i)^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.EventHub/namespaces/[^/]+$", var.namespace_id))
+    condition     = var.namespace_id != null && var.namespace_id != "" && can(regex("(?i)^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.EventHub/namespaces/[^/]+$", var.namespace_id))
     error_message = "namespace_id must be a valid Event Hub Namespace resource ID."
   }
-}
-
-variable "namespace_name" {
-  description = "The name of the Event Hub Namespace (deprecated in provider; use namespace_id when possible)."
-  type        = string
-  default     = null
-
-  validation {
-    condition     = var.namespace_name == null || can(regex("^[a-zA-Z][-a-zA-Z0-9]{4,48}[a-zA-Z0-9]$", var.namespace_name))
-    error_message = "The namespace name can contain only letters, numbers and hyphens. The namespace must start with a letter, and it must end with a letter or number and be between 6 and 50 characters long."
-  }
-}
-
-variable "resource_group_name" {
-  description = "The resource group name of the Event Hub Namespace (required when namespace_name is used)."
-  type        = string
-  default     = null
 }
 
 variable "partition_count" {

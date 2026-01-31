@@ -38,13 +38,11 @@ run "missing_namespace" {
   command = plan
 
   variables {
-    namespace_id        = null
-    namespace_name      = null
-    resource_group_name = null
+    namespace_id = null
   }
 
   expect_failures = [
-    azurerm_eventhub.eventhub
+    var.namespace_id
   ]
 }
 

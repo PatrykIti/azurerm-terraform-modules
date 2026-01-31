@@ -1,8 +1,8 @@
 locals {
-  namespace_id_parts = var.namespace_id == null ? [] : split("/", var.namespace_id)
+  namespace_id_parts = split("/", var.namespace_id)
 
-  namespace_name_effective      = var.namespace_id != null ? local.namespace_id_parts[8] : var.namespace_name
-  resource_group_name_effective = var.namespace_id != null ? local.namespace_id_parts[4] : var.resource_group_name
+  namespace_name_effective      = local.namespace_id_parts[8]
+  resource_group_name_effective = local.namespace_id_parts[4]
 
   authorization_rules = {
     for rule in var.authorization_rules : rule.name => rule
@@ -16,8 +16,6 @@ locals {
 resource "azurerm_eventhub" "eventhub" {
   name                = var.name
   namespace_id        = var.namespace_id
-  namespace_name      = var.namespace_id == null ? var.namespace_name : null
-  resource_group_name = var.namespace_id == null ? var.resource_group_name : null
 
   partition_count   = var.partition_count
   message_retention = var.retention_description == null ? var.message_retention : null
@@ -58,21 +56,6 @@ resource "azurerm_eventhub" "eventhub" {
       read   = try(timeouts.value.read, null)
       update = try(timeouts.value.update, null)
       delete = try(timeouts.value.delete, null)
-    }
-  }
-
-  lifecycle {
-    precondition {
-      condition = (
-        (var.namespace_id != null && var.namespace_id != "") &&
-        (var.namespace_name == null || var.namespace_name == "") &&
-        (var.resource_group_name == null || var.resource_group_name == "")
-        ) || (
-        (var.namespace_id == null || var.namespace_id == "") &&
-        (var.namespace_name != null && var.namespace_name != "") &&
-        (var.resource_group_name != null && var.resource_group_name != "")
-      )
-      error_message = "Provide either namespace_id OR namespace_name with resource_group_name."
     }
   }
 }
