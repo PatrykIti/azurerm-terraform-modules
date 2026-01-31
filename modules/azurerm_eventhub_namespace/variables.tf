@@ -199,7 +199,6 @@ variable "schema_groups" {
     timeouts = optional(object({
       create = optional(string)
       read   = optional(string)
-      update = optional(string)
       delete = optional(string)
     }))
   }))

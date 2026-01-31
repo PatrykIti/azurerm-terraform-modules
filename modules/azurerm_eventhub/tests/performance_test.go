@@ -16,7 +16,7 @@ func BenchmarkEventhubCreationSimple(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_eventhub/tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		// Override the random_suffix for benchmarking
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -73,7 +73,7 @@ func BenchmarkEventhubCreationWithFeatures(b *testing.B) {
 		b.Run(fc.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_eventhub/tests/fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
 				// Apply feature configuration
@@ -110,7 +110,7 @@ func BenchmarkEventhubCreationWithScale(b *testing.B) {
 		b.Run(fmt.Sprintf("Scale_%d", count), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_eventhub/tests/fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
 				// Configure scale parameters based on resource type
@@ -146,7 +146,7 @@ func BenchmarkEventhubParallelCreation(b *testing.B) {
 			b.RunParallel(func(pb *testing.PB) {
 				i := 0
 				for pb.Next() {
-					testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
+					testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_eventhub/tests/fixtures/basic")
 					terraformOptions := getTerraformOptions(b, testFolder)
 					// Override the random_suffix for parallel testing
 					terraformOptions.Vars["random_suffix"] = fmt.Sprintf("par%d%d%s", parallel, i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -172,7 +172,7 @@ func TestEventhubCreationTime(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -201,7 +201,7 @@ func TestEventhubScaling(t *testing.T) {
 
 	// Create multiple instances sequentially
 	for i := 0; i < instanceCount; i++ {
-		testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(t, testFolder)
 		// Override the random_suffix for each iteration
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("scale%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -238,7 +238,7 @@ func TestEventhubUpdatePerformance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -252,18 +252,15 @@ func TestEventhubUpdatePerformance(t *testing.T) {
 		update map[string]interface{}
 	}{
 		{
-			name: "UpdateTags",
+			name: "UpdateRetention",
 			update: map[string]interface{}{
-				"tags": map[string]interface{}{
-					"Environment": "Test",
-					"Updated":     "true",
-				},
+				"message_retention": 2,
 			},
 		},
 		{
-			name: "UpdateConfiguration",
+			name: "UpdateStatus",
 			update: map[string]interface{}{
-				"enable_monitoring": true,
+				"status": "SendDisabled",
 			},
 		},
 		// Add more update scenarios specific to eventhub
@@ -296,7 +293,7 @@ func TestEventhubDestroyPerformance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	// Create resource

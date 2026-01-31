@@ -114,7 +114,6 @@ resource "azurerm_eventhub_namespace_schema_group" "schema_group" {
     content {
       create = try(timeouts.value.create, null)
       read   = try(timeouts.value.read, null)
-      update = try(timeouts.value.update, null)
       delete = try(timeouts.value.delete, null)
     }
   }

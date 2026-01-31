@@ -7,12 +7,18 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.57.0"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.9"
+    }
   }
 }
 
 provider "azurerm" {
   features {}
 }
+
+data "azurerm_client_config" "current" {}
 
 locals {
   suffix         = var.random_suffix == "" ? "" : "-${var.random_suffix}"
@@ -53,12 +59,24 @@ resource "azurerm_storage_container" "capture" {
   container_access_type = "private"
 }
 
+resource "azurerm_role_assignment" "capture_storage_blob" {
+  scope                = azurerm_storage_account.example.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
+
+resource "time_sleep" "wait_for_capture_permissions" {
+  create_duration = "90s"
+  depends_on      = [azurerm_role_assignment.capture_storage_blob]
+}
+
 module "eventhub" {
   source = "../../../"
 
   name            = "${var.eventhub_name}${local.suffix}"
   namespace_id    = module.eventhub_namespace.id
   partition_count = 2
+  depends_on      = [time_sleep.wait_for_capture_permissions]
 
   capture_description = {
     enabled             = true

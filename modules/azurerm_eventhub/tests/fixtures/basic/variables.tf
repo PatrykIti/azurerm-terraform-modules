@@ -22,6 +22,24 @@ variable "eventhub_name" {
   default     = "eh-basic"
 }
 
+variable "partition_count" {
+  description = "Number of partitions for the Event Hub."
+  type        = number
+  default     = 2
+}
+
+variable "message_retention" {
+  description = "Number of days to retain events."
+  type        = number
+  default     = 1
+}
+
+variable "status" {
+  description = "Status of the Event Hub."
+  type        = string
+  default     = "Active"
+}
+
 variable "random_suffix" {
   description = "Random suffix used for test uniqueness."
   type        = string

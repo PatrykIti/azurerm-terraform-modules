@@ -19,7 +19,7 @@ func TestBasicEventhub(t *testing.T) {
 	t.Parallel()
 
 	// Create a folder for this test
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -53,7 +53,7 @@ func TestBasicEventhub(t *testing.T) {
 func TestCompleteEventhub(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -84,7 +84,7 @@ func TestCompleteEventhub(t *testing.T) {
 func TestSecureEventhub(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -114,7 +114,7 @@ func TestSecureEventhub(t *testing.T) {
 func TestNetworkEventhub(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/network")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/network")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -146,7 +146,7 @@ func TestEventhubPrivateEndpoint(t *testing.T) {
 		t.Skip("Private endpoint fixture not found; skipping test")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/private_endpoint")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/private_endpoint")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -170,7 +170,7 @@ func TestEventhubPrivateEndpoint(t *testing.T) {
 func TestCaptureEventhub(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/capture")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/capture")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -195,7 +195,7 @@ func TestCaptureEventhub(t *testing.T) {
 func TestConsumerGroupsEventhub(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/consumer_groups")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/consumer_groups")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -238,7 +238,7 @@ func TestEventhubValidationRules(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", fmt.Sprintf("tests/fixtures/%s", tc.fixtureFile))
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", fmt.Sprintf("azurerm_eventhub/tests/fixtures/%s", tc.fixtureFile))
 
 			// Use minimal terraform options for negative tests (no variables)
 			terraformOptions := &terraform.Options{
@@ -263,7 +263,7 @@ func BenchmarkEventhubCreation(b *testing.B) {
 		b.Skip("Skipping benchmark in short mode")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_eventhub/tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(b, testFolder)
 
 	// Cleanup after benchmark

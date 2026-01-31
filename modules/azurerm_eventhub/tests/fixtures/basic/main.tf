@@ -41,7 +41,9 @@ module "eventhub_namespace" {
 module "eventhub" {
   source = "../../../"
 
-  name            = "${var.eventhub_name}${local.suffix}"
-  namespace_id    = module.eventhub_namespace.id
-  partition_count = 2
+  name              = "${var.eventhub_name}${local.suffix}"
+  namespace_id      = module.eventhub_namespace.id
+  partition_count   = var.partition_count
+  message_retention = var.message_retention
+  status            = var.status
 }
