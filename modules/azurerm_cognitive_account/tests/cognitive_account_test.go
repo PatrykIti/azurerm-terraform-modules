@@ -311,10 +311,12 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		NoColor: true,
 		// Retry configuration
 		RetryableTerraformErrors: map[string]string{
-			".*timeout.*":               "Timeout error - retrying",
-			".*ResourceGroupNotFound.*": "Resource group not found - retrying",
-			".*AlreadyExists.*":         "Resource already exists - retrying",
-			".*TooManyRequests.*":       "Too many requests - retrying",
+			".*timeout.*":                        "Timeout error - retrying",
+			".*ResourceGroupNotFound.*":          "Resource group not found - retrying",
+			".*AlreadyExists.*":                  "Resource already exists - retrying",
+			".*TooManyRequests.*":                "Too many requests - retrying",
+			".*AccountProvisioningStateInvalid.*": "Cognitive account still provisioning - retrying",
+			".*in state Accepted.*":              "Cognitive account still provisioning - retrying",
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,

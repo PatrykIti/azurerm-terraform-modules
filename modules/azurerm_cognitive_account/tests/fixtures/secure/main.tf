@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "4.57.0"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.9"
+    }
   }
 }
 
@@ -107,6 +111,12 @@ module "cognitive_account" {
   tags = var.tags
 }
 
+resource "time_sleep" "wait_for_cognitive_account" {
+  # Wait for the cognitive account provisioning to fully settle before creating PE.
+  create_duration = "120s"
+  depends_on      = [module.cognitive_account]
+}
+
 resource "azurerm_private_dns_zone" "openai" {
   name                = var.private_dns_zone_name
   resource_group_name = azurerm_resource_group.example.name
@@ -124,6 +134,7 @@ resource "azurerm_private_endpoint" "openai" {
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   subnet_id           = azurerm_subnet.private_endpoint.id
+  depends_on          = [time_sleep.wait_for_cognitive_account]
 
   private_service_connection {
     name                           = "pe-cog-${var.random_suffix}-psc"
