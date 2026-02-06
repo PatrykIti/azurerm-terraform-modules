@@ -1,11 +1,11 @@
-data "azurerm_monitor_diagnostic_categories" "ai_services_account" {
+data "azurerm_monitor_diagnostic_categories" "ai_services" {
   count       = length(var.diagnostic_settings) > 0 ? 1 : 0
-  resource_id = azurerm_ai_services.ai_services_account.id
+  resource_id = azurerm_ai_services.ai_services.id
 }
 
 locals {
-  diagnostic_log_categories    = try(data.azurerm_monitor_diagnostic_categories.ai_services_account[0].log_category_types, [])
-  diagnostic_metric_categories = try(data.azurerm_monitor_diagnostic_categories.ai_services_account[0].metrics, [])
+  diagnostic_log_categories    = try(data.azurerm_monitor_diagnostic_categories.ai_services[0].log_category_types, [])
+  diagnostic_metric_categories = try(data.azurerm_monitor_diagnostic_categories.ai_services[0].metrics, [])
 
   diagnostic_settings_expanded = [
     for ds in var.diagnostic_settings : merge(ds, {
@@ -62,7 +62,7 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
   for_each = local.diagnostic_settings_by_name
 
   name               = each.value.name
-  target_resource_id = azurerm_ai_services.ai_services_account.id
+  target_resource_id = azurerm_ai_services.ai_services.id
 
   log_analytics_workspace_id     = try(each.value.log_analytics_workspace_id, null)
   log_analytics_destination_type = try(each.value.log_analytics_destination_type, null)

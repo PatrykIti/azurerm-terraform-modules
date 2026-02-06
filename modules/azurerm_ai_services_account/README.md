@@ -68,9 +68,9 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_ai_services.ai_services_account](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/ai_services) | resource |
+| [azurerm_ai_services.ai_services](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/ai_services) | resource |
 | [azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
-| [azurerm_monitor_diagnostic_categories.ai_services_account](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/data-sources/monitor_diagnostic_categories) | data source |
+| [azurerm_monitor_diagnostic_categories.ai_services](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/data-sources/monitor_diagnostic_categories) | data source |
 
 ## Inputs
 

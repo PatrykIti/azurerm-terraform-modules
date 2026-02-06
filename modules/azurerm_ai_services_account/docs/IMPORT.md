@@ -45,7 +45,7 @@ Create `import.tf`:
 
 ```hcl
 import {
-  to = module.ai_services_account.azurerm_ai_services.ai_services_account
+  to = module.ai_services_account.azurerm_ai_services.ai_services
   id = "<resource-id>"
 }
 ```
