@@ -13,7 +13,7 @@ This directory contains all Terraform modules published from this repository. Ea
 | [Cognitive Account](./azurerm_cognitive_account/) (`azurerm_cognitive_account`) | `COGv` | Azure Cognitive Services account module for OpenAI, Language, and Speech workloads |
 | [Event Hub](./azurerm_eventhub/) (`azurerm_eventhub`) | `EHv` | Azure Event Hub module with capture, consumer groups, and authorization rules |
 | [Event Hub Namespace](./azurerm_eventhub_namespace/) (`azurerm_eventhub_namespace`) | `EHNSv` | Azure Event Hub Namespace module with auth rules, network rules, CMK, and diagnostics |
-| [Application Insights](./azurerm_application_insights/) (`azurerm_application_insights`) | `APPINSv` | Azure Application Insights module with diagnostics, web tests, workbooks, and smart detection rules |
+| [Application Insights](./azurerm_application_insights/) (`azurerm_application_insights`) | `APPINSv` | Azure Application Insights module with diagnostics, web tests, and smart detection rules |
 | [Application Insights Workbook](./azurerm_application_insights_workbook/) (`azurerm_application_insights_workbook`) | `AIWBv` | Azure Application Insights Workbook module |
 | [Key Vault](./azurerm_key_vault/) (`azurerm_key_vault`) | `KVv` | Azure Key Vault module with data-plane resources and diagnostic settings |
 | [Log Analytics Workspace](./azurerm_log_analytics_workspace/) (`azurerm_log_analytics_workspace`) | `LAWv` | Azure Log Analytics Workspace module with workspace-linked sub-resources and diagnostics |

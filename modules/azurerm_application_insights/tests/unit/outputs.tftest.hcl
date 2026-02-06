@@ -19,7 +19,6 @@ mock_provider "azurerm" {
   mock_resource "azurerm_application_insights_analytics_item" {}
   mock_resource "azurerm_application_insights_web_test" {}
   mock_resource "azurerm_application_insights_standard_web_test" {}
-  mock_resource "azurerm_application_insights_workbook" {}
   mock_resource "azurerm_application_insights_smart_detection_rule" {}
 }
 

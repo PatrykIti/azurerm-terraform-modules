@@ -111,7 +111,7 @@ module "storage_account" {
 | [Role Assignment](./modules/azurerm_role_assignment/) | 🧪 Development | vUnreleased | Manages Azure RBAC role assignments |
 | [Role Definition](./modules/azurerm_role_definition/) | 🧪 Development | vUnreleased | Manages custom Azure RBAC role definitions |
 | [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv2.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv2.1.0) | Azure Storage Account Terraform module with enterprise-grade security features |
-| [Application Insights](./modules/azurerm_application_insights/) | ✅ Completed | [APPINSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.0.0) | Azure Application Insights module with diagnostics, web tests, workbooks, and smart detection rules |
+| [Application Insights](./modules/azurerm_application_insights/) | ✅ Completed | [APPINSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.0.0) | Azure Application Insights module with diagnostics, web tests, and smart detection rules |
 | [Application Insights Workbook](./modules/azurerm_application_insights_workbook/) | 🧪 Development | Unreleased | Azure Application Insights Workbook module |
 | [Key Vault](./modules/azurerm_key_vault/) | 🧪 Development | vUnreleased | Azure Key Vault module with data-plane resources and diagnostic settings |
 | [Log Analytics Workspace](./modules/azurerm_log_analytics_workspace/) | ✅ Completed | [LAWv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LAWv1.0.0) | Azure Log Analytics Workspace module with workspace-linked sub-resources and diagnostics |

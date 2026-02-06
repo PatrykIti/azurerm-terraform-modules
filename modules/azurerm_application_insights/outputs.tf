@@ -90,17 +90,6 @@ output "standard_web_tests" {
   }
 }
 
-output "workbooks" {
-  description = "Workbooks created for Application Insights."
-  value = {
-    for name, wb in azurerm_application_insights_workbook.application_insights_workbook : name => {
-      id           = wb.id
-      name         = wb.name
-      display_name = wb.display_name
-    }
-  }
-}
-
 output "smart_detection_rules" {
   description = "Smart detection rules created for Application Insights."
   value = {

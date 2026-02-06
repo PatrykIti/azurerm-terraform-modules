@@ -17,7 +17,6 @@ locals {
       })
     })
   }
-  workbooks_by_name             = { for wb in var.workbooks : wb.name => wb }
   smart_detection_rules_by_name = { for rule in var.smart_detection_rules : rule.name => rule }
   hidden_link_tag               = { "hidden-link:${azurerm_application_insights.application_insights.id}" = "Resource" }
 }
@@ -144,28 +143,6 @@ resource "azurerm_application_insights_standard_web_test" "application_insights_
   }
 
   tags = merge(var.tags, try(each.value.tags, {}), local.hidden_link_tag)
-}
-
-resource "azurerm_application_insights_workbook" "application_insights_workbook" {
-  for_each = local.workbooks_by_name
-
-  name                = each.value.name
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  display_name        = each.value.display_name
-  data_json           = each.value.data_json
-  description         = try(each.value.description, null)
-  category            = try(each.value.category, null)
-  source_id           = try(each.value.source_id, null)
-  tags                = merge(var.tags, try(each.value.tags, {}))
-
-  dynamic "identity" {
-    for_each = each.value.identity != null ? [each.value.identity] : []
-    content {
-      type         = identity.value.type
-      identity_ids = try(identity.value.identity_ids, null)
-    }
-  }
 }
 
 resource "azurerm_application_insights_smart_detection_rule" "application_insights_smart_detection_rule" {

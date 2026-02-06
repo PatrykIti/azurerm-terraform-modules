@@ -105,11 +105,6 @@ test-standard-web-tests: check-env deps
 	@echo "Running standard web tests..."
 	$(call run_with_log,standard-web-tests,go test -v -timeout 20m -run TestApplicationInsightsStandardWebTests ./...)
 
-# Run workbooks tests
-test-workbooks: check-env deps
-	@echo "Running workbook tests..."
-	$(call run_with_log,workbooks,go test -v -timeout 20m -run TestApplicationInsightsWorkbooks ./...)
-
 # Run smart detection rule tests
 test-smart-detection: check-env deps
 	@echo "Running smart detection rule tests..."
@@ -226,7 +221,6 @@ help:
 	@echo "  make test-analytics-items - Run analytics items tests"
 	@echo "  make test-web-tests      - Run classic web tests"
 	@echo "  make test-standard-web-tests - Run standard web tests"
-	@echo "  make test-workbooks      - Run workbooks tests"
 	@echo "  make test-smart-detection - Run smart detection rule tests"
 	@echo "  make test-validation     - Run validation tests"
 	@echo "  make test-integration    - Run integration tests"
@@ -259,7 +253,6 @@ help:
 	@echo "  make test-analytics-items - Run analytics items tests"
 	@echo "  make test-web-tests      - Run classic web tests"
 	@echo "  make test-standard-web-tests - Run standard web tests"
-	@echo "  make test-workbooks      - Run workbooks tests"
 	@echo "  make test-smart-detection - Run smart detection rule tests"
 	@echo "  make test-validation     - Run validation tests"
 	@echo "  make test-integration    - Run integration tests"
@@ -277,4 +270,4 @@ help:
 	@echo "  make ci                 - Run CI pipeline"
 	@echo "  make cd                 - Run CD pipeline (includes integration tests)"
 
-.PHONY: check-env deps test test-single test-basic test-complete test-secure test-api-keys test-analytics-items test-web-tests test-standard-web-tests test-workbooks test-smart-detection test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help
+.PHONY: check-env deps test test-single test-basic test-complete test-secure test-api-keys test-analytics-items test-web-tests test-standard-web-tests test-smart-detection test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help

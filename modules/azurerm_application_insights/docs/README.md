@@ -14,7 +14,6 @@ features without bundling networking or RBAC glue.
 - `azurerm_application_insights_analytics_item`
 - `azurerm_application_insights_web_test`
 - `azurerm_application_insights_standard_web_test`
-- `azurerm_application_insights_workbook`
 - `azurerm_application_insights_smart_detection_rule`
 - `azurerm_monitor_diagnostic_setting`
 
@@ -26,6 +25,7 @@ The following must be handled outside the module:
 - RBAC/role assignments
 - Virtual network integration or firewall rules
 - Log Analytics workspace provisioning (pass the ID via `workspace_id`)
+- Workbook provisioning (use `azurerm_application_insights_workbook`)
 
 ## Usage Notes
 
