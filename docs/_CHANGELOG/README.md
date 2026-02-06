@@ -16,7 +16,7 @@ Project Change Log.
 | [080](./080-2026-01-30-role-definition-module.md) | 2026-01-30 | Role Definition module | Feature |
 | [079](./079-2026-01-30-role-assignment-module.md) | 2026-01-30 | Role Assignment module | Feature |
 | [078](./078-2026-01-30-linux-virtual-machine-module.md) | 2026-01-30 | Linux Virtual Machine module | Feature |
-| [077](./077-2026-01-30-ai-services-account-module.md) | 2026-01-30 | AI Services Account module | Feature |
+| [077](./077-2026-01-30-ai-services-module.md) | 2026-01-30 | AI Services module | Feature |
 | [076](./076-2026-01-30-application-insights-workbook-module.md) | 2026-01-30 | Application Insights Workbook module | Feature |
 | [075](./075-2026-01-30-user-assigned-identity-module.md) | 2026-01-30 | User Assigned Identity module | Feature |
 | [074](./074-2026-01-30-linux-function-app-module.md) | 2026-01-30 | Linux Function App module | Feature |

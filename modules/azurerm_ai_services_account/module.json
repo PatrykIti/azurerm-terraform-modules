@@ -1,7 +1,0 @@
-{
-  "name": "azurerm_ai_services_account",
-  "title": "AI Services Account",
-  "commit_scope": "ai-services-account",
-  "tag_prefix": "AISAv",
-  "description": "Azure AI Services Account Terraform module with identity, CMK, network ACLs, and diagnostics support"
-}

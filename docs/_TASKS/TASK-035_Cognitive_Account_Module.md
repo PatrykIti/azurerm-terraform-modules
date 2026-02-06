@@ -20,7 +20,7 @@ Modul musi byc zgodny z:
 - `docs/TERRAFORM_BEST_PRACTICES_GUIDE.md`
 - `docs/SECURITY.md`
 
-`azurerm_ai_services_account` jest poza zakresem tego taska i ma osobny
+`azurerm_ai_services` jest poza zakresem tego taska i ma osobny
 zadany task (TASK-040).
 
 AKS jest wzorcem struktury i testow; wszystkie odstepstwa musza byc jawnie
@@ -44,7 +44,7 @@ udokumentowane.
 - `azurerm_cognitive_account_rai_blocklist_item` (jesli istnieje)
 
 **Out-of-scope:**
-- `azurerm_ai_services_account` (osobny task `TASK-040`)
+- `azurerm_ai_services` (osobny task `TASK-040`)
 - Private endpoints, Private DNS Zone i VNet links
 - RBAC/role assignments, policy, budzety
 - Key Vault / Managed HSM / UAI provisioning (tylko ID inputy)

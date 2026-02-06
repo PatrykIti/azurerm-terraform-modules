@@ -99,7 +99,7 @@ module "storage_account" {
 
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
-| [AI Services Account](./modules/azurerm_ai_services_account/) | 🧪 Development | vUnreleased | Azure AI Services Account module with identity, CMK, network ACLs, and diagnostics support |
+| [AI Services](./modules/azurerm_ai_services/) | 🧪 Development | vUnreleased | Azure AI Services module with identity, CMK, network ACLs, and diagnostics support |
 | [Cognitive Account](./modules/azurerm_cognitive_account/) | 🧪 Development | vUnreleased | Azure Cognitive Services account module for OpenAI, Language, and Speech workloads |
 | [Event Hub](./modules/azurerm_eventhub/) | 🧪 Development | vUnreleased | Azure Event Hub module with capture, consumer groups, and authorization rules |
 | [Event Hub Namespace](./modules/azurerm_eventhub_namespace/) | 🧪 Development | vUnreleased | Azure Event Hub Namespace module with auth rules, network rules, CMK, and diagnostics |

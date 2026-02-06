@@ -9,7 +9,7 @@ This directory contains all Terraform modules published from this repository. Ea
 
 | Module | Tag Prefix | Description |
 | --- | --- | --- |
-| [AI Services Account](./azurerm_ai_services_account/) (`azurerm_ai_services_account`) | `AISAv` | Azure AI Services Account module with identity, CMK, network ACLs, and diagnostics support |
+| [AI Services](./azurerm_ai_services/) (`azurerm_ai_services`) | `AISv` | Azure AI Services module with identity, CMK, network ACLs, and diagnostics support |
 | [Cognitive Account](./azurerm_cognitive_account/) (`azurerm_cognitive_account`) | `COGv` | Azure Cognitive Services account module for OpenAI, Language, and Speech workloads |
 | [Event Hub](./azurerm_eventhub/) (`azurerm_eventhub`) | `EHv` | Azure Event Hub module with capture, consumer groups, and authorization rules |
 | [Event Hub Namespace](./azurerm_eventhub_namespace/) (`azurerm_eventhub_namespace`) | `EHNSv` | Azure Event Hub Namespace module with auth rules, network rules, CMK, and diagnostics |

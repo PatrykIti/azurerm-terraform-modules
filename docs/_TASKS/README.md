@@ -46,7 +46,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-035](./TASK-035_Cognitive_Account_Module.md) | **Azure Cognitive Account module (OpenAI/Language/Speech)** | High | Large | `modules/azurerm_cognitive_account/` |
 | [TASK-029](./TASK-029_Key_Vault_Module.md) | **Key Vault module (full feature scope)** | High | Large | `modules/azurerm_key_vault/` |
 | [TASK-033](./TASK-033_Redis_Cache_Module.md) | **Azure Redis Cache module (full feature scope)** | High | Large | `modules/azurerm_redis_cache/` |
-| [TASK-040](./TASK-040_AI_Services_Account_Module.md) | **Azure AI Services Account module (azurerm_ai_services_account)** | High | Large | `modules/azurerm_ai_services_account/` |
+| [TASK-040](./TASK-040_AI_Services_Module.md) | **Azure AI Services module (azurerm_ai_services)** | High | Large | `modules/azurerm_ai_services/` |
 | [TASK-041](./TASK-041_Windows_Function_App_Module.md) | **Azure Windows Function App module (full feature scope)** | High | Large | `modules/azurerm_windows_function_app/` |
 | [TASK-028](./TASK-028_Role_Assignment_Module.md) | **Role Assignment module (RBAC) + zaleznosci** | High | Medium | `modules/azurerm_role_assignment/`, `modules/azurerm_role_definition/` |
 | [TASK-027](./TASK-027_User_Assigned_Identity_Module.md) | **User Assigned Identity module** | Medium | Medium | `modules/azurerm_user_assigned_identity/` |

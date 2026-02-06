@@ -32,7 +32,7 @@ This module does not manage:
 - Networking glue (VNets, subnets, NSGs, UDRs)
 - Log Analytics workspaces or Event Hubs
 - Key Vaults, Managed HSMs, or user-assigned identities (only IDs are accepted)
-- `azurerm_ai_services_account` (managed in a separate module)
+- `azurerm_ai_services` (managed in a separate module)
 
 ## Additional References
 
