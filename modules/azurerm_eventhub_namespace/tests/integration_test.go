@@ -1,14 +1,12 @@
 package test
 
 import (
-	"context"
 	"os"
 	"testing"
-	"time"
 
 	// Azure SDK imports - add specific ones for your resource type
 	// Example: "github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
-	
+
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
@@ -57,7 +55,6 @@ func TestEventhubNamespaceFullIntegration(t *testing.T) {
 // validateCoreFeatures validates basic eventhub_namespace features using SDK
 func validateCoreFeatures(t *testing.T, testFolder string) {
 	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-	helper := Neweventhub_namespaceHelper(t)
 
 	// Get outputs
 	resourceName := terraform.Output(t, terraformOptions, "eventhub_namespace_name")
@@ -84,6 +81,7 @@ func validateCoreFeatures(t *testing.T, testFolder string) {
 		"CostCenter":  "Engineering",
 		"Owner":       "terratest",
 	}
+	_ = expectedTags
 	// TODO: Validate tags using helper function
 	// Validateeventhub_namespaceTags(t, resource, expectedTags)
 }
@@ -91,7 +89,6 @@ func validateCoreFeatures(t *testing.T, testFolder string) {
 // validateSecurityFeatures validates security configurations using SDK
 func validateSecurityFeatures(t *testing.T, testFolder string) {
 	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-	helper := Neweventhub_namespaceHelper(t)
 
 	resourceName := terraform.Output(t, terraformOptions, "eventhub_namespace_name")
 	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
@@ -106,6 +103,9 @@ func validateSecurityFeatures(t *testing.T, testFolder string) {
 	// assert.True(t, *resource.Properties.EnableHTTPSTrafficOnly)
 	// assert.Equal(t, MinimumTLSVersionTLS12, *resource.Properties.MinimumTLSVersion)
 	// assert.False(t, *resource.Properties.AllowPublicAccess)
+
+	assert.NotEmpty(t, resourceName, "Resource name should not be empty")
+	assert.NotEmpty(t, resourceGroupName, "Resource group name should not be empty")
 	
 	// Validate encryption if applicable
 	// helper.Validateeventhub_namespaceEncryption(t, resource)
@@ -114,7 +114,6 @@ func validateSecurityFeatures(t *testing.T, testFolder string) {
 // validateNetworkFeatures validates network configurations using SDK
 func validateNetworkFeatures(t *testing.T, testFolder string) {
 	terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-	helper := Neweventhub_namespaceHelper(t)
 
 	resourceName := terraform.Output(t, terraformOptions, "eventhub_namespace_name")
 	resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
@@ -128,6 +127,9 @@ func validateNetworkFeatures(t *testing.T, testFolder string) {
 	// Examples:
 	// assert.Equal(t, DefaultActionDeny, *resource.Properties.NetworkRuleSet.DefaultAction)
 	// assert.Equal(t, BypassAzureServices, *resource.Properties.NetworkRuleSet.Bypass)
+
+	assert.NotEmpty(t, resourceName, "Resource name should not be empty")
+	assert.NotEmpty(t, resourceGroupName, "Resource group name should not be empty")
 	
 	// Validate IP rules and subnet rules if applicable
 	// expectedIPRules := []string{"203.0.113.0/24"}
@@ -183,7 +185,6 @@ func TestEventhubNamespaceWithNetworkRules(t *testing.T) {
 	// Validate network configuration
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		helper := Neweventhub_namespaceHelper(t)
 		
 		resourceName := terraform.Output(t, terraformOptions, "eventhub_namespace_name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
@@ -194,9 +195,8 @@ func TestEventhubNamespaceWithNetworkRules(t *testing.T) {
 		
 		// Validate network rules
 		// TODO: Add network rule validations
-		_ = helper // Remove when helper is used
-		_ = resourceName
-		_ = resourceGroupName
+		assert.NotEmpty(t, resourceName, "Resource name should not be empty")
+		assert.NotEmpty(t, resourceGroupName, "Resource group name should not be empty")
 	})
 }
 
@@ -270,7 +270,6 @@ func TestEventhubNamespaceSecurityConfiguration(t *testing.T) {
 	// Validate security settings
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		helper := Neweventhub_namespaceHelper(t)
 		
 		resourceName := terraform.Output(t, terraformOptions, "eventhub_namespace_name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
@@ -281,9 +280,8 @@ func TestEventhubNamespaceSecurityConfiguration(t *testing.T) {
 		
 		// Security assertions
 		// TODO: Add security-specific validations
-		_ = helper // Remove when helper is used
-		_ = resourceName
-		_ = resourceGroupName
+		assert.NotEmpty(t, resourceName, "Resource name should not be empty")
+		assert.NotEmpty(t, resourceGroupName, "Resource group name should not be empty")
 	})
 }
 
@@ -374,6 +372,6 @@ func TestEventhubNamespaceCompliance(t *testing.T) {
 			assert.True(t, cc.check(), cc.message)
 		})
 	}
-	
-	_ = resourceGroupName // Remove when used
+
+	assert.NotEmpty(t, resourceGroupName, "Resource group name should not be empty")
 }
