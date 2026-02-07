@@ -74,6 +74,71 @@ wszystkie odstepstwa musza byc jawnie udokumentowane.
 
 ---
 
+## Audit Subtasks (2026-02-07)
+
+**Status gate (docs/MODULE_GUIDE/11-scope-and-provider-coverage-status-check.md):**
+- Scope Status: **GREEN**
+- Provider Coverage Status: **YELLOW**
+- Overall Status: **YELLOW**
+- Audit mode: `AUDIT_ONLY`
+- Primary resource: `azurerm_bastion_host` (`azurerm` `4.57.0`)
+
+### 1) Scope boundary + atomicity (Checklist 10 + 11.A)
+
+- [x] Potwierdzic zgodnosc nazwy folderu i intencji modulu: `modules/azurerm_bastion_host`.
+- [x] Potwierdzic, ze primary resource w kodzie to `azurerm_bastion_host` (`main.tf`), a inline exception to tylko `azurerm_monitor_diagnostic_setting` (`diagnostics.tf`).
+- [x] Potwierdzic brak cross-resource glue w module (RBAC, private endpoint, budgets, NSG/UDR, networking orchestration poza modulem).
+- [x] Potwierdzic, ze `docs/README.md` ma jawna sekcje `Out of Scope` i jest spojna z kodem/examples.
+- [ ] Dodac do tego taska mini-mape dowodow `scope -> file:line`, zeby review PR mogl szybko zatwierdzic gate bez ponownego audytu.
+
+### 2) Provider capability coverage - PRIMARY_RESOURCE (`azurerm_bastion_host`) (11.B + 11.C)
+
+- [x] Potwierdzic pokrycie argumentow/blocks resource: `name`, `resource_group_name`, `location`, `sku`, `scale_units`, `copy_paste_enabled`, `file_copy_enabled`, `ip_connect_enabled`, `kerberos_enabled`, `shareable_link_enabled`, `tunneling_enabled`, `session_recording_enabled`, `virtual_network_id`, `zones`, `ip_configuration`, `timeouts`, `tags`.
+- [x] Potwierdzic walidacje i preconditions cross-field (Developer vs Basic/Standard/Premium; Standard/Premium feature gates; Premium-only session recording).
+- [ ] Uzupelnic formalna **Coverage Matrix** (capability-by-capability z kolumnami `Implemented/Omitted/N-A`, severity, evidence `file:line`) i utrzymywac ja w tasku az do zamkniecia.
+- [ ] Wykonac/podpiac schema diff dla `azurerm_bastion_host` (`4.57.0`) i zaznaczyc ewentualne odstepstwa jako jawne decyzje.
+
+### 3) Provider coverage - diagnostic settings companion (`azurerm_monitor_diagnostic_setting`)
+
+- [x] Potwierdzic inline diagnostics pattern zgodny z filozofia atomic module (diagnostic settings jako dozwolony inline wyjatek).
+- [ ] Rozstrzygnac i udokumentowac czy module ma wspierac `partner_solution_id` (albo jawnie oznaczyc jako intentional omission).
+- [ ] Rozstrzygnac i udokumentowac czy module ma wspierac `enabled_log.category_group` / `log_category_groups` (albo jawnie oznaczyc jako intentional omission).
+- [ ] Dodac testy + dokumentacje dla wybranej decyzji (implementacja albo kontrolowane pominiecie z uzasadnieniem).
+
+### 4) Module structure, docs, examples (Checklist 10 domains)
+
+- [x] Potwierdzic pelny layout modulu: core TF files, docs, examples, tests, `module.json`, `.releaserc.js`, `.terraform-docs.yml`, `Makefile`, `generate-docs.sh`.
+- [x] Potwierdzic markery README: `BEGIN_VERSION`, `BEGIN_EXAMPLES`, `BEGIN_TF_DOCS`.
+- [x] Potwierdzic wymagane przyklady: `examples/basic`, `examples/complete`, `examples/secure` + feature-specific examples.
+- [ ] Zaktualizowac historyczna sekcje `Feature matrix` w tym tasku (obecnie nie odzwierciedla wprost SKU `Developer` i pelnego `Premium` flow).
+- [ ] Dodac plan examples/tests dla scenariuszy `Developer` i `Premium + session_recording_enabled` (albo jawnie opisac powod braku).
+
+### 5) Testing + Go tests/fixtures addendum (Checklist 10 Testing + 11.G)
+
+- [x] Potwierdzic unit tests (`tests/unit/*.tftest.hcl`) dla defaults, naming, outputs i kluczowych walidacji.
+- [x] Potwierdzic Terratest fixtures dla `basic`, `complete`, `secure`, `ip-connect`, `tunneling`, `shareable-link`, `file-copy`, `diagnostic-settings`, `negative`.
+- [x] Potwierdzic `source = "../../.."` w fixtures i brak zaleznosci na sibling modules (wiec `CopyTerraformFolderToTemp(t, "..", "tests/fixtures/...")` pozostaje poprawne).
+- [ ] Dodac pozytywne testy scenariuszy: `Developer` (`virtual_network_id`) oraz `Premium` (`session_recording_enabled = true`).
+- [ ] Rozszerzyc negative tests o diagnostyke (brak destination, niepoprawne `areas`, niepoprawne kombinacje).
+- [ ] Domknac zgodnosc `tests/Makefile` z addendum: wszystkie targety `test-*` powinny korzystac z `run_with_log` (uzupelnic `test-quick`, `test-junit`).
+- [ ] Dodac i egzekwowac compile gate dla testow Go: `go test ./... -run '^$'`.
+
+### 6) Release + CI/CD integration (Checklist 10 Configuration/CI)
+
+- [x] Potwierdzic `module.json` (`name`, `title`, `commit_scope`, `tag_prefix`) i spojne mapowanie w `.releaserc.js`.
+- [x] Potwierdzic obecny scope `bastion-host` w `.github/workflows/pr-validation.yml`.
+- [ ] Dodac w tym tasku sekcje "audit evidence links" dla release/CI (sciezki + linie), aby reviewer mial gotowy check-pack.
+
+### Validation commands
+
+- [ ] `terraform -chdir=modules/azurerm_bastion_host fmt -check -recursive`
+- [ ] `terraform -chdir=modules/azurerm_bastion_host init -backend=false -input=false`
+- [ ] `terraform -chdir=modules/azurerm_bastion_host validate`
+- [ ] `terraform -chdir=modules/azurerm_bastion_host test -test-directory=tests/unit`
+- [ ] `cd modules/azurerm_bastion_host/tests && go test ./... -run '^$'`
+
+---
+
 ## Zakres i deliverables
 
 ### TASK-034-1: Discovery / feature inventory

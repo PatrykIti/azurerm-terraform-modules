@@ -9,6 +9,55 @@
 
 ---
 
+## Audit Subtasks (2026-02-07)
+
+- Scope Status: **GREEN** - Modul pozostaje atomowy: primary `azurerm_key_vault`, a dodatkowe resources sa bezposrednio key-vault-specific.
+- Provider Coverage Status: **YELLOW** - Potrzebny jawny schema diff/matrix dla `azurerm_key_vault` (`4.57.0`) i zasobow powiazanych.
+- Overall Status: **YELLOW** - Gaps sa glownie w test harness consistency i audit evidence, nie w samej strukturze modulu.
+
+### Naming/Provider-Alignment
+
+- [ ] Potwierdzic canonical naming i spojnosc referencji: `modules/azurerm_key_vault`, `modules/azurerm_key_vault/module.json`, `modules/azurerm_key_vault/main.tf`, `modules/azurerm_key_vault/outputs.tf`.
+- [ ] Dodac do taska capability matrix dla `PRIMARY_RESOURCE=azurerm_key_vault` z dowodami `file:line` (Implemented / Intentionally Omitted / N-A).
+- [ ] Dodac osobna matrix dla zasobow jawnie in-scope: `azurerm_key_vault_access_policy`, `azurerm_key_vault_key`, `azurerm_key_vault_secret`, `azurerm_key_vault_certificate`, `azurerm_key_vault_certificate_issuer`, `azurerm_key_vault_managed_storage_account`, `azurerm_key_vault_managed_storage_account_sas_token_definition`.
+
+### Scope boundaries (what to remove/keep)
+
+- [ ] Utrzymac scope bez cross-resource glue: brak provisioning private endpoint/DNS/RBAC assignment w module; te elementy tylko w examples/docs.
+- [ ] Jawnie utrzymac i opisac wyjatek inline diagnostics jako dozwolony pattern (`modules/azurerm_key_vault/diagnostics.tf`).
+- [ ] Dopisac w `modules/azurerm_key_vault/docs/README.md` sekcje "In scope / Out of scope" z mapowaniem do aktualnego kodu.
+
+### Provider coverage gaps for PRIMARY_RESOURCE
+
+- [ ] Wykonac schema diff dla `azurerm_key_vault` (`4.57.0`) i udokumentowac brakujace argumenty/bloki albo oznaczyc je jako intentional omissions.
+- [ ] Potwierdzic i udokumentowac pokrycie cross-field constraints (RBAC vs access policies, network ACL, purge protection retention) przez walidacje i preconditions.
+- [ ] Potwierdzic i udokumentowac pokrycie diagnostyki advanced (`partner_solution_id`, `log_category_groups`, `category_group`) wzgledem provider schema.
+
+### Go tests + fixtures checklist gaps
+
+- [ ] Podmienic `modules/azurerm_key_vault/tests/Makefile` na wzorzec z `modules/azurerm_postgresql_flexible_server/tests/Makefile` (`SHELL := /bin/bash`, `LOG_DIR`, `LOG_TIMESTAMP`, `run_with_log`, `tee`, ARM_* <-> AZURE_* normalization).
+- [ ] Upewnic sie, ze wszystkie targety `make test-*` w `modules/azurerm_key_vault/tests/Makefile` uzywaja `run_with_log` i zapisuja logi do `modules/azurerm_key_vault/tests/test_outputs/*.log`.
+- [ ] Zmienic CopyTerraformFolderToTemp na pattern zgodny z fixtures source: z `CopyTerraformFolderToTemp(t, ".", "fixtures/...")` na `CopyTerraformFolderToTemp(t, "..", "tests/fixtures/...")` w `modules/azurerm_key_vault/tests/key_vault_test.go`, `modules/azurerm_key_vault/tests/integration_test.go`, `modules/azurerm_key_vault/tests/performance_test.go`.
+- [ ] Zweryfikowac, ze wszystkie fixtures module-under-test maja `source = "../../../"` i pozostaja poprawne po zmianie sciezki kopiowania.
+- [ ] Dodac compile gate `go test ./... -run '^$'` do pipeline `make test` i do checklisty Done.
+
+### Docs/release/test harness alignment
+
+- [ ] Poprawic `modules/azurerm_key_vault/tests/README.md`, bo odwoluje sie do nieistniejacego targetu `make test-all` (canonical target to `make test`).
+- [ ] Ujednolicic nazwy test files/targets i fixture list miedzy `modules/azurerm_key_vault/tests/README.md`, `modules/azurerm_key_vault/tests/Makefile`, `modules/azurerm_key_vault/tests/test_config.yaml`.
+- [ ] Dodac w tasku wymagany final report format z `docs/MODULE_GUIDE/11-scope-and-provider-coverage-status-check.md` (Module/Mode/Changed files/Validation/Residual risks/Open decisions).
+
+### Validation commands
+
+- [ ] `terraform -chdir=modules/azurerm_key_vault fmt -check -recursive`
+- [ ] `terraform -chdir=modules/azurerm_key_vault init -backend=false -input=false`
+- [ ] `terraform -chdir=modules/azurerm_key_vault validate`
+- [ ] `terraform -chdir=modules/azurerm_key_vault test -test-directory=tests/unit`
+- [ ] `cd modules/azurerm_key_vault/tests && go test ./... -run '^$'`
+- [ ] `cd modules/azurerm_key_vault/tests && make test`
+
+---
+
 ## Cel
 
 Stworzyc nowy modul `modules/azurerm_key_vault` zgodny z:
