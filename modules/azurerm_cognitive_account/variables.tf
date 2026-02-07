@@ -429,10 +429,10 @@ variable "diagnostic_settings" {
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      alltrue([for c in (ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
-      alltrue([for c in (ds.metric_categories == null ? [] : ds.metric_categories) : c != ""]) &&
-      alltrue([for c in (ds.log_category_groups == null ? [] : ds.log_category_groups) : c != ""]) &&
-      alltrue([for c in (ds.areas == null ? [] : ds.areas) : c != ""])
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""]) &&
+      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : c != ""]) &&
+      alltrue([for c in(ds.areas == null ? [] : ds.areas) : c != ""])
     ])
     error_message = "diagnostic_settings categories and areas must not contain empty strings."
   }

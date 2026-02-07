@@ -26,6 +26,20 @@ resource "azurerm_log_analytics_workspace" "example" {
   retention_in_days   = 30
 }
 
+resource "azurerm_storage_account" "example" {
+  name                     = "staiwbcomplete${var.random_suffix}"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_storage_container" "workbook" {
+  name                  = "workbook-storage"
+  storage_account_id    = azurerm_storage_account.example.id
+  container_access_type = "private"
+}
+
 locals {
   workbook_data = {
     version = "Notebook/1.0"
@@ -45,14 +59,15 @@ locals {
 module "application_insights_workbook" {
   source = "../../.."
 
-  name                = "6b8b7d76-5d1a-4d4a-9b1c-9f5b8c2f0a02"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-  display_name        = "Workbook - Complete Test"
-  data_json           = jsonencode(local.workbook_data)
-  description         = "Complete fixture workbook."
-  category            = "workbook"
-  source_id           = lower(azurerm_log_analytics_workspace.example.id)
+  name                 = "6b8b7d76-5d1a-4d4a-9b1c-9f5b8c2f0a02"
+  resource_group_name  = azurerm_resource_group.example.name
+  location             = azurerm_resource_group.example.location
+  display_name         = "Workbook - Complete Test"
+  data_json            = jsonencode(local.workbook_data)
+  description          = "Complete fixture workbook."
+  category             = "workbook"
+  source_id            = lower(azurerm_log_analytics_workspace.example.id)
+  storage_container_id = azurerm_storage_container.workbook.resource_manager_id
 
   identity = {
     type = "SystemAssigned"

@@ -116,6 +116,11 @@ benchmark: check-env deps
 	@echo "Running benchmarks..."
 	$(call run_with_log,bench,go test -v -run=^$$ -bench=. -benchtime=1x ./...)
 
+# Compile gate (no test execution)
+compile-gate: deps
+	@echo "Running Go compile gate..."
+	go test ./... -run '^$$'
+
 # Run tests with coverage
 test-coverage: check-env deps
 	@echo "Running tests with coverage..."
@@ -187,7 +192,7 @@ test-quick: check-env deps
 	go test -v -timeout 5m -short ./...
 
 # CI/CD pipeline simulation
-ci: clean fmt-check lint test-coverage test-junit
+ci: clean fmt-check lint compile-gate test-coverage test-junit
 	@echo "CI pipeline completed successfully!"
 
 # CD pipeline simulation (includes performance and integration tests)
@@ -209,6 +214,7 @@ help:
 	@echo "  make test-performance    - Run performance tests"
 	@echo "  make test-quick          - Run quick smoke tests (with -short flag)"
 	@echo "  make benchmark           - Run benchmarks"
+	@echo "  make compile-gate        - Compile test packages without running tests"
 	@echo "  make test-coverage       - Run tests with coverage"
 	@echo "  make test-race          - Run tests with race detection"
 	@echo "  make test-junit         - Generate JUnit report"
@@ -220,4 +226,4 @@ help:
 	@echo "  make ci                 - Run CI pipeline"
 	@echo "  make cd                 - Run CD pipeline (includes integration tests)"
 
-.PHONY: check-env deps test test-single test-basic test-complete test-secure test-network test-private-endpoint test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help
+.PHONY: check-env deps test test-single test-basic test-complete test-secure test-network test-private-endpoint test-validation test-integration test-performance benchmark compile-gate test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help

@@ -22,6 +22,24 @@ variable "sku" {
   default     = "Standard"
 }
 
+variable "capacity" {
+  description = "Namespace throughput capacity."
+  type        = number
+  default     = 1
+}
+
+variable "auto_inflate_enabled" {
+  description = "Whether namespace auto-inflate is enabled."
+  type        = bool
+  default     = false
+}
+
+variable "maximum_throughput_units" {
+  description = "Maximum throughput units when auto-inflate is enabled."
+  type        = number
+  default     = null
+}
+
 variable "random_suffix" {
   description = "Random suffix used for test uniqueness."
   type        = string

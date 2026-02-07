@@ -34,6 +34,6 @@ output "ip_configuration" {
 }
 
 output "diagnostic_settings_skipped" {
-  description = "Diagnostic settings entries skipped because no log or metric categories were supplied."
+  description = "Diagnostic settings entries skipped because no log categories, log category groups, or metric categories were resolved."
   value       = local.diagnostic_settings_skipped
 }

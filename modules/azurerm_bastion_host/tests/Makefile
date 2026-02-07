@@ -12,7 +12,7 @@ LOG_TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)
 define run_with_log
 	@mkdir -p $(LOG_DIR)
 	@echo "Saving test output to $(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"
-	@bash -c 'set -o pipefail; $(2) 2>&1 | tee "$(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"'
+	@bash -c 'set -o pipefail; { $(2); } 2>&1 | tee "$(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"'
 endef
 
 # Normalize credential environment variables (ARM_ <-> AZURE_)
@@ -60,8 +60,13 @@ deps:
 	go mod download
 	go mod tidy
 
+# Compile-only gate for Go tests (no test execution)
+test-compile: deps
+	@echo "Running Go compile gate..."
+	$(call run_with_log,compile,go test ./... -run '^$$')
+
 # Run all tests
-test: check-env deps
+test: check-env deps test-compile
 	@echo "Running all tests..."
 	$(call run_with_log,all,go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...)
 
@@ -146,9 +151,8 @@ test-race: check-env deps
 test-junit: check-env deps
 	@echo "Running tests with JUnit output..."
 	go install github.com/jstemmer/go-junit-report/v2@latest
-	@mkdir -p $(LOG_DIR)
-	@echo "Saving test output to $(LOG_DIR)/junit_$(LOG_TIMESTAMP).log"
-	@bash -c 'set -o pipefail; go test -v -timeout $(TIMEOUT) ./... 2>&1 | tee "$(LOG_DIR)/junit_$(LOG_TIMESTAMP).log" | go-junit-report -set-exit-code > test-results.xml'
+	$(call run_with_log,junit,go test -v -timeout $(TIMEOUT) ./...)
+	go-junit-report -set-exit-code < "$(LOG_DIR)/junit_$(LOG_TIMESTAMP).log" > test-results.xml
 
 # Clean test artifacts
 clean:
@@ -198,7 +202,7 @@ security:
 # Run quick smoke tests
 test-quick: check-env deps
 	@echo "Running quick smoke tests..."
-	go test -v -timeout 5m -short ./...
+	$(call run_with_log,quick,go test -v -timeout 5m -short ./...)
 
 # CI/CD pipeline simulation
 ci: clean fmt-check lint test-coverage test-junit
@@ -212,6 +216,7 @@ cd: ci test-integration test-performance
 help:
 	@echo "Available targets:"
 	@echo "  make test                 - Run all tests"
+	@echo "  make test-compile        - Compile Go tests only (no execution)"
 	@echo "  make test-single TEST_NAME=TestName - Run specific test"
 	@echo "  make test-basic          - Run basic tests only"
 	@echo "  make test-complete       - Run complete tests"
@@ -237,4 +242,4 @@ help:
 	@echo "  make ci                 - Run CI pipeline"
 	@echo "  make cd                 - Run CD pipeline (includes integration tests)"
 
-.PHONY: check-env deps test test-single test-basic test-complete test-secure test-ip-connect test-tunneling test-shareable-link test-file-copy test-diagnostic-settings test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help
+.PHONY: check-env deps test-compile test test-single test-basic test-complete test-secure test-ip-connect test-tunneling test-shareable-link test-file-copy test-diagnostic-settings test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help

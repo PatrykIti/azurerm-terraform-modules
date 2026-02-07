@@ -40,6 +40,11 @@ run "verify_optional_defaults" {
   }
 
   assert {
+    condition     = var.storage_container_id == null
+    error_message = "storage_container_id should default to null when not set."
+  }
+
+  assert {
     condition     = var.identity == null
     error_message = "identity should default to null when not set."
   }

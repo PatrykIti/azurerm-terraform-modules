@@ -1,28 +1,48 @@
-.PHONY: test test-short test-integration test-all docs clean validate
+.PHONY: test test-short test-basic test-complete test-secure test-validation test-integration test-performance benchmark test-all docs clean validate security check help
 
-# Run only short tests (basic functionality)
+# Default module test entrypoint delegates to the module-local test harness
+# to keep one canonical flow for local and CI usage.
+test:
+	$(MAKE) -C tests test
+
+# Compatibility aliases
+# test-short is kept for callers using older target names.
 test-short:
-	cd tests && go test -v -short -parallel 8 -timeout 30m
+	$(MAKE) -C tests test-basic
 
-# Run only integration tests
+test-basic:
+	$(MAKE) -C tests test-basic
+
+test-complete:
+	$(MAKE) -C tests test-complete
+
+test-secure:
+	$(MAKE) -C tests test-secure
+
+test-validation:
+	$(MAKE) -C tests test-validation
+
 test-integration:
-	cd tests && go test -v -run "Integration|Lifecycle|Disaster|Compliance|Monitoring" -parallel 4 -timeout 60m
+	$(MAKE) -C tests test-integration
 
-# Run all tests
-test-all:
-	cd tests && go test -v -parallel 8 -timeout 60m
+test-performance:
+	$(MAKE) -C tests test-performance
 
-# Default test target
-test: test-short
+benchmark:
+	$(MAKE) -C tests benchmark
+
+# test-all is kept for backward compatibility.
+test-all: test
 
 # Generate documentation
 docs:
 	@echo "Generating documentation..."
 	./generate-docs.sh
 
-# Clean up test artifacts
+# Clean module and test artifacts
 clean:
-	@echo "Cleaning up test artifacts..."
+	@echo "Cleaning module and test artifacts..."
+	$(MAKE) -C tests clean
 	find . -name "*.tfstate*" -type f -delete
 	find . -name ".terraform" -type d -exec rm -rf {} +
 	find . -name "terraform.tfstate.d" -type d -exec rm -rf {} +
@@ -31,7 +51,7 @@ clean:
 # Validate Terraform configuration
 validate:
 	@echo "Initializing Terraform..."
-	terraform init -backend=false
+	terraform init -backend=false -input=false
 	@echo "Validating Terraform configuration..."
 	terraform validate
 	@echo "Formatting check..."
@@ -52,13 +72,19 @@ check: validate security
 # Show help
 help:
 	@echo "Available targets:"
-	@echo "  make test           - Run short tests (default)"
-	@echo "  make test-short     - Run only basic functionality tests"
+	@echo "  make test             - Run canonical module test flow (delegates to tests/Makefile)"
+	@echo "  make test-short       - Run basic tests (compatibility alias)"
+	@echo "  make test-basic       - Run basic tests"
+	@echo "  make test-complete    - Run complete tests"
+	@echo "  make test-secure      - Run secure tests"
+	@echo "  make test-validation  - Run validation tests"
 	@echo "  make test-integration - Run integration tests"
-	@echo "  make test-all       - Run all tests"
-	@echo "  make docs           - Generate/update documentation"
-	@echo "  make clean          - Clean up test artifacts"
-	@echo "  make validate       - Validate Terraform configuration"
-	@echo "  make security       - Run security scans"
-	@echo "  make check          - Run validation and security scans"
-	@echo "  make help           - Show this help message"
+	@echo "  make test-performance - Run performance tests"
+	@echo "  make benchmark        - Run benchmarks"
+	@echo "  make test-all         - Run all tests (compatibility alias)"
+	@echo "  make docs             - Generate/update documentation"
+	@echo "  make clean            - Clean up test and Terraform artifacts"
+	@echo "  make validate         - Validate Terraform configuration"
+	@echo "  make security         - Run security scans"
+	@echo "  make check            - Run validation and security scans"
+	@echo "  make help             - Show this help message"

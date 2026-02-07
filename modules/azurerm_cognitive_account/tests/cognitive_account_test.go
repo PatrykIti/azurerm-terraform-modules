@@ -194,11 +194,7 @@ func TestNetworkCognitiveAccount(t *testing.T) {
 func TestCognitiveAccountPrivateEndpoint(t *testing.T) {
 	t.Parallel()
 
-	if _, err := os.Stat("fixtures/private_endpoint"); os.IsNotExist(err) {
-		t.Skip("Private endpoint fixture not found; skipping test")
-	}
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/private_endpoint")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/openai-secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -311,12 +307,12 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		NoColor: true,
 		// Retry configuration
 		RetryableTerraformErrors: map[string]string{
-			".*timeout.*":                        "Timeout error - retrying",
-			".*ResourceGroupNotFound.*":          "Resource group not found - retrying",
-			".*AlreadyExists.*":                  "Resource already exists - retrying",
-			".*TooManyRequests.*":                "Too many requests - retrying",
+			".*timeout.*":                         "Timeout error - retrying",
+			".*ResourceGroupNotFound.*":           "Resource group not found - retrying",
+			".*AlreadyExists.*":                   "Resource already exists - retrying",
+			".*TooManyRequests.*":                 "Too many requests - retrying",
 			".*AccountProvisioningStateInvalid.*": "Cognitive account still provisioning - retrying",
-			".*in state Accepted.*":              "Cognitive account still provisioning - retrying",
+			".*in state Accepted.*":               "Cognitive account still provisioning - retrying",
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,

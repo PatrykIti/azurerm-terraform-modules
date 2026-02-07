@@ -33,10 +33,14 @@ func TestApplicationInsightsWorkbookFullIntegration(t *testing.T) {
 		resourceID := terraform.Output(t, terraformOptions, "application_insights_workbook_id")
 		resourceName := terraform.Output(t, terraformOptions, "application_insights_workbook_name")
 		identityType := terraform.Output(t, terraformOptions, "identity_type")
+		workbookStorageContainerID := terraform.Output(t, terraformOptions, "workbook_storage_container_id")
+		expectedStorageContainerID := terraform.Output(t, terraformOptions, "expected_storage_container_id")
 
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, resourceName)
 		assert.Equal(t, "SystemAssigned", identityType)
+		assert.NotEmpty(t, workbookStorageContainerID)
+		assert.Equal(t, expectedStorageContainerID, workbookStorageContainerID)
 	})
 }
 

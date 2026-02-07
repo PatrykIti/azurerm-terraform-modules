@@ -69,6 +69,37 @@ run "invalid_source_id" {
   ]
 }
 
+run "valid_storage_container_id" {
+  command = plan
+
+  variables {
+    storage_container_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/teststorage/blobServices/default/containers/workbook-storage"
+    identity = {
+      type = "SystemAssigned"
+    }
+  }
+
+  assert {
+    condition     = var.storage_container_id != null
+    error_message = "storage_container_id should be accepted when it is a valid storage container resource ID."
+  }
+}
+
+run "invalid_storage_container_id" {
+  command = plan
+
+  variables {
+    storage_container_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/teststorage"
+    identity = {
+      type = "SystemAssigned"
+    }
+  }
+
+  expect_failures = [
+    var.storage_container_id
+  ]
+}
+
 run "invalid_identity_type" {
   command = plan
 
@@ -108,6 +139,6 @@ run "identity_ids_without_user_assigned" {
   }
 
   expect_failures = [
-    var.identity
+    azurerm_application_insights_workbook.application_insights_workbook
   ]
 }

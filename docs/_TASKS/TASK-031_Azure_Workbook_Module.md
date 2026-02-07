@@ -12,39 +12,39 @@
 ## Audit Subtasks (2026-02-07)
 
 - Scope Status: **GREEN** - Modul pozostaje atomowy (zarzadza tylko `azurerm_application_insights_workbook`), a cross-resource glue jest poza kodem modulu.
-- Provider Coverage Status: **YELLOW** - Provider `azurerm` 4.57.0 wspiera `storage_container_id`, ale modul nie eksponuje tego argumentu.
+- Provider Coverage Status: **GREEN** - Modul eksponuje `storage_container_id` (input + mapowanie + test coverage).
 - Overall Status: **YELLOW** - Brak High, ale kilka Medium w pokryciu provider + test harness/docs alignment.
 
 ### Naming/Provider-Alignment
 
 - [ ] Potwierdzic i zapisac w tasku capability matrix dla `PRIMARY_RESOURCE` na podstawie realnego schema (`terraform providers schema -json`) zamiast tylko opisu README.
-- [ ] Utrzymac canonical naming bez rename work: `modules/azurerm_application_insights_workbook`, `module.json:name`, i label zasobu w `modules/azurerm_application_insights_workbook/main.tf`.
+- [x] Utrzymac canonical naming bez rename work: `modules/azurerm_application_insights_workbook`, `module.json:name`, i label zasobu w `modules/azurerm_application_insights_workbook/main.tf`.
 - [ ] Dodac `application-insights-workbook` do listy `scopes` w `.github/workflows/pr-validation.yml`, aby `commit_scope` z `modules/azurerm_application_insights_workbook/module.json` byl walidowany.
 
 ### Scope boundaries (what to remove/keep)
 
-- [ ] Zachowac atomic scope: w `modules/azurerm_application_insights_workbook/main.tf` tylko `azurerm_application_insights_workbook`; nie dodawac RBAC/network/private endpoint resources.
-- [ ] Utrzymac zaleznosci pomocnicze (LAW, role assignment) wylacznie w examples (`modules/azurerm_application_insights_workbook/examples/complete/main.tf`, `modules/azurerm_application_insights_workbook/examples/secure/main.tf`), nie w module API.
-- [ ] Doprecyzowac w `modules/azurerm_application_insights_workbook/docs/README.md`, ze `storage_container_id` (po dodaniu wsparcia) pozostaje workbook capability, a RBAC/networking dalej sa out-of-scope.
+- [x] Zachowac atomic scope: w `modules/azurerm_application_insights_workbook/main.tf` tylko `azurerm_application_insights_workbook`; nie dodawac RBAC/network/private endpoint resources.
+- [x] Utrzymac zaleznosci pomocnicze (LAW, role assignment) wylacznie w examples (`modules/azurerm_application_insights_workbook/examples/complete/main.tf`, `modules/azurerm_application_insights_workbook/examples/secure/main.tf`), nie w module API.
+- [x] Doprecyzowac w `modules/azurerm_application_insights_workbook/docs/README.md`, ze `storage_container_id` (po dodaniu wsparcia) pozostaje workbook capability, a RBAC/networking dalej sa out-of-scope.
 
 ### Provider coverage gaps for PRIMARY_RESOURCE
 
-- [ ] Dodac brakujacy input `storage_container_id` do `modules/azurerm_application_insights_workbook/variables.tf` (z walidacja resource ID) i mapowanie w `modules/azurerm_application_insights_workbook/main.tf`.
-- [ ] Zaktualizowac docs (`modules/azurerm_application_insights_workbook/README.md`, `modules/azurerm_application_insights_workbook/docs/README.md`, opcjonalnie `modules/azurerm_application_insights_workbook/docs/IMPORT.md`) o nowy argument i intencje jego uzycia.
-- [ ] Dodac pokrycie testowe dla `storage_container_id` w `modules/azurerm_application_insights_workbook/tests/unit/validation.tftest.hcl` oraz co najmniej jednym Terratest fixture (`tests/fixtures/complete` lub nowy fixture feature-specific).
+- [x] Dodac brakujacy input `storage_container_id` do `modules/azurerm_application_insights_workbook/variables.tf` (z walidacja resource ID) i mapowanie w `modules/azurerm_application_insights_workbook/main.tf`.
+- [x] Zaktualizowac docs (`modules/azurerm_application_insights_workbook/README.md`, `modules/azurerm_application_insights_workbook/docs/README.md`, opcjonalnie `modules/azurerm_application_insights_workbook/docs/IMPORT.md`) o nowy argument i intencje jego uzycia.
+- [x] Dodac pokrycie testowe dla `storage_container_id` w `modules/azurerm_application_insights_workbook/tests/unit/validation.tftest.hcl` oraz co najmniej jednym Terratest fixture (`tests/fixtures/complete` lub nowy fixture feature-specific).
 
 ### Go tests + fixtures checklist gaps
 
-- [ ] Dopasowac `modules/azurerm_application_insights_workbook/tests/Makefile` do wzorca addendum: `SHELL := /bin/bash`, `LOG_DIR`, `LOG_TIMESTAMP`, `run_with_log`, ARM<->AZURE env normalization.
-- [ ] Poprawic `modules/azurerm_application_insights_workbook/tests/run_tests_parallel.sh`: zamienic redirection `2>&1 > "$log_file"` na pipeline z `tee`, aby nie gubic stderr i miec kompletne logi.
-- [ ] Rozdzielic benchmark execution od test execution w `run_tests_parallel.sh` i `run_tests_sequential.sh` (`Benchmark...` nie powinny byc uruchamiane przez `go test -run`).
-- [ ] Uporzadkowac fixture `modules/azurerm_application_insights_workbook/tests/fixtures/negative/` do standardu guide (dodac minimalne `variables.tf` i `outputs.tf` albo udokumentowac wyjatek w `tests/README.md`).
+- [x] Dopasowac `modules/azurerm_application_insights_workbook/tests/Makefile` do wzorca addendum: `SHELL := /bin/bash`, `LOG_DIR`, `LOG_TIMESTAMP`, `run_with_log`, ARM<->AZURE env normalization.
+- [x] Poprawic `modules/azurerm_application_insights_workbook/tests/run_tests_parallel.sh`: zamienic redirection `2>&1 > "$log_file"` na pipeline z `tee`, aby nie gubic stderr i miec kompletne logi.
+- [x] Rozdzielic benchmark execution od test execution w `run_tests_parallel.sh` i `run_tests_sequential.sh` (`Benchmark...` nie powinny byc uruchamiane przez `go test -run`).
+- [x] Uporzadkowac fixture `modules/azurerm_application_insights_workbook/tests/fixtures/negative/` do standardu guide (dodac minimalne `variables.tf` i `outputs.tf` albo udokumentowac wyjatek w `tests/README.md`).
 
 ### Docs/release/test harness alignment
 
-- [ ] Zaktualizowac `modules/azurerm_application_insights_workbook/tests/README.md`, bo obecnie wskazuje nieistniejace targety (`make test-all`, `make test-short`) i nieaktualne nazwy plikow testowych (`module_test.go`).
-- [ ] Ujednolicic kontrakt env vars miedzy `modules/azurerm_application_insights_workbook/tests/Makefile`, `modules/azurerm_application_insights_workbook/tests/test_helpers.go` i `modules/azurerm_application_insights_workbook/tests/test_config.yaml` (ARM_* + AZURE_* fallback).
-- [ ] Zsynchronizowac module-level test entrypoints pomiedzy `modules/azurerm_application_insights_workbook/Makefile` i `modules/azurerm_application_insights_workbook/tests/Makefile`, a potem opisac jeden canonical flow w module README.
+- [x] Zaktualizowac `modules/azurerm_application_insights_workbook/tests/README.md`, bo obecnie wskazuje nieistniejace targety (`make test-all`, `make test-short`) i nieaktualne nazwy plikow testowych (`module_test.go`).
+- [x] Ujednolicic kontrakt env vars miedzy `modules/azurerm_application_insights_workbook/tests/Makefile`, `modules/azurerm_application_insights_workbook/tests/test_helpers.go` i `modules/azurerm_application_insights_workbook/tests/test_config.yaml` (ARM_* + AZURE_* fallback).
+- [x] Zsynchronizowac module-level test entrypoints pomiedzy `modules/azurerm_application_insights_workbook/Makefile` i `modules/azurerm_application_insights_workbook/tests/Makefile`, a potem opisac jeden canonical flow w module README.
 
 ### Validation commands
 

@@ -18,7 +18,7 @@ export ARM_SUBSCRIPTION_ID="your-subscription-id"
 export ARM_TENANT_ID="your-tenant-id"
 export ARM_CLIENT_ID="your-client-id"
 export ARM_CLIENT_SECRET="your-client-secret"
-export ARM_LOCATION="West Europe"  # Optional, defaults to West Europe
+export ARM_LOCATION="North Europe"  # Optional
 ```
 
 ## Running Tests
@@ -35,6 +35,16 @@ go mod download
 make test
 ```
 
+`make test` now enforces a compile gate first (`go test ./... -run '^$'`) before executing Terratest scenarios.
+
+### Compile Gate Only
+
+```bash
+make test-compile
+# or directly:
+go test ./... -run '^$'
+```
+
 ### Run Targeted Tests
 
 ```bash
@@ -49,6 +59,7 @@ make test-diagnostic-settings
 make test-validation
 make test-integration
 make test-performance
+make test-compile
 ```
 
 ### Run a Specific Test
@@ -75,4 +86,5 @@ The `fixtures/` directory contains Terraform configurations for different scenar
 
 - The fixtures use random suffixes to avoid naming collisions.
 - Performance tests are skipped when `-short` is set.
+- All `make test-*` targets write timestamped logs to `tests/test_outputs/`.
 - Update `test_config.yaml` when adding new scenarios.

@@ -20,6 +20,9 @@ module "application_insights_workbook" {
   location            = "westeurope"
   display_name        = "Imported Workbook"
   data_json           = jsonencode({ version = "Notebook/1.0", items = [] })
+
+  # Optional when workbook uses customer-managed storage
+  # storage_container_id = "/subscriptions/.../resourceGroups/.../providers/Microsoft.Storage/storageAccounts/<account>/blobServices/default/containers/<container>"
 }
 ```
 

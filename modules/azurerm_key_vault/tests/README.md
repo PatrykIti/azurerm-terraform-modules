@@ -22,14 +22,24 @@ export ARM_LOCATION="northeurope"  # Optional, defaults to northeurope
 ## Running Tests
 
 ```bash
-go mod download
-make test-all
+cd modules/azurerm_key_vault/tests
+make test
 ```
 
-Run a specific test:
+`make test` runs:
+- compile gate: `go test ./... -run '^$'`
+- full Terratest suite with timestamped logs in `test_outputs/`
+
+Run only the compile gate:
 
 ```bash
-go test -v -run TestBasicKeyVault -timeout 30m
+make test-compile
+```
+
+Run a specific test target:
+
+```bash
+make test-single TEST_NAME=TestBasicKeyVault
 ```
 
 ## Test Structure

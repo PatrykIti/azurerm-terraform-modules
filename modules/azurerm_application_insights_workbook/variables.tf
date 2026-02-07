@@ -91,6 +91,20 @@ variable "source_id" {
   }
 }
 
+variable "storage_container_id" {
+  description = "Optional storage container resource ID used by the workbook for backing storage."
+  type        = string
+  default     = null
+
+  validation {
+    condition = var.storage_container_id == null || can(regex(
+      "(?i)^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.Storage/storageAccounts/[^/]+/blobServices/default/containers/[^/]+$",
+      var.storage_container_id
+    ))
+    error_message = "storage_container_id must be a valid Azure Storage container resource ID when set."
+  }
+}
+
 variable "identity" {
   description = "Managed identity configuration for the workbook."
   type = object({

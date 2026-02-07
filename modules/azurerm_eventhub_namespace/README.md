@@ -9,7 +9,8 @@ Current version: **vUnreleased**
 ## Description
 
 Manages Azure Event Hub Namespaces and related sub-resources (authorization rules,
-network rule set, disaster recovery config, CMK, and diagnostic settings).
+schema registry groups, network rule set, disaster recovery config, CMK, and
+diagnostic settings).
 
 ## Usage
 
@@ -23,12 +24,28 @@ module "eventhub_namespace" {
 
   sku = "Standard"
 
+  schema_groups = [
+    {
+      name                 = "orders"
+      schema_type          = "Avro"
+      schema_compatibility = "Backward"
+    }
+  ]
+
   tags = {
     Environment = "Development"
     Project     = "Example"
   }
 }
 ```
+
+## Schema Registry Groups
+
+The module exposes namespace schema registry support end-to-end:
+
+- Input: `schema_groups`
+- Managed resource: `azurerm_eventhub_namespace_schema_group.schema_group`
+- Output: `schema_group_ids`
 
 ## Security Considerations
 

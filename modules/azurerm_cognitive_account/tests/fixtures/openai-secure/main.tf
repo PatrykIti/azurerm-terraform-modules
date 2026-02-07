@@ -32,10 +32,10 @@ resource "azurerm_virtual_network" "example" {
 }
 
 resource "azurerm_subnet" "private_endpoint" {
-  name                 = "snet-pe-cog-${var.random_suffix}"
-  resource_group_name  = azurerm_resource_group.example.name
-  virtual_network_name = azurerm_virtual_network.example.name
-  address_prefixes     = ["10.50.1.0/24"]
+  name                              = "snet-pe-cog-${var.random_suffix}"
+  resource_group_name               = azurerm_resource_group.example.name
+  virtual_network_name              = azurerm_virtual_network.example.name
+  address_prefixes                  = ["10.50.1.0/24"]
   private_endpoint_network_policies = "Disabled"
 }
 

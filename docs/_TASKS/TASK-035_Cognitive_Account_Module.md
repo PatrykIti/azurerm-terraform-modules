@@ -35,16 +35,16 @@
 
 ### Go tests + fixtures checklist gaps
 
-- [ ] Naprawic rozjazd fixture path `fixtures/private_endpoint`: obecnie testy odwoluja sie do nieistniejacej sciezki w `modules/azurerm_cognitive_account/tests/cognitive_account_test.go` i `modules/azurerm_cognitive_account/tests/integration_test.go`.
-- [ ] Zdecydowac i wdrozyc jedno z dwoch: (A) dodac `modules/azurerm_cognitive_account/tests/fixtures/private_endpoint`, albo (B) przepiac testy na istniejace `tests/fixtures/secure` / `tests/fixtures/openai-secure`.
-- [ ] Utrzymac `CopyTerraformFolderToTemp(t, "..", "tests/fixtures/...")` jako standard, bo modul nie wymaga sibling-module dependencies w fixtures.
-- [ ] Dodac compile gate `go test ./... -run '^$'` do checklisty runbookowej i do test pipeline.
+- [x] Naprawic rozjazd fixture path `fixtures/private_endpoint`: obecnie testy odwoluja sie do nieistniejacej sciezki w `modules/azurerm_cognitive_account/tests/cognitive_account_test.go` i `modules/azurerm_cognitive_account/tests/integration_test.go`.
+- [x] Zdecydowac i wdrozyc jedno z dwoch: (A) dodac `modules/azurerm_cognitive_account/tests/fixtures/private_endpoint`, albo (B) przepiac testy na istniejace `tests/fixtures/secure` / `tests/fixtures/openai-secure`.
+- [x] Utrzymac `CopyTerraformFolderToTemp(t, "..", "tests/fixtures/...")` jako standard, bo modul nie wymaga sibling-module dependencies w fixtures.
+- [x] Dodac compile gate `go test ./... -run '^$'` do checklisty runbookowej i do test pipeline.
 
 ### Docs/release/test harness alignment
 
-- [ ] Zaktualizowac `modules/azurerm_cognitive_account/tests/README.md` - usunac nieistniejace komendy (`make test-all`, `make test-short`) i nieaktualne nazwy plikow (`module_test.go`).
-- [ ] Ujednolicic README z realnymi fixture names (`openai-basic`, `openai-complete`, `openai-secure`, `language-basic`, `speech-basic`).
-- [ ] Usunac techniczne artefakty z examples (`modules/azurerm_cognitive_account/examples/*/.terraform*`) i dodac kontrolke na brak takich plikow w QA checklist.
+- [x] Zaktualizowac `modules/azurerm_cognitive_account/tests/README.md` - usunac nieistniejace komendy (`make test-all`, `make test-short`) i nieaktualne nazwy plikow (`module_test.go`).
+- [x] Ujednolicic README z realnymi fixture names (`openai-basic`, `openai-complete`, `openai-secure`, `language-basic`, `speech-basic`).
+- [x] Usunac techniczne artefakty z examples (`modules/azurerm_cognitive_account/examples/*/.terraform*`) i dodac kontrolke na brak takich plikow w QA checklist.
 
 ### Validation commands
 

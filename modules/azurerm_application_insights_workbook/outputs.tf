@@ -18,6 +18,11 @@ output "resource_group_name" {
   value       = try(azurerm_application_insights_workbook.application_insights_workbook.resource_group_name, null)
 }
 
+output "storage_container_id" {
+  description = "The storage container resource ID configured for the workbook, when set."
+  value       = try(azurerm_application_insights_workbook.application_insights_workbook.storage_container_id, null)
+}
+
 output "identity" {
   description = "Managed identity information for the workbook."
   value = try({

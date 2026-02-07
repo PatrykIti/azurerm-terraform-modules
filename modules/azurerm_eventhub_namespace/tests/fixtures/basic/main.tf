@@ -30,7 +30,11 @@ module "eventhub_namespace" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  sku = var.sku
+  sku      = var.sku
+  capacity = var.capacity
+
+  auto_inflate_enabled     = var.auto_inflate_enabled
+  maximum_throughput_units = var.maximum_throughput_units
 
   tags = {
     Environment = "Development"

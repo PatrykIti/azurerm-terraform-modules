@@ -16,8 +16,9 @@ mock_provider "azurerm" {
 
   mock_data "azurerm_monitor_diagnostic_categories" {
     defaults = {
-      log_category_types = ["BastionAuditLogs"]
-      metrics            = ["AllMetrics"]
+      log_category_types  = ["BastionAuditLogs"]
+      log_category_groups = ["allLogs"]
+      metrics             = ["AllMetrics"]
     }
   }
 }
@@ -152,5 +153,43 @@ run "scale_units_requires_standard_or_premium" {
 
   expect_failures = [
     azurerm_bastion_host.bastion_host
+  ]
+}
+
+run "diagnostic_partner_solution_only_destination_is_allowed" {
+  command = plan
+
+  variables {
+    diagnostic_settings = [
+      {
+        name                = "diag-partner"
+        partner_solution_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationsManagement/solutions/example"
+        log_categories      = ["BastionAuditLogs"]
+      }
+    ]
+  }
+
+  assert {
+    condition     = length(var.diagnostic_settings) == 1
+    error_message = "diagnostic_settings should accept partner_solution_id as a valid destination."
+  }
+}
+
+run "diagnostic_rejects_empty_partner_solution_id" {
+  command = plan
+
+  variables {
+    diagnostic_settings = [
+      {
+        name                       = "diag-empty-partner"
+        partner_solution_id        = ""
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/law"
+        log_categories             = ["BastionAuditLogs"]
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings
   ]
 }

@@ -2,6 +2,7 @@
 
 # Source environment variables if they exist
 if [ -f "./test_env.sh" ]; then
+  # shellcheck disable=SC1091
   source ./test_env.sh
 fi
 
@@ -9,52 +10,51 @@ fi
 OUTPUT_DIR="test_outputs/parallel_run_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$OUTPUT_DIR"
 
-# Function to run a single test and save output
-run_test() {
+run_test_case() {
     local test_name=$1
+    local kind=$2
     local output_file="$OUTPUT_DIR/${test_name}.json"
     local log_file="$OUTPUT_DIR/${test_name}.log"
-    
-    echo "[$(date +%H:%M:%S)] Starting test: $test_name"
-    
-    local start_time=$(date +%s)
-    go test -v -timeout 60m -run "^${test_name}$" . 2>&1 > "$log_file"
-    local exit_status=$?
-    local end_time=$(date +%s)
+
+    echo "[$(date +%H:%M:%S)] Starting ${kind}: $test_name"
+
+    local start_time
+    start_time=$(date +%s)
+
+    if [ "$kind" = "benchmark" ]; then
+        go test -v -timeout 60m -run=^$ -bench "^${test_name}$" -benchtime=1x . 2>&1 | tee "$log_file"
+    else
+        go test -v -timeout 60m -run "^${test_name}$" . 2>&1 | tee "$log_file"
+    fi
+
+    local exit_status=${PIPESTATUS[0]}
+    local end_time
+    end_time=$(date +%s)
     local duration=$((end_time - start_time))
-    
-    local status="unknown"
-    if grep -q "^--- PASS:" "$log_file"; then
+
+    local status="failed"
+    if [ "$exit_status" -eq 0 ]; then
         status="passed"
-    elif grep -q "^--- FAIL:" "$log_file"; then
-        status="failed"
-    elif grep -q "^--- SKIP:" "$log_file"; then
-        status="skipped"
     fi
-    
-    local error_message=""
-    if [ "$status" = "failed" ]; then
-        error_message=$(grep -A 5 "^--- FAIL:" "$log_file" | tail -n +2 | head -5 | tr '\n' ' ' | sed 's/"/\\"/g')
-    fi
-    
-    cat > "$output_file" << EOF
+
+    cat > "$output_file" << EOF_JSON
 {
   "test_name": "$test_name",
+  "kind": "$kind",
   "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "exit_status": $exit_status,
   "status": "$status",
   "duration_seconds": $duration,
   "success": $([ $exit_status -eq 0 ] && echo "true" || echo "false"),
-  "error_message": "$error_message",
   "log_file": "$(basename "$log_file")"
 }
-EOF
-    
-    echo "[$(date +%H:%M:%S)] Completed test: $test_name - Status: $status (${duration}s)"
+EOF_JSON
+
+    echo "[$(date +%H:%M:%S)] Completed ${kind}: $test_name - Status: $status (${duration}s)"
     return $exit_status
 }
 
-# List of tests to run
+# Tests and benchmarks are executed in separate phases.
 tests=(
     "TestBasicApplicationInsightsWorkbook"
     "TestCompleteApplicationInsightsWorkbook"
@@ -64,25 +64,35 @@ tests=(
     "TestApplicationInsightsWorkbookFullIntegration"
     "TestApplicationInsightsWorkbookLifecycle"
     "TestApplicationInsightsWorkbookCreationTime"
+)
+
+benchmarks=(
     "BenchmarkApplicationInsightsWorkbookCreationSimple"
+    "BenchmarkApplicationInsightsWorkbookParallelCreation"
 )
 
 echo "Starting parallel test execution for azurerm_application_insights_workbook"
-echo "Total tests to run: ${#tests[@]}"
+echo "Total tests: ${#tests[@]}"
+echo "Total benchmarks: ${#benchmarks[@]}"
 echo "Output directory: $OUTPUT_DIR"
 echo "=================================="
 
 declare -a pids=()
 
-for test in "${tests[@]}"; do
-    run_test "$test" &
+for test_name in "${tests[@]}"; do
+    run_test_case "$test_name" "test" &
     pids+=($!)
 done
 
-echo "Waiting for all tests to complete..."
+echo "Waiting for parallel tests to complete..."
 for pid in "${pids[@]}"; do
     wait "$pid" || true
 done
 
-echo "All tests completed. Results saved in: $OUTPUT_DIR"
+echo "Running benchmarks sequentially..."
+for benchmark_name in "${benchmarks[@]}"; do
+    run_test_case "$benchmark_name" "benchmark" || true
+done
+
+echo "All test phases completed. Results saved in: $OUTPUT_DIR"
 exit 0

@@ -16,30 +16,37 @@ import (
 
 // TestConfig holds common test configuration
 type TestConfig struct {
-	SubscriptionID    string
-	TenantID         string
-	ClientID         string
-	ClientSecret     string
-	Location         string
-	ResourceGroup    string
-	UniqueID         string
+	SubscriptionID string
+	TenantID       string
+	ClientID       string
+	ClientSecret   string
+	Location       string
+	ResourceGroup  string
+	UniqueID       string
+}
+
+func getEnvWithFallback(primary, fallback string) string {
+	if value := strings.TrimSpace(os.Getenv(primary)); value != "" {
+		return value
+	}
+	return strings.TrimSpace(os.Getenv(fallback))
 }
 
 // GetTestConfig returns a test configuration with required Azure credentials
 func GetTestConfig(t *testing.T) *TestConfig {
-	subscriptionID := os.Getenv("ARM_SUBSCRIPTION_ID")
-	require.NotEmpty(t, subscriptionID, "ARM_SUBSCRIPTION_ID environment variable must be set")
+	subscriptionID := getEnvWithFallback("ARM_SUBSCRIPTION_ID", "AZURE_SUBSCRIPTION_ID")
+	require.NotEmpty(t, subscriptionID, "ARM_SUBSCRIPTION_ID or AZURE_SUBSCRIPTION_ID environment variable must be set")
 
-	tenantID := os.Getenv("ARM_TENANT_ID")
-	require.NotEmpty(t, tenantID, "ARM_TENANT_ID environment variable must be set")
+	tenantID := getEnvWithFallback("ARM_TENANT_ID", "AZURE_TENANT_ID")
+	require.NotEmpty(t, tenantID, "ARM_TENANT_ID or AZURE_TENANT_ID environment variable must be set")
 
-	clientID := os.Getenv("ARM_CLIENT_ID")
-	require.NotEmpty(t, clientID, "ARM_CLIENT_ID environment variable must be set")
+	clientID := getEnvWithFallback("ARM_CLIENT_ID", "AZURE_CLIENT_ID")
+	require.NotEmpty(t, clientID, "ARM_CLIENT_ID or AZURE_CLIENT_ID environment variable must be set")
 
-	clientSecret := os.Getenv("ARM_CLIENT_SECRET")
-	require.NotEmpty(t, clientSecret, "ARM_CLIENT_SECRET environment variable must be set")
+	clientSecret := getEnvWithFallback("ARM_CLIENT_SECRET", "AZURE_CLIENT_SECRET")
+	require.NotEmpty(t, clientSecret, "ARM_CLIENT_SECRET or AZURE_CLIENT_SECRET environment variable must be set")
 
-	location := os.Getenv("ARM_LOCATION")
+	location := getEnvWithFallback("ARM_LOCATION", "AZURE_LOCATION")
 	if location == "" {
 		location = "West Europe"
 	}
@@ -48,12 +55,12 @@ func GetTestConfig(t *testing.T) *TestConfig {
 
 	return &TestConfig{
 		SubscriptionID: subscriptionID,
-		TenantID:      tenantID,
-		ClientID:      clientID,
-		ClientSecret:  clientSecret,
-		Location:      location,
-		ResourceGroup: fmt.Sprintf("rg-test-application_insights_workbook-%s", uniqueID),
-		UniqueID:      uniqueID,
+		TenantID:       tenantID,
+		ClientID:       clientID,
+		ClientSecret:   clientSecret,
+		Location:       location,
+		ResourceGroup:  fmt.Sprintf("rg-test-application_insights_workbook-%s", uniqueID),
+		UniqueID:       uniqueID,
 	}
 }
 

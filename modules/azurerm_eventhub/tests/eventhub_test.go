@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -135,34 +134,6 @@ func TestNetworkEventhub(t *testing.T) {
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, resourceName)
 		assert.NotEmpty(t, resourceGroupName)
-	})
-}
-
-// Test private endpoint configuration
-func TestEventhubPrivateEndpoint(t *testing.T) {
-	t.Parallel()
-
-	if _, err := os.Stat("tests/fixtures/private_endpoint"); os.IsNotExist(err) {
-		t.Skip("Private endpoint fixture not found; skipping test")
-	}
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/private_endpoint")
-	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
-	})
-
-	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
-		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
-	})
-
-	test_structure.RunTestStage(t, "validate", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-
-		resourceID := terraform.Output(t, terraformOptions, "eventhub_id")
-
-		assert.NotEmpty(t, resourceID)
 	})
 }
 

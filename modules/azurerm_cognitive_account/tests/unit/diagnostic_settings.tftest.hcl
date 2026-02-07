@@ -10,19 +10,19 @@ mock_provider "azurerm" {
   mock_resource "azurerm_monitor_diagnostic_setting" {}
   mock_data "azurerm_monitor_diagnostic_categories" {
     defaults = {
-      log_category_types   = ["AuditEvent"]
-      log_category_groups  = ["allLogs"]
-      metrics              = ["AllMetrics"]
+      log_category_types  = ["AuditEvent"]
+      log_category_groups = ["allLogs"]
+      metrics             = ["AllMetrics"]
     }
   }
 }
 
 variables {
-  name                = "cogunit"
-  resource_group_name = "test-rg"
-  location            = "westeurope"
-  kind                = "OpenAI"
-  sku_name            = "S0"
+  name                  = "cogunit"
+  resource_group_name   = "test-rg"
+  location              = "westeurope"
+  kind                  = "OpenAI"
+  sku_name              = "S0"
   custom_subdomain_name = "cogunit"
 }
 

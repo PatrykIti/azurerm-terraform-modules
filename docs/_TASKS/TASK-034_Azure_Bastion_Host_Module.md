@@ -101,9 +101,14 @@ wszystkie odstepstwa musza byc jawnie udokumentowane.
 ### 3) Provider coverage - diagnostic settings companion (`azurerm_monitor_diagnostic_setting`)
 
 - [x] Potwierdzic inline diagnostics pattern zgodny z filozofia atomic module (diagnostic settings jako dozwolony inline wyjatek).
-- [ ] Rozstrzygnac i udokumentowac czy module ma wspierac `partner_solution_id` (albo jawnie oznaczyc jako intentional omission).
-- [ ] Rozstrzygnac i udokumentowac czy module ma wspierac `enabled_log.category_group` / `log_category_groups` (albo jawnie oznaczyc jako intentional omission).
-- [ ] Dodac testy + dokumentacje dla wybranej decyzji (implementacja albo kontrolowane pominiecie z uzasadnieniem).
+- [x] Rozstrzygnac i udokumentowac czy module ma wspierac `partner_solution_id` (albo jawnie oznaczyc jako intentional omission).
+- [x] Rozstrzygnac i udokumentowac czy module ma wspierac `enabled_log.category_group` / `log_category_groups` (albo jawnie oznaczyc jako intentional omission).
+- [x] Dodac testy + dokumentacje dla wybranej decyzji (implementacja albo kontrolowane pominiecie z uzasadnieniem).
+
+Decyzja (2026-02-07):
+- `partner_solution_id`: **Implemented** w `modules/azurerm_bastion_host/variables.tf` i `modules/azurerm_bastion_host/diagnostics.tf`.
+- `log_category_groups` / `enabled_log.category_group`: **Implemented** w `modules/azurerm_bastion_host/variables.tf` i `modules/azurerm_bastion_host/diagnostics.tf` (z filtrowaniem do categories/groups expose'owanych przez `data.azurerm_monitor_diagnostic_categories`).
+- Pokrycie testami/docs: `modules/azurerm_bastion_host/tests/unit/validation.tftest.hcl`, `modules/azurerm_bastion_host/tests/unit/outputs.tftest.hcl`, `modules/azurerm_bastion_host/docs/README.md`, `modules/azurerm_bastion_host/README.md`.
 
 ### 4) Module structure, docs, examples (Checklist 10 domains)
 
@@ -112,6 +117,7 @@ wszystkie odstepstwa musza byc jawnie udokumentowane.
 - [x] Potwierdzic wymagane przyklady: `examples/basic`, `examples/complete`, `examples/secure` + feature-specific examples.
 - [ ] Zaktualizowac historyczna sekcje `Feature matrix` w tym tasku (obecnie nie odzwierciedla wprost SKU `Developer` i pelnego `Premium` flow).
 - [ ] Dodac plan examples/tests dla scenariuszy `Developer` i `Premium + session_recording_enabled` (albo jawnie opisac powod braku).
+  - Defer: wymaga dodatkowych fixtures + integracyjnych scenariuszy runtime (wiekszy zakres niz bezpieczny audit fix).
 
 ### 5) Testing + Go tests/fixtures addendum (Checklist 10 Testing + 11.G)
 
@@ -120,8 +126,9 @@ wszystkie odstepstwa musza byc jawnie udokumentowane.
 - [x] Potwierdzic `source = "../../.."` w fixtures i brak zaleznosci na sibling modules (wiec `CopyTerraformFolderToTemp(t, "..", "tests/fixtures/...")` pozostaje poprawne).
 - [ ] Dodac pozytywne testy scenariuszy: `Developer` (`virtual_network_id`) oraz `Premium` (`session_recording_enabled = true`).
 - [ ] Rozszerzyc negative tests o diagnostyke (brak destination, niepoprawne `areas`, niepoprawne kombinacje).
-- [ ] Domknac zgodnosc `tests/Makefile` z addendum: wszystkie targety `test-*` powinny korzystac z `run_with_log` (uzupelnic `test-quick`, `test-junit`).
-- [ ] Dodac i egzekwowac compile gate dla testow Go: `go test ./... -run '^$'`.
+- [x] Domknac zgodnosc `tests/Makefile` z addendum: wszystkie targety `test-*` powinny korzystac z `run_with_log` (uzupelnic `test-quick`, `test-junit`).
+- [x] Dodac i egzekwowac compile gate dla testow Go: `go test ./... -run '^$'`.
+  - Defer (pozostale duze testy): pelne pozytywne scenariusze `Developer`/`Premium` i szersze negative cases wymagaja nowych fixture/integration coverage.
 
 ### 6) Release + CI/CD integration (Checklist 10 Configuration/CI)
 

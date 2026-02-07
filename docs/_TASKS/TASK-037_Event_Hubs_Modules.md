@@ -21,7 +21,7 @@
 
 - [ ] Dodac matrix `PRIMARY_RESOURCE=azurerm_eventhub_namespace` z mapowaniem `provider capability -> file:line -> status`.
 - [ ] Zweryfikowac spojnosc naming i import paths dla namespace resources w `modules/azurerm_eventhub_namespace/main.tf`, `modules/azurerm_eventhub_namespace/outputs.tf`, `modules/azurerm_eventhub_namespace/docs/IMPORT.md`.
-- [ ] Uporzadkowac dokumentacje pod katem funkcji juz zaimplementowanych (`schema_groups`), aby README/docs nie zanizaly zakresu.
+- [x] Uporzadkowac dokumentacje pod katem funkcji juz zaimplementowanych (`schema_groups`), aby README/docs nie zanizaly zakresu.
 
 #### Scope boundaries (what to remove/keep)
 
@@ -30,21 +30,21 @@
 
 #### Provider coverage gaps for PRIMARY_RESOURCE
 
-- [ ] Udokumentowac pokrycie `schema_groups` (inputs, resource, outputs) w `modules/azurerm_eventhub_namespace/README.md`, `modules/azurerm_eventhub_namespace/docs/README.md`, `modules/azurerm_eventhub_namespace/docs/IMPORT.md`.
+- [x] Udokumentowac pokrycie `schema_groups` (inputs, resource, outputs) w `modules/azurerm_eventhub_namespace/README.md`, `modules/azurerm_eventhub_namespace/docs/README.md`, `modules/azurerm_eventhub_namespace/docs/IMPORT.md`.
 - [ ] Zweryfikowac i udokumentowac decyzje dla capabilities typu `kafka_enabled` / `zone_redundant` na podstawie schema `4.57.0` (supported vs intentional omission).
 - [ ] Zweryfikowac coverage i walidacje dla network rules, disaster recovery i diagnostics.
 
 #### Go tests + fixtures checklist gaps
 
-- [ ] Usunac/rework scenariusze private-endpoint testow, bo `modules/azurerm_eventhub_namespace/tests/fixtures/private_endpoint` nie istnieje, a testy dalej sie do niego odwoluja.
-- [ ] Utrzymac `CopyTerraformFolderToTemp(t, "..", "tests/fixtures/...")` dla namespace (brak zaleznosci na sibling modules).
-- [ ] Oczyscic `modules/azurerm_eventhub_namespace/tests/performance_test.go` z placeholder vars (`enable_monitoring`, `enable_backup`, `instance_count`) i mapowac tylko na realne inputs.
+- [x] Usunac/rework scenariusze private-endpoint testow, bo `modules/azurerm_eventhub_namespace/tests/fixtures/private_endpoint` nie istnieje, a testy dalej sie do niego odwoluja.
+- [x] Utrzymac `CopyTerraformFolderToTemp(t, "..", "tests/fixtures/...")` dla namespace (brak zaleznosci na sibling modules).
+- [x] Oczyscic `modules/azurerm_eventhub_namespace/tests/performance_test.go` z placeholder vars (`enable_monitoring`, `enable_backup`, `instance_count`) i mapowac tylko na realne inputs.
 - [ ] Dodac compile gate `go test ./... -run '^$'` i egzekwowac go razem z `make test`.
 
 #### Docs/release/test harness alignment
 
-- [ ] Zaktualizowac `modules/azurerm_eventhub_namespace/tests/README.md`: usunac nieistniejace komendy (`make test-all`, `make test-short`) i nieaktualne nazwy plikow (`module_test.go`).
-- [ ] Potwierdzic, ze `modules/azurerm_eventhub_namespace/tests/Makefile` nadal spelnia wzorzec logging/env-normalization i zapisuje logi w `tests/test_outputs`.
+- [x] Zaktualizowac `modules/azurerm_eventhub_namespace/tests/README.md`: usunac nieistniejace komendy (`make test-all`, `make test-short`) i nieaktualne nazwy plikow (`module_test.go`).
+- [x] Potwierdzic, ze `modules/azurerm_eventhub_namespace/tests/Makefile` nadal spelnia wzorzec logging/env-normalization i zapisuje logi w `tests/test_outputs`.
 
 #### Validation commands
 
@@ -65,7 +65,7 @@
 
 - [ ] Dodac matrix `PRIMARY_RESOURCE=azurerm_eventhub` z evidence `file:line`.
 - [ ] Potwierdzic spojnosc naming/references dla `modules/azurerm_eventhub/main.tf`, `modules/azurerm_eventhub/outputs.tf`, `modules/azurerm_eventhub/docs/IMPORT.md`.
-- [ ] Zweryfikowac, ze fixture sources do sibling namespace module pozostaja poprawne (`../../../../azurerm_eventhub_namespace`) po kopiowaniu szerszego katalogu.
+- [x] Zweryfikowac, ze fixture sources do sibling namespace module pozostaja poprawne (`../../../../azurerm_eventhub_namespace`) po kopiowaniu szerszego katalogu.
 
 #### Scope boundaries (what to remove/keep)
 
@@ -79,15 +79,15 @@
 
 #### Go tests + fixtures checklist gaps
 
-- [ ] Utrzymac pattern `CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/...")` dla fixture dependency na sibling module (`azurerm_eventhub_namespace`).
-- [ ] Usunac/rework private-endpoint test cases, bo `modules/azurerm_eventhub/tests/fixtures/private_endpoint` nie istnieje.
-- [ ] Oczyscic `modules/azurerm_eventhub/tests/performance_test.go` z placeholder vars (`enable_monitoring`, `enable_backup`, `instance_count`) i dopasowac do realnych inputow modulu.
+- [x] Utrzymac pattern `CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/...")` dla fixture dependency na sibling module (`azurerm_eventhub_namespace`).
+- [x] Usunac/rework private-endpoint test cases, bo `modules/azurerm_eventhub/tests/fixtures/private_endpoint` nie istnieje.
+- [x] Oczyscic `modules/azurerm_eventhub/tests/performance_test.go` z placeholder vars (`enable_monitoring`, `enable_backup`, `instance_count`) i dopasowac do realnych inputow modulu.
 - [ ] Dodac compile gate `go test ./... -run '^$'` i egzekwowac razem z `make test`.
 
 #### Docs/release/test harness alignment
 
-- [ ] Zaktualizowac `modules/azurerm_eventhub/tests/README.md` (usunac `make test-all`, `make test-short`, `module_test.go`; dopasowac do realnych targets i plikow).
-- [ ] Potwierdzic, ze `modules/azurerm_eventhub/tests/Makefile` ma pelne `run_with_log` pokrycie targetow oraz logowanie `tests/test_outputs/*.log`.
+- [x] Zaktualizowac `modules/azurerm_eventhub/tests/README.md` (usunac `make test-all`, `make test-short`, `module_test.go`; dopasowac do realnych targets i plikow).
+- [x] Potwierdzic, ze `modules/azurerm_eventhub/tests/Makefile` ma pelne `run_with_log` pokrycie targetow oraz logowanie `tests/test_outputs/*.log`.
 
 #### Validation commands
 

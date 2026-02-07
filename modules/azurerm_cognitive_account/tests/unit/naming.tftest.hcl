@@ -12,11 +12,11 @@ mock_provider "azurerm" {
 }
 
 variables {
-  name                = "cogunit"
-  resource_group_name = "test-rg"
-  location            = "westeurope"
-  kind                = "OpenAI"
-  sku_name            = "S0"
+  name                  = "cogunit"
+  resource_group_name   = "test-rg"
+  location              = "westeurope"
+  kind                  = "OpenAI"
+  sku_name              = "S0"
   custom_subdomain_name = "cogunit"
 }
 

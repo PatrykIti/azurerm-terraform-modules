@@ -92,17 +92,16 @@ func BenchmarkCognitiveAccountCreationWithFeatures(b *testing.B) {
 func BenchmarkCognitiveAccountCreationWithScale(b *testing.B) {
 	b.ReportAllocs()
 
-	// Define different scale configurations
-	scaleCounts := []int{1, 5, 10, 20}
+	// Vary a real module input (`tags`) instead of using placeholder scale knobs.
+	tagCounts := []int{1, 5, 10, 20}
 
-	for _, count := range scaleCounts {
-		b.Run(fmt.Sprintf("Scale_%d", count), func(b *testing.B) {
+	for _, count := range tagCounts {
+		b.Run(fmt.Sprintf("Tags_%d", count), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
 				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/openai-basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
-
-				_ = count
+				terraformOptions.Vars["tags"] = buildBenchmarkTags(count)
 
 				// Override the random_suffix for benchmarking
 				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -117,7 +116,7 @@ func BenchmarkCognitiveAccountCreationWithScale(b *testing.B) {
 				b.StartTimer()
 
 				b.ReportMetric(float64(creationTime.Milliseconds()), "creation_ms")
-				b.ReportMetric(float64(count), "scale_count")
+				b.ReportMetric(float64(count), "tag_count")
 			}
 		})
 	}
@@ -293,4 +292,17 @@ func TestCognitiveAccountDestroyPerformance(t *testing.T) {
 	// Destroy should complete within 3 minutes
 	require.LessOrEqual(t, destroyTime, 3*time.Minute,
 		"Destroy took %v, expected less than 3 minutes", destroyTime)
+}
+
+func buildBenchmarkTags(count int) map[string]string {
+	tags := map[string]string{
+		"Environment": "Test",
+		"Benchmark":   "true",
+	}
+
+	for i := 0; i < count; i++ {
+		tags[fmt.Sprintf("PerfTag%02d", i)] = fmt.Sprintf("value-%02d", i)
+	}
+
+	return tags
 }

@@ -4,13 +4,14 @@ This fixture demonstrates a full Application Insights Workbook configuration.
 
 ## Features
 
-- Workbook with category, description, and source ID
+- Workbook with category, description, source ID, and storage container ID
 - System-assigned identity
 - Log Analytics workspace as the source resource
+- Storage account + blob container wired through `storage_container_id`
 
 ## Key Configuration
 
-This fixture exercises identity and source linkage for integration testing.
+This fixture exercises identity, source linkage, and storage container wiring for integration testing.
 
 ## Usage
 

@@ -23,8 +23,9 @@ mock_provider "azurerm" {
 
   mock_data "azurerm_monitor_diagnostic_categories" {
     defaults = {
-      log_category_types = ["BastionAuditLogs"]
-      metrics            = ["AllMetrics"]
+      log_category_types  = ["BastionAuditLogs"]
+      log_category_groups = ["allLogs"]
+      metrics             = ["AllMetrics"]
     }
   }
 }
@@ -99,5 +100,24 @@ run "verify_diagnostic_settings_skipped" {
   assert {
     condition     = output.diagnostic_settings_skipped[0].name == "empty-categories"
     error_message = "Skipped diagnostic settings entry should include the name."
+  }
+}
+
+run "verify_diagnostic_partner_solution_and_category_group" {
+  command = apply
+
+  variables {
+    diagnostic_settings = [
+      {
+        name                = "partner-and-group"
+        partner_solution_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationsManagement/solutions/example"
+        log_category_groups = ["allLogs"]
+      }
+    ]
+  }
+
+  assert {
+    condition     = length(output.diagnostic_settings_skipped) == 0
+    error_message = "Supported category groups should not be skipped when partner_solution_id is used as destination."
   }
 }

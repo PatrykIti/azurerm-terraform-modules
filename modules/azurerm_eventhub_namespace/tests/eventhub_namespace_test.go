@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -70,11 +69,11 @@ func TestCompleteEventhubNamespace(t *testing.T) {
 		// Get outputs
 		resourceID := terraform.Output(t, terraformOptions, "eventhub_namespace_id")
 		resourceName := terraform.Output(t, terraformOptions, "eventhub_namespace_name")
-		
+
 		// Validate complete configuration
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, resourceName)
-		
+
 		// Add additional validations for complete configuration
 		// This should test all optional features and advanced settings
 	})
@@ -104,7 +103,7 @@ func TestSecureEventhubNamespace(t *testing.T) {
 		// Validate security settings
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, resourceName)
-		
+
 		// Add security-specific validations
 		// Validate encryption, TLS settings, access controls, etc.
 	})
@@ -129,46 +128,12 @@ func TestNetworkEventhubNamespace(t *testing.T) {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
 		resourceID := terraform.Output(t, terraformOptions, "eventhub_namespace_id")
-		
+
 		// Validate network rules
 		assert.NotEmpty(t, resourceID)
-		
+
 		// Add network-specific validations
 		// Validate IP rules, subnet restrictions, private endpoints, etc.
-	})
-}
-
-// Test private endpoint configuration
-func TestEventhubNamespacePrivateEndpoint(t *testing.T) {
-	t.Parallel()
-
-	if _, err := os.Stat("tests/fixtures/private_endpoint"); os.IsNotExist(err) {
-		t.Skip("Private endpoint fixture not found; skipping test")
-	}
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/private_endpoint")
-	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
-	})
-
-	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
-		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
-	})
-
-	test_structure.RunTestStage(t, "validate", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-
-		resourceID := terraform.Output(t, terraformOptions, "eventhub_namespace_id")
-		privateEndpointID := terraform.Output(t, terraformOptions, "private_endpoint_id")
-
-		// Validate private endpoint was created
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, privateEndpointID)
-		
-		// Validate public network access is disabled
-		// Add additional private endpoint validations
 	})
 }
 
@@ -195,7 +160,7 @@ func TestEventhubNamespaceValidationRules(t *testing.T) {
 			t.Parallel()
 
 			testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", fmt.Sprintf("tests/fixtures/%s", tc.fixtureFile))
-			
+
 			// Use minimal terraform options for negative tests (no variables)
 			terraformOptions := &terraform.Options{
 				TerraformDir: testFolder,
@@ -230,7 +195,7 @@ func BenchmarkEventhubNamespaceCreation(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		// Generate unique name for each iteration
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
-		
+
 		terraform.InitAndApply(b, terraformOptions)
 		terraform.Destroy(b, terraformOptions)
 	}
@@ -242,7 +207,7 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	timestamp := time.Now().UnixNano() % 1000 // Last 3 digits for more variation
 	baseID := strings.ToLower(random.UniqueId())
 	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
-	
+
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
@@ -252,10 +217,10 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		NoColor: true,
 		// Retry configuration
 		RetryableTerraformErrors: map[string]string{
-			".*timeout.*":                    "Timeout error - retrying",
-			".*ResourceGroupNotFound.*":      "Resource group not found - retrying",
-			".*AlreadyExists.*":              "Resource already exists - retrying",
-			".*TooManyRequests.*":            "Too many requests - retrying",
+			".*timeout.*":               "Timeout error - retrying",
+			".*ResourceGroupNotFound.*": "Resource group not found - retrying",
+			".*AlreadyExists.*":         "Resource already exists - retrying",
+			".*TooManyRequests.*":       "Too many requests - retrying",
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,

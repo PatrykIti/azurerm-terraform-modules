@@ -34,6 +34,9 @@ module "application_insights_workbook" {
     fallbackResourceIds = []
   })
 
+  # Optional workbook storage container
+  # storage_container_id = "/subscriptions/.../resourceGroups/.../providers/Microsoft.Storage/storageAccounts/<account>/blobServices/default/containers/<container>"
+
   tags = {
     Environment = "Development"
     Project     = "Example"
@@ -88,6 +91,7 @@ No modules.
 | <a name="input_description"></a> [description](#input\_description) | Optional description of the workbook. | `string` | `null` | no |
 | <a name="input_category"></a> [category](#input\_category) | Optional workbook category (for example: workbook, tsg, usage, Azure Monitor). | `string` | `null` | no |
 | <a name="input_source_id"></a> [source_id](#input\_source\_id) | Optional source resource ID used by the workbook. | `string` | `null` | no |
+| <a name="input_storage_container_id"></a> [storage_container_id](#input\_storage\_container\_id) | Optional storage container resource ID used by the workbook for backing storage. | `string` | `null` | no |
 | <a name="input_identity"></a> [identity](#input\_identity) | Managed identity configuration for the workbook. | <pre>object({<br/>    type         = string<br/>    identity_ids = optional(list(string), [])<br/>  })</pre> | `null` | no |
 | <a name="input_timeouts"></a> [timeouts](#input\_timeouts) | Optional timeouts configuration for the workbook. | <pre>object({<br/>    create = optional(string)<br/>    update = optional(string)<br/>    delete = optional(string)<br/>    read   = optional(string)<br/>  })</pre> | `{}` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resource. | `map(string)` | `{}` | no |
@@ -101,13 +105,25 @@ No modules.
 | <a name="output_location"></a> [location](#output\_location) | The location of the Application Insights Workbook. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the Application Insights Workbook. |
 | <a name="output_resource_group_name"></a> [resource_group_name](#output\_resource\_group\_name) | The resource group name of the Application Insights Workbook. |
+| <a name="output_storage_container_id"></a> [storage_container_id](#output\_storage\_container\_id) | The storage container resource ID configured for the workbook, when set. |
 <!-- END_TF_DOCS -->
 
 ## Security Considerations
 
 - Treat `data_json` as configuration code: it can embed queries and resource references.
 - Use managed identities and least-privilege RBAC on `source_id` targets.
+- Validate `storage_container_id` carefully and keep storage access private by default.
 - Keep `source_id` scoped to the intended subscription/resource group when possible.
+
+## Testing
+
+Canonical local flow:
+
+```bash
+make test
+```
+
+This delegates to `tests/Makefile` and keeps unit, Terratest, and script entrypoints aligned.
 
 ## Module Documentation
 

@@ -10,6 +10,11 @@ cross-resource glue.
 
 - `azurerm_application_insights_workbook`
 
+## In-Scope Workbook Capabilities
+
+The module supports workbook-native properties exposed by the provider,
+including `source_id`, `identity`, and `storage_container_id`.
+
 ## Out of Scope
 
 The following must be handled outside the module:
@@ -24,6 +29,8 @@ The following must be handled outside the module:
 - `data_json` must be valid workbook JSON; use `jsonencode()` in Terraform.
 - When using `identity` + `source_id`, grant the identity least-privilege access
   to the source resource (Reader is a common baseline).
+- `storage_container_id` is an optional workbook capability; this module only
+  accepts the container resource ID and does not manage storage RBAC/networking.
 
 ## Additional References
 

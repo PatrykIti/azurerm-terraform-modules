@@ -16,7 +16,7 @@ func BenchmarkKeyVaultCreationSimple(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 		b.StartTimer()
@@ -39,7 +39,7 @@ func BenchmarkKeyVaultCreationComplete(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/complete")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/complete")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 		b.StartTimer()
@@ -62,7 +62,7 @@ func TestKeyVaultCreationTime(t *testing.T) {
 		t.Skip("Skipping performance test in short mode")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	defer terraform.Destroy(t, terraformOptions)
 

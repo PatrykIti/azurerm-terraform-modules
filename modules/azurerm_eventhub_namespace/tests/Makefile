@@ -90,11 +90,6 @@ test-network: check-env deps
 	@echo "Running network tests..."
 	$(call run_with_log,network,go test -v -timeout 20m -run TestNetworkEventhubNamespace ./...)
 
-# Run private endpoint tests
-test-private-endpoint: check-env deps
-	@echo "Running private endpoint tests..."
-	$(call run_with_log,private-endpoint,go test -v -timeout 20m -run TestEventhubNamespacePrivateEndpoint ./...)
-
 # Run validation tests
 test-validation: check-env deps
 	@echo "Running validation tests..."
@@ -203,7 +198,6 @@ help:
 	@echo "  make test-complete       - Run complete tests"
 	@echo "  make test-secure         - Run security tests"
 	@echo "  make test-network        - Run network tests"
-	@echo "  make test-private-endpoint - Run private endpoint tests"
 	@echo "  make test-validation     - Run validation tests"
 	@echo "  make test-integration    - Run integration tests"
 	@echo "  make test-performance    - Run performance tests"
@@ -220,4 +214,4 @@ help:
 	@echo "  make ci                 - Run CI pipeline"
 	@echo "  make cd                 - Run CD pipeline (includes integration tests)"
 
-.PHONY: check-env deps test test-single test-basic test-complete test-secure test-network test-private-endpoint test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help
+.PHONY: check-env deps test test-single test-basic test-complete test-secure test-network test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help

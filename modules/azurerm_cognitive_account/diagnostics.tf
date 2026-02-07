@@ -10,7 +10,7 @@ locals {
 
   diagnostic_settings_create = {
     for ds in var.diagnostic_settings : ds.name => ds
-    if (
+    if(
       (
         ds.log_categories != null ||
         ds.metric_categories != null ||

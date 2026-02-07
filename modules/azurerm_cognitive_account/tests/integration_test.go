@@ -1,7 +1,6 @@
 package test
 
 import (
-	"os"
 	"testing"
 
 	// Azure SDK imports - add specific ones for your resource type
@@ -205,11 +204,7 @@ func TestCognitiveAccountPrivateEndpointIntegration(t *testing.T) {
 	}
 	t.Parallel()
 
-	if _, err := os.Stat("fixtures/private_endpoint"); os.IsNotExist(err) {
-		t.Skip("Private endpoint fixture not found; skipping test")
-	}
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/private_endpoint")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/openai-secure")
 
 	// Setup stages
 	defer test_structure.RunTestStage(t, "cleanup", func() {

@@ -35,16 +35,16 @@
 
 ### Go tests + fixtures checklist gaps
 
-- [ ] Podmienic `modules/azurerm_key_vault/tests/Makefile` na wzorzec z `modules/azurerm_postgresql_flexible_server/tests/Makefile` (`SHELL := /bin/bash`, `LOG_DIR`, `LOG_TIMESTAMP`, `run_with_log`, `tee`, ARM_* <-> AZURE_* normalization).
-- [ ] Upewnic sie, ze wszystkie targety `make test-*` w `modules/azurerm_key_vault/tests/Makefile` uzywaja `run_with_log` i zapisuja logi do `modules/azurerm_key_vault/tests/test_outputs/*.log`.
-- [ ] Zmienic CopyTerraformFolderToTemp na pattern zgodny z fixtures source: z `CopyTerraformFolderToTemp(t, ".", "fixtures/...")` na `CopyTerraformFolderToTemp(t, "..", "tests/fixtures/...")` w `modules/azurerm_key_vault/tests/key_vault_test.go`, `modules/azurerm_key_vault/tests/integration_test.go`, `modules/azurerm_key_vault/tests/performance_test.go`.
-- [ ] Zweryfikowac, ze wszystkie fixtures module-under-test maja `source = "../../../"` i pozostaja poprawne po zmianie sciezki kopiowania.
-- [ ] Dodac compile gate `go test ./... -run '^$'` do pipeline `make test` i do checklisty Done.
+- [x] Podmienic `modules/azurerm_key_vault/tests/Makefile` na wzorzec z `modules/azurerm_postgresql_flexible_server/tests/Makefile` (`SHELL := /bin/bash`, `LOG_DIR`, `LOG_TIMESTAMP`, `run_with_log`, `tee`, ARM_* <-> AZURE_* normalization).
+- [x] Upewnic sie, ze wszystkie targety `make test-*` w `modules/azurerm_key_vault/tests/Makefile` uzywaja `run_with_log` i zapisuja logi do `modules/azurerm_key_vault/tests/test_outputs/*.log`.
+- [x] Zmienic CopyTerraformFolderToTemp na pattern zgodny z fixtures source: z `CopyTerraformFolderToTemp(t, ".", "fixtures/...")` na `CopyTerraformFolderToTemp(t, "..", "tests/fixtures/...")` w `modules/azurerm_key_vault/tests/key_vault_test.go`, `modules/azurerm_key_vault/tests/integration_test.go`, `modules/azurerm_key_vault/tests/performance_test.go`.
+- [x] Zweryfikowac, ze wszystkie fixtures module-under-test maja `source = "../../../"` i pozostaja poprawne po zmianie sciezki kopiowania.
+- [x] Dodac compile gate `go test ./... -run '^$'` do pipeline `make test` i do checklisty Done.
 
 ### Docs/release/test harness alignment
 
-- [ ] Poprawic `modules/azurerm_key_vault/tests/README.md`, bo odwoluje sie do nieistniejacego targetu `make test-all` (canonical target to `make test`).
-- [ ] Ujednolicic nazwy test files/targets i fixture list miedzy `modules/azurerm_key_vault/tests/README.md`, `modules/azurerm_key_vault/tests/Makefile`, `modules/azurerm_key_vault/tests/test_config.yaml`.
+- [x] Poprawic `modules/azurerm_key_vault/tests/README.md`, bo odwoluje sie do nieistniejacego targetu `make test-all` (canonical target to `make test`).
+- [x] Ujednolicic nazwy test files/targets i fixture list miedzy `modules/azurerm_key_vault/tests/README.md`, `modules/azurerm_key_vault/tests/Makefile`, `modules/azurerm_key_vault/tests/test_config.yaml`.
 - [ ] Dodac w tasku wymagany final report format z `docs/MODULE_GUIDE/11-scope-and-provider-coverage-status-check.md` (Module/Mode/Changed files/Validation/Residual risks/Open decisions).
 
 ### Validation commands

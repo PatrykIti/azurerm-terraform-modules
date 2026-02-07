@@ -48,23 +48,23 @@ func BenchmarkEventhubCreationWithFeatures(b *testing.B) {
 			config: map[string]interface{}{},
 		},
 		{
-			name: "WithSecurity",
+			name: "WithHigherRetention",
 			config: map[string]interface{}{
-				"enable_advanced_security": true,
+				"message_retention": 7,
 			},
 		},
 		{
-			name: "WithMonitoring",
+			name: "WithSendDisabledStatus",
 			config: map[string]interface{}{
-				"enable_monitoring": true,
+				"status": "SendDisabled",
 			},
 		},
 		{
 			name: "Complete",
 			config: map[string]interface{}{
-				"enable_advanced_security": true,
-				"enable_monitoring":        true,
-				"enable_backup":            true,
+				"partition_count":   4,
+				"message_retention": 7,
+				"status":            "SendDisabled",
 			},
 		},
 	}
@@ -80,7 +80,7 @@ func BenchmarkEventhubCreationWithFeatures(b *testing.B) {
 				for k, v := range fc.config {
 					terraformOptions.Vars[k] = v
 				}
-				
+
 				// Override the random_suffix for benchmarking
 				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 				b.StartTimer()
@@ -113,10 +113,9 @@ func BenchmarkEventhubCreationWithScale(b *testing.B) {
 				testFolder := test_structure.CopyTerraformFolderToTemp(b, "../..", "azurerm_eventhub/tests/fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
-				// Configure scale parameters based on resource type
-				// This is a placeholder - adjust based on actual resource scaling capabilities
-				terraformOptions.Vars["instance_count"] = count
-				
+				// Partition count is a real Event Hub input exposed by the benchmark fixture.
+				terraformOptions.Vars["partition_count"] = count
+
 				// Override the random_suffix for benchmarking
 				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 				b.StartTimer()

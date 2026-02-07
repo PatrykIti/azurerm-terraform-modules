@@ -1,10 +1,53 @@
 # Makefile for Terratest execution
+SHELL := /bin/bash
 
 # Variables
 TIMEOUT ?= 30m
-TEST_FILTER ?= Test
 PARALLEL ?= 8
-AZURE_LOCATION ?= northeurope
+LOG_DIR ?= test_outputs
+LOG_TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)
+
+define run_with_log
+	@mkdir -p $(LOG_DIR)
+	@echo "Saving test output to $(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"
+	@bash -c 'set -o pipefail; $(2) 2>&1 | tee "$(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"'
+endef
+
+# Normalize credential environment variables (ARM_ <-> AZURE_)
+ifdef AZURE_SUBSCRIPTION_ID
+ARM_SUBSCRIPTION_ID ?= $(AZURE_SUBSCRIPTION_ID)
+endif
+ifdef AZURE_TENANT_ID
+ARM_TENANT_ID ?= $(AZURE_TENANT_ID)
+endif
+ifdef AZURE_CLIENT_ID
+ARM_CLIENT_ID ?= $(AZURE_CLIENT_ID)
+endif
+ifdef AZURE_CLIENT_SECRET
+ARM_CLIENT_SECRET ?= $(AZURE_CLIENT_SECRET)
+endif
+ifdef AZURE_LOCATION
+ARM_LOCATION ?= $(AZURE_LOCATION)
+endif
+
+ifdef ARM_SUBSCRIPTION_ID
+AZURE_SUBSCRIPTION_ID ?= $(ARM_SUBSCRIPTION_ID)
+endif
+ifdef ARM_TENANT_ID
+AZURE_TENANT_ID ?= $(ARM_TENANT_ID)
+endif
+ifdef ARM_CLIENT_ID
+AZURE_CLIENT_ID ?= $(ARM_CLIENT_ID)
+endif
+ifdef ARM_CLIENT_SECRET
+AZURE_CLIENT_SECRET ?= $(ARM_CLIENT_SECRET)
+endif
+ifdef ARM_LOCATION
+AZURE_LOCATION ?= $(ARM_LOCATION)
+endif
+
+export ARM_SUBSCRIPTION_ID ARM_TENANT_ID ARM_CLIENT_ID ARM_CLIENT_SECRET ARM_LOCATION
+export AZURE_SUBSCRIPTION_ID AZURE_TENANT_ID AZURE_CLIENT_ID AZURE_CLIENT_SECRET AZURE_LOCATION
 
 # Environment check
 check-env:
@@ -24,76 +67,83 @@ deps:
 # Run all tests
 test: check-env deps
 	@echo "Running all tests..."
-	go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...
+	$(call run_with_log,all,go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...)
 
 # Run specific test
 test-single: check-env deps
 	@echo "Running test: $(TEST_NAME)"
-	go test -v -timeout $(TIMEOUT) -run $(TEST_NAME) ./...
+	$(call run_with_log,single,go test -v -timeout $(TIMEOUT) -run "^$(TEST_NAME)$$" ./...)
 
 # Run basic tests only
 test-basic: check-env deps
 	@echo "Running basic tests..."
-	go test -v -timeout 15m -run TestBasicApplicationInsightsWorkbook ./...
+	$(call run_with_log,basic,go test -v -timeout 15m -run TestBasicApplicationInsightsWorkbook ./...)
 
 # Run complete tests
 test-complete: check-env deps
 	@echo "Running complete tests..."
-	go test -v -timeout 30m -run TestCompleteApplicationInsightsWorkbook ./...
+	$(call run_with_log,complete,go test -v -timeout 30m -run TestCompleteApplicationInsightsWorkbook ./...)
 
 # Run security tests
 test-secure: check-env deps
 	@echo "Running security tests..."
-	go test -v -timeout 30m -run TestSecureApplicationInsightsWorkbook ./...
+	$(call run_with_log,secure,go test -v -timeout 30m -run TestSecureApplicationInsightsWorkbook ./...)
 
 # Run validation tests
 test-validation: check-env deps
 	@echo "Running validation tests..."
-	go test -v -timeout 10m -run TestApplicationInsightsWorkbookValidationRules ./...
+	$(call run_with_log,validation,go test -v -timeout 15m -run TestApplicationInsightsWorkbookValidationRules ./...)
 
 # Run integration tests
 test-integration: check-env deps
 	@echo "Running integration tests..."
-	go test -v -timeout 45m -run TestApplicationInsightsWorkbookFullIntegration ./...
+	$(call run_with_log,integration,go test -v -timeout 45m -run "TestApplicationInsightsWorkbookFullIntegration|TestApplicationInsightsWorkbookLifecycle" ./...)
 
 # Run performance tests
 test-performance: check-env deps
 	@echo "Running performance tests..."
-	go test -v -timeout 60m -run TestApplicationInsightsWorkbookCreationTime ./...
-	go test -v -timeout 60m -run TestApplicationInsightsWorkbookUpdatePerformance ./...
-	go test -v -timeout 60m -run TestApplicationInsightsWorkbookDestroyPerformance ./...
+	$(call run_with_log,performance-create,go test -v -timeout 60m -run TestApplicationInsightsWorkbookCreationTime ./...)
+	$(call run_with_log,performance-update,go test -v -timeout 60m -run TestApplicationInsightsWorkbookUpdatePerformance ./...)
+	$(call run_with_log,performance-destroy,go test -v -timeout 60m -run TestApplicationInsightsWorkbookDestroyPerformance ./...)
 
 # Run benchmarks
 benchmark: check-env deps
 	@echo "Running benchmarks..."
-	go test -v -run=^$$ -bench=. -benchtime=1x ./...
+	$(call run_with_log,bench,go test -v -run=^$$ -bench=. -benchtime=1x ./...)
+
+# Run tests via harness scripts
+test-script-parallel: check-env deps
+	@echo "Running script-based parallel harness..."
+	./run_tests_parallel.sh
+
+test-script-sequential: check-env deps
+	@echo "Running script-based sequential harness..."
+	./run_tests_sequential.sh
 
 # Run tests with coverage
 test-coverage: check-env deps
 	@echo "Running tests with coverage..."
-	go test -v -timeout $(TIMEOUT) -coverprofile=coverage.out -covermode=atomic ./...
+	$(call run_with_log,coverage,go test -v -timeout $(TIMEOUT) -coverprofile=coverage.out -covermode=atomic ./...)
 	go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report generated: coverage.html"
 
 # Run tests with race detection
 test-race: check-env deps
 	@echo "Running tests with race detection..."
-	go test -v -timeout $(TIMEOUT) -race ./...
+	$(call run_with_log,race,go test -v -timeout $(TIMEOUT) -race ./...)
 
 # Generate JUnit report
 test-junit: check-env deps
 	@echo "Running tests with JUnit output..."
 	go install github.com/jstemmer/go-junit-report/v2@latest
-	go test -v -timeout $(TIMEOUT) ./... 2>&1 | go-junit-report -set-exit-code > test-results.xml
+	@mkdir -p $(LOG_DIR)
+	@echo "Saving test output to $(LOG_DIR)/junit_$(LOG_TIMESTAMP).log"
+	@bash -c 'set -o pipefail; go test -v -timeout $(TIMEOUT) ./... 2>&1 | tee "$(LOG_DIR)/junit_$(LOG_TIMESTAMP).log" | go-junit-report -set-exit-code > test-results.xml'
 
-# Clean test artifacts
-clean:
-	@echo "Cleaning test artifacts..."
-	rm -f coverage.out coverage.html test-results.xml
-	rm -rf test_outputs/
-	find . -name "*.tfstate*" -type f -delete
-	find . -name ".terraform" -type d -exec rm -rf {} +
-	find . -name "terraform.tfstate.d" -type d -exec rm -rf {} +
+# Run quick smoke tests
+test-quick: check-env deps
+	@echo "Running quick smoke tests..."
+	$(call run_with_log,quick,go test -v -timeout 5m -short ./...)
 
 # Validate terraform fixtures
 validate-fixtures:
@@ -101,8 +151,8 @@ validate-fixtures:
 	@for dir in fixtures/*/; do \
 		if [ -f "$$dir/main.tf" ]; then \
 			echo "Validating $$dir..."; \
-			cd $$dir && terraform init -backend=false && terraform validate && cd ../..; \
-		fi \
+			(cd "$$dir" && terraform init -backend=false -input=false && terraform validate); \
+		fi; \
 	done
 
 # Format check
@@ -131,41 +181,47 @@ security:
 	go install github.com/securego/gosec/v2/cmd/gosec@latest
 	gosec -fmt=json -out=security-report.json ./...
 
-# Run quick smoke tests
-test-quick: check-env deps
-	@echo "Running quick smoke tests..."
-	go test -v -timeout 5m -short ./...
+# Clean test artifacts
+clean:
+	@echo "Cleaning test artifacts..."
+	rm -f coverage.out coverage.html test-results.xml security-report.json
+	rm -rf test_outputs/
+	find . -name "*.tfstate*" -type f -delete
+	find . -name ".terraform" -type d -exec rm -rf {} +
+	find . -name "terraform.tfstate.d" -type d -exec rm -rf {} +
 
 # CI/CD pipeline simulation
 ci: clean fmt-check lint test-coverage test-junit
 	@echo "CI pipeline completed successfully!"
 
-# CD pipeline simulation (includes performance and integration tests)
+# CD pipeline simulation
 cd: ci test-integration test-performance
 	@echo "CD pipeline completed successfully!"
 
 # Help
 help:
 	@echo "Available targets:"
-	@echo "  make test                 - Run all tests"
+	@echo "  make test                   - Run all tests"
 	@echo "  make test-single TEST_NAME=TestName - Run specific test"
-	@echo "  make test-basic          - Run basic tests only"
-	@echo "  make test-complete       - Run complete tests"
-	@echo "  make test-secure         - Run security tests"
-	@echo "  make test-validation     - Run validation tests"
-	@echo "  make test-integration    - Run integration tests"
-	@echo "  make test-performance    - Run performance tests"
-	@echo "  make test-quick          - Run quick smoke tests (with -short flag)"
-	@echo "  make benchmark           - Run benchmarks"
-	@echo "  make test-coverage       - Run tests with coverage"
-	@echo "  make test-race          - Run tests with race detection"
-	@echo "  make test-junit         - Generate JUnit report"
-	@echo "  make validate-fixtures   - Validate Terraform fixtures"
-	@echo "  make clean              - Clean test artifacts"
-	@echo "  make fmt                - Format Go code"
-	@echo "  make lint               - Run linters"
-	@echo "  make security           - Run security scan"
-	@echo "  make ci                 - Run CI pipeline"
-	@echo "  make cd                 - Run CD pipeline (includes integration tests)"
+	@echo "  make test-basic             - Run basic tests only"
+	@echo "  make test-complete          - Run complete tests"
+	@echo "  make test-secure            - Run secure tests"
+	@echo "  make test-validation        - Run validation tests"
+	@echo "  make test-integration       - Run integration tests"
+	@echo "  make test-performance       - Run performance tests"
+	@echo "  make benchmark              - Run benchmarks"
+	@echo "  make test-script-parallel   - Run parallel harness script"
+	@echo "  make test-script-sequential - Run sequential harness script"
+	@echo "  make test-coverage          - Run tests with coverage"
+	@echo "  make test-race              - Run tests with race detection"
+	@echo "  make test-junit             - Generate JUnit report"
+	@echo "  make test-quick             - Run quick smoke tests"
+	@echo "  make validate-fixtures      - Validate Terraform fixtures"
+	@echo "  make fmt                    - Format Go code"
+	@echo "  make lint                   - Run linters"
+	@echo "  make security               - Run security scan"
+	@echo "  make clean                  - Clean test artifacts"
+	@echo "  make ci                     - Run CI pipeline"
+	@echo "  make cd                     - Run CD pipeline"
 
-.PHONY: check-env deps test test-single test-basic test-complete test-secure test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help
+.PHONY: check-env deps test test-single test-basic test-complete test-secure test-validation test-integration test-performance benchmark test-script-parallel test-script-sequential test-coverage test-race test-junit test-quick validate-fixtures fmt-check fmt lint security clean ci cd help

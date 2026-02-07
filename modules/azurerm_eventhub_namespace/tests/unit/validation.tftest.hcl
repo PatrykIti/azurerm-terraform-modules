@@ -56,7 +56,7 @@ run "auto_inflate_requires_max" {
   }
 
   expect_failures = [
-    var.maximum_throughput_units
+    azurerm_eventhub_namespace.namespace
   ]
 }
 

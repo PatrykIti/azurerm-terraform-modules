@@ -1,41 +1,69 @@
-data "azurerm_monitor_diagnostic_categories" "bastion_host" {
-  count       = length(var.diagnostic_settings) > 0 ? 1 : 0
-  resource_id = azurerm_bastion_host.bastion_host.id
-}
-
 locals {
-  bastion_diag_log_categories    = try(data.azurerm_monitor_diagnostic_categories.bastion_host[0].log_category_types, [])
-  bastion_diag_metric_categories = try(data.azurerm_monitor_diagnostic_categories.bastion_host[0].metrics, [])
-
-  bastion_area_log_map_raw = {
-    audit = ["BastionAuditLogs"]
-  }
-
-  bastion_area_log_map = merge(
-    {
-      all  = local.bastion_diag_log_categories
-      logs = local.bastion_diag_log_categories
-    },
-    {
-      for area, categories in local.bastion_area_log_map_raw :
-      area => [for category in categories : category if contains(local.bastion_diag_log_categories, category)]
+  bastion_area_map = {
+    all = {
+      log_categories      = ["BastionAuditLogs"]
+      log_category_groups = ["allLogs"]
+      metric_categories   = ["AllMetrics"]
     }
-  )
-
-  bastion_area_metric_map = {
-    all     = local.bastion_diag_metric_categories
-    metrics = local.bastion_diag_metric_categories
+    logs = {
+      log_categories      = ["BastionAuditLogs"]
+      log_category_groups = ["allLogs"]
+      metric_categories   = []
+    }
+    metrics = {
+      log_categories      = []
+      log_category_groups = []
+      metric_categories   = ["AllMetrics"]
+    }
+    audit = {
+      log_categories      = ["BastionAuditLogs"]
+      log_category_groups = []
+      metric_categories   = []
+    }
   }
+
+  diagnostic_settings_expanded = [
+    for ds in var.diagnostic_settings : merge(ds, {
+      area_names = ds.areas != null ? ds.areas : (
+        ds.log_categories == null && ds.metric_categories == null && ds.log_category_groups == null ? ["all"] : []
+      )
+    })
+  ]
 
   diagnostic_settings_resolved = [
-    for ds in var.diagnostic_settings : merge(ds, {
-      areas = coalesce(ds.areas, ["all"])
-      log_categories = ds.log_categories != null ? ds.log_categories : distinct(flatten([
-        for area in coalesce(ds.areas, ["all"]) : lookup(local.bastion_area_log_map, area, [])
-      ]))
-      metric_categories = ds.metric_categories != null ? ds.metric_categories : distinct(flatten([
-        for area in coalesce(ds.areas, ["all"]) : lookup(local.bastion_area_metric_map, area, [])
-      ]))
+    for ds in local.diagnostic_settings_expanded : merge(ds, {
+      log_categories = sort(distinct(concat(
+        flatten([
+          for area in ds.area_names : lookup(local.bastion_area_map, area, {
+            log_categories      = []
+            log_category_groups = []
+            metric_categories   = []
+          }).log_categories
+        ]),
+        ds.log_categories != null ? ds.log_categories : []
+      )))
+
+      log_category_groups = sort(distinct(concat(
+        flatten([
+          for area in ds.area_names : lookup(local.bastion_area_map, area, {
+            log_categories      = []
+            log_category_groups = []
+            metric_categories   = []
+          }).log_category_groups
+        ]),
+        ds.log_category_groups != null ? ds.log_category_groups : []
+      )))
+
+      metric_categories = sort(distinct(concat(
+        flatten([
+          for area in ds.area_names : lookup(local.bastion_area_map, area, {
+            log_categories      = []
+            log_category_groups = []
+            metric_categories   = []
+          }).metric_categories
+        ]),
+        ds.metric_categories != null ? ds.metric_categories : []
+      )))
     })
   ]
 
@@ -45,21 +73,18 @@ locals {
 
   diagnostic_settings_skipped = [
     for ds in local.diagnostic_settings_resolved : {
-      name              = ds.name
-      areas             = ds.areas
-      log_categories    = ds.log_categories
-      metric_categories = ds.metric_categories
+      name                = ds.name
+      areas               = ds.area_names
+      log_categories      = ds.log_categories
+      log_category_groups = ds.log_category_groups
+      metric_categories   = ds.metric_categories
     }
-    if length(ds.log_categories) + length(ds.metric_categories) == 0
+    if length(ds.log_categories) + length(ds.log_category_groups) + length(ds.metric_categories) == 0
   ]
 
   diagnostic_settings_for_each = {
-    for ds in var.diagnostic_settings : ds.name => ds
-    if(
-      length(coalesce(ds.log_categories, [])) +
-      length(coalesce(ds.metric_categories, [])) +
-      length(coalesce(ds.areas, ["all"]))
-    ) > 0
+    for ds in local.diagnostic_settings_resolved : ds.name => ds
+    if length(ds.log_categories) + length(ds.log_category_groups) + length(ds.metric_categories) > 0
   }
 }
 
@@ -74,11 +99,19 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
   storage_account_id             = try(each.value.storage_account_id, null)
   eventhub_authorization_rule_id = try(each.value.eventhub_authorization_rule_id, null)
   eventhub_name                  = try(each.value.eventhub_name, null)
+  partner_solution_id            = try(each.value.partner_solution_id, null)
 
   dynamic "enabled_log" {
     for_each = local.diagnostic_settings_by_name[each.key].log_categories
     content {
       category = enabled_log.value
+    }
+  }
+
+  dynamic "enabled_log" {
+    for_each = local.diagnostic_settings_by_name[each.key].log_category_groups
+    content {
+      category_group = enabled_log.value
     }
   }
 

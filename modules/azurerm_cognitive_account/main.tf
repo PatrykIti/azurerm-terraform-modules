@@ -5,11 +5,11 @@ resource "azurerm_cognitive_account" "cognitive_account" {
   kind                = var.kind == "Language" ? "TextAnalytics" : var.kind
   sku_name            = var.sku_name
 
-  custom_subdomain_name           = var.custom_subdomain_name
-  public_network_access_enabled   = var.public_network_access_enabled
-  local_auth_enabled              = var.local_auth_enabled
+  custom_subdomain_name              = var.custom_subdomain_name
+  public_network_access_enabled      = var.public_network_access_enabled
+  local_auth_enabled                 = var.local_auth_enabled
   outbound_network_access_restricted = var.outbound_network_access_restricted
-  fqdns                           = var.fqdns
+  fqdns                              = var.fqdns
 
   dynamic "network_acls" {
     for_each = var.network_acls == null ? [] : [var.network_acls]

@@ -14,8 +14,8 @@ locals {
 }
 
 resource "azurerm_eventhub" "eventhub" {
-  name                = var.name
-  namespace_id        = var.namespace_id
+  name         = var.name
+  namespace_id = var.namespace_id
 
   partition_count   = var.partition_count
   message_retention = var.retention_description == null ? var.message_retention : null

@@ -98,6 +98,7 @@ stages:
     steps:
       - "fmt-check"
       - "lint"
+      - "compile-gate"
       - "validate-fixtures"
       - "security"
       

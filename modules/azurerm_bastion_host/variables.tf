@@ -144,7 +144,7 @@ variable "diagnostic_settings" {
   description = <<-EOT
     Diagnostic settings for the Bastion Host.
 
-    Provide either log_categories/metric_categories or areas to select categories.
+    Provide explicit log_categories/metric_categories/log_category_groups, or use areas to select categories.
     If neither is provided, areas defaults to ["all"].
   EOT
 
@@ -152,12 +152,14 @@ variable "diagnostic_settings" {
     name                           = string
     areas                          = optional(list(string))
     log_categories                 = optional(list(string))
+    log_category_groups            = optional(list(string))
     metric_categories              = optional(list(string))
     log_analytics_workspace_id     = optional(string)
     log_analytics_destination_type = optional(string)
     storage_account_id             = optional(string)
     eventhub_authorization_rule_id = optional(string)
     eventhub_name                  = optional(string)
+    partner_solution_id            = optional(string)
   }))
 
   default  = []
@@ -176,9 +178,9 @@ variable "diagnostic_settings" {
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      ds.log_analytics_workspace_id != null || ds.storage_account_id != null || ds.eventhub_authorization_rule_id != null
+      ds.log_analytics_workspace_id != null || ds.storage_account_id != null || ds.eventhub_authorization_rule_id != null || ds.partner_solution_id != null
     ])
-    error_message = "Each diagnostic_settings entry must specify at least one destination: log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id."
+    error_message = "Each diagnostic_settings entry must specify at least one destination: log_analytics_workspace_id, storage_account_id, eventhub_authorization_rule_id, or partner_solution_id."
   }
 
   validation {
@@ -209,10 +211,19 @@ variable "diagnostic_settings" {
     condition = alltrue([
       for ds in var.diagnostic_settings :
       alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
+      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : c != ""]) &&
       alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""]) &&
       alltrue([for c in(ds.areas == null ? [] : ds.areas) : c != ""])
     ])
-    error_message = "log_categories, metric_categories, and areas must not contain empty strings."
+    error_message = "log_categories, log_category_groups, metric_categories, and areas must not contain empty strings."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.partner_solution_id == null || trimspace(ds.partner_solution_id) != ""
+    ])
+    error_message = "partner_solution_id must not be empty when specified."
   }
 }
 

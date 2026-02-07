@@ -16,7 +16,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "test" {
   name     = "rg-application_insights_workbook-negative-test"
-  location = "West Europe"
+  location = var.location
 }
 
 locals {

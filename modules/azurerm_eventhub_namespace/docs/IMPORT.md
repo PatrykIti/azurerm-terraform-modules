@@ -31,6 +31,12 @@ import {
   id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.EventHub/namespaces/example-ehns/authorizationRules/send-only"
 }
 
+# Namespace schema registry group
+import {
+  to = module.eventhub_namespace.azurerm_eventhub_namespace_schema_group.schema_group["orders"]
+  id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.EventHub/namespaces/example-ehns/schemaGroups/orders"
+}
+
 # Disaster recovery config
 import {
   to = module.eventhub_namespace.azurerm_eventhub_namespace_disaster_recovery_config.disaster_recovery["ehns-dr"]
@@ -54,4 +60,5 @@ import {
 
 - Network rule set is managed inline in `azurerm_eventhub_namespace` and does not
   require a separate import.
+- Schema registry groups are optional and imported per `schema_groups[*].name`.
 - Ensure `customer_managed_key` identity settings match the existing namespace.
