@@ -4,7 +4,7 @@ SHELL := /bin/bash
 # Variables
 TIMEOUT ?= 90m
 TEST_FILTER ?= Test
-PARALLEL ?= 8
+PARALLEL ?= 2
 AZURE_LOCATION ?= northeurope
 LOG_DIR ?= test_outputs
 LOG_TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)

@@ -160,8 +160,8 @@ func generateRandomSuffix() string {
 	now := uint64(time.Now().UnixNano())
 	seq := atomic.AddUint64(&randomSuffixCounter, 1)
 	raw := fmt.Sprintf("%x%x", now, seq)
-	if len(raw) > 10 {
-		return raw[len(raw)-10:]
+	if len(raw) > 8 {
+		return raw[len(raw)-8:]
 	}
 
 	return raw

@@ -54,7 +54,7 @@ resource "azurerm_user_assigned_identity" "cmk" {
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_key_vault" "example" {
-  name                       = "${var.key_vault_name}${local.suffix_compact}"
+  name                       = substr("${var.key_vault_name}${local.suffix_compact}", 0, 24)
   location                   = azurerm_resource_group.example.location
   resource_group_name        = azurerm_resource_group.example.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
