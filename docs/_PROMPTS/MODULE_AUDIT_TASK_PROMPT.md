@@ -5,6 +5,8 @@ Use this prompt to have another agent audit a single module against the repo gui
 INPUT (edit only this line):
 MODULE_PATH=modules/<provider>_<resource>
 MODE=AUDIT_ONLY   # AUDIT_ONLY or FULL_RENAME
+PRIMARY_RESOURCE=<provider_resource_type>   # e.g. azurerm_private_dns_zone
+PROVIDER_VERSION=4.57.0
 
 Instructions:
 
@@ -29,6 +31,11 @@ Instructions:
 - `main.tf`: use locals for shared values; stable `for_each` keys (no index keys); dynamic blocks for optional features; add lifecycle preconditions for cross-field constraints.
 - Optional object + `count`: `count = 0` prevents evaluation of resource arguments, but outputs still need guards (ternary/try).
 - `outputs.tf`: include descriptions; mark sensitive outputs; guard optional outputs.
+- Build a schema diff for `PRIMARY_RESOURCE` in `PROVIDER_VERSION` (provider docs/schema vs module inputs/blocks/outputs).
+- Expected: full support for `PRIMARY_RESOURCE` arguments/blocks; omissions must be explicitly justified in docs.
+- Do not auto-expand scope to adjacent resource types unless module scope explicitly requires it.
+  - Example: `azurerm_private_dns_zone` is not automatically responsible for all `azurerm_private_dns_*_record` resources.
+  - Example: `azurerm_key_vault` is not automatically responsible for secret/certificate/key resources unless explicitly in scope.
 
 4) Documentation audit
 - `README.md` has markers: `BEGIN_VERSION`, `BEGIN_EXAMPLES`, `BEGIN_TF_DOCS`.

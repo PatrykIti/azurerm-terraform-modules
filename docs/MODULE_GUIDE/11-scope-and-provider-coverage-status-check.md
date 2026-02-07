@@ -17,6 +17,15 @@ Set these values at the start of the audit:
 - `PROVIDER_NAME=<azurerm|azuredevops|...>`
 - `PROVIDER_VERSION=<from versions.tf>`
 
+## Scope Rule: Resource Schema vs Service Family
+
+- Atomic module expectation applies to the **primary resource type**, not the entire cloud service family.
+- Coverage target is full capability coverage of `PRIMARY_RESOURCE` arguments/blocks for the pinned provider version.
+- Service-adjacent resource types are out of scope unless explicitly declared in module scope.
+- Examples:
+  - `azurerm_private_dns_zone` module should not be forced to manage `azurerm_private_dns_*_record` resources.
+  - `azurerm_key_vault` module should not be forced to manage `azurerm_key_vault_secret`, `azurerm_key_vault_certificate`, and `azurerm_key_vault_key` unless the module scope explicitly includes them.
+
 ## Status Scale
 
 - `GREEN`: no High findings and at most 2 Medium findings.
@@ -57,10 +66,12 @@ Build a capability map for each managed resource:
 - Use provider schema and docs for the pinned provider version.
 - List all meaningful arguments/blocks.
 - Mark each capability as `Implemented`, `Intentionally Omitted`, or `Not Applicable`.
+- For `PRIMARY_RESOURCE`, expected target is **full schema coverage** for the pinned provider version (for example `azurerm` `4.57.0`), unless omission is explicitly justified.
 
 Checklist:
 
 - [ ] All required resource arguments are supported by module inputs or fixed secure defaults.
+- [ ] For `PRIMARY_RESOURCE`, all supported arguments/blocks in pinned provider version are implemented or explicitly documented as intentionally omitted.
 - [ ] Security-relevant capabilities are exposed or intentionally locked down with documented rationale.
 - [ ] Enum/range/format inputs have validations in `variables.tf`.
 - [ ] Cross-field rules are guarded with `lifecycle` preconditions or equivalent.
@@ -82,6 +93,7 @@ Rules:
 
 - Missing `High` capabilities block approval.
 - `Omitted` is acceptable only with explicit rationale in docs.
+- For `PRIMARY_RESOURCE`, undocumented omissions of supported arguments/blocks are at least `Medium` and can be `High` when they affect security/compliance.
 
 ## D. Required Agent Output (Status Report)
 
