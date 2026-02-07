@@ -48,6 +48,14 @@ locals {
     })
   ]
 
+  diagnostic_settings_signal_counts = {
+    for ds in local.diagnostic_settings_resolved : ds.name => (
+      (ds.log_categories == null ? 0 : length(ds.log_categories)) +
+      (ds.metric_categories == null ? 0 : length(ds.metric_categories)) +
+      (ds.log_category_groups == null ? 0 : length(ds.log_category_groups))
+    )
+  }
+
   monitoring_for_each = {
     for ds in local.diagnostic_settings_resolved : ds.name => ds
     if contains(keys(local.diagnostic_settings_create), ds.name)
@@ -61,11 +69,7 @@ locals {
       metric_categories   = ds.metric_categories
       log_category_groups = ds.log_category_groups
     }
-    if(
-      (ds.log_categories == null ? 0 : length(ds.log_categories)) +
-      (ds.metric_categories == null ? 0 : length(ds.metric_categories)) +
-      (ds.log_category_groups == null ? 0 : length(ds.log_category_groups))
-    ) == 0
+    if local.diagnostic_settings_signal_counts[ds.name] == 0
   ]
 }
 
@@ -80,6 +84,29 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_setting" {
   storage_account_id             = each.value.storage_account_id
   eventhub_authorization_rule_id = each.value.eventhub_authorization_rule_id
   eventhub_name                  = each.value.eventhub_name
+
+  lifecycle {
+    precondition {
+      condition = each.value.log_categories == null || alltrue([
+        for category in each.value.log_categories : contains(local.diagnostic_log_categories, category)
+      ])
+      error_message = "Diagnostic setting \"${each.key}\" contains unsupported log_categories for this Cognitive Account."
+    }
+
+    precondition {
+      condition = each.value.metric_categories == null || alltrue([
+        for category in each.value.metric_categories : contains(local.diagnostic_metric_categories, category)
+      ])
+      error_message = "Diagnostic setting \"${each.key}\" contains unsupported metric_categories for this Cognitive Account."
+    }
+
+    precondition {
+      condition = each.value.log_category_groups == null || alltrue([
+        for group in each.value.log_category_groups : contains(local.diagnostic_log_groups, group)
+      ])
+      error_message = "Diagnostic setting \"${each.key}\" contains unsupported log_category_groups for this Cognitive Account."
+    }
+  }
 
   dynamic "enabled_log" {
     for_each = concat(

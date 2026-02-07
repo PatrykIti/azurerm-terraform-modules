@@ -56,7 +56,7 @@ run "auto_inflate_requires_max" {
   }
 
   expect_failures = [
-    azurerm_eventhub_namespace.namespace
+    var.maximum_throughput_units
   ]
 }
 
@@ -89,7 +89,28 @@ run "cmk_requires_identity" {
   }
 
   expect_failures = [
-    azurerm_eventhub_namespace_customer_managed_key.customer_managed_key
+    var.customer_managed_key
+  ]
+}
+
+run "cmk_user_assigned_identity_must_match_namespace_identity" {
+  command = plan
+
+  variables {
+    identity = {
+      type         = "UserAssigned"
+      identity_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-a"]
+    }
+    customer_managed_key = {
+      key_vault_key_ids = [
+        "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.KeyVault/vaults/kv/keys/key"
+      ]
+      user_assigned_identity_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-b"
+    }
+  }
+
+  expect_failures = [
+    var.customer_managed_key
   ]
 }
 
@@ -107,6 +128,6 @@ run "network_public_access_mismatch" {
   }
 
   expect_failures = [
-    azurerm_eventhub_namespace.namespace
+    var.network_rule_set
   ]
 }

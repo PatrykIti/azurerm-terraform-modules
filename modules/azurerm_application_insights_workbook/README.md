@@ -10,6 +10,13 @@ Current version: **vUnreleased**
 
 Manages Azure Application Insights Workbooks.
 
+## Input Model
+
+The module keeps a flat top-level API for workbook fields to preserve a 1:1
+mapping with `azurerm_application_insights_workbook` arguments in azurerm
+`4.57.0`. Only provider-native nested blocks (`identity`, `timeouts`) are
+modeled as objects.
+
 ## Usage
 
 ```hcl

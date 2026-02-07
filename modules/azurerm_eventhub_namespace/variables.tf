@@ -55,6 +55,11 @@ variable "maximum_throughput_units" {
     condition     = var.maximum_throughput_units == null || (var.maximum_throughput_units >= 1 && var.maximum_throughput_units <= 40 && floor(var.maximum_throughput_units) == var.maximum_throughput_units)
     error_message = "maximum_throughput_units must be an integer between 1 and 40."
   }
+
+  validation {
+    condition     = !var.auto_inflate_enabled || var.maximum_throughput_units != null
+    error_message = "maximum_throughput_units is required when auto_inflate_enabled is true."
+  }
 }
 
 variable "dedicated_cluster_id" {
@@ -146,6 +151,11 @@ variable "network_rule_set" {
       can(regex("(?i)^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.Network/virtualNetworks/[^/]+/subnets/[^/]+$", rule.subnet_id))
     ])
     error_message = "network_rule_set.vnet_rules subnet_id must be a valid subnet resource ID."
+  }
+
+  validation {
+    condition     = var.network_rule_set == null || var.network_rule_set.public_network_access_enabled == null || var.network_rule_set.public_network_access_enabled == var.public_network_access_enabled
+    error_message = "network_rule_set.public_network_access_enabled must match public_network_access_enabled when set."
   }
 }
 
@@ -271,6 +281,19 @@ variable "customer_managed_key" {
   validation {
     condition     = var.customer_managed_key == null || var.customer_managed_key.user_assigned_identity_id == null || can(regex("(?i)^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.ManagedIdentity/userAssignedIdentities/[^/]+$", var.customer_managed_key.user_assigned_identity_id))
     error_message = "customer_managed_key.user_assigned_identity_id must be a valid user-assigned identity resource ID."
+  }
+
+  validation {
+    condition = var.customer_managed_key == null || var.customer_managed_key.user_assigned_identity_id == null || (
+      contains(["UserAssigned", "SystemAssigned, UserAssigned"], try(var.identity.type, "")) &&
+      contains(try(var.identity.identity_ids, []), var.customer_managed_key.user_assigned_identity_id)
+    )
+    error_message = "customer_managed_key.user_assigned_identity_id requires the same identity to be assigned to the namespace (identity.type includes UserAssigned and identity.identity_ids contains the ID)."
+  }
+
+  validation {
+    condition     = var.customer_managed_key == null || var.customer_managed_key.user_assigned_identity_id != null || contains(["SystemAssigned", "SystemAssigned, UserAssigned"], try(var.identity.type, ""))
+    error_message = "customer_managed_key requires a SystemAssigned identity when user_assigned_identity_id is not set."
   }
 }
 

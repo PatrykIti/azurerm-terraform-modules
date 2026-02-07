@@ -4,19 +4,29 @@ variable "name" {
   type        = string
 
   validation {
-    condition     = can(regex("^([a-zA-Z0-9]{1}[a-zA-Z0-9_.-]{1,})$", var.name))
-    error_message = "name must start with an alphanumeric character, be at least 2 characters long, and contain only alphanumerics, periods, dashes, or underscores."
+    condition     = can(regex("^([a-zA-Z0-9][a-zA-Z0-9_.-]{1,63})$", var.name))
+    error_message = "name must start with an alphanumeric character, be 2-64 characters long, and contain only alphanumerics, periods, dashes, or underscores."
   }
 }
 
 variable "resource_group_name" {
   description = "The name of the resource group in which to create the Cognitive Account."
   type        = string
+
+  validation {
+    condition     = trimspace(var.resource_group_name) != ""
+    error_message = "resource_group_name must not be empty."
+  }
 }
 
 variable "location" {
   description = "The Azure region where the Cognitive Account should exist."
   type        = string
+
+  validation {
+    condition     = trimspace(var.location) != ""
+    error_message = "location must not be empty."
+  }
 }
 
 variable "kind" {
@@ -48,7 +58,7 @@ variable "custom_subdomain_name" {
   default     = null
 
   validation {
-    condition     = var.custom_subdomain_name == null || var.custom_subdomain_name != ""
+    condition     = var.custom_subdomain_name == null || trimspace(var.custom_subdomain_name) != ""
     error_message = "custom_subdomain_name must not be an empty string when set."
   }
 }
@@ -78,7 +88,7 @@ variable "fqdns" {
   nullable    = false
 
   validation {
-    condition     = alltrue([for fqdn in var.fqdns : fqdn != ""])
+    condition     = alltrue([for fqdn in var.fqdns : trimspace(fqdn) != ""])
     error_message = "fqdns must not contain empty strings."
   }
 }
@@ -108,14 +118,14 @@ variable "network_acls" {
 
   validation {
     condition = var.network_acls == null || alltrue([
-      for ip in coalesce(var.network_acls.ip_rules, []) : ip != ""
+      for ip in coalesce(var.network_acls.ip_rules, []) : trimspace(ip) != ""
     ])
     error_message = "network_acls.ip_rules must not contain empty strings."
   }
 
   validation {
     condition = var.network_acls == null || alltrue([
-      for rule in coalesce(var.network_acls.virtual_network_rules, []) : rule.subnet_id != ""
+      for rule in coalesce(var.network_acls.virtual_network_rules, []) : trimspace(rule.subnet_id) != ""
     ])
     error_message = "network_acls.virtual_network_rules subnet_id must not be empty."
   }
@@ -160,6 +170,18 @@ variable "identity" {
     )
     error_message = "identity.identity_ids is required when identity.type includes UserAssigned."
   }
+
+  validation {
+    condition = var.identity == null || alltrue([
+      for identity_id in var.identity.identity_ids : trimspace(identity_id) != ""
+    ])
+    error_message = "identity.identity_ids must not contain empty values."
+  }
+
+  validation {
+    condition     = var.identity == null || length(distinct(var.identity.identity_ids)) == length(var.identity.identity_ids)
+    error_message = "identity.identity_ids must contain unique values."
+  }
 }
 
 variable "customer_managed_key" {
@@ -174,6 +196,14 @@ variable "customer_managed_key" {
   validation {
     condition     = var.customer_managed_key == null || var.customer_managed_key.key_vault_key_id != ""
     error_message = "customer_managed_key.key_vault_key_id must not be empty when set."
+  }
+
+  validation {
+    condition = var.customer_managed_key == null || (
+      var.customer_managed_key.identity_client_id == null ||
+      trimspace(var.customer_managed_key.identity_client_id) != ""
+    )
+    error_message = "customer_managed_key.identity_client_id must not be an empty string when set."
   }
 
   validation {
@@ -196,13 +226,21 @@ variable "storage" {
   nullable = false
 
   validation {
-    condition     = alltrue([for entry in var.storage : entry.storage_account_id != ""])
+    condition     = alltrue([for entry in var.storage : trimspace(entry.storage_account_id) != ""])
     error_message = "storage.storage_account_id must not be empty."
   }
 
   validation {
     condition     = var.kind != "OpenAI" || length(var.storage) == 0
     error_message = "storage is not supported for kind OpenAI."
+  }
+
+  validation {
+    condition = alltrue([
+      for entry in var.storage :
+      entry.identity_client_id == null || trimspace(entry.identity_client_id) != ""
+    ])
+    error_message = "storage.identity_client_id must not be an empty string when set."
   }
 }
 
@@ -243,7 +281,10 @@ variable "deployments" {
   validation {
     condition = alltrue([
       for deployment in var.deployments :
-      deployment.name != "" && deployment.model.format != "" && deployment.model.name != "" && deployment.sku.name != ""
+      trimspace(deployment.name) != "" &&
+      trimspace(deployment.model.format) != "" &&
+      trimspace(deployment.model.name) != "" &&
+      trimspace(deployment.sku.name) != ""
     ])
     error_message = "deployments require non-empty name, model.format, model.name, and sku.name."
   }
@@ -283,6 +324,14 @@ variable "deployments" {
       deployment.sku.capacity == null || deployment.sku.capacity > 0
     ])
     error_message = "deployments.sku.capacity must be greater than 0 when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for deployment in var.deployments :
+      deployment.rai_policy_name == null || trimspace(deployment.rai_policy_name) != ""
+    ])
+    error_message = "deployments.rai_policy_name must not be an empty string when set."
   }
 }
 
@@ -367,6 +416,14 @@ variable "rai_blocklists" {
     condition     = alltrue([for blocklist in var.rai_blocklists : blocklist.name != ""])
     error_message = "rai_blocklists.name must not be empty."
   }
+
+  validation {
+    condition = alltrue([
+      for blocklist in var.rai_blocklists :
+      blocklist.description == null || trimspace(blocklist.description) != ""
+    ])
+    error_message = "rai_blocklists.description must not be an empty string when set."
+  }
 }
 
 # Diagnostics
@@ -403,9 +460,18 @@ variable "diagnostic_settings" {
   }
 
   validation {
+    condition     = alltrue([for ds in var.diagnostic_settings : trimspace(ds.name) != ""])
+    error_message = "Each diagnostic_settings entry name must not be empty."
+  }
+
+  validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      ds.log_analytics_workspace_id != null || ds.storage_account_id != null || ds.eventhub_authorization_rule_id != null
+      length(compact([
+        ds.log_analytics_workspace_id == null ? null : trimspace(ds.log_analytics_workspace_id),
+        ds.storage_account_id == null ? null : trimspace(ds.storage_account_id),
+        ds.eventhub_authorization_rule_id == null ? null : trimspace(ds.eventhub_authorization_rule_id)
+      ])) > 0
     ])
     error_message = "Each diagnostic_settings entry must specify at least one destination: log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id."
   }
@@ -413,9 +479,43 @@ variable "diagnostic_settings" {
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      ds.eventhub_authorization_rule_id == null || (ds.eventhub_name != null && ds.eventhub_name != "")
+      ds.eventhub_authorization_rule_id == null ||
+      trimspace(ds.eventhub_authorization_rule_id) == "" ||
+      (ds.eventhub_name != null && trimspace(ds.eventhub_name) != "")
     ])
     error_message = "eventhub_name is required when eventhub_authorization_rule_id is set."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.log_analytics_workspace_id == null || trimspace(ds.log_analytics_workspace_id) != ""
+    ])
+    error_message = "diagnostic_settings.log_analytics_workspace_id must not be an empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.storage_account_id == null || trimspace(ds.storage_account_id) != ""
+    ])
+    error_message = "diagnostic_settings.storage_account_id must not be an empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.eventhub_authorization_rule_id == null || trimspace(ds.eventhub_authorization_rule_id) != ""
+    ])
+    error_message = "diagnostic_settings.eventhub_authorization_rule_id must not be an empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.eventhub_name == null || trimspace(ds.eventhub_name) != ""
+    ])
+    error_message = "diagnostic_settings.eventhub_name must not be an empty string when set."
   }
 
   validation {
@@ -429,10 +529,21 @@ variable "diagnostic_settings" {
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
-      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""]) &&
-      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : c != ""]) &&
-      alltrue([for c in(ds.areas == null ? [] : ds.areas) : c != ""])
+      ds.log_analytics_destination_type == null || (
+        ds.log_analytics_workspace_id != null &&
+        trimspace(ds.log_analytics_workspace_id) != ""
+      )
+    ])
+    error_message = "log_analytics_destination_type requires log_analytics_workspace_id."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : trimspace(c) != ""]) &&
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : trimspace(c) != ""]) &&
+      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : trimspace(c) != ""]) &&
+      alltrue([for c in(ds.areas == null ? [] : ds.areas) : trimspace(c) != ""])
     ])
     error_message = "diagnostic_settings categories and areas must not contain empty strings."
   }

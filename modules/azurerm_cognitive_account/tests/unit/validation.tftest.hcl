@@ -131,3 +131,38 @@ run "openai_subresources_require_openai_kind" {
     var.deployments
   ]
 }
+
+run "diagnostic_destination_empty_string" {
+  command = plan
+
+  variables {
+    diagnostic_settings = [
+      {
+        name               = "diag-empty-destination"
+        storage_account_id = " "
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings
+  ]
+}
+
+run "log_analytics_destination_type_requires_workspace" {
+  command = plan
+
+  variables {
+    diagnostic_settings = [
+      {
+        name                           = "diag-destination-type"
+        storage_account_id             = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/diagsa"
+        log_analytics_destination_type = "Dedicated"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings
+  ]
+}

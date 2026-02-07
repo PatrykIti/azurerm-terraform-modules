@@ -1,12 +1,3 @@
-locals {
-  identity_configured = var.identity != null
-  identity_ids_set    = var.identity != null && length(coalesce(var.identity.identity_ids, [])) > 0
-  identity_user_assigned = var.identity != null && contains(
-    ["UserAssigned", "SystemAssigned, UserAssigned"],
-    var.identity.type
-  )
-}
-
 resource "azurerm_application_insights_workbook" "application_insights_workbook" {
   name                 = var.name
   resource_group_name  = var.resource_group_name
@@ -20,10 +11,10 @@ resource "azurerm_application_insights_workbook" "application_insights_workbook"
   tags                 = var.tags
 
   dynamic "identity" {
-    for_each = local.identity_configured ? [var.identity] : []
+    for_each = var.identity == null ? [] : [var.identity]
     content {
       type         = identity.value.type
-      identity_ids = try(identity.value.identity_ids, null)
+      identity_ids = contains(["UserAssigned", "SystemAssigned, UserAssigned"], identity.value.type) ? try(identity.value.identity_ids, null) : null
     }
   }
 
@@ -39,21 +30,6 @@ resource "azurerm_application_insights_workbook" "application_insights_workbook"
       update = try(timeouts.value.update, null)
       delete = try(timeouts.value.delete, null)
       read   = try(timeouts.value.read, null)
-    }
-  }
-
-  lifecycle {
-    precondition {
-      condition     = var.storage_container_id == null || local.identity_configured
-      error_message = "identity must be configured when storage_container_id is set."
-    }
-    precondition {
-      condition     = !local.identity_user_assigned || local.identity_ids_set
-      error_message = "identity.identity_ids must be provided when identity.type includes UserAssigned."
-    }
-    precondition {
-      condition     = local.identity_user_assigned || !local.identity_ids_set
-      error_message = "identity.identity_ids can only be set when identity.type includes UserAssigned."
     }
   }
 }

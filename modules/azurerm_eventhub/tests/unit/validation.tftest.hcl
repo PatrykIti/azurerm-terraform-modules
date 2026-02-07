@@ -66,6 +66,22 @@ run "capture_missing_tokens" {
   ]
 }
 
+run "retention_conflicts_with_message_retention" {
+  command = plan
+
+  variables {
+    message_retention = 7
+    retention_description = {
+      cleanup_policy          = "Delete"
+      retention_time_in_hours = 24
+    }
+  }
+
+  expect_failures = [
+    var.message_retention
+  ]
+}
+
 run "authorization_rule_requires_permissions" {
   command = plan
 

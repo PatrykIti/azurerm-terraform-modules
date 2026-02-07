@@ -99,7 +99,7 @@ run "standard_feature_requires_standard_sku" {
   }
 
   expect_failures = [
-    azurerm_bastion_host.bastion_host
+    var.file_copy_enabled
   ]
 }
 
@@ -112,7 +112,7 @@ run "session_recording_requires_premium" {
   }
 
   expect_failures = [
-    azurerm_bastion_host.bastion_host
+    var.session_recording_enabled
   ]
 }
 
@@ -126,7 +126,7 @@ run "developer_requires_virtual_network_id" {
   }
 
   expect_failures = [
-    azurerm_bastion_host.bastion_host
+    var.virtual_network_id
   ]
 }
 
@@ -139,7 +139,20 @@ run "developer_disallows_ip_configuration" {
   }
 
   expect_failures = [
-    azurerm_bastion_host.bastion_host
+    var.ip_configuration
+  ]
+}
+
+run "virtual_network_id_only_for_developer" {
+  command = plan
+
+  variables {
+    sku                = "Basic"
+    virtual_network_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/vnet"
+  }
+
+  expect_failures = [
+    var.virtual_network_id
   ]
 }
 
@@ -152,7 +165,7 @@ run "scale_units_requires_standard_or_premium" {
   }
 
   expect_failures = [
-    azurerm_bastion_host.bastion_host
+    var.scale_units
   ]
 }
 

@@ -29,13 +29,18 @@ variable "partition_count" {
 }
 
 variable "message_retention" {
-  description = "Specifies the number of days to retain events. Valid range is 1-90."
+  description = "Specifies the number of days to retain events. Valid range is 1-90 when retention_description is not used."
   type        = number
-  default     = 1
+  default     = null
 
   validation {
     condition     = var.message_retention == null || (var.message_retention >= 1 && var.message_retention <= 90 && floor(var.message_retention) == var.message_retention)
     error_message = "message_retention must be an integer between 1 and 90."
+  }
+
+  validation {
+    condition     = var.retention_description == null || var.message_retention == null
+    error_message = "message_retention must be null when retention_description is provided."
   }
 }
 

@@ -1,16 +1,6 @@
 locals {
-  namespace_id_parts = split("/", var.namespace_id)
-
-  namespace_name_effective      = local.namespace_id_parts[8]
-  resource_group_name_effective = local.namespace_id_parts[4]
-
-  authorization_rules = {
-    for rule in var.authorization_rules : rule.name => rule
-  }
-
-  consumer_groups = {
-    for group in var.consumer_groups : group.name => group
-  }
+  namespace_name_effective      = split("/", var.namespace_id)[8]
+  resource_group_name_effective = split("/", var.namespace_id)[4]
 }
 
 resource "azurerm_eventhub" "eventhub" {
@@ -18,7 +8,7 @@ resource "azurerm_eventhub" "eventhub" {
   namespace_id = var.namespace_id
 
   partition_count   = var.partition_count
-  message_retention = var.retention_description == null ? var.message_retention : null
+  message_retention = var.retention_description == null ? coalesce(var.message_retention, 1) : null
   status            = var.status
 
   dynamic "retention_description" {
@@ -61,7 +51,7 @@ resource "azurerm_eventhub" "eventhub" {
 }
 
 resource "azurerm_eventhub_consumer_group" "consumer_groups" {
-  for_each = local.consumer_groups
+  for_each = { for group in var.consumer_groups : group.name => group }
 
   name                = each.value.name
   namespace_name      = local.namespace_name_effective
@@ -71,7 +61,7 @@ resource "azurerm_eventhub_consumer_group" "consumer_groups" {
 }
 
 resource "azurerm_eventhub_authorization_rule" "authorization_rules" {
-  for_each = local.authorization_rules
+  for_each = { for rule in var.authorization_rules : rule.name => rule }
 
   name                = each.value.name
   namespace_name      = local.namespace_name_effective

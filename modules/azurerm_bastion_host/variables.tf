@@ -39,6 +39,11 @@ variable "scale_units" {
     condition     = var.scale_units == null || (var.scale_units >= 2 && var.scale_units <= 50)
     error_message = "scale_units must be between 2 and 50 when specified."
   }
+
+  validation {
+    condition     = var.scale_units == null || contains(["Standard", "Premium"], var.sku)
+    error_message = "scale_units can only be set when sku is Standard or Premium."
+  }
 }
 
 variable "ip_configuration" {
@@ -77,6 +82,11 @@ variable "ip_configuration" {
     ])
     error_message = "ip_configuration.subnet_id must reference the AzureBastionSubnet subnet."
   }
+
+  validation {
+    condition     = var.sku == "Developer" ? length(var.ip_configuration) == 0 : length(var.ip_configuration) == 1
+    error_message = "ip_configuration must be set to exactly one entry for Basic/Standard/Premium SKUs and must be omitted for Developer."
+  }
 }
 
 variable "virtual_network_id" {
@@ -84,6 +94,16 @@ variable "virtual_network_id" {
   type        = string
   default     = null
   nullable    = true
+
+  validation {
+    condition     = var.sku != "Developer" || (var.virtual_network_id != null && trimspace(var.virtual_network_id) != "")
+    error_message = "virtual_network_id is required when sku is Developer."
+  }
+
+  validation {
+    condition     = var.sku == "Developer" || var.virtual_network_id == null || trimspace(var.virtual_network_id) == ""
+    error_message = "virtual_network_id is only supported with the Developer SKU."
+  }
 }
 
 variable "copy_paste_enabled" {
@@ -96,36 +116,66 @@ variable "file_copy_enabled" {
   description = "Is File Copy enabled for the Bastion Host? Supported on Standard or Premium SKU only."
   type        = bool
   default     = false
+
+  validation {
+    condition     = !var.file_copy_enabled || contains(["Standard", "Premium"], var.sku)
+    error_message = "file_copy_enabled requires Standard or Premium SKU."
+  }
 }
 
 variable "ip_connect_enabled" {
   description = "Is IP Connect enabled for the Bastion Host? Supported on Standard or Premium SKU only."
   type        = bool
   default     = false
+
+  validation {
+    condition     = !var.ip_connect_enabled || contains(["Standard", "Premium"], var.sku)
+    error_message = "ip_connect_enabled requires Standard or Premium SKU."
+  }
 }
 
 variable "shareable_link_enabled" {
   description = "Is Shareable Link enabled for the Bastion Host? Supported on Standard or Premium SKU only."
   type        = bool
   default     = false
+
+  validation {
+    condition     = !var.shareable_link_enabled || contains(["Standard", "Premium"], var.sku)
+    error_message = "shareable_link_enabled requires Standard or Premium SKU."
+  }
 }
 
 variable "tunneling_enabled" {
   description = "Is Tunneling enabled for the Bastion Host? Supported on Standard or Premium SKU only."
   type        = bool
   default     = false
+
+  validation {
+    condition     = !var.tunneling_enabled || contains(["Standard", "Premium"], var.sku)
+    error_message = "tunneling_enabled requires Standard or Premium SKU."
+  }
 }
 
 variable "session_recording_enabled" {
   description = "Is Session Recording enabled for the Bastion Host? Supported on Premium SKU only."
   type        = bool
   default     = false
+
+  validation {
+    condition     = !var.session_recording_enabled || var.sku == "Premium"
+    error_message = "session_recording_enabled requires the Premium SKU."
+  }
 }
 
 variable "kerberos_enabled" {
   description = "Is Kerberos authentication enabled for the Bastion Host? Supported on Standard or Premium SKU only."
   type        = bool
   default     = false
+
+  validation {
+    condition     = !var.kerberos_enabled || contains(["Standard", "Premium"], var.sku)
+    error_message = "kerberos_enabled requires Standard or Premium SKU."
+  }
 }
 
 variable "zones" {

@@ -1,5 +1,7 @@
 resource "azurerm_key_vault_access_policy" "access_policies" {
-  for_each = local.access_policies_by_name
+  for_each = {
+    for policy in var.access_policies : policy.name => policy
+  }
 
   key_vault_id = azurerm_key_vault.key_vault.id
   tenant_id    = coalesce(each.value.tenant_id, var.tenant_id)
@@ -18,13 +20,6 @@ resource "azurerm_key_vault_access_policy" "access_policies" {
       read   = timeouts.value.read
       update = timeouts.value.update
       delete = timeouts.value.delete
-    }
-  }
-
-  lifecycle {
-    precondition {
-      condition     = !var.rbac_authorization_enabled
-      error_message = "access_policies cannot be used when rbac_authorization_enabled is true."
     }
   }
 }

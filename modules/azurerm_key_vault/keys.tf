@@ -1,5 +1,7 @@
 resource "azurerm_key_vault_key" "keys" {
-  for_each = local.keys_by_name
+  for_each = {
+    for key in var.keys : key.name => key
+  }
 
   name         = each.value.name
   key_vault_id = azurerm_key_vault.key_vault.id
@@ -40,16 +42,4 @@ resource "azurerm_key_vault_key" "keys" {
   tags = merge(var.tags, try(each.value.tags, {}))
 
   depends_on = [azurerm_key_vault_access_policy.access_policies]
-
-  lifecycle {
-    precondition {
-      condition     = !contains(["RSA", "RSA-HSM"], each.value.key_type) || (each.value.key_size != null && contains([2048, 3072, 4096], each.value.key_size))
-      error_message = "RSA and RSA-HSM keys require key_size of 2048, 3072, or 4096."
-    }
-
-    precondition {
-      condition     = !contains(["EC", "EC-HSM"], each.value.key_type) || (each.value.curve != null && contains(["P-256", "P-384", "P-521", "P-256K"], each.value.curve))
-      error_message = "EC and EC-HSM keys require curve set to P-256, P-384, P-521, or P-256K."
-    }
-  }
 }

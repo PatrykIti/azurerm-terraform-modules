@@ -103,6 +103,11 @@ variable "storage_container_id" {
     ))
     error_message = "storage_container_id must be a valid Azure Storage container resource ID when set."
   }
+
+  validation {
+    condition     = var.storage_container_id == null || var.identity != null
+    error_message = "identity must be configured when storage_container_id is set."
+  }
 }
 
 variable "identity" {
@@ -125,6 +130,22 @@ variable "identity" {
   validation {
     condition     = var.identity == null || !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type) || length(var.identity.identity_ids) > 0
     error_message = "identity.identity_ids must be provided when identity.type includes UserAssigned."
+  }
+
+  validation {
+    condition     = var.identity == null || contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type) || length(var.identity.identity_ids) == 0
+    error_message = "identity.identity_ids can only be set when identity.type includes UserAssigned."
+  }
+
+  validation {
+    condition = var.identity == null || alltrue([
+      for identity_id in var.identity.identity_ids :
+      can(regex(
+        "(?i)^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.ManagedIdentity/userAssignedIdentities/[^/]+$",
+        identity_id
+      ))
+    ])
+    error_message = "identity.identity_ids must contain valid user-assigned identity resource IDs."
   }
 }
 

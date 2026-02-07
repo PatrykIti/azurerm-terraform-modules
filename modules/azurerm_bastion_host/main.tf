@@ -1,9 +1,3 @@
-locals {
-  sku_supports_standard_features = contains(["Standard", "Premium"], var.sku)
-  sku_is_premium                 = var.sku == "Premium"
-  sku_is_developer               = var.sku == "Developer"
-}
-
 resource "azurerm_bastion_host" "bastion_host" {
   name                = var.name
   resource_group_name = var.resource_group_name
@@ -41,42 +35,4 @@ resource "azurerm_bastion_host" "bastion_host" {
   }
 
   tags = var.tags
-
-  lifecycle {
-    precondition {
-      condition     = local.sku_is_developer ? length(var.ip_configuration) == 0 : length(var.ip_configuration) == 1
-      error_message = "ip_configuration must be set to exactly one entry for Basic/Standard/Premium SKUs and must be omitted for Developer."
-    }
-
-    precondition {
-      condition     = !local.sku_is_developer || (var.virtual_network_id != null && var.virtual_network_id != "")
-      error_message = "virtual_network_id is required when sku is Developer."
-    }
-
-    precondition {
-      condition     = local.sku_is_developer || var.virtual_network_id == null || var.virtual_network_id == ""
-      error_message = "virtual_network_id is only supported with the Developer SKU."
-    }
-
-    precondition {
-      condition = local.sku_supports_standard_features || (
-        !var.file_copy_enabled &&
-        !var.ip_connect_enabled &&
-        !var.kerberos_enabled &&
-        !var.shareable_link_enabled &&
-        !var.tunneling_enabled
-      )
-      error_message = "file_copy_enabled, ip_connect_enabled, kerberos_enabled, shareable_link_enabled, and tunneling_enabled require Standard or Premium SKU."
-    }
-
-    precondition {
-      condition     = !var.session_recording_enabled || local.sku_is_premium
-      error_message = "session_recording_enabled requires the Premium SKU."
-    }
-
-    precondition {
-      condition     = var.scale_units == null || local.sku_supports_standard_features
-      error_message = "scale_units can only be set when sku is Standard or Premium."
-    }
-  }
 }

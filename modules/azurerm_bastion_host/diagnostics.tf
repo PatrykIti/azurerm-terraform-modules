@@ -67,10 +67,6 @@ locals {
     })
   ]
 
-  diagnostic_settings_by_name = {
-    for ds in local.diagnostic_settings_resolved : ds.name => ds
-  }
-
   diagnostic_settings_skipped = [
     for ds in local.diagnostic_settings_resolved : {
       name                = ds.name
@@ -102,21 +98,21 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
   partner_solution_id            = try(each.value.partner_solution_id, null)
 
   dynamic "enabled_log" {
-    for_each = local.diagnostic_settings_by_name[each.key].log_categories
+    for_each = each.value.log_categories
     content {
       category = enabled_log.value
     }
   }
 
   dynamic "enabled_log" {
-    for_each = local.diagnostic_settings_by_name[each.key].log_category_groups
+    for_each = each.value.log_category_groups
     content {
       category_group = enabled_log.value
     }
   }
 
   dynamic "enabled_metric" {
-    for_each = local.diagnostic_settings_by_name[each.key].metric_categories
+    for_each = each.value.metric_categories
     content {
       category = enabled_metric.value
     }

@@ -27,6 +27,9 @@ The following must be handled outside the module:
 
 - `name` must be a UUID (GUID) and known at plan time.
 - `data_json` must be valid workbook JSON; use `jsonencode()` in Terraform.
+- The module keeps a flat input surface for workbook fields to mirror the
+  provider schema, while `identity` and `timeouts` remain object inputs because
+  they map to nested provider blocks.
 - When using `identity` + `source_id`, grant the identity least-privilege access
   to the source resource (Reader is a common baseline).
 - `storage_container_id` is an optional workbook capability; this module only

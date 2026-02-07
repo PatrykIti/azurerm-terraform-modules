@@ -1,8 +1,13 @@
+locals {
+  normalized_kind = var.kind == "Language" ? "TextAnalytics" : var.kind
+  is_openai_kind  = local.normalized_kind == "OpenAI"
+}
+
 resource "azurerm_cognitive_account" "cognitive_account" {
   name                = var.name
   location            = var.location
   resource_group_name = var.resource_group_name
-  kind                = var.kind == "Language" ? "TextAnalytics" : var.kind
+  kind                = local.normalized_kind
   sku_name            = var.sku_name
 
   custom_subdomain_name              = var.custom_subdomain_name
@@ -71,7 +76,7 @@ resource "azurerm_cognitive_account" "cognitive_account" {
 }
 
 resource "azurerm_cognitive_deployment" "cognitive_deployment" {
-  for_each = var.kind == "OpenAI" ? { for deployment in var.deployments : deployment.name => deployment } : {}
+  for_each = local.is_openai_kind ? { for deployment in var.deployments : deployment.name => deployment } : {}
 
   name                 = each.value.name
   cognitive_account_id = azurerm_cognitive_account.cognitive_account.id
@@ -96,7 +101,7 @@ resource "azurerm_cognitive_deployment" "cognitive_deployment" {
 }
 
 resource "azurerm_cognitive_account_rai_policy" "cognitive_account_rai_policy" {
-  for_each = var.kind == "OpenAI" ? { for policy in var.rai_policies : policy.name => policy } : {}
+  for_each = local.is_openai_kind ? { for policy in var.rai_policies : policy.name => policy } : {}
 
   name                 = each.value.name
   cognitive_account_id = azurerm_cognitive_account.cognitive_account.id
@@ -117,7 +122,7 @@ resource "azurerm_cognitive_account_rai_policy" "cognitive_account_rai_policy" {
 }
 
 resource "azurerm_cognitive_account_rai_blocklist" "cognitive_account_rai_blocklist" {
-  for_each = var.kind == "OpenAI" ? { for blocklist in var.rai_blocklists : blocklist.name => blocklist } : {}
+  for_each = local.is_openai_kind ? { for blocklist in var.rai_blocklists : blocklist.name => blocklist } : {}
 
   name                 = each.value.name
   cognitive_account_id = azurerm_cognitive_account.cognitive_account.id
