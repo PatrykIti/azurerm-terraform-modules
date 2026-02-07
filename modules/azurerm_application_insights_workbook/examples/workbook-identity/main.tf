@@ -18,6 +18,12 @@ resource "azurerm_resource_group" "example" {
   location = "West Europe"
 }
 
+resource "azurerm_user_assigned_identity" "workbook" {
+  name                = "uai-aiwb-identity-example"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+
 locals {
   workbook_data = {
     version = "Notebook/1.0"
@@ -44,7 +50,8 @@ module "application_insights_workbook" {
   data_json           = jsonencode(local.workbook_data)
 
   identity = {
-    type = "SystemAssigned"
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.workbook.id]
   }
 
   tags = {

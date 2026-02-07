@@ -36,8 +36,5 @@ module "eventhub_namespace" {
   auto_inflate_enabled     = var.auto_inflate_enabled
   maximum_throughput_units = var.maximum_throughput_units
 
-  tags = {
-    Environment = "Development"
-    Example     = "Basic"
-  }
+  tags = var.tags
 }

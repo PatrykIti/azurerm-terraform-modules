@@ -40,6 +40,15 @@ variable "maximum_throughput_units" {
   default     = null
 }
 
+variable "tags" {
+  description = "Tags for the namespace resources."
+  type        = map(string)
+  default = {
+    Environment = "Development"
+    Example     = "Basic"
+  }
+}
+
 variable "random_suffix" {
   description = "Random suffix used for test uniqueness."
   type        = string

@@ -30,6 +30,23 @@ locals {
     metrics = local.eventhub_diag_metric_categories
   }
 
+  diagnostic_settings_create = {
+    for ds in var.diagnostic_settings : ds.name => ds
+    if(
+      (
+        ds.log_categories != null ||
+        ds.metric_categories != null
+      )
+      ? (
+        length(ds.log_categories == null ? [] : ds.log_categories) +
+        length(ds.metric_categories == null ? [] : ds.metric_categories)
+      ) > 0
+      : (
+        ds.areas == null || length(ds.areas) > 0
+      )
+    )
+  }
+
   diagnostic_settings_resolved = [
     for ds in var.diagnostic_settings : merge(ds, {
       areas = coalesce(ds.areas, ["all"])
@@ -60,7 +77,8 @@ locals {
 
 resource "azurerm_monitor_diagnostic_setting" "diagnostic_settings" {
   for_each = {
-    for ds in local.diagnostic_settings_effective : ds.name => ds
+    for ds in local.diagnostic_settings_resolved : ds.name => ds
+    if contains(keys(local.diagnostic_settings_create), ds.name)
   }
 
   name               = each.value.name
@@ -71,6 +89,13 @@ resource "azurerm_monitor_diagnostic_setting" "diagnostic_settings" {
   storage_account_id             = try(each.value.storage_account_id, null)
   eventhub_authorization_rule_id = try(each.value.eventhub_authorization_rule_id, null)
   eventhub_name                  = try(each.value.eventhub_name, null)
+
+  lifecycle {
+    precondition {
+      condition     = length(each.value.log_categories) + length(each.value.metric_categories) > 0
+      error_message = "Diagnostic setting \"${each.key}\" resolves to zero log/metric categories for this namespace."
+    }
+  }
 
   dynamic "enabled_log" {
     for_each = each.value.log_categories

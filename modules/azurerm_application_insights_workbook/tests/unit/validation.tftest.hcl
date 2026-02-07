@@ -75,7 +75,8 @@ run "valid_storage_container_id" {
   variables {
     storage_container_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/teststorage/blobServices/default/containers/workbook-storage"
     identity = {
-      type = "SystemAssigned"
+      type         = "UserAssigned"
+      identity_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/test"]
     }
   }
 
@@ -91,7 +92,8 @@ run "invalid_storage_container_id" {
   variables {
     storage_container_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/teststorage"
     identity = {
-      type = "SystemAssigned"
+      type         = "UserAssigned"
+      identity_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/test"]
     }
   }
 

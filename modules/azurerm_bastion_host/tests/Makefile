@@ -63,7 +63,7 @@ deps:
 # Compile-only gate for Go tests (no test execution)
 test-compile: deps
 	@echo "Running Go compile gate..."
-	$(call run_with_log,compile,go test ./... -run '^$$')
+	$(call run_with_log,all_compile,go test ./... -run '^$$')
 
 # Run all tests
 test: check-env deps test-compile

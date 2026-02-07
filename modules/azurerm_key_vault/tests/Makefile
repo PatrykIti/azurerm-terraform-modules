@@ -63,7 +63,7 @@ deps:
 # Compile-only gate for pipeline smoke checks
 test-compile: deps
 	@echo "Running compile gate..."
-	$(call run_with_log,compile-gate,go test ./... -run=^$$)
+	$(call run_with_log,all_compile,go test ./... -run=^$$)
 
 # Run all tests
 test: check-env test-compile

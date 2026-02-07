@@ -38,7 +38,7 @@ func TestApplicationInsightsWorkbookFullIntegration(t *testing.T) {
 
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, resourceName)
-		assert.Equal(t, "SystemAssigned", identityType)
+		assert.Equal(t, "UserAssigned", identityType)
 		assert.NotEmpty(t, workbookStorageContainerID)
 		assert.Equal(t, expectedStorageContainerID, workbookStorageContainerID)
 	})

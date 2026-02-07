@@ -268,9 +268,10 @@ variable "customer_managed_key" {
   validation {
     condition = var.customer_managed_key == null || alltrue([
       for id in var.customer_managed_key.key_vault_key_ids :
+      can(regex("(?i)^https://[^/]+\\.vault\\.azure\\.net/keys/[^/]+/[^/]+$", id)) ||
       can(regex("(?i)^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.KeyVault/vaults/[^/]+/keys/[^/]+(/[^/]+)?$", id))
     ])
-    error_message = "customer_managed_key.key_vault_key_ids must be valid Key Vault key IDs."
+    error_message = "customer_managed_key.key_vault_key_ids must be valid Key Vault key IDs (URI or ARM ID)."
   }
 
   validation {

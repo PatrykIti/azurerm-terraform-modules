@@ -11,10 +11,10 @@ mock_provider "azurerm" {
       data_json            = "{\"version\":\"Notebook/1.0\",\"items\":[]}"
       storage_container_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/teststorage/blobServices/default/containers/workbook-storage"
       identity = {
-        type         = "SystemAssigned"
+        type         = "UserAssigned"
         principal_id = "00000000-0000-0000-0000-000000000001"
         tenant_id    = "00000000-0000-0000-0000-000000000002"
-        identity_ids = []
+        identity_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/test"]
       }
     }
   }
@@ -28,7 +28,8 @@ variables {
   data_json            = "{\"version\":\"Notebook/1.0\",\"items\":[]}"
   storage_container_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/teststorage/blobServices/default/containers/workbook-storage"
   identity = {
-    type = "SystemAssigned"
+    type         = "UserAssigned"
+    identity_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/test"]
   }
 }
 
@@ -61,7 +62,7 @@ run "verify_outputs" {
   }
 
   assert {
-    condition     = output.identity.type == "SystemAssigned"
+    condition     = output.identity.type == "UserAssigned"
     error_message = "Output 'identity.type' should return the identity type."
   }
 }

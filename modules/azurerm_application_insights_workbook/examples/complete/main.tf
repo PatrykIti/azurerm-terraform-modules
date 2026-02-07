@@ -40,6 +40,12 @@ resource "azurerm_storage_container" "workbook" {
   container_access_type = "private"
 }
 
+resource "azurerm_user_assigned_identity" "workbook" {
+  name                = "uai-aiwb-complete-${var.random_suffix}"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+
 locals {
   workbook_data = {
     version = "Notebook/1.0"
@@ -67,10 +73,11 @@ module "application_insights_workbook" {
   description          = "Complete example workbook with identity and source."
   category             = "workbook"
   source_id            = lower(azurerm_log_analytics_workspace.example.id)
-  storage_container_id = azurerm_storage_container.workbook.resource_manager_id
+  storage_container_id = azurerm_storage_container.workbook.id
 
   identity = {
-    type = "SystemAssigned"
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.workbook.id]
   }
 
   tags = {

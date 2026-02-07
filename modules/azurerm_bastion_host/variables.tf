@@ -260,6 +260,14 @@ variable "diagnostic_settings" {
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
+      !(length(coalesce(ds.log_categories, [])) > 0 && length(coalesce(ds.log_category_groups, [])) > 0)
+    ])
+    error_message = "Do not set both log_categories and log_category_groups in the same diagnostic setting."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
       alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
       alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : c != ""]) &&
       alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""]) &&

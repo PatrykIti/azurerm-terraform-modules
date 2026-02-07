@@ -14,7 +14,7 @@ resource "azurerm_application_insights_workbook" "application_insights_workbook"
     for_each = var.identity == null ? [] : [var.identity]
     content {
       type         = identity.value.type
-      identity_ids = contains(["UserAssigned", "SystemAssigned, UserAssigned"], identity.value.type) ? try(identity.value.identity_ids, null) : null
+      identity_ids = try(identity.value.identity_ids, null)
     }
   }
 

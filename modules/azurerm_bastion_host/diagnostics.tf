@@ -1,12 +1,12 @@
 locals {
   bastion_area_map = {
     all = {
-      log_categories      = ["BastionAuditLogs"]
+      log_categories      = []
       log_category_groups = ["allLogs"]
       metric_categories   = ["AllMetrics"]
     }
     logs = {
-      log_categories      = ["BastionAuditLogs"]
+      log_categories      = []
       log_category_groups = ["allLogs"]
       metric_categories   = []
     }

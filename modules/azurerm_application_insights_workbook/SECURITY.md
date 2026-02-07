@@ -11,7 +11,7 @@ render and which resources it can reference.
 
 ### Managed Identity
 
-- Supports `SystemAssigned` and `UserAssigned` identities.
+- Supports `UserAssigned` identity.
 - Use least-privilege RBAC on the resource referenced by `source_id`.
 - Prefer `UserAssigned` when you need tighter lifecycle control.
 

@@ -25,5 +25,5 @@ output "workbook_storage_container_id" {
 
 output "expected_storage_container_id" {
   description = "The expected storage container ID from the fixture resource"
-  value       = azurerm_storage_container.workbook.resource_manager_id
+  value       = azurerm_storage_container.workbook.id
 }

@@ -65,7 +65,7 @@ func TestCompleteApplicationInsightsWorkbook(t *testing.T) {
 
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, resourceName)
-		assert.Equal(t, "SystemAssigned", identityType)
+		assert.Equal(t, "UserAssigned", identityType)
 		assert.NotEmpty(t, workbookStorageContainerID)
 		assert.Equal(t, expectedStorageContainerID, workbookStorageContainerID)
 	})
@@ -116,7 +116,7 @@ func TestWorkbookIdentityFixture(t *testing.T) {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 		identityType := terraform.Output(t, terraformOptions, "identity_type")
 
-		assert.Equal(t, "SystemAssigned", identityType)
+		assert.Equal(t, "UserAssigned", identityType)
 	})
 }
 

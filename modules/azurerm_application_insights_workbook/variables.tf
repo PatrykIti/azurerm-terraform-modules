@@ -119,22 +119,18 @@ variable "identity" {
   default = null
 
   validation {
-    condition = var.identity == null || contains([
-      "SystemAssigned",
-      "UserAssigned",
-      "SystemAssigned, UserAssigned"
-    ], var.identity.type)
-    error_message = "identity.type must be one of: SystemAssigned, UserAssigned, SystemAssigned, UserAssigned."
+    condition     = var.identity == null || var.identity.type == "UserAssigned"
+    error_message = "identity.type must be UserAssigned."
   }
 
   validation {
-    condition     = var.identity == null || !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type) || length(var.identity.identity_ids) > 0
+    condition     = var.identity == null || length(var.identity.identity_ids) > 0
     error_message = "identity.identity_ids must be provided when identity.type includes UserAssigned."
   }
 
   validation {
-    condition     = var.identity == null || contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type) || length(var.identity.identity_ids) == 0
-    error_message = "identity.identity_ids can only be set when identity.type includes UserAssigned."
+    condition     = var.identity == null || length(distinct(var.identity.identity_ids)) == length(var.identity.identity_ids)
+    error_message = "identity.identity_ids must not contain duplicates."
   }
 
   validation {

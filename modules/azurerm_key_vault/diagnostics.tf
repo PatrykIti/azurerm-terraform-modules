@@ -35,6 +35,25 @@ locals {
     })
   ]
 
+  diagnostic_settings_create = {
+    for ds in var.diagnostic_settings : ds.name => ds
+    if(
+      (
+        ds.log_categories != null ||
+        ds.metric_categories != null ||
+        ds.log_category_groups != null
+      )
+      ? (
+        length(ds.log_categories == null ? [] : ds.log_categories) +
+        length(ds.metric_categories == null ? [] : ds.metric_categories) +
+        length(ds.log_category_groups == null ? [] : ds.log_category_groups)
+      ) > 0
+      : (
+        ds.areas == null || length(ds.areas) > 0
+      )
+    )
+  }
+
   diagnostic_settings_resolved = [
     for ds in local.diagnostic_settings_expanded : merge(ds, {
       resolved_log_categories = sort(tolist(setintersection(
@@ -66,7 +85,7 @@ locals {
 
   diagnostic_settings_for_each = {
     for ds in local.diagnostic_settings_resolved : ds.name => ds
-    if length(ds.resolved_log_categories) + length(ds.resolved_metric_categories) + length(ds.resolved_log_category_groups) > 0
+    if contains(keys(local.diagnostic_settings_create), ds.name)
   }
 
   diagnostic_settings_skipped = [
@@ -93,6 +112,13 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
   eventhub_authorization_rule_id = each.value.eventhub_authorization_rule_id
   eventhub_name                  = each.value.eventhub_name
   partner_solution_id            = each.value.partner_solution_id
+
+  lifecycle {
+    precondition {
+      condition     = length(each.value.resolved_log_categories) + length(each.value.resolved_metric_categories) + length(each.value.resolved_log_category_groups) > 0
+      error_message = "Diagnostic setting \"${each.key}\" resolves to zero categories for this Key Vault."
+    }
+  }
 
   dynamic "enabled_log" {
     for_each = each.value.resolved_log_categories
