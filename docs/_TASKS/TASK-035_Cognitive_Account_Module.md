@@ -11,49 +11,49 @@
 
 ## Audit Subtasks (2026-02-07)
 
-- Scope Status: **GREEN** - Modul pozostaje w granicach cognitive-account family i nie dodaje cross-resource glue.
-- Provider Coverage Status: **YELLOW** - Potrzebna formalna matrix pokrycia `azurerm_cognitive_account` (`4.57.0`) i zasobow in-scope.
-- Overall Status: **YELLOW** - Najwieksze braki sa w test harness/docs consistency i dowodach coverage.
+- Scope Status: **GREEN** - Modul pozostaje atomowy: kod modulu zarzadza tylko `azurerm_cognitive_account` + in-scope sub-resources + diagnostic settings.
+- Provider Coverage Status: **YELLOW** - Brakuje formalnej coverage matrix/schema diff dla `PRIMARY_RESOURCE`, a czesc capability decisions nadal nie ma jawnego `Implemented/Omitted/N-A`.
+- Overall Status: **YELLOW** - Najwieksze otwarte Medium to: evidence dla provider coverage, logic-placement audit trail i realna asertywnosc testow integracyjnych.
 
 ### Naming/Provider-Alignment
 
-- [ ] Potwierdzic canonical naming i brak literowek: `modules/azurerm_cognitive_account` (nie `congnitive`), `modules/azurerm_cognitive_account/module.json`, `modules/azurerm_cognitive_account/main.tf`.
-- [ ] Dodac do taska capability matrix dla `PRIMARY_RESOURCE=azurerm_cognitive_account` (Implemented / Intentionally Omitted / N-A + evidence).
-- [ ] Doprecyzowac matrix dla in-scope sub-resources: `azurerm_cognitive_deployment`, `azurerm_cognitive_account_rai_policy`, `azurerm_cognitive_account_rai_blocklist`, `azurerm_cognitive_account_customer_managed_key`.
+- [x] Canonical naming jest spojne: `modules/azurerm_cognitive_account`, `modules/azurerm_cognitive_account/module.json`, `modules/azurerm_cognitive_account/main.tf`.
+- [ ] Dodac do taska formalna Coverage Matrix (11.C) dla `PRIMARY_RESOURCE=azurerm_cognitive_account` z evidence `file:line`.
+- [ ] Rozszerzyc matrix o in-scope sub-resources: `azurerm_cognitive_deployment`, `azurerm_cognitive_account_rai_policy`, `azurerm_cognitive_account_rai_blocklist`, `azurerm_cognitive_account_customer_managed_key`, `azurerm_monitor_diagnostic_setting`.
 
 ### Scope boundaries (what to remove/keep)
 
-- [ ] Utrzymac atomic scope: tylko cognitive-account resources; private endpoint/DNS/RBAC assignment zostaja poza modulem (tylko examples).
-- [ ] Jawnie potwierdzic w `modules/azurerm_cognitive_account/docs/README.md`, ktore zasoby sa out-of-scope i dlaczego.
-- [ ] Zweryfikowac, ze `azurerm_ai_services` nie pojawia sie przypadkiem w kodzie/dokumentacji tego modulu.
+- [x] Atomic scope jest utrzymany: private endpoint/DNS/RBAC assignment pozostaja poza modulem (tylko examples/fixtures).
+- [x] `modules/azurerm_cognitive_account/docs/README.md` jawnie opisuje out-of-scope i rozdziela ten modul od `azurerm_ai_services`.
+- [ ] Dodac krotka mape dowodow `scope -> file:line` (code + docs + examples), aby domknac gate 11.A bez ponownego audytu.
 
 ### Provider coverage gaps for PRIMARY_RESOURCE
 
-- [ ] Wykonac schema diff `azurerm_cognitive_account` dla `4.57.0` i dopisac missing/omitted capabilities z uzasadnieniem.
-- [ ] Potwierdzic coverage wszystkich krytycznych blokow account-level (network/local auth/identity/CMK/api properties), z mapowaniem na `variables.tf`, `main.tf`, `outputs.tf`.
-- [ ] Uporzadkowac placeholders TODO w testach integracyjnych tak, by scenariusze nie byly "green by skip/comment", tylko realnie asertywne.
+- [ ] Wykonac schema diff `azurerm_cognitive_account` dla `4.57.0` i wpisac kazdy argument/block jako `Implemented / Intentionally Omitted / N-A`.
+- [ ] Rozstrzygnac i udokumentowac status account-level capabilities niewidocznych obecnie w API modulu (np. `api_properties` i inne service-specific fields, jesli wspierane w schema).
+- [ ] Dodac mapowanie `capability -> variables.tf/main.tf/outputs.tf` + pokrycie testowe dla pozycji oznaczonych jako `Implemented`.
 
-### Go tests + fixtures checklist gaps
+### Logic placement + input model (Guide 10 + 11.H)
 
-- [x] Naprawic rozjazd fixture path `fixtures/private_endpoint`: obecnie testy odwoluja sie do nieistniejacej sciezki w `modules/azurerm_cognitive_account/tests/cognitive_account_test.go` i `modules/azurerm_cognitive_account/tests/integration_test.go`.
-- [x] Zdecydowac i wdrozyc jedno z dwoch: (A) dodac `modules/azurerm_cognitive_account/tests/fixtures/private_endpoint`, albo (B) przepiac testy na istniejace `tests/fixtures/secure` / `tests/fixtures/openai-secure`.
-- [x] Utrzymac `CopyTerraformFolderToTemp(t, "..", "tests/fixtures/...")` jako standard, bo modul nie wymaga sibling-module dependencies w fixtures.
-- [x] Dodac compile gate `go test ./... -run '^$'` do checklisty runbookowej i do test pipeline.
+- [ ] Spisac rule-placement map dla kluczowych regul (`validation` vs `precondition` vs `locals`) i usunac niejednoznacznosci.
+- [ ] Dodac `lifecycle.precondition` tylko dla regul wymagajacych semantyki zasobu/apply-time (np. zaleznosc `deployments[*].rai_policy_name` od zdefiniowanych `rai_policies`, jesli nie da sie tego pewnie wymusic walidacja inputu).
+- [ ] Przejrzec model wejscia pod ergonomie groupingu (network/identity/cmk/deployments/diagnostics): albo zaproponowac grupowanie, albo dopisac jawne rationale utrzymania obecnego flat API.
+- [ ] Rozszerzyc `tests/unit/*.tftest.hcl`, aby osobno pokrywaly sciezki `variables validation` i sciezki `precondition` po finalnym rozmieszczeniu logiki.
 
-### Docs/release/test harness alignment
+### Test depth + fixtures (real gaps)
 
-- [x] Zaktualizowac `modules/azurerm_cognitive_account/tests/README.md` - usunac nieistniejace komendy (`make test-all`, `make test-short`) i nieaktualne nazwy plikow (`module_test.go`).
-- [x] Ujednolicic README z realnymi fixture names (`openai-basic`, `openai-complete`, `openai-secure`, `language-basic`, `speech-basic`).
-- [x] Usunac techniczne artefakty z examples (`modules/azurerm_cognitive_account/examples/*/.terraform*`) i dodac kontrolke na brak takich plikow w QA checklist.
+- [ ] Zastapic placeholder/TODO assertions w `modules/azurerm_cognitive_account/tests/cognitive_account_test.go` i `modules/azurerm_cognitive_account/tests/integration_test.go` realnymi walidacjami zachowania (network/auth/CMK/diagnostics/OpenAI sub-resources).
+- [ ] Potwierdzic docelowy pattern walidacji dla integracji (SDK helper vs output/API assertions) i dopisac ten kontrakt do `modules/azurerm_cognitive_account/tests/README.md`.
+- [ ] Rozszerzyc negative coverage: konkretne `expectedError` i przypadki dla krytycznych walidacji (kind/sku/cmk/network/deployments).
 
 ### Validation commands
 
-- [ ] `terraform -chdir=modules/azurerm_cognitive_account fmt -check -recursive`
-- [ ] `terraform -chdir=modules/azurerm_cognitive_account init -backend=false -input=false`
-- [ ] `terraform -chdir=modules/azurerm_cognitive_account validate`
-- [ ] `terraform -chdir=modules/azurerm_cognitive_account test -test-directory=tests/unit`
-- [ ] `cd modules/azurerm_cognitive_account/tests && go test ./... -run '^$'`
-- [ ] `cd modules/azurerm_cognitive_account/tests && make test`
+- [x] `terraform -chdir=modules/azurerm_cognitive_account fmt -check -recursive`
+- [ ] `terraform -chdir=modules/azurerm_cognitive_account init -backend=false -input=false` (blocked: brak dostepu do `registry.terraform.io` w tym srodowisku)
+- [ ] `terraform -chdir=modules/azurerm_cognitive_account validate` (blocked: provider plugin schema nie laduje sie w tym srodowisku)
+- [ ] `terraform -chdir=modules/azurerm_cognitive_account test -test-directory=tests/unit` (blocked: ten sam problem ze schema providera)
+- [x] `cd modules/azurerm_cognitive_account/tests && go test ./... -run '^$'`
+- [ ] `cd modules/azurerm_cognitive_account/tests && make test` (blocked lokalnie bez `ARM_*`/`AZURE_*` credentials)
 
 ---
 

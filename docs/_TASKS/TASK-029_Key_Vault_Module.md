@@ -12,26 +12,33 @@
 ## Audit Subtasks (2026-02-07)
 
 - Scope Status: **GREEN** - Modul pozostaje atomowy: primary `azurerm_key_vault`, a dodatkowe resources sa bezposrednio key-vault-specific.
-- Provider Coverage Status: **YELLOW** - Potrzebny jawny schema diff/matrix dla `azurerm_key_vault` (`4.57.0`) i zasobow powiazanych.
-- Overall Status: **YELLOW** - Gaps sa glownie w test harness consistency i audit evidence, nie w samej strukturze modulu.
+- Provider Coverage Status: **YELLOW** - Nadal brakuje jawnego schema diff/matrix dla `azurerm_key_vault` (`4.57.0`) i zasobow powiazanych.
+- Overall Status: **YELLOW** - Najwieksze remaining gaps sa w audit evidence oraz logic placement/variable grouping; test harness consistency jest domknieta.
 
 ### Naming/Provider-Alignment
 
-- [ ] Potwierdzic canonical naming i spojnosc referencji: `modules/azurerm_key_vault`, `modules/azurerm_key_vault/module.json`, `modules/azurerm_key_vault/main.tf`, `modules/azurerm_key_vault/outputs.tf`.
+- [x] Potwierdzic canonical naming i spojnosc referencji: `modules/azurerm_key_vault`, `modules/azurerm_key_vault/module.json`, `modules/azurerm_key_vault/main.tf`, `modules/azurerm_key_vault/outputs.tf`.
 - [ ] Dodac do taska capability matrix dla `PRIMARY_RESOURCE=azurerm_key_vault` z dowodami `file:line` (Implemented / Intentionally Omitted / N-A).
 - [ ] Dodac osobna matrix dla zasobow jawnie in-scope: `azurerm_key_vault_access_policy`, `azurerm_key_vault_key`, `azurerm_key_vault_secret`, `azurerm_key_vault_certificate`, `azurerm_key_vault_certificate_issuer`, `azurerm_key_vault_managed_storage_account`, `azurerm_key_vault_managed_storage_account_sas_token_definition`.
 
 ### Scope boundaries (what to remove/keep)
 
-- [ ] Utrzymac scope bez cross-resource glue: brak provisioning private endpoint/DNS/RBAC assignment w module; te elementy tylko w examples/docs.
-- [ ] Jawnie utrzymac i opisac wyjatek inline diagnostics jako dozwolony pattern (`modules/azurerm_key_vault/diagnostics.tf`).
-- [ ] Dopisac w `modules/azurerm_key_vault/docs/README.md` sekcje "In scope / Out of scope" z mapowaniem do aktualnego kodu.
+- [x] Utrzymac scope bez cross-resource glue: brak provisioning private endpoint/DNS/RBAC assignment w module; te elementy tylko w examples/docs.
+- [x] Jawnie utrzymac i opisac wyjatek inline diagnostics jako dozwolony pattern (`modules/azurerm_key_vault/diagnostics.tf`).
+- [ ] Ujednolicic w `modules/azurerm_key_vault/docs/README.md` nazewnictwo sekcji na "In scope / Out of scope" oraz dopisac mapowanie `resource -> plik.tf` jako audit evidence.
 
 ### Provider coverage gaps for PRIMARY_RESOURCE
 
 - [ ] Wykonac schema diff dla `azurerm_key_vault` (`4.57.0`) i udokumentowac brakujace argumenty/bloki albo oznaczyc je jako intentional omissions.
-- [ ] Potwierdzic i udokumentowac pokrycie cross-field constraints (RBAC vs access policies, network ACL, purge protection retention) przez walidacje i preconditions.
-- [ ] Potwierdzic i udokumentowac pokrycie diagnostyki advanced (`partner_solution_id`, `log_category_groups`, `category_group`) wzgledem provider schema.
+- [ ] Potwierdzic i udokumentowac pokrycie cross-field constraints (RBAC vs access policies, network ACL, purge protection retention) z rozdzieleniem: `variables.tf` validation vs `lifecycle.precondition`.
+- [ ] Potwierdzic i udokumentowac pokrycie diagnostyki advanced (`partner_solution_id`, `log_category_groups`, `category_group`) wzgledem provider schema wraz z dowodami `file:line`.
+
+### Logic placement and variable grouping (updated guide)
+
+- [ ] Zredukowac duplikacje reguł input-only miedzy `variables.tf` i `lifecycle.precondition` (np. `main.tf`, `keys.tf`, `secrets.tf`, `certificates.tf`, `managed_storage.tf`); zostawic `precondition` tylko tam, gdzie walidacja inputowa nie wystarcza.
+- [ ] Usunac lub uzasadnic preconditions o niskiej wartosci sygnalu (np. check retencji soft-delete, ktory jest juz wymuszony przez typ/range walidacji).
+- [ ] Przygotowac i zatwierdzic plan grupowania top-level inputs do logicznych obiektow (min. `core`, `security`, `network`, `diagnostic_settings`, `timeouts`) zgodnie z guide + decyzja o kompatybilnosci wstecznej.
+- [ ] Po decyzji o groupingu dopisac/rozszerzyc `tests/unit/*.tftest.hcl` tak, aby osobno pokrywaly sciezki grouped-object validation i `precondition`.
 
 ### Go tests + fixtures checklist gaps
 

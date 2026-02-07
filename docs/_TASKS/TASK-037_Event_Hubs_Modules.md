@@ -13,38 +13,46 @@
 
 ### azurerm_eventhub_namespace
 
-- Scope Status: **GREEN** - Modul pozostaje atomowy dla namespace i jego bezposrednich sub-resources.
-- Provider Coverage Status: **YELLOW** - Brakuje formalnej capability matrix i jawnego schema diff dla `azurerm_eventhub_namespace` (`4.57.0`).
-- Overall Status: **YELLOW** - Najwieksze luki sa w docs/test consistency oraz coverage evidence.
+- Scope Status: **GREEN** - Modul pozostaje atomowy dla namespace, a diagnostics sa trzymane inline.
+- Provider Coverage Status: **YELLOW** - Brakuje formalnej capability matrix + jawnego schema diff dla `azurerm_eventhub_namespace` (`4.57.0`).
+- Overall Status: **YELLOW** - Najwieksze luki sa w evidence coverage, logic placement i test-harness consistency.
 
 #### Naming/Provider-Alignment
 
 - [ ] Dodac matrix `PRIMARY_RESOURCE=azurerm_eventhub_namespace` z mapowaniem `provider capability -> file:line -> status`.
-- [ ] Zweryfikowac spojnosc naming i import paths dla namespace resources w `modules/azurerm_eventhub_namespace/main.tf`, `modules/azurerm_eventhub_namespace/outputs.tf`, `modules/azurerm_eventhub_namespace/docs/IMPORT.md`.
-- [x] Uporzadkowac dokumentacje pod katem funkcji juz zaimplementowanych (`schema_groups`), aby README/docs nie zanizaly zakresu.
+- [x] Potwierdzic spojnosc naming i import paths dla namespace resources w `modules/azurerm_eventhub_namespace/main.tf`, `modules/azurerm_eventhub_namespace/outputs.tf`, `modules/azurerm_eventhub_namespace/docs/IMPORT.md`.
+- [ ] Domknac README TF_DOCS dla `schema_groups` (resource/output coverage evidence), aby generated sekcje nie zanizaly zakresu.
 
 #### Scope boundaries (what to remove/keep)
 
-- [ ] Utrzymac out-of-scope dla private endpoint, DNS, RBAC assignment, budgets; pozostawiac je poza modulem.
-- [ ] Potwierdzic, ze namespace module nie przejmuje odpowiedzialnosci za eventhub-level settings i vice versa.
+- [x] Utrzymac out-of-scope dla private endpoint, DNS, RBAC assignment, budgets; pozostawiac je poza modulem.
+- [x] Potwierdzic, ze namespace module nie przejmuje odpowiedzialnosci za eventhub-level settings i vice versa.
 
 #### Provider coverage gaps for PRIMARY_RESOURCE
 
-- [x] Udokumentowac pokrycie `schema_groups` (inputs, resource, outputs) w `modules/azurerm_eventhub_namespace/README.md`, `modules/azurerm_eventhub_namespace/docs/README.md`, `modules/azurerm_eventhub_namespace/docs/IMPORT.md`.
+- [ ] Udokumentowac pokrycie `schema_groups` (inputs, resource, outputs) z pelnym evidence row w generated README.
 - [ ] Zweryfikowac i udokumentowac decyzje dla capabilities typu `kafka_enabled` / `zone_redundant` na podstawie schema `4.57.0` (supported vs intentional omission).
-- [ ] Zweryfikowac coverage i walidacje dla network rules, disaster recovery i diagnostics.
+- [ ] Zweryfikowac coverage i unit validation dla network rules, disaster recovery i diagnostics (wraz z evidence `file:line` do matrix).
+
+#### Logic placement + variable modeling
+
+- [ ] Przeniesc input-only rule `auto_inflate_enabled => maximum_throughput_units` z `lifecycle.precondition` do `variables.tf` validation.
+- [ ] Przeniesc input-only rule `network_rule_set.public_network_access_enabled` vs `public_network_access_enabled` do `variables.tf` validation (albo dodac jawne uzasadnienie pozostawienia w precondition).
+- [ ] Ocenic CMK/identity cross-field checks pod katem przeniesienia do variable validation (albo udokumentowac, czemu to precondition-only).
+- [ ] Rozdzielic test evidence dla validation-path vs precondition-path zgodnie z guide.
 
 #### Go tests + fixtures checklist gaps
 
-- [x] Usunac/rework scenariusze private-endpoint testow, bo `modules/azurerm_eventhub_namespace/tests/fixtures/private_endpoint` nie istnieje, a testy dalej sie do niego odwoluja.
 - [x] Utrzymac `CopyTerraformFolderToTemp(t, "..", "tests/fixtures/...")` dla namespace (brak zaleznosci na sibling modules).
 - [x] Oczyscic `modules/azurerm_eventhub_namespace/tests/performance_test.go` z placeholder vars (`enable_monitoring`, `enable_backup`, `instance_count`) i mapowac tylko na realne inputs.
+- [ ] Oczyscic stale wpisy private-endpoint i benchmark list w `tests/run_tests_parallel.sh`, `tests/run_tests_sequential.sh`, `tests/test_config.yaml` (nieistniejace test names / benchmark uruchamiany przez `-run`).
 - [ ] Dodac compile gate `go test ./... -run '^$'` i egzekwowac go razem z `make test`.
 
 #### Docs/release/test harness alignment
 
 - [x] Zaktualizowac `modules/azurerm_eventhub_namespace/tests/README.md`: usunac nieistniejace komendy (`make test-all`, `make test-short`) i nieaktualne nazwy plikow (`module_test.go`).
 - [x] Potwierdzic, ze `modules/azurerm_eventhub_namespace/tests/Makefile` nadal spelnia wzorzec logging/env-normalization i zapisuje logi w `tests/test_outputs`.
+- [ ] Domknac realne assertions w integration helpers (obecnie duzo TODO placeholders zamiast walidacji cech namespace).
 
 #### Validation commands
 
@@ -59,35 +67,44 @@
 
 - Scope Status: **GREEN** - Modul pozostaje atomowy dla eventhub i jego bezposrednich sub-resources.
 - Provider Coverage Status: **YELLOW** - Potrzebna formalna coverage matrix dla `azurerm_eventhub` i capture/auth/consumer-group capabilities.
-- Overall Status: **YELLOW** - Krytyczne luki sa w test fixtures/docs consistency i placeholder performance scenarios.
+- Overall Status: **YELLOW** - Najwieksze luki sa w coverage evidence, logic placement i test-harness consistency.
 
 #### Naming/Provider-Alignment
 
 - [ ] Dodac matrix `PRIMARY_RESOURCE=azurerm_eventhub` z evidence `file:line`.
-- [ ] Potwierdzic spojnosc naming/references dla `modules/azurerm_eventhub/main.tf`, `modules/azurerm_eventhub/outputs.tf`, `modules/azurerm_eventhub/docs/IMPORT.md`.
+- [x] Potwierdzic spojnosc naming/references dla `modules/azurerm_eventhub/main.tf`, `modules/azurerm_eventhub/outputs.tf`, `modules/azurerm_eventhub/docs/IMPORT.md`.
 - [x] Zweryfikowac, ze fixture sources do sibling namespace module pozostaja poprawne (`../../../../azurerm_eventhub_namespace`) po kopiowaniu szerszego katalogu.
 
 #### Scope boundaries (what to remove/keep)
 
-- [ ] Utrzymac out-of-scope dla private endpoint/DNS/RBAC assignment po stronie Event Hub module.
-- [ ] Trzymac namespace provisioning poza eventhub module API (namespace jako input/dependency).
+- [x] Utrzymac out-of-scope dla private endpoint/DNS/RBAC assignment po stronie Event Hub module.
+- [x] Trzymac namespace provisioning poza eventhub module API (namespace jako input/dependency).
 
 #### Provider coverage gaps for PRIMARY_RESOURCE
 
 - [ ] Wykonac schema diff `azurerm_eventhub` (`4.57.0`) i domknac matrix dla capture/status/retention/partition constraints.
-- [ ] Potwierdzic coverage i walidacje dla capture destination block i auth/consumer-group resources.
+- [ ] Potwierdzic coverage i walidacje dla capture destination block i auth/consumer-group resources (z evidence `file:line`).
+- [ ] Potwierdzic i udokumentowac pelny enum `status` wg schema `4.57.0` (czy brakujace wartosci sa intentional omission).
+- [ ] Uzgodnic decyzje dla diagnostic settings przy `azurerm_eventhub` (inline support vs jawny out-of-scope) i zapisac rationale.
+
+#### Logic placement + variable modeling
+
+- [ ] Dodac jawna walidacje `message_retention` vs `retention_description` (mutual exclusion), zamiast ukrywania logiki tylko w przypisaniu argumentu resource.
+- [x] Utrzymac locals tylko tam, gdzie daja realna wartosc (`namespace_id` parsing + mapy `for_each`).
+- [ ] Dodac unit tests, ktore pokrywaja cross-field retention/capture rules jako validation-path, nie tylko plan/apply behavior.
 
 #### Go tests + fixtures checklist gaps
 
 - [x] Utrzymac pattern `CopyTerraformFolderToTemp(t, "../..", "azurerm_eventhub/tests/fixtures/...")` dla fixture dependency na sibling module (`azurerm_eventhub_namespace`).
-- [x] Usunac/rework private-endpoint test cases, bo `modules/azurerm_eventhub/tests/fixtures/private_endpoint` nie istnieje.
 - [x] Oczyscic `modules/azurerm_eventhub/tests/performance_test.go` z placeholder vars (`enable_monitoring`, `enable_backup`, `instance_count`) i dopasowac do realnych inputow modulu.
+- [ ] Oczyscic stale wpisy private-endpoint i benchmark list w `tests/run_tests_parallel.sh`, `tests/run_tests_sequential.sh`, `tests/test_config.yaml` (nieistniejace test names / benchmark uruchamiany przez `-run`).
 - [ ] Dodac compile gate `go test ./... -run '^$'` i egzekwowac razem z `make test`.
 
 #### Docs/release/test harness alignment
 
 - [x] Zaktualizowac `modules/azurerm_eventhub/tests/README.md` (usunac `make test-all`, `make test-short`, `module_test.go`; dopasowac do realnych targets i plikow).
 - [x] Potwierdzic, ze `modules/azurerm_eventhub/tests/Makefile` ma pelne `run_with_log` pokrycie targetow oraz logowanie `tests/test_outputs/*.log`.
+- [ ] Domknac realne assertions w integration helpers (obecnie duzo TODO placeholders zamiast walidacji cech eventhub).
 
 #### Validation commands
 

@@ -94,7 +94,7 @@ wszystkie odstepstwa musza byc jawnie udokumentowane.
 ### 2) Provider capability coverage - PRIMARY_RESOURCE (`azurerm_bastion_host`) (11.B + 11.C)
 
 - [x] Potwierdzic pokrycie argumentow/blocks resource: `name`, `resource_group_name`, `location`, `sku`, `scale_units`, `copy_paste_enabled`, `file_copy_enabled`, `ip_connect_enabled`, `kerberos_enabled`, `shareable_link_enabled`, `tunneling_enabled`, `session_recording_enabled`, `virtual_network_id`, `zones`, `ip_configuration`, `timeouts`, `tags`.
-- [x] Potwierdzic walidacje i preconditions cross-field (Developer vs Basic/Standard/Premium; Standard/Premium feature gates; Premium-only session recording).
+- [x] Potwierdzic obecne cross-field guardy runtime (Developer vs Basic/Standard/Premium; Standard/Premium feature gates; Premium-only session recording) - obecnie glownie przez `lifecycle.precondition`.
 - [ ] Uzupelnic formalna **Coverage Matrix** (capability-by-capability z kolumnami `Implemented/Omitted/N-A`, severity, evidence `file:line`) i utrzymywac ja w tasku az do zamkniecia.
 - [ ] Wykonac/podpiac schema diff dla `azurerm_bastion_host` (`4.57.0`) i zaznaczyc ewentualne odstepstwa jako jawne decyzje.
 
@@ -116,8 +116,7 @@ Decyzja (2026-02-07):
 - [x] Potwierdzic markery README: `BEGIN_VERSION`, `BEGIN_EXAMPLES`, `BEGIN_TF_DOCS`.
 - [x] Potwierdzic wymagane przyklady: `examples/basic`, `examples/complete`, `examples/secure` + feature-specific examples.
 - [ ] Zaktualizowac historyczna sekcje `Feature matrix` w tym tasku (obecnie nie odzwierciedla wprost SKU `Developer` i pelnego `Premium` flow).
-- [ ] Dodac plan examples/tests dla scenariuszy `Developer` i `Premium + session_recording_enabled` (albo jawnie opisac powod braku).
-  - Defer: wymaga dodatkowych fixtures + integracyjnych scenariuszy runtime (wiekszy zakres niz bezpieczny audit fix).
+- [ ] Dodac jawne examples/fixtures dla scenariuszy `Developer` oraz `Premium + session_recording_enabled` (albo wpisac intentional omission z uzasadnieniem).
 
 ### 5) Testing + Go tests/fixtures addendum (Checklist 10 Testing + 11.G)
 
@@ -126,15 +125,22 @@ Decyzja (2026-02-07):
 - [x] Potwierdzic `source = "../../.."` w fixtures i brak zaleznosci na sibling modules (wiec `CopyTerraformFolderToTemp(t, "..", "tests/fixtures/...")` pozostaje poprawne).
 - [ ] Dodac pozytywne testy scenariuszy: `Developer` (`virtual_network_id`) oraz `Premium` (`session_recording_enabled = true`).
 - [ ] Rozszerzyc negative tests o diagnostyke (brak destination, niepoprawne `areas`, niepoprawne kombinacje).
+- [ ] Rozdzielic pokrycie testami sciezek `validation` vs `precondition` po relokacji logiki wg Checklist 11.H.
 - [x] Domknac zgodnosc `tests/Makefile` z addendum: wszystkie targety `test-*` powinny korzystac z `run_with_log` (uzupelnic `test-quick`, `test-junit`).
 - [x] Dodac i egzekwowac compile gate dla testow Go: `go test ./... -run '^$'`.
-  - Defer (pozostale duze testy): pelne pozytywne scenariusze `Developer`/`Premium` i szersze negative cases wymagaja nowych fixture/integration coverage.
 
 ### 6) Release + CI/CD integration (Checklist 10 Configuration/CI)
 
 - [x] Potwierdzic `module.json` (`name`, `title`, `commit_scope`, `tag_prefix`) i spojne mapowanie w `.releaserc.js`.
 - [x] Potwierdzic obecny scope `bastion-host` w `.github/workflows/pr-validation.yml`.
 - [ ] Dodac w tym tasku sekcje "audit evidence links" dla release/CI (sciezki + linie), aby reviewer mial gotowy check-pack.
+
+### 7) Logic placement + variable modeling (Checklist 11.H)
+
+- [ ] Przeniesc input-only constraints do `variables.tf` validations (priorytet: `validation > precondition > locals`) dla regul: `sku`/`virtual_network_id`, `sku`/`ip_configuration`, `sku`/feature toggles, `sku`/`scale_units`.
+- [ ] Ograniczyc `lifecycle.precondition` do przypadkow wymagajacych semantyki zasobu lub apply-time context; usunac checks, ktore da sie pewnie wyrazic na etapie input validation.
+- [ ] Po relokacji regul uproscic `locals` w `main.tf` (usunac one-off aliasy, zostawic tylko transformacje zwiekszajace czytelnosc).
+- [ ] Zaprojektowac logiczne grupowanie zmiennych (np. `sku/features/network`) w sposob ergonomiczny i testowalny, bez utraty discoverability provider capabilities.
 
 ### Validation commands
 

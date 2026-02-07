@@ -11,13 +11,13 @@
 
 ## Audit Subtasks (2026-02-07)
 
-- Scope Status: **GREEN** - Modul pozostaje atomowy (zarzadza tylko `azurerm_application_insights_workbook`), a cross-resource glue jest poza kodem modulu.
-- Provider Coverage Status: **GREEN** - Modul eksponuje `storage_container_id` (input + mapowanie + test coverage).
-- Overall Status: **YELLOW** - Brak High, ale kilka Medium w pokryciu provider + test harness/docs alignment.
+- Scope Status: **GREEN** - Modul pozostaje atomowy (zarzadza tylko `azurerm_application_insights_workbook`), a cross-resource glue pozostaje poza kodem modulu.
+- Provider Coverage Status: **YELLOW** - API PRIMARY_RESOURCE jest prawie pelne (w tym `storage_container_id`), ale audit pozostaje otwarty bez schema-based capability matrix i domkniecia checkow logic placement/modeling z guide.
+- Overall Status: **YELLOW** - Brak High; pozostaja Medium follow-upy do domkniecia przed zamknieciem audytu.
 
 ### Naming/Provider-Alignment
 
-- [ ] Potwierdzic i zapisac w tasku capability matrix dla `PRIMARY_RESOURCE` na podstawie realnego schema (`terraform providers schema -json`) zamiast tylko opisu README.
+- [ ] Potwierdzic i wpisac do tego taska capability matrix dla `PRIMARY_RESOURCE=azurerm_application_insights_workbook` na podstawie realnego schema (`terraform providers schema -json`) + mapowania do `variables.tf`, `main.tf`, `outputs.tf` (nie tylko README).
 - [x] Utrzymac canonical naming bez rename work: `modules/azurerm_application_insights_workbook`, `module.json:name`, i label zasobu w `modules/azurerm_application_insights_workbook/main.tf`.
 - [ ] Dodac `application-insights-workbook` do listy `scopes` w `.github/workflows/pr-validation.yml`, aby `commit_scope` z `modules/azurerm_application_insights_workbook/module.json` byl walidowany.
 
@@ -32,6 +32,14 @@
 - [x] Dodac brakujacy input `storage_container_id` do `modules/azurerm_application_insights_workbook/variables.tf` (z walidacja resource ID) i mapowanie w `modules/azurerm_application_insights_workbook/main.tf`.
 - [x] Zaktualizowac docs (`modules/azurerm_application_insights_workbook/README.md`, `modules/azurerm_application_insights_workbook/docs/README.md`, opcjonalnie `modules/azurerm_application_insights_workbook/docs/IMPORT.md`) o nowy argument i intencje jego uzycia.
 - [x] Dodac pokrycie testowe dla `storage_container_id` w `modules/azurerm_application_insights_workbook/tests/unit/validation.tftest.hcl` oraz co najmniej jednym Terratest fixture (`tests/fixtures/complete` lub nowy fixture feature-specific).
+
+### Logic placement + input model (Guide 10 + 11.H)
+
+- [ ] Przeniesc input-only reguly do `modules/azurerm_application_insights_workbook/variables.tf` jako first-line checks (np. `identity.identity_ids` tylko dla typow z `UserAssigned`) i ograniczyc duplikacje w `modules/azurerm_application_insights_workbook/main.tf`.
+- [ ] Zostawic `lifecycle.precondition` w `modules/azurerm_application_insights_workbook/main.tf` tylko tam, gdzie walidacja wejscia nie wystarcza (resource/apply-time semantics), i dodac krotkie uzasadnienie przy kazdym pozostawionym precondition.
+- [ ] Zminimalizowac niepotrzebne locals w `modules/azurerm_application_insights_workbook/main.tf` (review `identity_configured`, `identity_ids_set`, `identity_user_assigned`): zostawic tylko reusable/computed wartosci, bez aliasow 1:1 do var.
+- [ ] Przegladnac model wejscia w `modules/azurerm_application_insights_workbook/variables.tf`: zgrupowac powiazane opcjonalne ustawienia workbooka w logiczne objecty tam, gdzie to poprawia ergonomie; jesli zostaje flat API, dopisac jawne rationale do `modules/azurerm_application_insights_workbook/README.md` i `modules/azurerm_application_insights_workbook/docs/README.md`.
+- [ ] Rozszerzyc `modules/azurerm_application_insights_workbook/tests/unit/validation.tftest.hcl`, aby osobno pokrywac sciezki `variables validation` i sciezki `precondition` po docelowym przelozeniu logiki.
 
 ### Go tests + fixtures checklist gaps
 
@@ -48,8 +56,10 @@
 
 ### Validation commands
 
-- `terraform -chdir=modules/azurerm_application_insights providers schema -json | jq '.provider_schemas["registry.terraform.io/hashicorp/azurerm"].resource_schemas["azurerm_application_insights_workbook"].block.attributes.storage_container_id'`
+- `terraform -chdir=modules/azurerm_application_insights_workbook providers schema -json | jq '.provider_schemas["registry.terraform.io/hashicorp/azurerm"].resource_schemas["azurerm_application_insights_workbook"].block'`
 - `rg -n "storage_container_id" modules/azurerm_application_insights_workbook`
+- `rg -n "lifecycle|precondition|locals\\s*\\{" modules/azurerm_application_insights_workbook/main.tf`
+- `rg -n "identity_ids|validation" modules/azurerm_application_insights_workbook/variables.tf modules/azurerm_application_insights_workbook/tests/unit/validation.tftest.hcl`
 - `terraform -chdir=modules/azurerm_application_insights_workbook test -test-directory=tests/unit`
 - `cd modules/azurerm_application_insights_workbook/tests && make test`
 - `rg -n "application-insights-workbook" .github/workflows/pr-validation.yml`
