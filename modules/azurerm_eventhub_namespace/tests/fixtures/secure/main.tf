@@ -114,7 +114,7 @@ module "eventhub_namespace" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  sku                           = "Standard"
+  sku                           = "Premium"
   public_network_access_enabled = false
   local_authentication_enabled  = false
   minimum_tls_version           = "1.2"
