@@ -59,6 +59,15 @@ Before submitting a pull request for a new module, please review this checklist 
 - [ ] Variables and resources use clear, consistent naming.
 - [ ] Commit messages follow the [Conventional Commits](https://www.conventionalcommits.org/) standard with the correct scope (e.g., `feat(scope): ...`).
 
+## Scope and Coverage Gate
+
+- [ ] Run the mandatory status gate: [Scope and Provider Coverage Status Check](./11-scope-and-provider-coverage-status-check.md).
+- [ ] Confirm module atomic scope is preserved (no unrelated or dedicated-module resources included).
+- [ ] Confirm provider capability coverage matrix is produced with explicit rationale for omissions.
+- [ ] Apply naming/provider-alignment addendum when `AUDIT_ONLY` or `FULL_RENAME` naming work is involved.
+- [ ] Apply Go tests + fixtures addendum for Terratest modules.
+- [ ] Overall status is not `RED` before PR.
+
 ## CI/CD Integration
 
 - [ ] `module.json` and `.releaserc.js` are configured for release automation.

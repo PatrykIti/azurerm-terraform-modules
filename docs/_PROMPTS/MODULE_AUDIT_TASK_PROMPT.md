@@ -4,6 +4,7 @@ Use this prompt to have another agent audit a single module against the repo gui
 
 INPUT (edit only this line):
 MODULE_PATH=modules/<provider>_<resource>
+MODE=AUDIT_ONLY   # AUDIT_ONLY or FULL_RENAME
 
 Instructions:
 
@@ -11,6 +12,8 @@ Instructions:
 - Read `AGENTS.md`.
 - Read the guides:
   - `docs/MODULE_GUIDE/README.md`
+  - `docs/MODULE_GUIDE/10-checklist.md`
+  - `docs/MODULE_GUIDE/11-scope-and-provider-coverage-status-check.md`
   - `docs/TESTING_GUIDE/README.md`
   - `docs/TERRAFORM_BEST_PRACTICES_GUIDE.md`
 - Use `rg` for search.
@@ -51,6 +54,14 @@ Instructions:
 
 8) Compliance report
 - List deviations by severity (High/Medium/Low) with file references.
+- Run and report:
+  - Scope Status (`GREEN/YELLOW/RED`)
+  - Provider Coverage Status (`GREEN/YELLOW/RED`)
+  - Overall Status (`GREEN/YELLOW/RED`)
+- Include a capability coverage matrix per `docs/MODULE_GUIDE/11-scope-and-provider-coverage-status-check.md`.
+- Apply the addendum checklists from the same document:
+  - Naming/Provider-Alignment checklist
+  - Go Tests + Fixtures checklist
 
 9) Task creation
 - If deviations exist, create a new task file under `docs/_TASKS/`.

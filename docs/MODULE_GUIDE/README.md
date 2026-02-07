@@ -51,3 +51,6 @@ Following these guides is mandatory to ensure all modules are consistent, secure
 
 10. [**New Module Checklist**](./10-checklist.md)
     - A comprehensive checklist to verify before submitting a new module.
+
+11. [**Scope and Provider Coverage Status Check**](./11-scope-and-provider-coverage-status-check.md)
+    - Mandatory status gate for atomic scope boundaries and provider capability coverage.
