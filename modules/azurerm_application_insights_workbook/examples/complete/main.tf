@@ -46,6 +46,18 @@ resource "azurerm_user_assigned_identity" "workbook" {
   resource_group_name = azurerm_resource_group.example.name
 }
 
+resource "azurerm_role_assignment" "workbook_reader" {
+  scope                = azurerm_log_analytics_workspace.example.id
+  role_definition_name = "Reader"
+  principal_id         = azurerm_user_assigned_identity.workbook.principal_id
+}
+
+resource "azurerm_role_assignment" "workbook_storage_contributor" {
+  scope                = azurerm_storage_account.example.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.workbook.principal_id
+}
+
 locals {
   workbook_data = {
     version = "Notebook/1.0"
@@ -84,4 +96,9 @@ module "application_insights_workbook" {
     Environment = "Development"
     Example     = "Complete"
   }
+
+  depends_on = [
+    azurerm_role_assignment.workbook_reader,
+    azurerm_role_assignment.workbook_storage_contributor
+  ]
 }

@@ -2,11 +2,10 @@ package test
 
 import (
 	"fmt"
-	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
-	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
@@ -155,10 +154,21 @@ func TestApplicationInsightsWorkbookValidationRules(t *testing.T) {
 	}
 }
 
+var randomSuffixCounter uint64
+
+func generateRandomSuffix() string {
+	now := uint64(time.Now().UnixNano())
+	seq := atomic.AddUint64(&randomSuffixCounter, 1)
+	raw := fmt.Sprintf("%x%x", now, seq)
+	if len(raw) > 10 {
+		return raw[len(raw)-10:]
+	}
+
+	return raw
+}
+
 func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
-	timestamp := time.Now().UnixNano() % 1000
-	baseID := strings.ToLower(random.UniqueId())
-	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
+	uniqueID := generateRandomSuffix()
 
 	return &terraform.Options{
 		TerraformDir: terraformDir,
