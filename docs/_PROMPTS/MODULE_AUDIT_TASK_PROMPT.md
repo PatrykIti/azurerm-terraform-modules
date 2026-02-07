@@ -27,8 +27,12 @@ Instructions:
 
 3) Terraform code audit
 - `versions.tf`: pin Terraform + provider versions to repo standards (azurerm 4.57.0 / azuredevops 1.12.2).
-- `variables.tf`: every variable has description + type; prefer `object`/`list(object)`; add validations; enforce cross-field rules.
-- `main.tf`: use locals for shared values; stable `for_each` keys (no index keys); dynamic blocks for optional features; add lifecycle preconditions for cross-field constraints.
+- `variables.tf`: every variable has description + type; prefer `object`/`list(object)` for logical grouping; add validations; enforce input-only constraints as early as possible.
+- `main.tf`: use locals only when needed (reused/computed or readability), keep stable `for_each` keys (no index keys), dynamic blocks for optional features, and avoid unnecessary one-use alias locals.
+- Place constraints by priority:
+  - first: `variables.tf` validation for input-only rules,
+  - second: `lifecycle.precondition` only when validation cannot express rule reliably (resource/apply-time semantics).
+- If resource arguments contain heavy inline logic, require extraction into named locals (or equivalent) for maintainability.
 - Optional object + `count`: `count = 0` prevents evaluation of resource arguments, but outputs still need guards (ternary/try).
 - `outputs.tf`: include descriptions; mark sensitive outputs; guard optional outputs.
 - Build a schema diff for `PRIMARY_RESOURCE` in `PROVIDER_VERSION` (provider docs/schema vs module inputs/blocks/outputs).

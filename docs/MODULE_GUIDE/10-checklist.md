@@ -10,13 +10,22 @@ Before submitting a pull request for a new module, please review this checklist 
 - [ ] `variables.tf` is complete with descriptions and validation for all variables.
 - [ ] `main.tf` contains the core module logic.
 - [ ] `outputs.tf` provides clear, described outputs for all relevant resources.
-- [ ] `locals` are used for computed values or complex logic (in `main.tf` or `locals.tf`, if applicable).
+- [ ] `locals` are used only when needed (shared computed values, reused expressions, or readability for complex transformations).
 
 ## Configuration
 
 - [ ] `module.json` is created and correctly populated (`name`, `title`, `commit_scope`, `tag_prefix`).
 - [ ] `.releaserc.js` is present and copied from a reference module.
 - [ ] `.terraform-docs.yml` is configured to generate the `README.md`.
+
+## Logic Placement and Input Model
+
+- [ ] Input-only rules are enforced first in `variables.tf` validation blocks (type, enum, format, range, simple cross-field inside one variable object).
+- [ ] `lifecycle.precondition` is used only when validation cannot be expressed in `variables.tf` (resource-level semantics, cross-resource relations, apply-time constraints).
+- [ ] Trivial one-use `locals` are avoided; keep logic close to source unless extraction clearly improves reuse/readability.
+- [ ] Complex inline expressions in resource arguments are extracted into named `locals` for maintainability.
+- [ ] `variables.tf` groups related settings into logical objects (for example `network`, `identity`, `diagnostic_settings`, `timeouts`) where it improves consumption ergonomics.
+- [ ] Variable grouping does not hide provider capabilities: grouped objects still expose full supported `PRIMARY_RESOURCE` schema or document intentional omissions.
 
 ## Documentation
 

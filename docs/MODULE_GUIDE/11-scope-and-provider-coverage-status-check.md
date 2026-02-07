@@ -81,6 +81,25 @@ Checklist:
 - [ ] Examples cover baseline + advanced/security variants for implemented major features.
 - [ ] Unit tests cover validation and default behavior for implemented feature groups.
 
+## H. Logic Placement and Variable Modeling Check
+
+Design intent: keep module logic predictable, easy to consume, and easy to maintain.
+
+Priority order for rule placement:
+1. `variables.tf` validation for input-only constraints.
+2. `lifecycle.precondition` for constraints that require resource semantics or apply-time context.
+3. `locals` only for reused/computed transformations and readability.
+
+Checklist:
+
+- [ ] Input-only constraints are validated in `variables.tf` (not deferred to `precondition` by default).
+- [ ] `precondition` blocks are reserved for checks that cannot be reliably enforced at variable-validation stage.
+- [ ] No unnecessary one-off `locals` aliases that only rename direct variable references.
+- [ ] Complex inline expressions in resource arguments are extracted to named locals (or equivalent) when they reduce cognitive load.
+- [ ] Variables are grouped into logical objects where beneficial for module consumers (environment configuration ergonomics), similar to patterns used in `azurerm_postgresql_flexible_server` and `azurerm_kubernetes_cluster`.
+- [ ] Grouped inputs remain explicit and testable; they do not reduce discoverability of supported provider features.
+- [ ] Tests cover grouped-object validation paths and precondition paths separately.
+
 ## C. Mandatory Coverage Matrix
 
 Agents must include this matrix in the report:
