@@ -718,6 +718,10 @@ variable "diagnostic_settings" {
     Diagnostic settings for the Key Vault.
 
     areas: optional shorthand mapping to log/metric categories (all, logs, metrics, audit).
+    Supported categories for azurerm 4.57.0:
+    - log_categories: AuditEvent, AzurePolicyEvaluationDetails
+    - metric_categories: AllMetrics
+    - log_category_groups: allLogs
   EOT
 
   type = list(object({
@@ -775,6 +779,45 @@ variable "diagnostic_settings" {
       ])
     ])
     error_message = "diagnostic_settings.areas may include only: all, logs, metrics, audit."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings : (
+        alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : trimspace(c) != ""]) &&
+        alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : trimspace(c) != ""]) &&
+        alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : trimspace(c) != ""]) &&
+        alltrue([for c in(ds.areas == null ? [] : ds.areas) : trimspace(c) != ""])
+      )
+    ])
+    error_message = "diagnostic_settings category and area values must not contain empty strings."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings : alltrue([
+        for category in(ds.log_categories == null ? [] : ds.log_categories) : contains(["AuditEvent", "AzurePolicyEvaluationDetails"], category)
+      ])
+    ])
+    error_message = "diagnostic_settings.log_categories may include only: AuditEvent, AzurePolicyEvaluationDetails."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings : alltrue([
+        for category in(ds.metric_categories == null ? [] : ds.metric_categories) : contains(["AllMetrics"], category)
+      ])
+    ])
+    error_message = "diagnostic_settings.metric_categories may include only: AllMetrics."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings : alltrue([
+        for group in(ds.log_category_groups == null ? [] : ds.log_category_groups) : contains(["allLogs"], group)
+      ])
+    ])
+    error_message = "diagnostic_settings.log_category_groups may include only: allLogs."
   }
 }
 

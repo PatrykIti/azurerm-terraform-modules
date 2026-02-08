@@ -1,12 +1,4 @@
 locals {
-  access_policies_by_name = {
-    for policy in var.access_policies : policy.name => policy
-  }
-
-  keys_by_name = {
-    for key in var.keys : key.name => key
-  }
-
   secrets_by_name = {
     for secret in var.secrets : secret.name => secret
   }
@@ -102,18 +94,6 @@ resource "azurerm_key_vault_secret" "secrets" {
   tags = merge(var.tags, try(each.value.tags, {}))
 
   depends_on = [azurerm_key_vault_access_policy.access_policies]
-
-  lifecycle {
-    precondition {
-      condition     = ((each.value.value != null ? 1 : 0) + (each.value.value_wo != null ? 1 : 0)) == 1
-      error_message = "Each secret must set exactly one of value or value_wo."
-    }
-
-    precondition {
-      condition     = each.value.value_wo == null || each.value.value_wo_version != null
-      error_message = "value_wo requires value_wo_version."
-    }
-  }
 }
 
 
@@ -244,23 +224,6 @@ resource "azurerm_key_vault_certificate" "certificates" {
   tags = merge(var.tags, try(each.value.tags, {}))
 
   depends_on = [azurerm_key_vault_access_policy.access_policies]
-
-  lifecycle {
-    precondition {
-      condition     = each.value.certificate != null || each.value.certificate_policy != null
-      error_message = "Certificates require either certificate or certificate_policy."
-    }
-
-    precondition {
-      condition     = each.value.certificate_policy == null || !contains(["RSA", "RSA-HSM"], each.value.certificate_policy.key_properties.key_type) || (each.value.certificate_policy.key_properties.key_size != null && contains([2048, 3072, 4096], each.value.certificate_policy.key_properties.key_size))
-      error_message = "RSA and RSA-HSM certificate key types require key_size of 2048, 3072, or 4096."
-    }
-
-    precondition {
-      condition     = each.value.certificate_policy == null || !contains(["EC", "EC-HSM"], each.value.certificate_policy.key_properties.key_type) || (each.value.certificate_policy.key_properties.curve != null && contains(["P-256", "P-384", "P-521", "P-256K"], each.value.certificate_policy.key_properties.curve))
-      error_message = "EC and EC-HSM certificate key types require curve set to P-256, P-384, P-521, or P-256K."
-    }
-  }
 }
 
 resource "azurerm_key_vault_certificate_issuer" "issuers" {
@@ -347,13 +310,6 @@ resource "azurerm_key_vault_managed_storage_account" "managed_storage_accounts" 
   tags = merge(var.tags, try(each.value.tags, {}))
 
   depends_on = [azurerm_key_vault_access_policy.access_policies]
-
-  lifecycle {
-    precondition {
-      condition     = !each.value.regenerate_key_automatically || (each.value.regeneration_period != null && length(trimspace(each.value.regeneration_period)) > 0)
-      error_message = "regeneration_period is required when regenerate_key_automatically is true."
-    }
-  }
 }
 
 resource "azurerm_key_vault_managed_storage_account_sas_token_definition" "sas_definitions" {
@@ -381,12 +337,4 @@ resource "azurerm_key_vault_managed_storage_account_sas_token_definition" "sas_d
     azurerm_key_vault_access_policy.access_policies,
     azurerm_key_vault_managed_storage_account.managed_storage_accounts
   ]
-
-  lifecycle {
-    precondition {
-      condition     = (each.value.managed_storage_account_name != null ? 1 : 0) + (each.value.managed_storage_account_id != null ? 1 : 0) == 1
-      error_message = "managed_storage_account_name or managed_storage_account_id must be set, but not both."
-    }
-  }
 }
-

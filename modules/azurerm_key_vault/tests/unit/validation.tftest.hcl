@@ -195,3 +195,39 @@ run "invalid_diagnostic_settings_destination" {
     var.diagnostic_settings
   ]
 }
+
+run "invalid_diagnostic_log_category" {
+  command = plan
+
+  variables {
+    diagnostic_settings = [
+      {
+        name                       = "diag"
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/law"
+        log_categories             = ["InvalidCategory"]
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings
+  ]
+}
+
+run "invalid_diagnostic_log_category_group" {
+  command = plan
+
+  variables {
+    diagnostic_settings = [
+      {
+        name                       = "diag"
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/law"
+        log_category_groups        = ["invalidGroup"]
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings
+  ]
+}

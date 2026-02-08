@@ -23,7 +23,7 @@ Diagnostic settings are managed inline.
 - RBAC and access policies are mutually exclusive.
 - Key Vault data-plane resources require access policies or RBAC roles that allow creation.
 - Managed storage accounts require storage account IDs and access keys.
-- Diagnostic settings use category discovery to enable only supported categories.
+- Diagnostic settings use a static category catalog aligned to azurerm 4.57.0.
 
 ## Out-of-scope Resources
 
