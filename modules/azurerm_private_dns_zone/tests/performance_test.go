@@ -16,7 +16,7 @@ func BenchmarkPrivateDnsZoneCreationSimple(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		// Override the random_suffix for benchmarking
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -60,13 +60,13 @@ func BenchmarkPrivateDnsZoneCreationWithFeatures(b *testing.B) {
 		b.Run(fc.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
 				if fc.tags != nil {
 					terraformOptions.Vars["tags"] = fc.tags
 				}
-				
+
 				// Override the random_suffix for benchmarking
 				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 				b.StartTimer()
@@ -96,13 +96,13 @@ func BenchmarkPrivateDnsZoneCreationWithScale(b *testing.B) {
 		b.Run(fmt.Sprintf("Scale_%d", count), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
 				terraformOptions.Vars["tags"] = map[string]interface{}{
 					"ScaleCount": fmt.Sprintf("%d", count),
 				}
-				
+
 				// Override the random_suffix for benchmarking
 				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 				b.StartTimer()
@@ -132,7 +132,7 @@ func BenchmarkPrivateDnsZoneParallelCreation(b *testing.B) {
 			b.RunParallel(func(pb *testing.PB) {
 				i := 0
 				for pb.Next() {
-					testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+					testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 					terraformOptions := getTerraformOptions(b, testFolder)
 					// Override the random_suffix for parallel testing
 					terraformOptions.Vars["random_suffix"] = fmt.Sprintf("par%d%d%s", parallel, i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -158,7 +158,7 @@ func TestPrivateDnsZoneCreationTime(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -187,7 +187,7 @@ func TestPrivateDnsZoneScaling(t *testing.T) {
 
 	// Create multiple instances sequentially
 	for i := 0; i < instanceCount; i++ {
-		testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(t, testFolder)
 		// Override the random_suffix for each iteration
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("scale%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -224,7 +224,7 @@ func TestPrivateDnsZoneUpdatePerformance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -275,7 +275,7 @@ func TestPrivateDnsZoneDestroyPerformance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	// Create resource

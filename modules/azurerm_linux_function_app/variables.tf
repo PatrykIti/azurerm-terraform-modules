@@ -21,178 +21,188 @@ variable "location" {
 variable "service_plan_id" {
   description = "The ID of the App Service Plan where this Linux Function App will be hosted."
   type        = string
-}
-
-variable "functions_extension_version" {
-  description = "The runtime version associated with the Function App."
-  type        = string
-  default     = "~4"
-}
-
-variable "storage_account_name" {
-  description = "The name of the Storage Account used by the Function App."
-  type        = string
-}
-
-variable "storage_account_access_key" {
-  description = "The access key for the Storage Account used by the Function App (required when storage_uses_managed_identity is false)."
-  type        = string
-  default     = null
-  sensitive   = true
-}
-
-variable "storage_uses_managed_identity" {
-  description = "When true, the Function App will access the storage account using its managed identity."
-  type        = bool
-  default     = false
 
   validation {
-    condition = var.storage_uses_managed_identity == false || (
-      var.identity != null && var.storage_account_access_key == null
-    )
-    error_message = "When storage_uses_managed_identity is true, identity must be configured and storage_account_access_key must be null."
+    condition     = length(trimspace(var.service_plan_id)) > 0
+    error_message = "service_plan_id must be a non-empty string."
   }
 }
 
-variable "content_share_force_disabled" {
-  description = "Should the settings for linking the Function App to storage be suppressed."
-  type        = bool
-  default     = false
+variable "storage_configuration" {
+  description = <<-EOT
+    Storage configuration for the Function App.
+
+    account_name: Name of the Storage Account used by the Function App.
+    account_access_key: Access key for the storage account (required when not using managed identity and not using key_vault_secret_id).
+    key_vault_secret_id: Key Vault Secret ID containing a storage connection string; mutually exclusive with account_name.
+    uses_managed_identity: When true, storage access uses managed identity (requires identity configuration).
+    content_share_force_disabled: Suppresses platform content share settings.
+    mounts: Optional storage mounts exposed as `storage_account` blocks.
+  EOT
+
+  type = object({
+    account_name                 = optional(string)
+    account_access_key           = optional(string)
+    key_vault_secret_id          = optional(string)
+    uses_managed_identity        = optional(bool, false)
+    content_share_force_disabled = optional(bool, false)
+    mounts = optional(list(object({
+      name         = string
+      account_name = string
+      access_key   = string
+      share_name   = string
+      type         = string
+      mount_path   = optional(string)
+    })), [])
+  })
+  default   = {}
+  nullable  = false
+  sensitive = true
+
+  validation {
+    condition     = try(var.storage_configuration.account_name, null) == null || trimspace(var.storage_configuration.account_name) != ""
+    error_message = "storage_configuration.account_name must not be empty or whitespace when set."
+  }
+
+  validation {
+    condition     = try(var.storage_configuration.account_access_key, null) == null || trimspace(var.storage_configuration.account_access_key) != ""
+    error_message = "storage_configuration.account_access_key must not be empty or whitespace when set."
+  }
+
+  validation {
+    condition     = try(var.storage_configuration.key_vault_secret_id, null) == null || trimspace(var.storage_configuration.key_vault_secret_id) != ""
+    error_message = "storage_configuration.key_vault_secret_id must not be empty or whitespace when set."
+  }
+
+  validation {
+    condition = (
+      (try(var.storage_configuration.key_vault_secret_id, null) != null && trimspace(var.storage_configuration.key_vault_secret_id) != "") ||
+      (try(var.storage_configuration.account_name, null) != null && trimspace(var.storage_configuration.account_name) != "")
+    )
+    error_message = "Either storage_configuration.account_name or storage_configuration.key_vault_secret_id must be set."
+  }
+
+  validation {
+    condition = (
+      try(var.storage_configuration.key_vault_secret_id, null) == null ||
+      trimspace(var.storage_configuration.key_vault_secret_id) == "" ||
+      try(var.storage_configuration.account_name, null) == null ||
+      trimspace(var.storage_configuration.account_name) == ""
+    )
+    error_message = "storage_configuration.key_vault_secret_id cannot be used with storage_configuration.account_name."
+  }
+
+  validation {
+    condition = try(var.storage_configuration.uses_managed_identity, false) == false || (
+      (try(var.storage_configuration.key_vault_secret_id, null) == null || trimspace(var.storage_configuration.key_vault_secret_id) == "") &&
+      var.identity != null
+    )
+    error_message = "When storage_configuration.uses_managed_identity is true, identity must be configured and storage_configuration.key_vault_secret_id must not be set."
+  }
+
+  validation {
+    condition = (
+      try(var.storage_configuration.key_vault_secret_id, null) != null && trimspace(var.storage_configuration.key_vault_secret_id) != "" ? (
+        try(var.storage_configuration.account_access_key, null) == null || trimspace(var.storage_configuration.account_access_key) == ""
+        ) : (
+        try(var.storage_configuration.uses_managed_identity, false) ? (
+          try(var.storage_configuration.account_access_key, null) == null || trimspace(var.storage_configuration.account_access_key) == ""
+          ) : (
+          try(var.storage_configuration.account_access_key, null) != null && trimspace(var.storage_configuration.account_access_key) != ""
+        )
+      )
+    )
+    error_message = "When storage_configuration.uses_managed_identity is true, account_access_key must be null/empty. When false, account_access_key is required unless key_vault_secret_id is set."
+  }
+
+  validation {
+    condition     = alltrue([for mount in try(var.storage_configuration.mounts, []) : contains(["AzureFiles", "AzureBlob"], mount.type)])
+    error_message = "storage_configuration.mounts[*].type must be AzureFiles or AzureBlob."
+  }
 }
 
-variable "app_settings" {
-  description = "A map of key-value pairs for App Settings."
-  type        = map(string)
-  default     = {}
-  sensitive   = true
-}
+variable "application_configuration" {
+  description = <<-EOT
+    Application-level configuration for the Function App runtime.
 
-variable "connection_strings" {
-  description = "Connection strings for the Function App."
-  type = list(object({
-    name  = string
-    type  = string
-    value = string
-  }))
-  default   = []
+    functions_extension_version: Runtime version (defaults to "~4").
+    app_settings: App settings map.
+    connection_strings: Connection string definitions.
+    sticky_settings: Slot sticky settings for app settings and connection strings.
+    zip_deploy_file: Path to ZIP package for zip deploy.
+    builtin_logging_enabled: Enables built-in logging.
+    enabled: Enables or disables the Function App.
+    daily_memory_time_quota: Daily memory quota in GB-seconds.
+    application_insights_connection_string/application_insights_key: Optional insights values used in site configuration.
+  EOT
+
+  type = object({
+    functions_extension_version = optional(string, "~4")
+    app_settings                = optional(map(string), {})
+    connection_strings = optional(list(object({
+      name  = string
+      type  = string
+      value = string
+    })), [])
+    sticky_settings = optional(object({
+      app_setting_names       = optional(list(string))
+      connection_string_names = optional(list(string))
+    }))
+    zip_deploy_file                        = optional(string)
+    builtin_logging_enabled                = optional(bool, true)
+    enabled                                = optional(bool, true)
+    daily_memory_time_quota                = optional(number)
+    application_insights_connection_string = optional(string)
+    application_insights_key               = optional(string)
+  })
+  default   = {}
+  nullable  = false
   sensitive = true
 
   validation {
     condition = alltrue([
-      for cs in var.connection_strings : contains(["Custom", "MySql", "PostgreSQL", "SQLAzure", "SQLServer"], cs.type)
+      for cs in try(var.application_configuration.connection_strings, []) : contains(["Custom", "MySql", "PostgreSQL", "SQLAzure", "SQLServer"], cs.type)
     ])
-    error_message = "connection_strings.type must be one of Custom, MySql, PostgreSQL, SQLAzure, SQLServer."
+    error_message = "application_configuration.connection_strings[*].type must be one of Custom, MySql, PostgreSQL, SQLAzure, SQLServer."
   }
 }
 
-variable "storage_accounts" {
-  description = "Optional storage mount configurations for the Function App."
-  type = list(object({
-    name         = string
-    account_name = string
-    access_key   = string
-    share_name   = string
-    type         = string
-    mount_path   = optional(string)
-  }))
-  default   = []
-  sensitive = true
+variable "access_configuration" {
+  description = <<-EOT
+    Access, networking, and publishing configuration for the Function App.
+
+    https_only/public_network_access_enabled: Controls public access surface.
+    client_certificate_*: Client certificate behavior.
+    ftp_publish_basic_authentication_enabled/webdeploy_publish_basic_authentication_enabled: Publishing profile auth settings.
+    key_vault_reference_identity_id: User-assigned identity used for Key Vault references.
+    virtual_network_subnet_id/virtual_network_backup_restore_enabled/vnet_image_pull_enabled: VNet integration settings.
+  EOT
+
+  type = object({
+    https_only                                     = optional(bool, true)
+    public_network_access_enabled                  = optional(bool, false)
+    client_certificate_enabled                     = optional(bool, false)
+    client_certificate_mode                        = optional(string)
+    client_certificate_exclusion_paths             = optional(string)
+    ftp_publish_basic_authentication_enabled       = optional(bool, false)
+    webdeploy_publish_basic_authentication_enabled = optional(bool, false)
+    key_vault_reference_identity_id                = optional(string)
+    virtual_network_subnet_id                      = optional(string)
+    virtual_network_backup_restore_enabled         = optional(bool, false)
+    vnet_image_pull_enabled                        = optional(bool, false)
+  })
+  default  = {}
+  nullable = false
 
   validation {
-    condition     = alltrue([for sa in var.storage_accounts : contains(["AzureFiles", "AzureBlob"], sa.type)])
-    error_message = "storage_accounts.type must be AzureFiles or AzureBlob."
+    condition     = try(var.access_configuration.client_certificate_mode, null) == null || contains(["Required", "Optional", "OptionalInteractiveUser"], var.access_configuration.client_certificate_mode)
+    error_message = "access_configuration.client_certificate_mode must be Required, Optional, or OptionalInteractiveUser."
   }
-}
-
-variable "zip_deploy_file" {
-  description = "The path to the ZIP file to deploy to the Function App."
-  type        = string
-  default     = null
-}
-
-variable "builtin_logging_enabled" {
-  description = "Should built-in logging be enabled?"
-  type        = bool
-  default     = true
-}
-
-variable "enabled" {
-  description = "Is the Function App enabled?"
-  type        = bool
-  default     = true
-}
-
-variable "https_only" {
-  description = "Should the Function App only be accessible over HTTPS?"
-  type        = bool
-  default     = true
-}
-
-variable "public_network_access_enabled" {
-  description = "Should public network access be enabled for the Function App?"
-  type        = bool
-  default     = false
-}
-
-variable "client_certificate_enabled" {
-  description = "Should the Function App use client certificates?"
-  type        = bool
-  default     = false
-}
-
-variable "client_certificate_mode" {
-  description = "The mode of the Function App's client certificates requirement."
-  type        = string
-  default     = null
 
   validation {
-    condition     = var.client_certificate_mode == null || contains(["Required", "Optional", "OptionalInteractiveUser"], var.client_certificate_mode)
-    error_message = "client_certificate_mode must be Required, Optional, or OptionalInteractiveUser."
+    condition     = try(var.access_configuration.client_certificate_mode, null) == null || try(var.access_configuration.client_certificate_enabled, false)
+    error_message = "access_configuration.client_certificate_mode can only be set when access_configuration.client_certificate_enabled is true."
   }
-}
-
-variable "client_certificate_exclusion_paths" {
-  description = "Paths to exclude when using client certificates, separated by ';'."
-  type        = string
-  default     = null
-}
-
-variable "daily_memory_time_quota" {
-  description = "The amount of memory in gigabyte-seconds allowed per day."
-  type        = number
-  default     = null
-}
-
-variable "ftp_publish_basic_authentication_enabled" {
-  description = "Should the default FTP Basic Authentication publishing profile be enabled?"
-  type        = bool
-  default     = false
-}
-
-variable "key_vault_reference_identity_id" {
-  description = "The User Assigned Identity ID used for accessing KeyVault secrets."
-  type        = string
-  default     = null
-}
-
-variable "virtual_network_subnet_id" {
-  description = "The subnet ID for regional virtual network integration."
-  type        = string
-  default     = null
-}
-
-variable "application_insights_connection_string" {
-  description = "The Application Insights connection string."
-  type        = string
-  default     = null
-  sensitive   = true
-}
-
-variable "application_insights_key" {
-  description = "The Application Insights instrumentation key."
-  type        = string
-  default     = null
-  sensitive   = true
 }
 
 variable "identity" {
@@ -263,16 +273,16 @@ variable "auth_settings" {
 variable "auth_settings_v2" {
   description = "Authentication/Authorization settings (v2)."
   type = object({
-    auth_enabled                      = optional(bool)
-    runtime_version                   = optional(string)
-    config_file_path                  = optional(string)
-    require_authentication            = optional(bool)
-    unauthenticated_action            = optional(string)
-    default_provider                  = optional(string)
-    excluded_paths                    = optional(list(string))
-    require_https                     = optional(bool)
-    http_route_api_prefix             = optional(string)
-    forward_proxy_convention          = optional(string)
+    auth_enabled                            = optional(bool)
+    runtime_version                         = optional(string)
+    config_file_path                        = optional(string)
+    require_authentication                  = optional(bool)
+    unauthenticated_action                  = optional(string)
+    default_provider                        = optional(string)
+    excluded_paths                          = optional(list(string))
+    require_https                           = optional(bool)
+    http_route_api_prefix                   = optional(string)
+    forward_proxy_convention                = optional(string)
     forward_proxy_custom_host_header_name   = optional(string)
     forward_proxy_custom_scheme_header_name = optional(string)
 
@@ -304,12 +314,12 @@ variable "auth_settings_v2" {
     }))
 
     custom_oidc_v2 = optional(list(object({
-      name                         = string
-      client_id                    = string
+      name                          = string
+      client_id                     = string
       openid_configuration_endpoint = string
-      client_secret_setting_name   = optional(string)
-      allowed_audiences            = optional(list(string))
-      login_scopes                 = optional(list(string))
+      client_secret_setting_name    = optional(string)
+      allowed_audiences             = optional(list(string))
+      login_scopes                  = optional(list(string))
     })))
 
     facebook_v2 = optional(object({
@@ -339,20 +349,15 @@ variable "auth_settings_v2" {
     }))
 
     twitter_v2 = optional(object({
-      consumer_key               = string
+      consumer_key                 = string
       consumer_secret_setting_name = string
     }))
   })
   default   = null
   sensitive = true
-
-  validation {
-    condition     = var.auth_settings_v2 == null || var.auth_settings == null
-    error_message = "auth_settings and auth_settings_v2 are mutually exclusive."
-  }
 }
 
-variable "site_config" {
+variable "site_configuration" {
   description = "Site configuration for the Linux Function App."
   type = object({
     always_on                              = optional(bool)
@@ -387,19 +392,19 @@ variable "site_config" {
         retention_in_days = optional(number)
       }))
     }))
-    auto_swap_slot_name                    = optional(string)
+    auto_swap_slot_name                           = optional(string)
     container_registry_managed_identity_client_id = optional(string)
     container_registry_use_managed_identity       = optional(bool)
     cors = optional(object({
       allowed_origins     = optional(list(string))
       support_credentials = optional(bool)
     }))
-    default_documents               = optional(list(string))
-    elastic_instance_minimum        = optional(number)
-    ftps_state                      = optional(string)
-    health_check_path               = optional(string)
+    default_documents                 = optional(list(string))
+    elastic_instance_minimum          = optional(number)
+    ftps_state                        = optional(string)
+    health_check_path                 = optional(string)
     health_check_eviction_time_in_min = optional(number)
-    http2_enabled                   = optional(bool)
+    http2_enabled                     = optional(bool)
     ip_restriction = optional(list(object({
       action                    = optional(string)
       ip_address                = optional(string)
@@ -415,13 +420,13 @@ variable "site_config" {
         x_forwarded_host  = optional(list(string))
       }))
     })))
-    ip_restriction_default_action = optional(string)
-    load_balancing_mode           = optional(string)
-    managed_pipeline_mode         = optional(string)
-    minimum_tls_version           = optional(string)
-    pre_warmed_instance_count     = optional(number)
-    remote_debugging_enabled      = optional(bool)
-    remote_debugging_version      = optional(string)
+    ip_restriction_default_action    = optional(string)
+    load_balancing_mode              = optional(string)
+    managed_pipeline_mode            = optional(string)
+    minimum_tls_version              = optional(string)
+    pre_warmed_instance_count        = optional(number)
+    remote_debugging_enabled         = optional(bool)
+    remote_debugging_version         = optional(string)
     runtime_scale_monitoring_enabled = optional(bool)
     scm_ip_restriction = optional(list(object({
       action                    = optional(string)
@@ -446,65 +451,84 @@ variable "site_config" {
     websockets_enabled                = optional(bool)
     worker_count                      = optional(number)
   })
+  default = null
 
   validation {
-    condition     = var.site_config.ftps_state == null || contains(["AllAllowed", "FtpsOnly", "Disabled"], var.site_config.ftps_state)
-    error_message = "site_config.ftps_state must be AllAllowed, FtpsOnly, or Disabled."
+    condition     = var.site_configuration == null || var.site_configuration.ftps_state == null || contains(["AllAllowed", "FtpsOnly", "Disabled"], var.site_configuration.ftps_state)
+    error_message = "site_configuration.ftps_state must be AllAllowed, FtpsOnly, or Disabled."
   }
 
   validation {
-    condition     = var.site_config.minimum_tls_version == null || contains(["1.0", "1.1", "1.2", "1.3"], var.site_config.minimum_tls_version)
-    error_message = "site_config.minimum_tls_version must be 1.0, 1.1, 1.2, or 1.3."
+    condition     = var.site_configuration == null || var.site_configuration.minimum_tls_version == null || contains(["1.0", "1.1", "1.2", "1.3"], var.site_configuration.minimum_tls_version)
+    error_message = "site_configuration.minimum_tls_version must be 1.0, 1.1, 1.2, or 1.3."
   }
 
   validation {
-    condition     = var.site_config.scm_minimum_tls_version == null || contains(["1.0", "1.1", "1.2", "1.3"], var.site_config.scm_minimum_tls_version)
-    error_message = "site_config.scm_minimum_tls_version must be 1.0, 1.1, 1.2, or 1.3."
+    condition     = var.site_configuration == null || var.site_configuration.scm_minimum_tls_version == null || contains(["1.0", "1.1", "1.2", "1.3"], var.site_configuration.scm_minimum_tls_version)
+    error_message = "site_configuration.scm_minimum_tls_version must be 1.0, 1.1, 1.2, or 1.3."
   }
 
   validation {
-    condition     = var.site_config.ip_restriction_default_action == null || contains(["Allow", "Deny"], var.site_config.ip_restriction_default_action)
-    error_message = "site_config.ip_restriction_default_action must be Allow or Deny."
+    condition     = var.site_configuration == null || var.site_configuration.ip_restriction_default_action == null || contains(["Allow", "Deny"], var.site_configuration.ip_restriction_default_action)
+    error_message = "site_configuration.ip_restriction_default_action must be Allow or Deny."
   }
 
   validation {
-    condition     = var.site_config.scm_ip_restriction_default_action == null || contains(["Allow", "Deny"], var.site_config.scm_ip_restriction_default_action)
-    error_message = "site_config.scm_ip_restriction_default_action must be Allow or Deny."
+    condition     = var.site_configuration == null || var.site_configuration.scm_ip_restriction_default_action == null || contains(["Allow", "Deny"], var.site_configuration.scm_ip_restriction_default_action)
+    error_message = "site_configuration.scm_ip_restriction_default_action must be Allow or Deny."
   }
 
   validation {
-    condition     = var.site_config.managed_pipeline_mode == null || contains(["Integrated", "Classic"], var.site_config.managed_pipeline_mode)
-    error_message = "site_config.managed_pipeline_mode must be Integrated or Classic."
+    condition     = var.site_configuration == null || var.site_configuration.managed_pipeline_mode == null || contains(["Integrated", "Classic"], var.site_configuration.managed_pipeline_mode)
+    error_message = "site_configuration.managed_pipeline_mode must be Integrated or Classic."
   }
 
   validation {
-    condition = var.site_config.load_balancing_mode == null || contains([
+    condition = var.site_configuration == null || var.site_configuration.load_balancing_mode == null || contains([
       "WeightedRoundRobin",
       "LeastRequests",
       "LeastResponseTime",
       "WeightedTotalTraffic",
       "RequestHash",
       "PerSiteRoundRobin"
-    ], var.site_config.load_balancing_mode)
-    error_message = "site_config.load_balancing_mode contains an unsupported value."
+    ], var.site_configuration.load_balancing_mode)
+    error_message = "site_configuration.load_balancing_mode contains an unsupported value."
   }
 
   validation {
-    condition     = var.site_config.remote_debugging_version == null || contains(["VS2017", "VS2019", "VS2022"], var.site_config.remote_debugging_version)
-    error_message = "site_config.remote_debugging_version must be VS2017, VS2019, or VS2022."
+    condition     = var.site_configuration == null || var.site_configuration.remote_debugging_version == null || contains(["VS2017", "VS2019", "VS2022"], var.site_configuration.remote_debugging_version)
+    error_message = "site_configuration.remote_debugging_version must be VS2017, VS2019, or VS2022."
   }
 
   validation {
-    condition = var.site_config.application_stack != null && (
-      (var.site_config.application_stack.docker != null ? 1 : 0) +
-      (var.site_config.application_stack.dotnet_version != null ? 1 : 0) +
-      (var.site_config.application_stack.java_version != null ? 1 : 0) +
-      (var.site_config.application_stack.node_version != null ? 1 : 0) +
-      (var.site_config.application_stack.powershell_core_version != null ? 1 : 0) +
-      (var.site_config.application_stack.python_version != null ? 1 : 0) +
-      (try(var.site_config.application_stack.use_custom_runtime, false) ? 1 : 0)
-    ) == 1
-    error_message = "site_config.application_stack must be set with exactly one runtime (docker or a single language runtime or custom runtime)."
+    condition = var.site_configuration == null || (
+      var.site_configuration.application_stack != null && (
+        (var.site_configuration.application_stack.docker != null ? 1 : 0) +
+        (var.site_configuration.application_stack.dotnet_version != null ? 1 : 0) +
+        (var.site_configuration.application_stack.java_version != null ? 1 : 0) +
+        (var.site_configuration.application_stack.node_version != null ? 1 : 0) +
+        (var.site_configuration.application_stack.powershell_core_version != null ? 1 : 0) +
+        (var.site_configuration.application_stack.python_version != null ? 1 : 0) +
+        (coalesce(try(var.site_configuration.application_stack.use_custom_runtime, null), false) ? 1 : 0)
+      ) == 1
+    )
+    error_message = "site_configuration.application_stack must be set with exactly one runtime (docker or a single language runtime or custom runtime)."
+  }
+
+  validation {
+    condition     = var.site_configuration == null || var.site_configuration.health_check_eviction_time_in_min == null || var.site_configuration.health_check_path != null
+    error_message = "health_check_eviction_time_in_min requires health_check_path to be set."
+  }
+
+  validation {
+    condition = var.site_configuration == null || var.site_configuration.application_stack == null || var.site_configuration.application_stack.docker == null || (
+      try(var.site_configuration.container_registry_use_managed_identity, false) ||
+      (
+        try(var.site_configuration.application_stack.docker.registry_username, null) != null &&
+        try(var.site_configuration.application_stack.docker.registry_password, null) != null
+      )
+    )
+    error_message = "Docker registry_username and registry_password are required when container_registry_use_managed_identity is false."
   }
 }
 
@@ -539,9 +563,9 @@ variable "timeouts" {
 variable "slots" {
   description = "Linux Function App slots configuration."
   type = list(object({
-    name                                = string
-    app_settings                        = optional(map(string))
-    connection_strings                  = optional(list(object({
+    name         = string
+    app_settings = optional(map(string))
+    connection_strings = optional(list(object({
       name  = string
       type  = string
       value = string
@@ -554,17 +578,19 @@ variable "slots" {
       type         = string
       mount_path   = optional(string)
     })))
-    functions_extension_version         = optional(string)
-    builtin_logging_enabled             = optional(bool)
-    enabled                             = optional(bool)
-    https_only                          = optional(bool)
-    public_network_access_enabled       = optional(bool)
-    client_certificate_enabled          = optional(bool)
-    client_certificate_mode             = optional(string)
-    client_certificate_exclusion_paths  = optional(string)
+    functions_extension_version              = optional(string)
+    builtin_logging_enabled                  = optional(bool)
+    enabled                                  = optional(bool)
+    https_only                               = optional(bool)
+    public_network_access_enabled            = optional(bool)
+    client_certificate_enabled               = optional(bool)
+    client_certificate_mode                  = optional(string)
+    client_certificate_exclusion_paths       = optional(string)
     ftp_publish_basic_authentication_enabled = optional(bool)
-    key_vault_reference_identity_id     = optional(string)
-    virtual_network_subnet_id           = optional(string)
+    key_vault_reference_identity_id          = optional(string)
+    storage_key_vault_secret_id              = optional(string)
+    virtual_network_subnet_id                = optional(string)
+    virtual_network_backup_restore_enabled   = optional(bool)
     identity = optional(object({
       type         = string
       identity_ids = optional(list(string))
@@ -610,16 +636,16 @@ variable "slots" {
       }))
     }))
     auth_settings_v2 = optional(object({
-      auth_enabled                      = optional(bool)
-      runtime_version                   = optional(string)
-      config_file_path                  = optional(string)
-      require_authentication            = optional(bool)
-      unauthenticated_action            = optional(string)
-      default_provider                  = optional(string)
-      excluded_paths                    = optional(list(string))
-      require_https                     = optional(bool)
-      http_route_api_prefix             = optional(string)
-      forward_proxy_convention          = optional(string)
+      auth_enabled                            = optional(bool)
+      runtime_version                         = optional(string)
+      config_file_path                        = optional(string)
+      require_authentication                  = optional(bool)
+      unauthenticated_action                  = optional(string)
+      default_provider                        = optional(string)
+      excluded_paths                          = optional(list(string))
+      require_https                           = optional(bool)
+      http_route_api_prefix                   = optional(string)
+      forward_proxy_convention                = optional(string)
       forward_proxy_custom_host_header_name   = optional(string)
       forward_proxy_custom_scheme_header_name = optional(string)
 
@@ -651,12 +677,12 @@ variable "slots" {
       }))
 
       custom_oidc_v2 = optional(list(object({
-        name                         = string
-        client_id                    = string
+        name                          = string
+        client_id                     = string
         openid_configuration_endpoint = string
-        client_secret_setting_name   = optional(string)
-        allowed_audiences            = optional(list(string))
-        login_scopes                 = optional(list(string))
+        client_secret_setting_name    = optional(string)
+        allowed_audiences             = optional(list(string))
+        login_scopes                  = optional(list(string))
       })))
 
       facebook_v2 = optional(object({
@@ -686,11 +712,11 @@ variable "slots" {
       }))
 
       twitter_v2 = optional(object({
-        consumer_key               = string
+        consumer_key                 = string
         consumer_secret_setting_name = string
       }))
     }))
-    site_config = object({
+    site_configuration = optional(object({
       always_on                              = optional(bool)
       api_definition_url                     = optional(string)
       api_management_api_id                  = optional(string)
@@ -723,19 +749,19 @@ variable "slots" {
           retention_in_days = optional(number)
         }))
       }))
-      auto_swap_slot_name                    = optional(string)
+      auto_swap_slot_name                           = optional(string)
       container_registry_managed_identity_client_id = optional(string)
       container_registry_use_managed_identity       = optional(bool)
       cors = optional(object({
         allowed_origins     = optional(list(string))
         support_credentials = optional(bool)
       }))
-      default_documents               = optional(list(string))
-      elastic_instance_minimum        = optional(number)
-      ftps_state                      = optional(string)
-      health_check_path               = optional(string)
+      default_documents                 = optional(list(string))
+      elastic_instance_minimum          = optional(number)
+      ftps_state                        = optional(string)
+      health_check_path                 = optional(string)
       health_check_eviction_time_in_min = optional(number)
-      http2_enabled                   = optional(bool)
+      http2_enabled                     = optional(bool)
       ip_restriction = optional(list(object({
         action                    = optional(string)
         ip_address                = optional(string)
@@ -751,13 +777,13 @@ variable "slots" {
           x_forwarded_host  = optional(list(string))
         }))
       })))
-      ip_restriction_default_action = optional(string)
-      load_balancing_mode           = optional(string)
-      managed_pipeline_mode         = optional(string)
-      minimum_tls_version           = optional(string)
-      pre_warmed_instance_count     = optional(number)
-      remote_debugging_enabled      = optional(bool)
-      remote_debugging_version      = optional(string)
+      ip_restriction_default_action    = optional(string)
+      load_balancing_mode              = optional(string)
+      managed_pipeline_mode            = optional(string)
+      minimum_tls_version              = optional(string)
+      pre_warmed_instance_count        = optional(number)
+      remote_debugging_enabled         = optional(bool)
+      remote_debugging_version         = optional(string)
       runtime_scale_monitoring_enabled = optional(bool)
       scm_ip_restriction = optional(list(object({
         action                    = optional(string)
@@ -781,7 +807,7 @@ variable "slots" {
       vnet_route_all_enabled            = optional(bool)
       websockets_enabled                = optional(bool)
       worker_count                      = optional(number)
-    })
+    }))
     tags = optional(map(string))
   }))
   default = []
@@ -790,20 +816,59 @@ variable "slots" {
     condition     = length(distinct([for slot in var.slots : slot.name])) == length(var.slots)
     error_message = "Each slot name must be unique."
   }
+
+  validation {
+    condition = alltrue([
+      for slot in var.slots : slot.auth_settings == null || slot.auth_settings_v2 == null
+    ])
+    error_message = "auth_settings and auth_settings_v2 are mutually exclusive for slots."
+  }
+
+  validation {
+    condition = alltrue([
+      for slot in var.slots : slot.client_certificate_mode == null || try(slot.client_certificate_enabled, false)
+    ])
+    error_message = "client_certificate_mode can only be set when client_certificate_enabled is true."
+  }
+
+  validation {
+    condition = alltrue([
+      for slot in var.slots : slot.site_configuration == null || (
+        slot.site_configuration.application_stack != null && (
+          (slot.site_configuration.application_stack.docker != null ? 1 : 0) +
+          (slot.site_configuration.application_stack.dotnet_version != null ? 1 : 0) +
+          (slot.site_configuration.application_stack.java_version != null ? 1 : 0) +
+          (slot.site_configuration.application_stack.node_version != null ? 1 : 0) +
+          (slot.site_configuration.application_stack.powershell_core_version != null ? 1 : 0) +
+          (slot.site_configuration.application_stack.python_version != null ? 1 : 0) +
+          (coalesce(try(slot.site_configuration.application_stack.use_custom_runtime, null), false) ? 1 : 0)
+        ) == 1
+      )
+    ])
+    error_message = "slot.site_configuration.application_stack must be set with exactly one runtime (docker or a single language runtime or custom runtime)."
+  }
+
+  validation {
+    condition = alltrue([
+      for slot in var.slots : slot.site_configuration == null || slot.site_configuration.health_check_eviction_time_in_min == null || slot.site_configuration.health_check_path != null
+    ])
+    error_message = "slot.site_configuration.health_check_eviction_time_in_min requires health_check_path to be set."
+  }
 }
 
 variable "diagnostic_settings" {
   description = "Diagnostic settings for logs and metrics."
   type = list(object({
     name                           = string
-    areas                          = optional(list(string))
     log_categories                 = optional(list(string))
+    log_category_groups            = optional(list(string))
     metric_categories              = optional(list(string))
     log_analytics_workspace_id     = optional(string)
     log_analytics_destination_type = optional(string)
     storage_account_id             = optional(string)
     eventhub_authorization_rule_id = optional(string)
     eventhub_name                  = optional(string)
+    partner_solution_id            = optional(string)
   }))
   default  = []
   nullable = false
@@ -821,15 +886,41 @@ variable "diagnostic_settings" {
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      ds.log_analytics_workspace_id != null || ds.storage_account_id != null || ds.eventhub_authorization_rule_id != null
+      trimspace(ds.name) != ""
     ])
-    error_message = "Each diagnostic setting must specify at least one destination: log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id."
+    error_message = "Each diagnostic setting name must not be empty or whitespace."
   }
 
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      ds.eventhub_authorization_rule_id == null || (ds.eventhub_name != null && ds.eventhub_name != "")
+      (
+        (ds.log_analytics_workspace_id != null && trimspace(ds.log_analytics_workspace_id) != "") ||
+        (ds.storage_account_id != null && trimspace(ds.storage_account_id) != "") ||
+        (ds.eventhub_authorization_rule_id != null && trimspace(ds.eventhub_authorization_rule_id) != "") ||
+        (ds.partner_solution_id != null && trimspace(ds.partner_solution_id) != "")
+      )
+    ])
+    error_message = "Each diagnostic setting must specify at least one destination: log_analytics_workspace_id, storage_account_id, eventhub_authorization_rule_id, or partner_solution_id."
+  }
+
+  validation {
+    condition = alltrue(flatten([
+      for ds in var.diagnostic_settings : [
+        ds.log_analytics_workspace_id == null || trimspace(ds.log_analytics_workspace_id) != "",
+        ds.storage_account_id == null || trimspace(ds.storage_account_id) != "",
+        ds.eventhub_authorization_rule_id == null || trimspace(ds.eventhub_authorization_rule_id) != "",
+        ds.partner_solution_id == null || trimspace(ds.partner_solution_id) != "",
+        ds.eventhub_name == null || trimspace(ds.eventhub_name) != ""
+      ]
+    ]))
+    error_message = "Diagnostic setting destination and eventhub_name values must not be empty or whitespace."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.eventhub_authorization_rule_id == null || trimspace(ds.eventhub_authorization_rule_id) == "" || (ds.eventhub_name != null && trimspace(ds.eventhub_name) != "")
     ])
     error_message = "eventhub_name is required when eventhub_authorization_rule_id is set."
   }
@@ -840,6 +931,14 @@ variable "diagnostic_settings" {
       ds.log_analytics_destination_type == null || contains(["Dedicated", "AzureDiagnostics"], ds.log_analytics_destination_type)
     ])
     error_message = "log_analytics_destination_type must be Dedicated or AzureDiagnostics."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      (length(coalesce(ds.log_categories, [])) + length(coalesce(ds.log_category_groups, [])) + length(coalesce(ds.metric_categories, []))) > 0
+    ])
+    error_message = "Each diagnostic setting must include at least one log category, log category group, or metric category."
   }
 }
 

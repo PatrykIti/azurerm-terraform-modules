@@ -105,22 +105,28 @@ module "linux_virtual_machine" {
   location            = azurerm_resource_group.example.location
   size                = "Standard_B2s"
 
-  network_interface_ids = [azurerm_network_interface.example.id]
+  network = {
+    network_interface_ids = [azurerm_network_interface.example.id]
+  }
 
-  admin_username                  = "azureuser"
-  disable_password_authentication = true
-  admin_ssh_keys = [
-    {
-      username   = "azureuser"
-      public_key = tls_private_key.example.public_key_openssh
+  admin = {
+    username                        = "azureuser"
+    disable_password_authentication = true
+    ssh_keys = [
+      {
+        username   = "azureuser"
+        public_key = tls_private_key.example.public_key_openssh
+      }
+    ]
+  }
+
+  image = {
+    source_image_reference = {
+      publisher = "Canonical"
+      offer     = "0001-com-ubuntu-server-jammy"
+      sku       = "22_04-lts-gen2"
+      version   = "latest"
     }
-  ]
-
-  source_image_reference = {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts-gen2"
-    version   = "latest"
   }
 
   os_disk = {
@@ -166,7 +172,9 @@ module "linux_virtual_machine" {
     reboot_setting        = "IfRequired"
   }
 
-  custom_data = base64encode(local.cloud_init)
+  runtime = {
+    custom_data = base64encode(local.cloud_init)
+  }
 
   extensions = [
     {
@@ -183,8 +191,8 @@ module "linux_virtual_machine" {
   diagnostic_settings = [
     {
       name                       = "diag"
-      areas                      = ["logs", "metrics"]
       log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+      metric_categories          = ["AllMetrics"]
     }
   ]
 

@@ -31,9 +31,6 @@ test_suites:
 
   - name: "Performance Tests"
     tests:
-      - BenchmarkPrivateEndpointCreationSimple
-      - BenchmarkPrivateEndpointCreationWithFeatures
-      - BenchmarkPrivateEndpointParallelCreation
       - TestPrivateEndpointCreationTime
       - TestPrivateEndpointScaling
       - TestPrivateEndpointUpdatePerformance
@@ -44,10 +41,10 @@ test_suites:
 # Test environment requirements
 environment:
   required_vars:
-    - AZURE_SUBSCRIPTION_ID
-    - AZURE_TENANT_ID
-    - AZURE_CLIENT_ID
-    - AZURE_CLIENT_SECRET
+    - ARM_SUBSCRIPTION_ID
+    - ARM_TENANT_ID
+    - ARM_CLIENT_ID
+    - ARM_CLIENT_SECRET
 
   azure_regions:
     - northeurope
@@ -124,12 +121,9 @@ matrix:
     - westus2
 
   terraform_versions:
-    - "1.5.x"
-    - "1.6.x"
-    - "1.7.x"
+    - "1.12.x"
 
   go_versions:
-    - "1.20"
     - "1.21"
 
 # Notifications

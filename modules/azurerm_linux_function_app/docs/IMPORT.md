@@ -44,11 +44,14 @@ module "linux_function_app" {
   resource_group_name = var.resource_group_name
   location            = var.location
 
-  service_plan_id     = var.service_plan_id
-  storage_account_name        = var.storage_account_name
-  storage_account_access_key  = var.storage_account_access_key
+  service_plan_id = var.service_plan_id
 
-  site_config = {
+  storage_configuration = {
+    account_name       = var.storage_configuration.account_name
+    account_access_key = var.storage_configuration.account_access_key
+  }
+
+  site_configuration = {
     application_stack = {
       node_version = "20"
     }
@@ -63,8 +66,10 @@ function_app_name        = "func-prod"
 resource_group_name      = "rg-apps-prod"
 location                 = "westeurope"
 service_plan_id          = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Web/serverFarms/<plan>"
-storage_account_name     = "stappsprod"
-storage_account_access_key = "<secret>"
+storage_configuration = {
+  account_name       = "stappsprod"
+  account_access_key = "<secret>"
+}
 ```
 
 Get current values with Azure CLI:
@@ -108,7 +113,7 @@ import {
 **Diagnostic settings**
 ```hcl
 import {
-  to = module.linux_function_app.azurerm_monitor_diagnostic_setting.diagnostic_settings["diag"]
+  to = module.linux_function_app.azurerm_monitor_diagnostic_setting.monitor_diagnostic_setting["diag"]
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Web/sites/<app>/providers/microsoft.insights/diagnosticSettings/diag"
 }
 ```

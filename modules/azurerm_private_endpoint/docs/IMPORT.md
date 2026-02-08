@@ -4,7 +4,7 @@
 
 ```hcl
 import {
-  to = azurerm_private_endpoint.main
+  to = azurerm_private_endpoint.private_endpoint
   id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/example-rg/providers/Microsoft.Network/privateEndpoints/example-pe"
 }
 ```

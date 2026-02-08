@@ -72,22 +72,28 @@ module "linux_virtual_machine" {
   location            = azurerm_resource_group.example.location
   size                = "Standard_B2s"
 
-  network_interface_ids = [azurerm_network_interface.example.id]
+  network = {
+    network_interface_ids = [azurerm_network_interface.example.id]
+  }
 
-  admin_username                  = "azureuser"
-  disable_password_authentication = true
-  admin_ssh_keys = [
-    {
-      username   = "azureuser"
-      public_key = tls_private_key.example.public_key_openssh
+  admin = {
+    username                        = "azureuser"
+    disable_password_authentication = true
+    ssh_keys = [
+      {
+        username   = "azureuser"
+        public_key = tls_private_key.example.public_key_openssh
+      }
+    ]
+  }
+
+  image = {
+    source_image_reference = {
+      publisher = "Canonical"
+      offer     = "0001-com-ubuntu-server-jammy"
+      sku       = "22_04-lts-gen2"
+      version   = "latest"
     }
-  ]
-
-  source_image_reference = {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts-gen2"
-    version   = "latest"
   }
 
   os_disk = {

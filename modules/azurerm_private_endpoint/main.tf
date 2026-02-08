@@ -1,18 +1,4 @@
-locals {
-  private_service_connections = {
-    for conn in var.private_service_connections : conn.name => conn
-  }
-
-  ip_configurations = {
-    for cfg in var.ip_configurations : cfg.name => cfg
-  }
-
-  private_dns_zone_groups = {
-    for group in var.private_dns_zone_groups : group.name => group
-  }
-}
-
-resource "azurerm_private_endpoint" "main" {
+resource "azurerm_private_endpoint" "private_endpoint" {
   name                = var.name
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -21,7 +7,7 @@ resource "azurerm_private_endpoint" "main" {
   custom_network_interface_name = var.custom_network_interface_name
 
   dynamic "private_service_connection" {
-    for_each = local.private_service_connections
+    for_each = { for private_service_connection in var.private_service_connections : private_service_connection.name => private_service_connection }
 
     content {
       name                              = private_service_connection.value.name
@@ -34,7 +20,7 @@ resource "azurerm_private_endpoint" "main" {
   }
 
   dynamic "ip_configuration" {
-    for_each = local.ip_configurations
+    for_each = { for ip_configuration in var.ip_configurations : ip_configuration.name => ip_configuration }
 
     content {
       name               = ip_configuration.value.name
@@ -45,7 +31,7 @@ resource "azurerm_private_endpoint" "main" {
   }
 
   dynamic "private_dns_zone_group" {
-    for_each = local.private_dns_zone_groups
+    for_each = { for private_dns_zone_group in var.private_dns_zone_groups : private_dns_zone_group.name => private_dns_zone_group }
 
     content {
       name                 = private_dns_zone_group.value.name
@@ -65,22 +51,4 @@ resource "azurerm_private_endpoint" "main" {
   }
 
   tags = var.tags
-
-  lifecycle {
-    precondition {
-      condition = alltrue([
-        for conn in var.private_service_connections :
-        (try(conn.private_connection_resource_id, null) != null) != (try(conn.private_connection_resource_alias, null) != null)
-      ])
-      error_message = "Each private_service_connection must set exactly one of private_connection_resource_id or private_connection_resource_alias."
-    }
-
-    precondition {
-      condition = alltrue([
-        for conn in var.private_service_connections :
-        conn.is_manual_connection == false || (try(conn.request_message, null) != null && length(trim(conn.request_message)) > 0)
-      ])
-      error_message = "request_message is required when is_manual_connection is true."
-    }
-  }
 }

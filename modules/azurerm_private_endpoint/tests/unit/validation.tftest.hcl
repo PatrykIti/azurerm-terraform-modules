@@ -82,6 +82,63 @@ run "both_resource_id_and_alias" {
   ]
 }
 
+run "whitespace_resource_id" {
+  command = plan
+
+  variables {
+    private_service_connections = [
+      {
+        name                           = "psc-whitespace-id"
+        is_manual_connection           = false
+        private_connection_resource_id = "   "
+        subresource_names              = ["blob"]
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.private_service_connections
+  ]
+}
+
+run "whitespace_resource_alias" {
+  command = plan
+
+  variables {
+    private_service_connections = [
+      {
+        name                              = "psc-whitespace-alias"
+        is_manual_connection              = false
+        private_connection_resource_alias = "   "
+        subresource_names                 = ["blob"]
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.private_service_connections
+  ]
+}
+
+run "whitespace_subresource_name" {
+  command = plan
+
+  variables {
+    private_service_connections = [
+      {
+        name                           = "psc-whitespace-subresource"
+        is_manual_connection           = false
+        private_connection_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/testsa"
+        subresource_names              = ["blob", "   "]
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.private_service_connections
+  ]
+}
+
 run "manual_connection_missing_request_message" {
   command = plan
 
@@ -157,5 +214,66 @@ run "invalid_private_dns_zone_id" {
 
   expect_failures = [
     var.private_dns_zone_groups
+  ]
+}
+
+run "invalid_subnet_id_format" {
+  command = plan
+
+  variables {
+    subnet_id = "not-a-subnet-id"
+  }
+
+  expect_failures = [
+    var.subnet_id
+  ]
+}
+
+run "invalid_ip_configuration_private_ip_address" {
+  command = plan
+
+  variables {
+    ip_configurations = [
+      {
+        name               = "cfg-invalid-ip"
+        private_ip_address = "300.10.1.5"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.ip_configurations
+  ]
+}
+
+run "duplicate_private_dns_zone_ids_in_group" {
+  command = plan
+
+  variables {
+    private_dns_zone_groups = [
+      {
+        name = "dns-dup-ids"
+        private_dns_zone_ids = [
+          "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net",
+          "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net"
+        ]
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.private_dns_zone_groups
+  ]
+}
+
+run "whitespace_custom_network_interface_name" {
+  command = plan
+
+  variables {
+    custom_network_interface_name = "   "
+  }
+
+  expect_failures = [
+    var.custom_network_interface_name
   ]
 }

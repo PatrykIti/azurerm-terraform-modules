@@ -13,7 +13,7 @@ for an existing Private DNS Zone. It requires a Private DNS Zone name and a Virt
 
 - `registration_enabled` defaults to `false`. Enable it only for trusted networks that should
   auto-register VM records in the zone.
-- `resolution_policy` is optional and supports `Default` or `Recursive`.
+- `resolution_policy` is optional and supports `Default` or `NxDomainRedirect`.
 - The module does not create the Private DNS Zone or the Virtual Network.
 
 ## Out of Scope

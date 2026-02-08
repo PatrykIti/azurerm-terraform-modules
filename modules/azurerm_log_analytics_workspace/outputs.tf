@@ -136,6 +136,12 @@ output "cluster_customer_managed_keys" {
 }
 
 output "diagnostic_settings_skipped" {
-  description = "Diagnostic settings entries skipped because no log or metric categories were supplied."
-  value       = local.diagnostic_settings_skipped
+  description = "Deprecated compatibility output. Always empty because invalid diagnostic_settings entries now fail validation instead of being silently skipped."
+  value = [
+    for ds in var.diagnostic_settings : {
+      name              = ds.name
+      log_categories    = ds.log_categories
+      metric_categories = ds.metric_categories
+    } if false
+  ]
 }

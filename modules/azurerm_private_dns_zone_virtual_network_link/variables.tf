@@ -56,13 +56,13 @@ variable "registration_enabled" {
 }
 
 variable "resolution_policy" {
-  description = "Optional DNS resolution policy for the link. Accepted values are Default or Recursive."
+  description = "Optional DNS resolution policy for the link. Accepted values are Default or NxDomainRedirect."
   type        = string
   default     = null
 
   validation {
-    condition     = var.resolution_policy == null || contains(["Default", "Recursive"], var.resolution_policy)
-    error_message = "resolution_policy must be either Default or Recursive when set."
+    condition     = var.resolution_policy == null || contains(["Default", "NxDomainRedirect"], var.resolution_policy)
+    error_message = "resolution_policy must be either Default or NxDomainRedirect when set."
   }
 }
 

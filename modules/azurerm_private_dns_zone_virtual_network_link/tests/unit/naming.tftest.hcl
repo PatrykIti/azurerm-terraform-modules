@@ -32,7 +32,7 @@ run "invalid_name_too_long" {
   command = plan
 
   variables {
-    name = "this-name-is-way-too-long-for-a-virtual-network-link-and-should-fail-12345"
+    name = "this-name-is-way-too-long-for-a-virtual-network-link-and-should-fail-12345678901234567890"
   }
 
   expect_failures = [

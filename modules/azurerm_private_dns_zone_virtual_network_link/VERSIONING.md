@@ -11,8 +11,7 @@ PDNSZLNKv{major}.{minor}.{patch}
 ```
 
 Where:
-- `PDNSZLNK` = azurerm_private_dns_zone_virtual_network_link module identifier
-- `v` = version prefix
+- `PDNSZLNKv` = azurerm_private_dns_zone_virtual_network_link module tag prefix (`module.json`)
 - `{major}.{minor}.{patch}` = semantic version numbers (automatically determined)
 
 ### Examples:
@@ -117,7 +116,7 @@ module "private_dns_zone_virtual_network_link" {
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| PDNSZLNKv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
+| PDNSZLNKv1.x.x | >= 1.12.2 | 4.57.0 (pinned) | Managed by AzureRM provider |
 
 **Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
 

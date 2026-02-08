@@ -5,9 +5,9 @@ This directory contains automated tests for the Log Analytics Workspace Terrafor
 ## Prerequisites
 
 1. **Go**: Version 1.21 or later
-2. **Terraform**: Version 1.3.0 or later
-3. **Azure CLI**: Authenticated with appropriate permissions
-4. **Azure Service Principal**: With Contributor access to the test subscription
+2. **Terraform**: Version 1.12.2 or later
+3. **Azure Service Principal**: With Contributor access to the test subscription
+4. **Azure CLI**: Optional, useful for troubleshooting/manual cleanup
 
 ## Environment Variables
 
@@ -19,6 +19,7 @@ export ARM_TENANT_ID="your-tenant-id"
 export ARM_CLIENT_ID="your-client-id"
 export ARM_CLIENT_SECRET="your-client-secret"
 export ARM_LOCATION="West Europe"  # Optional, defaults to West Europe
+export RUN_LOG_ANALYTICS_CLUSTER_TESTS="false"  # Optional, cluster tests are opt-in
 ```
 
 ## Running Tests
@@ -33,6 +34,12 @@ go mod download
 
 ```bash
 make test
+```
+
+### Compile/Discovery Check (no test execution)
+
+```bash
+go test ./... -run '^$'
 ```
 
 ### Run Basic Tests Only
@@ -63,6 +70,12 @@ export RUN_LOG_ANALYTICS_CLUSTER_TESTS=true
 go test -v -run TestLogAnalyticsClusters -timeout 180m
 go test -v -run TestLogAnalyticsClusterCustomerManagedKey -timeout 180m
 ```
+
+### Helper Script Behavior
+
+`run_tests_parallel.sh` and `run_tests_sequential.sh` execute a fixed list of
+tests and write JSON/log artifacts under `test_outputs/`. They continue on
+individual test failures and are best for batch reporting, not fail-fast CI.
 
 ## Test Structure
 

@@ -3,13 +3,6 @@
 mock_provider "azurerm" {
   mock_resource "azurerm_linux_function_app" {}
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types = ["FunctionAppLogs"]
-      metrics            = ["AllMetrics"]
-    }
-  }
 }
 
 variables {
@@ -17,9 +10,11 @@ variables {
   resource_group_name = "test-rg"
   location            = "northeurope"
   service_plan_id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Web/serverFarms/plan"
-  storage_account_name        = "stunit001"
-  storage_account_access_key  = "fakekey"
-  site_config = {
+  storage_configuration = {
+    account_name       = "stunit001"
+    account_access_key = "fakekey"
+  }
+  site_configuration = {
     application_stack = {
       node_version = "20"
     }
@@ -30,12 +25,14 @@ run "storage_managed_identity_requires_identity" {
   command = plan
 
   variables {
-    storage_uses_managed_identity = true
-    storage_account_access_key    = null
+    storage_configuration = {
+      account_name          = "stunit001"
+      uses_managed_identity = true
+    }
   }
 
   expect_failures = [
-    var.storage_uses_managed_identity
+    var.storage_configuration
   ]
 }
 
@@ -60,7 +57,7 @@ run "invalid_application_stack" {
   command = plan
 
   variables {
-    site_config = {
+    site_configuration = {
       application_stack = {
         node_version   = "20"
         python_version = "3.11"
@@ -69,7 +66,7 @@ run "invalid_application_stack" {
   }
 
   expect_failures = [
-    var.site_config
+    var.site_configuration
   ]
 }
 
@@ -77,10 +74,12 @@ run "client_certificate_mode_without_enabled" {
   command = plan
 
   variables {
-    client_certificate_mode = "Required"
+    access_configuration = {
+      client_certificate_mode = "Required"
+    }
   }
 
   expect_failures = [
-    var.client_certificate_mode
+    var.access_configuration
   ]
 }

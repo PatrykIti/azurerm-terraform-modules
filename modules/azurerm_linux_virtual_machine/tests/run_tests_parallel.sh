@@ -1,7 +1,10 @@
 #!/bin/bash
 
+set -uo pipefail
+
 # Source environment variables if they exist
 if [ -f "./test_env.sh" ]; then
+  # shellcheck source=/dev/null
   source ./test_env.sh
 fi
 
@@ -14,15 +17,17 @@ run_test() {
     local test_name=$1
     local output_file="$OUTPUT_DIR/${test_name}.json"
     local log_file="$OUTPUT_DIR/${test_name}.log"
-    
+
     echo "[$(date +%H:%M:%S)] Starting test: $test_name"
-    
-    local start_time=$(date +%s)
-    go test -v -timeout 60m -run "^${test_name}$" . 2>&1 > "$log_file"
+
+    local start_time
+    start_time=$(date +%s)
+    go test -v -timeout 60m -run "^${test_name}$" . > "$log_file" 2>&1
     local exit_status=$?
-    local end_time=$(date +%s)
+    local end_time
+    end_time=$(date +%s)
     local duration=$((end_time - start_time))
-    
+
     local status="unknown"
     if grep -q "^--- PASS:" "$log_file"; then
         status="passed"
@@ -31,13 +36,13 @@ run_test() {
     elif grep -q "^--- SKIP:" "$log_file"; then
         status="skipped"
     fi
-    
+
     local error_message=""
     if [ "$status" = "failed" ]; then
         error_message=$(grep -A 5 "^--- FAIL:" "$log_file" | tail -n +2 | head -5 | tr '\n' ' ' | sed 's/"/\\"/g')
     fi
-    
-    cat > "$output_file" << EOF
+
+    cat > "$output_file" << EOF2
 {
   "test_name": "$test_name",
   "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
@@ -48,8 +53,8 @@ run_test() {
   "error_message": "$error_message",
   "log_file": "$(basename "$log_file")"
 }
-EOF
-    
+EOF2
+
     echo "[$(date +%H:%M:%S)] Completed test: $test_name - Status: $status (${duration}s)"
     return $exit_status
 }
@@ -57,15 +62,11 @@ EOF
 # List of tests to run
 tests=(
     "TestBasicLinuxVirtualMachine"
-    "TestCompleteLinuxVirtualMachine"
     "TestSecureLinuxVirtualMachine"
-    "TestNetworkLinuxVirtualMachine"
-    "TestLinuxVirtualMachinePrivateEndpoint"
-    "TestLinuxVirtualMachineValidationRules"
-    "TestLinuxVirtualMachineFullIntegration"
+    "TestLinuxVirtualMachineDataDisks"
+    "TestLinuxVirtualMachineExtensions"
+    "TestLinuxVirtualMachineCompleteIntegration"
     "TestLinuxVirtualMachineLifecycle"
-    "TestLinuxVirtualMachineCreationTime"
-    "BenchmarkLinuxVirtualMachineCreation"
 )
 
 echo "Starting parallel test execution for azurerm_linux_virtual_machine"

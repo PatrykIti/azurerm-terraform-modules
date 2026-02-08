@@ -3,14 +3,14 @@
 mock_provider "azurerm" {
   mock_resource "azurerm_linux_function_app" {
     defaults = {
-      id                            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Web/sites/funcunit"
-      name                          = "funcunit"
-      location                      = "northeurope"
-      resource_group_name           = "test-rg"
-      default_hostname              = "funcunit.azurewebsites.net"
-      outbound_ip_addresses         = "1.1.1.1"
-      outbound_ip_address_list      = ["1.1.1.1"]
-      possible_outbound_ip_addresses = "1.1.1.1,2.2.2.2"
+      id                                = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Web/sites/funcunit"
+      name                              = "funcunit"
+      location                          = "northeurope"
+      resource_group_name               = "test-rg"
+      default_hostname                  = "funcunit.azurewebsites.net"
+      outbound_ip_addresses             = "1.1.1.1"
+      outbound_ip_address_list          = ["1.1.1.1"]
+      possible_outbound_ip_addresses    = "1.1.1.1,2.2.2.2"
       possible_outbound_ip_address_list = ["1.1.1.1", "2.2.2.2"]
       tags = {
         Environment = "Test"
@@ -25,13 +25,6 @@ mock_provider "azurerm" {
 
   mock_resource "azurerm_linux_function_app_slot" {}
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types = ["FunctionAppLogs"]
-      metrics            = ["AllMetrics"]
-    }
-  }
 }
 
 variables {
@@ -39,9 +32,11 @@ variables {
   resource_group_name = "test-rg"
   location            = "northeurope"
   service_plan_id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Web/serverFarms/plan"
-  storage_account_name        = "stunit001"
-  storage_account_access_key  = "fakekey"
-  site_config = {
+  storage_configuration = {
+    account_name       = "stunit001"
+    account_access_key = "fakekey"
+  }
+  site_configuration = {
     application_stack = {
       node_version = "20"
     }

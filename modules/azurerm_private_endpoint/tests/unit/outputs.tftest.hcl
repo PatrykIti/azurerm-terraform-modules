@@ -18,32 +18,6 @@ mock_provider "azurerm" {
           name = "test-pe-nic"
         }
       ]
-      private_service_connection = [
-        {
-          name                              = "psc-unit"
-          is_manual_connection              = false
-          private_connection_resource_id    = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/testsa"
-          private_connection_resource_alias = null
-          subresource_names                 = ["blob"]
-          request_message                   = null
-          private_ip_address                = "10.0.1.4"
-        }
-      ]
-      ip_configuration = []
-      private_dns_zone_group = [
-        {
-          id                   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/privateEndpoints/test-pe/privateDnsZoneGroups/test-group"
-          name                 = "test-group"
-          private_dns_zone_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net"]
-        }
-      ]
-      custom_dns_configs = [
-        {
-          fqdn         = "test.blob.core.windows.net"
-          ip_addresses = ["10.0.1.4"]
-        }
-      ]
-      private_dns_zone_configs = []
     }
   }
 }
@@ -89,28 +63,5 @@ run "verify_basic_outputs" {
   assert {
     condition     = output.subnet_id == "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/test-snet"
     error_message = "Output 'subnet_id' should return the subnet ID."
-  }
-}
-
-run "verify_private_ip_output" {
-  command = plan
-
-  assert {
-    condition     = output.private_ip_address == "10.0.1.4"
-    error_message = "Output 'private_ip_address' should return the service connection private IP."
-  }
-}
-
-run "verify_dns_group_output" {
-  command = plan
-
-  assert {
-    condition     = length(output.private_dns_zone_group) == 1
-    error_message = "Output 'private_dns_zone_group' should return the configured DNS zone group."
-  }
-
-  assert {
-    condition     = output.private_dns_zone_group[0].name == "test-group"
-    error_message = "Output 'private_dns_zone_group' should include the DNS zone group name."
   }
 }

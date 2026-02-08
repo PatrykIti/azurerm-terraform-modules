@@ -18,7 +18,7 @@ func TestBasicPrivateDnsZoneVirtualNetworkLink(t *testing.T) {
 	t.Parallel()
 
 	// Create a folder for this test
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -49,7 +49,7 @@ func TestBasicPrivateDnsZoneVirtualNetworkLink(t *testing.T) {
 func TestCompletePrivateDnsZoneVirtualNetworkLink(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -66,11 +66,11 @@ func TestCompletePrivateDnsZoneVirtualNetworkLink(t *testing.T) {
 		// Get outputs
 		resourceID := terraform.Output(t, terraformOptions, "private_dns_zone_virtual_network_link_id")
 		resourceName := terraform.Output(t, terraformOptions, "private_dns_zone_virtual_network_link_name")
-		
+
 		// Validate complete configuration
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, resourceName)
-		
+
 		// Add additional validations for complete configuration
 		// This should test all optional features and advanced settings
 	})
@@ -80,7 +80,7 @@ func TestCompletePrivateDnsZoneVirtualNetworkLink(t *testing.T) {
 func TestSecurePrivateDnsZoneVirtualNetworkLink(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -124,8 +124,8 @@ func TestPrivateDnsZoneVirtualNetworkLinkValidationRules(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", fmt.Sprintf("fixtures/%s", tc.fixtureFile))
-			
+			testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", fmt.Sprintf("tests/fixtures/%s", tc.fixtureFile))
+
 			// Use minimal terraform options for negative tests (no variables)
 			terraformOptions := &terraform.Options{
 				TerraformDir: testFolder,
@@ -149,7 +149,7 @@ func BenchmarkPrivateDnsZoneVirtualNetworkLinkCreation(b *testing.B) {
 		b.Skip("Skipping benchmark in short mode")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(b, testFolder)
 
 	// Cleanup after benchmark
@@ -160,7 +160,7 @@ func BenchmarkPrivateDnsZoneVirtualNetworkLinkCreation(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		// Generate unique name for each iteration
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
-		
+
 		terraform.InitAndApply(b, terraformOptions)
 		terraform.Destroy(b, terraformOptions)
 	}
@@ -172,7 +172,7 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	timestamp := time.Now().UnixNano() % 1000 // Last 3 digits for more variation
 	baseID := strings.ToLower(random.UniqueId())
 	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
-	
+
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
@@ -182,10 +182,10 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		NoColor: true,
 		// Retry configuration
 		RetryableTerraformErrors: map[string]string{
-			".*timeout.*":                    "Timeout error - retrying",
-			".*ResourceGroupNotFound.*":      "Resource group not found - retrying",
-			".*AlreadyExists.*":              "Resource already exists - retrying",
-			".*TooManyRequests.*":            "Too many requests - retrying",
+			".*timeout.*":               "Timeout error - retrying",
+			".*ResourceGroupNotFound.*": "Resource group not found - retrying",
+			".*AlreadyExists.*":         "Resource already exists - retrying",
+			".*TooManyRequests.*":       "Too many requests - retrying",
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,

@@ -24,6 +24,6 @@ output "identity" {
 }
 
 output "diagnostic_settings_skipped" {
-  description = "Diagnostic settings skipped entries"
+  description = "Deprecated compatibility output from the module (always empty)."
   value       = module.linux_virtual_machine.diagnostic_settings_skipped
 }

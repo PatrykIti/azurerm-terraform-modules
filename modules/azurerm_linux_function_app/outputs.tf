@@ -64,16 +64,18 @@ output "slots" {
 }
 
 output "diagnostic_settings_skipped" {
-  description = "Diagnostic settings entries skipped because no log or metric categories were supplied."
+  description = "Diagnostic settings entries skipped because no log categories/groups or metric categories were supplied."
   value = [
-    for ds in local.diagnostic_settings_effective : {
-      name              = ds.name
-      log_categories    = ds.log_categories
-      metric_categories = ds.metric_categories
+    for ds in var.diagnostic_settings : {
+      name                = ds.name
+      log_categories      = ds.log_categories
+      log_category_groups = ds.log_category_groups
+      metric_categories   = ds.metric_categories
     }
     if(
-      (ds.log_categories == null ? 0 : length(ds.log_categories)) +
-      (ds.metric_categories == null ? 0 : length(ds.metric_categories))
+      length(coalesce(ds.log_categories, [])) +
+      length(coalesce(ds.log_category_groups, [])) +
+      length(coalesce(ds.metric_categories, []))
     ) == 0
   ]
 }

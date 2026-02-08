@@ -33,8 +33,8 @@ variable "subnet_id" {
   type        = string
 
   validation {
-    condition     = length(trimspace(var.subnet_id)) > 0
-    error_message = "subnet_id must not be empty."
+    condition     = can(regex("(?i)^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.Network/virtualNetworks/[^/]+/subnets/[^/]+$", trimspace(var.subnet_id)))
+    error_message = "subnet_id must be a valid Azure subnet resource ID."
   }
 }
 
@@ -42,6 +42,11 @@ variable "custom_network_interface_name" {
   description = "The custom name of the network interface attached to the private endpoint. Changing this forces a new resource to be created."
   type        = string
   default     = null
+
+  validation {
+    condition     = var.custom_network_interface_name == null || can(regex("^[A-Za-z0-9][A-Za-z0-9_.-]{0,78}[A-Za-z0-9]$", trimspace(var.custom_network_interface_name)))
+    error_message = "custom_network_interface_name must be 1-80 characters, start and end with an alphanumeric character, and contain only letters, numbers, periods, underscores, or hyphens."
+  }
 }
 
 variable "private_service_connections" {
@@ -73,6 +78,14 @@ variable "private_service_connections" {
   validation {
     condition = alltrue([
       for conn in var.private_service_connections :
+      length(trimspace(conn.name)) > 0
+    ])
+    error_message = "private_service_connections.name must not be empty or whitespace."
+  }
+
+  validation {
+    condition = alltrue([
+      for conn in var.private_service_connections :
       (try(conn.private_connection_resource_id, null) != null) != (try(conn.private_connection_resource_alias, null) != null)
     ])
     error_message = "Each private_service_connection must set exactly one of private_connection_resource_id or private_connection_resource_alias."
@@ -81,7 +94,23 @@ variable "private_service_connections" {
   validation {
     condition = alltrue([
       for conn in var.private_service_connections :
-      conn.is_manual_connection == false || (try(conn.request_message, null) != null && length(trim(conn.request_message)) > 0)
+      try(conn.private_connection_resource_id, null) == null || length(trimspace(conn.private_connection_resource_id)) > 0
+    ])
+    error_message = "private_connection_resource_id must not be empty or whitespace when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for conn in var.private_service_connections :
+      try(conn.private_connection_resource_alias, null) == null || length(trimspace(conn.private_connection_resource_alias)) > 0
+    ])
+    error_message = "private_connection_resource_alias must not be empty or whitespace when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for conn in var.private_service_connections :
+      conn.is_manual_connection == false || (try(conn.request_message, null) != null && length(trimspace(conn.request_message)) > 0)
     ])
     error_message = "request_message is required when is_manual_connection is true."
   }
@@ -101,6 +130,25 @@ variable "private_service_connections" {
     ])
     error_message = "subresource_names must contain at least one value when provided."
   }
+
+  validation {
+    condition = alltrue([
+      for conn in var.private_service_connections :
+      try(conn.subresource_names, null) == null || alltrue([
+        for subresource_name in conn.subresource_names :
+        length(trimspace(subresource_name)) > 0
+      ])
+    ])
+    error_message = "Each subresource_names value must not be empty or whitespace."
+  }
+
+  validation {
+    condition = alltrue([
+      for conn in var.private_service_connections :
+      try(conn.subresource_names, null) == null || length(distinct([for subresource_name in conn.subresource_names : lower(trimspace(subresource_name))])) == length(conn.subresource_names)
+    ])
+    error_message = "subresource_names values must be unique when provided."
+  }
 }
 
 variable "ip_configurations" {
@@ -116,6 +164,38 @@ variable "ip_configurations" {
   validation {
     condition     = length(var.ip_configurations) == length(distinct([for cfg in var.ip_configurations : cfg.name]))
     error_message = "ip_configurations names must be unique."
+  }
+
+  validation {
+    condition = alltrue([
+      for cfg in var.ip_configurations :
+      length(trimspace(cfg.name)) > 0
+    ])
+    error_message = "ip_configurations.name must not be empty or whitespace."
+  }
+
+  validation {
+    condition = alltrue([
+      for cfg in var.ip_configurations :
+      length(trimspace(cfg.private_ip_address)) > 0 && can(cidrhost(format("%s/%s", trimspace(cfg.private_ip_address), can(regex(":", trimspace(cfg.private_ip_address))) ? "128" : "32"), 0))
+    ])
+    error_message = "ip_configurations.private_ip_address must be a valid IPv4 or IPv6 address."
+  }
+
+  validation {
+    condition = alltrue([
+      for cfg in var.ip_configurations :
+      try(cfg.subresource_name, null) == null || length(trimspace(cfg.subresource_name)) > 0
+    ])
+    error_message = "ip_configurations.subresource_name must not be empty or whitespace when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for cfg in var.ip_configurations :
+      try(cfg.member_name, null) == null || length(trimspace(cfg.member_name)) > 0
+    ])
+    error_message = "ip_configurations.member_name must not be empty or whitespace when provided."
   }
 }
 
@@ -144,6 +224,14 @@ variable "private_dns_zone_groups" {
 
   validation {
     condition = alltrue([
+      for group in var.private_dns_zone_groups :
+      length(trimspace(group.name)) > 0
+    ])
+    error_message = "private_dns_zone_groups.name must not be empty or whitespace."
+  }
+
+  validation {
+    condition = alltrue([
       for group in var.private_dns_zone_groups : length(group.private_dns_zone_ids) > 0
     ])
     error_message = "private_dns_zone_groups.private_dns_zone_ids must contain at least one Private DNS Zone ID."
@@ -153,10 +241,18 @@ variable "private_dns_zone_groups" {
     condition = alltrue([
       for group in var.private_dns_zone_groups : alltrue([
         for zone_id in group.private_dns_zone_ids :
-        can(regex("^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.Network/privateDnsZones/[^/]+$", zone_id))
+        length(trimspace(zone_id)) > 0 && can(regex("^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.Network/privateDnsZones/[^/]+$", trimspace(zone_id)))
       ])
     ])
     error_message = "Each private_dns_zone_id must be a valid Azure Private DNS Zone resource ID."
+  }
+
+  validation {
+    condition = alltrue([
+      for group in var.private_dns_zone_groups :
+      length(distinct([for zone_id in group.private_dns_zone_ids : lower(trimspace(zone_id))])) == length(group.private_dns_zone_ids)
+    ])
+    error_message = "private_dns_zone_groups.private_dns_zone_ids must contain unique values."
   }
 }
 

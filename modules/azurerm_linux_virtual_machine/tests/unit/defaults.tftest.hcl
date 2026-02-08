@@ -18,22 +18,28 @@ variables {
   location            = "westeurope"
   size                = "Standard_B2s"
 
-  network_interface_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test/providers/Microsoft.Network/networkInterfaces/nic1"]
+  network = {
+    network_interface_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test/providers/Microsoft.Network/networkInterfaces/nic1"]
+  }
 
-  admin_username                  = "azureuser"
-  disable_password_authentication = true
-  admin_ssh_keys = [
-    {
-      username   = "azureuser"
-      public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7example"
+  admin = {
+    username                        = "azureuser"
+    disable_password_authentication = true
+    ssh_keys = [
+      {
+        username   = "azureuser"
+        public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6pEPPOMrZJib6o/ao9ia0OoMyaHS5kQ/4mml7U7edCx/BPbHji3BCz8oTKnJY/CKQ7gRIDCzPxgqv86TTYkQSMiJF5F8BwSB6lZ5X+MPNTPA37y9WzxXtzNaRvt95VlmNFScSd5AzmGFdedw5QGsDsKo06SA9LbTajR1FVnGS6hy02hM4C/AfOIF5O5nLDvb63fU+yh+kAT+WjEWkf+bGh4QNiFlY+T3uCJSuIO88v8TNxYCRRj1oYgF4CoXTWCUR5ftoldFATHX4A+OatuoX4kXJM1rnJwnTluhVBGhHR8siEI8SmRf+iHM+uzdKIIMSTnmySJIVpRpgDVzP1UWh"
+      }
+    ]
+  }
+
+  image = {
+    source_image_reference = {
+      publisher = "Canonical"
+      offer     = "0001-com-ubuntu-server-jammy"
+      sku       = "22_04-lts-gen2"
+      version   = "latest"
     }
-  ]
-
-  source_image_reference = {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts-gen2"
-    version   = "latest"
   }
 
   os_disk = {

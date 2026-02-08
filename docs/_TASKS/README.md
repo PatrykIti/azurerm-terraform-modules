@@ -5,7 +5,7 @@ Task board for module work. Update statuses in markdown files.
 ## Statistics
 - **To Do:** 22 tasks
 - **In Progress:** 0
-- **Done:** 62 tasks
+- **Done:** 64 tasks
 
 ---
 
@@ -48,6 +48,8 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-048](./TASK-048_Log_Analytics_Workspace_Diagnostic_Settings_Input_Alignment.md) | **Log Analytics Workspace diagnostic settings input alignment** | High | Medium | `modules/azurerm_log_analytics_workspace/` |
+| [TASK-049](./TASK-049_Private_Endpoint_Variables_Hardening_and_Validation_Alignment.md) | **Private Endpoint variables hardening and validation alignment** | High | Medium | `modules/azurerm_private_endpoint/` |
 | [TASK-037](./TASK-037_Event_Hubs_Modules.md) | **Azure Event Hubs modules (Namespace + Event Hub)** | High | Large | `modules/azurerm_eventhub_namespace/`, `modules/azurerm_eventhub/` |
 | [TASK-035](./TASK-035_Cognitive_Account_Module.md) | **Azure Cognitive Account module (OpenAI/Language/Speech)** | High | Large | `modules/azurerm_cognitive_account/` |
 | [TASK-029](./TASK-029_Key_Vault_Module.md) | **Key Vault module (full feature scope)** | High | Large | `modules/azurerm_key_vault/` |

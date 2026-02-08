@@ -8,11 +8,11 @@ exposes additional controls for authentication, networking, and monitoring.
 
 ## Security Defaults
 
-- **HTTPS-only**: `https_only = true` by default.
-- **TLS minimum**: `site_config.minimum_tls_version` supports 1.2/1.3 (set to
+- **HTTPS-only**: `access_configuration.https_only = true` by default.
+- **TLS minimum**: `site_configuration.minimum_tls_version` supports 1.2/1.3 (set to
   1.2 in secure examples).
-- **Public access**: `public_network_access_enabled = false` by default.
-- **FTP basic auth**: `ftp_publish_basic_authentication_enabled = false` by default.
+- **Public access**: `access_configuration.public_network_access_enabled = false` by default.
+- **FTP basic auth**: `access_configuration.ftp_publish_basic_authentication_enabled = false` by default.
 
 ## Key Security Controls
 
@@ -22,11 +22,11 @@ exposes additional controls for authentication, networking, and monitoring.
 - Prefer `auth_settings_v2` for modern flows and managed secrets.
 
 ### Identity & Secrets
-- Use **Managed Identity** for storage access with `storage_uses_managed_identity = true`.
+- Use **Managed Identity** for storage access with `storage_configuration.uses_managed_identity = true`.
 - Store secrets in Key Vault and reference them via app settings where possible.
 
 ### Network Restrictions
-- Use `site_config.ip_restriction` and `site_config.scm_ip_restriction` to
+- Use `site_configuration.ip_restriction` and `site_configuration.scm_ip_restriction` to
   allow only approved IP ranges, service tags, or subnets.
 - Set default action to `Deny` when restricting inbound access.
 
@@ -46,17 +46,21 @@ module "linux_function_app" {
   location            = azurerm_resource_group.main.location
   service_plan_id     = azurerm_service_plan.main.id
 
-  storage_account_name        = azurerm_storage_account.main.name
-  storage_uses_managed_identity = true
+  storage_configuration = {
+    account_name          = azurerm_storage_account.main.name
+    uses_managed_identity = true
+  }
 
   identity = {
     type = "SystemAssigned"
   }
 
-  https_only                    = true
-  public_network_access_enabled = false
+  access_configuration = {
+    https_only                    = true
+    public_network_access_enabled = false
+  }
 
-  site_config = {
+  site_configuration = {
     minimum_tls_version = "1.2"
     scm_minimum_tls_version = "1.2"
     ip_restriction_default_action = "Deny"
@@ -70,7 +74,8 @@ module "linux_function_app" {
     {
       name                       = "diag"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
-      areas                      = ["all"]
+      log_category_groups        = ["allLogs"]
+      metric_categories          = ["AllMetrics"]
     }
   ]
 

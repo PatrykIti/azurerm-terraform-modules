@@ -61,7 +61,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_private_dns_zone.main](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone.private_dns_zone](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_dns_zone) | resource |
 
 ## Inputs
 

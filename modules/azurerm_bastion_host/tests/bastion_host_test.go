@@ -68,7 +68,7 @@ func TestCompleteBastionHost(t *testing.T) {
 
 // Test security-focused bastion host settings
 func TestSecureBastionHost(t *testing.T) {
-	t.Parallel()
+	// Run sequentially to reduce Azure-side delete contention for Bastion in CI.
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {

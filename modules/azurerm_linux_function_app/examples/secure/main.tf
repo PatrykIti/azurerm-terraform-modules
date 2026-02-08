@@ -49,23 +49,30 @@ module "linux_function_app" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  service_plan_id            = azurerm_service_plan.example.id
-  storage_account_name       = azurerm_storage_account.example.name
-  storage_uses_managed_identity = true
+  service_plan_id = azurerm_service_plan.example.id
+
+  storage_configuration = {
+    account_name          = azurerm_storage_account.example.name
+    uses_managed_identity = true
+  }
 
   identity = {
     type = "SystemAssigned"
   }
 
-  application_insights_connection_string = azurerm_application_insights.example.connection_string
+  application_configuration = {
+    application_insights_connection_string = azurerm_application_insights.example.connection_string
+  }
 
-  https_only                    = true
-  public_network_access_enabled = false
+  access_configuration = {
+    https_only                    = true
+    public_network_access_enabled = false
+  }
 
-  site_config = {
-    minimum_tls_version         = "1.2"
-    scm_minimum_tls_version     = "1.2"
-    ip_restriction_default_action   = "Deny"
+  site_configuration = {
+    minimum_tls_version               = "1.2"
+    scm_minimum_tls_version           = "1.2"
+    ip_restriction_default_action     = "Deny"
     scm_ip_restriction_default_action = "Deny"
     application_stack = {
       node_version = "20"
@@ -84,7 +91,8 @@ module "linux_function_app" {
     {
       name                       = "diag"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-      areas                      = ["all"]
+      log_category_groups        = ["allLogs"]
+      metric_categories          = ["AllMetrics"]
     }
   ]
 

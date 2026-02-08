@@ -49,24 +49,27 @@ module "linux_function_app" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  service_plan_id            = azurerm_service_plan.example.id
-  storage_account_name       = azurerm_storage_account.example.name
-  storage_account_access_key = azurerm_storage_account.example.primary_access_key
+  service_plan_id = azurerm_service_plan.example.id
 
-  application_insights_connection_string = azurerm_application_insights.example.connection_string
-
-  app_settings = {
-    FUNCTIONS_WORKER_RUNTIME = "node"
-    WEBSITE_RUN_FROM_PACKAGE = "1"
+  storage_configuration = {
+    account_name       = azurerm_storage_account.example.name
+    account_access_key = azurerm_storage_account.example.primary_access_key
   }
 
-  connection_strings = [
-    {
-      name  = "example-db"
-      type  = "SQLAzure"
-      value = "Server=tcp:example.database.windows.net,1433;Database=example;User ID=example;Password=example;"
+  application_configuration = {
+    application_insights_connection_string = azurerm_application_insights.example.connection_string
+    app_settings = {
+      FUNCTIONS_WORKER_RUNTIME = "node"
+      WEBSITE_RUN_FROM_PACKAGE = "1"
     }
-  ]
+    connection_strings = [
+      {
+        name  = "example-db"
+        type  = "SQLAzure"
+        value = "Server=tcp:example.database.windows.net,1433;Database=example;User ID=example;Password=example;"
+      }
+    ]
+  }
 
   auth_settings = {
     enabled                       = true
@@ -78,14 +81,14 @@ module "linux_function_app" {
     }
   }
 
-  site_config = {
-    always_on                       = true
-    ftps_state                      = "FtpsOnly"
-    http2_enabled                   = true
-    minimum_tls_version             = "1.2"
-    scm_minimum_tls_version         = "1.2"
-    health_check_path               = "/api/health"
-    ip_restriction_default_action   = "Allow"
+  site_configuration = {
+    always_on                     = true
+    ftps_state                    = "FtpsOnly"
+    http2_enabled                 = true
+    minimum_tls_version           = "1.2"
+    scm_minimum_tls_version       = "1.2"
+    health_check_path             = "/api/health"
+    ip_restriction_default_action = "Allow"
     application_stack = {
       node_version = "20"
     }
@@ -106,7 +109,8 @@ module "linux_function_app" {
     {
       name                       = "diag"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-      areas                      = ["all"]
+      log_category_groups        = ["allLogs"]
+      metric_categories          = ["AllMetrics"]
     }
   ]
 

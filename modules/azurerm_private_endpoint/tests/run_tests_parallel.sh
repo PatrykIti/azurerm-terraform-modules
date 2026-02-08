@@ -18,7 +18,7 @@ run_test() {
     echo "[$(date +%H:%M:%S)] Starting test: $test_name"
     
     local start_time=$(date +%s)
-    go test -v -timeout 60m -run "^${test_name}$" . 2>&1 > "$log_file"
+    go test -v -timeout 60m -run "^${test_name}$" . > "$log_file" 2>&1
     local exit_status=$?
     local end_time=$(date +%s)
     local duration=$((end_time - start_time))

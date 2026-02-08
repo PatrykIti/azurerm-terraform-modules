@@ -49,7 +49,7 @@ Create `import.tf` with the import block:
 
 ```hcl
 import {
-  to = module.private_dns_zone.azurerm_private_dns_zone.main
+  to = module.private_dns_zone.azurerm_private_dns_zone.private_dns_zone
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Network/privateDnsZones/<zone>"
 }
 ```

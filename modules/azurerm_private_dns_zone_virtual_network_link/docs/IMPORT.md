@@ -51,7 +51,7 @@ Create `import.tf` with the import block:
 
 ```hcl
 import {
-  to = module.private_dns_zone_virtual_network_link.azurerm_private_dns_zone_virtual_network_link.main
+  to = module.private_dns_zone_virtual_network_link.azurerm_private_dns_zone_virtual_network_link.private_dns_zone_virtual_network_link
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Network/privateDnsZones/<zone>/virtualNetworkLinks/<link>"
 }
 ```

@@ -51,7 +51,7 @@ run "valid_name" {
   }
 
   assert {
-    condition     = azurerm_private_endpoint.main.name == "pe-prod-westeu-001"
+    condition     = azurerm_private_endpoint.private_endpoint.name == "pe-prod-westeu-001"
     error_message = "Private Endpoint name should match the input."
   }
 }
@@ -64,7 +64,7 @@ run "valid_name_with_underscores" {
   }
 
   assert {
-    condition     = azurerm_private_endpoint.main.name == "pe_prod_westeu_001"
+    condition     = azurerm_private_endpoint.private_endpoint.name == "pe_prod_westeu_001"
     error_message = "Private Endpoint name with underscores should be valid."
   }
 }

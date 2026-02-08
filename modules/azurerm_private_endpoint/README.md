@@ -71,7 +71,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_private_endpoint.main](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_endpoint) | resource |
+| [azurerm_private_endpoint.private_endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_endpoint) | resource |
 
 ## Inputs
 
@@ -82,7 +82,7 @@ No modules.
 | <a name="input_location"></a> [location](#input\_location) | The Azure region where the Private Endpoint should exist. Changing this forces a new resource to be created. | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | The name of the Private Endpoint. Changing this forces a new resource to be created. | `string` | n/a | yes |
 | <a name="input_private_dns_zone_groups"></a> [private\_dns\_zone\_groups](#input\_private\_dns\_zone\_groups) | Optional private DNS zone group configuration for the Private Endpoint.<br/><br/>The provider schema allows at most one group. | <pre>list(object({<br/>    name                 = string<br/>    private_dns_zone_ids = list(string)<br/>  }))</pre> | `[]` | no |
-| <a name="input_private_service_connections"></a> [private\_service\_connections](#input\_private\_service\_connections) | The private service connection configuration for the Private Endpoint.<br/><br/>Exactly one connection is supported by the provider schema. | <pre>list(object({<br/>    name                            = string<br/>    is_manual_connection            = bool<br/>    private_connection_resource_id  = optional(string)<br/>    private_connection_resource_alias = optional(string)<br/>    subresource_names               = optional(list(string))<br/>    request_message                 = optional(string)<br/>  }))</pre> | n/a | yes |
+| <a name="input_private_service_connections"></a> [private\_service\_connections](#input\_private\_service\_connections) | The private service connection configuration for the Private Endpoint.<br/><br/>Exactly one connection is supported by the provider schema. | <pre>list(object({<br/>    name                              = string<br/>    is_manual_connection              = bool<br/>    private_connection_resource_id    = optional(string)<br/>    private_connection_resource_alias = optional(string)<br/>    subresource_names                 = optional(list(string))<br/>    request_message                   = optional(string)<br/>  }))</pre> | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group in which to create the Private Endpoint. Changing this forces a new resource to be created. | `string` | n/a | yes |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | The ID of the subnet from which Private IP Addresses will be allocated for this Private Endpoint. Changing this forces a new resource to be created. | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resource. | `map(string)` | `{}` | no |

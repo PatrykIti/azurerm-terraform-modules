@@ -172,5 +172,9 @@ module "bastion_host" {
   session_recording_enabled = false
   kerberos_enabled          = false
 
+  timeouts = {
+    delete = "90m"
+  }
+
   tags = var.tags
 }

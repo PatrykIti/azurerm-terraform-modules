@@ -3,13 +3,6 @@
 mock_provider "azurerm" {
   mock_resource "azurerm_linux_function_app" {}
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types = ["FunctionAppLogs"]
-      metrics            = ["AllMetrics"]
-    }
-  }
 }
 
 variables {
@@ -17,9 +10,11 @@ variables {
   resource_group_name = "test-rg"
   location            = "northeurope"
   service_plan_id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Web/serverFarms/plan"
-  storage_account_name        = "stunit001"
-  storage_account_access_key  = "fakekey"
-  site_config = {
+  storage_configuration = {
+    account_name       = "stunit001"
+    account_access_key = "fakekey"
+  }
+  site_configuration = {
     application_stack = {
       node_version = "20"
     }

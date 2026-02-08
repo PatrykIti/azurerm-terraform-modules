@@ -31,7 +31,7 @@ output "identity" {
 output "extensions" {
   description = "VM extensions created by the module."
   value = {
-    for name, extension in azurerm_virtual_machine_extension.virtual_machine_extensions : name => {
+    for name, extension in azurerm_virtual_machine_extension.virtual_machine_extension : name => {
       id   = extension.id
       name = extension.name
     }
@@ -39,6 +39,6 @@ output "extensions" {
 }
 
 output "diagnostic_settings_skipped" {
-  description = "Diagnostic settings entries skipped because no log or metric categories were supplied."
-  value       = local.diagnostic_settings_skipped
+  description = "Deprecated compatibility output. Diagnostic settings require explicit categories, so no entries are skipped."
+  value       = []
 }

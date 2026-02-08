@@ -1,8 +1,26 @@
 package test
 
-import "testing"
+import (
+	"os"
+	"path/filepath"
+	"testing"
+)
 
-// Integration coverage is exercised by the basic/complete fixtures.
+// Integration coverage runs through the main Terratest suites that deploy real fixtures.
 func TestPrivateDnsZoneIntegration(t *testing.T) {
-	t.Skip("Integration scenarios are covered by basic/complete Terratest fixtures.")
+	t.Parallel()
+
+	requiredFixtures := []string{
+		filepath.Join("fixtures", "basic", "main.tf"),
+		filepath.Join("fixtures", "complete", "main.tf"),
+		filepath.Join("fixtures", "secure", "main.tf"),
+	}
+
+	for _, fixture := range requiredFixtures {
+		if _, err := os.Stat(fixture); err != nil {
+			t.Fatalf("expected integration fixture %q to exist: %v", fixture, err)
+		}
+	}
+
+	t.Log("Integration coverage is executed by TestBasicPrivateDnsZone, TestCompletePrivateDnsZone, and TestSecurePrivateDnsZone.")
 }

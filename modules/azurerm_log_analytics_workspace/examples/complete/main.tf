@@ -42,7 +42,7 @@ module "log_analytics_workspace" {
     local_authentication_enabled = true
   }
 
-  monitoring = [
+  diagnostic_settings = [
     {
       name               = "diag"
       metric_categories  = ["AllMetrics"]

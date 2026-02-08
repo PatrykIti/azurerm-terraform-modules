@@ -6,7 +6,7 @@ and centralized diagnostics.
 
 ## Features
 
-- `public_network_access_enabled = false`
+- `access_configuration.public_network_access_enabled = false`
 - TLS 1.2 for app and SCM endpoints
 - Managed identity for storage access
 - Diagnostic settings to Log Analytics

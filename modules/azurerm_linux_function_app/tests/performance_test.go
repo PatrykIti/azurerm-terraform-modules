@@ -16,7 +16,7 @@ func BenchmarkLinuxFunctionAppCreationSimple(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		// Override the random_suffix for benchmarking
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -34,38 +34,26 @@ func BenchmarkLinuxFunctionAppCreationSimple(b *testing.B) {
 	}
 }
 
-// BenchmarkLinuxFunctionAppCreationWithFeatures benchmarks linux_function_app with various features
+// BenchmarkLinuxFunctionAppCreationWithFeatures benchmarks linux_function_app using richer fixtures.
 func BenchmarkLinuxFunctionAppCreationWithFeatures(b *testing.B) {
 	b.ReportAllocs()
 
-	// Define different feature configurations to benchmark
+	// Use fixture variants instead of injecting undeclared placeholder variables.
 	featureConfigs := []struct {
-		name   string
-		config map[string]interface{}
+		name    string
+		fixture string
 	}{
 		{
-			name:   "Basic",
-			config: map[string]interface{}{},
+			name:    "Basic",
+			fixture: "tests/fixtures/basic",
 		},
 		{
-			name: "WithSecurity",
-			config: map[string]interface{}{
-				"enable_advanced_security": true,
-			},
+			name:    "Complete",
+			fixture: "tests/fixtures/complete",
 		},
 		{
-			name: "WithMonitoring",
-			config: map[string]interface{}{
-				"enable_monitoring": true,
-			},
-		},
-		{
-			name: "Complete",
-			config: map[string]interface{}{
-				"enable_advanced_security": true,
-				"enable_monitoring":        true,
-				"enable_backup":            true,
-			},
+			name:    "Secure",
+			fixture: "tests/fixtures/secure",
 		},
 	}
 
@@ -73,14 +61,9 @@ func BenchmarkLinuxFunctionAppCreationWithFeatures(b *testing.B) {
 		b.Run(fc.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", fc.fixture)
 				terraformOptions := getTerraformOptions(b, testFolder)
 
-				// Apply feature configuration
-				for k, v := range fc.config {
-					terraformOptions.Vars[k] = v
-				}
-				
 				// Override the random_suffix for benchmarking
 				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 				b.StartTimer()
@@ -110,16 +93,12 @@ func BenchmarkLinuxFunctionAppCreationWithScale(b *testing.B) {
 		b.Run(fmt.Sprintf("Scale_%d", count), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				b.StopTimer()
-				testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
-				// Configure scale parameters based on resource type
-				// This is a placeholder - adjust based on actual resource scaling capabilities
-				terraformOptions.Vars["instance_count"] = count
-				
-				// Override the random_suffix for benchmarking
-				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
-				b.StartTimer()
+					// Override the random_suffix for benchmarking
+					terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
+					b.StartTimer()
 
 				start := time.Now()
 				terraform.InitAndApply(b, terraformOptions)
@@ -146,7 +125,7 @@ func BenchmarkLinuxFunctionAppParallelCreation(b *testing.B) {
 			b.RunParallel(func(pb *testing.PB) {
 				i := 0
 				for pb.Next() {
-					testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+					testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 					terraformOptions := getTerraformOptions(b, testFolder)
 					// Override the random_suffix for parallel testing
 					terraformOptions.Vars["random_suffix"] = fmt.Sprintf("par%d%d%s", parallel, i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -172,7 +151,7 @@ func TestLinuxFunctionAppCreationTime(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -201,7 +180,7 @@ func TestLinuxFunctionAppScaling(t *testing.T) {
 
 	// Create multiple instances sequentially
 	for i := 0; i < instanceCount; i++ {
-		testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(t, testFolder)
 		// Override the random_suffix for each iteration
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("scale%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
@@ -238,7 +217,7 @@ func TestLinuxFunctionAppUpdatePerformance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
@@ -246,45 +225,23 @@ func TestLinuxFunctionAppUpdatePerformance(t *testing.T) {
 	// Initial deployment
 	terraform.InitAndApply(t, terraformOptions)
 
-	// Measure update times for different changes
-	updateScenarios := []struct {
-		name   string
-		update map[string]interface{}
-	}{
-		{
-			name: "UpdateTags",
-			update: map[string]interface{}{
-				"tags": map[string]interface{}{
-					"Environment": "Test",
-					"Updated":     "true",
-				},
-			},
-		},
-		{
-			name: "UpdateConfiguration",
-			update: map[string]interface{}{
-				"enable_monitoring": true,
-			},
-		},
-		// Add more update scenarios specific to linux_function_app
+	// Measure re-apply time for idempotent updates.
+	updateScenarios := []string{
+		"NoOpApply",
 	}
 
-	for _, scenario := range updateScenarios {
-		t.Run(scenario.name, func(t *testing.T) {
-			// Apply update
-			for k, v := range scenario.update {
-				terraformOptions.Vars[k] = v
-			}
+	for _, scenarioName := range updateScenarios {
+		t.Run(scenarioName, func(t *testing.T) {
 
 			start := time.Now()
 			terraform.Apply(t, terraformOptions)
 			updateTime := time.Since(start)
 
-			t.Logf("%s completed in %v", scenario.name, updateTime)
+			t.Logf("%s completed in %v", scenarioName, updateTime)
 
 			// Updates should complete within 2 minutes
 			require.LessOrEqual(t, updateTime, 2*time.Minute,
-				"%s took %v, expected less than 2 minutes", scenario.name, updateTime)
+				"%s took %v, expected less than 2 minutes", scenarioName, updateTime)
 		})
 	}
 }
@@ -296,7 +253,7 @@ func TestLinuxFunctionAppDestroyPerformance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	// Create resource

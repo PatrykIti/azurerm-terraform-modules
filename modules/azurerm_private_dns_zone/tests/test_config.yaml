@@ -1,133 +1,64 @@
-# Test configuration for CI/CD integration
+module:
+  name: azurerm_private_dns_zone
+  path: modules/azurerm_private_dns_zone
+
+baseline_versions:
+  terraform: ">= 1.12.2"
+  azurerm_provider: "4.57.0"
+  go: "1.21"
+
+environment:
+  credential_sets:
+    - name: arm
+      vars:
+        - ARM_SUBSCRIPTION_ID
+        - ARM_TENANT_ID
+        - ARM_CLIENT_ID
+        - ARM_CLIENT_SECRET
+    - name: azure
+      vars:
+        - AZURE_SUBSCRIPTION_ID
+        - AZURE_TENANT_ID
+        - AZURE_CLIENT_ID
+        - AZURE_CLIENT_SECRET
+  optional_vars:
+    - ARM_LOCATION
+
+test_fixtures:
+  active:
+    - fixtures/basic
+    - fixtures/complete
+    - fixtures/secure
+    - fixtures/negative
+
+# Real tests currently implemented in this module.
 test_suites:
-  - name: "Basic Tests"
+  - name: compile-check
+    command: "go test ./... -run '^$'"
+    requires_azure_credentials: false
+
+  - name: terratest-functional
     tests:
       - TestBasicPrivateDnsZone
-    parallel: true
-    timeout: 15m
-
-  - name: "Complete Feature Tests"
-    tests:
       - TestCompletePrivateDnsZone
       - TestSecurePrivateDnsZone
-    parallel: true
-    timeout: 30m
-
-  - name: "Validation Tests"
-    tests:
       - TestPrivateDnsZoneValidationRules
-    parallel: true
-    timeout: 10m
-
-  - name: "Performance Tests"
-    tests:
-      - BenchmarkPrivateDnsZoneCreation
-    parallel: false
+      - TestPrivateDnsZoneIntegration
     timeout: 60m
-    benchmark: true
+    parallel: true
+    requires_azure_credentials: true
 
-# Test environment requirements
-environment:
-  required_vars:
-    - AZURE_SUBSCRIPTION_ID
-    - AZURE_TENANT_ID
-    - AZURE_CLIENT_ID
-    - AZURE_CLIENT_SECRET
+  - name: terraform-unit
+    command: "terraform test -test-directory=tests/unit"
+    requires_azure_credentials: false
 
-  azure_regions:
-    - northeurope
-    - westeurope
-
-  resource_limits:
-    max_concurrent_resources: 10
-    max_resource_groups: 5
-
-# Code coverage settings
-coverage:
-  enabled: true
-  threshold: 80
-  exclude_patterns:
-    - "test_helpers.go"
-    - "*_test.go"
-
-# Test report settings
-reporting:
-  format: junit
-  output_dir: test_outputs/
-  include_logs: true
-  include_metrics: true
-
-# Retry configuration
-retry:
-  max_attempts: 3
-  backoff_seconds: 30
-  retryable_errors:
-    - "ResourceGroupNotFound"
-    - "ResourceNotFound"
-    - "AlreadyExists"
-    - "timeout"
-    - "TooManyRequests"
-    - "ServiceUnavailable"
-    - "InternalServerError"
-
-# Test stages for CI/CD pipelines
-stages:
-  - name: "validation"
-    description: "Validate code and configurations"
-    steps:
-      - "fmt-check"
-      - "lint"
-      - "validate-fixtures"
-      - "security"
-
-  - name: "unit"
-    description: "Run unit and validation tests"
-    test_suites:
-      - "Basic Tests"
-      - "Validation Tests"
-    fail_fast: true
-
-  - name: "integration"
-    description: "Run integration tests"
-    test_suites:
-      - "Complete Feature Tests"
-    fail_fast: false
-
-  - name: "performance"
-    description: "Run performance benchmarks"
-    test_suites:
-      - "Performance Tests"
-    condition: "branch == 'main' || tag"
-
-# Matrix testing configuration
-matrix:
-  azure_regions:
-    - northeurope
-    - westeurope
-    - eastus
-    - westus2
-
-  terraform_versions:
-    - "1.5.x"
-    - "1.6.x"
-    - "1.7.x"
-
-  go_versions:
-    - "1.20"
-    - "1.21"
-
-# Notifications
-notifications:
-  slack:
-    enabled: false
-    webhook_url: "${SLACK_WEBHOOK_URL}"
-    channels:
-      success: "#ci-success"
-      failure: "#ci-failures"
-
-  email:
-    enabled: false
-    recipients:
-      - "team@example.com"
-    on_failure: true
-    on_success: false
+  - name: performance-opt-in
+    tests:
+      - TestPrivateDnsZoneCreationTime
+      - TestPrivateDnsZoneScaling
+      - TestPrivateDnsZoneUpdatePerformance
+      - TestPrivateDnsZoneDestroyPerformance
+    timeout: 60m
+    parallel: false
+    enabled_by_default: false
+    requires_azure_credentials: true

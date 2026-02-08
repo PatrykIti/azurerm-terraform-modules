@@ -1,7 +1,12 @@
 locals {
-  patch_mode            = var.patching.patch_mode
-  patch_assessment_mode = var.patching.patch_assessment_mode
-  reboot_setting        = var.patching.reboot_setting
+  network_interface_ids_effective = var.network.primary_network_interface_id == null ? var.network.network_interface_ids : concat(
+    [var.network.primary_network_interface_id],
+    [for id in var.network.network_interface_ids : id if id != var.network.primary_network_interface_id]
+  )
+
+  data_disks_by_name = {
+    for disk in var.data_disks : disk.name => disk
+  }
 }
 
 resource "azurerm_linux_virtual_machine" "linux_virtual_machine" {
@@ -10,20 +15,19 @@ resource "azurerm_linux_virtual_machine" "linux_virtual_machine" {
   location            = var.location
   size                = var.size
 
-  admin_username                  = var.admin_username
-  disable_password_authentication = var.disable_password_authentication
-  admin_password                  = var.disable_password_authentication ? null : var.admin_password
+  admin_username                  = var.admin.username
+  disable_password_authentication = var.admin.disable_password_authentication
+  admin_password                  = var.admin.disable_password_authentication ? null : var.admin.password
 
-  network_interface_ids        = var.network_interface_ids
-  primary_network_interface_id = var.primary_network_interface_id
-  computer_name                = var.computer_name
-  custom_data                  = var.custom_data
-  user_data                    = var.user_data
+  network_interface_ids = local.network_interface_ids_effective
+  computer_name         = var.runtime.computer_name
+  custom_data           = var.runtime.custom_data
+  user_data             = var.runtime.user_data
 
-  source_image_id = var.source_image_id
+  source_image_id = var.image.source_image_id
 
   dynamic "source_image_reference" {
-    for_each = var.source_image_reference != null ? [var.source_image_reference] : []
+    for_each = var.image.source_image_reference != null ? [var.image.source_image_reference] : []
     content {
       publisher = source_image_reference.value.publisher
       offer     = source_image_reference.value.offer
@@ -33,7 +37,7 @@ resource "azurerm_linux_virtual_machine" "linux_virtual_machine" {
   }
 
   dynamic "plan" {
-    for_each = var.plan != null ? [var.plan] : []
+    for_each = var.image.plan != null ? [var.image.plan] : []
     content {
       publisher = plan.value.publisher
       product   = plan.value.product
@@ -42,7 +46,7 @@ resource "azurerm_linux_virtual_machine" "linux_virtual_machine" {
   }
 
   dynamic "admin_ssh_key" {
-    for_each = var.admin_ssh_keys
+    for_each = var.admin.ssh_keys
     content {
       username   = admin_ssh_key.value.username
       public_key = admin_ssh_key.value.public_key
@@ -66,22 +70,6 @@ resource "azurerm_linux_virtual_machine" "linux_virtual_machine" {
     }
   }
 
-  dynamic "data_disk" {
-    for_each = var.data_disks
-    content {
-      name                           = data_disk.value.name
-      lun                            = data_disk.value.lun
-      caching                        = data_disk.value.caching
-      disk_size_gb                   = data_disk.value.disk_size_gb
-      storage_account_type           = data_disk.value.storage_account_type
-      create_option                  = data_disk.value.create_option
-      write_accelerator_enabled      = data_disk.value.write_accelerator_enabled
-      disk_encryption_set_id         = data_disk.value.disk_encryption_set_id
-      ultra_ssd_disk_iops_read_write = data_disk.value.ultra_ssd_disk_iops_read_write
-      ultra_ssd_disk_mbps_read_write = data_disk.value.ultra_ssd_disk_mbps_read_write
-    }
-  }
-
   dynamic "boot_diagnostics" {
     for_each = var.boot_diagnostics != null && var.boot_diagnostics.enabled ? [var.boot_diagnostics] : []
     content {
@@ -97,14 +85,14 @@ resource "azurerm_linux_virtual_machine" "linux_virtual_machine" {
     }
   }
 
-  availability_set_id           = var.availability_set_id
-  zone                          = var.zone
-  proximity_placement_group_id  = var.proximity_placement_group_id
-  dedicated_host_id             = var.dedicated_host_id
-  dedicated_host_group_id       = var.dedicated_host_group_id
-  capacity_reservation_group_id = var.capacity_reservation_group_id
-  platform_fault_domain         = var.platform_fault_domain
-  virtual_machine_scale_set_id  = var.virtual_machine_scale_set_id
+  availability_set_id           = var.placement.availability_set_id
+  zone                          = var.placement.zone
+  proximity_placement_group_id  = var.placement.proximity_placement_group_id
+  dedicated_host_id             = var.placement.dedicated_host_id
+  dedicated_host_group_id       = var.placement.dedicated_host_group_id
+  capacity_reservation_group_id = var.placement.capacity_reservation_group_id
+  platform_fault_domain         = var.placement.platform_fault_domain
+  virtual_machine_scale_set_id  = var.placement.virtual_machine_scale_set_id
 
   secure_boot_enabled        = try(var.security_profile.secure_boot_enabled, null)
   vtpm_enabled               = try(var.security_profile.vtpm_enabled, null)
@@ -125,12 +113,12 @@ resource "azurerm_linux_virtual_machine" "linux_virtual_machine" {
   provision_vm_agent         = var.vm_agent.provision_vm_agent
   allow_extension_operations = var.vm_agent.allow_extension_operations
   extensions_time_budget     = var.vm_agent.extensions_time_budget
-  patch_mode                 = local.patch_mode
-  patch_assessment_mode      = local.patch_assessment_mode
-  reboot_setting             = local.reboot_setting
+  patch_mode                 = var.patching.patch_mode
+  patch_assessment_mode      = var.patching.patch_assessment_mode
+  reboot_setting             = var.patching.reboot_setting
 
   dynamic "gallery_application" {
-    for_each = var.gallery_applications
+    for_each = var.runtime.gallery_applications
     content {
       version_id                = gallery_application.value.version_id
       automatic_upgrade_enabled = gallery_application.value.automatic_upgrade_enabled
@@ -139,7 +127,7 @@ resource "azurerm_linux_virtual_machine" "linux_virtual_machine" {
   }
 
   dynamic "secret" {
-    for_each = var.secrets
+    for_each = var.runtime.secrets
     content {
       key_vault_id = secret.value.key_vault_id
 
@@ -163,66 +151,33 @@ resource "azurerm_linux_virtual_machine" "linux_virtual_machine" {
   }
 
   tags = var.tags
+}
 
-  lifecycle {
-    precondition {
-      condition     = var.disable_password_authentication ? length(var.admin_ssh_keys) > 0 : (var.admin_password != null && var.admin_password != "")
-      error_message = "When disable_password_authentication is true, at least one admin_ssh_key is required. When false, admin_password must be provided."
-    }
+resource "azurerm_managed_disk" "managed_disk" {
+  for_each = local.data_disks_by_name
 
-    precondition {
-      condition     = (var.source_image_reference != null) != (var.source_image_id != null)
-      error_message = "Exactly one of source_image_reference or source_image_id must be set."
-    }
+  name                = each.value.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
 
-    precondition {
-      condition     = var.availability_set_id == null || var.zone == null
-      error_message = "availability_set_id cannot be combined with zone."
-    }
+  storage_account_type = each.value.storage_account_type
+  create_option        = each.value.create_option
+  disk_size_gb         = each.value.disk_size_gb
 
-    precondition {
-      condition     = var.dedicated_host_id == null || var.dedicated_host_group_id == null
-      error_message = "dedicated_host_id and dedicated_host_group_id are mutually exclusive."
-    }
+  disk_encryption_set_id = each.value.disk_encryption_set_id
+  disk_iops_read_write   = each.value.ultra_ssd_disk_iops_read_write
+  disk_mbps_read_write   = each.value.ultra_ssd_disk_mbps_read_write
 
-    precondition {
-      condition     = var.primary_network_interface_id == null || contains(var.network_interface_ids, var.primary_network_interface_id)
-      error_message = "primary_network_interface_id must be one of network_interface_ids."
-    }
+  tags = var.tags
+}
 
-    precondition {
-      condition     = var.spot.priority != "Spot" || var.spot.eviction_policy != null
-      error_message = "spot.eviction_policy is required when spot.priority is Spot."
-    }
+resource "azurerm_virtual_machine_data_disk_attachment" "virtual_machine_data_disk_attachment" {
+  for_each = local.data_disks_by_name
 
-    precondition {
-      condition     = var.spot.priority == "Spot" || (var.spot.eviction_policy == null && var.spot.max_bid_price == null)
-      error_message = "spot.eviction_policy and max_bid_price can only be set when spot.priority is Spot."
-    }
+  managed_disk_id    = azurerm_managed_disk.managed_disk[each.key].id
+  virtual_machine_id = azurerm_linux_virtual_machine.linux_virtual_machine.id
+  lun                = each.value.lun
+  caching            = each.value.caching
 
-    precondition {
-      condition     = local.patch_mode != "AutomaticByPlatform" || var.vm_agent.provision_vm_agent
-      error_message = "patching.patch_mode = AutomaticByPlatform requires vm_agent.provision_vm_agent = true."
-    }
-
-    precondition {
-      condition     = local.patch_assessment_mode != "AutomaticByPlatform" || var.vm_agent.provision_vm_agent
-      error_message = "patching.patch_assessment_mode = AutomaticByPlatform requires vm_agent.provision_vm_agent = true."
-    }
-
-    precondition {
-      condition     = local.reboot_setting == null || local.patch_mode == "AutomaticByPlatform"
-      error_message = "patching.reboot_setting can only be set when patching.patch_mode is AutomaticByPlatform."
-    }
-
-    precondition {
-      condition     = var.vm_agent.provision_vm_agent || var.vm_agent.allow_extension_operations == false
-      error_message = "allow_extension_operations must be false when provision_vm_agent is false."
-    }
-
-    precondition {
-      condition     = var.os_disk.write_accelerator_enabled == false || (var.os_disk.storage_account_type == "Premium_LRS" && var.os_disk.caching == "None")
-      error_message = "os_disk.write_accelerator_enabled requires storage_account_type = Premium_LRS and caching = None."
-    }
-  }
+  write_accelerator_enabled = each.value.write_accelerator_enabled
 }

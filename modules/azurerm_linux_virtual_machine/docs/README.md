@@ -12,7 +12,7 @@ This module provisions a single Azure Linux Virtual Machine and VM-scoped resour
 
 - Linux VM with configurable OS/data disks, availability/host settings, and security profile
 - Optional VM extensions (Custom Script, AAD login, monitoring agents, etc.)
-- Optional diagnostic settings with category discovery via `azurerm_monitor_diagnostic_categories`
+- Optional diagnostic settings with explicit log categories, log category groups, and metric categories
 
 ## Usage Notes
 

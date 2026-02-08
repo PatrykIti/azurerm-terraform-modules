@@ -33,16 +33,21 @@ module "linux_function_app" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 
-  service_plan_id            = azurerm_service_plan.example.id
-  storage_account_name       = azurerm_storage_account.example.name
-  storage_account_access_key = azurerm_storage_account.example.primary_access_key
+  service_plan_id = azurerm_service_plan.example.id
 
-  app_settings = {
-    FUNCTIONS_WORKER_RUNTIME = "node"
-    AAD_CLIENT_SECRET        = var.aad_client_secret
+  storage_configuration = {
+    account_name       = azurerm_storage_account.example.name
+    account_access_key = azurerm_storage_account.example.primary_access_key
   }
 
-  site_config = {
+  application_configuration = {
+    app_settings = {
+      FUNCTIONS_WORKER_RUNTIME = "node"
+      AAD_CLIENT_SECRET        = var.aad_client_secret
+    }
+  }
+
+  site_configuration = {
     application_stack = {
       node_version = "20"
     }

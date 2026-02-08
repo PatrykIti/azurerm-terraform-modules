@@ -17,10 +17,10 @@ private endpoints, RBAC, networking glue) outside the module.
 
 - **Service plan is required**: Provide a Linux App Service Plan ID via
   `service_plan_id`.
-- **Storage is required**: Provide `storage_account_name` and either
-  `storage_account_access_key` or enable `storage_uses_managed_identity` with
-  a managed identity.
-- **Runtime stack required**: `site_config.application_stack` must specify
+- **Storage is required**: Configure `storage_configuration.account_name` and either
+  `storage_configuration.account_access_key` or set
+  `storage_configuration.uses_managed_identity = true` with a managed identity.
+- **Runtime stack required**: `site_configuration.application_stack` must specify
   exactly one runtime (Docker or a single language runtime).
 - **Authentication**: `auth_settings` and `auth_settings_v2` are mutually
   exclusive for both the primary app and slots.

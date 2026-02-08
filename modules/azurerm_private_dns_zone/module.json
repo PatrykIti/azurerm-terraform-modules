@@ -2,6 +2,6 @@
   "name": "azurerm_private_dns_zone",
   "title": "Private DNS Zone",
   "commit_scope": "private-dns-zone",
-  "tag_prefix": "PDNSZ",
+  "tag_prefix": "PDNSZv",
   "description": "Manages Azure Private DNS Zones"
 }

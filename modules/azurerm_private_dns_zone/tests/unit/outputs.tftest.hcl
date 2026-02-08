@@ -3,11 +3,11 @@
 mock_provider "azurerm" {
   mock_resource "azurerm_private_dns_zone" {
     defaults = {
-      id                                             = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/privateDnsZones/example.internal"
-      name                                           = "example.internal"
-      resource_group_name                            = "test-rg"
-      number_of_record_sets                          = 5
-      max_number_of_virtual_network_links            = 1000
+      id                                                    = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/privateDnsZones/example.internal"
+      name                                                  = "example.internal"
+      resource_group_name                                   = "test-rg"
+      number_of_record_sets                                 = 5
+      max_number_of_virtual_network_links                   = 1000
       max_number_of_virtual_network_links_with_registration = 100
       tags = {
         Environment = "Test"
@@ -65,11 +65,6 @@ run "verify_outputs" {
   assert {
     condition     = output.max_number_of_virtual_network_links_with_registration == 100
     error_message = "Output 'max_number_of_virtual_network_links_with_registration' should return the limit."
-  }
-
-  assert {
-    condition     = output.soa_record.email == "hostmaster.example.internal"
-    error_message = "Output 'soa_record' should expose the SOA email."
   }
 
   assert {

@@ -63,7 +63,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_private_dns_zone_virtual_network_link.main](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.private_dns_zone_virtual_network_link](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/private_dns_zone_virtual_network_link) | resource |
 
 ## Inputs
 
@@ -72,7 +72,7 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | The name of the Private DNS Zone Virtual Network Link. | `string` | n/a | yes |
 | <a name="input_private_dns_zone_name"></a> [private\_dns\_zone\_name](#input\_private\_dns\_zone\_name) | The name of the Private DNS Zone (without a trailing dot). | `string` | n/a | yes |
 | <a name="input_registration_enabled"></a> [registration\_enabled](#input\_registration\_enabled) | Whether auto-registration of virtual machine records in the linked virtual network is enabled. | `bool` | `false` | no |
-| <a name="input_resolution_policy"></a> [resolution\_policy](#input\_resolution\_policy) | Optional DNS resolution policy for the link. Accepted values are Default or Recursive. | `string` | `null` | no |
+| <a name="input_resolution_policy"></a> [resolution\_policy](#input\_resolution\_policy) | Optional DNS resolution policy for the link. Accepted values are Default or NxDomainRedirect. | `string` | `null` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group containing the Private DNS Zone. | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resource. | `map(string)` | `{}` | no |
 | <a name="input_timeouts"></a> [timeouts](#input\_timeouts) | Timeout configuration for creating, reading, updating, and deleting the Virtual Network Link. | <pre>object({<br/>    create = optional(string)<br/>    read   = optional(string)<br/>    update = optional(string)<br/>    delete = optional(string)<br/>  })</pre> | `null` | no |

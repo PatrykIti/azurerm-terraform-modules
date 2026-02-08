@@ -117,7 +117,7 @@ module "private_endpoint" {
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| PEv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
+| PEv1.x | >= 1.12.2 | 4.57.0 (pinned) | Provider-managed |
 
 **Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
 
@@ -126,7 +126,7 @@ module "private_endpoint" {
 ### Direct from GitHub (Recommended)
 ```hcl
 module "private_endpoint" {
-  source = "github.com/yourusername/azurerm-terraform-modules//modules/azurerm_private_endpoint?ref=PEv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_private_endpoint?ref=PEv1.0.0"
   
   # Module configuration
   # ...

@@ -9,9 +9,9 @@ Networking (VNet/subnet/NSG/public IP), RBAC, Key Vault, and backup are **out of
 ## Security Features in This Module
 
 ### Authentication
-- **disable_password_authentication** defaults to `true` (SSH keys only).
-- **admin_ssh_keys** supports multiple SSH public keys.
-- **admin_password** is supported when password auth is required.
+- **admin.disable_password_authentication** defaults to `true` (SSH keys only).
+- **admin.ssh_keys** supports multiple SSH public keys.
+- **admin.password** is supported when password auth is required.
 
 ### VM Security Profile
 - **security_profile.secure_boot_enabled** and **security_profile.vtpm_enabled** enable Trusted Launch capabilities.
@@ -26,7 +26,7 @@ Networking (VNet/subnet/NSG/public IP), RBAC, Key Vault, and backup are **out of
 
 ### Diagnostic Settings
 - **diagnostic_settings** forwards logs/metrics to Log Analytics, Storage, or Event Hub.
-- Use explicit categories or `areas` to control log volume and exposure.
+- Use explicit categories (`log_categories`, `log_category_groups`, `metric_categories`) to control log volume and exposure.
 
 ## Example: Security-Focused Configuration
 
@@ -39,22 +39,28 @@ module "linux_virtual_machine" {
   location            = azurerm_resource_group.main.location
   size                = "Standard_B2s"
 
-  network_interface_ids = [azurerm_network_interface.private.id]
+  network = {
+    network_interface_ids = [azurerm_network_interface.private.id]
+  }
 
-  admin_username                  = "azureuser"
-  disable_password_authentication = true
-  admin_ssh_keys = [
-    {
-      username   = "azureuser"
-      public_key = file("~/.ssh/id_rsa.pub")
+  admin = {
+    username                        = "azureuser"
+    disable_password_authentication = true
+    ssh_keys = [
+      {
+        username   = "azureuser"
+        public_key = file("~/.ssh/id_rsa.pub")
+      }
+    ]
+  }
+
+  image = {
+    source_image_reference = {
+      publisher = "Canonical"
+      offer     = "0001-com-ubuntu-server-jammy"
+      sku       = "22_04-lts-gen2"
+      version   = "latest"
     }
-  ]
-
-  source_image_reference = {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts-gen2"
-    version   = "latest"
   }
 
   os_disk = {
@@ -81,14 +87,14 @@ module "linux_virtual_machine" {
 - [ ] Enable secure boot and vTPM when supported by the image/region.
 - [ ] Use managed identities instead of credentials where possible.
 - [ ] Configure diagnostic settings with explicit categories.
-- [ ] Treat custom_data/user_data as sensitive; avoid secrets in cleartext.
+- [ ] Treat runtime.custom_data/runtime.user_data as sensitive; avoid secrets in cleartext.
 - [ ] Review boot diagnostics storage access and retention.
 
 ## Common Mistakes to Avoid
 
 1. **Enabling password authentication without rotation controls**
 2. **Exposing a VM with a public IP and permissive NSG rules**
-3. **Placing secrets in cloud-init custom_data**
+3. **Placing secrets in cloud-init runtime.custom_data**
 4. **Sending diagnostics to unsecured destinations**
 
 ## Additional Resources

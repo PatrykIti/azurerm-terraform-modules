@@ -3,14 +3,14 @@
 mock_provider "azurerm" {
   mock_resource "azurerm_private_dns_zone_virtual_network_link" {
     defaults = {
-      id                  = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/privateDnsZones/example.internal/virtualNetworkLinks/pdns-link"
-      name                = "pdns-link"
-      resource_group_name = "test-rg"
+      id                    = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/privateDnsZones/example.internal/virtualNetworkLinks/pdns-link"
+      name                  = "pdns-link"
+      resource_group_name   = "test-rg"
       private_dns_zone_name = "example.internal"
-      virtual_network_id  = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/vnet-test"
-      registration_enabled = false
-      resolution_policy    = "Default"
-      tags                 = {}
+      virtual_network_id    = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/vnet-test"
+      registration_enabled  = false
+      resolution_policy     = "Default"
+      tags                  = {}
     }
   }
 }

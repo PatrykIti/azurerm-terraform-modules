@@ -1,165 +1,75 @@
 # Private DNS Zone Module Tests
 
-This directory contains automated tests for the Private DNS Zone Terraform module using [Terratest](https://terratest.gruntwork.io/).
+This directory contains test automation for `modules/azurerm_private_dns_zone`.
 
-## Prerequisites
+## Test Layers
 
-1. **Go**: Version 1.21 or later
-2. **Terraform**: Version 1.3.0 or later
-3. **Azure CLI**: Authenticated with appropriate permissions
-4. **Azure Service Principal**: With Contributor access to the test subscription
+1. `terraform test` unit checks in `tests/unit/*.tftest.hcl` using mocked providers (no Azure deployment).
+2. Terratest integration/lifecycle checks in Go (`*_test.go`) against Azure fixtures.
 
-## Environment Variables
+## Baseline Versions
 
-Set the following environment variables before running tests:
+- Terraform: `>= 1.12.2`
+- AzureRM provider: `4.57.0` (pinned)
+- Go: `1.21`
 
-```bash
-export ARM_SUBSCRIPTION_ID="your-subscription-id"
-export ARM_TENANT_ID="your-tenant-id"
-export ARM_CLIENT_ID="your-client-id"
-export ARM_CLIENT_SECRET="your-client-secret"
-export ARM_LOCATION="westeurope"  # Optional, defaults to westeurope
-```
+## Fixtures In Scope
 
-## Running Tests
+- `fixtures/basic`
+- `fixtures/complete`
+- `fixtures/secure`
+- `fixtures/negative`
 
-### Install Dependencies
+`fixtures/network` was removed from active inventory because `azurerm_private_dns_zone` does not support `location` or `network_rules` arguments.
 
-```bash
-go mod download
-```
+## Terratest Credentials
 
-### Run All Tests
+Set one credential family before running Terratest:
 
 ```bash
-make test
+export ARM_SUBSCRIPTION_ID="<subscription>"
+export ARM_TENANT_ID="<tenant>"
+export ARM_CLIENT_ID="<client-id>"
+export ARM_CLIENT_SECRET="<client-secret>"
+export ARM_LOCATION="northeurope" # optional
 ```
 
-### Run Short Tests Only
+Equivalent `AZURE_*` variables are also accepted by the test Makefile.
+
+## Commands
+
+Compile-only Go test pass (no tests executed):
 
 ```bash
-make test-quick
+go test ./... -run '^$'
 ```
 
-### Run Integration Tests Only
+Run Terratest functional suite:
 
 ```bash
-make test-integration
+go test -v -timeout 60m -run 'TestBasicPrivateDnsZone|TestCompletePrivateDnsZone|TestSecurePrivateDnsZone|TestPrivateDnsZoneValidationRules|TestPrivateDnsZoneIntegration' ./...
 ```
 
-### Run Specific Test
+Run Terraform unit tests:
 
 ```bash
-make test-single TEST_NAME=TestBasicPrivateDnsZone
+terraform test -test-directory=tests/unit
 ```
 
-## Test Structure
-
-### Test Files
-
-- `private_dns_zone_test.go` - Main module functionality tests
-- `integration_test.go` - Integration test placeholders
-- `performance_test.go` - Performance and load tests
-- `test_helpers.go` - Common test utilities and helpers
-- `test_config.yaml` - Test configuration and scenarios
-
-### Test Fixtures
-
-The `fixtures/` directory contains Terraform configurations for different test scenarios:
-
-- `fixtures/basic/` - Basic module configuration
-- `fixtures/complete/` - Complete feature demonstration
-- `fixtures/secure/` - Security-focused configuration
-- `fixtures/negative/` - Negative test cases
-
-## Test Scenarios
-
-### Basic Tests (`-short` flag)
-
-- Module deployment and destruction
-- Basic functionality validation
-- Output verification
-- Resource naming validation
-
-### Integration Tests
-
-- Integration with other Azure services
-- Network connectivity tests
-- Security compliance validation
-- Disaster recovery scenarios
-- Monitoring and logging validation
-
-### Performance Tests
-
-- Resource creation time
-- Concurrent deployment handling
-- Resource limits testing
-- Cleanup performance
-
-## Test Configuration
-
-Tests are configured via `test_config.yaml`. Key configuration options:
-
-- **Environments**: Different Azure regions and configurations
-- **Scenarios**: Test case definitions and timeouts
-- **Performance**: Load testing parameters
-- **Integration**: Cross-service testing settings
-
-## Debugging Tests
-
-### Verbose Output
+Run performance-focused tests (opt-in):
 
 ```bash
-go test -v -run TestModuleBasic
+go test -v -timeout 60m -run 'TestPrivateDnsZoneCreationTime|TestPrivateDnsZoneScaling|TestPrivateDnsZoneUpdatePerformance|TestPrivateDnsZoneDestroyPerformance' ./...
 ```
 
-### Keep Resources After Test Failure
+## Test Inventory
 
-Set the `SKIP_TEARDOWN` environment variable:
+- `private_dns_zone_test.go`: main Terratest lifecycle and validation coverage.
+- `integration_test.go`: integration coverage statement and fixture-scope guard.
+- `performance_test.go`: performance and scaling checks (not default for fast validation).
+- `unit/*.tftest.hcl`: module input/output/default validation under mocked provider.
 
-```bash
-export SKIP_TEARDOWN=true
-go test -v -run TestModuleBasic
-```
+## Notes
 
-### Debug Terraform
-
-Enable Terraform debug logging:
-
-```bash
-export TF_LOG=DEBUG
-go test -v -run TestModuleBasic
-```
-
-## Continuous Integration
-
-Tests are automatically run in CI/CD pipelines:
-
-- **Pull Requests**: Short tests only
-- **Main Branch**: All tests including integration
-- **Releases**: Full test suite including performance tests
-
-## Contributing
-
-When adding new tests:
-
-1. Follow the existing test structure and naming conventions
-2. Add appropriate fixtures in the `fixtures/` directory
-3. Update `test_config.yaml` if adding new scenarios
-4. Ensure tests are idempotent and clean up resources
-5. Add documentation for any new test scenarios
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Authentication Errors**: Verify Azure credentials and permissions
-2. **Resource Conflicts**: Ensure unique resource naming
-3. **Timeout Issues**: Increase test timeouts for complex scenarios
-4. **Quota Limits**: Check Azure subscription quotas
-
-### Getting Help
-
-- Check the [Terratest documentation](https://terratest.gruntwork.io/)
-- Review Azure provider documentation
-- Check module-specific troubleshooting in the main README
+- `TestPrivateDnsZoneIntegration` does not provision resources itself; it documents and guards that integration coverage is provided by `TestBasicPrivateDnsZone`, `TestCompletePrivateDnsZone`, and `TestSecurePrivateDnsZone`.
+- Keep fixture configuration aligned with the module's supported arguments only.

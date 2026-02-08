@@ -11,8 +11,7 @@ PDNSZv{major}.{minor}.{patch}
 ```
 
 Where:
-- `PDNSZ` = azurerm_private_dns_zone module identifier
-- `v` = version prefix
+- `PDNSZv` = azurerm_private_dns_zone tag prefix (from `module.json`)
 - `{major}.{minor}.{patch}` = semantic version numbers (automatically determined)
 
 ### Examples:
@@ -115,11 +114,11 @@ module "private_dns_zone" {
 
 ## Version Compatibility Matrix
 
-| Module Version | Terraform Version | AzureRM Provider | Azure API Version |
-|----------------|-------------------|------------------|-------------------|
-| PDNSZv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
+| Module Version Range | Terraform Version | AzureRM Provider | Go Test Baseline |
+|----------------------|-------------------|------------------|------------------|
+| PDNSZv1.x | >= 1.12.2 | 4.57.0 (pinned) | 1.21 |
 
-**Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
+**Note**: Terraform and provider versions are pinned/validated in `versions.tf`; test tooling baseline is tracked in `tests/go.mod`.
 
 ## Module Versioning in Usage
 

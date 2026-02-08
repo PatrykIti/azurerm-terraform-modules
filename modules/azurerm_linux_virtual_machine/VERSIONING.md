@@ -117,7 +117,7 @@ module "linux_virtual_machine" {
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| LINUXVMv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
+| LINUXVMv1.0.x | >= 1.12.2 | 4.57.0 (pinned) | TBD |
 
 **Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
 

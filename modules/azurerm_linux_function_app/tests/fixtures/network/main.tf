@@ -34,11 +34,14 @@ module "linux_function_app" {
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
 
-  service_plan_id            = azurerm_service_plan.example.id
-  storage_account_name       = azurerm_storage_account.example.name
-  storage_account_access_key = azurerm_storage_account.example.primary_access_key
+  service_plan_id = azurerm_service_plan.example.id
 
-  site_config = {
+  storage_configuration = {
+    account_name       = azurerm_storage_account.example.name
+    account_access_key = azurerm_storage_account.example.primary_access_key
+  }
+
+  site_configuration = {
     ip_restriction_default_action = "Deny"
     application_stack = {
       node_version = "20"
