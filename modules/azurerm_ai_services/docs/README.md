@@ -9,13 +9,12 @@ from the AzureRM provider.
 
 - `azurerm_ai_services` (AI Services)
 - `azurerm_monitor_diagnostic_setting` (optional; one or more diagnostic settings)
-- `azurerm_monitor_diagnostic_categories` (data source for category discovery)
 
 ## Usage Notes
 
 - `custom_subdomain_name` is required when `network_acls` is provided.
 - `customer_managed_key` requires a user-assigned identity and `identity.identity_ids`.
-- Diagnostic settings support `areas` to map to available log/metric categories.
+- Diagnostic settings use explicit categories validated in `variables.tf`.
 
 ## Out of Scope
 

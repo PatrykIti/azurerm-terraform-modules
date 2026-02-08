@@ -13,14 +13,6 @@ mock_provider "azurerm" {
   }
 
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types  = ["BastionAuditLogs"]
-      log_category_groups = ["allLogs"]
-      metrics             = ["AllMetrics"]
-    }
-  }
 }
 
 variables {
@@ -198,6 +190,23 @@ run "diagnostic_rejects_empty_partner_solution_id" {
         partner_solution_id        = ""
         log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/law"
         log_categories             = ["BastionAuditLogs"]
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings
+  ]
+}
+
+run "diagnostic_requires_categories" {
+  command = plan
+
+  variables {
+    diagnostic_settings = [
+      {
+        name                       = "diag-empty"
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/law"
       }
     ]
   }

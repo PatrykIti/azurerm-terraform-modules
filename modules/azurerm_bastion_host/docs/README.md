@@ -13,7 +13,7 @@ This module provisions a single Azure Bastion Host and optional Azure Monitor di
 
 - Public Bastion SKUs (Basic/Standard/Premium) require an `AzureBastionSubnet` and a Standard, static public IP address.
 - The Developer SKU uses `virtual_network_id` and does not use a public IP or `ip_configuration`.
-- Diagnostic settings support `areas` mapping (`all`, `logs`, `metrics`, `audit`), explicit `log_category_groups`, and partner destinations via `partner_solution_id`.
+- Diagnostic settings use explicit categories/groups and support partner destinations via `partner_solution_id`.
 
 ## Out of Scope
 

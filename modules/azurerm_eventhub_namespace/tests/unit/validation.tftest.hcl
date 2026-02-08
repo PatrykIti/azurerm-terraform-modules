@@ -19,13 +19,6 @@ mock_provider "azurerm" {
   mock_resource "azurerm_eventhub_namespace_disaster_recovery_config" {}
   mock_resource "azurerm_eventhub_namespace_customer_managed_key" {}
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types = ["OperationalLogs"]
-      metrics            = ["AllMetrics"]
-    }
-  }
 }
 
 variables {
@@ -129,5 +122,22 @@ run "network_public_access_mismatch" {
 
   expect_failures = [
     var.network_rule_set
+  ]
+}
+
+run "diagnostic_requires_categories" {
+  command = plan
+
+  variables {
+    diagnostic_settings = [
+      {
+        name                       = "diag-empty"
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/law"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings
   ]
 }

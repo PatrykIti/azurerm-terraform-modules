@@ -196,13 +196,13 @@ variable "diagnostic_settings" {
   description = <<-EOT
     Diagnostic settings for the AI Services Account.
 
-    Provide explicit log_categories and/or metric_categories, or use areas to map to
-    available diagnostic categories. If neither is provided, areas defaults to ["all"].
+    Supported categories for azurerm 4.57.0:
+    - log_categories: Audit
+    - metric_categories: AllMetrics
   EOT
 
   type = list(object({
     name                           = string
-    areas                          = optional(list(string))
     log_categories                 = optional(list(string))
     metric_categories              = optional(list(string))
     log_analytics_workspace_id     = optional(string)
@@ -253,10 +253,33 @@ variable "diagnostic_settings" {
     condition = alltrue([
       for ds in var.diagnostic_settings :
       alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
-      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""]) &&
-      alltrue([for c in(ds.areas == null ? [] : ds.areas) : c != ""])
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""])
     ])
-    error_message = "log_categories, metric_categories, and areas must not contain empty strings."
+    error_message = "log_categories and metric_categories must not contain empty strings."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      length(coalesce(ds.log_categories, [])) + length(coalesce(ds.metric_categories, [])) > 0
+    ])
+    error_message = "Each diagnostic_settings entry must define at least one category: log_categories or metric_categories."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : contains(["Audit"], c)])
+    ])
+    error_message = "log_categories may include only: Audit."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : contains(["AllMetrics"], c)])
+    ])
+    error_message = "metric_categories may include only: AllMetrics."
   }
 }
 

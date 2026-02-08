@@ -431,12 +431,13 @@ variable "diagnostic_settings" {
   description = <<-EOT
     Diagnostic settings configuration for the Cognitive Account.
 
-    Provide explicit log_categories/metric_categories or use areas (all, logs, metrics).
-    Additional values in areas are treated as log category groups when supported.
+    Supported categories for azurerm 4.57.0:
+    - log_categories: AuditEvent
+    - log_category_groups: allLogs
+    - metric_categories: AllMetrics
   EOT
   type = list(object({
     name                           = string
-    areas                          = optional(list(string))
     log_categories                 = optional(list(string))
     metric_categories              = optional(list(string))
     log_category_groups            = optional(list(string))
@@ -542,10 +543,41 @@ variable "diagnostic_settings" {
       for ds in var.diagnostic_settings :
       alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : trimspace(c) != ""]) &&
       alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : trimspace(c) != ""]) &&
-      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : trimspace(c) != ""]) &&
-      alltrue([for c in(ds.areas == null ? [] : ds.areas) : trimspace(c) != ""])
+      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : trimspace(c) != ""])
     ])
-    error_message = "diagnostic_settings categories and areas must not contain empty strings."
+    error_message = "diagnostic_settings categories must not contain empty strings."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      length(coalesce(ds.log_categories, [])) + length(coalesce(ds.metric_categories, [])) + length(coalesce(ds.log_category_groups, [])) > 0
+    ])
+    error_message = "Each diagnostic_settings entry must define at least one category: log_categories, log_category_groups, or metric_categories."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : contains(["AuditEvent"], c)])
+    ])
+    error_message = "diagnostic_settings.log_categories may include only: AuditEvent."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : contains(["allLogs"], c)])
+    ])
+    error_message = "diagnostic_settings.log_category_groups may include only: allLogs."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : contains(["AllMetrics"], c)])
+    ])
+    error_message = "diagnostic_settings.metric_categories may include only: AllMetrics."
   }
 }
 

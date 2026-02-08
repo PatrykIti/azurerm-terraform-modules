@@ -24,7 +24,7 @@ Cross-resource glue (private endpoints, Private DNS, RBAC) is out of scope.
   and IDs are exposed via `schema_group_ids`.
 - Network rule set public access must match `public_network_access_enabled`.
 - Customer-managed keys require a managed identity with Key Vault permissions.
-- Diagnostic settings require at least one destination and categories or areas.
+- Diagnostic settings require at least one destination and explicit categories.
 - `kafka_enabled` and `zone_redundant` are not exposed in azurerm 4.57.0.
 
 ## Out of Scope

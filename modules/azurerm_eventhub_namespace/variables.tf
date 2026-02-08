@@ -302,13 +302,13 @@ variable "diagnostic_settings" {
   description = <<-EOT
     Diagnostic settings for the Event Hub Namespace.
 
-    Provide either log_categories/metric_categories or areas to select categories.
-    If neither is provided, areas defaults to ["all"].
+    Supported categories for azurerm 4.57.0:
+    - log_categories: OperationalLogs, ArchiveLogs, AutoScaleLogs, KafkaCoordinatorLogs, KafkaUserErrorLogs
+    - metric_categories: AllMetrics
   EOT
 
   type = list(object({
     name                           = string
-    areas                          = optional(list(string))
     log_categories                 = optional(list(string))
     metric_categories              = optional(list(string))
     log_analytics_workspace_id     = optional(string)
@@ -358,19 +358,40 @@ variable "diagnostic_settings" {
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      alltrue([for area in coalesce(ds.areas, []) : contains(["all", "logs", "metrics", "archive", "operational", "autoscale", "kafka"], area)])
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""])
     ])
-    error_message = "areas may only include: all, logs, metrics, archive, operational, autoscale, kafka."
+    error_message = "log_categories and metric_categories must not contain empty strings."
   }
 
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
-      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""]) &&
-      alltrue([for c in(ds.areas == null ? [] : ds.areas) : c != ""])
+      length(coalesce(ds.log_categories, [])) + length(coalesce(ds.metric_categories, [])) > 0
     ])
-    error_message = "log_categories, metric_categories, and areas must not contain empty strings."
+    error_message = "Each diagnostic_settings entry must define at least one category: log_categories or metric_categories."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : contains([
+        "OperationalLogs",
+        "ArchiveLogs",
+        "AutoScaleLogs",
+        "KafkaCoordinatorLogs",
+        "KafkaUserErrorLogs"
+      ], c)])
+    ])
+    error_message = "log_categories may include only: OperationalLogs, ArchiveLogs, AutoScaleLogs, KafkaCoordinatorLogs, KafkaUserErrorLogs."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : contains(["AllMetrics"], c)])
+    ])
+    error_message = "metric_categories may include only: AllMetrics."
   }
 }
 

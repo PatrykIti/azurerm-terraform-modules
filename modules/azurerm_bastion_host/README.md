@@ -86,14 +86,13 @@ No modules.
 |------|------|
 | [azurerm_bastion_host.bastion_host](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/bastion_host) | resource |
 | [azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
-| [azurerm_monitor_diagnostic_categories.bastion_host](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/data-sources/monitor_diagnostic_categories) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_copy_paste_enabled"></a> [copy\_paste\_enabled](#input\_copy\_paste\_enabled) | Is Copy/Paste enabled for the Bastion Host? | `bool` | `true` | no |
-| <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Diagnostic settings for the Bastion Host.<br/><br/>Provide explicit log\_categories/metric\_categories/log\_category\_groups, or use areas to select categories.<br/>If neither is provided, areas defaults to ["all"]. | <pre>list(object({<br/>    name                           = string<br/>    areas                          = optional(list(string))<br/>    log_categories                 = optional(list(string))<br/>    log_category_groups            = optional(list(string))<br/>    metric_categories              = optional(list(string))<br/>    log_analytics_workspace_id     = optional(string)<br/>    log_analytics_destination_type = optional(string)<br/>    storage_account_id             = optional(string)<br/>    eventhub_authorization_rule_id = optional(string)<br/>    eventhub_name                  = optional(string)<br/>    partner_solution_id            = optional(string)<br/>  }))</pre> | `[]` | no |
+| <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Diagnostic settings for the Bastion Host.<br/><br/>Supported categories for azurerm 4.57.0:<br/>- log\_categories: BastionAuditLogs<br/>- log\_category\_groups: allLogs<br/>- metric\_categories: AllMetrics | <pre>list(object({<br/>    name                           = string<br/>    log_categories                 = optional(list(string))<br/>    log_category_groups            = optional(list(string))<br/>    metric_categories              = optional(list(string))<br/>    log_analytics_workspace_id     = optional(string)<br/>    log_analytics_destination_type = optional(string)<br/>    storage_account_id             = optional(string)<br/>    eventhub_authorization_rule_id = optional(string)<br/>    eventhub_name                  = optional(string)<br/>    partner_solution_id            = optional(string)<br/>  }))</pre> | `[]` | no |
 | <a name="input_file_copy_enabled"></a> [file\_copy\_enabled](#input\_file\_copy\_enabled) | Is File Copy enabled for the Bastion Host? Supported on Standard or Premium SKU only. | `bool` | `false` | no |
 | <a name="input_ip_configuration"></a> [ip\_configuration](#input\_ip\_configuration) | IP configuration for the Bastion Host (required for Basic/Standard/Premium). | <pre>list(object({<br/>    name                 = string<br/>    subnet_id            = string<br/>    public_ip_address_id = string<br/>  }))</pre> | `[]` | no |
 | <a name="input_ip_connect_enabled"></a> [ip\_connect\_enabled](#input\_ip\_connect\_enabled) | Is IP Connect enabled for the Bastion Host? Supported on Standard or Premium SKU only. | `bool` | `false` | no |
@@ -115,7 +114,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_diagnostic_settings_skipped"></a> [diagnostic\_settings\_skipped](#output\_diagnostic\_settings\_skipped) | Diagnostic settings entries skipped because no log categories, log category groups, or metric categories were resolved. |
+| <a name="output_diagnostic_settings_skipped"></a> [diagnostic\_settings\_skipped](#output\_diagnostic\_settings\_skipped) | Deprecated compatibility output. Diagnostic settings require explicit categories, so no entries are skipped. |
 | <a name="output_dns_name"></a> [dns\_name](#output\_dns\_name) | The FQDN of the Bastion Host. |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the Bastion Host. |
 | <a name="output_ip_configuration"></a> [ip\_configuration](#output\_ip\_configuration) | The IP configuration for the Bastion Host. |

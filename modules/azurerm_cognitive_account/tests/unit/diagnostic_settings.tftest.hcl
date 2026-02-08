@@ -8,13 +8,6 @@ mock_provider "azurerm" {
     }
   }
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types  = ["AuditEvent"]
-      log_category_groups = ["allLogs"]
-      metrics             = ["AllMetrics"]
-    }
-  }
 }
 
 variables {
@@ -33,7 +26,8 @@ run "diagnostic_settings_valid" {
     diagnostic_settings = [
       {
         name                       = "diag"
-        areas                      = ["all"]
+        log_category_groups        = ["allLogs"]
+        metric_categories          = ["AllMetrics"]
         log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/law"
       }
     ]
@@ -41,27 +35,6 @@ run "diagnostic_settings_valid" {
 
   assert {
     condition     = length(output.diagnostic_settings_skipped) == 0
-    error_message = "diagnostic_settings_skipped should be empty when areas resolve categories."
-  }
-}
-
-run "diagnostic_settings_skips_empty" {
-  command = apply
-
-  variables {
-    diagnostic_settings = [
-      {
-        name                       = "diag-empty"
-        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/law"
-        log_categories             = []
-        metric_categories          = []
-        log_category_groups        = []
-      }
-    ]
-  }
-
-  assert {
-    condition     = length(output.diagnostic_settings_skipped) == 1
-    error_message = "diagnostic_settings_skipped should capture empty categories."
+    error_message = "diagnostic_settings_skipped should remain empty when explicit categories are used."
   }
 }

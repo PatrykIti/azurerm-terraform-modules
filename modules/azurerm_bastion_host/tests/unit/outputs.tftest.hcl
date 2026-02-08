@@ -20,14 +20,6 @@ mock_provider "azurerm" {
   }
 
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types  = ["BastionAuditLogs"]
-      log_category_groups = ["allLogs"]
-      metrics             = ["AllMetrics"]
-    }
-  }
 }
 
 variables {
@@ -76,30 +68,6 @@ run "verify_basic_outputs" {
   assert {
     condition     = length(output.ip_configuration) == 1
     error_message = "Output 'ip_configuration' should include a single entry."
-  }
-}
-
-run "verify_diagnostic_settings_skipped" {
-  command = apply
-
-  variables {
-    diagnostic_settings = [
-      {
-        name                       = "empty-categories"
-        areas                      = []
-        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/law"
-      }
-    ]
-  }
-
-  assert {
-    condition     = length(output.diagnostic_settings_skipped) == 1
-    error_message = "Diagnostic settings with no categories should be reported as skipped."
-  }
-
-  assert {
-    condition     = output.diagnostic_settings_skipped[0].name == "empty-categories"
-    error_message = "Skipped diagnostic settings entry should include the name."
   }
 }
 

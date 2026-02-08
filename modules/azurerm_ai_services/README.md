@@ -70,7 +70,6 @@ No modules.
 |------|------|
 | [azurerm_ai_services.ai_services](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/ai_services) | resource |
 | [azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
-| [azurerm_monitor_diagnostic_categories.ai_services](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/data-sources/monitor_diagnostic_categories) | data source |
 
 ## Inputs
 
@@ -78,7 +77,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_custom_subdomain_name"></a> [custom\_subdomain\_name](#input\_custom\_subdomain\_name) | Custom subdomain name used for token-based authentication. Required when network\_acls is specified. | `string` | `null` | no |
 | <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key) | Customer-managed key configuration for encryption at rest. | <pre>object({<br/>    key_vault_key_id   = optional(string)<br/>    managed_hsm_key_id = optional(string)<br/>    identity_client_id = optional(string)<br/>  })</pre> | `null` | no |
-| <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Diagnostic settings for the AI Services Account.<br/><br/>Provide explicit log\_categories and/or metric\_categories, or use areas to map to<br/>available diagnostic categories. If neither is provided, areas defaults to ["all"]. | <pre>list(object({<br/>    name                           = string<br/>    areas                          = optional(list(string))<br/>    log_categories                 = optional(list(string))<br/>    metric_categories              = optional(list(string))<br/>    log_analytics_workspace_id     = optional(string)<br/>    log_analytics_destination_type = optional(string)<br/>    storage_account_id             = optional(string)<br/>    eventhub_authorization_rule_id = optional(string)<br/>    eventhub_name                  = optional(string)<br/>  }))</pre> | `[]` | no |
+| <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Diagnostic settings for the AI Services Account.<br/><br/>Supported categories for azurerm 4.57.0:<br/>- log\_categories: Audit<br/>- metric\_categories: AllMetrics | <pre>list(object({<br/>    name                           = string<br/>    log_categories                 = optional(list(string))<br/>    metric_categories              = optional(list(string))<br/>    log_analytics_workspace_id     = optional(string)<br/>    log_analytics_destination_type = optional(string)<br/>    storage_account_id             = optional(string)<br/>    eventhub_authorization_rule_id = optional(string)<br/>    eventhub_name                  = optional(string)<br/>  }))</pre> | `[]` | no |
 | <a name="input_fqdns"></a> [fqdns](#input\_fqdns) | List of FQDNs allowed for the AI Services Account. | `list(string)` | `null` | no |
 | <a name="input_identity"></a> [identity](#input\_identity) | Managed identity configuration for the AI Services Account. | <pre>object({<br/>    type         = string<br/>    identity_ids = optional(list(string))<br/>  })</pre> | `null` | no |
 | <a name="input_local_authentication_enabled"></a> [local\_authentication\_enabled](#input\_local\_authentication\_enabled) | Whether local authentication is enabled for the AI Services Account. | `bool` | `true` | no |
@@ -97,7 +96,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_diagnostic_settings_skipped"></a> [diagnostic\_settings\_skipped](#output\_diagnostic\_settings\_skipped) | Diagnostic settings entries skipped because no log or metric categories were supplied. |
+| <a name="output_diagnostic_settings_skipped"></a> [diagnostic\_settings\_skipped](#output\_diagnostic\_settings\_skipped) | Deprecated compatibility output. Diagnostic settings require explicit categories, so no entries are skipped. |
 | <a name="output_endpoint"></a> [endpoint](#output\_endpoint) | The endpoint of the AI Services Account. |
 | <a name="output_fqdns"></a> [fqdns](#output\_fqdns) | The allowed FQDNs for the AI Services Account. |
 | <a name="output_id"></a> [id](#output\_id) | The ID of the AI Services Account. |

@@ -68,7 +68,8 @@ module "bastion_host" {
   diagnostic_settings = [
     {
       name                       = "diag-bastion"
-      areas                      = ["audit", "metrics"]
+      log_categories             = ["BastionAuditLogs"]
+      metric_categories          = ["AllMetrics"]
       log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
     }
   ]

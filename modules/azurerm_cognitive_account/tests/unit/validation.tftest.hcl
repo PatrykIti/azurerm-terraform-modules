@@ -12,7 +12,6 @@ mock_provider "azurerm" {
   mock_resource "azurerm_cognitive_account_rai_blocklist" {}
   mock_resource "azurerm_cognitive_account_customer_managed_key" {}
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-  mock_data "azurerm_monitor_diagnostic_categories" {}
 }
 
 variables {
@@ -158,6 +157,23 @@ run "log_analytics_destination_type_requires_workspace" {
         name                           = "diag-destination-type"
         storage_account_id             = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/diagsa"
         log_analytics_destination_type = "Dedicated"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings
+  ]
+}
+
+run "diagnostic_requires_categories" {
+  command = plan
+
+  variables {
+    diagnostic_settings = [
+      {
+        name                       = "diag-empty-categories"
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/law"
       }
     ]
   }

@@ -12,13 +12,6 @@ mock_provider "azurerm" {
   }
 
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types = ["Audit"]
-      metrics            = ["AllMetrics"]
-    }
-  }
 }
 
 variables {
@@ -91,5 +84,22 @@ run "user_assigned_identity_requires_ids" {
 
   expect_failures = [
     var.identity
+  ]
+}
+
+run "diagnostic_requires_categories" {
+  command = plan
+
+  variables {
+    diagnostic_settings = [
+      {
+        name                       = "diag-empty"
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/law"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings
   ]
 }

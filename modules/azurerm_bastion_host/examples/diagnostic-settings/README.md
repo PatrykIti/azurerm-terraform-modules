@@ -5,7 +5,7 @@ This example demonstrates configuring Azure Monitor diagnostic settings for a Ba
 ## Features
 
 - Standard SKU Bastion Host with diagnostic settings.
-- Sends audit logs and metrics to Log Analytics using `areas` mapping.
+- Sends explicit audit logs and metrics to Log Analytics.
 
 ## Usage
 

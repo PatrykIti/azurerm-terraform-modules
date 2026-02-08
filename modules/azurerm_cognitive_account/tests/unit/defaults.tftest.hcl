@@ -12,7 +12,6 @@ mock_provider "azurerm" {
   mock_resource "azurerm_cognitive_account_rai_blocklist" {}
   mock_resource "azurerm_cognitive_account_customer_managed_key" {}
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-  mock_data "azurerm_monitor_diagnostic_categories" {}
 }
 
 variables {

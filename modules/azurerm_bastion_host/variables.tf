@@ -194,13 +194,14 @@ variable "diagnostic_settings" {
   description = <<-EOT
     Diagnostic settings for the Bastion Host.
 
-    Provide explicit log_categories/metric_categories/log_category_groups, or use areas to select categories.
-    If neither is provided, areas defaults to ["all"].
+    Supported categories for azurerm 4.57.0:
+    - log_categories: BastionAuditLogs
+    - log_category_groups: allLogs
+    - metric_categories: AllMetrics
   EOT
 
   type = list(object({
     name                           = string
-    areas                          = optional(list(string))
     log_categories                 = optional(list(string))
     log_category_groups            = optional(list(string))
     metric_categories              = optional(list(string))
@@ -252,28 +253,43 @@ variable "diagnostic_settings" {
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      alltrue([for area in coalesce(ds.areas, []) : contains(["all", "logs", "metrics", "audit"], area)])
-    ])
-    error_message = "areas may only include: all, logs, metrics, audit."
-  }
-
-  validation {
-    condition = alltrue([
-      for ds in var.diagnostic_settings :
-      !(length(coalesce(ds.log_categories, [])) > 0 && length(coalesce(ds.log_category_groups, [])) > 0)
-    ])
-    error_message = "Do not set both log_categories and log_category_groups in the same diagnostic setting."
-  }
-
-  validation {
-    condition = alltrue([
-      for ds in var.diagnostic_settings :
       alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
       alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : c != ""]) &&
-      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""]) &&
-      alltrue([for c in(ds.areas == null ? [] : ds.areas) : c != ""])
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""])
     ])
-    error_message = "log_categories, log_category_groups, metric_categories, and areas must not contain empty strings."
+    error_message = "log_categories, log_category_groups, and metric_categories must not contain empty strings."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      length(coalesce(ds.log_categories, [])) + length(coalesce(ds.log_category_groups, [])) + length(coalesce(ds.metric_categories, [])) > 0
+    ])
+    error_message = "Each diagnostic_settings entry must define at least one category: log_categories, log_category_groups, or metric_categories."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : contains(["BastionAuditLogs"], c)])
+    ])
+    error_message = "log_categories may include only: BastionAuditLogs."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : contains(["allLogs"], c)])
+    ])
+    error_message = "log_category_groups may include only: allLogs."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : contains(["AllMetrics"], c)])
+    ])
+    error_message = "metric_categories may include only: AllMetrics."
   }
 
   validation {

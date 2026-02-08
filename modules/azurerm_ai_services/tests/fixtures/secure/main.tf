@@ -120,7 +120,8 @@ module "ai_services" {
   diagnostic_settings = [{
     name                       = "ai-services-secure-${var.random_suffix}"
     log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-    areas                      = ["all"]
+    log_categories             = ["Audit"]
+    metric_categories          = ["AllMetrics"]
   }]
 
   tags = var.tags

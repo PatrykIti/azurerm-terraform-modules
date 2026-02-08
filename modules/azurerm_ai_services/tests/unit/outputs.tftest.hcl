@@ -14,13 +14,6 @@ mock_provider "azurerm" {
   }
 
   mock_resource "azurerm_monitor_diagnostic_setting" {}
-
-  mock_data "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types = ["Audit"]
-      metrics            = ["AllMetrics"]
-    }
-  }
 }
 
 variables {

@@ -97,7 +97,8 @@ module "eventhub_namespace" {
   diagnostic_settings = [
     {
       name                       = "diag-logs"
-      areas                      = ["all"]
+      log_categories             = ["OperationalLogs"]
+      metric_categories          = ["AllMetrics"]
       log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
     }
   ]
