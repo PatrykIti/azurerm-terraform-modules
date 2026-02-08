@@ -27,6 +27,18 @@ Before submitting a pull request for a new module, please review this checklist 
 - [ ] `variables.tf` groups related settings into logical objects (for example `network`, `identity`, `diagnostic_settings`, `timeouts`) where it improves consumption ergonomics.
 - [ ] Variable grouping does not hide provider capabilities: grouped objects still expose full supported `PRIMARY_RESOURCE` schema or document intentional omissions.
 
+## Diagnostic Settings Pattern
+
+- [ ] If module supports diagnostics, it uses explicit `diagnostic_settings` input (no hidden discovery behavior).
+- [ ] Module does **not** use `azurerm_monitor_diagnostic_categories` data source to infer categories at runtime.
+- [ ] Allowed `log_categories`, `log_category_groups`, and `metric_categories` are validated in `variables.tf` against pinned provider/resource support (for example `azurerm` `4.57.0`).
+- [ ] `variables.tf` enforces that each diagnostic setting contains at least one enabled category/group.
+- [ ] `variables.tf` enforces destination semantics (`log_analytics_workspace_id`, `storage_account_id`, `eventhub_authorization_rule_id`, `partner_solution_id`) and rejects empty-string values.
+- [ ] `diagnostics.tf` uses minimal `for_each` filtering to skip empty-category entries instead of complex `locals` orchestration.
+- [ ] Diagnostic validation logic is not duplicated in `locals` or `precondition` when it can be fully enforced in `variables.tf`.
+- [ ] Examples and unit tests include both valid and invalid diagnostic category cases.
+- [ ] Module docs clearly state that callers must provide supported diagnostic categories for the target resource.
+
 ## Documentation
 
 - [ ] `README.md` is generated and includes all required sections.

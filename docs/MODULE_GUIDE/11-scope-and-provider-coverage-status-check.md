@@ -100,6 +100,29 @@ Checklist:
 - [ ] Grouped inputs remain explicit and testable; they do not reduce discoverability of supported provider features.
 - [ ] Tests cover grouped-object validation paths and precondition paths separately.
 
+## I. Diagnostic Settings Scope and Coverage Check
+
+Apply this section when a module manages `azurerm_monitor_diagnostic_setting` for its primary resource.
+
+Checklist:
+
+- [ ] Diagnostic behavior is explicit-input driven (`diagnostic_settings`) and deterministic.
+- [ ] Module does not use `azurerm_monitor_diagnostic_categories` runtime discovery.
+- [ ] Allowed diagnostic categories/groups/metrics are pinned and validated in `variables.tf` for the module's provider version.
+- [ ] Validation enforces at least one category/group per diagnostic setting object.
+- [ ] Validation enforces destination consistency and rejects empty-string identifiers.
+- [ ] `diagnostics.tf` uses simple `for_each` filtering (`length(...) > 0`) and avoids complex category-expansion `locals`.
+- [ ] `lifecycle.precondition` is used for diagnostics only when a rule cannot be expressed in variable validation.
+- [ ] `README.md` and `docs/README.md` explain the explicit category model and caller responsibility.
+- [ ] Unit tests contain positive and negative diagnostic validation scenarios.
+- [ ] Examples include at least one realistic diagnostic configuration for the resource.
+
+Severity guidance:
+
+- `High`: diagnostics implementation manages unrelated resources or introduces non-deterministic behavior that breaks atomic scope.
+- `Medium`: supported categories exist in pinned provider but are not exposed/validated/documented.
+- `Low`: wording inconsistencies in docs/examples without runtime impact.
+
 ## C. Mandatory Coverage Matrix
 
 Agents must include this matrix in the report:
