@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 17 tasks
+- **To Do:** 22 tasks
 - **In Progress:** 0
-- **Done:** 61 tasks
+- **Done:** 62 tasks
 
 ---
 
@@ -13,6 +13,12 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-042](./TASK-042_Linux_Function_App_Compliance_Reaudit.md) | **Linux Function App compliance re-audit** | High | Large | `modules/azurerm_linux_function_app/` |
+| [TASK-043](./TASK-043_Linux_Virtual_Machine_Compliance_Reaudit.md) | **Linux Virtual Machine compliance re-audit** | High | Large | `modules/azurerm_linux_virtual_machine/` |
+| [TASK-044](./TASK-044_Log_Analytics_Workspace_Compliance_Reaudit.md) | **Log Analytics Workspace compliance re-audit** | High | Large | `modules/azurerm_log_analytics_workspace/` |
+| [TASK-045](./TASK-045_Private_DNS_Zone_Compliance_Reaudit.md) | **Private DNS Zone compliance re-audit** | High | Medium | `modules/azurerm_private_dns_zone/` |
+| [TASK-046](./TASK-046_Private_DNS_Zone_VNet_Link_Compliance_Reaudit.md) | **Private DNS Zone VNet Link compliance re-audit** | High | Medium | `modules/azurerm_private_dns_zone_virtual_network_link/` |
+| [TASK-047](./TASK-047_Private_Endpoint_Compliance_Reaudit.md) | **Private Endpoint compliance re-audit** | High | Medium | `modules/azurerm_private_endpoint/` |
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
 | [TASK-014](./TASK-014_Virtual_Network_Module_Alignment.md) | **Virtual Network module alignment (docs + examples + tests)** | High | Medium | `modules/azurerm_virtual_network/` |
 | [TASK-032](./TASK-032_Container_Registry_Module.md) | **Azure Container Registry module (full feature scope)** | High | Large | `modules/azurerm_container_registry/` |
