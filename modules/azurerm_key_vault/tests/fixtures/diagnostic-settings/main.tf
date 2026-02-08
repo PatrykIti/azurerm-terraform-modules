@@ -52,7 +52,8 @@ module "key_vault" {
     {
       name                       = "diag"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-      areas                      = ["all"]
+      log_category_groups        = ["allLogs"]
+      metric_categories          = ["AllMetrics"]
     }
   ]
 

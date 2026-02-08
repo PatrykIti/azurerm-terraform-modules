@@ -125,8 +125,8 @@ output "managed_storage_sas_definitions" {
 }
 
 output "diagnostic_settings_skipped" {
-  description = "Diagnostic settings entries skipped because no log or metric categories were supplied."
-  value       = local.diagnostic_settings_skipped
+  description = "Deprecated compatibility output. Diagnostic settings require explicit categories, so no entries are skipped."
+  value       = []
 }
 
 output "tags" {

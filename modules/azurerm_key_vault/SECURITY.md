@@ -30,7 +30,7 @@ Networking glue (private endpoints, Private DNS) and RBAC role assignments are
 
 ### Diagnostic Settings
 - `diagnostic_settings` supports Log Analytics, Storage, Event Hub, or partner solutions.
-- Use `areas` to enable all supported log/metric categories by default.
+- Configure categories explicitly (`log_categories`, `metric_categories`, `log_category_groups`).
 
 ## Example: Security-Focused Configuration
 
@@ -56,7 +56,8 @@ module "key_vault" {
     {
       name                       = "diag"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.audit.id
-      areas                      = ["all"]
+      log_category_groups        = ["allLogs"]
+      metric_categories          = ["AllMetrics"]
     }
   ]
 

@@ -717,7 +717,6 @@ variable "diagnostic_settings" {
   description = <<-EOT
     Diagnostic settings for the Key Vault.
 
-    areas: optional shorthand mapping to log/metric categories (all, logs, metrics, audit).
     Supported categories for azurerm 4.57.0:
     - log_categories: AuditEvent, AzurePolicyEvaluationDetails
     - metric_categories: AllMetrics
@@ -735,7 +734,6 @@ variable "diagnostic_settings" {
     log_categories                 = optional(list(string))
     metric_categories              = optional(list(string))
     log_category_groups            = optional(list(string))
-    areas                          = optional(list(string))
   }))
 
   default  = []
@@ -774,23 +772,24 @@ variable "diagnostic_settings" {
 
   validation {
     condition = alltrue([
-      for ds in var.diagnostic_settings : ds.areas == null || alltrue([
-        for area in ds.areas : contains(["all", "logs", "metrics", "audit"], area)
-      ])
+      for ds in var.diagnostic_settings : (
+        alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : trimspace(c) != ""]) &&
+        alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : trimspace(c) != ""]) &&
+        alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : trimspace(c) != ""])
+      )
     ])
-    error_message = "diagnostic_settings.areas may include only: all, logs, metrics, audit."
+    error_message = "diagnostic_settings category values must not contain empty strings."
   }
 
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings : (
-        alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : trimspace(c) != ""]) &&
-        alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : trimspace(c) != ""]) &&
-        alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : trimspace(c) != ""]) &&
-        alltrue([for c in(ds.areas == null ? [] : ds.areas) : trimspace(c) != ""])
-      )
+        length(coalesce(ds.log_categories, [])) +
+        length(coalesce(ds.metric_categories, [])) +
+        length(coalesce(ds.log_category_groups, []))
+      ) > 0
     ])
-    error_message = "diagnostic_settings category and area values must not contain empty strings."
+    error_message = "diagnostic_settings entries must define at least one category: log_categories, metric_categories, or log_category_groups."
   }
 
   validation {
