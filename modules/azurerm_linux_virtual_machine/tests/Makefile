@@ -2,14 +2,16 @@
 SHELL := /bin/bash
 
 TIMEOUT ?= 60m
+TEST_FILTER ?= Test
 PARALLEL ?= 4
+AZURE_LOCATION ?= northeurope
 LOG_DIR ?= test_outputs
 LOG_TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)
 
 define run_with_log
 	@mkdir -p $(LOG_DIR)
-	@echo "Saving output to $(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"
-	@bash -c 'set -o pipefail; { $(2); } 2>&1 | tee "$(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"'
+	@echo "Saving test output to $(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"
+	@bash -c 'set -o pipefail; $(2) 2>&1 | tee "$(LOG_DIR)/$(1)_$(LOG_TIMESTAMP).log"'
 endef
 
 # Normalize credential environment variables (ARM_ <-> AZURE_)
@@ -53,10 +55,11 @@ check-env:
 deps:
 	@echo "Installing Go dependencies..."
 	go mod download
+	go mod tidy
 
 test-compile: deps
 	@echo "Running Go compile gate..."
-	$(call run_with_log,compile,go test ./... -run=^$$)
+	$(call run_with_log,all_compile,go test ./... -run=^$$)
 
 test: check-env deps test-compile
 	@echo "Running all Terratest tests..."
@@ -87,8 +90,33 @@ test-integration: check-env deps
 benchmark: check-env deps
 	$(call run_with_log,benchmark,go test -v -run=^$$ -bench '^BenchmarkLinuxVirtualMachineCreationSimple$$' -benchtime=1x ./...)
 
+test-performance: check-env deps
+	@echo "Running performance benchmarks..."
+	$(call run_with_log,performance,go test -v -run=^$$ -bench '^BenchmarkLinuxVirtualMachineCreationSimple$$' -benchtime=1x ./...)
+
+test-coverage: check-env deps
+	@echo "Running tests with coverage..."
+	$(call run_with_log,coverage,go test -v -timeout $(TIMEOUT) -coverprofile=coverage.out -covermode=atomic ./...)
+	go tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage report generated: coverage.html"
+
+test-race: check-env deps
+	@echo "Running tests with race detection..."
+	$(call run_with_log,race,go test -v -timeout $(TIMEOUT) -race ./...)
+
+test-junit: check-env deps
+	@echo "Running tests with JUnit output..."
+	go install github.com/jstemmer/go-junit-report/v2@latest
+	$(call run_with_log,junit,go test -v -timeout $(TIMEOUT) ./...)
+	@cat "$(LOG_DIR)/junit_$(LOG_TIMESTAMP).log" | go-junit-report -set-exit-code > test-results.xml
+	@echo "JUnit report generated: test-results.xml"
+
 test-short: deps
 	$(call run_with_log,short,go test -v -short ./...)
+
+test-quick: check-env deps
+	@echo "Running quick smoke tests..."
+	$(call run_with_log,quick,go test -v -timeout 5m -short ./...)
 
 run-sequential: check-env deps
 	$(call run_with_log,sequential,bash ./run_tests_sequential.sh)
@@ -104,6 +132,15 @@ clean:
 	find . -name ".terraform" -type d -exec rm -rf {} +
 	find . -name "terraform.tfstate.d" -type d -exec rm -rf {} +
 
+validate-fixtures:
+	@echo "Validating Terraform fixtures..."
+	@for dir in fixtures/*/; do \
+		if [ -f "$$dir/main.tf" ]; then \
+			echo "Validating $$dir..."; \
+			cd $$dir && terraform init -backend=false && terraform validate && cd ../..; \
+		fi \
+	done
+
 fmt-check:
 	@echo "Checking Go formatting..."
 	@if [ -n "$$(gofmt -l .)" ]; then \
@@ -115,6 +152,22 @@ fmt-check:
 fmt:
 	@echo "Formatting Go code..."
 	gofmt -w .
+
+lint:
+	@echo "Running linters..."
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	golangci-lint run ./...
+
+security:
+	@echo "Running security scan..."
+	go install github.com/securego/gosec/v2/cmd/gosec@latest
+	gosec -fmt=json -out=security-report.json ./...
+
+ci: clean fmt-check lint test-coverage test-junit
+	@echo "CI pipeline completed successfully!"
+
+cd: ci test-integration test-performance
+	@echo "CD pipeline completed successfully!"
 
 help:
 	@echo "Available targets:"
@@ -128,11 +181,21 @@ help:
 	@echo "  make test-extensions       - Run TestLinuxVirtualMachineExtensions"
 	@echo "  make test-integration      - Run integration lifecycle tests"
 	@echo "  make benchmark             - Run BenchmarkLinuxVirtualMachineCreationSimple"
+	@echo "  make test-performance      - Run performance benchmarks"
+	@echo "  make test-coverage         - Run tests with coverage"
+	@echo "  make test-race             - Run tests with race detection"
+	@echo "  make test-junit            - Generate JUnit report"
 	@echo "  make test-short            - Run tests in short mode"
+	@echo "  make test-quick            - Run quick smoke tests (with -short flag)"
 	@echo "  make run-sequential        - Run wrapper script sequentially"
 	@echo "  make run-parallel          - Run wrapper script in parallel"
+	@echo "  make validate-fixtures     - Validate Terraform fixtures"
 	@echo "  make clean                 - Clean test artifacts"
 	@echo "  make fmt-check             - Verify Go formatting"
 	@echo "  make fmt                   - Format Go files"
+	@echo "  make lint                  - Run linters"
+	@echo "  make security              - Run security scan"
+	@echo "  make ci                    - Run CI pipeline"
+	@echo "  make cd                    - Run CD pipeline"
 
-.PHONY: check-env deps test-compile test test-single test-basic test-secure test-complete test-data-disks test-extensions test-integration benchmark test-short run-sequential run-parallel clean fmt-check fmt help
+.PHONY: check-env deps test-compile test test-single test-basic test-secure test-complete test-data-disks test-extensions test-integration benchmark test-performance test-coverage test-race test-junit test-short test-quick run-sequential run-parallel clean validate-fixtures fmt-check fmt lint security ci cd help

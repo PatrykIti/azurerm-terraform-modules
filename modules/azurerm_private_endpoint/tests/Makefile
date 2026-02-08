@@ -60,8 +60,13 @@ deps:
 	go mod download
 	go mod tidy
 
+# Compile-only gate for pipeline smoke checks
+test-compile: deps
+	@echo "Running compile gate..."
+	$(call run_with_log,all_compile,go test ./... -run=^$$)
+
 # Run all tests
-test: check-env deps
+test: check-env test-compile
 	@echo "Running all tests..."
 	$(call run_with_log,all,go test -v -timeout $(TIMEOUT) -parallel $(PARALLEL) ./...)
 
@@ -132,9 +137,9 @@ test-race: check-env deps
 test-junit: check-env deps
 	@echo "Running tests with JUnit output..."
 	go install github.com/jstemmer/go-junit-report/v2@latest
-	@mkdir -p $(LOG_DIR)
-	@echo "Saving test output to $(LOG_DIR)/junit_$(LOG_TIMESTAMP).log"
-	@bash -c 'set -o pipefail; go test -v -timeout $(TIMEOUT) ./... 2>&1 | tee "$(LOG_DIR)/junit_$(LOG_TIMESTAMP).log" | go-junit-report -set-exit-code > test-results.xml'
+	$(call run_with_log,junit,go test -v -timeout $(TIMEOUT) ./...)
+	@cat "$(LOG_DIR)/junit_$(LOG_TIMESTAMP).log" | go-junit-report -set-exit-code > test-results.xml
+	@echo "JUnit report generated: test-results.xml"
 
 # Clean test artifacts
 clean:
@@ -184,7 +189,7 @@ security:
 # Run quick smoke tests
 test-quick: check-env deps
 	@echo "Running quick smoke tests..."
-	go test -v -timeout 5m -short ./...
+	$(call run_with_log,quick,go test -v -timeout 5m -short ./...)
 
 # CI/CD pipeline simulation
 ci: clean fmt-check lint test-coverage test-junit
@@ -198,6 +203,7 @@ cd: ci test-integration test-performance
 help:
 	@echo "Available targets:"
 	@echo "  make test                 - Run all tests"
+	@echo "  make test-compile         - Compile gate only (go test ./... -run '^$$')"
 	@echo "  make test-single TEST_NAME=TestName - Run specific test"
 	@echo "  make test-basic          - Run basic tests only"
 	@echo "  make test-complete       - Run complete tests"
@@ -220,4 +226,4 @@ help:
 	@echo "  make ci                 - Run CI pipeline"
 	@echo "  make cd                 - Run CD pipeline (includes integration tests)"
 
-.PHONY: check-env deps test test-single test-basic test-complete test-secure test-network test-private-endpoint test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help
+.PHONY: check-env deps test test-compile test-single test-basic test-complete test-secure test-network test-private-endpoint test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help
