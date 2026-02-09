@@ -389,11 +389,13 @@ variable "backup" {
 variable "site_config" {
   description = "Site configuration for the Function App."
   type = object({
-    always_on             = optional(bool)
-    api_definition_url    = optional(string)
-    api_management_api_id = optional(string)
-    app_command_line      = optional(string)
-    app_scale_limit       = optional(number)
+    always_on                              = optional(bool)
+    api_definition_url                     = optional(string)
+    api_management_api_id                  = optional(string)
+    app_command_line                       = optional(string)
+    app_scale_limit                        = optional(number)
+    application_insights_connection_string = optional(string)
+    application_insights_key               = optional(string)
     application_stack = optional(object({
       dotnet_version              = optional(string)
       java_version                = optional(string)
@@ -761,11 +763,13 @@ variable "slots" {
     }))
 
     site_config = object({
-      always_on             = optional(bool)
-      api_definition_url    = optional(string)
-      api_management_api_id = optional(string)
-      app_command_line      = optional(string)
-      app_scale_limit       = optional(number)
+      always_on                              = optional(bool)
+      api_definition_url                     = optional(string)
+      api_management_api_id                  = optional(string)
+      app_command_line                       = optional(string)
+      app_scale_limit                        = optional(number)
+      application_insights_connection_string = optional(string)
+      application_insights_key               = optional(string)
       application_stack = optional(object({
         dotnet_version              = optional(string)
         java_version                = optional(string)
@@ -896,11 +900,17 @@ variable "slots" {
     condition = alltrue([
       for slot in var.slots : (
         (
-          coalesce(slot.storage_key_vault_secret_id, var.storage_configuration.key_vault_secret_id) != null &&
-          trimspace(coalesce(slot.storage_key_vault_secret_id, var.storage_configuration.key_vault_secret_id)) != ""
+          (
+            try(trimspace(slot.storage_key_vault_secret_id), "") != "" ?
+            try(trimspace(slot.storage_key_vault_secret_id), "") :
+            try(trimspace(var.storage_configuration.key_vault_secret_id), "")
+          ) != ""
           ) || (
-          coalesce(slot.storage_account_name, var.storage_configuration.account_name) != null &&
-          trimspace(coalesce(slot.storage_account_name, var.storage_configuration.account_name)) != ""
+          (
+            try(trimspace(slot.storage_account_name), "") != "" ?
+            try(trimspace(slot.storage_account_name), "") :
+            try(trimspace(var.storage_configuration.account_name), "")
+          ) != ""
         )
       )
     ])
@@ -911,11 +921,26 @@ variable "slots" {
     condition = alltrue([
       for slot in var.slots : (
         (
-          coalesce(slot.storage_key_vault_secret_id, var.storage_configuration.key_vault_secret_id) == null ||
-          trimspace(coalesce(slot.storage_key_vault_secret_id, var.storage_configuration.key_vault_secret_id)) == ""
+          (
+            try(trimspace(slot.storage_key_vault_secret_id), "") != "" ?
+            try(trimspace(slot.storage_key_vault_secret_id), "") :
+            try(trimspace(var.storage_configuration.key_vault_secret_id), "")
+          ) == ""
           ) || (
-          (coalesce(slot.storage_account_name, var.storage_configuration.account_name) == null || trimspace(coalesce(slot.storage_account_name, var.storage_configuration.account_name)) == "") &&
-          (coalesce(slot.storage_account_access_key, var.storage_configuration.account_access_key) == null || trimspace(coalesce(slot.storage_account_access_key, var.storage_configuration.account_access_key)) == "") &&
+          (
+            (
+              try(trimspace(slot.storage_account_name), "") != "" ?
+              try(trimspace(slot.storage_account_name), "") :
+              try(trimspace(var.storage_configuration.account_name), "")
+            ) == ""
+          ) &&
+          (
+            (
+              try(trimspace(slot.storage_account_access_key), "") != "" ?
+              try(trimspace(slot.storage_account_access_key), "") :
+              try(trimspace(var.storage_configuration.account_access_key), "")
+            ) == ""
+          ) &&
           !coalesce(slot.storage_uses_managed_identity, var.storage_configuration.uses_managed_identity)
         )
       )
@@ -927,15 +952,29 @@ variable "slots" {
     condition = alltrue([
       for slot in var.slots : (
         (
-          coalesce(slot.storage_key_vault_secret_id, var.storage_configuration.key_vault_secret_id) != null &&
-          trimspace(coalesce(slot.storage_key_vault_secret_id, var.storage_configuration.key_vault_secret_id)) != ""
+          (
+            try(trimspace(slot.storage_key_vault_secret_id), "") != "" ?
+            try(trimspace(slot.storage_key_vault_secret_id), "") :
+            try(trimspace(var.storage_configuration.key_vault_secret_id), "")
+          ) != ""
           ) ? true : (
           coalesce(slot.storage_uses_managed_identity, var.storage_configuration.uses_managed_identity) ? (
             slot.identity != null &&
-            (coalesce(slot.storage_account_access_key, var.storage_configuration.account_access_key) == null || trimspace(coalesce(slot.storage_account_access_key, var.storage_configuration.account_access_key)) == "")
+            (
+              (
+                try(trimspace(slot.storage_account_access_key), "") != "" ?
+                try(trimspace(slot.storage_account_access_key), "") :
+                try(trimspace(var.storage_configuration.account_access_key), "")
+              ) == ""
+            )
             ) : (
-            coalesce(slot.storage_account_access_key, var.storage_configuration.account_access_key) != null &&
-            trimspace(coalesce(slot.storage_account_access_key, var.storage_configuration.account_access_key)) != ""
+            (
+              (
+                try(trimspace(slot.storage_account_access_key), "") != "" ?
+                try(trimspace(slot.storage_account_access_key), "") :
+                try(trimspace(var.storage_configuration.account_access_key), "")
+              ) != ""
+            )
           )
         )
       )

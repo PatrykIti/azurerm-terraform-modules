@@ -10,14 +10,6 @@ mock_provider "azurerm" {
       default_hostname               = "wfuncunit.azurewebsites.net"
       outbound_ip_addresses          = "10.0.0.1,10.0.0.2"
       possible_outbound_ip_addresses = "10.0.0.3,10.0.0.4"
-      identity = [
-        {
-          type         = "SystemAssigned"
-          principal_id = "00000000-0000-0000-0000-000000000001"
-          tenant_id    = "00000000-0000-0000-0000-000000000002"
-          identity_ids = []
-        }
-      ]
     }
   }
 
@@ -38,6 +30,9 @@ variables {
     application_stack = {
       dotnet_version = "v8.0"
     }
+  }
+  identity = {
+    type = "SystemAssigned"
   }
 }
 

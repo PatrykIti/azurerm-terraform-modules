@@ -28,7 +28,6 @@ resource "azurerm_windows_function_app_slot" "windows_function_app_slot" {
   key_vault_reference_identity_id        = each.value.key_vault_reference_identity_id
   virtual_network_subnet_id              = each.value.virtual_network_subnet_id
   virtual_network_backup_restore_enabled = each.value.virtual_network_backup_restore_enabled
-  zip_deploy_file                        = each.value.zip_deploy_file
 
   tags = each.value.tags == null ? var.tags : merge(var.tags, each.value.tags)
 
@@ -272,32 +271,34 @@ resource "azurerm_windows_function_app_slot" "windows_function_app_slot" {
   dynamic "site_config" {
     for_each = each.value.site_config == null ? [] : [each.value.site_config]
     content {
-      always_on                         = site_config.value.always_on
-      api_definition_url                = site_config.value.api_definition_url
-      api_management_api_id             = site_config.value.api_management_api_id
-      app_command_line                  = site_config.value.app_command_line
-      app_scale_limit                   = site_config.value.app_scale_limit
-      default_documents                 = site_config.value.default_documents
-      elastic_instance_minimum          = site_config.value.elastic_instance_minimum
-      ftps_state                        = site_config.value.ftps_state
-      health_check_path                 = site_config.value.health_check_path
-      health_check_eviction_time_in_min = site_config.value.health_check_eviction_time_in_min
-      http2_enabled                     = site_config.value.http2_enabled
-      ip_restriction_default_action     = site_config.value.ip_restriction_default_action
-      load_balancing_mode               = site_config.value.load_balancing_mode
-      managed_pipeline_mode             = site_config.value.managed_pipeline_mode
-      minimum_tls_version               = site_config.value.minimum_tls_version
-      pre_warmed_instance_count         = site_config.value.pre_warmed_instance_count
-      remote_debugging_enabled          = site_config.value.remote_debugging_enabled
-      remote_debugging_version          = site_config.value.remote_debugging_version
-      runtime_scale_monitoring_enabled  = site_config.value.runtime_scale_monitoring_enabled
-      scm_ip_restriction_default_action = site_config.value.scm_ip_restriction_default_action
-      scm_minimum_tls_version           = site_config.value.scm_minimum_tls_version
-      scm_use_main_ip_restriction       = site_config.value.scm_use_main_ip_restriction
-      use_32_bit_worker                 = site_config.value.use_32_bit_worker
-      vnet_route_all_enabled            = site_config.value.vnet_route_all_enabled
-      websockets_enabled                = site_config.value.websockets_enabled
-      worker_count                      = site_config.value.worker_count
+      always_on                              = site_config.value.always_on
+      api_definition_url                     = site_config.value.api_definition_url
+      api_management_api_id                  = site_config.value.api_management_api_id
+      app_command_line                       = site_config.value.app_command_line
+      app_scale_limit                        = site_config.value.app_scale_limit
+      application_insights_connection_string = site_config.value.application_insights_connection_string
+      application_insights_key               = site_config.value.application_insights_key
+      default_documents                      = site_config.value.default_documents
+      elastic_instance_minimum               = site_config.value.elastic_instance_minimum
+      ftps_state                             = site_config.value.ftps_state
+      health_check_path                      = site_config.value.health_check_path
+      health_check_eviction_time_in_min      = site_config.value.health_check_eviction_time_in_min
+      http2_enabled                          = site_config.value.http2_enabled
+      ip_restriction_default_action          = site_config.value.ip_restriction_default_action
+      load_balancing_mode                    = site_config.value.load_balancing_mode
+      managed_pipeline_mode                  = site_config.value.managed_pipeline_mode
+      minimum_tls_version                    = site_config.value.minimum_tls_version
+      pre_warmed_instance_count              = site_config.value.pre_warmed_instance_count
+      remote_debugging_enabled               = site_config.value.remote_debugging_enabled
+      remote_debugging_version               = site_config.value.remote_debugging_version
+      runtime_scale_monitoring_enabled       = site_config.value.runtime_scale_monitoring_enabled
+      scm_ip_restriction_default_action      = site_config.value.scm_ip_restriction_default_action
+      scm_minimum_tls_version                = site_config.value.scm_minimum_tls_version
+      scm_use_main_ip_restriction            = site_config.value.scm_use_main_ip_restriction
+      use_32_bit_worker                      = site_config.value.use_32_bit_worker
+      vnet_route_all_enabled                 = site_config.value.vnet_route_all_enabled
+      websockets_enabled                     = site_config.value.websockets_enabled
+      worker_count                           = site_config.value.worker_count
 
       dynamic "application_stack" {
         for_each = site_config.value.application_stack == null ? [] : [site_config.value.application_stack]
