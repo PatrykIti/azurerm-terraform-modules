@@ -1,6 +1,7 @@
 package test
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
@@ -11,6 +12,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+type federatedIdentityCredentialOutput struct {
+	ID       string   `json:"id"`
+	Name     string   `json:"name"`
+	Issuer   string   `json:"issuer"`
+	Subject  string   `json:"subject"`
+	Audience []string `json:"audience"`
+}
 
 // Test basic user_assigned_identity creation
 func TestBasicUserAssignedIdentity(t *testing.T) {
@@ -66,7 +75,7 @@ func TestCompleteUserAssignedIdentity(t *testing.T) {
 
 		resourceID := terraform.Output(t, terraformOptions, "user_assigned_identity_id")
 		resourceName := terraform.Output(t, terraformOptions, "user_assigned_identity_name")
-		federatedCredentials := terraform.OutputMapOfObjects(t, terraformOptions, "federated_identity_credentials")
+		federatedCredentials := getFederatedIdentityCredentials(t, terraformOptions)
 
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, resourceName)
@@ -94,7 +103,7 @@ func TestSecureUserAssignedIdentity(t *testing.T) {
 
 		resourceID := terraform.Output(t, terraformOptions, "user_assigned_identity_id")
 		roleAssignmentID := terraform.Output(t, terraformOptions, "role_assignment_id")
-		federatedCredentials := terraform.OutputMapOfObjects(t, terraformOptions, "federated_identity_credentials")
+		federatedCredentials := getFederatedIdentityCredentials(t, terraformOptions)
 
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, roleAssignmentID)
@@ -121,7 +130,7 @@ func TestFederatedIdentityCredentials(t *testing.T) {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
 		resourceID := terraform.Output(t, terraformOptions, "user_assigned_identity_id")
-		federatedCredentials := terraform.OutputMapOfObjects(t, terraformOptions, "federated_identity_credentials")
+		federatedCredentials := getFederatedIdentityCredentials(t, terraformOptions)
 
 		assert.NotEmpty(t, resourceID)
 		assert.Equal(t, 2, len(federatedCredentials))
@@ -184,4 +193,15 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,
 	}
+}
+
+func getFederatedIdentityCredentials(t testing.TB, terraformOptions *terraform.Options) map[string]federatedIdentityCredentialOutput {
+	t.Helper()
+
+	outputJSON := terraform.OutputJson(t, terraformOptions, "federated_identity_credentials")
+
+	var credentials map[string]federatedIdentityCredentialOutput
+	require.NoError(t, json.Unmarshal([]byte(outputJSON), &credentials))
+
+	return credentials
 }

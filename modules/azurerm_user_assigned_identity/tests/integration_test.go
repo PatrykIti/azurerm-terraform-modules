@@ -30,7 +30,7 @@ func TestUserAssignedIdentityIntegration(t *testing.T) {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
 		resourceID := terraform.Output(t, terraformOptions, "user_assigned_identity_id")
-		federatedCredentials := terraform.OutputMapOfObjects(t, terraformOptions, "federated_identity_credentials")
+		federatedCredentials := getFederatedIdentityCredentials(t, terraformOptions)
 
 		assert.NotEmpty(t, resourceID)
 		assert.GreaterOrEqual(t, len(federatedCredentials), 2)
