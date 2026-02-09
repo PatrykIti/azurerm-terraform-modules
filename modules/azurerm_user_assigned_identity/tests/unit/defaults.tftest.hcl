@@ -23,7 +23,7 @@ run "defaults_apply" {
   command = apply
 
   assert {
-    condition     = output.tags == {}
+    condition     = length(keys(output.tags)) == 0
     error_message = "Default tags should be an empty map."
   }
 

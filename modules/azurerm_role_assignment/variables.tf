@@ -158,7 +158,6 @@ variable "timeouts" {
   description = "Optional timeouts configuration for role assignments."
   type = object({
     create = optional(string)
-    update = optional(string)
     delete = optional(string)
     read   = optional(string)
   })

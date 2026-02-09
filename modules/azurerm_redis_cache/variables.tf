@@ -160,16 +160,16 @@ variable "redis_configuration" {
   default = null
 
   validation {
-    condition = var.redis_configuration == null || !try(var.redis_configuration.aof_backup_enabled, false) || (
-      (try(var.redis_configuration.aof_storage_connection_string_0, "") != "") ||
-      (try(var.redis_configuration.aof_storage_connection_string_1, "") != "")
+    condition = var.redis_configuration == null || !coalesce(var.redis_configuration.aof_backup_enabled, false) || (
+      try(trimspace(var.redis_configuration.aof_storage_connection_string_0), "") != "" ||
+      try(trimspace(var.redis_configuration.aof_storage_connection_string_1), "") != ""
     )
     error_message = "aof_storage_connection_string_0 or aof_storage_connection_string_1 must be set when aof_backup_enabled is true."
   }
 
   validation {
-    condition = var.redis_configuration == null || !try(var.redis_configuration.rdb_backup_enabled, false) || (
-      try(var.redis_configuration.rdb_storage_connection_string, "") != ""
+    condition = var.redis_configuration == null || !coalesce(var.redis_configuration.rdb_backup_enabled, false) || (
+      try(trimspace(var.redis_configuration.rdb_storage_connection_string), "") != ""
     )
     error_message = "rdb_storage_connection_string must be set when rdb_backup_enabled is true."
   }

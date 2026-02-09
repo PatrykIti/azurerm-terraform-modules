@@ -16,16 +16,14 @@ resource "azurerm_role_assignment" "role_assignment" {
   skip_service_principal_aad_check       = var.skip_service_principal_aad_check
 
   dynamic "timeouts" {
-    for_each = (
+    for_each = var.timeouts == null ? [] : (
       var.timeouts.create != null ||
-      var.timeouts.update != null ||
       var.timeouts.delete != null ||
       var.timeouts.read != null
     ) ? [var.timeouts] : []
 
     content {
       create = try(timeouts.value.create, null)
-      update = try(timeouts.value.update, null)
       delete = try(timeouts.value.delete, null)
       read   = try(timeouts.value.read, null)
     }

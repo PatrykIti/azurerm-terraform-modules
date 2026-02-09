@@ -81,7 +81,7 @@ No modules.
 | <a name="input_role_definition_name"></a> [role\_definition\_name](#input\_role\_definition\_name) | The built-in role definition name to assign. Exactly one of role\_definition\_id or role\_definition\_name must be set. | `string` | `null` | no |
 | <a name="input_scope"></a> [scope](#input\_scope) | The scope at which the role assignment applies. Use a management group, subscription, resource group, or resource ID. | `string` | n/a | yes |
 | <a name="input_skip_service_principal_aad_check"></a> [skip\_service\_principal\_aad\_check](#input\_skip\_service\_principal\_aad\_check) | If true, skips the AAD check for service principals during assignment. | `bool` | `false` | no |
-| <a name="input_timeouts"></a> [timeouts](#input\_timeouts) | Optional timeouts configuration for role assignments. | <pre>object({<br/>    create = optional(string)<br/>    update = optional(string)<br/>    delete = optional(string)<br/>    read   = optional(string)<br/>  })</pre> | `{}` | no |
+| <a name="input_timeouts"></a> [timeouts](#input\_timeouts) | Optional timeouts configuration for role assignments. | <pre>object({<br/>    create = optional(string)<br/>    delete = optional(string)<br/>    read   = optional(string)<br/>  })</pre> | `{}` | no |
 
 ## Outputs
 
