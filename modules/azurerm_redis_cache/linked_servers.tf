@@ -1,5 +1,5 @@
 resource "azurerm_redis_linked_server" "redis_linked_server" {
-  for_each = local.sku_is_premium ? {
+  for_each = var.sku_name == "Premium" ? {
     for ls in var.linked_servers : ls.name => ls
   } : {}
 

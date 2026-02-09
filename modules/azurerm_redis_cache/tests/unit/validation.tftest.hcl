@@ -25,7 +25,7 @@ run "invalid_sku_family_combo" {
   }
 
   expect_failures = [
-    azurerm_redis_cache.redis_cache,
+    var.capacity,
   ]
 }
 
@@ -37,7 +37,7 @@ run "invalid_capacity_for_standard" {
   }
 
   expect_failures = [
-    azurerm_redis_cache.redis_cache,
+    var.capacity,
   ]
 }
 
@@ -73,7 +73,7 @@ run "subnet_requires_premium" {
   }
 
   expect_failures = [
-    azurerm_redis_cache.redis_cache,
+    var.subnet_id,
   ]
 }
 
@@ -88,7 +88,7 @@ run "subnet_requires_private_ip" {
   }
 
   expect_failures = [
-    azurerm_redis_cache.redis_cache,
+    var.subnet_id,
   ]
 }
 
@@ -105,7 +105,7 @@ run "subnet_requires_public_access_disabled" {
   }
 
   expect_failures = [
-    azurerm_redis_cache.redis_cache,
+    var.subnet_id,
   ]
 }
 
@@ -124,7 +124,7 @@ run "firewall_requires_public_access" {
   }
 
   expect_failures = [
-    azurerm_redis_cache.redis_cache,
+    var.firewall_rules,
   ]
 }
 
@@ -141,7 +141,7 @@ run "patch_schedule_requires_premium" {
   }
 
   expect_failures = [
-    azurerm_redis_cache.redis_cache,
+    var.patch_schedule,
   ]
 }
 
@@ -160,7 +160,7 @@ run "linked_servers_requires_premium" {
   }
 
   expect_failures = [
-    azurerm_redis_cache.redis_cache,
+    var.linked_servers,
   ]
 }
 
@@ -172,7 +172,7 @@ run "replicas_requires_premium" {
   }
 
   expect_failures = [
-    azurerm_redis_cache.redis_cache,
+    var.replicas_per_primary,
   ]
 }
 
@@ -188,7 +188,7 @@ run "shard_count_conflicts_with_replicas" {
   }
 
   expect_failures = [
-    azurerm_redis_cache.redis_cache,
+    var.replicas_per_primary,
   ]
 }
 
@@ -204,7 +204,7 @@ run "replicas_fields_mutually_exclusive" {
   }
 
   expect_failures = [
-    azurerm_redis_cache.redis_cache,
+    var.replicas_per_primary,
   ]
 }
 
@@ -216,7 +216,7 @@ run "access_keys_disabled_requires_ad" {
   }
 
   expect_failures = [
-    azurerm_redis_cache.redis_cache,
+    var.access_keys_authentication_enabled,
   ]
 }
 

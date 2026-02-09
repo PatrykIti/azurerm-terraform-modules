@@ -48,6 +48,14 @@ variable "capacity" {
     condition     = var.capacity >= 0
     error_message = "capacity must be a non-negative number."
   }
+
+  validation {
+    condition = (
+      (var.sku_name == "Premium" && var.family == "P" && var.capacity >= 1 && var.capacity <= 5) ||
+      ((var.sku_name == "Basic" || var.sku_name == "Standard") && var.family == "C" && var.capacity >= 0 && var.capacity <= 6)
+    )
+    error_message = "sku_name/family/capacity must be Basic/Standard with family C and capacity 0-6, or Premium with family P and capacity 1-5."
+  }
 }
 
 # Network
@@ -61,6 +69,25 @@ variable "subnet_id" {
   description = "The ID of the subnet to deploy the Redis Cache into (Premium only)."
   type        = string
   default     = null
+
+  validation {
+    condition     = var.subnet_id == null || trimspace(var.subnet_id) == "" || var.sku_name == "Premium"
+    error_message = "subnet_id is only supported with Premium SKU."
+  }
+
+  validation {
+    condition = (
+      var.subnet_id == null || trimspace(var.subnet_id) == ""
+      ) == (
+      var.private_static_ip_address == null || trimspace(var.private_static_ip_address) == ""
+    )
+    error_message = "subnet_id and private_static_ip_address must be set together."
+  }
+
+  validation {
+    condition     = var.subnet_id == null || trimspace(var.subnet_id) == "" || var.public_network_access_enabled == false
+    error_message = "public_network_access_enabled must be false when subnet_id is set."
+  }
 }
 
 variable "private_static_ip_address" {
@@ -91,6 +118,14 @@ variable "access_keys_authentication_enabled" {
   description = "Whether access key authentication is enabled. When disabled, Active Directory authentication must be enabled in redis_configuration."
   type        = bool
   default     = true
+
+  validation {
+    condition = var.access_keys_authentication_enabled || (
+      var.redis_configuration != null &&
+      coalesce(var.redis_configuration.active_directory_authentication_enabled, false)
+    )
+    error_message = "When access_keys_authentication_enabled is false, redis_configuration.active_directory_authentication_enabled must be true."
+  }
 }
 
 # Availability and scale
@@ -116,12 +151,38 @@ variable "shard_count" {
   description = "The number of shards (Premium only)."
   type        = number
   default     = null
+
+  validation {
+    condition     = var.shard_count == null || var.sku_name == "Premium"
+    error_message = "shard_count is only supported with Premium SKU."
+  }
 }
 
 variable "replicas_per_primary" {
   description = "The number of replicas per primary (Premium only)."
   type        = number
   default     = null
+
+  validation {
+    condition = (
+      var.replicas_per_primary == null && var.replicas_per_master == null
+      ) || (
+      var.sku_name == "Premium"
+    )
+    error_message = "replicas_per_master/replicas_per_primary are only supported with Premium SKU."
+  }
+
+  validation {
+    condition = var.shard_count == null || (
+      var.replicas_per_primary == null && var.replicas_per_master == null
+    )
+    error_message = "replicas_per_master/replicas_per_primary cannot be used with shard_count."
+  }
+
+  validation {
+    condition     = var.replicas_per_primary == null || var.replicas_per_master == null
+    error_message = "replicas_per_master and replicas_per_primary are mutually exclusive; set only one."
+  }
 }
 
 variable "replicas_per_master" {
@@ -236,6 +297,11 @@ variable "patch_schedule" {
     ])
     error_message = "patch_schedule.start_hour_utc must be between 0 and 23 when set."
   }
+
+  validation {
+    condition     = length(var.patch_schedule) == 0 || var.sku_name == "Premium"
+    error_message = "patch_schedule is only supported with Premium SKU."
+  }
 }
 
 # Firewall rules
@@ -253,6 +319,11 @@ variable "firewall_rules" {
   validation {
     condition     = length(distinct([for rule in var.firewall_rules : rule.name])) == length(var.firewall_rules)
     error_message = "Each firewall rule must have a unique name."
+  }
+
+  validation {
+    condition     = length(var.firewall_rules) == 0 || var.public_network_access_enabled
+    error_message = "firewall_rules require public_network_access_enabled = true."
   }
 }
 
@@ -279,6 +350,11 @@ variable "linked_servers" {
       for ls in var.linked_servers : contains(["Primary", "Secondary"], ls.server_role)
     ])
     error_message = "linked_servers.server_role must be Primary or Secondary."
+  }
+
+  validation {
+    condition     = length(var.linked_servers) == 0 || var.sku_name == "Premium"
+    error_message = "linked_servers are only supported with Premium SKU."
   }
 }
 
