@@ -21,7 +21,8 @@ func TestBasicWindowsVirtualMachine(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -52,7 +53,8 @@ func TestSecureWindowsVirtualMachine(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -81,7 +83,8 @@ func TestWindowsVirtualMachineDataDisks(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/data-disks")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -110,7 +113,8 @@ func TestWindowsVirtualMachineExtensions(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/vm-extensions")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
