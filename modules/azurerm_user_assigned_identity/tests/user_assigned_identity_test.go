@@ -16,7 +16,7 @@ import (
 func TestBasicUserAssignedIdentity(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -50,7 +50,7 @@ func TestBasicUserAssignedIdentity(t *testing.T) {
 func TestCompleteUserAssignedIdentity(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -78,7 +78,7 @@ func TestCompleteUserAssignedIdentity(t *testing.T) {
 func TestSecureUserAssignedIdentity(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -106,7 +106,7 @@ func TestSecureUserAssignedIdentity(t *testing.T) {
 func TestFederatedIdentityCredentials(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/federated-identity-credentials")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/federated-identity-credentials")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -132,7 +132,7 @@ func TestFederatedIdentityCredentials(t *testing.T) {
 func TestUserAssignedIdentityValidationRules(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/negative")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/negative")
 	terraformOptions := &terraform.Options{
 		TerraformDir: testFolder,
 		NoColor:      true,
@@ -148,7 +148,7 @@ func BenchmarkUserAssignedIdentityCreation(b *testing.B) {
 		b.Skip("Skipping benchmark in short mode")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(b, testFolder)
 
 	defer terraform.Destroy(b, terraformOptions)

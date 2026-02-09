@@ -16,7 +16,7 @@ import (
 func TestBasicRedisCache(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -43,7 +43,7 @@ func TestBasicRedisCache(t *testing.T) {
 func TestCompleteRedisCache(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -68,7 +68,7 @@ func TestCompleteRedisCache(t *testing.T) {
 func TestSecureRedisCache(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/secure")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -91,7 +91,7 @@ func TestSecureRedisCache(t *testing.T) {
 func TestRedisCachePatchSchedule(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/patch-schedule")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/patch-schedule")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -113,7 +113,7 @@ func TestRedisCachePatchSchedule(t *testing.T) {
 func TestRedisCacheFirewallRules(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/firewall-rules")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/firewall-rules")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -135,7 +135,7 @@ func TestRedisCacheFirewallRules(t *testing.T) {
 func TestRedisCacheLinkedServer(t *testing.T) {
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/linked-server")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/linked-server")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraform.Destroy(t, getTerraformOptions(t, testFolder))
 	})
@@ -162,7 +162,7 @@ func BenchmarkRedisCacheCreation(b *testing.B) {
 		b.Skip("Skipping benchmark in short mode")
 	}
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(b, testFolder)
 
 	defer terraform.Destroy(b, terraformOptions)

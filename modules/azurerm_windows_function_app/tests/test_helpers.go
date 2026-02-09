@@ -16,13 +16,13 @@ import (
 
 // TestConfig holds common test configuration
 type TestConfig struct {
-	SubscriptionID    string
-	TenantID         string
-	ClientID         string
-	ClientSecret     string
-	Location         string
-	ResourceGroup    string
-	UniqueID         string
+	SubscriptionID string
+	TenantID       string
+	ClientID       string
+	ClientSecret   string
+	Location       string
+	ResourceGroup  string
+	UniqueID       string
 }
 
 // GetTestConfig returns a test configuration with required Azure credentials
@@ -48,12 +48,12 @@ func GetTestConfig(t *testing.T) *TestConfig {
 
 	return &TestConfig{
 		SubscriptionID: subscriptionID,
-		TenantID:      tenantID,
-		ClientID:      clientID,
-		ClientSecret:  clientSecret,
-		Location:      location,
-		ResourceGroup: fmt.Sprintf("rg-test-windows_function_app-%s", uniqueID),
-		UniqueID:      uniqueID,
+		TenantID:       tenantID,
+		ClientID:       clientID,
+		ClientSecret:   clientSecret,
+		Location:       location,
+		ResourceGroup:  fmt.Sprintf("rg-test-windows_function_app-%s", uniqueID),
+		UniqueID:       uniqueID,
 	}
 }
 

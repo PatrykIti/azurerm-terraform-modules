@@ -16,7 +16,7 @@ func BenchmarkUserAssignedIdentityCreationSimple(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 		b.StartTimer()
@@ -39,7 +39,7 @@ func BenchmarkUserAssignedIdentityWithFIC(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		testFolder := test_structure.CopyTerraformFolderToTemp(b, ".", "fixtures/complete")
+		testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/complete")
 		terraformOptions := getTerraformOptions(b, testFolder)
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 		b.StartTimer()
@@ -63,7 +63,7 @@ func TestUserAssignedIdentityCreationTime(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, ".", "fixtures/basic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
 	defer terraform.Destroy(t, terraformOptions)
