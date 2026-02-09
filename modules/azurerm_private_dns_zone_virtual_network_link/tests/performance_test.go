@@ -211,10 +211,10 @@ func TestPrivateDnsZoneVirtualNetworkLinkScaling(t *testing.T) {
 
 	t.Logf("Average creation time for %d private_dns_zone_virtual_network_link instances: %v", instanceCount, avgTime)
 
-	// Ensure average time is reasonable (under 3 minutes)
-	// Adjust based on expected resource creation time
-	require.LessOrEqual(t, avgTime, 3*time.Minute,
-		"Average creation time %v exceeds maximum of 3 minutes", avgTime)
+	// Ensure average time is reasonable while accounting for transient Azure delays.
+	maxAverageCreationTime := 4 * time.Minute
+	require.LessOrEqual(t, avgTime, maxAverageCreationTime,
+		"Average creation time %v exceeds maximum of %v", avgTime, maxAverageCreationTime)
 }
 
 // TestPrivateDnsZoneVirtualNetworkLinkUpdatePerformance tests update performance
@@ -288,7 +288,8 @@ func TestPrivateDnsZoneVirtualNetworkLinkDestroyPerformance(t *testing.T) {
 
 	t.Logf("Private DNS Zone Virtual Network Link destroyed in %v", destroyTime)
 
-	// Destroy should complete within 3 minutes
-	require.LessOrEqual(t, destroyTime, 3*time.Minute,
-		"Destroy took %v, expected less than 3 minutes", destroyTime)
+	// Destroy operations can be slow in Azure due to asynchronous VNet-link cleanup.
+	maxDestroyDuration := 5 * time.Minute
+	require.LessOrEqual(t, destroyTime, maxDestroyDuration,
+		"Destroy took %v, expected less than %v", destroyTime, maxDestroyDuration)
 }

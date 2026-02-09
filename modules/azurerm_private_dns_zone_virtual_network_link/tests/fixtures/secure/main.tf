@@ -26,7 +26,7 @@ resource "azurerm_virtual_network" "example" {
 }
 
 resource "azurerm_private_dns_zone" "example" {
-  name                = "privatelink-${var.random_suffix}.vaultcore.azure.net"
+  name                = "privatelink.vaultcore.azure.net"
   resource_group_name = azurerm_resource_group.example.name
 }
 

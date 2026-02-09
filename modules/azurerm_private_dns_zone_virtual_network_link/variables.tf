@@ -64,6 +64,11 @@ variable "resolution_policy" {
     condition     = var.resolution_policy == null || contains(["Default", "NxDomainRedirect"], var.resolution_policy)
     error_message = "resolution_policy must be either Default or NxDomainRedirect when set."
   }
+
+  validation {
+    condition     = var.resolution_policy == null || startswith(lower(var.private_dns_zone_name), "privatelink.")
+    error_message = "resolution_policy can only be set for private link zones (private_dns_zone_name must start with 'privatelink.')."
+  }
 }
 
 variable "timeouts" {

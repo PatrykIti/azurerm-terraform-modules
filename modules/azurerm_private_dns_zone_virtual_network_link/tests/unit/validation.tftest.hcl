@@ -45,7 +45,7 @@ run "valid_resolution_policy_default" {
   command = plan
 
   variables {
-    private_dns_zone_name = "example.internal"
+    private_dns_zone_name = "privatelink.blob.core.windows.net"
     virtual_network_id    = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/vnet-test"
     resolution_policy     = "Default"
   }
@@ -60,7 +60,7 @@ run "valid_resolution_policy_nxdomain_redirect" {
   command = plan
 
   variables {
-    private_dns_zone_name = "example.internal"
+    private_dns_zone_name = "privatelink.blob.core.windows.net"
     virtual_network_id    = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/vnet-test"
     resolution_policy     = "NxDomainRedirect"
   }
@@ -75,9 +75,23 @@ run "invalid_resolution_policy_recursive" {
   command = plan
 
   variables {
-    private_dns_zone_name = "example.internal"
+    private_dns_zone_name = "privatelink.blob.core.windows.net"
     virtual_network_id    = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/vnet-test"
     resolution_policy     = "Recursive"
+  }
+
+  expect_failures = [
+    var.resolution_policy
+  ]
+}
+
+run "resolution_policy_requires_privatelink_zone" {
+  command = plan
+
+  variables {
+    private_dns_zone_name = "example.internal"
+    virtual_network_id    = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/vnet-test"
+    resolution_policy     = "Default"
   }
 
   expect_failures = [

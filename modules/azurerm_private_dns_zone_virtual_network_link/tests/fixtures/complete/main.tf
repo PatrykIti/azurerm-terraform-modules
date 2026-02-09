@@ -26,7 +26,7 @@ resource "azurerm_virtual_network" "example" {
 }
 
 resource "azurerm_private_dns_zone" "example" {
-  name                = "privatelink-${var.random_suffix}.blob.core.windows.net"
+  name                = "privatelink.blob.core.windows.net"
   resource_group_name = azurerm_resource_group.example.name
 }
 
