@@ -248,7 +248,7 @@ resource "azurerm_linux_function_app" "linux_function_app" {
       elastic_instance_minimum                      = site_config.value.elastic_instance_minimum
       ftps_state                                    = site_config.value.ftps_state
       health_check_path                             = site_config.value.health_check_path
-      health_check_eviction_time_in_min             = site_config.value.health_check_eviction_time_in_min
+      health_check_eviction_time_in_min             = site_config.value.health_check_path == null ? null : coalesce(site_config.value.health_check_eviction_time_in_min, 2)
       http2_enabled                                 = site_config.value.http2_enabled
       ip_restriction_default_action                 = site_config.value.ip_restriction_default_action
       load_balancing_mode                           = site_config.value.load_balancing_mode
@@ -636,7 +636,7 @@ resource "azurerm_linux_function_app_slot" "linux_function_app_slot" {
       elastic_instance_minimum                      = site_config.value.elastic_instance_minimum
       ftps_state                                    = site_config.value.ftps_state
       health_check_path                             = site_config.value.health_check_path
-      health_check_eviction_time_in_min             = site_config.value.health_check_eviction_time_in_min
+      health_check_eviction_time_in_min             = site_config.value.health_check_path == null ? null : coalesce(site_config.value.health_check_eviction_time_in_min, 2)
       http2_enabled                                 = site_config.value.http2_enabled
       ip_restriction_default_action                 = site_config.value.ip_restriction_default_action
       load_balancing_mode                           = site_config.value.load_balancing_mode

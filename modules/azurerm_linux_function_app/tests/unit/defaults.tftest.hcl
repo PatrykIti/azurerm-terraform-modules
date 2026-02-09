@@ -89,3 +89,21 @@ run "verify_tags_default" {
     error_message = "tags should be empty by default."
   }
 }
+
+run "verify_health_check_eviction_default" {
+  command = plan
+
+  variables {
+    site_configuration = {
+      health_check_path = "/health"
+      application_stack = {
+        node_version = "20"
+      }
+    }
+  }
+
+  assert {
+    condition     = try(azurerm_linux_function_app.linux_function_app.site_config[0].health_check_eviction_time_in_min, null) == 2
+    error_message = "health_check_eviction_time_in_min should default to 2 when health_check_path is set."
+  }
+}
