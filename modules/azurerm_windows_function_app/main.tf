@@ -1,35 +1,3 @@
-locals {
-  slots_by_name = { for slot in var.slots : slot.name => slot }
-
-  storage_key_vault_secret_id_set = var.storage_configuration.key_vault_secret_id != null && var.storage_configuration.key_vault_secret_id != ""
-
-  slot_storage = {
-    for slot in var.slots : slot.name => {
-      storage_key_vault_secret_id = coalesce(slot.storage_key_vault_secret_id, var.storage_configuration.key_vault_secret_id)
-      storage_key_vault_secret_id_set = (
-        coalesce(slot.storage_key_vault_secret_id, var.storage_configuration.key_vault_secret_id) != null &&
-        coalesce(slot.storage_key_vault_secret_id, var.storage_configuration.key_vault_secret_id) != ""
-      )
-      storage_uses_managed_identity = coalesce(slot.storage_uses_managed_identity, var.storage_configuration.uses_managed_identity)
-      storage_account_name = (
-        (
-          coalesce(slot.storage_key_vault_secret_id, var.storage_configuration.key_vault_secret_id) != null &&
-          coalesce(slot.storage_key_vault_secret_id, var.storage_configuration.key_vault_secret_id) != ""
-        ) ? null : coalesce(slot.storage_account_name, var.storage_configuration.account_name)
-      )
-      storage_account_access_key = (
-        (
-          coalesce(slot.storage_key_vault_secret_id, var.storage_configuration.key_vault_secret_id) != null &&
-          coalesce(slot.storage_key_vault_secret_id, var.storage_configuration.key_vault_secret_id) != ""
-          ) ? null : (
-          coalesce(slot.storage_uses_managed_identity, var.storage_configuration.uses_managed_identity) ? null :
-          coalesce(slot.storage_account_access_key, var.storage_configuration.account_access_key)
-        )
-      )
-    }
-  }
-}
-
 resource "azurerm_windows_function_app" "windows_function_app" {
   name                = var.name
   resource_group_name = var.resource_group_name
@@ -37,8 +5,14 @@ resource "azurerm_windows_function_app" "windows_function_app" {
 
   service_plan_id = var.service_plan_id
 
-  storage_account_name = local.storage_key_vault_secret_id_set ? null : var.storage_configuration.account_name
-  storage_account_access_key = local.storage_key_vault_secret_id_set ? null : (
+  storage_account_name = (
+    var.storage_configuration.key_vault_secret_id != null &&
+    try(trimspace(var.storage_configuration.key_vault_secret_id), "") != ""
+  ) ? null : var.storage_configuration.account_name
+  storage_account_access_key = (
+    var.storage_configuration.key_vault_secret_id != null &&
+    try(trimspace(var.storage_configuration.key_vault_secret_id), "") != ""
+    ) ? null : (
     var.storage_configuration.uses_managed_identity ? null : var.storage_configuration.account_access_key
   )
   storage_uses_managed_identity = var.storage_configuration.uses_managed_identity ? true : null
@@ -446,15 +420,39 @@ resource "azurerm_windows_function_app" "windows_function_app" {
 }
 
 resource "azurerm_windows_function_app_slot" "windows_function_app_slot" {
-  for_each = local.slots_by_name
+  for_each = { for slot in var.slots : slot.name => slot }
 
   name            = each.value.name
   function_app_id = azurerm_windows_function_app.windows_function_app.id
 
-  storage_account_name          = local.slot_storage[each.key].storage_account_name
-  storage_account_access_key    = local.slot_storage[each.key].storage_account_access_key
-  storage_uses_managed_identity = local.slot_storage[each.key].storage_uses_managed_identity ? true : null
-  storage_key_vault_secret_id   = local.slot_storage[each.key].storage_key_vault_secret_id
+  storage_account_name = (
+    try(
+      trimspace(
+        each.value.storage_key_vault_secret_id != null ? each.value.storage_key_vault_secret_id : var.storage_configuration.key_vault_secret_id
+      ),
+      ""
+    ) != ""
+    ) ? null : (
+    each.value.storage_account_name != null ? each.value.storage_account_name : var.storage_configuration.account_name
+  )
+  storage_account_access_key = (
+    try(
+      trimspace(
+        each.value.storage_key_vault_secret_id != null ? each.value.storage_key_vault_secret_id : var.storage_configuration.key_vault_secret_id
+      ),
+      ""
+    ) != ""
+    ) ? null : (
+    (each.value.storage_uses_managed_identity != null ? each.value.storage_uses_managed_identity : var.storage_configuration.uses_managed_identity) ? null : (
+      each.value.storage_account_access_key != null ? each.value.storage_account_access_key : var.storage_configuration.account_access_key
+    )
+  )
+  storage_uses_managed_identity = (
+    each.value.storage_uses_managed_identity != null ? each.value.storage_uses_managed_identity : var.storage_configuration.uses_managed_identity
+  ) ? true : null
+  storage_key_vault_secret_id = (
+    each.value.storage_key_vault_secret_id != null ? each.value.storage_key_vault_secret_id : var.storage_configuration.key_vault_secret_id
+  )
 
   service_plan_id = each.value.service_plan_id
 
@@ -836,4 +834,3 @@ resource "azurerm_windows_function_app_slot" "windows_function_app_slot" {
   }
 
 }
-

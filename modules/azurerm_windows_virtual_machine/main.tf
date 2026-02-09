@@ -1,12 +1,3 @@
-locals {
-  network_interface_ids_effective = var.network.primary_network_interface_id == null ? var.network.network_interface_ids : concat(
-    [var.network.primary_network_interface_id],
-    [for id in var.network.network_interface_ids : id if id != var.network.primary_network_interface_id]
-  )
-
-  data_disks_by_name = { for disk in var.data_disks : disk.name => disk }
-}
-
 resource "azurerm_windows_virtual_machine" "windows_virtual_machine" {
   name                = var.name
   resource_group_name = var.resource_group_name
@@ -16,7 +7,10 @@ resource "azurerm_windows_virtual_machine" "windows_virtual_machine" {
   admin_username = var.admin.username
   admin_password = var.admin.password
 
-  network_interface_ids = local.network_interface_ids_effective
+  network_interface_ids = var.network.primary_network_interface_id == null ? var.network.network_interface_ids : concat(
+    [var.network.primary_network_interface_id],
+    [for id in var.network.network_interface_ids : id if id != var.network.primary_network_interface_id]
+  )
 
   computer_name = try(var.windows_profile.computer_name, null)
   timezone      = try(var.windows_profile.timezone, null)
@@ -191,7 +185,7 @@ resource "azurerm_windows_virtual_machine" "windows_virtual_machine" {
 }
 
 resource "azurerm_managed_disk" "managed_disk" {
-  for_each = local.data_disks_by_name
+  for_each = { for disk in var.data_disks : disk.name => disk }
 
   name                = each.value.name
   location            = var.location
@@ -207,7 +201,7 @@ resource "azurerm_managed_disk" "managed_disk" {
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "virtual_machine_data_disk_attachment" {
-  for_each = local.data_disks_by_name
+  for_each = { for disk in var.data_disks : disk.name => disk }
 
   managed_disk_id           = azurerm_managed_disk.managed_disk[each.key].id
   virtual_machine_id        = azurerm_windows_virtual_machine.windows_virtual_machine.id
@@ -243,4 +237,3 @@ resource "azurerm_virtual_machine_extension" "virtual_machine_extension" {
 
   tags = try(each.value.tags, null)
 }
-
