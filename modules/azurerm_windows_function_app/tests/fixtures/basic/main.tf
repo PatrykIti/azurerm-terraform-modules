@@ -46,6 +46,7 @@ module "windows_function_app" {
 
   application_configuration = {
     functions_extension_version = "~4"
+    app_settings                = var.app_settings
   }
 
   access_configuration = {
@@ -58,9 +59,5 @@ module "windows_function_app" {
     }
   }
 
-  tags = {
-    Environment = "Test"
-    TestType    = "Basic"
-    Owner       = "terratest"
-  }
+  tags = var.module_tags
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -97,6 +98,30 @@ func GenerateResourceName(prefix string, uniqueID string) string {
 		name = name[:24]
 	}
 	return strings.ToLower(name)
+}
+
+// PrepareTerraformWorkingDirs removes Terraform artifacts from copied fixtures.
+// This prevents stale module snapshots in .terraform from previous runs.
+func PrepareTerraformWorkingDirs(t testing.TB, terraformDir string) {
+	t.Helper()
+
+	moduleRoot := filepath.Clean(filepath.Join(terraformDir, "../../.."))
+
+	pathsToClean := []string{
+		filepath.Join(terraformDir, ".terraform"),
+		filepath.Join(terraformDir, ".terraform.lock.hcl"),
+		filepath.Join(terraformDir, "terraform.tfstate"),
+		filepath.Join(terraformDir, "terraform.tfstate.backup"),
+		filepath.Join(terraformDir, "crash.log"),
+		filepath.Join(moduleRoot, ".terraform"),
+		filepath.Join(moduleRoot, ".terraform.lock.hcl"),
+	}
+
+	for _, path := range pathsToClean {
+		if err := os.RemoveAll(path); err != nil {
+			t.Fatalf("failed to clean terraform artifact %s: %v", path, err)
+		}
+	}
 }
 
 // windowsFunctionAppHelper is a placeholder for future SDK-backed helpers.

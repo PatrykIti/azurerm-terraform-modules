@@ -182,6 +182,8 @@ func BenchmarkRedisCacheCreation(b *testing.B) {
 }
 
 func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
+	PrepareTerraformWorkingDirs(t, terraformDir)
+
 	timestamp := time.Now().UnixNano() % 1000
 	baseID := strings.ToLower(random.UniqueId())
 	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
@@ -201,5 +203,6 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,
+		Upgrade:            true,
 	}
 }

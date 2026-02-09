@@ -243,19 +243,19 @@ resource "azurerm_windows_function_app" "windows_function_app" {
       }
 
       dynamic "login" {
-        for_each = auth_settings_v2.value.login == null ? [] : [auth_settings_v2.value.login]
+        for_each = [auth_settings_v2.value.login == null ? {} : auth_settings_v2.value.login]
         content {
-          allowed_external_redirect_urls    = login.value.allowed_external_redirect_urls
-          cookie_expiration_convention      = login.value.cookie_expiration_convention
-          cookie_expiration_time            = login.value.cookie_expiration_time
-          logout_endpoint                   = login.value.logout_endpoint
-          nonce_expiration_time             = login.value.nonce_expiration_time
-          preserve_url_fragments_for_logins = login.value.preserve_url_fragments_for_logins
-          token_refresh_extension_time      = login.value.token_refresh_extension_time
-          token_store_enabled               = login.value.token_store_enabled
-          token_store_path                  = login.value.token_store_path
-          token_store_sas_setting_name      = login.value.token_store_sas_setting_name
-          validate_nonce                    = login.value.validate_nonce
+          allowed_external_redirect_urls    = try(login.value.allowed_external_redirect_urls, null)
+          cookie_expiration_convention      = try(login.value.cookie_expiration_convention, null)
+          cookie_expiration_time            = try(login.value.cookie_expiration_time, null)
+          logout_endpoint                   = try(login.value.logout_endpoint, null)
+          nonce_expiration_time             = try(login.value.nonce_expiration_time, null)
+          preserve_url_fragments_for_logins = try(login.value.preserve_url_fragments_for_logins, null)
+          token_refresh_extension_time      = try(login.value.token_refresh_extension_time, null)
+          token_store_enabled               = try(login.value.token_store_enabled, null)
+          token_store_path                  = try(login.value.token_store_path, null)
+          token_store_sas_setting_name      = try(login.value.token_store_sas_setting_name, null)
+          validate_nonce                    = try(login.value.validate_nonce, null)
         }
       }
     }
@@ -676,19 +676,19 @@ resource "azurerm_windows_function_app_slot" "windows_function_app_slot" {
       }
 
       dynamic "login" {
-        for_each = auth_settings_v2.value.login == null ? [] : [auth_settings_v2.value.login]
+        for_each = [auth_settings_v2.value.login == null ? {} : auth_settings_v2.value.login]
         content {
-          allowed_external_redirect_urls    = login.value.allowed_external_redirect_urls
-          cookie_expiration_convention      = login.value.cookie_expiration_convention
-          cookie_expiration_time            = login.value.cookie_expiration_time
-          logout_endpoint                   = login.value.logout_endpoint
-          nonce_expiration_time             = login.value.nonce_expiration_time
-          preserve_url_fragments_for_logins = login.value.preserve_url_fragments_for_logins
-          token_refresh_extension_time      = login.value.token_refresh_extension_time
-          token_store_enabled               = login.value.token_store_enabled
-          token_store_path                  = login.value.token_store_path
-          token_store_sas_setting_name      = login.value.token_store_sas_setting_name
-          validate_nonce                    = login.value.validate_nonce
+          allowed_external_redirect_urls    = try(login.value.allowed_external_redirect_urls, null)
+          cookie_expiration_convention      = try(login.value.cookie_expiration_convention, null)
+          cookie_expiration_time            = try(login.value.cookie_expiration_time, null)
+          logout_endpoint                   = try(login.value.logout_endpoint, null)
+          nonce_expiration_time             = try(login.value.nonce_expiration_time, null)
+          preserve_url_fragments_for_logins = try(login.value.preserve_url_fragments_for_logins, null)
+          token_refresh_extension_time      = try(login.value.token_refresh_extension_time, null)
+          token_store_enabled               = try(login.value.token_store_enabled, null)
+          token_store_path                  = try(login.value.token_store_path, null)
+          token_store_sas_setting_name      = try(login.value.token_store_sas_setting_name, null)
+          validate_nonce                    = try(login.value.validate_nonce, null)
         }
       }
     }

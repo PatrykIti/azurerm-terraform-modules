@@ -17,7 +17,8 @@ func TestBasicWindowsFunctionApp(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -44,7 +45,8 @@ func TestCompleteWindowsFunctionApp(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -71,7 +73,8 @@ func TestSecureWindowsFunctionApp(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -94,6 +97,8 @@ func TestSecureWindowsFunctionApp(t *testing.T) {
 }
 
 func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
+	PrepareTerraformWorkingDirs(t, terraformDir)
+
 	timestamp := time.Now().UnixNano() % 1000
 	baseID := strings.ToLower(random.UniqueId())
 	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
@@ -113,5 +118,6 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,
+		Upgrade:            true,
 	}
 }
