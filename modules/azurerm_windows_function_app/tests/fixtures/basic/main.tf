@@ -1,11 +1,3 @@
-variable "random_suffix" {
-  type = string
-}
-
-variable "location" {
-  type = string
-}
-
 provider "azurerm" {
   features {}
 }
@@ -40,7 +32,7 @@ resource "azurerm_service_plan" "example" {
 }
 
 module "windows_function_app" {
-  source = "../../"
+  source = "../../../"
 
   name                = local.function_app_name
   resource_group_name = azurerm_resource_group.example.name

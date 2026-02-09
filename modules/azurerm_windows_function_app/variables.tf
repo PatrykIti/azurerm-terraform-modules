@@ -554,7 +554,7 @@ variable "site_config" {
   }
 
   validation {
-    condition     = var.site_config.application_stack == null || !try(var.site_config.application_stack.use_dotnet_isolated_runtime, false) || var.site_config.application_stack.dotnet_version != null
+    condition     = var.site_config.application_stack == null || !coalesce(var.site_config.application_stack.use_dotnet_isolated_runtime, false) || var.site_config.application_stack.dotnet_version != null
     error_message = "site_config.application_stack.use_dotnet_isolated_runtime requires dotnet_version to be set."
   }
 }
@@ -1035,7 +1035,7 @@ variable "slots" {
   validation {
     condition = alltrue([
       for slot in var.slots :
-      slot.site_config.application_stack == null || !try(slot.site_config.application_stack.use_dotnet_isolated_runtime, false) ||
+      slot.site_config.application_stack == null || !coalesce(slot.site_config.application_stack.use_dotnet_isolated_runtime, false) ||
       slot.site_config.application_stack.dotnet_version != null
     ])
     error_message = "slot.site_config.application_stack.use_dotnet_isolated_runtime requires dotnet_version to be set."
