@@ -1,30 +1,18 @@
-data "azurerm_monitor_diagnostic_categories" "redis_cache" {
-  count       = length(var.diagnostic_settings) > 0 ? 1 : 0
-  resource_id = azurerm_redis_cache.redis_cache.id
-}
-
 locals {
-  diagnostic_log_categories    = try(data.azurerm_monitor_diagnostic_categories.redis_cache[0].log_category_types, [])
-  diagnostic_metric_categories = try(data.azurerm_monitor_diagnostic_categories.redis_cache[0].metrics, [])
-
-  diagnostic_settings_filtered = [
+  diagnostic_settings_normalized = [
     for ds in var.diagnostic_settings : merge(ds, {
-      log_categories = ds.log_categories == null ? [] : [
-        for c in ds.log_categories : c if contains(local.diagnostic_log_categories, c)
-      ]
-      metric_categories = ds.metric_categories == null ? [] : [
-        for c in ds.metric_categories : c if contains(local.diagnostic_metric_categories, c)
-      ]
+      log_categories    = coalesce(ds.log_categories, [])
+      metric_categories = coalesce(ds.metric_categories, [])
     })
   ]
 
-  diagnostic_settings_effective = [
-    for ds in local.diagnostic_settings_filtered : ds
+  diagnostic_settings_for_each = {
+    for ds in local.diagnostic_settings_normalized : ds.name => ds
     if length(ds.log_categories) + length(ds.metric_categories) > 0
-  ]
+  }
 
   diagnostic_settings_skipped = [
-    for ds in local.diagnostic_settings_filtered : {
+    for ds in local.diagnostic_settings_normalized : {
       name              = ds.name
       log_categories    = ds.log_categories
       metric_categories = ds.metric_categories
@@ -34,9 +22,7 @@ locals {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_setting" {
-  for_each = {
-    for ds in local.diagnostic_settings_effective : ds.name => ds
-  }
+  for_each = local.diagnostic_settings_for_each
 
   name               = each.value.name
   target_resource_id = azurerm_redis_cache.redis_cache.id
@@ -48,14 +34,14 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_setting" {
   eventhub_name                  = each.value.eventhub_name
 
   dynamic "enabled_log" {
-    for_each = each.value.log_categories
+    for_each = toset(each.value.log_categories)
     content {
       category = enabled_log.value
     }
   }
 
   dynamic "enabled_metric" {
-    for_each = each.value.metric_categories
+    for_each = toset(each.value.metric_categories)
     content {
       category = enabled_metric.value
     }
