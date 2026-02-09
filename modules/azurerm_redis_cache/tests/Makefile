@@ -113,7 +113,7 @@ test-integration: check-env deps
 # Run performance tests
 test-performance: check-env deps
 	@echo "Running performance tests..."
-	$(call run_with_log,performance,go test -v -timeout 60m -run TestRedisCacheCreationTime ./...)
+	$(call run_with_log,performance,RUN_PERFORMANCE_TESTS=1 go test -v -timeout 60m -run TestRedisCacheCreationTime ./...)
 
 # Run benchmarks
 benchmark: check-env deps

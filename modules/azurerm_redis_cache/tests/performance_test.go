@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -33,6 +34,9 @@ func BenchmarkRedisCacheCreationSimple(b *testing.B) {
 func TestRedisCacheCreationTime(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping performance test in short mode")
+	}
+	if os.Getenv("RUN_PERFORMANCE_TESTS") != "1" {
+		t.Skip("Skipping performance test by default; set RUN_PERFORMANCE_TESTS=1 to enable.")
 	}
 	t.Parallel()
 
