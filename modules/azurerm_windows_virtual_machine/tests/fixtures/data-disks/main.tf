@@ -19,6 +19,12 @@ provider "azurerm" {
 
 provider "random" {}
 
+locals {
+  suffix              = lower(replace(var.random_suffix, "-", ""))
+  short_suffix        = substr(local.suffix, 0, min(length(local.suffix), 8))
+  resource_group_name = coalesce(var.resource_group_name, "rg-win-vm-data-disks-${local.short_suffix}")
+}
+
 resource "random_password" "admin" {
   length      = 20
   special     = true
@@ -29,26 +35,26 @@ resource "random_password" "admin" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = var.resource_group_name
+  name     = local.resource_group_name
   location = var.location
 }
 
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-win-vm-data-disks-test"
+  name                = "vnet-win-vm-data-disks-${local.short_suffix}"
   address_space       = ["10.160.0.0/16"]
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
 
 resource "azurerm_subnet" "example" {
-  name                 = "snet-win-vm-data-disks-test"
+  name                 = "snet-win-vm-data-disks-${local.short_suffix}"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.160.1.0/24"]
 }
 
 resource "azurerm_public_ip" "example" {
-  name                = "pip-win-vm-data-disks-test"
+  name                = "pip-win-vm-data-disks-${local.short_suffix}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   allocation_method   = "Static"
@@ -56,7 +62,7 @@ resource "azurerm_public_ip" "example" {
 }
 
 resource "azurerm_network_interface" "example" {
-  name                = "nic-win-vm-data-disks-test"
+  name                = "nic-win-vm-data-disks-${local.short_suffix}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -71,7 +77,7 @@ resource "azurerm_network_interface" "example" {
 module "windows_virtual_machine" {
   source = "../../../"
 
-  name                = "winvmdatadiskstest01"
+  name                = "wvm-disk-${local.short_suffix}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   size                = "Standard_D2s_v3"
@@ -101,7 +107,7 @@ module "windows_virtual_machine" {
 
   data_disks = [
     {
-      name                 = "winvm-data-disk-test-01"
+      name                 = "wvm-data-disk-${local.short_suffix}"
       lun                  = 0
       caching              = "ReadWrite"
       disk_size_gb         = 64
@@ -112,5 +118,9 @@ module "windows_virtual_machine" {
   tags = {
     Environment = "Test"
     Example     = "DataDisks"
+  }
+
+  windows_profile = {
+    computer_name = "wvd${local.short_suffix}"
   }
 }

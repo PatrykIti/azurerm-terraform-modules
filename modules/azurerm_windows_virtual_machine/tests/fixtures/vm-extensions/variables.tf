@@ -4,8 +4,13 @@ variable "location" {
   default     = "West Europe"
 }
 
-variable "resource_group_name" {
-  description = "Resource group name"
+variable "random_suffix" {
+  description = "Unique suffix appended to test resource names."
   type        = string
-  default     = "rg-win-vm-extensions-test"
+}
+
+variable "resource_group_name" {
+  description = "Optional resource group name override."
+  type        = string
+  default     = null
 }

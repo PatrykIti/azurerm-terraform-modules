@@ -19,6 +19,12 @@ provider "azurerm" {
 
 provider "random" {}
 
+locals {
+  suffix              = lower(replace(var.random_suffix, "-", ""))
+  short_suffix        = substr(local.suffix, 0, min(length(local.suffix), 8))
+  resource_group_name = coalesce(var.resource_group_name, "rg-win-vm-secure-${local.short_suffix}")
+}
+
 resource "random_password" "admin" {
   length      = 24
   special     = true
@@ -29,32 +35,32 @@ resource "random_password" "admin" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = var.resource_group_name
+  name     = local.resource_group_name
   location = var.location
 }
 
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-win-vm-secure-test"
+  name                = "vnet-win-vm-secure-${local.short_suffix}"
   address_space       = ["10.130.0.0/16"]
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
 
 resource "azurerm_subnet" "example" {
-  name                 = "snet-win-vm-secure-test"
+  name                 = "snet-win-vm-secure-${local.short_suffix}"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.130.1.0/24"]
 }
 
 resource "azurerm_network_security_group" "example" {
-  name                = "nsg-win-vm-secure-test"
+  name                = "nsg-win-vm-secure-${local.short_suffix}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
 
 resource "azurerm_network_security_rule" "rdp" {
-  name                        = "Allow-RDP-Restricted"
+  name                        = "Allow-RDP-${local.short_suffix}"
   priority                    = 100
   direction                   = "Inbound"
   access                      = "Allow"
@@ -68,7 +74,7 @@ resource "azurerm_network_security_rule" "rdp" {
 }
 
 resource "azurerm_network_interface" "example" {
-  name                = "nic-win-vm-secure-test"
+  name                = "nic-win-vm-secure-${local.short_suffix}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -87,7 +93,7 @@ resource "azurerm_network_interface_security_group_association" "example" {
 module "windows_virtual_machine" {
   source = "../../../"
 
-  name                = "winvmsecuretest01"
+  name                = "wvm-sec-${local.short_suffix}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   size                = "Standard_D2s_v3"
@@ -123,6 +129,10 @@ module "windows_virtual_machine" {
     secure_boot_enabled        = true
     vtpm_enabled               = true
     encryption_at_host_enabled = true
+  }
+
+  windows_profile = {
+    computer_name = "wvs${local.short_suffix}"
   }
 
   tags = {

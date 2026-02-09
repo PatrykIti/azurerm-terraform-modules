@@ -19,6 +19,12 @@ provider "azurerm" {
 
 provider "random" {}
 
+locals {
+  suffix              = lower(replace(var.random_suffix, "-", ""))
+  short_suffix        = substr(local.suffix, 0, min(length(local.suffix), 8))
+  resource_group_name = coalesce(var.resource_group_name, "rg-win-vm-complete-${local.short_suffix}")
+}
+
 resource "random_password" "admin" {
   length      = 24
   special     = true
@@ -29,26 +35,26 @@ resource "random_password" "admin" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = var.resource_group_name
+  name     = local.resource_group_name
   location = var.location
 }
 
 resource "azurerm_virtual_network" "example" {
-  name                = "vnet-win-vm-complete-test"
+  name                = "vnet-win-vm-complete-${local.short_suffix}"
   address_space       = ["10.120.0.0/16"]
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
 
 resource "azurerm_subnet" "example" {
-  name                 = "snet-win-vm-complete-test"
+  name                 = "snet-win-vm-complete-${local.short_suffix}"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.120.1.0/24"]
 }
 
 resource "azurerm_public_ip" "example" {
-  name                = "pip-win-vm-complete-test"
+  name                = "pip-win-vm-complete-${local.short_suffix}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   allocation_method   = "Static"
@@ -56,7 +62,7 @@ resource "azurerm_public_ip" "example" {
 }
 
 resource "azurerm_network_interface" "example" {
-  name                = "nic-win-vm-complete-test"
+  name                = "nic-win-vm-complete-${local.short_suffix}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
@@ -69,7 +75,7 @@ resource "azurerm_network_interface" "example" {
 }
 
 resource "azurerm_log_analytics_workspace" "example" {
-  name                = "law-win-vm-complete-test"
+  name                = "law-win-vm-complete-${local.short_suffix}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
@@ -77,7 +83,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 }
 
 resource "azurerm_user_assigned_identity" "example" {
-  name                = "uai-win-vm-complete-test"
+  name                = "uai-win-vm-complete-${local.short_suffix}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
@@ -85,7 +91,7 @@ resource "azurerm_user_assigned_identity" "example" {
 module "windows_virtual_machine" {
   source = "../../../"
 
-  name                = "winvmcompletetest01"
+  name                = "wvm-complete-${local.short_suffix}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   size                = "Standard_D2s_v3"
@@ -116,7 +122,7 @@ module "windows_virtual_machine" {
 
   data_disks = [
     {
-      name                 = "winvm-complete-test-data-01"
+      name                 = "wvm-complete-data-${local.short_suffix}"
       lun                  = 0
       caching              = "ReadWrite"
       disk_size_gb         = 64
@@ -137,7 +143,7 @@ module "windows_virtual_machine" {
 
   extensions = [
     {
-      name                 = "custom-script"
+      name                 = "custom-script-${local.short_suffix}"
       publisher            = "Microsoft.Compute"
       type                 = "CustomScriptExtension"
       type_handler_version = "1.10"
@@ -149,11 +155,15 @@ module "windows_virtual_machine" {
 
   diagnostic_settings = [
     {
-      name                       = "diag-win-vm-complete-test"
+      name                       = "diag-win-vm-complete-${local.short_suffix}"
       metric_categories          = ["AllMetrics"]
       log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
     }
   ]
+
+  windows_profile = {
+    computer_name = "wvc${local.short_suffix}"
+  }
 
   tags = {
     Environment = "Test"

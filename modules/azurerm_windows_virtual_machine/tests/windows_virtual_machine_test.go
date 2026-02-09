@@ -1,9 +1,12 @@
 package test
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
@@ -128,10 +131,15 @@ func TestWindowsVirtualMachineExtensions(t *testing.T) {
 }
 
 func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
+	timestamp := time.Now().UnixNano() % 1000
+	baseID := strings.ToLower(random.UniqueId())
+	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
+
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
-			"location": "northeurope",
+			"location":      "northeurope",
+			"random_suffix": uniqueID,
 		},
 		NoColor: true,
 		RetryableTerraformErrors: map[string]string{
