@@ -440,10 +440,9 @@ variable "additional_capabilities" {
 variable "vm_agent" {
   description = "VM agent configuration."
   type = object({
-    provision_vm_agent                = optional(bool, true)
-    allow_extension_operations        = optional(bool, true)
-    extensions_time_budget            = optional(string)
-    vm_agent_platform_updates_enabled = optional(bool)
+    provision_vm_agent         = optional(bool, true)
+    allow_extension_operations = optional(bool, true)
+    extensions_time_budget     = optional(string)
   })
   default = {}
 
@@ -462,7 +461,6 @@ variable "patching" {
     reboot_setting                                         = optional(string)
     hotpatching_enabled                                    = optional(bool)
     automatic_updates_enabled                              = optional(bool)
-    enable_automatic_updates                               = optional(bool)
     bypass_platform_safety_checks_on_user_schedule_enabled = optional(bool)
   })
   default = {}
@@ -480,11 +478,6 @@ variable "patching" {
   validation {
     condition     = var.patching.reboot_setting == null || contains(["Always", "IfRequired", "Never"], var.patching.reboot_setting)
     error_message = "patching.reboot_setting must be Always, IfRequired, or Never."
-  }
-
-  validation {
-    condition     = !(var.patching.automatic_updates_enabled != null && var.patching.enable_automatic_updates != null)
-    error_message = "automatic_updates_enabled and enable_automatic_updates cannot both be set."
   }
 
   validation {

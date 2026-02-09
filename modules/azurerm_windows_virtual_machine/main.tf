@@ -101,17 +101,15 @@ resource "azurerm_windows_virtual_machine" "windows_virtual_machine" {
     }
   }
 
-  provision_vm_agent                = var.vm_agent.provision_vm_agent
-  allow_extension_operations        = var.vm_agent.allow_extension_operations
-  extensions_time_budget            = var.vm_agent.extensions_time_budget
-  vm_agent_platform_updates_enabled = var.vm_agent.vm_agent_platform_updates_enabled
+  provision_vm_agent         = var.vm_agent.provision_vm_agent
+  allow_extension_operations = var.vm_agent.allow_extension_operations
+  extensions_time_budget     = var.vm_agent.extensions_time_budget
 
   patch_mode                                             = var.patching.patch_mode
   patch_assessment_mode                                  = var.patching.patch_assessment_mode
   reboot_setting                                         = var.patching.reboot_setting
   hotpatching_enabled                                    = var.patching.hotpatching_enabled
   automatic_updates_enabled                              = var.patching.automatic_updates_enabled
-  enable_automatic_updates                               = var.patching.enable_automatic_updates
   bypass_platform_safety_checks_on_user_schedule_enabled = var.patching.bypass_platform_safety_checks_on_user_schedule_enabled
 
   license_type         = var.license_type
