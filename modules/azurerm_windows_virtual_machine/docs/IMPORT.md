@@ -16,7 +16,7 @@ This guide shows how to import an existing Windows VM into
 ## 1) Prepare a minimal config
 
 Create `main.tf` with only the module block. Populate values to match your VM.
-`admin_password` is write-only in Azure; set it to the value you want enforced.
+`admin.password` is write-only in Azure; set it to the value you want enforced.
 
 ```hcl
 terraform {
@@ -42,12 +42,18 @@ module "windows_virtual_machine" {
   location            = var.location
   size                = var.size
 
-  network_interface_ids = var.network_interface_ids
+  network = {
+    network_interface_ids = var.network_interface_ids
+  }
 
-  admin_username = var.admin_username
-  admin_password = var.admin_password
+  admin = {
+    username = var.admin_username
+    password = var.admin_password
+  }
 
-  source_image_id = var.source_image_id
+  image = {
+    source_image_id = var.source_image_id
+  }
 
   os_disk = {
     caching              = "ReadWrite"
@@ -84,7 +90,7 @@ If you enable these inputs, import their resources as well.
 **Extensions**
 ```hcl
 import {
-  to = module.windows_virtual_machine.azurerm_virtual_machine_extension.virtual_machine_extensions["custom-script"]
+  to = module.windows_virtual_machine.azurerm_virtual_machine_extension.virtual_machine_extension["custom-script"]
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Compute/virtualMachines/<vm>/extensions/custom-script"
 }
 ```
@@ -92,7 +98,7 @@ import {
 **Diagnostic settings**
 ```hcl
 import {
-  to = module.windows_virtual_machine.azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings["diag"]
+  to = module.windows_virtual_machine.azurerm_monitor_diagnostic_setting.monitor_diagnostic_setting["diag"]
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Compute/virtualMachines/<vm>/providers/microsoft.insights/diagnosticSettings/diag"
 }
 ```
@@ -100,12 +106,12 @@ import {
 **Managed data disks (if `data_disks` is configured)**
 ```hcl
 import {
-  to = module.windows_virtual_machine.azurerm_managed_disk.data_disks["data-disk-01"]
+  to = module.windows_virtual_machine.azurerm_managed_disk.managed_disk["data-disk-01"]
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Compute/disks/data-disk-01"
 }
 
 import {
-  to = module.windows_virtual_machine.azurerm_virtual_machine_data_disk_attachment.data_disks["data-disk-01"]
+  to = module.windows_virtual_machine.azurerm_virtual_machine_data_disk_attachment.virtual_machine_data_disk_attachment["data-disk-01"]
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Compute/virtualMachines/<vm>/dataDisks/data-disk-01"
 }
 ```

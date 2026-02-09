@@ -5,41 +5,42 @@ resource "azurerm_windows_function_app" "windows_function_app" {
 
   service_plan_id = var.service_plan_id
 
-  storage_account_name          = local.storage_account_name_effective
-  storage_account_access_key    = local.storage_account_access_key_effective
-  storage_uses_managed_identity = var.storage_uses_managed_identity
-  storage_key_vault_secret_id   = var.storage_key_vault_secret_id
+  storage_account_name = local.storage_key_vault_secret_id_set ? null : var.storage_configuration.account_name
+  storage_account_access_key = local.storage_key_vault_secret_id_set ? null : (
+    var.storage_configuration.uses_managed_identity ? null : var.storage_configuration.account_access_key
+  )
+  storage_uses_managed_identity = var.storage_configuration.uses_managed_identity ? true : null
+  storage_key_vault_secret_id   = var.storage_configuration.key_vault_secret_id
 
-  functions_extension_version = var.functions_extension_version
-  builtin_logging_enabled      = var.builtin_logging_enabled
-  enabled                      = var.enabled
+  functions_extension_version = var.application_configuration.functions_extension_version
+  builtin_logging_enabled     = var.application_configuration.builtin_logging_enabled
+  enabled                     = var.application_configuration.enabled
 
-  https_only                   = var.https_only
-  public_network_access_enabled = var.public_network_access_enabled
-  client_certificate_enabled   = var.client_certificate_enabled
-  client_certificate_mode      = var.client_certificate_mode
-  client_certificate_exclusion_paths = var.client_certificate_exclusion_paths
+  https_only                         = var.access_configuration.https_only
+  public_network_access_enabled      = var.access_configuration.public_network_access_enabled
+  client_certificate_enabled         = var.access_configuration.client_certificate_enabled
+  client_certificate_mode            = var.access_configuration.client_certificate_mode
+  client_certificate_exclusion_paths = var.access_configuration.client_certificate_exclusion_paths
 
-  app_settings        = var.app_settings
-  content_share_force_disabled = var.content_share_force_disabled
-  daily_memory_time_quota      = var.daily_memory_time_quota
-  ftp_publish_basic_authentication_enabled = var.ftp_publish_basic_authentication_enabled
+  app_settings                             = var.application_configuration.app_settings
+  content_share_force_disabled             = var.storage_configuration.content_share_force_disabled
+  daily_memory_time_quota                  = var.application_configuration.daily_memory_time_quota
+  ftp_publish_basic_authentication_enabled = var.access_configuration.ftp_publish_basic_authentication_enabled
+  application_insights_connection_string   = var.application_configuration.application_insights_connection_string
+  application_insights_key                 = var.application_configuration.application_insights_key
 
-  application_insights_connection_string = var.application_insights_connection_string
-  application_insights_key               = var.application_insights_key
+  key_vault_reference_identity_id        = var.access_configuration.key_vault_reference_identity_id
+  virtual_network_backup_restore_enabled = var.access_configuration.virtual_network_backup_restore_enabled
+  virtual_network_subnet_id              = var.access_configuration.virtual_network_subnet_id
+  vnet_image_pull_enabled                = var.access_configuration.vnet_image_pull_enabled
 
-  key_vault_reference_identity_id = var.key_vault_reference_identity_id
-  virtual_network_backup_restore_enabled = var.virtual_network_backup_restore_enabled
-  virtual_network_subnet_id       = var.virtual_network_subnet_id
-  vnet_image_pull_enabled         = var.vnet_image_pull_enabled
-
-  webdeploy_publish_basic_authentication_enabled = var.webdeploy_publish_basic_authentication_enabled
-  zip_deploy_file                                = var.zip_deploy_file
+  webdeploy_publish_basic_authentication_enabled = var.access_configuration.webdeploy_publish_basic_authentication_enabled
+  zip_deploy_file                                = var.application_configuration.zip_deploy_file
 
   tags = var.tags
 
   dynamic "connection_string" {
-    for_each = var.connection_strings
+    for_each = var.application_configuration.connection_strings
     content {
       name  = connection_string.value.name
       type  = connection_string.value.type
@@ -121,8 +122,8 @@ resource "azurerm_windows_function_app" "windows_function_app" {
       dynamic "twitter" {
         for_each = auth_settings.value.twitter == null ? [] : [auth_settings.value.twitter]
         content {
-          consumer_key              = twitter.value.consumer_key
-          consumer_secret           = twitter.value.consumer_secret
+          consumer_key                 = twitter.value.consumer_key
+          consumer_secret              = twitter.value.consumer_secret
           consumer_secret_setting_name = twitter.value.consumer_secret_setting_name
         }
       }
@@ -132,18 +133,18 @@ resource "azurerm_windows_function_app" "windows_function_app" {
   dynamic "auth_settings_v2" {
     for_each = var.auth_settings_v2 == null ? [] : [var.auth_settings_v2]
     content {
-      auth_enabled                             = auth_settings_v2.value.auth_enabled
-      config_file_path                         = auth_settings_v2.value.config_file_path
-      default_provider                         = auth_settings_v2.value.default_provider
-      excluded_paths                           = auth_settings_v2.value.excluded_paths
-      forward_proxy_convention                 = auth_settings_v2.value.forward_proxy_convention
-      forward_proxy_custom_host_header_name    = auth_settings_v2.value.forward_proxy_custom_host_header_name
-      forward_proxy_custom_scheme_header_name  = auth_settings_v2.value.forward_proxy_custom_scheme_header_name
-      http_route_api_prefix                    = auth_settings_v2.value.http_route_api_prefix
-      require_authentication                   = auth_settings_v2.value.require_authentication
-      require_https                            = auth_settings_v2.value.require_https
-      runtime_version                          = auth_settings_v2.value.runtime_version
-      unauthenticated_action                   = auth_settings_v2.value.unauthenticated_action
+      auth_enabled                            = auth_settings_v2.value.auth_enabled
+      config_file_path                        = auth_settings_v2.value.config_file_path
+      default_provider                        = auth_settings_v2.value.default_provider
+      excluded_paths                          = auth_settings_v2.value.excluded_paths
+      forward_proxy_convention                = auth_settings_v2.value.forward_proxy_convention
+      forward_proxy_custom_host_header_name   = auth_settings_v2.value.forward_proxy_custom_host_header_name
+      forward_proxy_custom_scheme_header_name = auth_settings_v2.value.forward_proxy_custom_scheme_header_name
+      http_route_api_prefix                   = auth_settings_v2.value.http_route_api_prefix
+      require_authentication                  = auth_settings_v2.value.require_authentication
+      require_https                           = auth_settings_v2.value.require_https
+      runtime_version                         = auth_settings_v2.value.runtime_version
+      unauthenticated_action                  = auth_settings_v2.value.unauthenticated_action
 
       dynamic "active_directory_v2" {
         for_each = auth_settings_v2.value.active_directory_v2 == null ? [] : [auth_settings_v2.value.active_directory_v2]
@@ -232,7 +233,7 @@ resource "azurerm_windows_function_app" "windows_function_app" {
       dynamic "twitter_v2" {
         for_each = auth_settings_v2.value.twitter_v2 == null ? [] : [auth_settings_v2.value.twitter_v2]
         content {
-          consumer_key               = twitter_v2.value.consumer_key
+          consumer_key                 = twitter_v2.value.consumer_key
           consumer_secret_setting_name = twitter_v2.value.consumer_secret_setting_name
         }
       }
@@ -268,121 +269,113 @@ resource "azurerm_windows_function_app" "windows_function_app" {
           frequency_interval       = schedule.value.frequency_interval
           frequency_unit           = schedule.value.frequency_unit
           keep_at_least_one_backup = schedule.value.keep_at_least_one_backup
-          retention_period_in_days = schedule.value.retention_period_in_days
+          retention_period_days    = schedule.value.retention_period_days
           start_time               = schedule.value.start_time
         }
       }
     }
   }
 
-  site_config {
-    always_on                             = var.site_config.always_on
-    api_definition_url                    = var.site_config.api_definition_url
-    api_management_api_id                 = var.site_config.api_management_api_id
-    app_command_line                      = var.site_config.app_command_line
-    app_scale_limit                       = var.site_config.app_scale_limit
-    container_registry_managed_identity_client_id = var.site_config.container_registry_managed_identity_client_id
-    container_registry_use_managed_identity       = var.site_config.container_registry_use_managed_identity
-    default_documents                     = var.site_config.default_documents
-    elastic_instance_minimum              = var.site_config.elastic_instance_minimum
-    ftps_state                            = var.site_config.ftps_state
-    health_check_path                     = var.site_config.health_check_path
-    health_check_eviction_time_in_min     = var.site_config.health_check_eviction_time_in_min
-    http2_enabled                         = var.site_config.http2_enabled
-    ip_restriction_default_action         = var.site_config.ip_restriction_default_action
-    load_balancing_mode                   = var.site_config.load_balancing_mode
-    managed_pipeline_mode                 = var.site_config.managed_pipeline_mode
-    minimum_tls_version                   = var.site_config.minimum_tls_version
-    pre_warmed_instance_count             = var.site_config.pre_warmed_instance_count
-    remote_debugging_enabled              = var.site_config.remote_debugging_enabled
-    remote_debugging_version              = var.site_config.remote_debugging_version
-    runtime_scale_monitoring_enabled      = var.site_config.runtime_scale_monitoring_enabled
-    scm_ip_restriction_default_action     = var.site_config.scm_ip_restriction_default_action
-    scm_minimum_tls_version               = var.site_config.scm_minimum_tls_version
-    scm_use_main_ip_restriction           = var.site_config.scm_use_main_ip_restriction
-    use_32_bit_worker                     = var.site_config.use_32_bit_worker
-    vnet_route_all_enabled                = var.site_config.vnet_route_all_enabled
-    websockets_enabled                    = var.site_config.websockets_enabled
-    worker_count                          = var.site_config.worker_count
+  dynamic "site_config" {
+    for_each = var.site_config == null ? [] : [var.site_config]
+    content {
+      always_on                         = site_config.value.always_on
+      api_definition_url                = site_config.value.api_definition_url
+      api_management_api_id             = site_config.value.api_management_api_id
+      app_command_line                  = site_config.value.app_command_line
+      app_scale_limit                   = site_config.value.app_scale_limit
+      default_documents                 = site_config.value.default_documents
+      elastic_instance_minimum          = site_config.value.elastic_instance_minimum
+      ftps_state                        = site_config.value.ftps_state
+      health_check_path                 = site_config.value.health_check_path
+      health_check_eviction_time_in_min = site_config.value.health_check_eviction_time_in_min
+      http2_enabled                     = site_config.value.http2_enabled
+      ip_restriction_default_action     = site_config.value.ip_restriction_default_action
+      load_balancing_mode               = site_config.value.load_balancing_mode
+      managed_pipeline_mode             = site_config.value.managed_pipeline_mode
+      minimum_tls_version               = site_config.value.minimum_tls_version
+      pre_warmed_instance_count         = site_config.value.pre_warmed_instance_count
+      remote_debugging_enabled          = site_config.value.remote_debugging_enabled
+      remote_debugging_version          = site_config.value.remote_debugging_version
+      runtime_scale_monitoring_enabled  = site_config.value.runtime_scale_monitoring_enabled
+      scm_ip_restriction_default_action = site_config.value.scm_ip_restriction_default_action
+      scm_minimum_tls_version           = site_config.value.scm_minimum_tls_version
+      scm_use_main_ip_restriction       = site_config.value.scm_use_main_ip_restriction
+      use_32_bit_worker                 = site_config.value.use_32_bit_worker
+      vnet_route_all_enabled            = site_config.value.vnet_route_all_enabled
+      websockets_enabled                = site_config.value.websockets_enabled
+      worker_count                      = site_config.value.worker_count
 
-    dynamic "application_stack" {
-      for_each = var.site_config.application_stack == null ? [] : [var.site_config.application_stack]
-      content {
-        dotnet_version              = application_stack.value.dotnet_version
-        java_version                = application_stack.value.java_version
-        node_version                = application_stack.value.node_version
-        powershell_core_version     = application_stack.value.powershell_core_version
-        use_custom_runtime          = application_stack.value.use_custom_runtime
-        use_dotnet_isolated_runtime = application_stack.value.use_dotnet_isolated_runtime
+      dynamic "application_stack" {
+        for_each = site_config.value.application_stack == null ? [] : [site_config.value.application_stack]
+        content {
+          dotnet_version              = application_stack.value.dotnet_version
+          java_version                = application_stack.value.java_version
+          node_version                = application_stack.value.node_version
+          powershell_core_version     = application_stack.value.powershell_core_version
+          use_custom_runtime          = application_stack.value.use_custom_runtime
+          use_dotnet_isolated_runtime = application_stack.value.use_dotnet_isolated_runtime
+        }
       }
-    }
 
-    dynamic "app_service_logs" {
-      for_each = var.site_config.app_service_logs == null ? [] : [var.site_config.app_service_logs]
-      content {
-        disk_quota_mb         = app_service_logs.value.disk_quota_mb
-        retention_period_days = app_service_logs.value.retention_period_days
+      dynamic "app_service_logs" {
+        for_each = site_config.value.app_service_logs == null ? [] : [site_config.value.app_service_logs]
+        content {
+          disk_quota_mb         = app_service_logs.value.disk_quota_mb
+          retention_period_days = app_service_logs.value.retention_period_days
+        }
+      }
 
-        dynamic "azure_blob_storage" {
-          for_each = app_service_logs.value.azure_blob_storage == null ? [] : [app_service_logs.value.azure_blob_storage]
-          content {
-            level             = azure_blob_storage.value.level
-            sas_url           = azure_blob_storage.value.sas_url
-            retention_in_days = azure_blob_storage.value.retention_in_days
+      dynamic "cors" {
+        for_each = site_config.value.cors == null ? [] : [site_config.value.cors]
+        content {
+          allowed_origins     = cors.value.allowed_origins
+          support_credentials = cors.value.support_credentials
+        }
+      }
+
+      dynamic "ip_restriction" {
+        for_each = site_config.value.ip_restriction == null ? [] : site_config.value.ip_restriction
+        content {
+          action                    = ip_restriction.value.action
+          ip_address                = ip_restriction.value.ip_address
+          name                      = ip_restriction.value.name
+          priority                  = ip_restriction.value.priority
+          service_tag               = ip_restriction.value.service_tag
+          virtual_network_subnet_id = ip_restriction.value.virtual_network_subnet_id
+          description               = ip_restriction.value.description
+
+          dynamic "headers" {
+            for_each = ip_restriction.value.headers == null ? [] : [ip_restriction.value.headers]
+            content {
+              x_azure_fdid      = headers.value.x_azure_fdid
+              x_fd_health_probe = headers.value.x_fd_health_probe
+              x_forwarded_for   = headers.value.x_forwarded_for
+              x_forwarded_host  = headers.value.x_forwarded_host
+            }
           }
         }
       }
-    }
 
-    dynamic "cors" {
-      for_each = var.site_config.cors == null ? [] : [var.site_config.cors]
-      content {
-        allowed_origins     = cors.value.allowed_origins
-        support_credentials = cors.value.support_credentials
-      }
-    }
+      dynamic "scm_ip_restriction" {
+        for_each = site_config.value.scm_ip_restriction == null ? [] : site_config.value.scm_ip_restriction
+        content {
+          action                    = scm_ip_restriction.value.action
+          ip_address                = scm_ip_restriction.value.ip_address
+          name                      = scm_ip_restriction.value.name
+          priority                  = scm_ip_restriction.value.priority
+          service_tag               = scm_ip_restriction.value.service_tag
+          virtual_network_subnet_id = scm_ip_restriction.value.virtual_network_subnet_id
+          description               = scm_ip_restriction.value.description
 
-    dynamic "ip_restriction" {
-      for_each = var.site_config.ip_restriction == null ? [] : var.site_config.ip_restriction
-      content {
-        action                    = ip_restriction.value.action
-        ip_address                = ip_restriction.value.ip_address
-        name                      = ip_restriction.value.name
-        priority                  = ip_restriction.value.priority
-        service_tag               = ip_restriction.value.service_tag
-        virtual_network_subnet_id = ip_restriction.value.virtual_network_subnet_id
-        description               = ip_restriction.value.description
-
-        dynamic "headers" {
-          for_each = ip_restriction.value.headers == null ? [] : [ip_restriction.value.headers]
-          content {
-            x_azure_fdid      = headers.value.x_azure_fdid
-            x_fd_health_probe = headers.value.x_fd_health_probe
-            x_forwarded_for   = headers.value.x_forwarded_for
-            x_forwarded_host  = headers.value.x_forwarded_host
-          }
-        }
-      }
-    }
-
-    dynamic "scm_ip_restriction" {
-      for_each = var.site_config.scm_ip_restriction == null ? [] : var.site_config.scm_ip_restriction
-      content {
-        action                    = scm_ip_restriction.value.action
-        ip_address                = scm_ip_restriction.value.ip_address
-        name                      = scm_ip_restriction.value.name
-        priority                  = scm_ip_restriction.value.priority
-        service_tag               = scm_ip_restriction.value.service_tag
-        virtual_network_subnet_id = scm_ip_restriction.value.virtual_network_subnet_id
-        description               = scm_ip_restriction.value.description
-
-        dynamic "headers" {
-          for_each = scm_ip_restriction.value.headers == null ? [] : [scm_ip_restriction.value.headers]
-          content {
-            x_azure_fdid      = headers.value.x_azure_fdid
-            x_fd_health_probe = headers.value.x_fd_health_probe
-            x_forwarded_for   = headers.value.x_forwarded_for
-            x_forwarded_host  = headers.value.x_forwarded_host
+          dynamic "headers" {
+            for_each = scm_ip_restriction.value.headers == null ? [] : [scm_ip_restriction.value.headers]
+            content {
+              x_azure_fdid      = headers.value.x_azure_fdid
+              x_fd_health_probe = headers.value.x_fd_health_probe
+              x_forwarded_for   = headers.value.x_forwarded_for
+              x_forwarded_host  = headers.value.x_forwarded_host
+            }
           }
         }
       }
@@ -390,7 +383,7 @@ resource "azurerm_windows_function_app" "windows_function_app" {
   }
 
   dynamic "storage_account" {
-    for_each = var.storage_accounts
+    for_each = var.storage_configuration.mounts
     content {
       name         = storage_account.value.name
       account_name = storage_account.value.account_name
@@ -402,7 +395,7 @@ resource "azurerm_windows_function_app" "windows_function_app" {
   }
 
   dynamic "sticky_settings" {
-    for_each = var.sticky_settings == null ? [] : [var.sticky_settings]
+    for_each = var.application_configuration.sticky_settings == null ? [] : [var.application_configuration.sticky_settings]
     content {
       app_setting_names       = sticky_settings.value.app_setting_names
       connection_string_names = sticky_settings.value.connection_string_names
@@ -416,65 +409,6 @@ resource "azurerm_windows_function_app" "windows_function_app" {
       update = timeouts.value.update
       read   = timeouts.value.read
       delete = timeouts.value.delete
-    }
-  }
-
-  lifecycle {
-    precondition {
-      condition     = var.service_plan_id != null && var.service_plan_id != ""
-      error_message = "service_plan_id is required."
-    }
-
-    precondition {
-      condition     = local.storage_key_vault_secret_id_set || (var.storage_account_name != null && var.storage_account_name != "")
-      error_message = "Either storage_account_name or storage_key_vault_secret_id must be set."
-    }
-
-    precondition {
-      condition     = !local.storage_key_vault_secret_id_set || (var.storage_account_name == null || var.storage_account_name == "")
-      error_message = "storage_key_vault_secret_id cannot be used with storage_account_name."
-    }
-
-    precondition {
-      condition     = !local.storage_key_vault_secret_id_set || (var.storage_account_access_key == null || var.storage_account_access_key == "")
-      error_message = "storage_key_vault_secret_id cannot be used with storage_account_access_key."
-    }
-
-    precondition {
-      condition     = !local.storage_key_vault_secret_id_set || var.storage_uses_managed_identity == false
-      error_message = "storage_key_vault_secret_id cannot be used with storage_uses_managed_identity."
-    }
-
-    precondition {
-      condition = local.storage_key_vault_secret_id_set ? true : (
-        var.storage_uses_managed_identity ? (
-          var.identity != null &&
-          (var.storage_account_access_key == null || var.storage_account_access_key == "")
-        ) : (
-          var.storage_account_access_key != null && var.storage_account_access_key != ""
-        )
-      )
-      error_message = "When storage_uses_managed_identity is true, identity must be configured and storage_account_access_key must be null. When false, storage_account_access_key is required."
-    }
-
-    precondition {
-      condition     = !(var.auth_settings != null && var.auth_settings_v2 != null)
-      error_message = "auth_settings and auth_settings_v2 are mutually exclusive."
-    }
-
-    precondition {
-      condition     = var.client_certificate_mode == null || var.client_certificate_enabled
-      error_message = "client_certificate_mode requires client_certificate_enabled to be true."
-    }
-
-    precondition {
-      condition     = var.site_config.application_stack != null && local.application_stack_count == 1
-      error_message = "site_config.application_stack must be set with exactly one runtime (dotnet, java, node, powershell, or custom runtime)."
-    }
-
-    precondition {
-      condition     = var.site_config.health_check_eviction_time_in_min == null || var.site_config.health_check_path != null
-      error_message = "health_check_eviction_time_in_min requires health_check_path to be set."
     }
   }
 }

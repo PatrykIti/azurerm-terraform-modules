@@ -73,7 +73,7 @@ run "assignable_scope_outside_scope" {
   }
 
   expect_failures = [
-    azurerm_role_definition.role_definition
+    var.assignable_scopes
   ]
 }
 
@@ -98,6 +98,6 @@ run "data_actions_with_management_group_scope" {
   }
 
   expect_failures = [
-    azurerm_role_definition.role_definition
+    var.assignable_scopes
   ]
 }

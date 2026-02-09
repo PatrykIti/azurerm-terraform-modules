@@ -25,50 +25,66 @@ variable "size" {
 }
 
 # Networking
-variable "network_interface_ids" {
-  description = "A list of Network Interface IDs to attach to the VM. The first is used as primary."
-  type        = list(string)
+variable "network" {
+  description = <<-EOT
+    Network configuration for the VM.
+
+    network_interface_ids: list of NIC IDs to attach to the VM.
+    primary_network_interface_id: optional NIC ID that must belong to network_interface_ids.
+  EOT
+  type = object({
+    network_interface_ids        = list(string)
+    primary_network_interface_id = optional(string)
+  })
 
   validation {
-    condition     = length(var.network_interface_ids) > 0
-    error_message = "At least one network_interface_id must be provided."
+    condition     = length(var.network.network_interface_ids) > 0
+    error_message = "network.network_interface_ids must contain at least one NIC ID."
+  }
+
+  validation {
+    condition     = var.network.primary_network_interface_id == null || contains(var.network.network_interface_ids, var.network.primary_network_interface_id)
+    error_message = "network.primary_network_interface_id must be one of network.network_interface_ids."
   }
 }
 
 # Admin/authentication
-variable "admin_username" {
-  description = "The admin username for the Windows Virtual Machine."
-  type        = string
+variable "admin" {
+  description = <<-EOT
+    Administrator configuration for the VM.
+
+    username: admin username.
+    password: admin password.
+  EOT
+  type = object({
+    username = string
+    password = string
+  })
+  sensitive = true
 
   validation {
-    condition     = can(regex("^[A-Za-z0-9][A-Za-z0-9_-]{0,19}$", var.admin_username))
-    error_message = "admin_username must be 1-20 characters and contain only letters, numbers, hyphens, or underscores."
+    condition     = can(regex("^[A-Za-z0-9][A-Za-z0-9_-]{0,19}$", var.admin.username))
+    error_message = "admin.username must be 1-20 characters and contain only letters, numbers, hyphens, or underscores."
   }
 
   validation {
-    condition     = !contains(["administrator", "admin", "root", "guest", "user", "user1", "test"], lower(var.admin_username))
-    error_message = "admin_username uses a reserved value. Choose a different username."
+    condition     = !contains(["administrator", "admin", "root", "guest", "user", "user1", "test"], lower(var.admin.username))
+    error_message = "admin.username uses a reserved value. Choose a different username."
   }
-}
-
-variable "admin_password" {
-  description = "The admin password for the Windows Virtual Machine."
-  type        = string
-  sensitive   = true
 
   validation {
-    condition     = length(var.admin_password) >= 12 && length(var.admin_password) <= 123
-    error_message = "admin_password must be between 12 and 123 characters."
+    condition     = length(var.admin.password) >= 12 && length(var.admin.password) <= 123
+    error_message = "admin.password must be between 12 and 123 characters."
   }
 
   validation {
     condition = (
-      (can(regex("[A-Z]", var.admin_password)) ? 1 : 0) +
-      (can(regex("[a-z]", var.admin_password)) ? 1 : 0) +
-      (can(regex("[0-9]", var.admin_password)) ? 1 : 0) +
-      (can(regex("[^A-Za-z0-9]", var.admin_password)) ? 1 : 0)
+      (can(regex("[A-Z]", var.admin.password)) ? 1 : 0) +
+      (can(regex("[a-z]", var.admin.password)) ? 1 : 0) +
+      (can(regex("[0-9]", var.admin.password)) ? 1 : 0) +
+      (can(regex("[^A-Za-z0-9]", var.admin.password)) ? 1 : 0)
     ) >= 3
-    error_message = "admin_password must include at least three of: uppercase, lowercase, number, and special character."
+    error_message = "admin.password must include at least three of: uppercase, lowercase, number, and special character."
   }
 }
 
@@ -130,36 +146,32 @@ variable "windows_profile" {
 }
 
 # Image settings
-variable "source_image_reference" {
-  description = "The source image reference for the VM. Mutually exclusive with source_image_id."
+variable "image" {
+  description = <<-EOT
+    Image configuration for the VM.
+
+    Set exactly one of source_image_reference or source_image_id.
+    plan is optional and used for marketplace images.
+  EOT
   type = object({
-    publisher = string
-    offer     = string
-    sku       = string
-    version   = string
+    source_image_reference = optional(object({
+      publisher = string
+      offer     = string
+      sku       = string
+      version   = string
+    }))
+    source_image_id = optional(string)
+    plan = optional(object({
+      publisher = string
+      product   = string
+      name      = string
+    }))
   })
-  default = null
 
   validation {
-    condition     = (var.source_image_reference != null) != (var.source_image_id != null)
-    error_message = "Exactly one of source_image_reference or source_image_id must be set."
+    condition     = (var.image.source_image_reference != null) != (var.image.source_image_id != null)
+    error_message = "Exactly one of image.source_image_reference or image.source_image_id must be set."
   }
-}
-
-variable "source_image_id" {
-  description = "The source image ID for the VM. Mutually exclusive with source_image_reference."
-  type        = string
-  default     = null
-}
-
-variable "plan" {
-  description = "Purchase plan for marketplace images."
-  type = object({
-    publisher = string
-    product   = string
-    name      = string
-  })
-  default = null
 }
 
 # OS disk
@@ -171,14 +183,14 @@ variable "os_disk" {
     storage_account_type: Standard_LRS, StandardSSD_LRS, StandardSSD_ZRS, Premium_LRS, PremiumV2_LRS, Premium_ZRS, UltraSSD_LRS
   EOT
   type = object({
-    name                         = optional(string)
-    caching                      = string
-    storage_account_type         = string
-    disk_size_gb                 = optional(number)
-    write_accelerator_enabled    = optional(bool, false)
-    disk_encryption_set_id       = optional(string)
+    name                             = optional(string)
+    caching                          = string
+    storage_account_type             = string
+    disk_size_gb                     = optional(number)
+    write_accelerator_enabled        = optional(bool, false)
+    disk_encryption_set_id           = optional(string)
     secure_vm_disk_encryption_set_id = optional(string)
-    security_encryption_type     = optional(string)
+    security_encryption_type         = optional(string)
     diff_disk_settings = optional(object({
       option    = string
       placement = optional(string)
@@ -214,8 +226,26 @@ variable "os_disk" {
   }
 
   validation {
-    condition = var.os_disk.diff_disk_settings == null || var.os_disk.diff_disk_settings.placement == null || contains(["CacheDisk", "ResourceDisk", "NvmeDisk"], var.os_disk.diff_disk_settings.placement)
+    condition     = var.os_disk.diff_disk_settings == null || var.os_disk.diff_disk_settings.placement == null || contains(["CacheDisk", "ResourceDisk", "NvmeDisk"], var.os_disk.diff_disk_settings.placement)
     error_message = "os_disk.diff_disk_settings.placement must be CacheDisk, ResourceDisk, or NvmeDisk when specified."
+  }
+
+  validation {
+    condition     = var.os_disk.write_accelerator_enabled == false || (var.os_disk.storage_account_type == "Premium_LRS" && var.os_disk.caching == "None")
+    error_message = "os_disk.write_accelerator_enabled requires storage_account_type = Premium_LRS and caching = None."
+  }
+
+  validation {
+    condition     = var.os_disk.security_encryption_type == null || try(var.security_profile.vtpm_enabled, false) == true
+    error_message = "os_disk.security_encryption_type requires security_profile.vtpm_enabled = true."
+  }
+
+  validation {
+    condition = (
+      (var.os_disk.disk_encryption_set_id == null && var.os_disk.secure_vm_disk_encryption_set_id == null) ||
+      (var.identity != null && contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type))
+    )
+    error_message = "Disk encryption set IDs require identity.type to include UserAssigned."
   }
 }
 
@@ -318,68 +348,40 @@ variable "identity" {
   }
 
   validation {
-    condition = var.identity == null || !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type) || length(var.identity.identity_ids) > 0
+    condition     = var.identity == null || !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type) || length(var.identity.identity_ids) > 0
     error_message = "identity.identity_ids must be provided when identity.type includes UserAssigned."
   }
 }
 
 # Availability/host settings
-variable "zone" {
-  description = "The Availability Zone in which the VM should be created."
-  type        = string
-  default     = null
-}
+variable "placement" {
+  description = <<-EOT
+    Placement and host configuration for the VM.
 
-variable "availability_set_id" {
-  description = "The ID of the Availability Set to place the VM in."
-  type        = string
-  default     = null
-
-  validation {
-    condition     = var.availability_set_id == null || var.zone == null
-    error_message = "availability_set_id cannot be combined with zone."
-  }
-}
-
-variable "proximity_placement_group_id" {
-  description = "The ID of the Proximity Placement Group to associate with the VM."
-  type        = string
-  default     = null
-}
-
-variable "dedicated_host_id" {
-  description = "The ID of the Dedicated Host on which to provision the VM."
-  type        = string
-  default     = null
+    zone and availability_set_id are mutually exclusive.
+    dedicated_host_id and dedicated_host_group_id are mutually exclusive.
+  EOT
+  type = object({
+    zone                          = optional(string)
+    availability_set_id           = optional(string)
+    proximity_placement_group_id  = optional(string)
+    dedicated_host_id             = optional(string)
+    dedicated_host_group_id       = optional(string)
+    capacity_reservation_group_id = optional(string)
+    platform_fault_domain         = optional(number)
+    virtual_machine_scale_set_id  = optional(string)
+  })
+  default = {}
 
   validation {
-    condition     = var.dedicated_host_id == null || var.dedicated_host_group_id == null
-    error_message = "dedicated_host_id and dedicated_host_group_id are mutually exclusive."
+    condition     = var.placement.availability_set_id == null || var.placement.zone == null
+    error_message = "placement.availability_set_id cannot be combined with placement.zone."
   }
-}
 
-variable "dedicated_host_group_id" {
-  description = "The ID of the Dedicated Host Group on which to provision the VM."
-  type        = string
-  default     = null
-}
-
-variable "capacity_reservation_group_id" {
-  description = "The ID of the Capacity Reservation Group to use for the VM."
-  type        = string
-  default     = null
-}
-
-variable "platform_fault_domain" {
-  description = "The platform fault domain in which the VM should be created."
-  type        = number
-  default     = null
-}
-
-variable "virtual_machine_scale_set_id" {
-  description = "The ID of an orchestrated virtual machine scale set to place this VM in."
-  type        = string
-  default     = null
+  validation {
+    condition     = var.placement.dedicated_host_id == null || var.placement.dedicated_host_group_id == null
+    error_message = "placement.dedicated_host_id and placement.dedicated_host_group_id are mutually exclusive."
+  }
 }
 
 # Security profile
@@ -412,6 +414,16 @@ variable "spot" {
     condition     = var.spot.eviction_policy == null || contains(["Deallocate", "Delete"], var.spot.eviction_policy)
     error_message = "spot.eviction_policy must be Deallocate or Delete."
   }
+
+  validation {
+    condition     = var.spot.priority != "Spot" || var.spot.eviction_policy != null
+    error_message = "spot.eviction_policy is required when spot.priority is Spot."
+  }
+
+  validation {
+    condition     = var.spot.priority == "Spot" || (var.spot.eviction_policy == null && var.spot.max_bid_price == null)
+    error_message = "spot.eviction_policy and max_bid_price can only be set when spot.priority is Spot."
+  }
 }
 
 # Additional capabilities
@@ -428,24 +440,29 @@ variable "additional_capabilities" {
 variable "vm_agent" {
   description = "VM agent configuration."
   type = object({
-    provision_vm_agent            = optional(bool, true)
-    allow_extension_operations    = optional(bool, true)
-    extensions_time_budget        = optional(string)
+    provision_vm_agent                = optional(bool, true)
+    allow_extension_operations        = optional(bool, true)
+    extensions_time_budget            = optional(string)
     vm_agent_platform_updates_enabled = optional(bool)
   })
   default = {}
+
+  validation {
+    condition     = var.vm_agent.provision_vm_agent || var.vm_agent.allow_extension_operations == false
+    error_message = "allow_extension_operations must be false when provision_vm_agent is false."
+  }
 }
 
 # Guest patching
 variable "patching" {
   description = "Guest patching configuration."
   type = object({
-    patch_mode            = optional(string, "AutomaticByOS")
-    patch_assessment_mode = optional(string, "ImageDefault")
-    reboot_setting        = optional(string)
-    hotpatching_enabled   = optional(bool)
-    automatic_updates_enabled = optional(bool)
-    enable_automatic_updates  = optional(bool)
+    patch_mode                                             = optional(string, "AutomaticByOS")
+    patch_assessment_mode                                  = optional(string, "ImageDefault")
+    reboot_setting                                         = optional(string)
+    hotpatching_enabled                                    = optional(bool)
+    automatic_updates_enabled                              = optional(bool)
+    enable_automatic_updates                               = optional(bool)
     bypass_platform_safety_checks_on_user_schedule_enabled = optional(bool)
   })
   default = {}
@@ -468,6 +485,26 @@ variable "patching" {
   validation {
     condition     = !(var.patching.automatic_updates_enabled != null && var.patching.enable_automatic_updates != null)
     error_message = "automatic_updates_enabled and enable_automatic_updates cannot both be set."
+  }
+
+  validation {
+    condition     = var.patching.patch_mode != "AutomaticByPlatform" || var.vm_agent.provision_vm_agent
+    error_message = "patching.patch_mode = AutomaticByPlatform requires vm_agent.provision_vm_agent = true."
+  }
+
+  validation {
+    condition     = var.patching.patch_assessment_mode != "AutomaticByPlatform" || var.vm_agent.provision_vm_agent
+    error_message = "patching.patch_assessment_mode = AutomaticByPlatform requires vm_agent.provision_vm_agent = true."
+  }
+
+  validation {
+    condition     = var.patching.reboot_setting == null || var.patching.patch_mode == "AutomaticByPlatform"
+    error_message = "patching.reboot_setting can only be set when patching.patch_mode is AutomaticByPlatform."
+  }
+
+  validation {
+    condition     = var.patching.hotpatching_enabled != true || (var.patching.patch_mode == "AutomaticByPlatform" && var.vm_agent.provision_vm_agent)
+    error_message = "hotpatching_enabled requires patching.patch_mode = AutomaticByPlatform and vm_agent.provision_vm_agent = true."
   }
 }
 
@@ -534,11 +571,11 @@ variable "termination_notification" {
 variable "gallery_applications" {
   description = "Gallery applications to install on the VM."
   type = list(object({
-    version_id                               = string
-    automatic_upgrade_enabled                 = optional(bool)
-    configuration_blob_uri                   = optional(string)
-    order                                    = optional(number)
-    tag                                      = optional(string)
+    version_id                                  = string
+    automatic_upgrade_enabled                   = optional(bool)
+    configuration_blob_uri                      = optional(string)
+    order                                       = optional(number)
+    tag                                         = optional(string)
     treat_failure_as_deployment_failure_enabled = optional(bool)
   }))
   default = []
@@ -576,10 +613,9 @@ variable "extensions" {
     auto_upgrade_minor_version  = optional(bool)
     automatic_upgrade_enabled   = optional(bool)
     failure_suppression_enabled = optional(bool)
-    force_update_tag            = optional(string)
     provision_after_extensions  = optional(list(string), [])
     protected_settings_from_key_vault = optional(object({
-      secret_url     = string
+      secret_url      = string
       source_vault_id = string
     }))
     tags = optional(map(string), {})
@@ -590,6 +626,14 @@ variable "extensions" {
     condition     = length(distinct([for ext in var.extensions : ext.name])) == length(var.extensions)
     error_message = "Each extension must have a unique name."
   }
+
+  validation {
+    condition = alltrue([
+      for ext in var.extensions :
+      ext.protected_settings == null || ext.protected_settings_from_key_vault == null
+    ])
+    error_message = "protected_settings and protected_settings_from_key_vault cannot be used together for VM extensions."
+  }
 }
 
 # Diagnostic settings
@@ -597,12 +641,11 @@ variable "diagnostic_settings" {
   description = <<-EOT
     Diagnostic settings configuration for the VM.
 
-    Provide explicit log_categories and/or metric_categories, or use areas to map to
-    available diagnostic categories. Areas support: logs, metrics, all.
+    Provide explicit log_categories, log_category_groups, and/or metric_categories.
+    Each entry must define at least one destination and at least one category/group/metric.
   EOT
   type = list(object({
     name                           = string
-    areas                          = optional(list(string))
     log_categories                 = optional(list(string))
     log_category_groups            = optional(list(string))
     metric_categories              = optional(list(string))
@@ -621,14 +664,23 @@ variable "diagnostic_settings" {
   }
 
   validation {
-    condition     = length(distinct([for ds in var.diagnostic_settings : ds.name])) == length(var.diagnostic_settings)
+    condition     = length(distinct([for ds in var.diagnostic_settings : trimspace(ds.name)])) == length(var.diagnostic_settings)
     error_message = "Each diagnostic setting entry must have a unique name."
+  }
+
+  validation {
+    condition     = alltrue([for ds in var.diagnostic_settings : trimspace(ds.name) != ""])
+    error_message = "Each diagnostic setting entry name must not be empty."
   }
 
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      ds.log_analytics_workspace_id != null || ds.storage_account_id != null || ds.eventhub_authorization_rule_id != null
+      length(compact([
+        ds.log_analytics_workspace_id == null ? null : trimspace(ds.log_analytics_workspace_id),
+        ds.storage_account_id == null ? null : trimspace(ds.storage_account_id),
+        ds.eventhub_authorization_rule_id == null ? null : trimspace(ds.eventhub_authorization_rule_id)
+      ])) > 0
     ])
     error_message = "Each diagnostic setting must specify at least one destination: log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id."
   }
@@ -636,7 +688,9 @@ variable "diagnostic_settings" {
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      ds.eventhub_authorization_rule_id == null || (ds.eventhub_name != null && ds.eventhub_name != "")
+      ds.eventhub_authorization_rule_id == null ||
+      trimspace(ds.eventhub_authorization_rule_id) == "" ||
+      (ds.eventhub_name != null && trimspace(ds.eventhub_name) != "")
     ])
     error_message = "eventhub_name is required when eventhub_authorization_rule_id is set."
   }
@@ -652,12 +706,73 @@ variable "diagnostic_settings" {
   validation {
     condition = alltrue([
       for ds in var.diagnostic_settings :
-      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
-      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""]) &&
-      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : c != ""]) &&
-      alltrue([for c in(ds.areas == null ? [] : ds.areas) : c != ""])
+      ds.log_analytics_workspace_id == null || trimspace(ds.log_analytics_workspace_id) != ""
     ])
-    error_message = "diagnostic_settings categories and areas must not contain empty strings."
+    error_message = "diagnostic_settings.log_analytics_workspace_id must not be an empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.storage_account_id == null || trimspace(ds.storage_account_id) != ""
+    ])
+    error_message = "diagnostic_settings.storage_account_id must not be an empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.eventhub_authorization_rule_id == null || trimspace(ds.eventhub_authorization_rule_id) != ""
+    ])
+    error_message = "diagnostic_settings.eventhub_authorization_rule_id must not be an empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.eventhub_name == null || trimspace(ds.eventhub_name) != ""
+    ])
+    error_message = "diagnostic_settings.eventhub_name must not be an empty string when set."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.eventhub_name == null || (
+        ds.eventhub_authorization_rule_id != null &&
+        trimspace(ds.eventhub_authorization_rule_id) != ""
+      )
+    ])
+    error_message = "eventhub_name can only be set when eventhub_authorization_rule_id is specified."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.log_analytics_destination_type == null || (
+        ds.log_analytics_workspace_id != null &&
+        trimspace(ds.log_analytics_workspace_id) != ""
+      )
+    ])
+    error_message = "log_analytics_destination_type requires log_analytics_workspace_id."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : trimspace(c) != ""]) &&
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : trimspace(c) != ""]) &&
+      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : trimspace(c) != ""])
+    ])
+    error_message = "diagnostic_settings categories must not contain empty strings."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      length(coalesce(ds.log_categories, [])) + length(coalesce(ds.metric_categories, [])) + length(coalesce(ds.log_category_groups, [])) > 0
+    ])
+    error_message = "Each diagnostic setting must define at least one category: log_categories, log_category_groups, or metric_categories."
   }
 }
 

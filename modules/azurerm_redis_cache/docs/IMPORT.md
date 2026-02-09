@@ -13,7 +13,7 @@ import {
 
 ```hcl
 import {
-  to = azurerm_redis_firewall_rule.firewall_rule["office"]
+  to = azurerm_redis_firewall_rule.redis_firewall_rule["office"]
   id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/example-rg/providers/Microsoft.Cache/Redis/example-redis/firewallRules/office"
 }
 ```
@@ -22,7 +22,7 @@ import {
 
 ```hcl
 import {
-  to = azurerm_redis_linked_server.linked_server["geo-secondary"]
+  to = azurerm_redis_linked_server.redis_linked_server["geo-secondary"]
   id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/example-rg/providers/Microsoft.Cache/Redis/example-redis/linkedServers/geo-secondary"
 }
 ```
@@ -31,7 +31,7 @@ import {
 
 ```hcl
 import {
-  to = azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings["diag"]
+  to = azurerm_monitor_diagnostic_setting.monitor_diagnostic_setting["diag"]
   id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/example-rg/providers/Microsoft.Cache/Redis/example-redis|diag"
 }
 ```

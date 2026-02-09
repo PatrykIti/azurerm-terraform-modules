@@ -1,4 +1,4 @@
-resource "azurerm_redis_firewall_rule" "firewall_rule" {
+resource "azurerm_redis_firewall_rule" "redis_firewall_rule" {
   for_each = var.public_network_access_enabled ? {
     for rule in var.firewall_rules : rule.name => rule
   } : {}

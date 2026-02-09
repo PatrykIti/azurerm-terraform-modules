@@ -13,16 +13,15 @@ Diagnostics are configured inline to avoid cross-module coupling.
 - `azurerm_virtual_machine_data_disk_attachment`
 - `azurerm_virtual_machine_extension`
 - `azurerm_monitor_diagnostic_setting`
-- `data.azurerm_monitor_diagnostic_categories`
 
 ## Usage Notes
 
 - **Data disks**: `data_disks` are created as managed disks and attached to the
   VM because the azurerm 4.57.0 schema does not expose inline data disk blocks
   for Windows VMs.
-- **Diagnostics**: use `diagnostic_settings` with `areas` (all/logs/metrics) or
-  explicit category lists. Entries with no categories are reported in
-  `diagnostic_settings_skipped`.
+- **Diagnostics**: use explicit `diagnostic_settings.log_categories`,
+  `log_category_groups`, and/or `metric_categories`. No category auto-discovery
+  is performed.
 - **Disk encryption sets**: when `os_disk.disk_encryption_set_id` or
   `os_disk.secure_vm_disk_encryption_set_id` is set, `identity.type` must include
   `UserAssigned`.

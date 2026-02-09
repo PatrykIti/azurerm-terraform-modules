@@ -1,10 +1,4 @@
-locals {
-  federated_identity_credentials = {
-    for credential in var.federated_identity_credentials : credential.name => credential
-  }
-}
-
-resource "azurerm_user_assigned_identity" "main" {
+resource "azurerm_user_assigned_identity" "user_assigned_identity" {
   name                = var.name
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -26,12 +20,14 @@ resource "azurerm_user_assigned_identity" "main" {
   }
 }
 
-resource "azurerm_federated_identity_credential" "main" {
-  for_each = local.federated_identity_credentials
+resource "azurerm_federated_identity_credential" "federated_identity_credential" {
+  for_each = {
+    for credential in var.federated_identity_credentials : credential.name => credential
+  }
 
   name                = each.value.name
   resource_group_name = var.resource_group_name
-  parent_id           = azurerm_user_assigned_identity.main.id
+  parent_id           = azurerm_user_assigned_identity.user_assigned_identity.id
   issuer              = each.value.issuer
   subject             = each.value.subject
   audience            = each.value.audience
@@ -48,25 +44,6 @@ resource "azurerm_federated_identity_credential" "main" {
       update = try(timeouts.value.update, null)
       delete = try(timeouts.value.delete, null)
       read   = try(timeouts.value.read, null)
-    }
-  }
-
-  lifecycle {
-    precondition {
-      condition     = can(regex("^https://", each.value.issuer)) && length(trimspace(each.value.issuer)) > 8
-      error_message = "Federated identity credential issuer must be a valid HTTPS URL."
-    }
-    precondition {
-      condition     = length(trimspace(each.value.subject)) > 0
-      error_message = "Federated identity credential subject must not be empty."
-    }
-    precondition {
-      condition     = length(each.value.audience) > 0
-      error_message = "Federated identity credential audience must contain at least one value."
-    }
-    precondition {
-      condition     = alltrue([for aud in each.value.audience : length(trimspace(aud)) > 0])
-      error_message = "Federated identity credential audience values must not be empty."
     }
   }
 }

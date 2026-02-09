@@ -13,13 +13,13 @@ This module manages a single Azure Windows Function App with optional slots and 
 ## Usage Notes
 
 - `site_config` is required and must include an `application_stack` with exactly one runtime.
-- Storage must be configured using either:
-  - `storage_account_name` + `storage_account_access_key`, or
-  - `storage_account_name` + `storage_uses_managed_identity` (with `identity`), or
-  - `storage_key_vault_secret_id` (without `storage_account_name`).
+- Storage must be configured through `storage_configuration` using either:
+  - `account_name` + `account_access_key`, or
+  - `account_name` + `uses_managed_identity` (with `identity`), or
+  - `key_vault_secret_id` (without `account_name`).
 - `auth_settings` and `auth_settings_v2` are mutually exclusive.
 - Slots require their own `site_config` and can inherit storage settings from the main app or override them.
-- Diagnostic settings support `areas = ["all"]`, `areas = ["logs"]`, or `areas = ["metrics"]` to auto-select categories.
+- Diagnostic settings are explicit and require supported `log_categories`, `log_category_groups`, and/or `metric_categories`.
 
 ## Out of Scope
 

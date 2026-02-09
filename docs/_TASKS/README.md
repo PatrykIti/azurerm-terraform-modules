@@ -3,7 +3,7 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 22 tasks
+- **To Do:** 23 tasks
 - **In Progress:** 0
 - **Done:** 64 tasks
 
@@ -13,6 +13,7 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-050](./TASK-050_Final_Six_AzureRM_Modules_Compliance_Alignment.md) | **Final six AzureRM modules compliance alignment** | High | Large | `azurerm_redis_cache`, `azurerm_role_assignment`, `azurerm_role_definition`, `azurerm_user_assigned_identity`, `azurerm_windows_function_app`, `azurerm_windows_virtual_machine` |
 | [TASK-042](./TASK-042_Linux_Function_App_Compliance_Reaudit.md) | **Linux Function App compliance re-audit** | High | Large | `modules/azurerm_linux_function_app/` |
 | [TASK-043](./TASK-043_Linux_Virtual_Machine_Compliance_Reaudit.md) | **Linux Virtual Machine compliance re-audit** | High | Large | `modules/azurerm_linux_virtual_machine/` |
 | [TASK-044](./TASK-044_Log_Analytics_Workspace_Compliance_Reaudit.md) | **Log Analytics Workspace compliance re-audit** | High | Large | `modules/azurerm_log_analytics_workspace/` |

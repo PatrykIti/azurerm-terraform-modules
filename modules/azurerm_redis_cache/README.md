@@ -90,10 +90,10 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
+| [azurerm_monitor_diagnostic_setting.monitor_diagnostic_setting](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_redis_cache.redis_cache](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/redis_cache) | resource |
-| [azurerm_redis_firewall_rule.firewall_rule](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/redis_firewall_rule) | resource |
-| [azurerm_redis_linked_server.linked_server](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/redis_linked_server) | resource |
+| [azurerm_redis_firewall_rule.redis_firewall_rule](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/redis_firewall_rule) | resource |
+| [azurerm_redis_linked_server.redis_linked_server](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/redis_linked_server) | resource |
 | [azurerm_monitor_diagnostic_categories.redis_cache](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/data-sources/monitor_diagnostic_categories) | data source |
 
 ## Inputs

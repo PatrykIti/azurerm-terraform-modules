@@ -15,16 +15,22 @@ variables {
   location            = "northeurope"
   size                = "Standard_B2s"
 
-  network_interface_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/networkInterfaces/nic1"]
+  network = {
+    network_interface_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/networkInterfaces/nic1"]
+  }
 
-  admin_username = "azureuser"
-  admin_password = "Str0ngPassw0rd!"
+  admin = {
+    username = "azureuser"
+    password = "Str0ngPassw0rd!"
+  }
 
-  source_image_reference = {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2022-datacenter-g2"
-    version   = "latest"
+  image = {
+    source_image_reference = {
+      publisher = "MicrosoftWindowsServer"
+      offer     = "WindowsServer"
+      sku       = "2022-datacenter-g2"
+      version   = "latest"
+    }
   }
 
   os_disk = {
@@ -37,7 +43,7 @@ run "naming_plan" {
   command = plan
 
   assert {
-    condition     = true
+    condition     = can(regex("^[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?$", output.name))
     error_message = "Naming validation failed."
   }
 }

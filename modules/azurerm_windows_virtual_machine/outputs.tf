@@ -56,7 +56,7 @@ output "identity" {
 output "extensions" {
   description = "VM extensions created by the module."
   value = {
-    for name, extension in azurerm_virtual_machine_extension.virtual_machine_extensions : name => {
+    for name, extension in azurerm_virtual_machine_extension.virtual_machine_extension : name => {
       id   = extension.id
       name = extension.name
     }
@@ -66,7 +66,7 @@ output "extensions" {
 output "data_disks" {
   description = "Managed data disks created by the module."
   value = {
-    for name, disk in azurerm_managed_disk.data_disks : name => {
+    for name, disk in azurerm_managed_disk.managed_disk : name => {
       id   = disk.id
       name = disk.name
     }
@@ -74,6 +74,6 @@ output "data_disks" {
 }
 
 output "diagnostic_settings_skipped" {
-  description = "Diagnostic settings entries skipped because no log or metric categories were supplied."
-  value       = local.diagnostic_settings_skipped
+  description = "Deprecated compatibility output. Diagnostic settings require explicit categories, so no entries are skipped."
+  value       = []
 }

@@ -69,7 +69,7 @@ output "identity" {
 output "firewall_rules" {
   description = "Firewall rules created for the Redis Cache."
   value = {
-    for name, rule in azurerm_redis_firewall_rule.firewall_rule : name => {
+    for name, rule in azurerm_redis_firewall_rule.redis_firewall_rule : name => {
       id       = rule.id
       start_ip = rule.start_ip
       end_ip   = rule.end_ip
@@ -80,7 +80,7 @@ output "firewall_rules" {
 output "linked_servers" {
   description = "Linked servers created for the Redis Cache."
   value = {
-    for name, ls in azurerm_redis_linked_server.linked_server : name => {
+    for name, ls in azurerm_redis_linked_server.redis_linked_server : name => {
       id                               = ls.id
       linked_redis_cache_id            = ls.linked_redis_cache_id
       linked_redis_cache_location      = ls.linked_redis_cache_location

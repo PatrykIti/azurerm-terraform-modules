@@ -70,8 +70,8 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_federated_identity_credential.main](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/federated_identity_credential) | resource |
-| [azurerm_user_assigned_identity.main](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/user_assigned_identity) | resource |
+| [azurerm_federated_identity_credential.federated_identity_credential](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/federated_identity_credential) | resource |
+| [azurerm_user_assigned_identity.user_assigned_identity](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/user_assigned_identity) | resource |
 
 ## Inputs
 

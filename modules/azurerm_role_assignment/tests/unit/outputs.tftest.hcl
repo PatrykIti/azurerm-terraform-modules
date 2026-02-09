@@ -3,15 +3,15 @@
 mock_provider "azurerm" {
   mock_resource "azurerm_role_assignment" {
     defaults = {
-      id                 = "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Authorization/roleAssignments/11111111-1111-1111-1111-111111111111"
-      name               = "11111111-1111-1111-1111-111111111111"
-      scope              = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg"
-      role_definition_id = "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000"
-      role_definition_name = "Reader"
-      principal_id       = "00000000-0000-0000-0000-000000000000"
-      principal_type     = "ServicePrincipal"
-      condition          = null
-      condition_version  = null
+      id                                     = "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Authorization/roleAssignments/11111111-1111-1111-1111-111111111111"
+      name                                   = "11111111-1111-1111-1111-111111111111"
+      scope                                  = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg"
+      role_definition_id                     = "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000"
+      role_definition_name                   = "Reader"
+      principal_id                           = "00000000-0000-0000-0000-000000000000"
+      principal_type                         = "ServicePrincipal"
+      condition                              = null
+      condition_version                      = null
       delegated_managed_identity_resource_id = null
     }
   }

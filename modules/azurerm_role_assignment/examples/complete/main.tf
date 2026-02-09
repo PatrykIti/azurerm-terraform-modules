@@ -35,13 +35,13 @@ resource "azurerm_storage_account" "example" {
 module "role_assignment" {
   source = "../.."
 
-  name                  = var.role_assignment_name
-  scope                 = azurerm_storage_account.example.id
-  role_definition_name  = "Storage Blob Data Reader"
-  principal_id          = azurerm_user_assigned_identity.example.principal_id
-  principal_type        = "ServicePrincipal"
-  description           = "Role assignment with ABAC condition at storage account scope"
-  condition             = "@Resource[Microsoft.Storage/storageAccounts:Name] StringEquals '${azurerm_storage_account.example.name}'"
-  condition_version     = "2.0"
+  name                             = var.role_assignment_name
+  scope                            = azurerm_storage_account.example.id
+  role_definition_name             = "Storage Blob Data Reader"
+  principal_id                     = azurerm_user_assigned_identity.example.principal_id
+  principal_type                   = "ServicePrincipal"
+  description                      = "Role assignment with ABAC condition at storage account scope"
+  condition                        = "@Resource[Microsoft.Storage/storageAccounts:Name] StringEquals '${azurerm_storage_account.example.name}'"
+  condition_version                = "2.0"
   skip_service_principal_aad_check = true
 }

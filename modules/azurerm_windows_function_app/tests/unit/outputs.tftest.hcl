@@ -3,12 +3,12 @@
 mock_provider "azurerm" {
   mock_resource "azurerm_windows_function_app" {
     defaults = {
-      id                         = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Web/sites/wfuncunit"
-      name                       = "wfuncunit"
-      location                   = "northeurope"
-      resource_group_name        = "test-rg"
-      default_hostname           = "wfuncunit.azurewebsites.net"
-      outbound_ip_addresses      = "10.0.0.1,10.0.0.2"
+      id                             = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Web/sites/wfuncunit"
+      name                           = "wfuncunit"
+      location                       = "northeurope"
+      resource_group_name            = "test-rg"
+      default_hostname               = "wfuncunit.azurewebsites.net"
+      outbound_ip_addresses          = "10.0.0.1,10.0.0.2"
       possible_outbound_ip_addresses = "10.0.0.3,10.0.0.4"
       identity = [
         {
@@ -26,12 +26,14 @@ mock_provider "azurerm" {
 }
 
 variables {
-  name                       = "wfuncunit"
-  resource_group_name        = "test-rg"
-  location                   = "northeurope"
-  service_plan_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Web/serverfarms/plan"
-  storage_account_name       = "storageunit"
-  storage_account_access_key = "fakekey"
+  name                = "wfuncunit"
+  resource_group_name = "test-rg"
+  location            = "northeurope"
+  service_plan_id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Web/serverFarms/plan"
+  storage_configuration = {
+    account_name       = "storageunit"
+    account_access_key = "fakekey"
+  }
   site_config = {
     application_stack = {
       dotnet_version = "v8.0"

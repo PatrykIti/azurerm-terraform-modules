@@ -27,8 +27,8 @@ resource "azurerm_user_assigned_identity" "example" {
 module "role_assignment" {
   source = "../.."
 
-  scope                 = azurerm_resource_group.example.id
-  role_definition_name  = "Reader"
-  principal_id          = azurerm_user_assigned_identity.example.principal_id
-  principal_type        = "ServicePrincipal"
+  scope                = azurerm_resource_group.example.id
+  role_definition_name = "Reader"
+  principal_id         = azurerm_user_assigned_identity.example.principal_id
+  principal_type       = "ServicePrincipal"
 }

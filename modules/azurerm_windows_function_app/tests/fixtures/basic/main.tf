@@ -47,11 +47,18 @@ module "windows_function_app" {
   location            = azurerm_resource_group.example.location
   service_plan_id     = azurerm_service_plan.example.id
 
-  storage_account_name       = azurerm_storage_account.example.name
-  storage_account_access_key = azurerm_storage_account.example.primary_access_key
+  storage_configuration = {
+    account_name       = azurerm_storage_account.example.name
+    account_access_key = azurerm_storage_account.example.primary_access_key
+  }
 
-  functions_extension_version   = "~4"
-  public_network_access_enabled = true
+  application_configuration = {
+    functions_extension_version = "~4"
+  }
+
+  access_configuration = {
+    public_network_access_enabled = true
+  }
 
   site_config = {
     application_stack = {

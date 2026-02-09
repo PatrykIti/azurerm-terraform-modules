@@ -7,14 +7,6 @@ mock_provider "azurerm" {
       name = "winvmunittest01"
     }
   }
-
-  mock_data_source "azurerm_monitor_diagnostic_categories" {
-    defaults = {
-      log_category_types    = ["AuditEvent"]
-      log_category_groups   = []
-      metric_category_types = ["AllMetrics"]
-    }
-  }
 }
 
 variables {
@@ -23,16 +15,22 @@ variables {
   location            = "northeurope"
   size                = "Standard_B2s"
 
-  network_interface_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/networkInterfaces/nic1"]
+  network = {
+    network_interface_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/networkInterfaces/nic1"]
+  }
 
-  admin_username = "azureuser"
-  admin_password = "Str0ngPassw0rd!"
+  admin = {
+    username = "azureuser"
+    password = "Str0ngPassw0rd!"
+  }
 
-  source_image_reference = {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2022-datacenter-g2"
-    version   = "latest"
+  image = {
+    source_image_reference = {
+      publisher = "MicrosoftWindowsServer"
+      offer     = "WindowsServer"
+      sku       = "2022-datacenter-g2"
+      version   = "latest"
+    }
   }
 
   os_disk = {
@@ -45,7 +43,7 @@ run "defaults_plan" {
   command = plan
 
   assert {
-    condition     = true
+    condition     = output.name == "winvmunittest01"
     error_message = "Defaults validation failed."
   }
 }

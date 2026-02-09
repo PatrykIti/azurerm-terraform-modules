@@ -59,6 +59,14 @@ variable "role_definition_name" {
     condition     = var.role_definition_name == null || length(trimspace(var.role_definition_name)) > 0
     error_message = "role_definition_name must be a non-empty string when provided."
   }
+
+  validation {
+    condition = (
+      (var.role_definition_id != null && length(trimspace(var.role_definition_id)) > 0) !=
+      (var.role_definition_name != null && length(trimspace(var.role_definition_name)) > 0)
+    )
+    error_message = "Exactly one of role_definition_id or role_definition_name must be set."
+  }
 }
 
 # Principal Configuration
@@ -100,6 +108,17 @@ variable "condition_version" {
     condition     = var.condition_version == null || contains(["2.0"], var.condition_version)
     error_message = "condition_version must be \"2.0\" when provided."
   }
+
+  validation {
+    condition = (
+      (var.condition == null || length(trimspace(var.condition)) == 0) &&
+      (var.condition_version == null || length(trimspace(var.condition_version)) == 0)
+      ) || (
+      (var.condition != null && length(trimspace(var.condition)) > 0) &&
+      (var.condition_version != null && length(trimspace(var.condition_version)) > 0)
+    )
+    error_message = "condition and condition_version must either both be set or both be null."
+  }
 }
 
 variable "delegated_managed_identity_resource_id" {
@@ -111,12 +130,28 @@ variable "delegated_managed_identity_resource_id" {
     condition     = var.delegated_managed_identity_resource_id == null || length(trimspace(var.delegated_managed_identity_resource_id)) > 0
     error_message = "delegated_managed_identity_resource_id must be a non-empty string when provided."
   }
+
+  validation {
+    condition = var.delegated_managed_identity_resource_id == null || (
+      var.principal_type != null &&
+      trimspace(var.principal_type) == "ServicePrincipal"
+    )
+    error_message = "delegated_managed_identity_resource_id requires principal_type to be ServicePrincipal."
+  }
 }
 
 variable "skip_service_principal_aad_check" {
   description = "If true, skips the AAD check for service principals during assignment."
   type        = bool
   default     = false
+
+  validation {
+    condition = !var.skip_service_principal_aad_check || (
+      var.principal_type != null &&
+      trimspace(var.principal_type) == "ServicePrincipal"
+    )
+    error_message = "skip_service_principal_aad_check can only be used when principal_type is ServicePrincipal."
+  }
 }
 
 variable "timeouts" {

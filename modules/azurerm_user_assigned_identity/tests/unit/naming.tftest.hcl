@@ -38,7 +38,7 @@ run "valid_uai_name" {
   }
 
   assert {
-    condition     = azurerm_user_assigned_identity.main.name == "uai-test_name-01"
+    condition     = azurerm_user_assigned_identity.user_assigned_identity.name == "uai-test_name-01"
     error_message = "User Assigned Identity name should match the input."
   }
 }
@@ -59,7 +59,7 @@ run "valid_fic_name" {
   }
 
   assert {
-    condition     = azurerm_federated_identity_credential.main["github-actions"].name == "github-actions"
+    condition     = azurerm_federated_identity_credential.federated_identity_credential["github-actions"].name == "github-actions"
     error_message = "Federated identity credential name should match the input."
   }
 }

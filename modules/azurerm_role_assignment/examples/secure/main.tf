@@ -25,7 +25,7 @@ resource "azurerm_user_assigned_identity" "example" {
 }
 
 module "role_definition" {
-  source = "../../azurerm_role_definition"
+  source = "../../../azurerm_role_definition"
 
   name        = var.role_definition_name
   scope       = azurerm_resource_group.example.id

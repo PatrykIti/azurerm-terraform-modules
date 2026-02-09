@@ -14,7 +14,7 @@ provider "azurerm" {
 }
 
 locals {
-  suffix = lower(replace(var.random_suffix, "-", ""))
+  suffix               = lower(replace(var.random_suffix, "-", ""))
   storage_account_name = substr("sara${local.suffix}abac", 0, 24)
 }
 

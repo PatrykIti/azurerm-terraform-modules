@@ -23,16 +23,22 @@ module "windows_virtual_machine" {
   location            = azurerm_resource_group.example.location
   size                = "Standard_B2s"
 
-  network_interface_ids = [azurerm_network_interface.example.id]
+  network = {
+    network_interface_ids = [azurerm_network_interface.example.id]
+  }
 
-  admin_username = "azureuser"
-  admin_password = random_password.admin.result
+  admin = {
+    username = "azureuser"
+    password = random_password.admin.result
+  }
 
-  source_image_reference = {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2022-datacenter-g2"
-    version   = "latest"
+  image = {
+    source_image_reference = {
+      publisher = "MicrosoftWindowsServer"
+      offer     = "WindowsServer"
+      sku       = "2022-datacenter-g2"
+      version   = "latest"
+    }
   }
 
   os_disk = {
@@ -53,8 +59,8 @@ module "windows_virtual_machine" {
   `azurerm_virtual_machine_data_disk_attachment` because the
   `azurerm_windows_virtual_machine` schema in azurerm 4.57.0 does not expose an
   inline data disk block.
-- `primary_network_interface_id` is not available in azurerm 4.57.0 for
-  Windows VMs; the first element of `network_interface_ids` is used as primary.
+- Use `network.primary_network_interface_id` to force NIC ordering when needed.
+  The module places this NIC first in `network.network_interface_ids`.
 
 ## Examples
 

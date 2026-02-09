@@ -33,7 +33,7 @@ locals {
   ]
 }
 
-resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
+resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_setting" {
   for_each = {
     for ds in local.diagnostic_settings_effective : ds.name => ds
   }

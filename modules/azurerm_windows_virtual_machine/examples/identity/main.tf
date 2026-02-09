@@ -20,8 +20,8 @@ provider "azurerm" {
 provider "random" {}
 
 resource "random_password" "admin" {
-  length  = 20
-  special = true
+  length      = 20
+  special     = true
   min_upper   = 1
   min_lower   = 1
   min_numeric = 1
@@ -82,16 +82,22 @@ module "windows_virtual_machine" {
   location            = azurerm_resource_group.example.location
   size                = "Standard_B2s"
 
-  network_interface_ids = [azurerm_network_interface.example.id]
+  network = {
+    network_interface_ids = [azurerm_network_interface.example.id]
+  }
 
-  admin_username = "azureuser"
-  admin_password = random_password.admin.result
+  admin = {
+    username = "azureuser"
+    password = random_password.admin.result
+  }
 
-  source_image_reference = {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2022-datacenter-g2"
-    version   = "latest"
+  image = {
+    source_image_reference = {
+      publisher = "MicrosoftWindowsServer"
+      offer     = "WindowsServer"
+      sku       = "2022-datacenter-g2"
+      version   = "latest"
+    }
   }
 
   os_disk = {

@@ -6,29 +6,29 @@ resource "azurerm_windows_function_app_slot" "windows_function_app_slot" {
 
   storage_account_name          = local.slot_storage[each.key].storage_account_name
   storage_account_access_key    = local.slot_storage[each.key].storage_account_access_key
-  storage_uses_managed_identity = local.slot_storage[each.key].storage_uses_managed_identity
+  storage_uses_managed_identity = local.slot_storage[each.key].storage_uses_managed_identity ? true : null
   storage_key_vault_secret_id   = local.slot_storage[each.key].storage_key_vault_secret_id
 
-  service_plan_id              = each.value.service_plan_id
+  service_plan_id = each.value.service_plan_id
 
-  functions_extension_version  = each.value.functions_extension_version
-  builtin_logging_enabled      = each.value.builtin_logging_enabled
-  enabled                      = each.value.enabled
-  https_only                   = each.value.https_only
-  public_network_access_enabled = each.value.public_network_access_enabled
-  client_certificate_enabled   = each.value.client_certificate_enabled
-  client_certificate_mode      = each.value.client_certificate_mode
+  functions_extension_version        = each.value.functions_extension_version
+  builtin_logging_enabled            = each.value.builtin_logging_enabled
+  enabled                            = each.value.enabled
+  https_only                         = each.value.https_only
+  public_network_access_enabled      = each.value.public_network_access_enabled
+  client_certificate_enabled         = each.value.client_certificate_enabled
+  client_certificate_mode            = each.value.client_certificate_mode
   client_certificate_exclusion_paths = each.value.client_certificate_exclusion_paths
 
-  app_settings                = each.value.app_settings
-  content_share_force_disabled = each.value.content_share_force_disabled
-  daily_memory_time_quota      = each.value.daily_memory_time_quota
+  app_settings                             = each.value.app_settings
+  content_share_force_disabled             = each.value.content_share_force_disabled
+  daily_memory_time_quota                  = each.value.daily_memory_time_quota
   ftp_publish_basic_authentication_enabled = each.value.ftp_publish_basic_authentication_enabled
 
-  key_vault_reference_identity_id = each.value.key_vault_reference_identity_id
-  virtual_network_subnet_id       = each.value.virtual_network_subnet_id
+  key_vault_reference_identity_id        = each.value.key_vault_reference_identity_id
+  virtual_network_subnet_id              = each.value.virtual_network_subnet_id
   virtual_network_backup_restore_enabled = each.value.virtual_network_backup_restore_enabled
-  zip_deploy_file                 = each.value.zip_deploy_file
+  zip_deploy_file                        = each.value.zip_deploy_file
 
   tags = each.value.tags == null ? var.tags : merge(var.tags, each.value.tags)
 
@@ -115,8 +115,8 @@ resource "azurerm_windows_function_app_slot" "windows_function_app_slot" {
       dynamic "twitter" {
         for_each = auth_settings.value.twitter == null ? [] : [auth_settings.value.twitter]
         content {
-          consumer_key              = twitter.value.consumer_key
-          consumer_secret           = twitter.value.consumer_secret
+          consumer_key                 = twitter.value.consumer_key
+          consumer_secret              = twitter.value.consumer_secret
           consumer_secret_setting_name = twitter.value.consumer_secret_setting_name
         }
       }
@@ -126,18 +126,18 @@ resource "azurerm_windows_function_app_slot" "windows_function_app_slot" {
   dynamic "auth_settings_v2" {
     for_each = each.value.auth_settings_v2 == null ? [] : [each.value.auth_settings_v2]
     content {
-      auth_enabled                             = auth_settings_v2.value.auth_enabled
-      config_file_path                         = auth_settings_v2.value.config_file_path
-      default_provider                         = auth_settings_v2.value.default_provider
-      excluded_paths                           = auth_settings_v2.value.excluded_paths
-      forward_proxy_convention                 = auth_settings_v2.value.forward_proxy_convention
-      forward_proxy_custom_host_header_name    = auth_settings_v2.value.forward_proxy_custom_host_header_name
-      forward_proxy_custom_scheme_header_name  = auth_settings_v2.value.forward_proxy_custom_scheme_header_name
-      http_route_api_prefix                    = auth_settings_v2.value.http_route_api_prefix
-      require_authentication                   = auth_settings_v2.value.require_authentication
-      require_https                            = auth_settings_v2.value.require_https
-      runtime_version                          = auth_settings_v2.value.runtime_version
-      unauthenticated_action                   = auth_settings_v2.value.unauthenticated_action
+      auth_enabled                            = auth_settings_v2.value.auth_enabled
+      config_file_path                        = auth_settings_v2.value.config_file_path
+      default_provider                        = auth_settings_v2.value.default_provider
+      excluded_paths                          = auth_settings_v2.value.excluded_paths
+      forward_proxy_convention                = auth_settings_v2.value.forward_proxy_convention
+      forward_proxy_custom_host_header_name   = auth_settings_v2.value.forward_proxy_custom_host_header_name
+      forward_proxy_custom_scheme_header_name = auth_settings_v2.value.forward_proxy_custom_scheme_header_name
+      http_route_api_prefix                   = auth_settings_v2.value.http_route_api_prefix
+      require_authentication                  = auth_settings_v2.value.require_authentication
+      require_https                           = auth_settings_v2.value.require_https
+      runtime_version                         = auth_settings_v2.value.runtime_version
+      unauthenticated_action                  = auth_settings_v2.value.unauthenticated_action
 
       dynamic "active_directory_v2" {
         for_each = auth_settings_v2.value.active_directory_v2 == null ? [] : [auth_settings_v2.value.active_directory_v2]
@@ -226,7 +226,7 @@ resource "azurerm_windows_function_app_slot" "windows_function_app_slot" {
       dynamic "twitter_v2" {
         for_each = auth_settings_v2.value.twitter_v2 == null ? [] : [auth_settings_v2.value.twitter_v2]
         content {
-          consumer_key               = twitter_v2.value.consumer_key
+          consumer_key                 = twitter_v2.value.consumer_key
           consumer_secret_setting_name = twitter_v2.value.consumer_secret_setting_name
         }
       }
@@ -262,121 +262,113 @@ resource "azurerm_windows_function_app_slot" "windows_function_app_slot" {
           frequency_interval       = schedule.value.frequency_interval
           frequency_unit           = schedule.value.frequency_unit
           keep_at_least_one_backup = schedule.value.keep_at_least_one_backup
-          retention_period_in_days = schedule.value.retention_period_in_days
+          retention_period_days    = schedule.value.retention_period_days
           start_time               = schedule.value.start_time
         }
       }
     }
   }
 
-  site_config {
-    always_on                             = each.value.site_config.always_on
-    api_definition_url                    = each.value.site_config.api_definition_url
-    api_management_api_id                 = each.value.site_config.api_management_api_id
-    app_command_line                      = each.value.site_config.app_command_line
-    app_scale_limit                       = each.value.site_config.app_scale_limit
-    container_registry_managed_identity_client_id = each.value.site_config.container_registry_managed_identity_client_id
-    container_registry_use_managed_identity       = each.value.site_config.container_registry_use_managed_identity
-    default_documents                     = each.value.site_config.default_documents
-    elastic_instance_minimum              = each.value.site_config.elastic_instance_minimum
-    ftps_state                            = each.value.site_config.ftps_state
-    health_check_path                     = each.value.site_config.health_check_path
-    health_check_eviction_time_in_min     = each.value.site_config.health_check_eviction_time_in_min
-    http2_enabled                         = each.value.site_config.http2_enabled
-    ip_restriction_default_action         = each.value.site_config.ip_restriction_default_action
-    load_balancing_mode                   = each.value.site_config.load_balancing_mode
-    managed_pipeline_mode                 = each.value.site_config.managed_pipeline_mode
-    minimum_tls_version                   = each.value.site_config.minimum_tls_version
-    pre_warmed_instance_count             = each.value.site_config.pre_warmed_instance_count
-    remote_debugging_enabled              = each.value.site_config.remote_debugging_enabled
-    remote_debugging_version              = each.value.site_config.remote_debugging_version
-    runtime_scale_monitoring_enabled      = each.value.site_config.runtime_scale_monitoring_enabled
-    scm_ip_restriction_default_action     = each.value.site_config.scm_ip_restriction_default_action
-    scm_minimum_tls_version               = each.value.site_config.scm_minimum_tls_version
-    scm_use_main_ip_restriction           = each.value.site_config.scm_use_main_ip_restriction
-    use_32_bit_worker                     = each.value.site_config.use_32_bit_worker
-    vnet_route_all_enabled                = each.value.site_config.vnet_route_all_enabled
-    websockets_enabled                    = each.value.site_config.websockets_enabled
-    worker_count                          = each.value.site_config.worker_count
+  dynamic "site_config" {
+    for_each = each.value.site_config == null ? [] : [each.value.site_config]
+    content {
+      always_on                         = site_config.value.always_on
+      api_definition_url                = site_config.value.api_definition_url
+      api_management_api_id             = site_config.value.api_management_api_id
+      app_command_line                  = site_config.value.app_command_line
+      app_scale_limit                   = site_config.value.app_scale_limit
+      default_documents                 = site_config.value.default_documents
+      elastic_instance_minimum          = site_config.value.elastic_instance_minimum
+      ftps_state                        = site_config.value.ftps_state
+      health_check_path                 = site_config.value.health_check_path
+      health_check_eviction_time_in_min = site_config.value.health_check_eviction_time_in_min
+      http2_enabled                     = site_config.value.http2_enabled
+      ip_restriction_default_action     = site_config.value.ip_restriction_default_action
+      load_balancing_mode               = site_config.value.load_balancing_mode
+      managed_pipeline_mode             = site_config.value.managed_pipeline_mode
+      minimum_tls_version               = site_config.value.minimum_tls_version
+      pre_warmed_instance_count         = site_config.value.pre_warmed_instance_count
+      remote_debugging_enabled          = site_config.value.remote_debugging_enabled
+      remote_debugging_version          = site_config.value.remote_debugging_version
+      runtime_scale_monitoring_enabled  = site_config.value.runtime_scale_monitoring_enabled
+      scm_ip_restriction_default_action = site_config.value.scm_ip_restriction_default_action
+      scm_minimum_tls_version           = site_config.value.scm_minimum_tls_version
+      scm_use_main_ip_restriction       = site_config.value.scm_use_main_ip_restriction
+      use_32_bit_worker                 = site_config.value.use_32_bit_worker
+      vnet_route_all_enabled            = site_config.value.vnet_route_all_enabled
+      websockets_enabled                = site_config.value.websockets_enabled
+      worker_count                      = site_config.value.worker_count
 
-    dynamic "application_stack" {
-      for_each = each.value.site_config.application_stack == null ? [] : [each.value.site_config.application_stack]
-      content {
-        dotnet_version              = application_stack.value.dotnet_version
-        java_version                = application_stack.value.java_version
-        node_version                = application_stack.value.node_version
-        powershell_core_version     = application_stack.value.powershell_core_version
-        use_custom_runtime          = application_stack.value.use_custom_runtime
-        use_dotnet_isolated_runtime = application_stack.value.use_dotnet_isolated_runtime
+      dynamic "application_stack" {
+        for_each = site_config.value.application_stack == null ? [] : [site_config.value.application_stack]
+        content {
+          dotnet_version              = application_stack.value.dotnet_version
+          java_version                = application_stack.value.java_version
+          node_version                = application_stack.value.node_version
+          powershell_core_version     = application_stack.value.powershell_core_version
+          use_custom_runtime          = application_stack.value.use_custom_runtime
+          use_dotnet_isolated_runtime = application_stack.value.use_dotnet_isolated_runtime
+        }
       }
-    }
 
-    dynamic "app_service_logs" {
-      for_each = each.value.site_config.app_service_logs == null ? [] : [each.value.site_config.app_service_logs]
-      content {
-        disk_quota_mb         = app_service_logs.value.disk_quota_mb
-        retention_period_days = app_service_logs.value.retention_period_days
+      dynamic "app_service_logs" {
+        for_each = site_config.value.app_service_logs == null ? [] : [site_config.value.app_service_logs]
+        content {
+          disk_quota_mb         = app_service_logs.value.disk_quota_mb
+          retention_period_days = app_service_logs.value.retention_period_days
+        }
+      }
 
-        dynamic "azure_blob_storage" {
-          for_each = app_service_logs.value.azure_blob_storage == null ? [] : [app_service_logs.value.azure_blob_storage]
-          content {
-            level             = azure_blob_storage.value.level
-            sas_url           = azure_blob_storage.value.sas_url
-            retention_in_days = azure_blob_storage.value.retention_in_days
+      dynamic "cors" {
+        for_each = site_config.value.cors == null ? [] : [site_config.value.cors]
+        content {
+          allowed_origins     = cors.value.allowed_origins
+          support_credentials = cors.value.support_credentials
+        }
+      }
+
+      dynamic "ip_restriction" {
+        for_each = site_config.value.ip_restriction == null ? [] : site_config.value.ip_restriction
+        content {
+          action                    = ip_restriction.value.action
+          ip_address                = ip_restriction.value.ip_address
+          name                      = ip_restriction.value.name
+          priority                  = ip_restriction.value.priority
+          service_tag               = ip_restriction.value.service_tag
+          virtual_network_subnet_id = ip_restriction.value.virtual_network_subnet_id
+          description               = ip_restriction.value.description
+
+          dynamic "headers" {
+            for_each = ip_restriction.value.headers == null ? [] : [ip_restriction.value.headers]
+            content {
+              x_azure_fdid      = headers.value.x_azure_fdid
+              x_fd_health_probe = headers.value.x_fd_health_probe
+              x_forwarded_for   = headers.value.x_forwarded_for
+              x_forwarded_host  = headers.value.x_forwarded_host
+            }
           }
         }
       }
-    }
 
-    dynamic "cors" {
-      for_each = each.value.site_config.cors == null ? [] : [each.value.site_config.cors]
-      content {
-        allowed_origins     = cors.value.allowed_origins
-        support_credentials = cors.value.support_credentials
-      }
-    }
+      dynamic "scm_ip_restriction" {
+        for_each = site_config.value.scm_ip_restriction == null ? [] : site_config.value.scm_ip_restriction
+        content {
+          action                    = scm_ip_restriction.value.action
+          ip_address                = scm_ip_restriction.value.ip_address
+          name                      = scm_ip_restriction.value.name
+          priority                  = scm_ip_restriction.value.priority
+          service_tag               = scm_ip_restriction.value.service_tag
+          virtual_network_subnet_id = scm_ip_restriction.value.virtual_network_subnet_id
+          description               = scm_ip_restriction.value.description
 
-    dynamic "ip_restriction" {
-      for_each = each.value.site_config.ip_restriction == null ? [] : each.value.site_config.ip_restriction
-      content {
-        action                    = ip_restriction.value.action
-        ip_address                = ip_restriction.value.ip_address
-        name                      = ip_restriction.value.name
-        priority                  = ip_restriction.value.priority
-        service_tag               = ip_restriction.value.service_tag
-        virtual_network_subnet_id = ip_restriction.value.virtual_network_subnet_id
-        description               = ip_restriction.value.description
-
-        dynamic "headers" {
-          for_each = ip_restriction.value.headers == null ? [] : [ip_restriction.value.headers]
-          content {
-            x_azure_fdid      = headers.value.x_azure_fdid
-            x_fd_health_probe = headers.value.x_fd_health_probe
-            x_forwarded_for   = headers.value.x_forwarded_for
-            x_forwarded_host  = headers.value.x_forwarded_host
-          }
-        }
-      }
-    }
-
-    dynamic "scm_ip_restriction" {
-      for_each = each.value.site_config.scm_ip_restriction == null ? [] : each.value.site_config.scm_ip_restriction
-      content {
-        action                    = scm_ip_restriction.value.action
-        ip_address                = scm_ip_restriction.value.ip_address
-        name                      = scm_ip_restriction.value.name
-        priority                  = scm_ip_restriction.value.priority
-        service_tag               = scm_ip_restriction.value.service_tag
-        virtual_network_subnet_id = scm_ip_restriction.value.virtual_network_subnet_id
-        description               = scm_ip_restriction.value.description
-
-        dynamic "headers" {
-          for_each = scm_ip_restriction.value.headers == null ? [] : [scm_ip_restriction.value.headers]
-          content {
-            x_azure_fdid      = headers.value.x_azure_fdid
-            x_fd_health_probe = headers.value.x_fd_health_probe
-            x_forwarded_for   = headers.value.x_forwarded_for
-            x_forwarded_host  = headers.value.x_forwarded_host
+          dynamic "headers" {
+            for_each = scm_ip_restriction.value.headers == null ? [] : [scm_ip_restriction.value.headers]
+            content {
+              x_azure_fdid      = headers.value.x_azure_fdid
+              x_fd_health_probe = headers.value.x_fd_health_probe
+              x_forwarded_for   = headers.value.x_forwarded_for
+              x_forwarded_host  = headers.value.x_forwarded_host
+            }
           }
         }
       }
@@ -395,62 +387,4 @@ resource "azurerm_windows_function_app_slot" "windows_function_app_slot" {
     }
   }
 
-  lifecycle {
-    precondition {
-      condition     = !(each.value.auth_settings != null && each.value.auth_settings_v2 != null)
-      error_message = "slot auth_settings and auth_settings_v2 are mutually exclusive."
-    }
-
-    precondition {
-      condition     = local.slot_storage[each.key].storage_key_vault_secret_id_set ||
-        (local.slot_storage[each.key].storage_account_name != null && local.slot_storage[each.key].storage_account_name != "")
-      error_message = "Slot storage requires storage_account_name or storage_key_vault_secret_id."
-    }
-
-    precondition {
-      condition     = !local.slot_storage[each.key].storage_key_vault_secret_id_set ||
-        (local.slot_storage[each.key].storage_account_name == null || local.slot_storage[each.key].storage_account_name == "")
-      error_message = "Slot storage_key_vault_secret_id cannot be used with storage_account_name."
-    }
-
-    precondition {
-      condition     = !local.slot_storage[each.key].storage_key_vault_secret_id_set ||
-        (local.slot_storage[each.key].storage_account_access_key == null || local.slot_storage[each.key].storage_account_access_key == "")
-      error_message = "Slot storage_key_vault_secret_id cannot be used with storage_account_access_key."
-    }
-
-    precondition {
-      condition     = !local.slot_storage[each.key].storage_key_vault_secret_id_set ||
-        local.slot_storage[each.key].storage_uses_managed_identity == false
-      error_message = "Slot storage_key_vault_secret_id cannot be used with storage_uses_managed_identity."
-    }
-
-    precondition {
-      condition = local.slot_storage[each.key].storage_key_vault_secret_id_set ? true : (
-        local.slot_storage[each.key].storage_uses_managed_identity ? (
-          each.value.identity != null &&
-          (local.slot_storage[each.key].storage_account_access_key == null || local.slot_storage[each.key].storage_account_access_key == "")
-        ) : (
-          local.slot_storage[each.key].storage_account_access_key != null &&
-          local.slot_storage[each.key].storage_account_access_key != ""
-        )
-      )
-      error_message = "When storage_uses_managed_identity is true, slot identity must be configured and storage_account_access_key must be null. When false, storage_account_access_key is required."
-    }
-
-    precondition {
-      condition     = each.value.client_certificate_mode == null || each.value.client_certificate_enabled
-      error_message = "slot client_certificate_mode requires client_certificate_enabled to be true."
-    }
-
-    precondition {
-      condition     = each.value.site_config.application_stack != null && local.slot_application_stack_counts[each.key] == 1
-      error_message = "slot.site_config.application_stack must be set with exactly one runtime (dotnet, java, node, powershell, or custom runtime)."
-    }
-
-    precondition {
-      condition     = each.value.site_config.health_check_eviction_time_in_min == null || each.value.site_config.health_check_path != null
-      error_message = "slot.site_config.health_check_eviction_time_in_min requires health_check_path to be set."
-    }
-  }
 }

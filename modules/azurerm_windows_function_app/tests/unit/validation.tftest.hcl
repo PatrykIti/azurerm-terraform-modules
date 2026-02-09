@@ -7,12 +7,14 @@ mock_provider "azurerm" {
 }
 
 variables {
-  name                       = "wfuncunit"
-  resource_group_name        = "test-rg"
-  location                   = "northeurope"
-  service_plan_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Web/serverfarms/plan"
-  storage_account_name       = "storageunit"
-  storage_account_access_key = "fakekey"
+  name                = "wfuncunit"
+  resource_group_name = "test-rg"
+  location            = "northeurope"
+  service_plan_id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Web/serverFarms/plan"
+  storage_configuration = {
+    account_name       = "storageunit"
+    account_access_key = "fakekey"
+  }
   site_config = {
     application_stack = {
       dotnet_version = "v8.0"
@@ -24,14 +26,18 @@ run "managed_identity_requires_no_access_key" {
   command = plan
 
   variables {
-    storage_uses_managed_identity = true
+    storage_configuration = {
+      account_name          = "storageunit"
+      account_access_key    = "fakekey"
+      uses_managed_identity = true
+    }
     identity = {
       type = "SystemAssigned"
     }
   }
 
   expect_failures = [
-    var.storage_uses_managed_identity
+    var.storage_configuration
   ]
 }
 
@@ -39,12 +45,15 @@ run "managed_identity_requires_identity" {
   command = plan
 
   variables {
-    storage_uses_managed_identity = true
-    storage_account_access_key    = null
+    storage_configuration = {
+      account_name          = "storageunit"
+      account_access_key    = null
+      uses_managed_identity = true
+    }
   }
 
   expect_failures = [
-    var.storage_uses_managed_identity
+    var.storage_configuration
   ]
 }
 
@@ -69,12 +78,14 @@ run "client_certificate_mode_requires_enabled" {
   command = plan
 
   variables {
-    client_certificate_mode    = "Required"
-    client_certificate_enabled = false
+    access_configuration = {
+      client_certificate_mode    = "Required"
+      client_certificate_enabled = false
+    }
   }
 
   expect_failures = [
-    var.client_certificate_mode
+    var.access_configuration
   ]
 }
 
@@ -110,4 +121,54 @@ run "invalid_minimum_tls_version" {
   expect_failures = [
     var.site_config
   ]
+}
+
+run "diagnostic_requires_explicit_categories" {
+  command = plan
+
+  variables {
+    diagnostic_settings = [
+      {
+        name                       = "diag"
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/law"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings
+  ]
+}
+
+run "invalid_diagnostic_log_category" {
+  command = plan
+
+  variables {
+    diagnostic_settings = [
+      {
+        name                       = "diag"
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/law"
+        log_categories             = ["NotSupportedCategory"]
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.diagnostic_settings
+  ]
+}
+
+run "valid_explicit_diagnostic_categories" {
+  command = plan
+
+  variables {
+    diagnostic_settings = [
+      {
+        name                       = "diag"
+        log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/law"
+        log_categories             = ["FunctionAppLogs"]
+        metric_categories          = ["AllMetrics"]
+      }
+    ]
+  }
 }

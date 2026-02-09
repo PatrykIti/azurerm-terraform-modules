@@ -53,7 +53,7 @@ Create `import.tf` with the import block:
 
 ```hcl
 import {
-  to = module.user_assigned_identity.azurerm_user_assigned_identity.main
+  to = module.user_assigned_identity.azurerm_user_assigned_identity.user_assigned_identity
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/<name>"
 }
 ```
@@ -70,7 +70,7 @@ Add an import block per credential:
 
 ```hcl
 import {
-  to = module.user_assigned_identity.azurerm_federated_identity_credential.main["<credential-name>"]
+  to = module.user_assigned_identity.azurerm_federated_identity_credential.federated_identity_credential["<credential-name>"]
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/<name>/federatedIdentityCredentials/<credential-name>"
 }
 ```

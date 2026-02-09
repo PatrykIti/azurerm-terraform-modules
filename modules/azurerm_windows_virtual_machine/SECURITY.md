@@ -13,7 +13,7 @@ networking, identity, and monitoring dependencies.
 - If RDP is required, restrict inbound access with NSG rules to trusted IPs.
 
 ### Credentials
-- `admin_password` must be strong (12+ chars, 3 of 4 complexity categories).
+- `admin.password` must be strong (12+ chars, 3 of 4 complexity categories).
 - Avoid hardcoding passwords. Use `random_password` or secrets from a secure
   pipeline, and rotate regularly.
 

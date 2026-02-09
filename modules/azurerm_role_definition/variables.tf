@@ -91,6 +91,28 @@ variable "assignable_scopes" {
     condition     = alltrue([for scope in var.assignable_scopes : length(trimspace(scope)) > 0])
     error_message = "assignable_scopes must not contain empty strings."
   }
+
+  validation {
+    condition = alltrue([
+      for assignable_scope in var.assignable_scopes :
+      trimspace(assignable_scope) == trimspace(var.scope) || startswith(trimspace(assignable_scope), "${trimspace(var.scope)}/")
+    ])
+    error_message = "assignable_scopes must be the same as scope or child scopes of scope."
+  }
+
+  validation {
+    condition = !(
+      (
+        can(regex("^/providers/Microsoft\\.Management/managementGroups/", trimspace(var.scope))) ||
+        anytrue([
+          for assignable_scope in var.assignable_scopes :
+          can(regex("^/providers/Microsoft\\.Management/managementGroups/", trimspace(assignable_scope)))
+        ])
+      ) &&
+      anytrue([for permission in var.permissions : length(try(permission.data_actions, [])) > 0])
+    )
+    error_message = "data_actions are not supported when assignable_scopes include a management group scope."
+  }
 }
 
 variable "timeouts" {

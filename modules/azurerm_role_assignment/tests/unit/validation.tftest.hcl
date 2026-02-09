@@ -18,7 +18,7 @@ run "missing_role_definition" {
   }
 
   expect_failures = [
-    azurerm_role_assignment.role_assignment
+    var.role_definition_name
   ]
 }
 
@@ -31,7 +31,7 @@ run "both_role_definition_values" {
   }
 
   expect_failures = [
-    azurerm_role_assignment.role_assignment
+    var.role_definition_name
   ]
 }
 
@@ -43,7 +43,7 @@ run "condition_without_version" {
   }
 
   expect_failures = [
-    azurerm_role_assignment.role_assignment
+    var.condition_version
   ]
 }
 
@@ -55,7 +55,7 @@ run "version_without_condition" {
   }
 
   expect_failures = [
-    azurerm_role_assignment.role_assignment
+    var.condition_version
   ]
 }
 
@@ -80,7 +80,7 @@ run "skip_aad_check_wrong_principal_type" {
   }
 
   expect_failures = [
-    azurerm_role_assignment.role_assignment
+    var.skip_service_principal_aad_check
   ]
 }
 
@@ -93,6 +93,6 @@ run "delegated_identity_wrong_principal_type" {
   }
 
   expect_failures = [
-    azurerm_role_assignment.role_assignment
+    var.delegated_managed_identity_resource_id
   ]
 }

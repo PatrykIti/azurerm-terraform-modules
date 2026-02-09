@@ -7,12 +7,14 @@ mock_provider "azurerm" {
 }
 
 variables {
-  name                       = "wfuncunit"
-  resource_group_name        = "test-rg"
-  location                   = "northeurope"
-  service_plan_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Web/serverfarms/plan"
-  storage_account_name       = "storageunit"
-  storage_account_access_key = "fakekey"
+  name                = "wfuncunit"
+  resource_group_name = "test-rg"
+  location            = "northeurope"
+  service_plan_id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Web/serverFarms/plan"
+  storage_configuration = {
+    account_name       = "storageunit"
+    account_access_key = "fakekey"
+  }
   site_config = {
     application_stack = {
       dotnet_version = "v8.0"
@@ -53,13 +55,15 @@ run "duplicate_connection_string_names" {
   command = plan
 
   variables {
-    connection_strings = [
-      { name = "cs1", type = "Custom", value = "value1" },
-      { name = "cs1", type = "Custom", value = "value2" }
-    ]
+    application_configuration = {
+      connection_strings = [
+        { name = "cs1", type = "Custom", value = "value1" },
+        { name = "cs1", type = "Custom", value = "value2" }
+      ]
+    }
   }
 
   expect_failures = [
-    var.connection_strings
+    var.application_configuration
   ]
 }

@@ -53,33 +53,39 @@ module "windows_function_app" {
   location            = azurerm_resource_group.example.location
   service_plan_id     = azurerm_service_plan.example.id
 
-  storage_account_name       = azurerm_storage_account.example.name
-  storage_account_access_key = azurerm_storage_account.example.primary_access_key
+  storage_configuration = {
+    account_name       = azurerm_storage_account.example.name
+    account_access_key = azurerm_storage_account.example.primary_access_key
+  }
 
-  functions_extension_version   = "~4"
-  public_network_access_enabled = false
-  https_only                    = true
-  client_certificate_enabled    = true
-  client_certificate_mode       = "Required"
+  application_configuration = {
+    functions_extension_version            = "~4"
+    application_insights_connection_string = azurerm_application_insights.example.connection_string
+  }
+
+  access_configuration = {
+    public_network_access_enabled = false
+    https_only                    = true
+    client_certificate_enabled    = true
+    client_certificate_mode       = "Required"
+  }
 
   identity = {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.example.id]
   }
 
-  application_insights_connection_string = azurerm_application_insights.example.connection_string
-
   site_config = {
-    minimum_tls_version     = "1.2"
-    scm_minimum_tls_version = "1.2"
-    ftps_state              = "Disabled"
-    http2_enabled           = true
+    minimum_tls_version           = "1.2"
+    scm_minimum_tls_version       = "1.2"
+    ftps_state                    = "Disabled"
+    http2_enabled                 = true
     ip_restriction_default_action = "Deny"
     ip_restriction = [
       {
-        name      = "office"
-        priority  = 100
-        action    = "Allow"
+        name       = "office"
+        priority   = 100
+        action     = "Allow"
         ip_address = "203.0.113.0/24"
       }
     ]
@@ -92,7 +98,8 @@ module "windows_function_app" {
     {
       name                       = "diag"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-      areas                      = ["all"]
+      log_category_groups        = ["allLogs"]
+      metric_categories          = ["AllMetrics"]
     }
   ]
 
