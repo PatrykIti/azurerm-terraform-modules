@@ -92,5 +92,12 @@ output "linked_servers" {
 
 output "diagnostic_settings_skipped" {
   description = "Diagnostic settings entries skipped because no log or metric categories were supplied."
-  value       = local.diagnostic_settings_skipped
+  value = [
+    for ds in var.diagnostic_settings : {
+      name              = ds.name
+      log_categories    = coalesce(ds.log_categories, [])
+      metric_categories = coalesce(ds.metric_categories, [])
+    }
+    if length(coalesce(ds.log_categories, [])) + length(coalesce(ds.metric_categories, [])) == 0
+  ]
 }
