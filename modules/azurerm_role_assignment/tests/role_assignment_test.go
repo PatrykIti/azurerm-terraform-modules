@@ -38,7 +38,7 @@ func TestBasicRoleAssignment(t *testing.T) {
 	})
 }
 
-// Test secure role assignment with custom role definition
+// Test secure role assignment using built-in Reader role
 func TestSecureRoleAssignment(t *testing.T) {
 	t.Parallel()
 

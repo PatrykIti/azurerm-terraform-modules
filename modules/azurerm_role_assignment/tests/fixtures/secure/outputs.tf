@@ -4,8 +4,8 @@ output "role_assignment_id" {
 }
 
 output "role_definition_id" {
-  description = "The custom role definition ID."
-  value       = module.role_definition.role_definition_id
+  description = "The role definition ID assigned by the role assignment."
+  value       = module.role_assignment.role_definition_id
 }
 
 output "resource_group_name" {
