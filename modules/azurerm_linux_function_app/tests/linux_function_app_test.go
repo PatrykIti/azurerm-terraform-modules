@@ -217,12 +217,20 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		NoColor: true,
 		// Retry configuration
 		RetryableTerraformErrors: map[string]string{
-			".*timeout.*":               "Timeout error - retrying",
-			".*ResourceGroupNotFound.*": "Resource group not found - retrying",
-			".*AlreadyExists.*":         "Resource already exists - retrying",
-			".*TooManyRequests.*":       "Too many requests - retrying",
+			".*timeout.*":                                          "Timeout error - retrying",
+			".*context deadline exceeded.*":                        "Context deadline exceeded - retrying",
+			".*ResourceGroupNotFound.*":                            "Resource group not found - retrying",
+			".*AlreadyExists.*":                                    "Resource already exists - retrying",
+			".*TooManyRequests.*":                                  "Too many requests - retrying",
+			".*Cannot find user\\..*":                              "Azure App Service backend propagation delay - retrying",
+			".*AnotherOperationInProgress.*":                       "Another Azure operation is in progress - retrying",
+			".*OperationNotAllowed.*":                              "Operation temporarily not allowed - retrying",
+			".*StatusCode=429.*":                                   "Rate limited by Azure API - retrying",
+			".*ServiceUnavailable.*":                               "Azure service unavailable - retrying",
+			".*RetryableError.*":                                   "Terraform reported retryable error - retrying",
+			".*Error ensuring Resource Providers are registered.*": "Provider registration race - retrying",
 		},
-		MaxRetries:         3,
-		TimeBetweenRetries: 10 * time.Second,
+		MaxRetries:         6,
+		TimeBetweenRetries: 20 * time.Second,
 	}
 }

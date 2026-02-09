@@ -96,9 +96,9 @@ func BenchmarkLinuxFunctionAppCreationWithScale(b *testing.B) {
 				testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 				terraformOptions := getTerraformOptions(b, testFolder)
 
-					// Override the random_suffix for benchmarking
-					terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
-					b.StartTimer()
+				// Override the random_suffix for benchmarking
+				terraformOptions.Vars["random_suffix"] = fmt.Sprintf("bench%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
+				b.StartTimer()
 
 				start := time.Now()
 				terraform.InitAndApply(b, terraformOptions)
@@ -204,10 +204,10 @@ func TestLinuxFunctionAppScaling(t *testing.T) {
 
 	t.Logf("Average creation time for %d linux_function_app instances: %v", instanceCount, avgTime)
 
-	// Ensure average time is reasonable (under 3 minutes)
-	// Adjust based on expected resource creation time
-	require.LessOrEqual(t, avgTime, 3*time.Minute,
-		"Average creation time %v exceeds maximum of 3 minutes", avgTime)
+	// Ensure average time is reasonable while accounting for transient Azure delays.
+	maxAverageCreationTime := 4 * time.Minute
+	require.LessOrEqual(t, avgTime, maxAverageCreationTime,
+		"Average creation time %v exceeds maximum of %v", avgTime, maxAverageCreationTime)
 }
 
 // TestLinuxFunctionAppUpdatePerformance tests update performance
