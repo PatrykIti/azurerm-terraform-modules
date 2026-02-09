@@ -73,3 +73,27 @@ resource "azurerm_redis_cache" "redis_cache" {
 
   tags = var.tags
 }
+
+resource "azurerm_redis_firewall_rule" "redis_firewall_rule" {
+  for_each = var.public_network_access_enabled ? {
+    for rule in var.firewall_rules : rule.name => rule
+  } : {}
+
+  name                = each.value.name
+  redis_cache_name    = azurerm_redis_cache.redis_cache.name
+  resource_group_name = azurerm_redis_cache.redis_cache.resource_group_name
+  start_ip            = each.value.start_ip_address
+  end_ip              = each.value.end_ip_address
+}
+
+resource "azurerm_redis_linked_server" "redis_linked_server" {
+  for_each = var.sku_name == "Premium" ? {
+    for ls in var.linked_servers : ls.name => ls
+  } : {}
+
+  resource_group_name         = azurerm_redis_cache.redis_cache.resource_group_name
+  target_redis_cache_name     = azurerm_redis_cache.redis_cache.name
+  linked_redis_cache_id       = each.value.linked_redis_cache_id
+  linked_redis_cache_location = each.value.linked_redis_cache_location
+  server_role                 = each.value.server_role
+}
