@@ -66,11 +66,28 @@ run "auth_settings_mutually_exclusive" {
     }
     auth_settings_v2 = {
       auth_enabled = true
+      github_v2 = {
+        client_id = "unit-client-id"
+      }
     }
   }
 
   expect_failures = [
     var.auth_settings
+  ]
+}
+
+run "auth_settings_v2_requires_provider" {
+  command = plan
+
+  variables {
+    auth_settings_v2 = {
+      auth_enabled = false
+    }
+  }
+
+  expect_failures = [
+    var.auth_settings_v2
   ]
 }
 

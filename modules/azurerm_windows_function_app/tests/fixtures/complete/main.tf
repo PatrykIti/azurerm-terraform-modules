@@ -95,11 +95,6 @@ module "windows_function_app" {
     }
   }
 
-  auth_settings_v2 = {
-    auth_enabled           = false
-    unauthenticated_action = "AllowAnonymous"
-  }
-
   diagnostic_settings = [
     {
       name                       = "diag"

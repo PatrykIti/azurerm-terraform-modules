@@ -63,13 +63,11 @@ module "redis_cache" {
   ]
 
   redis_configuration = {
-    maxmemory_policy                = "allkeys-lru"
-    aof_backup_enabled              = true
-    aof_storage_connection_string_0 = azurerm_storage_account.example.primary_connection_string
-    rdb_backup_enabled              = true
-    rdb_backup_frequency            = 60
-    rdb_backup_max_snapshot_count   = 1
-    rdb_storage_connection_string   = azurerm_storage_account.example.primary_connection_string
+    maxmemory_policy              = "allkeys-lru"
+    rdb_backup_enabled            = true
+    rdb_backup_frequency          = 60
+    rdb_backup_max_snapshot_count = 1
+    rdb_storage_connection_string = azurerm_storage_account.example.primary_connection_string
   }
 
   diagnostic_settings = [

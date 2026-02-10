@@ -248,6 +248,23 @@ run "rdb_backup_requires_connection_string" {
   ]
 }
 
+run "aof_and_rdb_mutually_exclusive" {
+  command = plan
+
+  variables {
+    redis_configuration = {
+      aof_backup_enabled              = true
+      aof_storage_connection_string_0 = "DefaultEndpointsProtocol=https;AccountName=test;AccountKey=test;EndpointSuffix=core.windows.net"
+      rdb_backup_enabled              = true
+      rdb_storage_connection_string   = "DefaultEndpointsProtocol=https;AccountName=test;AccountKey=test;EndpointSuffix=core.windows.net"
+    }
+  }
+
+  expect_failures = [
+    var.redis_configuration,
+  ]
+}
+
 run "invalid_patch_day" {
   command = plan
 

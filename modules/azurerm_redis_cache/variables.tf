@@ -234,6 +234,14 @@ variable "redis_configuration" {
     )
     error_message = "rdb_storage_connection_string must be set when rdb_backup_enabled is true."
   }
+
+  validation {
+    condition = var.redis_configuration == null || !(
+      coalesce(var.redis_configuration.aof_backup_enabled, false) &&
+      coalesce(var.redis_configuration.rdb_backup_enabled, false)
+    )
+    error_message = "aof_backup_enabled and rdb_backup_enabled cannot both be true."
+  }
 }
 
 variable "tenant_settings" {

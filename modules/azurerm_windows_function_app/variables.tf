@@ -368,6 +368,21 @@ variable "auth_settings_v2" {
   })
   default   = null
   sensitive = true
+
+  validation {
+    condition = var.auth_settings_v2 == null || anytrue([
+      var.auth_settings_v2.active_directory_v2 != null,
+      var.auth_settings_v2.apple_v2 != null,
+      var.auth_settings_v2.azure_static_web_app_v2 != null,
+      length(coalesce(try(var.auth_settings_v2.custom_oidc_v2, null), [])) > 0,
+      var.auth_settings_v2.facebook_v2 != null,
+      var.auth_settings_v2.github_v2 != null,
+      var.auth_settings_v2.google_v2 != null,
+      var.auth_settings_v2.microsoft_v2 != null,
+      var.auth_settings_v2.twitter_v2 != null
+    ])
+    error_message = "auth_settings_v2 requires at least one identity provider block (active_directory_v2, apple_v2, azure_static_web_app_v2, custom_oidc_v2, facebook_v2, github_v2, google_v2, microsoft_v2, or twitter_v2)."
+  }
 }
 
 variable "backup" {
@@ -853,6 +868,23 @@ variable "slots" {
       for slot in var.slots : !(slot.auth_settings != null && slot.auth_settings_v2 != null)
     ])
     error_message = "Slot auth_settings and auth_settings_v2 are mutually exclusive."
+  }
+
+  validation {
+    condition = alltrue([
+      for slot in var.slots : slot.auth_settings_v2 == null || anytrue([
+        slot.auth_settings_v2.active_directory_v2 != null,
+        slot.auth_settings_v2.apple_v2 != null,
+        slot.auth_settings_v2.azure_static_web_app_v2 != null,
+        length(coalesce(try(slot.auth_settings_v2.custom_oidc_v2, null), [])) > 0,
+        slot.auth_settings_v2.facebook_v2 != null,
+        slot.auth_settings_v2.github_v2 != null,
+        slot.auth_settings_v2.google_v2 != null,
+        slot.auth_settings_v2.microsoft_v2 != null,
+        slot.auth_settings_v2.twitter_v2 != null
+      ])
+    ])
+    error_message = "Slot auth_settings_v2 requires at least one identity provider block."
   }
 
   validation {
