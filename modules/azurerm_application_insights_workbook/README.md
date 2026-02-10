@@ -54,14 +54,15 @@ module "application_insights_workbook" {
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-- [Basic](examples/basic) - Minimal workbook with required inputs only.
-- [Complete](examples/complete) - Workbook with category, description, source ID, identity, and tags.
-- [Secure](examples/secure) - Workbook with user-assigned identity and RBAC to a source resource.
-- [Workbook Identity](examples/workbook-identity) - Identity-focused workbook example.
-- [Workbook Source ID](examples/workbook-source-id) - Workbook referencing a source resource ID.
+- [Basic](examples/basic) - This example demonstrates a minimal Application Insights Workbook configuration.
+- [Complete](examples/complete) - This example demonstrates a full Application Insights Workbook configuration.
+- [Secure](examples/secure) - This example demonstrates a security-focused Application Insights Workbook configuration.
+- [Workbook Identity](examples/workbook-identity) - This example demonstrates an Application Insights Workbook with a managed identity.
+- [Workbook Source Id](examples/workbook-source-id) - This example demonstrates an Application Insights Workbook referencing a source
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
+
 
 ## Requirements
 
@@ -90,18 +91,18 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_name"></a> [name](#input\_name) | The name of the workbook. Must be a UUID (GUID). | `string` | n/a | yes |
-| <a name="input_resource_group_name"></a> [resource_group_name](#input\_resource\_group\_name) | The name of the resource group in which to create the workbook. | `string` | n/a | yes |
-| <a name="input_location"></a> [location](#input\_location) | The Azure region where the workbook should exist. | `string` | n/a | yes |
-| <a name="input_display_name"></a> [display_name](#input\_display\_name) | The display name of the workbook. | `string` | n/a | yes |
-| <a name="input_data_json"></a> [data_json](#input\_data\_json) | The workbook content as a JSON string. | `string` | n/a | yes |
-| <a name="input_description"></a> [description](#input\_description) | Optional description of the workbook. | `string` | `null` | no |
 | <a name="input_category"></a> [category](#input\_category) | Optional workbook category (for example: workbook, tsg, usage, Azure Monitor). | `string` | `null` | no |
-| <a name="input_source_id"></a> [source_id](#input\_source\_id) | Optional source resource ID used by the workbook. | `string` | `null` | no |
-| <a name="input_storage_container_id"></a> [storage_container_id](#input\_storage\_container\_id) | Optional storage container resource ID used by the workbook for backing storage. | `string` | `null` | no |
+| <a name="input_data_json"></a> [data\_json](#input\_data\_json) | The workbook content as a JSON string. | `string` | n/a | yes |
+| <a name="input_description"></a> [description](#input\_description) | Optional description of the workbook. | `string` | `null` | no |
+| <a name="input_display_name"></a> [display\_name](#input\_display\_name) | The display name of the workbook. | `string` | n/a | yes |
 | <a name="input_identity"></a> [identity](#input\_identity) | Managed identity configuration for the workbook. | <pre>object({<br/>    type         = string<br/>    identity_ids = optional(list(string), [])<br/>  })</pre> | `null` | no |
-| <a name="input_timeouts"></a> [timeouts](#input\_timeouts) | Optional timeouts configuration for the workbook. | <pre>object({<br/>    create = optional(string)<br/>    update = optional(string)<br/>    delete = optional(string)<br/>    read   = optional(string)<br/>  })</pre> | `{}` | no |
+| <a name="input_location"></a> [location](#input\_location) | The Azure region where the workbook should exist. | `string` | n/a | yes |
+| <a name="input_name"></a> [name](#input\_name) | The name of the workbook. Must be a UUID (GUID). | `string` | n/a | yes |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group in which to create the workbook. | `string` | n/a | yes |
+| <a name="input_source_id"></a> [source\_id](#input\_source\_id) | Optional source resource ID used by the workbook. | `string` | `null` | no |
+| <a name="input_storage_container_id"></a> [storage\_container\_id](#input\_storage\_container\_id) | Optional storage container resource ID used by the workbook for backing storage. | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resource. | `map(string)` | `{}` | no |
+| <a name="input_timeouts"></a> [timeouts](#input\_timeouts) | Optional timeouts configuration for the workbook. | <pre>object({<br/>    create = optional(string)<br/>    update = optional(string)<br/>    delete = optional(string)<br/>    read   = optional(string)<br/>  })</pre> | `{}` | no |
 
 ## Outputs
 
@@ -111,8 +112,8 @@ No modules.
 | <a name="output_identity"></a> [identity](#output\_identity) | Managed identity information for the workbook. |
 | <a name="output_location"></a> [location](#output\_location) | The location of the Application Insights Workbook. |
 | <a name="output_name"></a> [name](#output\_name) | The name of the Application Insights Workbook. |
-| <a name="output_resource_group_name"></a> [resource_group_name](#output\_resource\_group\_name) | The resource group name of the Application Insights Workbook. |
-| <a name="output_storage_container_id"></a> [storage_container_id](#output\_storage\_container\_id) | The storage container resource ID configured for the workbook, when set. |
+| <a name="output_resource_group_name"></a> [resource\_group\_name](#output\_resource\_group\_name) | The resource group name of the Application Insights Workbook. |
+| <a name="output_storage_container_id"></a> [storage\_container\_id](#output\_storage\_container\_id) | The storage container resource ID configured for the workbook, when set. |
 <!-- END_TF_DOCS -->
 
 ## Security Considerations

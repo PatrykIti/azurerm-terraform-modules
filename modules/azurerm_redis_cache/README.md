@@ -94,7 +94,6 @@ No modules.
 | [azurerm_redis_cache.redis_cache](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/redis_cache) | resource |
 | [azurerm_redis_firewall_rule.redis_firewall_rule](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/redis_firewall_rule) | resource |
 | [azurerm_redis_linked_server.redis_linked_server](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/redis_linked_server) | resource |
-| [azurerm_monitor_diagnostic_categories.redis_cache](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/data-sources/monitor_diagnostic_categories) | data source |
 
 ## Inputs
 
