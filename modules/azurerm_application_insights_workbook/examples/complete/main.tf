@@ -15,7 +15,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "example" {
   name     = "rg-application_insights_workbook-complete-example"
-  location = "West Europe"
+  location = var.location
 }
 
 resource "azurerm_log_analytics_workspace" "example" {
@@ -41,7 +41,7 @@ resource "azurerm_storage_container" "workbook" {
 }
 
 resource "azurerm_user_assigned_identity" "workbook" {
-  name                = "uai-aiwb-complete-${var.random_suffix}"
+  name                = "uai-aiwb-complete-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
