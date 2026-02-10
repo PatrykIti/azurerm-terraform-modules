@@ -171,6 +171,22 @@ jobs:
             monitor-data-collection-rule
             monitor-private-link-scope
             network-security-group
+            ai-services
+            application-insights-workbook
+            cognitive-account
+            eventhub
+            eventhub-namespace
+            linux-function-app
+            linux-virtual-machine
+            private-dns-zone
+            private-dns-zone-vnet-link
+            private-endpoint
+            redis-cache
+            role-assignment
+            role-definition
+            user-assigned-identity
+            windows-function-app
+            windows-virtual-machine
             route-table
             subnet
             azuredevops-agent-pools
