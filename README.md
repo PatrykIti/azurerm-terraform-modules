@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Azure DevOps Artifacts Feed](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAFv*&label=Azure%20DevOps%20Artifacts%20Feed&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAFv2.0.0)
 [![Log Analytics Workspace](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=LAWv*&label=Log%20Analytics%20Workspace&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LAWv1.1.0)
 [![PostgreSQL Flexible Server](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PGFSv*&label=PostgreSQL%20Flexible%20Server&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSv1.1.0)
 [![Application Insights](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=APPINSv*&label=Application%20Insights&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.1.0)
@@ -47,7 +48,6 @@
 [![Azure DevOps Project](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOPv*&label=Azure%20DevOps%20Project&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOPv1.0.0)
 [![Azure DevOps Extension](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOEXv*&label=Azure%20DevOps%20Extension&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOEXv1.0.0)
 [![Azure DevOps Environments](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOEv*&label=Azure%20DevOps%20Environments&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOEv1.0.0)
-[![Azure DevOps Artifacts Feed](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAFv*&label=Azure%20DevOps%20Artifacts%20Feed&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAFv1.0.0)
 [![Azure DevOps Agent Pools](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAPv*&label=Azure%20DevOps%20Agent%20Pools&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAPv1.0.0)
 [![Azure DevOps Work Items](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOWK*&label=Azure%20DevOps%20Work%20Items&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOWK1.0.0)
 [![Azure DevOps Wiki](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOWI*&label=Azure%20DevOps%20Wiki&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOWI1.0.0)
@@ -152,7 +152,7 @@ Note: `azuredevops_identity` has been split into `azuredevops_group`, `azuredevo
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
 | [Azure DevOps Agent Pools](./modules/azuredevops_agent_pools/) | ✅ Completed | [ADOAPv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAPv1.0.0) | Azure DevOps agent pools module for managing pools, queues, and elastic pools |
-| [Azure DevOps Artifacts Feed](./modules/azuredevops_artifacts_feed/) | ✅ Completed | [ADOAFv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAFv1.0.0) | Azure DevOps artifacts feed module for managing feeds, retention, and permissions |
+| [Azure DevOps Artifacts Feed](./modules/azuredevops_artifacts_feed/) | ✅ Completed | [ADOAFv2.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAFv2.0.0) | Azure DevOps artifacts feed module for managing feeds, retention, and permissions |
 | [Azure DevOps Environments](./modules/azuredevops_environments/) | ✅ Completed | [ADOEv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOEv1.0.0) | Azure DevOps environments module for managing environments, resources, and checks |
 | [Azure DevOps Extension](./modules/azuredevops_extension/) | ✅ Completed | [ADOEXv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOEXv1.0.0) | Azure DevOps extension module for managing Marketplace extensions |
 | [Azure DevOps Group](./modules/azuredevops_group/) | ✅ Completed | [ADOGv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOGv1.0.0) | Azure DevOps group module for managing groups, memberships, and group entitlements |
