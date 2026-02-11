@@ -8,7 +8,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "private_dns_zone" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_private_dns_zone?ref=PDNSZv1.0.0"
 
   name                = "privatelink.vaultcore.azure.net"
   resource_group_name = azurerm_resource_group.example.name
