@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Application Insights Workbook](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AIWBv*&label=Application%20Insights%20Workbook&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AIWBv1.0.0)
 [![AI Services](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AISv*&label=AI%20Services&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AISv1.0.0)
 [![Monitor Private Link Scope](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AMPLSv*&label=Monitor%20Private%20Link%20Scope&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AMPLSv1.0.0)
 [![Private Endpoint](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PEv*&label=Private%20Endpoint&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PEv1.0.0)
@@ -113,7 +114,7 @@ module "storage_account" {
 | [Role Definition](./modules/azurerm_role_definition/) | 🧪 Development | vUnreleased | Manages custom Azure RBAC role definitions |
 | [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv2.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv2.1.0) | Azure Storage Account Terraform module with enterprise-grade security features |
 | [Application Insights](./modules/azurerm_application_insights/) | ✅ Completed | [APPINSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.0.0) | Azure Application Insights module with diagnostics, web tests, and smart detection rules |
-| [Application Insights Workbook](./modules/azurerm_application_insights_workbook/) | 🧪 Development | Unreleased | Azure Application Insights Workbook module |
+| [Application Insights Workbook](./modules/azurerm_application_insights_workbook/) | ✅ Completed | [AIWBv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AIWBv1.0.0) | Azure Application Insights Workbook module |
 | [Key Vault](./modules/azurerm_key_vault/) | 🧪 Development | vUnreleased | Azure Key Vault module with data-plane resources and diagnostic settings |
 | [Log Analytics Workspace](./modules/azurerm_log_analytics_workspace/) | ✅ Completed | [LAWv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LAWv1.0.0) | Azure Log Analytics Workspace module with workspace-linked sub-resources and diagnostics |
 | [Linux Function App](./modules/azurerm_linux_function_app/) | 🧪 Development | vUnreleased | Azure Linux Function App module with slots and diagnostic settings |

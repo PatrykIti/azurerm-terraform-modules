@@ -41,7 +41,7 @@ locals {
 }
 
 module "application_insights_workbook" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_application_insights_workbook?ref=AIWBv1.0.0"
 
   name                = "9c1a4e2b-1d2f-4d3a-8f1b-2b3c4d5e6f04"
   resource_group_name = azurerm_resource_group.example.name
