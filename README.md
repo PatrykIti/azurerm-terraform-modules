@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Role Definition](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=RDv*&label=Role%20Definition&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RDv1.0.0)
 [![Role Assignment](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=RAv*&label=Role%20Assignment&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RAv1.0.0)
 [![Redis Cache](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=REDISv*&label=Redis%20Cache&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/REDISv1.0.0)
 [![Private Endpoint](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PEv*&label=Private%20Endpoint&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PEv1.0.0)
@@ -120,7 +121,7 @@ module "storage_account" {
 | [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.1.0) | Manages Azure Network Security Groups with comprehensive security rules configuration |
 | [Route Table](./modules/azurerm_route_table/) | ✅ Completed | [RTv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.1.0) | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
 | [Role Assignment](./modules/azurerm_role_assignment/) | ✅ Completed | [RAv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RAv1.0.0) | Manages Azure RBAC role assignments |
-| [Role Definition](./modules/azurerm_role_definition/) | 🧪 Development | vUnreleased | Manages custom Azure RBAC role definitions |
+| [Role Definition](./modules/azurerm_role_definition/) | ✅ Completed | [RDv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RDv1.0.0) | Manages custom Azure RBAC role definitions |
 | [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv2.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv2.1.0) | Azure Storage Account Terraform module with enterprise-grade security features |
 | [Application Insights](./modules/azurerm_application_insights/) | ✅ Completed | [APPINSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.0.0) | Azure Application Insights module with diagnostics, web tests, and smart detection rules |
 | [Application Insights Workbook](./modules/azurerm_application_insights_workbook/) | ✅ Completed | [AIWBv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AIWBv1.0.0) | Azure Application Insights Workbook module |

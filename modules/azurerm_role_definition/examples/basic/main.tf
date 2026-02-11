@@ -16,7 +16,7 @@ provider "azurerm" {
 data "azurerm_subscription" "current" {}
 
 module "role_definition" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_role_definition?ref=RDv1.0.0"
 
   name  = var.role_definition_name
   scope = data.azurerm_subscription.current.id
