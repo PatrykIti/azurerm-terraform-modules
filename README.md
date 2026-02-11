@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Private Endpoint](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PEv*&label=Private%20Endpoint&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PEv1.0.0)
 [![Private DNS Zone Virtual Network Link](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PDNSZLNKv*&label=Private%20DNS%20Zone%20Virtual%20Network%20Link&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PDNSZLNKv1.0.0)
 [![Private DNS Zone](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PDNSZv*&label=Private%20DNS%20Zone&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PDNSZv1.0.0)
 [![Linux Virtual Machine](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=LINUXVMv*&label=Linux%20Virtual%20Machine&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LINUXVMv1.0.0)
@@ -17,7 +18,6 @@
 [![Application Insights Workbook](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AIWBv*&label=Application%20Insights%20Workbook&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AIWBv1.0.0)
 [![AI Services](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AISv*&label=AI%20Services&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AISv1.0.0)
 [![Monitor Private Link Scope](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AMPLSv*&label=Monitor%20Private%20Link%20Scope&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AMPLSv1.0.0)
-[![Private Endpoint](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PEv*&label=Private%20Endpoint&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PEv1.0.0)
 [![Monitor Data Collection Rule](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=DCRv*&label=Monitor%20Data%20Collection%20Rule&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCRv1.0.0)
 [![Monitor Data Collection Endpoint](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=DCEv*&label=Monitor%20Data%20Collection%20Endpoint&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCEv1.0.0)
 [![Log Analytics Workspace](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=LAWv*&label=Log%20Analytics%20Workspace&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LAWv1.0.0)
@@ -132,7 +132,7 @@ module "storage_account" {
 | [Monitor Private Link Scope](./modules/azurerm_monitor_private_link_scope/) | ✅ Completed | [AMPLSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AMPLSv1.0.0) | Azure Monitor Private Link Scope module with scoped services and diagnostic settings |
 | [Private DNS Zone](./modules/azurerm_private_dns_zone/) | ✅ Completed | [PDNSZv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PDNSZv1.0.0) | Manages Azure Private DNS Zones |
 | [Private DNS Zone Virtual Network Link](./modules/azurerm_private_dns_zone_virtual_network_link/) | ✅ Completed | [PDNSZLNKv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PDNSZLNKv1.0.0) | Manages Azure Private DNS Zone Virtual Network Links |
-| [Private Endpoint](./modules/azurerm_private_endpoint/) | 🧪 Development | vUnreleased | Manages Azure Private Endpoints with optional DNS zone group attachment |
+| [Private Endpoint](./modules/azurerm_private_endpoint/) | ✅ Completed | [PEv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PEv1.0.0) | Manages Azure Private Endpoints with optional DNS zone group attachment |
 | [PostgreSQL Flexible Server](./modules/azurerm_postgresql_flexible_server/) | ✅ Completed | [PGFSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSv1.0.0) | Azure PostgreSQL Flexible Server Terraform module with enterprise-grade features |
 | [PostgreSQL Flexible Server Database](./modules/azurerm_postgresql_flexible_server_database/) | ✅ Completed | [PGFSDBv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSDBv1.0.0) | PostgreSQL Flexible Server Database module for managing databases on an existing server |
 | [Redis Cache](./modules/azurerm_redis_cache/) | 🧪 Development | vUnreleased | Azure Redis Cache module with patch schedules, firewall rules, linked servers, and diagnostic settings |

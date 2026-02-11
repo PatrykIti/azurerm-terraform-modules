@@ -47,7 +47,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "blob" {
 }
 
 module "private_endpoint" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_private_endpoint?ref=PEv1.0.0"
 
   name                = "pe-secure-example"
   resource_group_name = azurerm_resource_group.example.name
