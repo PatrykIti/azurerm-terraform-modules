@@ -103,7 +103,7 @@ resource "azurerm_key_vault_key" "example" {
 }
 
 module "eventhub_namespace" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_eventhub_namespace?ref=EHNSv1.0.0"
 
   name                = var.namespace_name
   resource_group_name = azurerm_resource_group.example.name

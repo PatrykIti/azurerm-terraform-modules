@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Event Hub Namespace](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=EHNSv*&label=Event%20Hub%20Namespace&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/EHNSv1.0.0)
 [![Event Hub](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=EHv*&label=Event%20Hub&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/EHv1.0.0)
 [![Cognitive Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=COGv*&label=Cognitive%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/COGv1.0.0)
 [![Application Insights Workbook](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AIWBv*&label=Application%20Insights%20Workbook&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AIWBv1.0.0)
@@ -106,7 +107,7 @@ module "storage_account" {
 | [AI Services](./modules/azurerm_ai_services/) | ✅ Completed | [AISv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AISv1.0.0) | Azure AI Services module with identity, CMK, network ACLs, and diagnostics support |
 | [Cognitive Account](./modules/azurerm_cognitive_account/) | ✅ Completed | [COGv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/COGv1.0.0) | Azure Cognitive Services account module for OpenAI, Language, and Speech workloads |
 | [Event Hub](./modules/azurerm_eventhub/) | ✅ Completed | [EHv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/EHv1.0.0) | Azure Event Hub module with capture, consumer groups, and authorization rules |
-| [Event Hub Namespace](./modules/azurerm_eventhub_namespace/) | 🧪 Development | vUnreleased | Azure Event Hub Namespace module with auth rules, network rules, CMK, and diagnostics |
+| [Event Hub Namespace](./modules/azurerm_eventhub_namespace/) | ✅ Completed | [EHNSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/EHNSv1.0.0) | Azure Event Hub Namespace module with auth rules, network rules, CMK, and diagnostics |
 | [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv2.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv2.1.0) | Azure Kubernetes Service (AKS) Terraform module for managing clusters with node pools, addons, and enterprise-grade security features |
 | [Kubernetes Secrets](./modules/azurerm_kubernetes_secrets/) | ✅ Completed | [AKSSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSSv1.0.0) | Azure Kubernetes Secrets Terraform module with enterprise-grade features |
 | [Windows Virtual Machine](./modules/azurerm_windows_virtual_machine/) | 🧪 Development | vUnreleased | Azure Windows Virtual Machine module with managed data disks, extensions, and diagnostic settings |
