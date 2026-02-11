@@ -8,6 +8,13 @@ storage insights, linked services, dedicated clusters, and CMK for clusters).
 Cross-resource glue (private endpoints, Private DNS, RBAC/role assignments) is
 out of scope and should be managed externally.
 
+## Scope Exception (Current Decision)
+
+By explicit maintainer decision, this module currently remains broader in scope
+and keeps workspace-adjacent resources in a single module (no breaking split in
+TASK-044). Treat this as a temporary, explicit exception to the atomic-module
+guideline until a future refactor is approved.
+
 ## Managed Resources
 
 - `azurerm_log_analytics_workspace`

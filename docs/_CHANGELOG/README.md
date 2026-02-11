@@ -6,6 +6,23 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [087](./087-2026-01-30-eventhub-module.md) | 2026-01-30 | Event Hub module | Feature |
+| [086](./086-2026-01-30-eventhub-namespace-module.md) | 2026-01-30 | Event Hub Namespace module | Feature |
+| [085](./085-2026-01-30-windows-function-app-module.md) | 2026-01-30 | Windows Function App module | Feature |
+| [084](./084-2026-01-30-cognitive-account-module.md) | 2026-01-30 | Cognitive Account module | Feature |
+| [083](./083-2026-01-30-windows-virtual-machine-module.md) | 2026-01-30 | Windows Virtual Machine module | Feature |
+| [082](./082-2026-01-30-key-vault-module.md) | 2026-01-30 | Key Vault module | Feature |
+| [081](./081-2026-01-30-redis-cache-module.md) | 2026-01-30 | Redis Cache module | Feature |
+| [080](./080-2026-01-30-role-definition-module.md) | 2026-01-30 | Role Definition module | Feature |
+| [079](./079-2026-01-30-role-assignment-module.md) | 2026-01-30 | Role Assignment module | Feature |
+| [078](./078-2026-01-30-linux-virtual-machine-module.md) | 2026-01-30 | Linux Virtual Machine module | Feature |
+| [077](./077-2026-01-30-ai-services-module.md) | 2026-01-30 | AI Services module | Feature |
+| [076](./076-2026-01-30-application-insights-workbook-module.md) | 2026-01-30 | Application Insights Workbook module | Feature |
+| [075](./075-2026-01-30-user-assigned-identity-module.md) | 2026-01-30 | User Assigned Identity module | Feature |
+| [074](./074-2026-01-30-linux-function-app-module.md) | 2026-01-30 | Linux Function App module | Feature |
+| [073](./073-2026-01-30-private-endpoint.md) | 2026-01-30 | Private Endpoint module | Feature |
+| [071](./071-2026-01-30-private-dns-zone-vnet-link.md) | 2026-01-30 | Private DNS Zone VNet Link module | Feature |
+| [070](./070-2026-01-30-private-dns-zone.md) | 2026-01-30 | Private DNS Zone module | Feature |
 | [069](./069-2026-01-29-dcr-association-support.md) | 2026-01-29 | DCR association support | Feature / Maintenance |
 | [068](./068-2026-01-29-log-analytics-workspace-module-inputs-refactor.md) | 2026-01-29 | Log Analytics Workspace module inputs refactor | Breaking Change / Maintenance |
 | [067](./067-2026-01-29-log-analytics-workspace-module.md) | 2026-01-29 | Log Analytics Workspace module | Feature |

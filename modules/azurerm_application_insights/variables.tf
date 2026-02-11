@@ -253,42 +253,6 @@ variable "standard_web_tests" {
   }
 }
 
-variable "workbooks" {
-  description = "Application Insights workbooks."
-  type = list(object({
-    name         = string
-    display_name = string
-    data_json    = string
-    description  = optional(string)
-    category     = optional(string)
-    source_id    = optional(string)
-    tags         = optional(map(string), {})
-    identity = optional(object({
-      type         = string
-      identity_ids = optional(list(string), [])
-    }))
-  }))
-
-  default = []
-
-  validation {
-    condition     = length(distinct([for wb in var.workbooks : wb.name])) == length(var.workbooks)
-    error_message = "workbooks names must be unique."
-  }
-
-  validation {
-    condition = alltrue([
-      for wb in var.workbooks :
-      wb.identity == null || contains([
-        "SystemAssigned",
-        "UserAssigned",
-        "SystemAssigned, UserAssigned"
-      ], wb.identity.type)
-    ])
-    error_message = "workbooks.identity.type must be SystemAssigned, UserAssigned, or SystemAssigned, UserAssigned when provided."
-  }
-}
-
 variable "smart_detection_rules" {
   description = "Smart detection rules for Application Insights."
   type = list(object({

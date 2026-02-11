@@ -20,6 +20,6 @@ import {
 
 ## Other Sub-resources
 
-API keys, analytics items, web tests, workbooks, and smart detection rules can
+API keys, analytics items, web tests, and smart detection rules can
 be imported using their Azure resource IDs. Use the Azure portal or CLI to find
 the exact IDs, then map them to the corresponding resource instances.

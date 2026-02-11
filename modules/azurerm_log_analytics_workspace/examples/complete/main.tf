@@ -27,7 +27,7 @@ resource "azurerm_storage_account" "diagnostics" {
 }
 
 module "log_analytics_workspace" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_log_analytics_workspace?ref=LAWv1.0.0"
+  source = "../../"
 
   name                = var.workspace_name
   resource_group_name = azurerm_resource_group.example.name
@@ -42,7 +42,7 @@ module "log_analytics_workspace" {
     local_authentication_enabled = true
   }
 
-  monitoring = [
+  diagnostic_settings = [
     {
       name               = "diag"
       metric_categories  = ["AllMetrics"]

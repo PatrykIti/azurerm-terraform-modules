@@ -37,7 +37,7 @@ Private DNS, RBAC) is **out of scope** and must be handled externally.
 - **storage_insights** requires storage account keys; treat inputs as sensitive.
 
 ### Diagnostic Settings
-- **monitoring** configures diagnostic settings for audit and metrics delivery.
+- **diagnostic_settings** configures diagnostic settings for audit and metrics delivery.
 - Supports Log Analytics, Storage, or Event Hub destinations.
 
 ## Example: Security-Focused Configuration
@@ -56,7 +56,7 @@ module "log_analytics_workspace" {
     local_authentication_enabled = false
   }
 
-  monitoring = [
+  diagnostic_settings = [
     {
       name                       = "diag"
       metric_categories          = ["AllMetrics"]

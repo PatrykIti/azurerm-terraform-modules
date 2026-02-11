@@ -201,29 +201,6 @@ func TestApplicationInsightsStandardWebTests(t *testing.T) {
 	})
 }
 
-// Test workbooks
-func TestApplicationInsightsWorkbooks(t *testing.T) {
-	t.Parallel()
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/workbooks")
-	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
-	})
-
-	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
-		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
-	})
-
-	test_structure.RunTestStage(t, "validate", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-
-		resourceID := terraform.Output(t, terraformOptions, "application_insights_id")
-		assert.NotEmpty(t, resourceID)
-	})
-}
-
 // Test smart detection rules
 func TestApplicationInsightsSmartDetectionRules(t *testing.T) {
 	t.Parallel()

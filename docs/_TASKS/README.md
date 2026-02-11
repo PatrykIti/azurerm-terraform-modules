@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 15 tasks
+- **To Do:** 23 tasks
 - **In Progress:** 0
-- **Done:** 47 tasks
+- **Done:** 64 tasks
 
 ---
 
@@ -13,12 +13,19 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-050](./TASK-050_Final_Six_AzureRM_Modules_Compliance_Alignment.md) | **Final six AzureRM modules compliance alignment** | High | Large | `azurerm_redis_cache`, `azurerm_role_assignment`, `azurerm_role_definition`, `azurerm_user_assigned_identity`, `azurerm_windows_function_app`, `azurerm_windows_virtual_machine` |
+| [TASK-042](./TASK-042_Linux_Function_App_Compliance_Reaudit.md) | **Linux Function App compliance re-audit** | High | Large | `modules/azurerm_linux_function_app/` |
+| [TASK-043](./TASK-043_Linux_Virtual_Machine_Compliance_Reaudit.md) | **Linux Virtual Machine compliance re-audit** | High | Large | `modules/azurerm_linux_virtual_machine/` |
+| [TASK-044](./TASK-044_Log_Analytics_Workspace_Compliance_Reaudit.md) | **Log Analytics Workspace compliance re-audit** | High | Large | `modules/azurerm_log_analytics_workspace/` |
+| [TASK-045](./TASK-045_Private_DNS_Zone_Compliance_Reaudit.md) | **Private DNS Zone compliance re-audit** | High | Medium | `modules/azurerm_private_dns_zone/` |
+| [TASK-046](./TASK-046_Private_DNS_Zone_VNet_Link_Compliance_Reaudit.md) | **Private DNS Zone VNet Link compliance re-audit** | High | Medium | `modules/azurerm_private_dns_zone_virtual_network_link/` |
+| [TASK-047](./TASK-047_Private_Endpoint_Compliance_Reaudit.md) | **Private Endpoint compliance re-audit** | High | Medium | `modules/azurerm_private_endpoint/` |
 | [TASK-002](./TASK-002_AKS_Secrets_Manual_Rotation_and_KV_Integration.md) | **AKS secrets – manual rotation (TF) + standard KV/CSI/ESO** | High | Large | Pattern + moduł `modules/azurerm_kubernetes_secrets/` |
 | [TASK-014](./TASK-014_Virtual_Network_Module_Alignment.md) | **Virtual Network module alignment (docs + examples + tests)** | High | Medium | `modules/azurerm_virtual_network/` |
+| [TASK-032](./TASK-032_Container_Registry_Module.md) | **Azure Container Registry module (full feature scope)** | High | Large | `modules/azurerm_container_registry/` |
+| [TASK-034](./TASK-034_Azure_Bastion_Host_Module.md) | **Azure Bastion Host module (full feature scope)** | High | Medium | `modules/azurerm_bastion_host/` |
 | [TASK-ADO-017](./TASK-ADO-017_AzureDevOps_Environments_Module_Refactor.md) | **Azure DevOps Environments module refactor** | High | Medium | Re-opened; `modules/azuredevops_environments/` |
 | [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_artifacts_feed/` |
-| [TASK-ADO-032](./TASK-ADO-032_AzureDevOps_Artifacts_Feed_Module_Audit_Fixes.md) | **Azure DevOps Artifacts Feed module audit fixes** | Medium | Small | Docs + artifact cleanup; `modules/azuredevops_artifacts_feed/` |
-| [TASK-ADO-034](./TASK-ADO-034_AzureDevOps_Environments_Module_Compliance_Fixes.md) | **Azure DevOps Environments module compliance fixes** | High | Medium | `modules/azuredevops_environments/` |
 | [TASK-ADO-020](./TASK-ADO-020_AzureDevOps_Extension_Module_Refactor.md) | **Azure DevOps Extension module refactor** | Medium | Small | Re-opened; `modules/azuredevops_extension/` |
 | [TASK-ADO-021](./TASK-ADO-021_AzureDevOps_Pipelines_Module_Refactor.md) | **Azure DevOps Pipelines module refactor** | High | Medium | Re-opened; `modules/azuredevops_pipelines/` |
 | [TASK-ADO-022](./TASK-ADO-022_AzureDevOps_ServiceEndpoint_Module_Refactor.md) | **Azure DevOps Service Endpoint module refactor** | High | Large | Re-opened; `modules/azuredevops_serviceendpoint/` |
@@ -27,6 +34,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-025](./TASK-ADO-025_AzureDevOps_Variable_Groups_Module_Refactor.md) | **Azure DevOps Variable Groups module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_variable_groups/` |
 | [TASK-ADO-026](./TASK-ADO-026_AzureDevOps_Work_Items_Module_Refactor.md) | **Azure DevOps Work Items module refactor** | High | Medium | Re-opened; `modules/azuredevops_work_items/` |
 | [TASK-ADO-027](./TASK-ADO-027_AzureDevOps_Team_Module_Refactor.md) | **Azure DevOps Team module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_team/` |
+| [TASK-ADO-034](./TASK-ADO-034_AzureDevOps_Environments_Module_Compliance_Fixes.md) | **Azure DevOps Environments module compliance fixes** | High | Medium | `modules/azuredevops_environments/` |
 | [TASK-ADO-036](./TASK-ADO-036_AzureDevOps_Service_Principal_Entitlement_Module_Compliance_Alignment.md) | **Azure DevOps Service Principal Entitlement module compliance alignment** | High | Medium | `modules/azuredevops_service_principal_entitlement/` |
 
 ---
@@ -41,6 +49,22 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-048](./TASK-048_Log_Analytics_Workspace_Diagnostic_Settings_Input_Alignment.md) | **Log Analytics Workspace diagnostic settings input alignment** | High | Medium | `modules/azurerm_log_analytics_workspace/` |
+| [TASK-049](./TASK-049_Private_Endpoint_Variables_Hardening_and_Validation_Alignment.md) | **Private Endpoint variables hardening and validation alignment** | High | Medium | `modules/azurerm_private_endpoint/` |
+| [TASK-037](./TASK-037_Event_Hubs_Modules.md) | **Azure Event Hubs modules (Namespace + Event Hub)** | High | Large | `modules/azurerm_eventhub_namespace/`, `modules/azurerm_eventhub/` |
+| [TASK-035](./TASK-035_Cognitive_Account_Module.md) | **Azure Cognitive Account module (OpenAI/Language/Speech)** | High | Large | `modules/azurerm_cognitive_account/` |
+| [TASK-029](./TASK-029_Key_Vault_Module.md) | **Key Vault module (full feature scope)** | High | Large | `modules/azurerm_key_vault/` |
+| [TASK-033](./TASK-033_Redis_Cache_Module.md) | **Azure Redis Cache module (full feature scope)** | High | Large | `modules/azurerm_redis_cache/` |
+| [TASK-040](./TASK-040_AI_Services_Module.md) | **Azure AI Services module (azurerm_ai_services)** | High | Large | `modules/azurerm_ai_services/` |
+| [TASK-041](./TASK-041_Windows_Function_App_Module.md) | **Azure Windows Function App module (full feature scope)** | High | Large | `modules/azurerm_windows_function_app/` |
+| [TASK-028](./TASK-028_Role_Assignment_Module.md) | **Role Assignment module (RBAC) + zaleznosci** | High | Medium | `modules/azurerm_role_assignment/`, `modules/azurerm_role_definition/` |
+| [TASK-027](./TASK-027_User_Assigned_Identity_Module.md) | **User Assigned Identity module** | Medium | Medium | `modules/azurerm_user_assigned_identity/` |
+| [TASK-026](./TASK-026_Private_Endpoint_Module.md) | **Private Endpoint module** | High | Large | `modules/azurerm_private_endpoint/` |
+| [TASK-036](./TASK-036_Linux_Function_App_Module.md) | **Azure Linux Function App module (full feature scope)** | High | Large | `modules/azurerm_linux_function_app/` |
+| [TASK-038](./TASK-038_Azure_Linux_Virtual_Machine_Module.md) | **Azure Linux Virtual Machine module (full feature scope)** | High | Large | `modules/azurerm_linux_virtual_machine/` |
+| [TASK-039](./TASK-039_Azure_Windows_Virtual_Machine_Module.md) | **Azure Windows Virtual Machine module (full feature scope)** | High | Large | `modules/azurerm_windows_virtual_machine/` |
+| [TASK-031](./TASK-031_Azure_Workbook_Module.md) | **Azure Workbook module (azurerm_application_insights_workbook)** | High | Medium | `modules/azurerm_application_insights_workbook/` |
+| [TASK-030](./TASK-030_Private_DNS_Zone_Modules.md) | **Private DNS Zone + VNet Link modules** | High | Medium | `modules/azurerm_private_dns_zone/`, `modules/azurerm_private_dns_zone_virtual_network_link/` |
 | [TASK-024](./TASK-024_Application_Insights_Module.md) | **Application Insights module (full feature scope)** | High | Large | `modules/azurerm_application_insights/` |
 | [TASK-023](./TASK-023_Log_Analytics_Workspace_Module.md) | **Log Analytics Workspace module (full feature scope)** | High | Large | `modules/azurerm_log_analytics_workspace/` |
 | [TASK-020](./TASK-020_AKS_Monitoring_Addon_AMPLS_AzAPI.md) | **AKS monitoring add-on (Container Insights) + AMPLS via AzAPI** | High | Medium | `modules/azurerm_kubernetes_cluster/` |
@@ -55,6 +79,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-038](./TASK-ADO-038_AzureDevOps_User_Entitlement_Module_Compliance_Fixes.md) | **Azure DevOps User Entitlement module compliance fixes** | High | Medium | `modules/azuredevops_user_entitlement/` |
 | [TASK-ADO-037](./TASK-ADO-037_AzureDevOps_SecurityRole_Assignment_Docs_and_Tests_Alignment.md) | **Azure DevOps Security Role Assignment docs/tests alignment** | Medium | Medium | `modules/azuredevops_securityrole_assignment/` |
 | [TASK-ADO-033](./TASK-ADO-033_AzureDevOps_Extension_Compliance_Alignment.md) | **Azure DevOps Extension compliance alignment** | Medium | Small | `modules/azuredevops_extension/` |
+| [TASK-ADO-032](./TASK-ADO-032_AzureDevOps_Artifacts_Feed_Module_Audit_Fixes.md) | **Azure DevOps Artifacts Feed module audit fixes** | Medium | Small | Docs + artifact cleanup; `modules/azuredevops_artifacts_feed/` |
 | [TASK-010](./TASK-010_Workflow_and_Module_Docs_Alignment.md) | **Workflow and module documentation alignment** | Medium | Medium | `docs/WORKFLOWS.md`, `docs/MODULE_GUIDE/*`, ADO docs |
 | [TASK-011](./TASK-011_Terratest_Fixture_Path_Portability.md) | **Terratest fixture path portability** | Medium | Medium | Remove hardcoded `tests/fixtures` paths |
 | [TASK-012](./TASK-012_Module_Guide_Alignment.md) | **Module guide alignment (AKS + ADO patterns)** | Medium | Medium | `docs/MODULE_GUIDE/*` |

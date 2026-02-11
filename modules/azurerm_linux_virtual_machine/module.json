@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_linux_virtual_machine",
+  "title": "Linux Virtual Machine",
+  "commit_scope": "linux-virtual-machine",
+  "tag_prefix": "LINUXVMv",
+  "description": "Azure Linux Virtual Machine Terraform module with enterprise-grade features"
+}

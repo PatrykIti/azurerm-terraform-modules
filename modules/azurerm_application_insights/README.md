@@ -40,7 +40,6 @@ module "azurerm_application_insights" {
 - [Smart Detection Rules](examples/smart-detection-rules) - This example demonstrates how to configure smart detection rules for
 - [Standard Web Tests](examples/standard-web-tests) - This example demonstrates standard Application Insights web tests with request
 - [Web Tests](examples/web-tests) - This example demonstrates classic (XML-based) Application Insights web tests.
-- [Workbooks](examples/workbooks) - This example demonstrates how to create Application Insights workbooks.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
@@ -73,7 +72,6 @@ No modules.
 | [azurerm_application_insights_smart_detection_rule.application_insights_smart_detection_rule](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_smart_detection_rule) | resource |
 | [azurerm_application_insights_standard_web_test.application_insights_standard_web_test](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_standard_web_test) | resource |
 | [azurerm_application_insights_web_test.application_insights_web_test](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_web_test) | resource |
-| [azurerm_application_insights_workbook.application_insights_workbook](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/application_insights_workbook) | resource |
 | [azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
 
 ## Inputs
@@ -100,7 +98,6 @@ No modules.
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to the resource. | `map(string)` | `{}` | no |
 | <a name="input_timeouts"></a> [timeouts](#input\_timeouts) | Optional timeouts configuration for Application Insights. | <pre>object({<br/>    create = optional(string)<br/>    update = optional(string)<br/>    delete = optional(string)<br/>    read   = optional(string)<br/>  })</pre> | `{}` | no |
 | <a name="input_web_tests"></a> [web\_tests](#input\_web\_tests) | Classic Application Insights web tests. | <pre>list(object({<br/>    name          = string<br/>    kind          = optional(string, "ping")<br/>    description   = optional(string)<br/>    frequency     = optional(number, 300)<br/>    timeout       = optional(number, 30)<br/>    enabled       = optional(bool, true)<br/>    retry_enabled = optional(bool)<br/>    geo_locations = list(string)<br/>    web_test_xml  = string<br/>    tags          = optional(map(string), {})<br/>  }))</pre> | `[]` | no |
-| <a name="input_workbooks"></a> [workbooks](#input\_workbooks) | Application Insights workbooks. | <pre>list(object({<br/>    name         = string<br/>    display_name = string<br/>    data_json    = string<br/>    description  = optional(string)<br/>    category     = optional(string)<br/>    source_id    = optional(string)<br/>    tags         = optional(map(string), {})<br/>    identity = optional(object({<br/>      type         = string<br/>      identity_ids = optional(list(string), [])<br/>    }))<br/>  }))</pre> | `[]` | no |
 | <a name="input_workspace_id"></a> [workspace\_id](#input\_workspace\_id) | The Log Analytics workspace ID for workspace-based Application Insights. | `string` | `null` | no |
 
 ## Outputs
@@ -121,7 +118,6 @@ No modules.
 | <a name="output_smart_detection_rules"></a> [smart\_detection\_rules](#output\_smart\_detection\_rules) | Smart detection rules created for Application Insights. |
 | <a name="output_standard_web_tests"></a> [standard\_web\_tests](#output\_standard\_web\_tests) | Standard web tests created for Application Insights. |
 | <a name="output_web_tests"></a> [web\_tests](#output\_web\_tests) | Classic web tests created for Application Insights. |
-| <a name="output_workbooks"></a> [workbooks](#output\_workbooks) | Workbooks created for Application Insights. |
 | <a name="output_workspace_id"></a> [workspace\_id](#output\_workspace\_id) | The workspace ID linked to Application Insights (if workspace-based). |
 <!-- END_TF_DOCS -->
 

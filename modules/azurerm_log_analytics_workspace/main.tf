@@ -1,14 +1,3 @@
-locals {
-  solutions_by_name                     = { for s in var.features.solutions : s.name => s }
-  data_export_rules_by_name             = { for r in var.features.data_export_rules : r.name => r }
-  windows_event_datasources_by_name     = { for ds in var.features.windows_event_datasources : ds.name => ds }
-  windows_performance_counters_by_name  = { for ds in var.features.windows_performance_counters : ds.name => ds }
-  storage_insights_by_name              = { for si in var.features.storage_insights : si.name => si }
-  linked_services_by_name               = { for ls in var.features.linked_services : ls.name => ls }
-  clusters_by_name                      = { for c in var.features.clusters : c.name => c }
-  cluster_customer_managed_keys_by_name = { for cmk in var.features.cluster_customer_managed_keys : cmk.name => cmk }
-}
-
 resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
   name                = var.name
   location            = var.location
@@ -46,7 +35,7 @@ resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
 }
 
 resource "azurerm_log_analytics_solution" "log_analytics_solution" {
-  for_each = local.solutions_by_name
+  for_each = { for solution in var.features.solutions : solution.name => solution }
 
   solution_name         = each.value.name
   location              = var.location
@@ -64,7 +53,7 @@ resource "azurerm_log_analytics_solution" "log_analytics_solution" {
 }
 
 resource "azurerm_log_analytics_data_export_rule" "log_analytics_data_export_rule" {
-  for_each = local.data_export_rules_by_name
+  for_each = { for data_export_rule in var.features.data_export_rules : data_export_rule.name => data_export_rule }
 
   name                    = each.value.name
   resource_group_name     = var.resource_group_name
@@ -75,7 +64,7 @@ resource "azurerm_log_analytics_data_export_rule" "log_analytics_data_export_rul
 }
 
 resource "azurerm_log_analytics_datasource_windows_event" "log_analytics_datasource_windows_event" {
-  for_each = local.windows_event_datasources_by_name
+  for_each = { for windows_event_datasource in var.features.windows_event_datasources : windows_event_datasource.name => windows_event_datasource }
 
   name                = each.value.name
   resource_group_name = var.resource_group_name
@@ -85,7 +74,7 @@ resource "azurerm_log_analytics_datasource_windows_event" "log_analytics_datasou
 }
 
 resource "azurerm_log_analytics_datasource_windows_performance_counter" "log_analytics_datasource_windows_performance_counter" {
-  for_each = local.windows_performance_counters_by_name
+  for_each = { for windows_performance_counter in var.features.windows_performance_counters : windows_performance_counter.name => windows_performance_counter }
 
   name                = each.value.name
   resource_group_name = var.resource_group_name
@@ -97,7 +86,7 @@ resource "azurerm_log_analytics_datasource_windows_performance_counter" "log_ana
 }
 
 resource "azurerm_log_analytics_storage_insights" "log_analytics_storage_insights" {
-  for_each = local.storage_insights_by_name
+  for_each = { for storage_insight in var.features.storage_insights : storage_insight.name => storage_insight }
 
   name                = each.value.name
   resource_group_name = var.resource_group_name
@@ -110,7 +99,7 @@ resource "azurerm_log_analytics_storage_insights" "log_analytics_storage_insight
 }
 
 resource "azurerm_log_analytics_linked_service" "log_analytics_linked_service" {
-  for_each = local.linked_services_by_name
+  for_each = { for linked_service in var.features.linked_services : linked_service.name => linked_service }
 
   resource_group_name = var.resource_group_name
   workspace_id        = azurerm_log_analytics_workspace.log_analytics_workspace.id
@@ -119,7 +108,7 @@ resource "azurerm_log_analytics_linked_service" "log_analytics_linked_service" {
 }
 
 resource "azurerm_log_analytics_cluster" "log_analytics_cluster" {
-  for_each = local.clusters_by_name
+  for_each = { for cluster in var.features.clusters : cluster.name => cluster }
 
   name                = each.value.name
   resource_group_name = coalesce(try(each.value.resource_group_name, null), var.resource_group_name)
@@ -137,7 +126,7 @@ resource "azurerm_log_analytics_cluster" "log_analytics_cluster" {
 }
 
 resource "azurerm_log_analytics_cluster_customer_managed_key" "log_analytics_cluster_customer_managed_key" {
-  for_each = local.cluster_customer_managed_keys_by_name
+  for_each = { for cluster_customer_managed_key in var.features.cluster_customer_managed_keys : cluster_customer_managed_key.name => cluster_customer_managed_key }
 
   log_analytics_cluster_id = coalesce(
     try(each.value.log_analytics_cluster_id, null),

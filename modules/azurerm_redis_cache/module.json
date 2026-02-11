@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_redis_cache",
+  "title": "Redis Cache",
+  "commit_scope": "redis-cache",
+  "tag_prefix": "REDISv",
+  "description": "Azure Redis Cache Terraform module with enterprise-grade features"
+}

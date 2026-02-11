@@ -4,7 +4,7 @@
 
 This document outlines security-relevant configuration for the Application Insights module.
 The module manages an Application Insights resource and optional sub-resources
-(API keys, analytics items, web tests, workbooks, smart detection rules, and
+(API keys, analytics items, web tests, smart detection rules, and
 diagnostic settings). Networking glue (private endpoints, Private DNS, RBAC)
 is **out of scope** and must be handled externally.
 

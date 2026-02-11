@@ -48,7 +48,6 @@ make test-api-keys
 make test-analytics-items
 make test-web-tests
 make test-standard-web-tests
-make test-workbooks
 make test-smart-detection
 ```
 
@@ -79,7 +78,6 @@ The `fixtures/` directory contains Terraform configurations for different test s
 - `fixtures/analytics-items/` - Analytics items configuration
 - `fixtures/web-tests/` - Classic web tests configuration
 - `fixtures/standard-web-tests/` - Standard web tests configuration
-- `fixtures/workbooks/` - Workbooks configuration
 - `fixtures/smart-detection-rules/` - Smart detection rules configuration
 - `fixtures/negative/` - Negative validation test cases
 

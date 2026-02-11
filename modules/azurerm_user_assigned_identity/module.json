@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_user_assigned_identity",
+  "title": "User Assigned Identity",
+  "commit_scope": "user-assigned-identity",
+  "tag_prefix": "UAIv",
+  "description": "Manages Azure User Assigned Identities and federated identity credentials"
+}

@@ -117,7 +117,7 @@ module "log_analytics_workspace" {
 
 | Module Version | Terraform Version | AzureRM Provider | Azure API Version |
 |----------------|-------------------|------------------|-------------------|
-| LAWv1.0.x | >= 1.3.0 | 4.36.0 (pinned) | TBD |
+| LAWv1.0.x | >= 1.12.2 | 4.57.0 (pinned) | Provider-managed (via AzureRM 4.57.0) |
 
 **Note**: The AzureRM provider version is pinned to ensure consistent behavior across all deployments.
 

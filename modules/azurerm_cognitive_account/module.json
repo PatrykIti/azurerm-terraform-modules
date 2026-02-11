@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_cognitive_account",
+  "title": "Cognitive Account",
+  "commit_scope": "cognitive-account",
+  "tag_prefix": "COGv",
+  "description": "Azure Cognitive Services account module for OpenAI, Language, and Speech"
+}

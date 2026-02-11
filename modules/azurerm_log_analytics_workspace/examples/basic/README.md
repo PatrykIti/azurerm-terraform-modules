@@ -51,7 +51,7 @@ terraform destroy
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | ../../ | n/a |
+| <a name="module_log_analytics_workspace"></a> [log\_analytics\_workspace](#module\_log\_analytics\_workspace) | github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_log_analytics_workspace | LAWv1.0.0 |
 
 ## Resources
 

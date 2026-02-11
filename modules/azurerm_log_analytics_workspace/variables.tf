@@ -285,70 +285,149 @@ variable "features" {
   }
 }
 
-variable "monitoring" {
+variable "diagnostic_settings" {
   description = <<-EOT
-    Monitoring configuration for Log Analytics Workspace diagnostics.
+    Diagnostic settings configuration for Log Analytics Workspace.
 
-    Diagnostic settings for logs and metrics. Provide explicit log_categories
-    and/or metric_categories and at least one destination (Log Analytics,
-    Storage, or Event Hub).
+    Each entry is explicit and deterministic (no runtime category discovery).
+    Provide at least one destination and at least one category/group:
+    log_categories, log_category_groups, or metric_categories.
+
+    Pinned allow-lists (azurerm 4.57.0):
+    - log_categories: Audit, Ingestion, Query
+    - log_category_groups: allLogs, audit
+    - metric_categories: AllMetrics
   EOT
 
   type = list(object({
     name                           = string
     log_categories                 = optional(list(string))
+    log_category_groups            = optional(list(string))
     metric_categories              = optional(list(string))
     log_analytics_workspace_id     = optional(string)
     log_analytics_destination_type = optional(string)
     storage_account_id             = optional(string)
     eventhub_authorization_rule_id = optional(string)
     eventhub_name                  = optional(string)
+    partner_solution_id            = optional(string)
   }))
 
   nullable = false
   default  = []
 
   validation {
-    condition     = length(var.monitoring) <= 5
+    condition     = length(var.diagnostic_settings) <= 5
     error_message = "Azure allows a maximum of 5 diagnostic settings per workspace."
   }
 
   validation {
-    condition     = length(distinct([for ds in var.monitoring : ds.name])) == length(var.monitoring)
-    error_message = "Each monitoring entry must have a unique name."
+    condition     = length(distinct([for ds in var.diagnostic_settings : trimspace(ds.name)])) == length(var.diagnostic_settings)
+    error_message = "Each diagnostic setting entry must have a unique name."
+  }
+
+  validation {
+    condition     = alltrue([for ds in var.diagnostic_settings : trimspace(ds.name) != ""])
+    error_message = "Each diagnostic setting entry name must not be empty."
   }
 
   validation {
     condition = alltrue([
-      for ds in var.monitoring :
-      ds.log_analytics_workspace_id != null || ds.storage_account_id != null || ds.eventhub_authorization_rule_id != null
+      for ds in var.diagnostic_settings :
+      (ds.log_analytics_workspace_id == null || trimspace(ds.log_analytics_workspace_id) != "") &&
+      (ds.storage_account_id == null || trimspace(ds.storage_account_id) != "") &&
+      (ds.eventhub_authorization_rule_id == null || trimspace(ds.eventhub_authorization_rule_id) != "") &&
+      (ds.partner_solution_id == null || trimspace(ds.partner_solution_id) != "")
     ])
-    error_message = "Each monitoring entry must specify at least one destination: log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id."
+    error_message = "Destination IDs in diagnostic_settings must be non-empty when provided (log_analytics_workspace_id, storage_account_id, eventhub_authorization_rule_id, partner_solution_id)."
   }
 
   validation {
     condition = alltrue([
-      for ds in var.monitoring :
-      ds.eventhub_authorization_rule_id == null || (ds.eventhub_name != null && ds.eventhub_name != "")
+      for ds in var.diagnostic_settings :
+      anytrue([
+        ds.log_analytics_workspace_id != null && trimspace(ds.log_analytics_workspace_id) != "",
+        ds.storage_account_id != null && trimspace(ds.storage_account_id) != "",
+        ds.eventhub_authorization_rule_id != null && trimspace(ds.eventhub_authorization_rule_id) != "",
+        ds.partner_solution_id != null && trimspace(ds.partner_solution_id) != ""
+      ])
+    ])
+    error_message = "Each diagnostic_settings entry must specify at least one destination: log_analytics_workspace_id, storage_account_id, eventhub_authorization_rule_id, or partner_solution_id."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.eventhub_name == null || trimspace(ds.eventhub_name) != ""
+    ])
+    error_message = "eventhub_name must be non-empty when provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.eventhub_name == null || (
+        ds.eventhub_authorization_rule_id != null &&
+        trimspace(ds.eventhub_authorization_rule_id) != ""
+      )
+    ])
+    error_message = "eventhub_name can only be set when eventhub_authorization_rule_id is specified."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      (ds.eventhub_authorization_rule_id == null || trimspace(ds.eventhub_authorization_rule_id) == "") || (ds.eventhub_name != null && trimspace(ds.eventhub_name) != "")
     ])
     error_message = "eventhub_name is required when eventhub_authorization_rule_id is set."
   }
 
   validation {
     condition = alltrue([
-      for ds in var.monitoring :
-      ds.log_analytics_destination_type == null || contains(["Dedicated", "AzureDiagnostics"], ds.log_analytics_destination_type)
+      for ds in var.diagnostic_settings :
+      ds.log_analytics_destination_type == null || contains(["Dedicated", "AzureDiagnostics"], trimspace(ds.log_analytics_destination_type))
     ])
     error_message = "log_analytics_destination_type must be either Dedicated or AzureDiagnostics."
   }
 
   validation {
     condition = alltrue([
-      for ds in var.monitoring :
-      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
-      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""])
+      for ds in var.diagnostic_settings :
+      ds.log_analytics_destination_type == null || (
+        ds.log_analytics_workspace_id != null &&
+        trimspace(ds.log_analytics_workspace_id) != ""
+      )
     ])
-    error_message = "log_categories and metric_categories must not contain empty strings."
+    error_message = "log_analytics_destination_type requires log_analytics_workspace_id."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : trimspace(c) != ""]) &&
+      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : trimspace(c) != ""]) &&
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : trimspace(c) != ""])
+    ])
+    error_message = "diagnostic_settings category values must not contain empty strings."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : contains(["Audit", "Ingestion", "Query"], trimspace(c))]) &&
+      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : contains(["allLogs", "audit"], trimspace(c))]) &&
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : contains(["AllMetrics"], trimspace(c))])
+    ])
+    error_message = "diagnostic_settings categories must use supported values: log_categories=[Audit, Ingestion, Query], log_category_groups=[allLogs, audit], metric_categories=[AllMetrics]."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      length([for c in(ds.log_categories == null ? [] : ds.log_categories) : c if trimspace(c) != ""]) +
+      length([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : c if trimspace(c) != ""]) +
+      length([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c if trimspace(c) != ""]) > 0
+    ])
+    error_message = "Each diagnostic_settings entry must include at least one non-empty log category, log category group, or metric category."
   }
 }
 

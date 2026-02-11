@@ -1,0 +1,319 @@
+variable "name" {
+  description = "The name of the Bastion Host."
+  type        = string
+
+  validation {
+    condition     = can(regex("^(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_.-]{0,78}[A-Za-z0-9_])$", var.name))
+    error_message = "Bastion Host name must be 1-80 characters, start with a letter or number, contain only letters, numbers, underscores, periods, or hyphens, and end with a letter, number, or underscore."
+  }
+}
+
+variable "resource_group_name" {
+  description = "The name of the resource group in which to create the Bastion Host."
+  type        = string
+}
+
+variable "location" {
+  description = "The Azure region where the Bastion Host should exist."
+  type        = string
+}
+
+variable "sku" {
+  description = "The SKU of the Bastion Host. Possible values are Developer, Basic, Standard, and Premium."
+  type        = string
+  default     = "Basic"
+
+  validation {
+    condition     = contains(["Developer", "Basic", "Standard", "Premium"], var.sku)
+    error_message = "sku must be one of: Developer, Basic, Standard, Premium."
+  }
+}
+
+variable "scale_units" {
+  description = "The number of scale units for the Bastion Host (2-50). Only supported with Standard or Premium SKU."
+  type        = number
+  default     = null
+  nullable    = true
+
+  validation {
+    condition     = var.scale_units == null || (var.scale_units >= 2 && var.scale_units <= 50)
+    error_message = "scale_units must be between 2 and 50 when specified."
+  }
+
+  validation {
+    condition     = var.scale_units == null || contains(["Standard", "Premium"], var.sku)
+    error_message = "scale_units can only be set when sku is Standard or Premium."
+  }
+}
+
+variable "ip_configuration" {
+  description = "IP configuration for the Bastion Host (required for Basic/Standard/Premium)."
+  type = list(object({
+    name                 = string
+    subnet_id            = string
+    public_ip_address_id = string
+  }))
+
+  default  = []
+  nullable = false
+
+  validation {
+    condition     = length(var.ip_configuration) <= 1
+    error_message = "ip_configuration supports at most one entry."
+  }
+
+  validation {
+    condition     = length(distinct([for cfg in var.ip_configuration : cfg.name])) == length(var.ip_configuration)
+    error_message = "ip_configuration names must be unique."
+  }
+
+  validation {
+    condition = alltrue([
+      for cfg in var.ip_configuration :
+      cfg.name != "" && cfg.subnet_id != "" && cfg.public_ip_address_id != ""
+    ])
+    error_message = "ip_configuration requires non-empty name, subnet_id, and public_ip_address_id."
+  }
+
+  validation {
+    condition = alltrue([
+      for cfg in var.ip_configuration :
+      can(regex("(?i)/subnets/AzureBastionSubnet$", cfg.subnet_id))
+    ])
+    error_message = "ip_configuration.subnet_id must reference the AzureBastionSubnet subnet."
+  }
+
+  validation {
+    condition     = var.sku == "Developer" ? length(var.ip_configuration) == 0 : length(var.ip_configuration) == 1
+    error_message = "ip_configuration must be set to exactly one entry for Basic/Standard/Premium SKUs and must be omitted for Developer."
+  }
+}
+
+variable "virtual_network_id" {
+  description = "The ID of the Virtual Network for the Developer Bastion Host."
+  type        = string
+  default     = null
+  nullable    = true
+
+  validation {
+    condition     = var.sku != "Developer" || (var.virtual_network_id != null && trimspace(var.virtual_network_id) != "")
+    error_message = "virtual_network_id is required when sku is Developer."
+  }
+
+  validation {
+    condition     = var.sku == "Developer" || var.virtual_network_id == null || trimspace(var.virtual_network_id) == ""
+    error_message = "virtual_network_id is only supported with the Developer SKU."
+  }
+}
+
+variable "copy_paste_enabled" {
+  description = "Is Copy/Paste enabled for the Bastion Host?"
+  type        = bool
+  default     = true
+}
+
+variable "file_copy_enabled" {
+  description = "Is File Copy enabled for the Bastion Host? Supported on Standard or Premium SKU only."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.file_copy_enabled || contains(["Standard", "Premium"], var.sku)
+    error_message = "file_copy_enabled requires Standard or Premium SKU."
+  }
+}
+
+variable "ip_connect_enabled" {
+  description = "Is IP Connect enabled for the Bastion Host? Supported on Standard or Premium SKU only."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.ip_connect_enabled || contains(["Standard", "Premium"], var.sku)
+    error_message = "ip_connect_enabled requires Standard or Premium SKU."
+  }
+}
+
+variable "shareable_link_enabled" {
+  description = "Is Shareable Link enabled for the Bastion Host? Supported on Standard or Premium SKU only."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.shareable_link_enabled || contains(["Standard", "Premium"], var.sku)
+    error_message = "shareable_link_enabled requires Standard or Premium SKU."
+  }
+}
+
+variable "tunneling_enabled" {
+  description = "Is Tunneling enabled for the Bastion Host? Supported on Standard or Premium SKU only."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.tunneling_enabled || contains(["Standard", "Premium"], var.sku)
+    error_message = "tunneling_enabled requires Standard or Premium SKU."
+  }
+}
+
+variable "session_recording_enabled" {
+  description = "Is Session Recording enabled for the Bastion Host? Supported on Premium SKU only."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.session_recording_enabled || var.sku == "Premium"
+    error_message = "session_recording_enabled requires the Premium SKU."
+  }
+}
+
+variable "kerberos_enabled" {
+  description = "Is Kerberos authentication enabled for the Bastion Host? Supported on Standard or Premium SKU only."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.kerberos_enabled || contains(["Standard", "Premium"], var.sku)
+    error_message = "kerberos_enabled requires Standard or Premium SKU."
+  }
+}
+
+variable "zones" {
+  description = "A list of Availability Zones in which this Bastion Host should be located."
+  type        = list(string)
+  default     = null
+  nullable    = true
+
+  validation {
+    condition     = var.zones == null || alltrue([for zone in var.zones : zone != ""])
+    error_message = "zones must not contain empty strings."
+  }
+}
+
+variable "diagnostic_settings" {
+  description = <<-EOT
+    Diagnostic settings for the Bastion Host.
+
+    Supported categories for azurerm 4.57.0:
+    - log_categories: BastionAuditLogs
+    - log_category_groups: allLogs
+    - metric_categories: AllMetrics
+  EOT
+
+  type = list(object({
+    name                           = string
+    log_categories                 = optional(list(string))
+    log_category_groups            = optional(list(string))
+    metric_categories              = optional(list(string))
+    log_analytics_workspace_id     = optional(string)
+    log_analytics_destination_type = optional(string)
+    storage_account_id             = optional(string)
+    eventhub_authorization_rule_id = optional(string)
+    eventhub_name                  = optional(string)
+    partner_solution_id            = optional(string)
+  }))
+
+  default  = []
+  nullable = false
+
+  validation {
+    condition     = length(var.diagnostic_settings) <= 5
+    error_message = "Azure allows a maximum of 5 diagnostic settings per Bastion Host."
+  }
+
+  validation {
+    condition     = length(distinct([for ds in var.diagnostic_settings : ds.name])) == length(var.diagnostic_settings)
+    error_message = "Each diagnostic_settings entry must have a unique name."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.log_analytics_workspace_id != null || ds.storage_account_id != null || ds.eventhub_authorization_rule_id != null || ds.partner_solution_id != null
+    ])
+    error_message = "Each diagnostic_settings entry must specify at least one destination: log_analytics_workspace_id, storage_account_id, eventhub_authorization_rule_id, or partner_solution_id."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.eventhub_authorization_rule_id == null || (ds.eventhub_name != null && ds.eventhub_name != "")
+    ])
+    error_message = "eventhub_name is required when eventhub_authorization_rule_id is set."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.log_analytics_destination_type == null || contains(["Dedicated", "AzureDiagnostics"], ds.log_analytics_destination_type)
+    ])
+    error_message = "log_analytics_destination_type must be either Dedicated or AzureDiagnostics."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : c != ""]) &&
+      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : c != ""]) &&
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : c != ""])
+    ])
+    error_message = "log_categories, log_category_groups, and metric_categories must not contain empty strings."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      length(coalesce(ds.log_categories, [])) + length(coalesce(ds.log_category_groups, [])) + length(coalesce(ds.metric_categories, [])) > 0
+    ])
+    error_message = "Each diagnostic_settings entry must define at least one category: log_categories, log_category_groups, or metric_categories."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.log_categories == null ? [] : ds.log_categories) : contains(["BastionAuditLogs"], c)])
+    ])
+    error_message = "log_categories may include only: BastionAuditLogs."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.log_category_groups == null ? [] : ds.log_category_groups) : contains(["allLogs"], c)])
+    ])
+    error_message = "log_category_groups may include only: allLogs."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      alltrue([for c in(ds.metric_categories == null ? [] : ds.metric_categories) : contains(["AllMetrics"], c)])
+    ])
+    error_message = "metric_categories may include only: AllMetrics."
+  }
+
+  validation {
+    condition = alltrue([
+      for ds in var.diagnostic_settings :
+      ds.partner_solution_id == null || trimspace(ds.partner_solution_id) != ""
+    ])
+    error_message = "partner_solution_id must not be empty when specified."
+  }
+}
+
+variable "timeouts" {
+  description = "Custom timeouts for the Bastion Host resource."
+  type = object({
+    create = optional(string)
+    read   = optional(string)
+    update = optional(string)
+    delete = optional(string)
+  })
+  default = null
+}
+
+variable "tags" {
+  description = "A mapping of tags to assign to the Bastion Host."
+  type        = map(string)
+  default     = {}
+}

@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_private_dns_zone_virtual_network_link",
+  "title": "Private DNS Zone Virtual Network Link",
+  "commit_scope": "private-dns-zone-vnet-link",
+  "tag_prefix": "PDNSZLNKv",
+  "description": "Manages Azure Private DNS Zone Virtual Network Links"
+}

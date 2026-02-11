@@ -10,6 +10,10 @@ terraform {
 
 provider "azuredevops" {}
 
+data "azuredevops_group" "project_collection_admins" {
+  name = "Project Collection Administrators"
+}
+
 module "azuredevops_artifacts_feed" {
   source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_artifacts_feed?ref=ADOAFv1.0.0"
 
@@ -19,7 +23,7 @@ module "azuredevops_artifacts_feed" {
   feed_permissions = [
     {
       key                 = "secure-reader"
-      identity_descriptor = var.principal_descriptor
+      identity_descriptor = data.azuredevops_group.project_collection_admins.descriptor
       role                = "reader"
     }
   ]

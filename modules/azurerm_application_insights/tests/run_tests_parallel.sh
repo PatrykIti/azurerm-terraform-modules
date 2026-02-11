@@ -63,7 +63,6 @@ tests=(
     "TestApplicationInsightsAnalyticsItems"
     "TestApplicationInsightsWebTests"
     "TestApplicationInsightsStandardWebTests"
-    "TestApplicationInsightsWorkbooks"
     "TestApplicationInsightsSmartDetectionRules"
     "TestApplicationInsightsValidationRules"
     "TestApplicationInsightsFullIntegration"

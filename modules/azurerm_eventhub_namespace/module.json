@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_eventhub_namespace",
+  "title": "Event Hub Namespace",
+  "commit_scope": "eventhub-namespace",
+  "tag_prefix": "EHNSv",
+  "description": "Azure Event Hub Namespace Terraform module with enterprise-grade features"
+}

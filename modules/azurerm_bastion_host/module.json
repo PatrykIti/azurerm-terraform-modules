@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_bastion_host",
+  "title": "Bastion Host",
+  "commit_scope": "bastion-host",
+  "tag_prefix": "BASTIONv",
+  "description": "Azure Bastion Host Terraform module with diagnostic settings support"
+}

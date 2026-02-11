@@ -1,0 +1,107 @@
+package test
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/gruntwork-io/terratest/modules/random"
+	"github.com/stretchr/testify/require"
+)
+
+// TestConfig holds common test configuration
+type TestConfig struct {
+	SubscriptionID string
+	TenantID       string
+	ClientID       string
+	ClientSecret   string
+	Location       string
+	ResourceGroup  string
+	UniqueID       string
+}
+
+func getEnvWithFallback(primary, fallback string) string {
+	if value := strings.TrimSpace(os.Getenv(primary)); value != "" {
+		return value
+	}
+	return strings.TrimSpace(os.Getenv(fallback))
+}
+
+// GetTestConfig returns a test configuration with required Azure credentials
+func GetTestConfig(t *testing.T) *TestConfig {
+	subscriptionID := getEnvWithFallback("ARM_SUBSCRIPTION_ID", "AZURE_SUBSCRIPTION_ID")
+	require.NotEmpty(t, subscriptionID, "ARM_SUBSCRIPTION_ID or AZURE_SUBSCRIPTION_ID environment variable must be set")
+
+	tenantID := getEnvWithFallback("ARM_TENANT_ID", "AZURE_TENANT_ID")
+	require.NotEmpty(t, tenantID, "ARM_TENANT_ID or AZURE_TENANT_ID environment variable must be set")
+
+	clientID := getEnvWithFallback("ARM_CLIENT_ID", "AZURE_CLIENT_ID")
+	require.NotEmpty(t, clientID, "ARM_CLIENT_ID or AZURE_CLIENT_ID environment variable must be set")
+
+	clientSecret := getEnvWithFallback("ARM_CLIENT_SECRET", "AZURE_CLIENT_SECRET")
+	require.NotEmpty(t, clientSecret, "ARM_CLIENT_SECRET or AZURE_CLIENT_SECRET environment variable must be set")
+
+	location := getEnvWithFallback("ARM_LOCATION", "AZURE_LOCATION")
+	if location == "" {
+		location = "West Europe"
+	}
+
+	uniqueID := strings.ToLower(random.UniqueId())
+
+	return &TestConfig{
+		SubscriptionID: subscriptionID,
+		TenantID:       tenantID,
+		ClientID:       clientID,
+		ClientSecret:   clientSecret,
+		Location:       location,
+		ResourceGroup:  fmt.Sprintf("rg-test-application_insights_workbook-%s", uniqueID),
+		UniqueID:       uniqueID,
+	}
+}
+
+// GetAzureCredential returns Azure credentials for SDK calls
+func GetAzureCredential(t *testing.T) azcore.TokenCredential {
+	cred, err := azidentity.NewDefaultAzureCredential(nil)
+	require.NoError(t, err, "Failed to create Azure credential")
+	return cred
+}
+
+// WaitForResourceDeletion waits for a resource to be deleted
+func WaitForResourceDeletion(ctx context.Context, checkFunc func() (bool, error), timeout time.Duration) error {
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+
+	timeoutCh := time.After(timeout)
+
+	for {
+		select {
+		case <-timeoutCh:
+			return fmt.Errorf("timeout waiting for resource deletion")
+		case <-ticker.C:
+			exists, err := checkFunc()
+			if err != nil {
+				return fmt.Errorf("error checking resource existence: %w", err)
+			}
+			if !exists {
+				return nil
+			}
+		}
+	}
+}
+
+// GenerateResourceName generates a unique resource name for testing
+func GenerateResourceName(prefix string, uniqueID string) string {
+	// Ensure the name meets Azure naming requirements
+	name := fmt.Sprintf("%s%s", prefix, uniqueID)
+	// Remove any invalid characters and ensure length limits
+	name = strings.ReplaceAll(name, "-", "")
+	if len(name) > 24 {
+		name = name[:24]
+	}
+	return strings.ToLower(name)
+}

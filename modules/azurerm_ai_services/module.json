@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_ai_services",
+  "title": "AI Services",
+  "commit_scope": "ai-services",
+  "tag_prefix": "AISv",
+  "description": "Azure AI Services Terraform module with identity, CMK, network ACLs, and diagnostics support"
+}

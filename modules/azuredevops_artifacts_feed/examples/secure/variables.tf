@@ -8,8 +8,3 @@ variable "feed_name" {
   type        = string
   default     = "secure-feed"
 }
-
-variable "principal_descriptor" {
-  description = "Principal descriptor for feed permissions."
-  type        = string
-}

@@ -8,10 +8,12 @@
 
 <!-- MODULE BADGES START -->
 [![Monitor Private Link Scope](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AMPLSv*&label=Monitor%20Private%20Link%20Scope&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AMPLSv1.0.0)
+[![Private Endpoint](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PEv*&label=Private%20Endpoint&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PEv1.0.0)
 [![Monitor Data Collection Rule](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=DCRv*&label=Monitor%20Data%20Collection%20Rule&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCRv1.0.0)
 [![Monitor Data Collection Endpoint](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=DCEv*&label=Monitor%20Data%20Collection%20Endpoint&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCEv1.0.0)
 [![Log Analytics Workspace](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=LAWv*&label=Log%20Analytics%20Workspace&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LAWv1.0.0)
 [![Application Insights](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=APPINSv*&label=Application%20Insights&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.0.0)
+[![Key Vault](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=KVv*&label=Key%20Vault&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/KVv1.0.0)
 [![Kubernetes Cluster](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AKSv*&label=Kubernetes%20Cluster&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv2.1.0)
 [![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv2.1.0)
 [![PostgreSQL Flexible Server Database](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PGFSDBv*&label=PostgreSQL%20Flexible%20Server%20Database&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSDBv1.0.0)
@@ -97,18 +99,34 @@ module "storage_account" {
 
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
+| [AI Services](./modules/azurerm_ai_services/) | 🧪 Development | vUnreleased | Azure AI Services module with identity, CMK, network ACLs, and diagnostics support |
+| [Cognitive Account](./modules/azurerm_cognitive_account/) | 🧪 Development | vUnreleased | Azure Cognitive Services account module for OpenAI, Language, and Speech workloads |
+| [Event Hub](./modules/azurerm_eventhub/) | 🧪 Development | vUnreleased | Azure Event Hub module with capture, consumer groups, and authorization rules |
+| [Event Hub Namespace](./modules/azurerm_eventhub_namespace/) | 🧪 Development | vUnreleased | Azure Event Hub Namespace module with auth rules, network rules, CMK, and diagnostics |
 | [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv2.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv2.1.0) | Azure Kubernetes Service (AKS) Terraform module for managing clusters with node pools, addons, and enterprise-grade security features |
 | [Kubernetes Secrets](./modules/azurerm_kubernetes_secrets/) | ✅ Completed | [AKSSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSSv1.0.0) | Azure Kubernetes Secrets Terraform module with enterprise-grade features |
+| [Windows Virtual Machine](./modules/azurerm_windows_virtual_machine/) | 🧪 Development | vUnreleased | Azure Windows Virtual Machine module with managed data disks, extensions, and diagnostic settings |
 | [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.1.0) | Manages Azure Network Security Groups with comprehensive security rules configuration |
 | [Route Table](./modules/azurerm_route_table/) | ✅ Completed | [RTv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.1.0) | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
+| [Role Assignment](./modules/azurerm_role_assignment/) | 🧪 Development | vUnreleased | Manages Azure RBAC role assignments |
+| [Role Definition](./modules/azurerm_role_definition/) | 🧪 Development | vUnreleased | Manages custom Azure RBAC role definitions |
 | [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv2.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv2.1.0) | Azure Storage Account Terraform module with enterprise-grade security features |
-| [Application Insights](./modules/azurerm_application_insights/) | ✅ Completed | [APPINSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.0.0) | Azure Application Insights module with diagnostics, web tests, workbooks, and smart detection rules |
+| [Application Insights](./modules/azurerm_application_insights/) | ✅ Completed | [APPINSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.0.0) | Azure Application Insights module with diagnostics, web tests, and smart detection rules |
+| [Application Insights Workbook](./modules/azurerm_application_insights_workbook/) | 🧪 Development | Unreleased | Azure Application Insights Workbook module |
+| [Key Vault](./modules/azurerm_key_vault/) | 🧪 Development | vUnreleased | Azure Key Vault module with data-plane resources and diagnostic settings |
 | [Log Analytics Workspace](./modules/azurerm_log_analytics_workspace/) | ✅ Completed | [LAWv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LAWv1.0.0) | Azure Log Analytics Workspace module with workspace-linked sub-resources and diagnostics |
+| [Linux Function App](./modules/azurerm_linux_function_app/) | 🧪 Development | vUnreleased | Azure Linux Function App module with slots and diagnostic settings |
+| [Windows Function App](./modules/azurerm_windows_function_app/) | 🧪 Development | vUnreleased | Azure Windows Function App module with slots and diagnostic settings |
+| [Linux Virtual Machine](./modules/azurerm_linux_virtual_machine/) | 🧪 Development | vUnreleased | Azure Linux Virtual Machine module with extensions and diagnostic settings |
 | [Monitor Data Collection Endpoint](./modules/azurerm_monitor_data_collection_endpoint/) | ✅ Completed | [DCEv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCEv1.0.0) | Azure Monitor Data Collection Endpoint module for configuring ingestion endpoints |
 | [Monitor Data Collection Rule](./modules/azurerm_monitor_data_collection_rule/) | ✅ Completed | [DCRv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCRv1.0.0) | Azure Monitor Data Collection Rule module for defining data sources and flows |
 | [Monitor Private Link Scope](./modules/azurerm_monitor_private_link_scope/) | ✅ Completed | [AMPLSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AMPLSv1.0.0) | Azure Monitor Private Link Scope module with scoped services and diagnostic settings |
+| [Private DNS Zone](./modules/azurerm_private_dns_zone/) | 🧪 Development | vUnreleased | Manages Azure Private DNS Zones |
+| [Private DNS Zone Virtual Network Link](./modules/azurerm_private_dns_zone_virtual_network_link/) | 🧪 Development | vUnreleased | Manages Azure Private DNS Zone Virtual Network Links |
+| [Private Endpoint](./modules/azurerm_private_endpoint/) | 🧪 Development | vUnreleased | Manages Azure Private Endpoints with optional DNS zone group attachment |
 | [PostgreSQL Flexible Server](./modules/azurerm_postgresql_flexible_server/) | ✅ Completed | [PGFSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSv1.0.0) | Azure PostgreSQL Flexible Server Terraform module with enterprise-grade features |
 | [PostgreSQL Flexible Server Database](./modules/azurerm_postgresql_flexible_server_database/) | ✅ Completed | [PGFSDBv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSDBv1.0.0) | PostgreSQL Flexible Server Database module for managing databases on an existing server |
+| [Redis Cache](./modules/azurerm_redis_cache/) | 🧪 Development | vUnreleased | Azure Redis Cache module with patch schedules, firewall rules, linked servers, and diagnostic settings |
 | [Subnet](./modules/azurerm_subnet/) | ✅ Completed | [SNv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SNv1.1.0) | Azure Subnet Terraform module for managing subnets with service endpoints, delegations, network policies, and enterprise-grade security features |
 | [Virtual Network](./modules/azurerm_virtual_network/) | ✅ Completed | [VNv1.2.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/VNv1.2.0) | Azure Virtual Network Terraform module with advanced networking features |
 

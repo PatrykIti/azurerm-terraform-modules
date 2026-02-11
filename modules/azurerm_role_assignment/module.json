@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_role_assignment",
+  "title": "Role Assignment",
+  "commit_scope": "role-assignment",
+  "tag_prefix": "RAv",
+  "description": "Manages Azure RBAC role assignments"
+}

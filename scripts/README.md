@@ -6,6 +6,14 @@ chyba ze opis mowi inaczej.
 
 ## Top-level scripts
 
+### scripts/check-tasks.sh
+Cel: waliduje numeracje taskow w `docs/_TASKS` oraz spojnosc mapy taskow w README.  
+Uruchomienie:
+```bash
+./scripts/check-tasks.sh
+```
+Wymagania: `python3` w PATH.
+
 ### scripts/check-terraform-docs.sh
 Cel: sprawdza, czy sekcja terraform-docs w README danego modulu jest aktualna.  
 Uruchomienie:

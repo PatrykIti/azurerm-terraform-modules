@@ -43,10 +43,17 @@ resource "azurerm_postgresql_flexible_server" "postgresql_flexible_server" {
   }
 
   dynamic "high_availability" {
-    for_each = var.server.high_availability != null ? [var.server.high_availability] : []
+    for_each = var.server.high_availability != null && var.server.high_availability.standby_availability_zone != null ? [var.server.high_availability] : []
     content {
       mode                      = high_availability.value.mode
       standby_availability_zone = high_availability.value.standby_availability_zone
+    }
+  }
+
+  dynamic "high_availability" {
+    for_each = var.server.high_availability != null && var.server.high_availability.standby_availability_zone == null ? [var.server.high_availability] : []
+    content {
+      mode = high_availability.value.mode
     }
   }
 

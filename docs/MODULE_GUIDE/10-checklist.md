@@ -10,13 +10,34 @@ Before submitting a pull request for a new module, please review this checklist 
 - [ ] `variables.tf` is complete with descriptions and validation for all variables.
 - [ ] `main.tf` contains the core module logic.
 - [ ] `outputs.tf` provides clear, described outputs for all relevant resources.
-- [ ] `locals` are used for computed values or complex logic (in `main.tf` or `locals.tf`, if applicable).
+- [ ] `locals` are used only when needed (shared computed values, reused expressions, or readability for complex transformations).
 
 ## Configuration
 
 - [ ] `module.json` is created and correctly populated (`name`, `title`, `commit_scope`, `tag_prefix`).
 - [ ] `.releaserc.js` is present and copied from a reference module.
 - [ ] `.terraform-docs.yml` is configured to generate the `README.md`.
+
+## Logic Placement and Input Model
+
+- [ ] Input-only rules are enforced first in `variables.tf` validation blocks (type, enum, format, range, simple cross-field inside one variable object).
+- [ ] `lifecycle.precondition` is used only when validation cannot be expressed in `variables.tf` (resource-level semantics, cross-resource relations, apply-time constraints).
+- [ ] Trivial one-use `locals` are avoided; keep logic close to source unless extraction clearly improves reuse/readability.
+- [ ] Complex inline expressions in resource arguments are extracted into named `locals` for maintainability.
+- [ ] `variables.tf` groups related settings into logical objects (for example `network`, `identity`, `diagnostic_settings`, `timeouts`) where it improves consumption ergonomics.
+- [ ] Variable grouping does not hide provider capabilities: grouped objects still expose full supported `PRIMARY_RESOURCE` schema or document intentional omissions.
+
+## Diagnostic Settings Pattern
+
+- [ ] If module supports diagnostics, it uses explicit `diagnostic_settings` input (no hidden discovery behavior).
+- [ ] Module does **not** use `azurerm_monitor_diagnostic_categories` data source to infer categories at runtime.
+- [ ] Allowed `log_categories`, `log_category_groups`, and `metric_categories` are validated in `variables.tf` against pinned provider/resource support (for example `azurerm` `4.57.0`).
+- [ ] `variables.tf` enforces that each diagnostic setting contains at least one enabled category/group.
+- [ ] `variables.tf` enforces destination semantics (`log_analytics_workspace_id`, `storage_account_id`, `eventhub_authorization_rule_id`, `partner_solution_id`) and rejects empty-string values.
+- [ ] `diagnostics.tf` uses minimal `for_each` filtering to skip empty-category entries instead of complex `locals` orchestration.
+- [ ] Diagnostic validation logic is not duplicated in `locals` or `precondition` when it can be fully enforced in `variables.tf`.
+- [ ] Examples and unit tests include both valid and invalid diagnostic category cases.
+- [ ] Module docs clearly state that callers must provide supported diagnostic categories for the target resource.
 
 ## Documentation
 
@@ -58,6 +79,16 @@ Before submitting a pull request for a new module, please review this checklist 
 - [ ] No hardcoded secrets or sensitive data are present.
 - [ ] Variables and resources use clear, consistent naming.
 - [ ] Commit messages follow the [Conventional Commits](https://www.conventionalcommits.org/) standard with the correct scope (e.g., `feat(scope): ...`).
+
+## Scope and Coverage Gate
+
+- [ ] Run the mandatory status gate: [Scope and Provider Coverage Status Check](./11-scope-and-provider-coverage-status-check.md).
+- [ ] Confirm module atomic scope is preserved (no unrelated or dedicated-module resources included).
+- [ ] Confirm full `PRIMARY_RESOURCE` schema coverage for pinned provider version (for example `azurerm` `4.57.0`) or documented intentional omissions.
+- [ ] Confirm provider capability coverage matrix is produced with explicit rationale for omissions.
+- [ ] Apply naming/provider-alignment addendum when `AUDIT_ONLY` or `FULL_RENAME` naming work is involved.
+- [ ] Apply Go tests + fixtures addendum for Terratest modules.
+- [ ] Overall status is not `RED` before PR.
 
 ## CI/CD Integration
 
