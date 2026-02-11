@@ -27,7 +27,7 @@ resource "azurerm_service_plan" "example" {
 }
 
 module "linux_function_app" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_linux_function_app?ref=LFUNCv1.0.0"
 
   name                = "funcauthv2example001"
   resource_group_name = azurerm_resource_group.example.name

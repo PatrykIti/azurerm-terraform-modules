@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Linux Function App](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=LFUNCv*&label=Linux%20Function%20App&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LFUNCv1.0.0)
 [![Event Hub Namespace](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=EHNSv*&label=Event%20Hub%20Namespace&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/EHNSv1.0.0)
 [![Event Hub](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=EHv*&label=Event%20Hub&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/EHv1.0.0)
 [![Cognitive Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=COGv*&label=Cognitive%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/COGv1.0.0)
@@ -120,7 +121,7 @@ module "storage_account" {
 | [Application Insights Workbook](./modules/azurerm_application_insights_workbook/) | ✅ Completed | [AIWBv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AIWBv1.0.0) | Azure Application Insights Workbook module |
 | [Key Vault](./modules/azurerm_key_vault/) | 🧪 Development | vUnreleased | Azure Key Vault module with data-plane resources and diagnostic settings |
 | [Log Analytics Workspace](./modules/azurerm_log_analytics_workspace/) | ✅ Completed | [LAWv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LAWv1.0.0) | Azure Log Analytics Workspace module with workspace-linked sub-resources and diagnostics |
-| [Linux Function App](./modules/azurerm_linux_function_app/) | 🧪 Development | vUnreleased | Azure Linux Function App module with slots and diagnostic settings |
+| [Linux Function App](./modules/azurerm_linux_function_app/) | ✅ Completed | [LFUNCv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LFUNCv1.0.0) | Azure Linux Function App module with slots and diagnostic settings |
 | [Windows Function App](./modules/azurerm_windows_function_app/) | 🧪 Development | vUnreleased | Azure Windows Function App module with slots and diagnostic settings |
 | [Linux Virtual Machine](./modules/azurerm_linux_virtual_machine/) | 🧪 Development | vUnreleased | Azure Linux Virtual Machine module with extensions and diagnostic settings |
 | [Monitor Data Collection Endpoint](./modules/azurerm_monitor_data_collection_endpoint/) | ✅ Completed | [DCEv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCEv1.0.0) | Azure Monitor Data Collection Endpoint module for configuring ingestion endpoints |
