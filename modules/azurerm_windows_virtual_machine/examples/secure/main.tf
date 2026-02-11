@@ -85,7 +85,7 @@ resource "azurerm_network_interface_security_group_association" "example" {
 }
 
 module "windows_virtual_machine" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_windows_virtual_machine?ref=WINDOWSVMv1.0.0"
 
   name                = "winvm-secure-01"
   resource_group_name = azurerm_resource_group.example.name

@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Windows Virtual Machine](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=WINDOWSVMv*&label=Windows%20Virtual%20Machine&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/WINDOWSVMv1.0.0)
 [![Windows Function App](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=WFUNCv*&label=Windows%20Function%20App&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/WFUNCv1.0.0)
 [![User Assigned Identity](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=UAIv*&label=User%20Assigned%20Identity&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/UAIv1.0.0)
 [![Role Definition](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=RDv*&label=Role%20Definition&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RDv1.0.0)
@@ -119,7 +120,7 @@ module "storage_account" {
 | [Event Hub Namespace](./modules/azurerm_eventhub_namespace/) | ✅ Completed | [EHNSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/EHNSv1.0.0) | Azure Event Hub Namespace module with auth rules, network rules, CMK, and diagnostics |
 | [Kubernetes Cluster](./modules/azurerm_kubernetes_cluster/) | ✅ Completed | [AKSv2.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv2.1.0) | Azure Kubernetes Service (AKS) Terraform module for managing clusters with node pools, addons, and enterprise-grade security features |
 | [Kubernetes Secrets](./modules/azurerm_kubernetes_secrets/) | ✅ Completed | [AKSSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSSv1.0.0) | Azure Kubernetes Secrets Terraform module with enterprise-grade features |
-| [Windows Virtual Machine](./modules/azurerm_windows_virtual_machine/) | 🧪 Development | vUnreleased | Azure Windows Virtual Machine module with managed data disks, extensions, and diagnostic settings |
+| [Windows Virtual Machine](./modules/azurerm_windows_virtual_machine/) | ✅ Completed | [WINDOWSVMv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/WINDOWSVMv1.0.0) | Azure Windows Virtual Machine module with managed data disks, extensions, and diagnostic settings |
 | [Network Security Group](./modules/azurerm_network_security_group/) | ✅ Completed | [NSGv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/NSGv1.1.0) | Manages Azure Network Security Groups with comprehensive security rules configuration |
 | [Route Table](./modules/azurerm_route_table/) | ✅ Completed | [RTv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.1.0) | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
 | [Role Assignment](./modules/azurerm_role_assignment/) | ✅ Completed | [RAv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RAv1.0.0) | Manages Azure RBAC role assignments |
