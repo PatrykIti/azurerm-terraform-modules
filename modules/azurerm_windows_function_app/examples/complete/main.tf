@@ -40,7 +40,7 @@ resource "azurerm_application_insights" "example" {
 }
 
 module "windows_function_app" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_windows_function_app?ref=WFUNCv1.0.0"
 
   name                = "wfunccomplete001"
   resource_group_name = azurerm_resource_group.example.name
