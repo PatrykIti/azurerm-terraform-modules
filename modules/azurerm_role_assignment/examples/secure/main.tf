@@ -45,7 +45,7 @@ module "role_definition" {
 }
 
 module "role_assignment" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_role_assignment?ref=RAv1.0.0"
 
   scope              = azurerm_resource_group.example.id
   role_definition_id = module.role_definition.role_definition_id

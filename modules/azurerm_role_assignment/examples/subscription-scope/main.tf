@@ -27,7 +27,7 @@ resource "azurerm_user_assigned_identity" "example" {
 }
 
 module "role_assignment" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_role_assignment?ref=RAv1.0.0"
 
   scope                = data.azurerm_subscription.current.id
   role_definition_name = "Reader"

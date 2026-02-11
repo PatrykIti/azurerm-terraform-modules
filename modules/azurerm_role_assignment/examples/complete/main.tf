@@ -33,7 +33,7 @@ resource "azurerm_storage_account" "example" {
 }
 
 module "role_assignment" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_role_assignment?ref=RAv1.0.0"
 
   name                             = var.role_assignment_name
   scope                            = azurerm_storage_account.example.id
