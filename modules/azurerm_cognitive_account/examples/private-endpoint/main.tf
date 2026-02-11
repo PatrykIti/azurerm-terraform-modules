@@ -34,7 +34,7 @@ resource "azurerm_subnet" "private_endpoint" {
 }
 
 module "cognitive_account" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_cognitive_account?ref=COGv1.0.0"
 
   name                = var.account_name
   resource_group_name = azurerm_resource_group.example.name
