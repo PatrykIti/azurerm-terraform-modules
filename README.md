@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![AI Services](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AISv*&label=AI%20Services&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AISv1.0.0)
 [![Monitor Private Link Scope](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AMPLSv*&label=Monitor%20Private%20Link%20Scope&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AMPLSv1.0.0)
 [![Private Endpoint](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PEv*&label=Private%20Endpoint&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PEv1.0.0)
 [![Monitor Data Collection Rule](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=DCRv*&label=Monitor%20Data%20Collection%20Rule&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCRv1.0.0)
@@ -99,7 +100,7 @@ module "storage_account" {
 
 | Module | Status | Version | Description |
 |--------|--------|---------|-------------|
-| [AI Services](./modules/azurerm_ai_services/) | 🧪 Development | vUnreleased | Azure AI Services module with identity, CMK, network ACLs, and diagnostics support |
+| [AI Services](./modules/azurerm_ai_services/) | ✅ Completed | [AISv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AISv1.0.0) | Azure AI Services module with identity, CMK, network ACLs, and diagnostics support |
 | [Cognitive Account](./modules/azurerm_cognitive_account/) | 🧪 Development | vUnreleased | Azure Cognitive Services account module for OpenAI, Language, and Speech workloads |
 | [Event Hub](./modules/azurerm_eventhub/) | 🧪 Development | vUnreleased | Azure Event Hub module with capture, consumer groups, and authorization rules |
 | [Event Hub Namespace](./modules/azurerm_eventhub_namespace/) | 🧪 Development | vUnreleased | Azure Event Hub Namespace module with auth rules, network rules, CMK, and diagnostics |

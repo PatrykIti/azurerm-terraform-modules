@@ -85,7 +85,7 @@ resource "azurerm_subnet" "private_endpoints" {
 }
 
 module "ai_services" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_ai_services?ref=AISv1.0.0"
 
   name                  = var.ai_services_name
   resource_group_name   = azurerm_resource_group.example.name
