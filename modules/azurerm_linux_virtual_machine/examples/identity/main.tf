@@ -71,7 +71,7 @@ resource "tls_private_key" "example" {
 }
 
 module "linux_virtual_machine" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_linux_virtual_machine?ref=LINUXVMv1.0.0"
 
   name                = "linuxvm-identity-01"
   resource_group_name = azurerm_resource_group.example.name
