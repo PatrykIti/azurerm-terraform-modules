@@ -19,7 +19,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "application_insights" {
-  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_application_insights?ref=APPINSv1.0.0"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_application_insights?ref=APPINSv1.1.0"
 
   name                = var.application_insights_name
   resource_group_name = azurerm_resource_group.example.name
