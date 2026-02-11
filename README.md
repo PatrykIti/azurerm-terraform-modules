@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Redis Cache](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=REDISv*&label=Redis%20Cache&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/REDISv1.0.0)
 [![Private Endpoint](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PEv*&label=Private%20Endpoint&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PEv1.0.0)
 [![Private DNS Zone Virtual Network Link](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PDNSZLNKv*&label=Private%20DNS%20Zone%20Virtual%20Network%20Link&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PDNSZLNKv1.0.0)
 [![Private DNS Zone](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PDNSZv*&label=Private%20DNS%20Zone&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PDNSZv1.0.0)
@@ -135,7 +136,7 @@ module "storage_account" {
 | [Private Endpoint](./modules/azurerm_private_endpoint/) | ✅ Completed | [PEv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PEv1.0.0) | Manages Azure Private Endpoints with optional DNS zone group attachment |
 | [PostgreSQL Flexible Server](./modules/azurerm_postgresql_flexible_server/) | ✅ Completed | [PGFSv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSv1.0.0) | Azure PostgreSQL Flexible Server Terraform module with enterprise-grade features |
 | [PostgreSQL Flexible Server Database](./modules/azurerm_postgresql_flexible_server_database/) | ✅ Completed | [PGFSDBv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSDBv1.0.0) | PostgreSQL Flexible Server Database module for managing databases on an existing server |
-| [Redis Cache](./modules/azurerm_redis_cache/) | 🧪 Development | vUnreleased | Azure Redis Cache module with patch schedules, firewall rules, linked servers, and diagnostic settings |
+| [Redis Cache](./modules/azurerm_redis_cache/) | ✅ Completed | [REDISv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/REDISv1.0.0) | Azure Redis Cache module with patch schedules, firewall rules, linked servers, and diagnostic settings |
 | [Subnet](./modules/azurerm_subnet/) | ✅ Completed | [SNv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SNv1.1.0) | Azure Subnet Terraform module for managing subnets with service endpoints, delegations, network policies, and enterprise-grade security features |
 | [Virtual Network](./modules/azurerm_virtual_network/) | ✅ Completed | [VNv1.2.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/VNv1.2.0) | Azure Virtual Network Terraform module with advanced networking features |
 

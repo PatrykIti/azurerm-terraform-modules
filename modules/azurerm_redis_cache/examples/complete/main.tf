@@ -35,7 +35,7 @@ resource "azurerm_storage_account" "example" {
 }
 
 module "redis_cache" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_redis_cache?ref=REDISv1.0.0"
 
   name                = var.redis_cache_name
   resource_group_name = azurerm_resource_group.example.name

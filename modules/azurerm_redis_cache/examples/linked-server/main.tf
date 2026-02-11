@@ -19,7 +19,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "redis_secondary" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_redis_cache?ref=REDISv1.0.0"
 
   name                = var.secondary_cache_name
   resource_group_name = azurerm_resource_group.example.name
@@ -36,7 +36,7 @@ module "redis_secondary" {
 }
 
 module "redis_primary" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_redis_cache?ref=REDISv1.0.0"
 
   name                = var.primary_cache_name
   resource_group_name = azurerm_resource_group.example.name
