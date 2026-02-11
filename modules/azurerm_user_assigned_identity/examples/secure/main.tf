@@ -8,7 +8,7 @@ resource "azurerm_resource_group" "example" {
 }
 
 module "user_assigned_identity" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_user_assigned_identity?ref=UAIv1.0.0"
 
   name                = "uai-secure-example"
   resource_group_name = azurerm_resource_group.example.name

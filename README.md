@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![User Assigned Identity](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=UAIv*&label=User%20Assigned%20Identity&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/UAIv1.0.0)
 [![Role Definition](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=RDv*&label=Role%20Definition&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RDv1.0.0)
 [![Role Assignment](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=RAv*&label=Role%20Assignment&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RAv1.0.0)
 [![Redis Cache](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=REDISv*&label=Redis%20Cache&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/REDISv1.0.0)
