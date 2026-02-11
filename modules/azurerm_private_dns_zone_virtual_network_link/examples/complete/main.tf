@@ -20,7 +20,7 @@ resource "azurerm_private_dns_zone" "example" {
 }
 
 module "private_dns_zone_virtual_network_link" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_private_dns_zone_virtual_network_link?ref=PDNSZLNKv1.0.0"
 
   name                  = "pdns-link-complete"
   resource_group_name   = azurerm_resource_group.example.name
