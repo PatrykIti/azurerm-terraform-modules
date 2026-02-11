@@ -49,7 +49,7 @@ resource "azurerm_storage_container" "capture" {
 }
 
 module "eventhub" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_eventhub?ref=EHv1.0.0"
 
   name              = var.eventhub_name
   namespace_id      = module.eventhub_namespace.id
