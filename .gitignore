@@ -112,7 +112,6 @@ secrets.tf
 secrets.tfvars
 terraform.tfvars
 terraform.tfvars.json
-!/modules/azurerm_key_vault/secrets.tf
 
 # Ignore local testing directories
 examples/**/terraform.tfstate*
