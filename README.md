@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Log Analytics Workspace](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=LAWv*&label=Log%20Analytics%20Workspace&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LAWv1.1.0)
 [![PostgreSQL Flexible Server](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=PGFSv*&label=PostgreSQL%20Flexible%20Server&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/PGFSv1.1.0)
 [![Application Insights](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=APPINSv*&label=Application%20Insights&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.1.0)
 [![Windows Virtual Machine](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=WINDOWSVMv*&label=Windows%20Virtual%20Machine&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/WINDOWSVMv1.0.0)
@@ -28,7 +29,6 @@
 [![Monitor Private Link Scope](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AMPLSv*&label=Monitor%20Private%20Link%20Scope&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AMPLSv1.0.0)
 [![Monitor Data Collection Rule](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=DCRv*&label=Monitor%20Data%20Collection%20Rule&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCRv1.0.0)
 [![Monitor Data Collection Endpoint](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=DCEv*&label=Monitor%20Data%20Collection%20Endpoint&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCEv1.0.0)
-[![Log Analytics Workspace](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=LAWv*&label=Log%20Analytics%20Workspace&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LAWv1.0.0)
 [![Key Vault](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=KVv*&label=Key%20Vault&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/KVv1.0.0)
 [![Kubernetes Cluster](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AKSv*&label=Kubernetes%20Cluster&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AKSv2.1.0)
 [![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv2.1.0)
@@ -129,7 +129,7 @@ module "storage_account" {
 | [Application Insights](./modules/azurerm_application_insights/) | ✅ Completed | [APPINSv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.1.0) | Azure Application Insights module with diagnostics, web tests, and smart detection rules |
 | [Application Insights Workbook](./modules/azurerm_application_insights_workbook/) | ✅ Completed | [AIWBv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AIWBv1.0.0) | Azure Application Insights Workbook module |
 | [Key Vault](./modules/azurerm_key_vault/) | 🧪 Development | vUnreleased | Azure Key Vault module with data-plane resources and diagnostic settings |
-| [Log Analytics Workspace](./modules/azurerm_log_analytics_workspace/) | ✅ Completed | [LAWv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LAWv1.0.0) | Azure Log Analytics Workspace module with workspace-linked sub-resources and diagnostics |
+| [Log Analytics Workspace](./modules/azurerm_log_analytics_workspace/) | ✅ Completed | [LAWv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LAWv1.1.0) | Azure Log Analytics Workspace module with workspace-linked sub-resources and diagnostics |
 | [Linux Function App](./modules/azurerm_linux_function_app/) | ✅ Completed | [LFUNCv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LFUNCv1.0.0) | Azure Linux Function App module with slots and diagnostic settings |
 | [Windows Function App](./modules/azurerm_windows_function_app/) | ✅ Completed | [WFUNCv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/WFUNCv1.0.0) | Azure Windows Function App module with slots and diagnostic settings |
 | [Linux Virtual Machine](./modules/azurerm_linux_virtual_machine/) | ✅ Completed | [LINUXVMv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LINUXVMv1.0.0) | Azure Linux Virtual Machine module with extensions and diagnostic settings |

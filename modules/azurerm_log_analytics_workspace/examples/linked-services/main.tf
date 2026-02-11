@@ -26,7 +26,7 @@ resource "azurerm_automation_account" "example" {
 }
 
 module "log_analytics_workspace" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_log_analytics_workspace?ref=LAWv1.1.0"
 
   name                = var.workspace_name
   resource_group_name = azurerm_resource_group.example.name
