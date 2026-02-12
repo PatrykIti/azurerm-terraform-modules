@@ -15,6 +15,7 @@ This directory contains all Terraform modules published from this repository. Ea
 | [Event Hub Namespace](./azurerm_eventhub_namespace/) (`azurerm_eventhub_namespace`) | `EHNSv` | Azure Event Hub Namespace module with auth rules, network rules, CMK, and diagnostics |
 | [Application Insights](./azurerm_application_insights/) (`azurerm_application_insights`) | `APPINSv` | Azure Application Insights module with diagnostics, web tests, and smart detection rules |
 | [Application Insights Workbook](./azurerm_application_insights_workbook/) (`azurerm_application_insights_workbook`) | `AIWBv` | Azure Application Insights Workbook module |
+| [Bastion Host](./azurerm_bastion_host/) (`azurerm_bastion_host`) | `BASTIONv` | Azure Bastion Host module with diagnostic settings support |
 | [Key Vault](./azurerm_key_vault/) (`azurerm_key_vault`) | `KVv` | Azure Key Vault module with data-plane resources and diagnostic settings |
 | [Log Analytics Workspace](./azurerm_log_analytics_workspace/) (`azurerm_log_analytics_workspace`) | `LAWv` | Azure Log Analytics Workspace module with workspace-linked sub-resources and diagnostics |
 | [Linux Function App](./azurerm_linux_function_app/) (`azurerm_linux_function_app`) | `LFUNCv` | Azure Linux Function App module with slots and diagnostic settings |
@@ -33,6 +34,7 @@ This directory contains all Terraform modules published from this repository. Ea
 | [Role Assignment](./azurerm_role_assignment/) (`azurerm_role_assignment`) | `RAv` | Manages Azure RBAC role assignments |
 | [Role Definition](./azurerm_role_definition/) (`azurerm_role_definition`) | `RDv` | Manages custom Azure RBAC role definitions |
 | [Storage Account](./azurerm_storage_account/) (`azurerm_storage_account`) | `SAv` | Azure Storage Account Terraform module with enterprise-grade security features |
+| [User Assigned Identity](./azurerm_user_assigned_identity/) (`azurerm_user_assigned_identity`) | `UAIv` | Azure User Assigned Identity module with federated identity credential support |
 | [Monitor Private Link Scope](./azurerm_monitor_private_link_scope/) (`azurerm_monitor_private_link_scope`) | `AMPLSv` | Azure Monitor Private Link Scope module with scoped services and diagnostic settings |
 | [Private DNS Zone](./azurerm_private_dns_zone/) (`azurerm_private_dns_zone`) | `PDNSZv` | Manages Azure Private DNS Zones |
 | [Private DNS Zone Virtual Network Link](./azurerm_private_dns_zone_virtual_network_link/) (`azurerm_private_dns_zone_virtual_network_link`) | `PDNSZLNKv` | Manages Azure Private DNS Zone Virtual Network Links |
