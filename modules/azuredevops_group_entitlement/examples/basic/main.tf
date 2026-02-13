@@ -11,12 +11,12 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_group_entitlement" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_group_entitlement?ref=ADOGEv1.0.0"
+  source = "../../"
 
   group_entitlement = {
     key                  = "example-basic-group"
     display_name         = var.group_display_name
-    account_license_type = "basic"
+    account_license_type = "express"
     licensing_source     = "account"
   }
 }

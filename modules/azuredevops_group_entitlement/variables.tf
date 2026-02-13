@@ -49,9 +49,8 @@ variable "group_entitlement" {
       "none",
       "professional",
       "stakeholder",
-      "basic"
     ], var.group_entitlement.account_license_type)
-    error_message = "group_entitlement.account_license_type must be one of: advanced, earlyAdopter, express, none, professional, stakeholder, basic."
+    error_message = "group_entitlement.account_license_type must be one of: advanced, earlyAdopter, express, none, professional, stakeholder."
   }
 
   validation {

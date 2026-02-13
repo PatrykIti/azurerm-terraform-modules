@@ -25,7 +25,7 @@ module "azuredevops_group_entitlement" {
   group_entitlement = {
     key                  = "platform-group"
     display_name         = "ADO Platform Team"
-    account_license_type = "basic"
+    account_license_type = "express"
     licensing_source     = "account"
   }
 }

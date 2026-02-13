@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_elastic_pool" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_elastic_pool?ref=ADOEPv1.0.0"
+  source = "../../"
 
   name                   = var.elastic_pool_name
   service_endpoint_id    = var.service_endpoint_id

@@ -16,7 +16,7 @@ module "azuredevops_group_entitlement" {
   group_entitlement = {
     key                  = "fixture-basic-group"
     display_name         = var.group_display_name
-    account_license_type = "basic"
+    account_license_type = "express"
     licensing_source     = "account"
   }
 }

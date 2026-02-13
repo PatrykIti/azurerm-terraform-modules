@@ -13,7 +13,7 @@ variables {
   group_entitlement = {
     key                  = "platform-group"
     display_name         = "ADO Platform Team"
-    account_license_type = "basic"
+    account_license_type = "express"
     licensing_source     = "account"
   }
 }
@@ -27,7 +27,7 @@ run "group_entitlement_plan" {
   }
 
   assert {
-    condition     = azuredevops_group_entitlement.group_entitlement.account_license_type == "basic"
+    condition     = azuredevops_group_entitlement.group_entitlement.account_license_type == "express"
     error_message = "account_license_type should match provided value."
   }
 }
