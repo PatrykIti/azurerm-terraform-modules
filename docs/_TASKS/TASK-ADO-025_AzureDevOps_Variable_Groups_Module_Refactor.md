@@ -1,7 +1,7 @@
 # TASK-ADO-025: Azure DevOps Variable Groups Module Refactor
 # FileName: TASK-ADO-025_AzureDevOps_Variable_Groups_Module_Refactor.md
 
-**Priority:** 🟡 Medium
+**Priority:** 🔴 High
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-039, TASK-ADO-041
@@ -11,26 +11,22 @@
 
 ## Overview
 
-`modules/azuredevops_variable_groups` already follows the single-variable-group model with stable permission keys.
-This re-open tracks residual validation hardening, release/tag normalization, and formal compliance closure.
+`modules/azuredevops_variable_groups` still mixes atomic scopes and requires strict boundary alignment.
 
-## Current State (Already Aligned)
+## Mandatory Rule (Atomic Boundary)
 
-- Main `azuredevops_variable_group` is single-instance with flat inputs.
-- `key_vault` is modeled as a single optional object.
-- Permissions use stable keys (`coalesce(key, principal)`).
-- Single outputs (`variable_group_id`, `variable_group_name`) are present.
-- `docs/IMPORT.md` exists.
+- Primary resource in a module must be single and non-iterated (`no for_each`, `no count` on primary block).
+- Additional resources may remain only when they are strict children of that primary resource.
+- Strict child means direct dependency on module-managed primary resource and no external-ID fallback.
+- If a resource can operate without module primary resource (for example via external `*_id` input), it must be moved to a separate atomic module.
+- Multiplicity belongs in consumer configuration via module-level `for_each`.
 
-## Remaining Gaps
+## Current Gaps
 
-- Permission validation hardening is incomplete:
-  - no explicit validation that permission maps are non-empty,
-  - no explicit validation that permission values are limited to `Allow|Deny|NotSet`.
-- Release/tag mismatch remains:
-  - `module.json` prefix is `ADOVGv`, while root docs link `ADOVG1.0.0`.
-  - Example refs use `ADOVGv1.0.0`, which is currently missing as a git tag.
-- Final closure artifacts are missing (scope/coverage status report and matrix).
+- `azuredevops_library_permissions` is independent from `azuredevops_variable_group` and should be split.
+- `azuredevops_variable_group_permissions` accepts external `variable_group_id` fallback, so it is not strict-child only.
+- Existing validation hardening still needs completion for permissions map semantics.
+- Release references still require `ADOVGv*` normalization (`TASK-ADO-039`).
 
 ## Scope
 
@@ -42,26 +38,30 @@ This re-open tracks residual validation hardening, release/tag normalization, an
 ## Docs to Update
 
 - `modules/azuredevops_variable_groups/README.md`
+- `modules/azuredevops_variable_groups/docs/README.md`
 - `README.md`
 - `docs/_TASKS/README.md`
 
 ## Work Items
 
-- **Validation hardening:** add permission map non-empty + allowed-value validations for `variable_group_permissions` and `library_permissions`.
-- **Test updates:** add negative unit/integration coverage for invalid permission maps/values.
-- **Release normalization:** align this module with `TASK-ADO-039` (`ADOVGv*` tags and refs).
-- **Compliance closure:** add scope/coverage status summary + matrix.
+- **Atomic split:** move `library_permissions` to dedicated atomic module.
+- **Strict-child cleanup:** either remove external `variable_group_id` fallback from this module or split variable-group permissions to dedicated module.
+- **Validation hardening:** enforce non-empty permissions maps and allowed values.
+- **Tests/examples:** update for new composition pattern and negative validation coverage.
+- **Release normalization:** align tags and links with `ADOVGv*` (`TASK-ADO-039`).
 
 ## Acceptance Criteria
 
-- Permissions are explicitly validated for non-empty map and allowed status values.
-- Tests cover negative permission-value and empty-permissions scenarios.
-- Docs/examples point to existing `ADOVGv*` release tags.
-- Closure report is attached and no High findings remain.
+- No independent permissions scope remains in this module.
+- Any retained permission resource is strict-child only.
+- Permissions validation is explicit and covered by negative tests.
+- Examples show composition for split permission modules.
+- Docs reference existing `ADOVGv*` release tags.
 
 ## Implementation Checklist
 
-- [ ] Add missing permission validations in `variables.tf`.
-- [ ] Extend tests for permission validation paths.
-- [ ] Publish/confirm `ADOVGv*` release and update references.
-- [ ] Add final status report + coverage matrix.
+- [ ] Split `library_permissions` into dedicated module.
+- [ ] Remove fallback-based non-child behavior from retained resources.
+- [ ] Add/verify permissions map validations and tests.
+- [ ] Update examples/docs for composition model.
+- [ ] Publish/confirm `ADOVGv*` release and fix references.

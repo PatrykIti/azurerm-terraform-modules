@@ -1,7 +1,7 @@
 # TASK-ADO-027: Azure DevOps Team Module Refactor
 # FileName: TASK-ADO-027_AzureDevOps_Team_Module_Refactor.md
 
-**Priority:** 🟡 Medium
+**Priority:** 🔴 High
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-039, TASK-ADO-041
@@ -11,25 +11,22 @@
 
 ## Overview
 
-`modules/azuredevops_team` already implements single-team model with stable membership/admin keys.
-This re-open focuses on release/tag normalization and final audit closure.
+`modules/azuredevops_team` requires strict atomic-boundary cleanup for memberships and administrators management.
 
-## Current State (Already Aligned)
+## Mandatory Rule (Atomic Boundary)
 
-- Single `azuredevops_team` resource with flat team inputs.
-- `team_members` and `team_administrators` use stable key maps.
-- Mode defaults and allowed-value validations are implemented.
-- Stable output maps are present.
-- `docs/IMPORT.md` exists.
+- Primary resource in a module must be single and non-iterated (`no for_each`, `no count` on primary block).
+- Additional resources may remain only when they are strict children of that primary resource.
+- Strict child means direct dependency on module-managed primary resource and no external-ID fallback.
+- If a resource can operate without module primary resource (for example via external `*_id` input), it must be moved to a separate atomic module.
+- Multiplicity belongs in consumer configuration via module-level `for_each`.
 
-## Remaining Gaps
+## Current Gaps
 
-- Release/tag mismatch remains:
-  - `module.json` prefix is `ADOTv`, while root docs link `ADOT1.0.0`.
-  - Example refs use `ADOTv1.0.0`, which is currently missing as a git tag.
-- Final closure artifact is missing:
-  - need attached status report and capability matrix for this module.
-- Minor test-harness consistency checks should be aligned with ADO baseline (`TASK-ADO-041`) before closure.
+- `azuredevops_team_members` can target external `team_id`, so it is not strict-child only.
+- `azuredevops_team_administrators` can target external `team_id`, so it is not strict-child only.
+- Current module mixes team creation with reusable membership/administration scopes.
+- Release references still require `ADOTv*` normalization (`TASK-ADO-039`).
 
 ## Scope
 
@@ -41,25 +38,28 @@ This re-open focuses on release/tag normalization and final audit closure.
 ## Docs to Update
 
 - `modules/azuredevops_team/README.md`
+- `modules/azuredevops_team/docs/README.md`
 - `README.md`
 - `docs/_TASKS/README.md`
 
 ## Work Items
 
-- **Release normalization:** align to `TASK-ADO-039` and publish/point to existing `ADOTv*` tag.
-- **Examples/docs alignment:** ensure all source refs and version links use existing `ADOTv*` release tag.
-- **Closure report:** attach scope/provider/overall status and concise matrix.
-- **Test consistency:** verify no remaining harness drift relative to common ADO test baseline.
+- **Atomic split:** move team membership/admin scopes to dedicated modules, or make them strict-child-only without external `team_id` support.
+- **Scope decision:** pick one model and enforce it in variables, implementation, docs, and tests.
+- **Migration path:** document breaking changes for consumers relying on external team targeting.
+- **Tests/examples:** update to composition pattern from consumer layer.
+- **Release normalization:** align tags and links with `ADOTv*` (`TASK-ADO-039`).
 
 ## Acceptance Criteria
 
-- Docs/examples reference existing `ADOTv*` release tag(s).
-- Compliance closure report is attached with no unresolved High findings.
-- Test harness is aligned with ADO baseline requirements.
+- Team module has one non-iterated primary resource and no non-child fallback behavior.
+- Membership/admin behavior is either strict-child only or moved to dedicated modules.
+- Examples and tests match selected atomic model.
+- Docs reference existing `ADOTv*` release tags.
 
 ## Implementation Checklist
 
-- [ ] Publish/confirm `ADOTv*` release and update references.
-- [ ] Verify and update example/source version refs.
-- [ ] Attach final scope/coverage status report.
-- [ ] Confirm test harness parity with baseline.
+- [ ] Decide split vs strict-child-only model for membership/admin.
+- [ ] Implement selected model and remove fallback-based non-child behavior.
+- [ ] Update examples/tests/docs and migration notes.
+- [ ] Publish/confirm `ADOTv*` release and fix references.

@@ -11,25 +11,22 @@
 
 ## Overview
 
-`modules/azuredevops_serviceendpoint` is already on the new single-endpoint-per-module model with one-of endpoint selection and stable permission keys.
-This re-open is for final hardening and release/compliance closure.
+`modules/azuredevops_serviceendpoint` is still non-compliant with strict atomic-module boundaries and requires decomposition.
 
-## Current State (Already Aligned)
+## Mandatory Rule (Atomic Boundary)
 
-- Single-endpoint model enforced by one-of selector across `serviceendpoint_*` inputs.
-- Stable-key permissions map and default target resolution are implemented.
-- Strong auth-mode validations and sensitive input handling are present.
-- Single outputs (`serviceendpoint_id`, `serviceendpoint_name`) are present.
-- `docs/IMPORT.md` exists.
+- Primary resource in a module must be single and non-iterated (`no for_each`, `no count` on primary block).
+- Additional resources may remain only when they are strict children of that primary resource.
+- Strict child means direct dependency on module-managed primary resource and no external-ID fallback.
+- If a resource can operate without module primary resource (for example via external `*_id` input), it must be moved to a separate atomic module.
+- Multiplicity belongs in consumer configuration via module-level `for_each`.
 
-## Remaining Gaps
+## Current Gaps
 
-- Release/tag mismatch remains for this module:
-  - `module.json` prefix is `ADOSEv`, but root docs point to legacy `ADOSE1.0.0`.
-  - Example refs use `ADOSEv1.0.0`, which is currently missing as a git tag.
-- Final coverage closure is missing:
-  - Need explicit capability coverage matrix for the broad endpoint/auth combinations against pinned provider version.
-- Test consistency should be aligned with common ADO harness baseline from `TASK-ADO-041`.
+- Module multiplexes many primary endpoint resources via `count`, which violates single-primary-resource rule.
+- Primary resource selection is driven by one-of input across many resource types instead of one atomic module per resource.
+- `azuredevops_serviceendpoint_permissions` supports external `serviceendpoint_id` fallback and is not strict-child only.
+- Release references still require `ADOSEv*` normalization (`TASK-ADO-039`).
 
 ## Scope
 
@@ -41,26 +38,30 @@ This re-open is for final hardening and release/compliance closure.
 ## Docs to Update
 
 - `modules/azuredevops_serviceendpoint/README.md`
+- `modules/azuredevops_serviceendpoint/docs/README.md`
 - `README.md`
 - `docs/_TASKS/README.md`
 
 ## Work Items
 
-- **Release normalization:** align to `TASK-ADO-039` and publish/point to existing `ADOSEv*` tag.
-- **Coverage closure:** produce and store provider capability matrix for supported endpoint/auth combinations.
-- **Test harness alignment:** ensure test/Makefile/script conventions match ADO baseline (`TASK-ADO-041`).
-- **Final status report:** add Scope/Provider/Overall status summary and residual-risk notes.
+- **Atomic decomposition:** split endpoint types into dedicated atomic modules (one primary provider resource per module).
+- **Permissions split:** move `serviceendpoint_permissions` to dedicated module or restrict it to strict-child-only behavior without external-ID fallback.
+- **Migration path:** define compatibility/migration guidance for existing consumers of the multiplexed module.
+- **Tests/examples:** update to composition pattern and verify parity for key endpoint types.
+- **Release normalization:** align tags and links with `ADOSEv*` (`TASK-ADO-039`).
 
 ## Acceptance Criteria
 
-- Docs and examples reference existing `ADOSEv*` release tag(s).
-- Coverage matrix for module scope exists and documents intentional omissions.
-- Test harness is consistent with repository ADO baseline.
-- Module closure report shows no unresolved High findings.
+- No module contains multiple primary serviceendpoint resource types.
+- Each resulting module has one non-iterated primary resource.
+- Permissions behavior is strict-child only or moved to dedicated module.
+- Examples demonstrate composition from consumer layer.
+- Docs reference existing `ADOSEv*` release tags.
 
 ## Implementation Checklist
 
-- [ ] Publish/confirm `ADOSEv*` release and update references.
-- [ ] Generate capability matrix + closure report.
-- [ ] Align tests/scripts to common ADO harness baseline.
-- [ ] Close task after evidence is attached in docs.
+- [ ] Design target module split map for endpoint types.
+- [ ] Implement split and migration guidance.
+- [ ] Isolate permissions behavior to strict-child or separate module.
+- [ ] Update tests/examples/docs for new structure.
+- [ ] Publish/confirm `ADOSEv*` release and fix references.

@@ -3,7 +3,7 @@
 
 **Priority:** 🔴 High
 **Category:** Azure DevOps Modules
-**Estimated Effort:** Medium
+**Estimated Effort:** Large
 **Dependencies:** TASK-ADO-039, TASK-ADO-041
 **Status:** 🟠 **Re-opened**
 
@@ -11,33 +11,29 @@
 
 ## Overview
 
-`modules/azuredevops_work_items` already has stable keys and expanded outputs.
-This re-open targets unresolved atomic-scope governance, release/tag normalization, and final compliance sign-off.
+`modules/azuredevops_work_items` is currently a composite module spanning multiple independent provider resource families and must be decomposed.
 
-## Current State (Already Aligned)
+## Mandatory Rule (Atomic Boundary)
 
-- `project_id` defaulting and project-scoped validation patterns are implemented.
-- Stable key maps are used for process/query/folder/permission resources.
-- Output coverage for folders/queries/permissions is present.
-- `docs/IMPORT.md` exists.
+- Primary resource in a module must be single and non-iterated (`no for_each`, `no count` on primary block).
+- Additional resources may remain only when they are strict children of that primary resource.
+- Strict child means direct dependency on module-managed primary resource and no external-ID fallback.
+- If a resource can operate without module primary resource (for example via external `*_id` input), it must be moved to a separate atomic module.
+- Multiplicity belongs in consumer configuration via module-level `for_each`.
 
-## Remaining Gaps
+## Current Gaps
 
-- Atomic-scope decision remains unresolved:
-  - module currently manages multiple resource families in one module (`workitem`, `process`, `query_folder`, `query`, and several permissions),
-  - needs explicit decision: keep composite scope (with documented rationale) or split into smaller atomic modules.
-- Release/tag mismatch remains:
-  - `module.json` prefix is `ADOWKv`, while root docs link `ADOWK1.0.0`.
-  - Example refs use `ADOWKv1.0.0`, which is currently missing as a git tag.
-- Closure artifact missing:
-  - no final scope/coverage matrix documenting intentional scope breadth and accepted tradeoffs.
+- Module contains multiple independent primary scopes (`workitem`, `process`, `query_folder`, `query`, and multiple permissions resources).
+- Several resources are iterable primaries in the same module (`for_each` on non-child families).
+- Query and permission resources can be managed independently from work item creation, violating atomic boundary.
+- Release references still require `ADOWKv*` normalization (`TASK-ADO-039`).
 
 ## Scope
 
 - Module: `modules/azuredevops_work_items/`
 - Examples: `modules/azuredevops_work_items/examples/*`
 - Tests: `modules/azuredevops_work_items/tests/*`
-- Docs: module README + scope narrative + root release/version references
+- Docs: module README + scope docs + root release/version references
 
 ## Docs to Update
 
@@ -48,22 +44,24 @@ This re-open targets unresolved atomic-scope governance, release/tag normalizati
 
 ## Work Items
 
-- **Scope governance:** decide and record whether current multi-resource scope is accepted or must be split.
-- **If split is required:** define migration plan and follow-up tasks for resource decomposition.
-- **If scope is retained:** document rationale and explicit boundaries in module docs and coverage matrix.
-- **Release normalization:** align with `TASK-ADO-039` (`ADOWKv*` tags and references).
-- **Final closure:** attach status report with scope/provider status and action plan.
+- **Atomic decomposition:** split module into resource-family modules (work item, process, query folders/queries, permissions families).
+- **Strict-child policy:** prevent cross-family fallback behavior inside a single module.
+- **Migration path:** document breaking changes and composition examples for consumers.
+- **Tests/examples:** rebuild tests and examples around composition of atomic modules.
+- **Release normalization:** align tags and links with `ADOWKv*` (`TASK-ADO-039`).
 
 ## Acceptance Criteria
 
-- Explicit decision exists for composite-scope vs split-model direction.
-- Module docs match the chosen scope model with no ambiguity.
-- Docs/examples reference existing `ADOWKv*` release tags.
-- Scope/coverage closure report is attached and approved.
+- No module spans multiple independent work-item resource families.
+- Each resulting module has one non-iterated primary resource.
+- Cross-family fallback linking is removed from module internals.
+- Examples and tests use composition in consumer layer.
+- Docs reference existing `ADOWKv*` release tags.
 
 ## Implementation Checklist
 
-- [ ] Record formal scope decision (retain or split).
-- [ ] Update docs and follow-up tasks according to decision.
-- [ ] Publish/confirm `ADOWKv*` release and update references.
-- [ ] Attach final status report + coverage matrix.
+- [ ] Define target split map for work-item resource families.
+- [ ] Implement decomposition with migration guidance.
+- [ ] Remove non-child fallback coupling.
+- [ ] Update tests/examples/docs to composition model.
+- [ ] Publish/confirm `ADOWKv*` release and fix references.

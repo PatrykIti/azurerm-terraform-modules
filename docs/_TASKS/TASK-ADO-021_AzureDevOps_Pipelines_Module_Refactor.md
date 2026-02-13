@@ -3,7 +3,7 @@
 
 **Priority:** 🔴 High
 **Category:** Azure DevOps Modules
-**Estimated Effort:** Medium
+**Estimated Effort:** Large
 **Dependencies:** TASK-ADO-039, TASK-ADO-041
 **Status:** 🟠 **Re-opened**
 
@@ -11,23 +11,23 @@
 
 ## Overview
 
-`modules/azuredevops_pipelines` was already refactored to a single main build definition with stable-key list resources.
-This re-open focuses on residual gaps: release/tag alignment, test harness consistency, and final compliance closure.
+`modules/azuredevops_pipelines` requires another refactor pass to satisfy strict atomic-module boundaries from AGENTS.md and module guide checks.
 
-## Current State (Already Aligned)
+## Mandatory Rule (Atomic Boundary)
 
-- Main `azuredevops_build_definition` is single-instance in-module.
-- List resources (`build_folders`, permissions, authorizations) use stable key maps.
-- Key uniqueness and cross-field validations are implemented.
-- `docs/IMPORT.md` exists.
+- Primary resource in a module must be single and non-iterated (`no for_each`, `no count` on primary block).
+- Additional resources may remain only when they are strict children of that primary resource.
+- Strict child means direct dependency on module-managed primary resource and no external-ID fallback.
+- If a resource can operate without module primary resource (for example via external `*_id` input), it must be moved to a separate atomic module.
+- Multiplicity belongs in consumer configuration via module-level `for_each`.
 
-## Remaining Gaps
+## Current Gaps
 
-- Release/tag mismatch remains for this module:
-  - `module.json` tag prefix is `ADOPIv`, but published release references in root docs still point to `ADOPI1.0.0`.
-  - Example refs use `ADOPIv1.0.0`, which is not currently present as a git tag.
-- Go test consistency gap: core module tests are missing `t.Parallel()` in main suite file.
-- Final scope/coverage report from `docs/MODULE_GUIDE/11-scope-and-provider-coverage-status-check.md` is not attached as closure artifact.
+- `azuredevops_build_folder` is independent from `azuredevops_build_definition` and should not live in the same atomic module.
+- `azuredevops_build_folder_permissions` is independent from build definition and should be split.
+- `azuredevops_build_definition_permissions` supports external `build_definition_id` fallback, so it is not strict-child only.
+- `azuredevops_pipeline_authorization` resources support external pipeline IDs and are not strict-child only.
+- Release references still require `ADOPIv*` normalization (`TASK-ADO-039`).
 
 ## Scope
 
@@ -39,26 +39,30 @@ This re-open focuses on residual gaps: release/tag alignment, test harness consi
 ## Docs to Update
 
 - `modules/azuredevops_pipelines/README.md`
+- `modules/azuredevops_pipelines/docs/README.md`
 - `README.md`
 - `docs/_TASKS/README.md`
 
 ## Work Items
 
-- **Release normalization:** align this module with `TASK-ADO-039` and publish/point to `ADOPIv*` release tags.
-- **Examples alignment:** ensure example `source` refs point to existing `ADOPIv*` release tags.
-- **Test harness consistency:** align Go tests and test orchestration conventions with `TASK-ADO-041` baseline (including `t.Parallel()` where safe).
-- **Compliance closure:** attach final status report (Scope Status / Provider Coverage Status / Overall Status + matrix).
+- **Atomic split:** keep only build-definition scope in this module; move independent resources to dedicated modules.
+- **Strict-child cleanup:** remove external-ID fallback behavior from resources that remain in this module.
+- **Migration path:** provide migration notes for users currently relying on bundled folder/authorization/permission behavior.
+- **Tests/examples:** update examples and tests to compose split modules from the consumer layer.
+- **Release normalization:** align tags and version links with `ADOPIv*` (`TASK-ADO-039`).
 
 ## Acceptance Criteria
 
-- Root and module docs reference an existing `ADOPIv*` release tag.
-- Pipelines examples are runnable against existing release tag(s).
-- Go tests for this module follow agreed consistency baseline.
-- Compliance closure report is present and no High unresolved findings remain.
+- Primary resource remains single and non-iterated.
+- No non-child resource remains in `modules/azuredevops_pipelines`.
+- No retained resource in module can target external objects via fallback IDs.
+- Examples show module composition for split resources.
+- Docs reference existing `ADOPIv*` release tags.
 
 ## Implementation Checklist
 
-- [ ] Publish/confirm `ADOPIv*` release and update references.
-- [ ] Update examples to valid release refs.
-- [ ] Patch remaining test harness inconsistencies (`t.Parallel`, orchestration parity).
-- [ ] Add final scope/coverage status report for module closure.
+- [ ] Split non-child resources into dedicated modules.
+- [ ] Remove external-ID fallback from resources kept in this module.
+- [ ] Update examples and tests for composition pattern.
+- [ ] Add migration notes and refresh module docs.
+- [ ] Publish/confirm `ADOPIv*` release and fix references.
