@@ -13,6 +13,12 @@
 
 Re-audit `modules/azuredevops_group` for strict atomic boundaries and fallback-free child behavior.
 
+## Planning Assumption
+
+- No active production consumers yet (owner confirmation, 2026-02-13).
+- Breaking changes are explicitly allowed for atomic-boundary alignment.
+- Backward-compatibility shims are optional; prioritize clean target architecture.
+
 ## Mandatory Rule (Atomic Boundary)
 
 - Primary resource in a module must be single and non-iterated (`no for_each`, `no count` on primary block).

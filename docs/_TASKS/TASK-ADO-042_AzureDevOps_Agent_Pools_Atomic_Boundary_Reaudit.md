@@ -13,6 +13,12 @@
 
 Re-audit `modules/azuredevops_agent_pools` against strict atomic boundaries.
 
+## Planning Assumption
+
+- No active production consumers yet (owner confirmation, 2026-02-13).
+- Breaking changes are explicitly allowed for atomic-boundary alignment.
+- Backward-compatibility shims are optional; prioritize clean target architecture.
+
 ## Mandatory Rule (Atomic Boundary)
 
 - Primary resource in a module must be single and non-iterated (`no for_each`, `no count` on primary block).

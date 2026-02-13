@@ -13,6 +13,12 @@
 
 `modules/azuredevops_servicehooks` needs an atomic-boundary refactor. Current scope mixes independent resource types in one module.
 
+## Planning Assumption
+
+- No active production consumers yet (owner confirmation, 2026-02-13).
+- Breaking changes are explicitly allowed for atomic-boundary alignment.
+- Backward-compatibility shims are optional; prioritize clean target architecture.
+
 ## Mandatory Rule (Atomic Boundary)
 
 - Primary resource in a module must be single and non-iterated (`no for_each`, `no count` on primary block).

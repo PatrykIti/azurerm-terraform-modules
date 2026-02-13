@@ -22,6 +22,11 @@ Affected modules:
 - `modules/azuredevops_wiki/`
 - `modules/azuredevops_work_items/`
 
+## Planning Assumption
+
+- No active production consumers yet (owner confirmation, 2026-02-13).
+- Breaking changes are explicitly allowed for atomic-boundary alignment before release normalization.
+
 ## Mandatory Gate (Atomic Boundary)
 
 Before release normalization is marked done, each affected module must satisfy this gate:
