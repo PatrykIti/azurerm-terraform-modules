@@ -169,6 +169,8 @@ jobs:
             log-analytics-workspace
             monitor-data-collection-endpoint
             monitor-data-collection-rule
+            monitor-dce
+            monitor-dcr
             monitor-private-link-scope
             network-security-group
             ai-services

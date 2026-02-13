@@ -18,7 +18,7 @@ func TestBastionHostFullIntegration(t *testing.T) {
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		terraform.Destroy(t, terraformOptions)
+		destroyWithRetry(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -46,7 +46,7 @@ func TestBastionHostLifecycle(t *testing.T) {
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
-	defer terraform.Destroy(t, terraformOptions)
+	defer destroyWithRetry(t, terraformOptions)
 
 	terraform.InitAndApply(t, terraformOptions)
 	initialID := terraform.Output(t, terraformOptions, "bastion_host_id")
