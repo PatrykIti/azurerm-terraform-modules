@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [088](./088-2026-02-13-ado-agent-pools-group-atomic-boundary-split.md) | 2026-02-13 | Azure DevOps agent pools/group atomic boundary split | Breaking Change / Maintenance |
 | [087](./087-2026-01-30-eventhub-module.md) | 2026-01-30 | Event Hub module | Feature |
 | [086](./086-2026-01-30-eventhub-namespace-module.md) | 2026-01-30 | Event Hub Namespace module | Feature |
 | [085](./085-2026-01-30-windows-function-app-module.md) | 2026-01-30 | Windows Function App module | Feature |

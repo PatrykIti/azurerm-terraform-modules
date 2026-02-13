@@ -7,13 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Initial release of the azuredevops_group module
-- Core functionality for managing Azure DevOps groups, memberships, and group entitlements
-
-### Security
-- All security features are enabled by default
-- Follows Azure security best practices
+### Changed
+- Scope narrowed to `azuredevops_group` with strict-child memberships only.
+- Group entitlement scope moved to dedicated module `azuredevops_group_entitlement`.
 
 ---
 

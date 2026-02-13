@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes security considerations for managing Azure DevOps groups via Terraform. The module focuses on groups, group entitlements, and memberships.
+This document describes security considerations for managing Azure DevOps groups and memberships via Terraform.
 
 ## Security Features
 
@@ -10,13 +10,13 @@ This document describes security considerations for managing Azure DevOps groups
 - Prefer Azure DevOps groups for access management.
 - Avoid direct permissions for individual users when possible.
 
-### 2. Entitlements and Licensing
-- Grant only required license types.
-- Use group entitlements to simplify access governance.
+### 2. Membership Governance
+- Add members through explicit, reviewable Terraform changes.
+- Use `mode = "overwrite"` only with strict operational controls.
 
 ### 3. Auditability
 - Changes are tracked through Terraform state and version control.
-- Keep module inputs reviewed via code reviews.
+- Keep module inputs reviewed via pull requests.
 
 ## Security Configuration Example
 
@@ -24,22 +24,14 @@ This document describes security considerations for managing Azure DevOps groups
 module "azuredevops_group" {
   source = "./modules/azuredevops_group"
 
-  group_display_name = "ADO Platform Team"
-  group_description  = "Platform engineering group"
+  group_display_name = "ADO Security Reviewers"
+  group_description  = "Security reviewers"
 
   group_memberships = [
     {
-      key                = "platform-membership"
+      key                = "security-membership"
       member_descriptors = ["vssgp.Uy0xLTktMTIzNDU2Nzg5MA"]
-      mode               = "add"
-    }
-  ]
-
-  group_entitlements = [
-    {
-      display_name         = "ADO Platform Team"
-      account_license_type = "basic"
-      licensing_source     = "account"
+      mode               = "overwrite"
     }
   ]
 }
@@ -48,14 +40,9 @@ module "azuredevops_group" {
 ## Security Hardening Checklist
 
 - [ ] Manage access through groups, not individual users.
-- [ ] Review entitlements and licenses regularly.
-- [ ] Track changes through PR reviews and approvals.
-
-## Common Security Mistakes to Avoid
-
-1. **Granting high-privilege entitlements to large groups**
-2. **Assigning licenses without access reviews**
-3. **Mixing admin and contributor entitlements in the same group**
+- [ ] Keep membership changes code-reviewed.
+- [ ] Avoid broad overwrite operations unless required.
+- [ ] Use dedicated module for entitlements and review license assignments separately.
 
 ## Additional Resources
 
@@ -65,5 +52,5 @@ module "azuredevops_group" {
 ---
 
 **Module Version**: 1.0.0  
-**Last Updated**: 2025-12-28  
+**Last Updated**: 2026-02-13  
 **Security Contact**: patryk.ciechanski@patrykiti.pl

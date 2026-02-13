@@ -1,0 +1,7 @@
+{
+  "name": "azuredevops_group_entitlement",
+  "title": "Azure DevOps Group Entitlement",
+  "commit_scope": "azuredevops-group-entitlement",
+  "tag_prefix": "ADOGEv",
+  "description": "Azure DevOps module for managing a single group entitlement"
+}

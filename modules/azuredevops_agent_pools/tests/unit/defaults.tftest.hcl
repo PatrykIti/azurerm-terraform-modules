@@ -28,9 +28,4 @@ run "defaults_plan" {
     condition     = azuredevops_agent_pool.agent_pool.pool_type == "automation"
     error_message = "pool_type should default to automation."
   }
-
-  assert {
-    condition     = length(azuredevops_elastic_pool.elastic_pool) == 0
-    error_message = "No elastic pools should be created by default."
-  }
 }

@@ -12,8 +12,3 @@ output "group_membership_ids" {
   description = "Map of group membership IDs keyed by membership key."
   value       = module.azuredevops_group.group_membership_ids
 }
-
-output "group_entitlement_ids" {
-  description = "Map of group entitlement IDs keyed by entitlement key."
-  value       = module.azuredevops_group.group_entitlement_ids
-}

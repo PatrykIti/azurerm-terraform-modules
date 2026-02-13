@@ -1,0 +1,29 @@
+# Test configuration for CI/CD integration
+
+test_suites:
+  - name: "Basic Tests"
+    tests:
+      - TestBasicAzuredevopsElasticPool
+    parallel: true
+    timeout: 15m
+
+  - name: "Complete Tests"
+    tests:
+      - TestCompleteAzuredevopsElasticPool
+      - TestSecureAzuredevopsElasticPool
+    parallel: true
+    timeout: 30m
+
+  - name: "Integration Tests"
+    tests:
+      - TestAzuredevopsElasticPoolFullIntegration
+    parallel: false
+    timeout: 45m
+
+environment:
+  required_vars:
+    - AZDO_ORG_SERVICE_URL
+    - AZDO_PERSONAL_ACCESS_TOKEN
+    - AZDO_TEST_SERVICE_ENDPOINT_ID
+    - AZDO_TEST_SERVICE_ENDPOINT_SCOPE
+    - AZDO_TEST_AZURE_RESOURCE_ID

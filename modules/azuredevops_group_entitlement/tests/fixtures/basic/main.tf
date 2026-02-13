@@ -1,0 +1,22 @@
+terraform {
+  required_version = ">= 1.12.2"
+  required_providers {
+    azuredevops = {
+      source  = "microsoft/azuredevops"
+      version = "1.12.2"
+    }
+  }
+}
+
+provider "azuredevops" {}
+
+module "azuredevops_group_entitlement" {
+  source = "../../../"
+
+  group_entitlement = {
+    key                  = "fixture-basic-group"
+    display_name         = var.group_display_name
+    account_license_type = "basic"
+    licensing_source     = "account"
+  }
+}

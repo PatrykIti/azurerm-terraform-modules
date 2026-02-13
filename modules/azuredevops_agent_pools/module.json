@@ -3,5 +3,5 @@
   "title": "Azure DevOps Agent Pools",
   "commit_scope": "azuredevops-agent-pools",
   "tag_prefix": "ADOAPv",
-  "description": "Azure DevOps agent pools module for managing pools and elastic pools"
+  "description": "Azure DevOps agent pools module for managing a single agent pool"
 }

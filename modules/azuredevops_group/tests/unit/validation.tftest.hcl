@@ -9,7 +9,7 @@ run "missing_group_membership_members" {
     group_display_name = "Valid Group"
     group_memberships = [
       {
-        key                = "missing-group"
+        key                = "missing-members"
         member_descriptors = []
       }
     ]
@@ -28,6 +28,7 @@ run "missing_group_membership_key" {
 
     group_memberships = [
       {
+        key                = ""
         member_descriptors = ["vssgp.member"]
       }
     ]
@@ -78,46 +79,5 @@ run "duplicate_group_membership_keys" {
 
   expect_failures = [
     var.group_memberships,
-  ]
-}
-
-run "invalid_group_entitlement_selector" {
-  command = plan
-
-  variables {
-    group_display_name = "Valid Group"
-
-    group_entitlements = [
-      {
-        display_name = "AAD Group"
-        origin       = "aad"
-        origin_id    = "00000000-0000-0000-0000-000000000000"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.group_entitlements,
-  ]
-}
-
-run "duplicate_group_entitlement_keys" {
-  command = plan
-
-  variables {
-    group_display_name = "Valid Group"
-
-    group_entitlements = [
-      {
-        display_name = "AAD Group"
-      },
-      {
-        display_name = "AAD Group"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.group_entitlements,
   ]
 }

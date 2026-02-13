@@ -1,5 +1,5 @@
-variable "group_name_prefix" {
-  description = "Prefix for the Azure DevOps group name."
+variable "group_name" {
+  description = "Name for the Azure DevOps group."
   type        = string
-  default     = "ado-identity-basic"
+  default     = "ado-group-basic"
 }

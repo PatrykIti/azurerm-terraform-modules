@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-015, docs/MODULE_GUIDE/10-checklist.md, docs/MODULE_GUIDE/11-scope-and-provider-coverage-status-check.md
-**Status:** 🟡 To Do
+**Status:** 🟢 Done
 
 ---
 
@@ -55,7 +55,14 @@ Re-audit `modules/azuredevops_agent_pools` against strict atomic boundaries.
 
 ## Implementation Checklist
 
-- [ ] Define split target module for elastic pool scope.
-- [ ] Refactor module/examples/tests/docs.
-- [ ] Add migration guidance.
-- [ ] Update task board and closure evidence.
+- [x] Define split target module for elastic pool scope.
+- [x] Refactor module/examples/tests/docs.
+- [x] Add migration guidance.
+- [x] Update task board and closure evidence.
+
+## Closure Notes (2026-02-13)
+
+- `azuredevops_elastic_pool` moved to new dedicated module: `modules/azuredevops_elastic_pool`.
+- `modules/azuredevops_agent_pools` now manages only `azuredevops_agent_pool` primary scope.
+- `agent_pools` docs/examples/tests updated to composition model.
+- New elastic module includes independent docs, examples, tests, and release metadata (`ADOEPv`).

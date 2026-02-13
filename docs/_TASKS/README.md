@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 28 tasks
+- **To Do:** 26 tasks
 - **In Progress:** 0
-- **Done:** 64 tasks
+- **Done:** 66 tasks
 
 ---
 
@@ -39,8 +39,6 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-039](./TASK-ADO-039_AzureDevOps_Release_Tag_Normalization_and_Audit_Closure.md) | **Azure DevOps release tag normalization and audit closure (7 modules)** | High | Medium | `azuredevops_pipelines`, `azuredevops_serviceendpoint`, `azuredevops_servicehooks`, `azuredevops_team`, `azuredevops_variable_groups`, `azuredevops_wiki`, `azuredevops_work_items` |
 | [TASK-ADO-040](./TASK-ADO-040_AzureDevOps_Wiki_Module_Compliance_Reaudit.md) | **Azure DevOps Wiki module compliance re-audit** | High | Medium | `modules/azuredevops_wiki/` |
 | [TASK-ADO-041](./TASK-ADO-041_AzureDevOps_Test_Harness_Consistency_Alignment.md) | **Azure DevOps test harness consistency alignment** | Medium | Medium | `modules/azuredevops_*/tests` |
-| [TASK-ADO-042](./TASK-ADO-042_AzureDevOps_Agent_Pools_Atomic_Boundary_Reaudit.md) | **Azure DevOps Agent Pools atomic boundary re-audit** | High | Medium | `modules/azuredevops_agent_pools/` |
-| [TASK-ADO-043](./TASK-ADO-043_AzureDevOps_Group_Atomic_Boundary_Reaudit.md) | **Azure DevOps Group atomic boundary re-audit** | High | Medium | `modules/azuredevops_group/` |
 
 ---
 
@@ -54,6 +52,8 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-ADO-042](./TASK-ADO-042_AzureDevOps_Agent_Pools_Atomic_Boundary_Reaudit.md) | **Azure DevOps Agent Pools atomic boundary re-audit** | High | Medium | `modules/azuredevops_agent_pools/` |
+| [TASK-ADO-043](./TASK-ADO-043_AzureDevOps_Group_Atomic_Boundary_Reaudit.md) | **Azure DevOps Group atomic boundary re-audit** | High | Medium | `modules/azuredevops_group/` |
 | [TASK-048](./TASK-048_Log_Analytics_Workspace_Diagnostic_Settings_Input_Alignment.md) | **Log Analytics Workspace diagnostic settings input alignment** | High | Medium | `modules/azurerm_log_analytics_workspace/` |
 | [TASK-049](./TASK-049_Private_Endpoint_Variables_Hardening_and_Validation_Alignment.md) | **Private Endpoint variables hardening and validation alignment** | High | Medium | `modules/azurerm_private_endpoint/` |
 | [TASK-037](./TASK-037_Event_Hubs_Modules.md) | **Azure Event Hubs modules (Namespace + Event Hub)** | High | Large | `modules/azurerm_eventhub_namespace/`, `modules/azurerm_eventhub/` |
