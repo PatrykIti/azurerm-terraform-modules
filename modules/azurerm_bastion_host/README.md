@@ -3,7 +3,7 @@
 ## Module Version
 
 <!-- BEGIN_VERSION -->
-Current version: **vUnreleased**
+Current version: **1.0.0**
 <!-- END_VERSION -->
 
 ## Description
@@ -16,7 +16,7 @@ Diagnostic settings support all standard destinations, including `partner_soluti
 
 ```hcl
 module "bastion_host" {
-  source = "../.."
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_bastion_host?ref=BASTIONv1.0.0"
 
   name                = "bastion-basic-example"
   resource_group_name = azurerm_resource_group.example.name

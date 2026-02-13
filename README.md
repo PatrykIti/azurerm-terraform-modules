@@ -7,6 +7,7 @@
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
 
 <!-- MODULE BADGES START -->
+[![Bastion Host](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=BASTIONv*&label=Bastion%20Host&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/BASTIONv1.0.0)
 [![Key Vault](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=KVv*&label=Key%20Vault&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/KVv1.0.0)
 [![Azure DevOps Artifacts Feed](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAFv*&label=Azure%20DevOps%20Artifacts%20Feed&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAFv2.0.0)
 [![Log Analytics Workspace](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=LAWv*&label=Log%20Analytics%20Workspace&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/LAWv1.1.0)
@@ -27,7 +28,6 @@
 [![Event Hub](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=EHv*&label=Event%20Hub&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/EHv1.0.0)
 [![Cognitive Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=COGv*&label=Cognitive%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/COGv1.0.0)
 [![Application Insights Workbook](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AIWBv*&label=Application%20Insights%20Workbook&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AIWBv1.0.0)
-[![Bastion Host](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=BASTIONv*&label=Bastion%20Host&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/BASTIONv1.0.0)
 [![AI Services](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AISv*&label=AI%20Services&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AISv1.0.0)
 [![Monitor Private Link Scope](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AMPLSv*&label=Monitor%20Private%20Link%20Scope&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AMPLSv1.0.0)
 [![Monitor Data Collection Rule](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=DCRv*&label=Monitor%20Data%20Collection%20Rule&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/DCRv1.0.0)
