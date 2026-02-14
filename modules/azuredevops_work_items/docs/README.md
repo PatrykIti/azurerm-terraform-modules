@@ -2,50 +2,25 @@
 
 ## Overview
 
-This module manages Azure DevOps work items resources and related configuration.
+This module manages a single `azuredevops_workitem` resource per module instance.
 
 ## Managed Resources
 
-- `azuredevops_area_permissions`
-- `azuredevops_iteration_permissions`
-- `azuredevops_tagging_permissions`
 - `azuredevops_workitem`
-- `azuredevops_workitemquery`
-- `azuredevops_workitemquery_folder`
-- `azuredevops_workitemquery_permissions`
-- `azuredevops_workitemtrackingprocess_process`
 
 ## Usage Notes
 
-- Use `git::https://...//modules/azuredevops_work_items?ref=ADOWKvX.Y.Z` for module source.
-- Optional child resources are created only when corresponding inputs are set.
-- Use stable keys and unique names for list/object inputs to avoid address churn.
-
-## Inputs (Highlights)
-
-- Required: `title`, `type`
-- Optional: see `../README.md` and `../variables.tf`.
+- Use module-level `for_each` in consumer code to manage multiple work items.
+- Cross-scope resources (processes, queries, and query/area/iteration/tagging permissions) are intentionally out of scope for this atomic module.
+- Requires `project_id`, `title`, and `type`.
 
 ## Outputs (Highlights)
 
-- `area_permission_ids`
-- `iteration_permission_ids`
-- `process_ids`
-- `query_folder_ids`
-- `query_ids`
-- `query_permission_ids`
-- `tagging_permission_ids`
 - `work_item_id`
 
 ## Import Existing Resources
 
 See [IMPORT.md](./IMPORT.md) for import blocks and IDs.
-
-## Troubleshooting
-
-- **Permission errors**: ensure the PAT has rights for the target resource scope.
-- **Plan drift**: align inputs with existing state or leave optional inputs unset.
-- **Duplicate keys**: ensure list/object inputs use unique keys or names.
 
 ## Related Docs
 

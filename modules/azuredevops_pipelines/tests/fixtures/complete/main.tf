@@ -31,6 +31,7 @@ resource "azuredevops_serviceendpoint_generic" "example" {
 
 locals {
   folder_path = "\\Pipelines-${var.random_suffix}"
+
   pipelines = {
     app = {
       name     = "pip-ado-cmp-app-${var.random_suffix}"
@@ -55,13 +56,6 @@ locals {
           value = "dev"
         }
       ]
-      build_folders = [
-        {
-          path        = local.folder_path
-          description = "Pipeline folder"
-          key         = "pipelines"
-        }
-      ]
       pipeline_authorizations = [
         {
           key         = "app-endpoint"
@@ -77,9 +71,8 @@ locals {
       ci_trigger = {
         use_yaml = true
       }
-      schedules     = []
-      variables     = []
-      build_folders = []
+      schedules = []
+      variables = []
       pipeline_authorizations = [
         {
           key         = "release-endpoint"
@@ -111,6 +104,5 @@ module "azuredevops_pipelines" {
   schedules = each.value.schedules
   variables = each.value.variables
 
-  build_folders           = each.value.build_folders
   pipeline_authorizations = each.value.pipeline_authorizations
 }

@@ -70,7 +70,7 @@ go test -v -run TestBasicAzuredevopsPipelines -timeout 30m
 The `fixtures/` directory contains Terraform configurations for different test scenarios:
 
 - `fixtures/basic/` - Basic pipeline with a YAML build definition
-- `fixtures/complete/` - Multiple pipelines with folders and authorizations
+- `fixtures/complete/` - Multiple pipelines with strict-child resource authorizations
 - `fixtures/secure/` - Pipeline with restricted permissions and authorizations
 - `fixtures/network/` - Optional networking-related scenario coverage
 - `fixtures/negative/` - Negative test cases

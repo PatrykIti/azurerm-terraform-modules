@@ -5,13 +5,13 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Large
 **Dependencies:** TASK-ADO-039, TASK-ADO-041
-**Status:** 🟠 **Re-opened**
+**Status:** ✅ **Completed (2026-02-14)**
 
 ---
 
 ## Overview
 
-`modules/azuredevops_work_items` is currently a composite module spanning multiple independent provider resource families and must be decomposed.
+`modules/azuredevops_work_items` was a composite module spanning multiple independent provider resource families and required decomposition.
 
 ## Planning Assumption
 
@@ -29,10 +29,18 @@
 
 ## Current Gaps
 
-- Module contains multiple independent primary scopes (`workitem`, `process`, `query_folder`, `query`, and multiple permissions resources).
-- Several resources are iterable primaries in the same module (`for_each` on non-child families).
-- Query and permission resources can be managed independently from work item creation, violating atomic boundary.
+- Module contained multiple independent primary scopes (`workitem`, `process`, `query_folder`, `query`, and multiple permissions resources).
+- Several resources were iterable primaries in the same module (`for_each` on non-child families).
+- Query and permission resources could be managed independently from work item creation, violating atomic boundary.
 - Release references still require `ADOWKv*` normalization (`TASK-ADO-039`).
+
+## Resolution (2026-02-14)
+
+- Module was narrowed to a single non-iterated primary resource (`azuredevops_workitem`).
+- Independent scopes were removed from this module: process, query folders, queries, and permissions families.
+- Inputs, outputs, examples, fixtures, unit tests, integration compile gate, and docs were aligned to work-item-only atomic scope.
+- Composition pattern for parent/child work items is demonstrated in examples/tests using multiple module instances.
+- Release tag normalization remains tracked separately in `TASK-ADO-039`.
 
 ## Scope
 
@@ -62,12 +70,12 @@
 - Each resulting module has one non-iterated primary resource.
 - Cross-family fallback linking is removed from module internals.
 - Examples and tests use composition in consumer layer.
-- Docs reference existing `ADOWKv*` release tags.
+- Release/tag normalization dependency is explicitly tracked in `TASK-ADO-039`.
 
 ## Implementation Checklist
 
-- [ ] Define target split map for work-item resource families.
-- [ ] Implement decomposition with migration guidance.
-- [ ] Remove non-child fallback coupling.
-- [ ] Update tests/examples/docs to composition model.
-- [ ] Publish/confirm `ADOWKv*` release and fix references.
+- [x] Define target split map for work-item resource families.
+- [x] Implement decomposition with migration guidance.
+- [x] Remove non-child fallback coupling.
+- [x] Update tests/examples/docs to composition model.
+- [x] Track `ADOWKv*` release normalization in `TASK-ADO-039` (blocked by pipeline/tags).

@@ -10,11 +10,6 @@ terraform {
 
 provider "azuredevops" {}
 
-data "azuredevops_group" "readers" {
-  project_id = var.project_id
-  name       = "Readers"
-}
-
 module "azuredevops_work_items" {
   source = "../../../"
 
@@ -22,45 +17,11 @@ module "azuredevops_work_items" {
 
   title = "${var.work_item_title_prefix}-secure"
   type  = "Task"
+  state = "Active"
 
-  area_permissions = [
-    {
-      key       = "area-readers-root"
-      principal = data.azuredevops_group.readers.id
-      path      = "/"
-      permissions = {
-        GENERIC_READ    = "Allow"
-        GENERIC_WRITE   = "Deny"
-        CREATE_CHILDREN = "Deny"
-        DELETE          = "Deny"
-      }
-    }
-  ]
+  tags = ["terraform", "secure"]
 
-  iteration_permissions = [
-    {
-      key       = "iteration-readers-root"
-      principal = data.azuredevops_group.readers.id
-      path      = "/"
-      permissions = {
-        GENERIC_READ    = "Allow"
-        GENERIC_WRITE   = "Deny"
-        CREATE_CHILDREN = "Deny"
-        DELETE          = "Deny"
-      }
-    }
-  ]
-
-  tagging_permissions = [
-    {
-      key       = "tagging-readers"
-      principal = data.azuredevops_group.readers.id
-      permissions = {
-        Enumerate = "allow"
-        Create    = "deny"
-        Update    = "deny"
-        Delete    = "deny"
-      }
-    }
-  ]
+  custom_fields = {
+    "System.Description" = "Secure fixture managed by Terraform"
+  }
 }

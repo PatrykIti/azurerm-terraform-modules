@@ -1,3 +1,3 @@
 # Complete Work Items Fixture
 
-- Creates queries and a work item.
+- Creates parent and child work items using two module instances.

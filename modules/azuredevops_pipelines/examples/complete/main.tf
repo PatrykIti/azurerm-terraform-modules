@@ -53,13 +53,6 @@ locals {
           value = "dev"
         }
       ]
-      build_folders = [
-        {
-          key         = "pipelines"
-          path        = "\\Pipelines"
-          description = "Pipeline folder"
-        }
-      ]
       pipeline_authorizations = [
         {
           key         = "app-endpoint"
@@ -75,9 +68,8 @@ locals {
       ci_trigger = {
         use_yaml = true
       }
-      schedules     = []
-      variables     = []
-      build_folders = []
+      schedules = []
+      variables = []
       pipeline_authorizations = [
         {
           key         = "release-endpoint"
@@ -92,7 +84,7 @@ locals {
 module "azuredevops_pipelines" {
   for_each = local.pipelines
 
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_pipelines?ref=ADOPIv1.0.0"
+  source = "../../"
 
   project_id = var.project_id
   name       = each.value.name
@@ -109,6 +101,5 @@ module "azuredevops_pipelines" {
   schedules = each.value.schedules
   variables = each.value.variables
 
-  build_folders           = each.value.build_folders
   pipeline_authorizations = each.value.pipeline_authorizations
 }

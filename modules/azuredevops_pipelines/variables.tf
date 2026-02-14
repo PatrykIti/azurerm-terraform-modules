@@ -301,63 +301,18 @@ variable "jobs" {
 }
 
 # -----------------------------------------------------------------------------
-# Build Folders
-# -----------------------------------------------------------------------------
-
-variable "build_folders" {
-  description = "List of build folders to manage."
-  type = list(object({
-    key         = optional(string)
-    path        = string
-    description = optional(string)
-  }))
-  default = []
-
-  validation {
-    condition = alltrue([
-      for folder in var.build_folders : length(trimspace(folder.path)) > 0
-    ])
-    error_message = "build_folders.path must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for folder in var.build_folders : (
-        folder.key == null || length(trimspace(folder.key)) > 0
-      )
-    ])
-    error_message = "build_folders.key must be a non-empty string when provided."
-  }
-
-  validation {
-    condition     = length(var.build_folders) == length(distinct([for folder in var.build_folders : coalesce(folder.key, folder.path)]))
-    error_message = "build_folders key or path values must be unique."
-  }
-}
-
-# -----------------------------------------------------------------------------
-# Build Definition Permissions
+# Build Definition Permissions (strict child)
 # -----------------------------------------------------------------------------
 
 variable "build_definition_permissions" {
-  description = "List of build definition permissions to assign."
+  description = "List of build definition permissions to assign to the build definition created by this module."
   type = list(object({
-    key                 = optional(string)
-    build_definition_id = optional(string)
-    principal           = string
-    permissions         = map(string)
-    replace             = optional(bool, true)
+    key         = optional(string)
+    principal   = string
+    permissions = map(string)
+    replace     = optional(bool, true)
   }))
   default = []
-
-  validation {
-    condition = alltrue([
-      for permission in var.build_definition_permissions : (
-        permission.build_definition_id == null || length(trimspace(permission.build_definition_id)) > 0
-      )
-    ])
-    error_message = "build_definition_permissions.build_definition_id must be a non-empty string when provided."
-  }
 
   validation {
     condition = alltrue([
@@ -377,6 +332,13 @@ variable "build_definition_permissions" {
 
   validation {
     condition = alltrue([
+      for permission in var.build_definition_permissions : length(keys(permission.permissions)) > 0
+    ])
+    error_message = "build_definition_permissions.permissions must contain at least one permission entry."
+  }
+
+  validation {
+    condition = alltrue([
       for permission in var.build_definition_permissions : alltrue([
         for status in values(permission.permissions) : contains(["Allow", "Deny", "NotSet"], status)
       ])
@@ -385,81 +347,21 @@ variable "build_definition_permissions" {
   }
 
   validation {
-    condition     = length(var.build_definition_permissions) == length(distinct([for permission in var.build_definition_permissions : coalesce(permission.key, permission.principal)]))
+    condition     = length(var.build_definition_permissions) == length(distinct([for permission in var.build_definition_permissions : (permission.key != null && length(trimspace(permission.key)) > 0) ? permission.key : format("principal:%s", permission.principal)]))
     error_message = "build_definition_permissions keys must be unique; set key when principals would collide."
   }
 }
 
 # -----------------------------------------------------------------------------
-# Build Folder Permissions
-# -----------------------------------------------------------------------------
-
-variable "build_folder_permissions" {
-  description = "List of build folder permissions to assign."
-  type = list(object({
-    key         = optional(string)
-    path        = string
-    principal   = string
-    permissions = map(string)
-    replace     = optional(bool, true)
-  }))
-  default = []
-
-  validation {
-    condition = alltrue([
-      for permission in var.build_folder_permissions : length(trimspace(permission.path)) > 0
-    ])
-    error_message = "build_folder_permissions.path must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for permission in var.build_folder_permissions : (
-        permission.key == null || length(trimspace(permission.key)) > 0
-      )
-    ])
-    error_message = "build_folder_permissions.key must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for permission in var.build_folder_permissions : length(trimspace(permission.principal)) > 0
-    ])
-    error_message = "build_folder_permissions.principal must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for permission in var.build_folder_permissions : alltrue([
-        for status in values(permission.permissions) : contains(["Allow", "Deny", "NotSet"], status)
-      ])
-    ])
-    error_message = "build_folder_permissions values must be Allow, Deny, or NotSet."
-  }
-
-  validation {
-    condition = length(var.build_folder_permissions) == length(distinct([
-      for permission in var.build_folder_permissions : coalesce(
-        permission.key,
-        format("%s:%s", permission.path, permission.principal)
-      )
-    ]))
-    error_message = "build_folder_permissions keys must be unique; set key when path/principal pairs would collide."
-  }
-}
-
-# -----------------------------------------------------------------------------
-# Pipeline Authorizations
+# Pipeline Authorizations (strict child)
 # -----------------------------------------------------------------------------
 
 variable "pipeline_authorizations" {
-  description = "List of pipeline authorizations to manage. Set key when resource_id is computed to keep for_each stable."
+  description = "List of resource authorizations to assign to the build definition created by this module."
   type = list(object({
-    key                 = optional(string)
-    resource_id         = string
-    type                = string
-    pipeline_id         = optional(string)
-    pipeline_project_id = optional(string)
+    key         = optional(string)
+    resource_id = string
+    type        = string
   }))
   default = []
 
@@ -474,33 +376,6 @@ variable "pipeline_authorizations" {
       ], lower(authorization.type))
     ])
     error_message = "pipeline_authorizations.type must be endpoint, queue, variablegroup, environment, or repository."
-  }
-
-  validation {
-    condition = alltrue([
-      for authorization in var.pipeline_authorizations : (
-        authorization.pipeline_id == null || length(trimspace(authorization.pipeline_id)) > 0
-      )
-    ])
-    error_message = "pipeline_authorizations.pipeline_id must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for authorization in var.pipeline_authorizations : (
-        authorization.pipeline_id == null || can(tonumber(authorization.pipeline_id))
-      )
-    ])
-    error_message = "pipeline_authorizations.pipeline_id must be a numeric string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for authorization in var.pipeline_authorizations : (
-        authorization.pipeline_project_id == null || length(trimspace(authorization.pipeline_project_id)) > 0
-      )
-    ])
-    error_message = "pipeline_authorizations.pipeline_project_id must be a non-empty string when provided."
   }
 
   validation {
@@ -527,81 +402,5 @@ variable "pipeline_authorizations" {
       )
     ]))
     error_message = "pipeline_authorizations keys must be unique; set key when type/resource pairs would collide."
-  }
-}
-
-# -----------------------------------------------------------------------------
-# Resource Authorizations (legacy)
-# -----------------------------------------------------------------------------
-
-variable "resource_authorizations" {
-  description = "Legacy list of resource authorizations to manage. Prefer pipeline_authorizations; set key when resource_id is computed to keep for_each stable."
-  type = list(object({
-    key           = optional(string)
-    resource_id   = string
-    authorized    = bool
-    definition_id = optional(string)
-    type          = string
-  }))
-  default = []
-
-  validation {
-    condition = alltrue([
-      for authorization in var.resource_authorizations : (
-        authorization.definition_id == null || length(trimspace(authorization.definition_id)) > 0
-      )
-    ])
-    error_message = "resource_authorizations.definition_id must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for authorization in var.resource_authorizations : (
-        authorization.definition_id == null || can(tonumber(authorization.definition_id))
-      )
-    ])
-    error_message = "resource_authorizations.definition_id must be a numeric string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for authorization in var.resource_authorizations : length(trimspace(authorization.resource_id)) > 0
-    ])
-    error_message = "resource_authorizations.resource_id must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for authorization in var.resource_authorizations : (
-        authorization.key == null || length(trimspace(authorization.key)) > 0
-      )
-    ])
-    error_message = "resource_authorizations.key must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for authorization in var.resource_authorizations : (
-        contains(["endpoint", "queue", "variablegroup"], lower(authorization.type))
-      )
-    ])
-    error_message = "resource_authorizations.type must be endpoint, queue, or variablegroup."
-  }
-
-  validation {
-    condition = alltrue([
-      for authorization in var.resource_authorizations : authorization.authorized
-    ])
-    error_message = "resource_authorizations.authorized must be true; remove entries to revoke access."
-  }
-
-  validation {
-    condition = length(var.resource_authorizations) == length(distinct([
-      for authorization in var.resource_authorizations : coalesce(
-        authorization.key,
-        format("%s:%s", lower(authorization.type), authorization.resource_id)
-      )
-    ]))
-    error_message = "resource_authorizations keys must be unique; set key when type/resource pairs would collide."
   }
 }

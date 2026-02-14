@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [090](./090-2026-02-14-ado-pipelines-work-items-atomic-realignment.md) | 2026-02-14 | Azure DevOps pipelines/work-items atomic realignment | Breaking Change / Maintenance |
 | [089](./089-2026-02-14-ado-atomic-realignment-wave2.md) | 2026-02-14 | Azure DevOps atomic realignment wave 2 (5 modules) | Breaking Change / Maintenance |
 | [088](./088-2026-02-13-ado-agent-pools-group-atomic-boundary-split.md) | 2026-02-13 | Azure DevOps agent pools/group atomic boundary split | Breaking Change / Maintenance |
 | [087](./087-2026-01-30-eventhub-module.md) | 2026-01-30 | Event Hub module | Feature |

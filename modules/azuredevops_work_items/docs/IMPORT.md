@@ -1,8 +1,6 @@
 # Import existing Azure DevOps Work Items into the module
 
-This guide explains how to import existing Azure DevOps work items, query
-folders, queries, and permissions into `modules/azuredevops_work_items` using
-Terraform **import blocks**.
+This guide explains how to import an existing Azure DevOps work item into `modules/azuredevops_work_items` using Terraform import blocks.
 
 ---
 
@@ -16,8 +14,7 @@ Terraform **import blocks**.
 
 ## 1) Minimal module configuration
 
-Create `main.tf` with a minimal module block and fill it with the **current**
-resource settings. Use stable `key` values for list entries you plan to import.
+Create `main.tf` with a minimal module block and fill it with the current work item settings.
 
 ```hcl
 terraform {
@@ -37,115 +34,29 @@ module "azuredevops_work_items" {
   source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_work_items?ref=ADOWKv1.0.0"
 
   project_id = "00000000-0000-0000-0000-000000000000"
-
-  title = "Existing Work Item"
-  type  = "Issue"
-
-  query_folders = [
-    {
-      key  = "team"
-      name = "Team"
-      area = "Shared Queries"
-    }
-  ]
-
-  queries = [
-    {
-      key        = "active-issues"
-      name       = "Active Issues"
-      parent_key = "team"
-      wiql       = "SELECT [System.Id] FROM WorkItems"
-    }
-  ]
-
-  query_permissions = [
-    {
-      key       = "active-issues-readers"
-      query_key = "active-issues"
-      principal = "descriptor-0001"
-      permissions = {
-        Read = "Allow"
-      }
-    }
-  ]
+  title      = "existing-work-item-title"
+  type       = "Task"
 }
 ```
 
 ---
 
-## 2) Import work item
+## 2) Import the work item
 
 Create `import.tf`:
 
 ```hcl
 import {
   to = module.azuredevops_work_items.azuredevops_workitem.work_item
-  id = "<work_item_id>"
+  id = "<project_id>/<work_item_id>"
 }
 ```
 
-Use the **work item ID** from Azure DevOps (numeric ID).
+Use the work item ID from Azure DevOps (UI or REST API). Refer to the Azure DevOps provider documentation for the exact import ID format.
 
 ---
 
-## 3) Import query folders and queries
-
-```hcl
-import {
-  to = module.azuredevops_work_items.azuredevops_workitemquery_folder.query_folder["team"]
-  id = "<query_folder_id>"
-}
-
-import {
-  to = module.azuredevops_work_items.azuredevops_workitemquery.query["active-issues"]
-  id = "<query_id>"
-}
-```
-
-Use the folder/query IDs as defined by the Azure DevOps provider. Follow the
-provider docs for exact import ID formats.
-
----
-
-## 4) Import query permissions (optional)
-
-```hcl
-import {
-  to = module.azuredevops_work_items.azuredevops_workitemquery_permissions.query_permissions["active-issues-readers"]
-  id = "<query_permission_id>"
-}
-```
-
-Query permission import IDs are provider-specific. Check the Azure DevOps
-provider documentation for the expected format.
-
----
-
-## 5) Import area/iteration/tagging permissions (optional)
-
-```hcl
-import {
-  to = module.azuredevops_work_items.azuredevops_area_permissions.area_permissions["area-root"]
-  id = "<area_permission_id>"
-}
-
-import {
-  to = module.azuredevops_work_items.azuredevops_iteration_permissions.iteration_permissions["iteration-root"]
-  id = "<iteration_permission_id>"
-}
-
-import {
-  to = module.azuredevops_work_items.azuredevops_tagging_permissions.tagging_permissions["tagging-root"]
-  id = "<tagging_permission_id>"
-}
-```
-
-Permission import IDs depend on the Azure DevOps provider. Validate the ID
-formats in the provider documentation.
-
----
-
-## 6) Run the import
+## 3) Run the import
 
 ```bash
 terraform init

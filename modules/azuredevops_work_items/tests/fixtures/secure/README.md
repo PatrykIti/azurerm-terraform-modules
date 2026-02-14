@@ -1,3 +1,3 @@
 # Secure Work Items Fixture
 
-- Applies restricted area and tagging permissions.
+- Creates a work item with stricter field usage (`tags`, `custom_fields`).

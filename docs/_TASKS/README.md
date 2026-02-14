@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 20 tasks
+- **To Do:** 18 tasks
 - **In Progress:** 1 task
-- **Done:** 71 tasks
+- **Done:** 73 tasks
 
 ---
 
@@ -27,9 +27,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-017](./TASK-ADO-017_AzureDevOps_Environments_Module_Refactor.md) | **Azure DevOps Environments module refactor** | High | Medium | Re-opened; `modules/azuredevops_environments/` |
 | [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | Re-opened; `modules/azuredevops_artifacts_feed/` |
 | [TASK-ADO-020](./TASK-ADO-020_AzureDevOps_Extension_Module_Refactor.md) | **Azure DevOps Extension module refactor** | Medium | Small | Re-opened; `modules/azuredevops_extension/` |
-| [TASK-ADO-021](./TASK-ADO-021_AzureDevOps_Pipelines_Module_Refactor.md) | **Azure DevOps Pipelines module refactor** | High | Medium | Re-opened; `modules/azuredevops_pipelines/` |
 | [TASK-ADO-023](./TASK-ADO-023_AzureDevOps_Repository_Module_Refactor.md) | **Azure DevOps Repository module refactor** | High | Large | Re-opened; `modules/azuredevops_repository/` |
-| [TASK-ADO-026](./TASK-ADO-026_AzureDevOps_Work_Items_Module_Refactor.md) | **Azure DevOps Work Items module refactor** | High | Medium | Re-opened; `modules/azuredevops_work_items/` |
 | [TASK-ADO-034](./TASK-ADO-034_AzureDevOps_Environments_Module_Compliance_Fixes.md) | **Azure DevOps Environments module compliance fixes** | High | Medium | `modules/azuredevops_environments/` |
 | [TASK-ADO-036](./TASK-ADO-036_AzureDevOps_Service_Principal_Entitlement_Module_Compliance_Alignment.md) | **Azure DevOps Service Principal Entitlement module compliance alignment** | High | Medium | `modules/azuredevops_service_principal_entitlement/` |
 | [TASK-ADO-041](./TASK-ADO-041_AzureDevOps_Test_Harness_Consistency_Alignment.md) | **Azure DevOps test harness consistency alignment** | Medium | Medium | `modules/azuredevops_*/tests` |
@@ -40,7 +38,7 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
-| [TASK-ADO-039](./TASK-ADO-039_AzureDevOps_Release_Tag_Normalization_and_Audit_Closure.md) | **Azure DevOps release tag normalization and audit closure (7 modules)** | High | Medium | Waiting for `v` tag publication/pipeline closure; atomic closure done for 022/024/025/027/040, open for 021/026 |
+| [TASK-ADO-039](./TASK-ADO-039_AzureDevOps_Release_Tag_Normalization_and_Audit_Closure.md) | **Azure DevOps release tag normalization and audit closure (7 modules)** | High | Medium | Waiting for `v` tag publication/pipeline closure; atomic closure done for 021/022/024/025/026/027/040 |
 
 ---
 
@@ -48,6 +46,8 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-ADO-026](./TASK-ADO-026_AzureDevOps_Work_Items_Module_Refactor.md) | **Azure DevOps Work Items module refactor** | High | Medium | Completed 2026-02-14; narrowed to single `azuredevops_workitem` atomic scope |
+| [TASK-ADO-021](./TASK-ADO-021_AzureDevOps_Pipelines_Module_Refactor.md) | **Azure DevOps Pipelines module refactor** | High | Medium | Completed 2026-02-14; removed non-child folder/legacy scopes |
 | [TASK-ADO-040](./TASK-ADO-040_AzureDevOps_Wiki_Module_Compliance_Reaudit.md) | **Azure DevOps Wiki module compliance re-audit** | High | Medium | Completed 2026-02-14; atomic scope fixed in `modules/azuredevops_wiki/` |
 | [TASK-ADO-027](./TASK-ADO-027_AzureDevOps_Team_Module_Refactor.md) | **Azure DevOps Team module refactor** | Medium | Medium | Completed 2026-02-14; strict-child membership/admin alignment |
 | [TASK-ADO-025](./TASK-ADO-025_AzureDevOps_Variable_Groups_Module_Refactor.md) | **Azure DevOps Variable Groups module refactor** | Medium | Medium | Completed 2026-02-14; removed independent permissions scope |

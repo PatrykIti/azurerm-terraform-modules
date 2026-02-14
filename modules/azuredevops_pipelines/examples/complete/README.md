@@ -1,6 +1,6 @@
 # Complete Azure DevOps Pipelines Example
 
-This example demonstrates creating multiple YAML pipelines with folders and authorizations.
+This example demonstrates creating multiple YAML pipelines with strict-child resource authorizations.
 
 ## Features
 
@@ -71,5 +71,4 @@ terraform destroy
 | Name | Description |
 |------|-------------|
 | <a name="output_build_definition_ids"></a> [build\_definition\_ids](#output\_build\_definition\_ids) | Build definition IDs created by the module. |
-| <a name="output_build_folder_ids"></a> [build\_folder\_ids](#output\_build\_folder\_ids) | Build folder IDs created by the module. |
 <!-- END_TF_DOCS -->

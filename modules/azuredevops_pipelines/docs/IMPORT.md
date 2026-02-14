@@ -1,7 +1,6 @@
 # Import existing Azure DevOps Pipelines into the module
 
-This guide explains how to import existing Azure DevOps build definitions and
-folders into `modules/azuredevops_pipelines` using Terraform **import blocks**.
+This guide explains how to import existing Azure DevOps build definitions into `modules/azuredevops_pipelines` using Terraform **import blocks**.
 
 ---
 
@@ -44,13 +43,6 @@ module "azuredevops_pipelines" {
     repo_id   = "00000000-0000-0000-0000-000000000000"
     yml_path  = "azure-pipelines.yml"
   }
-
-  build_folders = [
-    {
-      key  = "pipelines"
-      path = "\\Pipelines"
-    }
-  ]
 }
 ```
 
@@ -72,30 +64,9 @@ Azure DevOps provider documentation for the exact import ID format.
 
 ---
 
-## 3) Import build folders (optional)
+## 3) Permissions and authorizations (optional)
 
-If you manage build folders, ensure each folder has a stable `key` and add an
-import block:
-
-```hcl
-import {
-  to = module.azuredevops_pipelines.azuredevops_build_folder.build_folder["pipelines"]
-  id = "<build_folder_import_id>"
-}
-```
-
-The import ID format varies by resource; follow the Azure DevOps provider
-documentation for `azuredevops_build_folder`.
-
----
-
-## 4) Permissions and authorizations (optional)
-
-If you manage `build_definition_permissions`, `build_folder_permissions`,
-`pipeline_authorizations`, or legacy `resource_authorizations` (mapped to
-`azuredevops_pipeline_authorization`), set a stable `key` for each item so the
-import address remains consistent (default keys are derived from principal or
-`type:resource_id` pairs):
+If you manage `build_definition_permissions` or `pipeline_authorizations`, set a stable `key` for each item so the import address remains consistent (default keys are derived from principal or `type:resource_id` pairs):
 
 ```hcl
 import {
@@ -109,7 +80,7 @@ DevOps provider documentation to confirm support for each resource.
 
 ---
 
-## 5) Run the import
+## 4) Run the import
 
 ```bash
 terraform init

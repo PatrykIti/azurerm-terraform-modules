@@ -12,24 +12,6 @@ variables {
   }
 }
 
-run "invalid_pipeline_authorization_pipeline_id_empty" {
-  command = plan
-
-  variables {
-    pipeline_authorizations = [
-      {
-        resource_id = "00000000-0000-0000-0000-000000000000"
-        type        = "endpoint"
-        pipeline_id = ""
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.pipeline_authorizations,
-  ]
-}
-
 run "invalid_pipeline_authorization_type" {
   command = plan
 
@@ -64,14 +46,53 @@ run "invalid_pipeline_authorization_resource_id_empty" {
   ]
 }
 
-run "invalid_build_definition_permission_empty_id" {
+run "invalid_pipeline_authorization_key_empty" {
+  command = plan
+
+  variables {
+    pipeline_authorizations = [
+      {
+        key         = ""
+        resource_id = "00000000-0000-0000-0000-000000000000"
+        type        = "endpoint"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.pipeline_authorizations,
+  ]
+}
+
+run "duplicate_pipeline_authorization_keys" {
+  command = plan
+
+  variables {
+    pipeline_authorizations = [
+      {
+        resource_id = "00000000-0000-0000-0000-000000000000"
+        type        = "endpoint"
+      },
+      {
+        resource_id = "00000000-0000-0000-0000-000000000000"
+        type        = "endpoint"
+      }
+    ]
+  }
+
+  expect_failures = [
+    var.pipeline_authorizations,
+  ]
+}
+
+run "invalid_build_definition_permission_key_empty" {
   command = plan
 
   variables {
     build_definition_permissions = [
       {
-        build_definition_id = ""
-        principal           = "00000000-0000-0000-0000-000000000000"
+        key       = ""
+        principal = "00000000-0000-0000-0000-000000000000"
         permissions = {
           ViewBuildDefinition = "Allow"
         }
@@ -84,79 +105,58 @@ run "invalid_build_definition_permission_empty_id" {
   ]
 }
 
-run "invalid_resource_authorization_definition_id_empty" {
+run "invalid_build_definition_permission_principal_empty" {
   command = plan
 
   variables {
-    resource_authorizations = [
+    build_definition_permissions = [
       {
-        resource_id   = "00000000-0000-0000-0000-000000000000"
-        authorized    = true
-        type          = "endpoint"
-        definition_id = ""
+        principal = ""
+        permissions = {
+          ViewBuildDefinition = "Allow"
+        }
       }
     ]
   }
 
   expect_failures = [
-    var.resource_authorizations,
+    var.build_definition_permissions,
   ]
 }
 
-run "invalid_resource_authorization_type" {
+run "invalid_build_definition_permission_empty_permissions_map" {
   command = plan
 
   variables {
-    resource_authorizations = [
+    build_definition_permissions = [
       {
-        resource_id   = "00000000-0000-0000-0000-000000000000"
-        authorized    = true
-        type          = "invalid"
-        definition_id = "123"
+        principal   = "00000000-0000-0000-0000-000000000000"
+        permissions = {}
       }
     ]
   }
 
   expect_failures = [
-    var.resource_authorizations,
+    var.build_definition_permissions,
   ]
 }
 
-run "invalid_resource_authorization_authorized_false" {
+run "invalid_build_definition_permission_value" {
   command = plan
 
   variables {
-    resource_authorizations = [
+    build_definition_permissions = [
       {
-        resource_id   = "00000000-0000-0000-0000-000000000000"
-        authorized    = false
-        type          = "endpoint"
-        definition_id = "123"
+        principal = "00000000-0000-0000-0000-000000000000"
+        permissions = {
+          ViewBuildDefinition = "Invalid"
+        }
       }
     ]
   }
 
   expect_failures = [
-    var.resource_authorizations,
-  ]
-}
-
-run "duplicate_build_folder_keys" {
-  command = plan
-
-  variables {
-    build_folders = [
-      {
-        path = "\\Pipelines"
-      },
-      {
-        path = "\\Pipelines"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.build_folders,
+    var.build_definition_permissions,
   ]
 }
 
@@ -182,194 +182,6 @@ run "duplicate_build_definition_permission_keys" {
 
   expect_failures = [
     var.build_definition_permissions,
-  ]
-}
-
-run "duplicate_build_folder_permission_keys" {
-  command = plan
-
-  variables {
-    build_folder_permissions = [
-      {
-        path      = "\\Pipelines"
-        principal = "00000000-0000-0000-0000-000000000000"
-        permissions = {
-          ViewBuildDefinition = "Allow"
-        }
-      },
-      {
-        path      = "\\Pipelines"
-        principal = "00000000-0000-0000-0000-000000000000"
-        permissions = {
-          ViewBuildDefinition = "Allow"
-        }
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.build_folder_permissions,
-  ]
-}
-
-run "duplicate_pipeline_authorization_keys" {
-  command = plan
-
-  variables {
-    pipeline_authorizations = [
-      {
-        resource_id = "00000000-0000-0000-0000-000000000000"
-        type        = "endpoint"
-      },
-      {
-        resource_id = "00000000-0000-0000-0000-000000000000"
-        type        = "endpoint"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.pipeline_authorizations,
-  ]
-}
-
-run "duplicate_resource_authorization_keys" {
-  command = plan
-
-  variables {
-    resource_authorizations = [
-      {
-        resource_id   = "00000000-0000-0000-0000-000000000000"
-        authorized    = true
-        type          = "endpoint"
-        definition_id = "123"
-      },
-      {
-        resource_id   = "00000000-0000-0000-0000-000000000000"
-        authorized    = true
-        type          = "endpoint"
-        definition_id = "456"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.resource_authorizations,
-  ]
-}
-
-run "invalid_build_folder_key_empty" {
-  command = plan
-
-  variables {
-    build_folders = [
-      {
-        key  = ""
-        path = "\\Pipelines"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.build_folders,
-  ]
-}
-
-run "invalid_build_definition_permission_key_empty" {
-  command = plan
-
-  variables {
-    build_definition_permissions = [
-      {
-        key       = ""
-        principal = "00000000-0000-0000-0000-000000000000"
-        permissions = {
-          ViewBuildDefinition = "Allow"
-        }
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.build_definition_permissions,
-  ]
-}
-
-run "invalid_build_folder_permission_key_empty" {
-  command = plan
-
-  variables {
-    build_folder_permissions = [
-      {
-        key       = ""
-        path      = "\\Pipelines"
-        principal = "00000000-0000-0000-0000-000000000000"
-        permissions = {
-          ViewBuildDefinition = "Allow"
-        }
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.build_folder_permissions,
-  ]
-}
-
-run "invalid_pipeline_authorization_key_empty" {
-  command = plan
-
-  variables {
-    pipeline_authorizations = [
-      {
-        key         = ""
-        resource_id = "00000000-0000-0000-0000-000000000000"
-        type        = "endpoint"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.pipeline_authorizations,
-  ]
-}
-
-run "invalid_resource_authorization_resource_id_empty" {
-  command = plan
-
-  variables {
-    resource_authorizations = [
-      {
-        resource_id   = ""
-        authorized    = true
-        type          = "endpoint"
-        definition_id = "123"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.resource_authorizations,
-  ]
-}
-
-run "invalid_resource_authorization_key_empty" {
-  command = plan
-
-  variables {
-    resource_authorizations = [
-      {
-        key           = ""
-        resource_id   = "00000000-0000-0000-0000-000000000000"
-        authorized    = true
-        type          = "endpoint"
-        definition_id = "123"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.resource_authorizations,
   ]
 }
 

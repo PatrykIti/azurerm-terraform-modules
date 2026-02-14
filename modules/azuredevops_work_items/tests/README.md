@@ -64,8 +64,8 @@ go test -v -run TestBasicAzuredevopsWorkItems -timeout 30m
 The `fixtures/` directory contains Terraform configurations for different test scenarios:
 
 - `fixtures/basic/` - Basic work item configuration
-- `fixtures/complete/` - Queries and work items
-- `fixtures/secure/` - Restricted permissions
+- `fixtures/complete/` - Parent and child work items via module composition
+- `fixtures/secure/` - Work item with stricter field usage
 - `fixtures/negative/` - Negative test cases
 
 ## Debugging Tests

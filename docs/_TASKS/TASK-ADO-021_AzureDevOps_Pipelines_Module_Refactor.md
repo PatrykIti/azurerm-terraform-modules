@@ -5,13 +5,13 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Large
 **Dependencies:** TASK-ADO-039, TASK-ADO-041
-**Status:** 🟠 **Re-opened**
+**Status:** ✅ **Completed (2026-02-14)**
 
 ---
 
 ## Overview
 
-`modules/azuredevops_pipelines` requires another refactor pass to satisfy strict atomic-module boundaries from AGENTS.md and module guide checks.
+`modules/azuredevops_pipelines` required another refactor pass to satisfy strict atomic-module boundaries from AGENTS.md and module guide checks.
 
 ## Planning Assumption
 
@@ -31,9 +31,19 @@
 
 - `azuredevops_build_folder` is independent from `azuredevops_build_definition` and should not live in the same atomic module.
 - `azuredevops_build_folder_permissions` is independent from build definition and should be split.
-- `azuredevops_build_definition_permissions` supports external `build_definition_id` fallback, so it is not strict-child only.
-- `azuredevops_pipeline_authorization` resources support external pipeline IDs and are not strict-child only.
+- `azuredevops_build_definition_permissions` supported external `build_definition_id` fallback and was not strict-child only.
+- `azuredevops_pipeline_authorization` resources supported external pipeline IDs and were not strict-child only.
 - Release references still require `ADOPIv*` normalization (`TASK-ADO-039`).
+
+## Resolution (2026-02-14)
+
+- Module was narrowed to a single non-iterated primary resource (`azuredevops_build_definition`).
+- Independent folder scopes (`build_folder`, `build_folder_permissions`) and legacy `resource_authorizations` scope were removed.
+- Retained child resources were converted to strict-child-only behavior:
+  - `build_definition_permissions` now always binds to module-managed build definition.
+  - `pipeline_authorizations` now always bind to module-managed build definition.
+- Examples, fixtures, unit tests, integration compile gate, and docs were aligned to the new atomic model.
+- Release tag normalization remains tracked separately in `TASK-ADO-039`.
 
 ## Scope
 
@@ -63,12 +73,12 @@
 - No non-child resource remains in `modules/azuredevops_pipelines`.
 - No retained resource in module can target external objects via fallback IDs.
 - Examples show module composition for split resources.
-- Docs reference existing `ADOPIv*` release tags.
+- Release/tag normalization dependency is explicitly tracked in `TASK-ADO-039`.
 
 ## Implementation Checklist
 
-- [ ] Split non-child resources into dedicated modules.
-- [ ] Remove external-ID fallback from resources kept in this module.
-- [ ] Update examples and tests for composition pattern.
-- [ ] Add migration notes and refresh module docs.
-- [ ] Publish/confirm `ADOPIv*` release and fix references.
+- [x] Split non-child resources out of this module scope to enforce atomic boundary.
+- [x] Remove external-ID fallback from resources kept in this module.
+- [x] Update examples and tests for composition pattern.
+- [x] Add migration notes and refresh module docs.
+- [x] Track `ADOPIv*` release normalization in `TASK-ADO-039` (blocked by pipeline/tags).

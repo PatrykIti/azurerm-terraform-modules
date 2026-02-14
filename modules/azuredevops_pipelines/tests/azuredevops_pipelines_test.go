@@ -54,10 +54,7 @@ func TestCompleteAzuredevopsPipelines(t *testing.T) {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
 		buildDefinitionIDs := terraform.OutputMap(t, terraformOptions, "build_definition_ids")
-		buildFolderIDs := terraform.OutputMap(t, terraformOptions, "build_folder_ids")
-
 		assert.NotEmpty(t, buildDefinitionIDs)
-		assert.NotEmpty(t, buildFolderIDs)
 	})
 }
 
@@ -97,7 +94,7 @@ func TestAzuredevopsPipelinesValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "pipeline_authorizations.pipeline_id must be a non-empty string when provided")
+	assert.Contains(t, err.Error(), "pipeline_authorizations.resource_id must be a non-empty string")
 }
 
 // Helper function to get terraform options

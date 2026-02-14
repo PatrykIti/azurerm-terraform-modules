@@ -1,4 +1,4 @@
-# Test process naming defaults
+# Test work item naming and field propagation
 
 mock_provider "azuredevops" {}
 
@@ -6,25 +6,19 @@ variables {
   project_id = "00000000-0000-0000-0000-000000000000"
   title      = "Naming Work Item"
   type       = "Task"
-
-  processes = [
-    {
-      name                   = "custom-agile"
-      parent_process_type_id = "adcc42ab-9882-485e-a3ed-7678f01f66bc"
-    }
-  ]
+  state      = "Active"
 }
 
-run "process_plan" {
+run "work_item_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_workitemtrackingprocess_process.process) == 1
-    error_message = "processes should create one process."
+    condition     = azuredevops_workitem.work_item.title == "Naming Work Item"
+    error_message = "Work item title should match the input."
   }
 
   assert {
-    condition     = azuredevops_workitemtrackingprocess_process.process["custom-agile"].name == "custom-agile"
-    error_message = "Process key should default to the process name when key is omitted."
+    condition     = azuredevops_workitem.work_item.state == "Active"
+    error_message = "Work item state should match the input."
   }
 }

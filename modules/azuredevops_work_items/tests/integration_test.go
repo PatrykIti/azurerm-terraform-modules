@@ -31,9 +31,6 @@ func TestAzuredevopsWorkItemsFullIntegration(t *testing.T) {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
 		workItemIDs := terraform.OutputMap(t, terraformOptions, "work_item_ids")
-		queryPermissionIDs := terraform.OutputMap(t, terraformOptions, "query_permission_ids")
-
 		assert.NotEmpty(t, workItemIDs)
-		assert.NotEmpty(t, queryPermissionIDs)
 	})
 }

@@ -1,20 +1,11 @@
 # Azure DevOps Pipelines
 
 locals {
-  build_definition_id        = try(azuredevops_build_definition.build_definition.id, null)
-  build_definition_id_number = local.build_definition_id == null ? null : tonumber(local.build_definition_id)
-  build_folders_by_key = {
-    for folder in var.build_folders :
-    coalesce(folder.key, folder.path) => folder
-  }
   build_definition_permissions_by_key = {
     for permission in var.build_definition_permissions :
-    coalesce(permission.key, permission.principal) => permission
+    (permission.key != null && length(trimspace(permission.key)) > 0) ? permission.key : format("principal:%s", permission.principal) => permission
   }
-  build_folder_permissions_by_key = {
-    for permission in var.build_folder_permissions :
-    coalesce(permission.key, format("%s:%s", permission.path, permission.principal)) => permission
-  }
+
   pipeline_authorizations_by_key = {
     for authorization in var.pipeline_authorizations :
     coalesce(
@@ -22,26 +13,6 @@ locals {
       format("%s:%s", lower(authorization.type), authorization.resource_id)
     ) => authorization
   }
-  resource_authorizations_by_key = {
-    for authorization in var.resource_authorizations :
-    coalesce(
-      authorization.key,
-      format("%s:%s", lower(authorization.type), authorization.resource_id)
-    ) => authorization
-  }
-}
-
-moved {
-  from = azuredevops_resource_authorization.resource_authorization
-  to   = azuredevops_pipeline_authorization.resource_authorization
-}
-
-resource "azuredevops_build_folder" "build_folder" {
-  for_each = local.build_folders_by_key
-
-  project_id  = var.project_id
-  path        = each.value.path
-  description = each.value.description
 }
 
 resource "azuredevops_build_definition" "build_definition" {
@@ -212,67 +183,18 @@ resource "azuredevops_build_definition" "build_definition" {
 resource "azuredevops_build_definition_permissions" "build_definition_permissions" {
   for_each = local.build_definition_permissions_by_key
 
-  project_id  = var.project_id
-  principal   = each.value.principal
-  permissions = each.value.permissions
-  replace     = each.value.replace
-
-  build_definition_id = coalesce(each.value.build_definition_id, local.build_definition_id)
-
-  lifecycle {
-    precondition {
-      condition     = each.value.build_definition_id != null || local.build_definition_id != null
-      error_message = "build_definition_permissions.build_definition_id must be set when the module build definition is not managed."
-    }
-  }
-}
-
-resource "azuredevops_build_folder_permissions" "build_folder_permissions" {
-  for_each = local.build_folder_permissions_by_key
-
-  project_id  = var.project_id
-  path        = each.value.path
-  principal   = each.value.principal
-  permissions = each.value.permissions
-  replace     = each.value.replace
+  project_id          = var.project_id
+  principal           = each.value.principal
+  permissions         = each.value.permissions
+  replace             = each.value.replace
+  build_definition_id = azuredevops_build_definition.build_definition.id
 }
 
 resource "azuredevops_pipeline_authorization" "pipeline_authorization" {
   for_each = local.pipeline_authorizations_by_key
 
-  project_id          = var.project_id
-  resource_id         = each.value.resource_id
-  type                = lower(each.value.type)
-  pipeline_project_id = each.value.pipeline_project_id
-  pipeline_id = coalesce(
-    each.value.pipeline_id == null ? null : tonumber(each.value.pipeline_id),
-    local.build_definition_id_number
-  )
-
-  lifecycle {
-    precondition {
-      condition     = each.value.pipeline_id != null || local.build_definition_id != null
-      error_message = "pipeline_authorizations.pipeline_id must be set when the module build definition is not managed."
-    }
-  }
-}
-
-resource "azuredevops_pipeline_authorization" "resource_authorization" {
-  for_each = local.resource_authorizations_by_key
-
   project_id  = var.project_id
   resource_id = each.value.resource_id
   type        = lower(each.value.type)
-
-  pipeline_id = coalesce(
-    each.value.definition_id == null ? null : tonumber(each.value.definition_id),
-    local.build_definition_id_number
-  )
-
-  lifecycle {
-    precondition {
-      condition     = each.value.definition_id != null || local.build_definition_id != null
-      error_message = "resource_authorizations.definition_id must be set when the module build definition is not managed."
-    }
-  }
+  pipeline_id = tonumber(azuredevops_build_definition.build_definition.id)
 }

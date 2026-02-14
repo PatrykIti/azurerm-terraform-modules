@@ -2,20 +2,21 @@
 
 ## Overview
 
-This document describes security considerations for Azure DevOps work items and permissions managed with Terraform.
+This document describes security considerations for managing Azure DevOps work items with Terraform.
 
-## Security Features
+## Security Guidance
 
-### 1. Permissions Management
-- Apply permissions to groups rather than individual users.
-- Restrict tagging, area, and iteration permissions to trusted teams.
+### 1. Limit Scope of Changes
+- Manage only required fields on each work item.
+- Avoid storing sensitive data in work item fields unless policy explicitly allows it.
 
-### 2. Query Access
-- Use query permissions to control visibility of shared queries.
-- Avoid granting manage permissions broadly.
+### 2. Validate Input Data
+- Keep `project_id`, `title`, and `type` controlled and non-empty.
+- Validate `custom_fields` values to avoid accidental injection of empty or malformed values.
 
-### 3. Process Governance
-- Limit process creation and customization to administrators.
+### 3. Protect Access to Terraform Credentials
+- Restrict PAT/API credentials used by Terraform to least privilege.
+- Use short-lived credentials and rotate them regularly.
 
 ## Security Configuration Example
 
@@ -24,56 +25,36 @@ module "azuredevops_work_items" {
   source = "./modules/azuredevops_work_items"
 
   project_id = "00000000-0000-0000-0000-000000000000"
+  title      = "Secure Work Item"
+  type       = "Issue"
 
-  title = "Secure Work Item"
-  type  = "Issue"
+  tags = ["terraform", "security-reviewed"]
 
-  query_permissions = [
-    {
-      principal = "vssgp.Uy0xLTktMTIzNDU2"
-      permissions = {
-        Read              = "Allow"
-        Contribute        = "Deny"
-        ManagePermissions = "Deny"
-        Delete            = "Deny"
-      }
-    }
-  ]
-
-  tagging_permissions = [
-    {
-      principal = "vssgp.Uy0xLTktMTIzNDU2"
-      permissions = {
-        Enumerate = "allow"
-        Create    = "deny"
-        Update    = "deny"
-        Delete    = "deny"
-      }
-    }
-  ]
+  custom_fields = {
+    "System.Description" = "Managed via Terraform"
+  }
 }
 ```
 
 ## Security Hardening Checklist
 
-- [ ] Restrict work item permissions to group principals.
-- [ ] Control query access to shared queries.
-- [ ] Apply least-privilege for tagging and area permissions.
-- [ ] Review process customization access regularly.
+- [ ] Restrict module usage to trusted CI identities.
+- [ ] Review work item data for sensitive content before apply.
+- [ ] Validate custom fields and metadata in code review.
 
 ## Common Security Mistakes to Avoid
 
-1. **Granting manage permissions to broad groups**
-2. **Allowing unrestricted tagging across projects**
-3. **Exposing sensitive queries to all users**
+1. **Embedding secrets in work item fields**
+2. **Using over-privileged PAT scopes for Terraform runs**
+3. **Allowing unreviewed custom field writes from untrusted input**
 
 ## Additional Resources
 
 - [Azure DevOps Work Items](https://learn.microsoft.com/en-us/azure/devops/boards/work-items/about-work-items)
-- [Azure DevOps Permissions](https://learn.microsoft.com/en-us/azure/devops/organizations/security/permissions)
+- [Azure DevOps Security](https://learn.microsoft.com/en-us/azure/devops/organizations/security/about-security-identity)
 
 ---
 
 **Module Version**: 1.0.0  
-**Last Updated**: 2025-12-24  
+**Last Updated**: 2026-02-14  
 **Security Contact**: patryk.ciechanski@patrykiti.pl

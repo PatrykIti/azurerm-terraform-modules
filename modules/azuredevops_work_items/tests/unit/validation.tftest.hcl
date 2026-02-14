@@ -20,252 +20,52 @@ run "invalid_parent_id" {
   ]
 }
 
-run "missing_project_id_for_work_item" {
+run "invalid_project_id_empty" {
   command = plan
 
   variables {
-    project_id = null
+    project_id = ""
   }
 
   expect_failures = [
-    azuredevops_workitem.work_item,
+    var.project_id,
   ]
 }
 
-run "duplicate_process_keys" {
+run "invalid_title_empty" {
   command = plan
 
   variables {
-    processes = [
-      {
-        name                   = "custom-agile"
-        parent_process_type_id = "adcc42ab-9882-485e-a3ed-7678f01f66bc"
-      },
-      {
-        name                   = "custom-agile"
-        parent_process_type_id = "adcc42ab-9882-485e-a3ed-7678f01f66bc"
-      }
-    ]
+    title = ""
   }
 
   expect_failures = [
-    var.processes,
+    var.title,
   ]
 }
 
-run "duplicate_query_folder_keys" {
+run "invalid_type_empty" {
   command = plan
 
   variables {
-    query_folders = [
-      {
-        name = "Shared"
-        area = "Shared Queries"
-      },
-      {
-        name = "Shared"
-        area = "Shared Queries"
-      }
-    ]
+    type = ""
   }
 
   expect_failures = [
-    var.query_folders,
+    var.type,
   ]
 }
 
-run "duplicate_query_keys" {
+run "invalid_custom_fields_empty_value" {
   command = plan
 
   variables {
-    queries = [
-      {
-        name = "Active Issues"
-        area = "Shared Queries"
-        wiql = "SELECT [System.Id] FROM WorkItems"
-      },
-      {
-        name = "Active Issues"
-        area = "Shared Queries"
-        wiql = "SELECT [System.Id] FROM WorkItems"
-      }
-    ]
+    custom_fields = {
+      "System.Description" = ""
+    }
   }
 
   expect_failures = [
-    var.queries,
-  ]
-}
-
-run "invalid_query_parent_key_reference" {
-  command = plan
-
-  variables {
-    queries = [
-      {
-        name       = "Active Issues"
-        parent_key = "missing"
-        wiql       = "SELECT [System.Id] FROM WorkItems"
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.queries,
-  ]
-}
-
-run "invalid_query_permission_selector" {
-  command = plan
-
-  variables {
-    queries = [
-      {
-        key  = "active-issues"
-        name = "Active Issues"
-        area = "Shared Queries"
-        wiql = "SELECT [System.Id] FROM WorkItems"
-      }
-    ]
-
-    query_permissions = [
-      {
-        principal = "descriptor-0001"
-        path      = "Shared Queries"
-        query_key = "active-issues"
-        permissions = {
-          Read = "Allow"
-        }
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.query_permissions,
-  ]
-}
-
-run "missing_query_permission_selector" {
-  command = plan
-
-  variables {
-    query_permissions = [
-      {
-        principal = "descriptor-0001"
-        permissions = {
-          Read = "Allow"
-        }
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.query_permissions,
-  ]
-}
-
-run "duplicate_query_permission_keys" {
-  command = plan
-
-  variables {
-    query_permissions = [
-      {
-        principal = "descriptor-0001"
-        path      = "Shared Queries"
-        permissions = {
-          Read = "Allow"
-        }
-      },
-      {
-        principal = "descriptor-0001"
-        path      = "Shared Queries"
-        permissions = {
-          Read = "Allow"
-        }
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.query_permissions,
-  ]
-}
-
-run "duplicate_area_permission_keys" {
-  command = plan
-
-  variables {
-    area_permissions = [
-      {
-        path      = "/"
-        principal = "descriptor-0001"
-        permissions = {
-          GENERIC_READ = "Allow"
-        }
-      },
-      {
-        path      = "/"
-        principal = "descriptor-0001"
-        permissions = {
-          GENERIC_READ = "Allow"
-        }
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.area_permissions,
-  ]
-}
-
-run "duplicate_iteration_permission_keys" {
-  command = plan
-
-  variables {
-    iteration_permissions = [
-      {
-        path      = "/"
-        principal = "descriptor-0001"
-        permissions = {
-          GENERIC_READ = "Allow"
-        }
-      },
-      {
-        path      = "/"
-        principal = "descriptor-0001"
-        permissions = {
-          GENERIC_READ = "Allow"
-        }
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.iteration_permissions,
-  ]
-}
-
-run "duplicate_tagging_permission_keys" {
-  command = plan
-
-  variables {
-    tagging_permissions = [
-      {
-        principal = "descriptor-0001"
-        permissions = {
-          Enumerate = "allow"
-        }
-      },
-      {
-        principal = "descriptor-0001"
-        permissions = {
-          Enumerate = "allow"
-        }
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.tagging_permissions,
+    var.custom_fields,
   ]
 }
