@@ -59,6 +59,7 @@ tests=(
     "TestBasicAzuredevopsElasticPool"
     "TestCompleteAzuredevopsElasticPool"
     "TestSecureAzuredevopsElasticPool"
+    "TestAzuredevopsElasticPoolValidationRules"
     "TestAzuredevopsElasticPoolFullIntegration"
 )
 

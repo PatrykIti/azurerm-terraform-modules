@@ -53,6 +53,11 @@ test-secure: check-env deps
 	@echo "Running security tests..."
 	$(call run_with_log,secure,go test -v -timeout 30m -run TestSecureAzuredevopsElasticPool ./...)
 
+# Run validation tests
+test-validation: check-env deps
+	@echo "Running validation tests..."
+	$(call run_with_log,validation,go test -v -timeout 10m -run TestAzuredevopsElasticPoolValidationRules ./...)
+
 # Run integration tests
 test-integration: check-env deps
 	@echo "Running integration tests..."

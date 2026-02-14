@@ -12,6 +12,7 @@ import (
 
 // Test basic azuredevops_extension creation
 func TestBasicAzuredevopsExtension(t *testing.T) {
+	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
@@ -47,6 +48,7 @@ func TestBasicAzuredevopsExtension(t *testing.T) {
 
 // Test complete azuredevops_extension with multiple extensions
 func TestCompleteAzuredevopsExtension(t *testing.T) {
+	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
@@ -86,6 +88,7 @@ func TestCompleteAzuredevopsExtension(t *testing.T) {
 
 // Test secure azuredevops_extension configuration
 func TestSecureAzuredevopsExtension(t *testing.T) {
+	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
@@ -124,6 +127,7 @@ func TestSecureAzuredevopsExtension(t *testing.T) {
 
 // Negative test cases for validation rules
 func TestAzuredevopsExtensionValidationRules(t *testing.T) {
+	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/negative")
@@ -142,7 +146,7 @@ func getTerraformOptions(terraformDir string, vars map[string]interface{}) *terr
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars:         vars,
-		NoColor: true,
+		NoColor:      true,
 		RetryableTerraformErrors: map[string]string{
 			".*timeout.*":         "Timeout error - retrying",
 			".*TooManyRequests.*": "Too many requests - retrying",

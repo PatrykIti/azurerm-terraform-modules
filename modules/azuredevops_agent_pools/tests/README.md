@@ -37,6 +37,24 @@ make test
 make test-basic
 ```
 
+### Run Complete Tests Only
+
+```bash
+make test-complete
+```
+
+### Run Secure Tests Only
+
+```bash
+make test-secure
+```
+
+### Run Validation Pattern
+
+```bash
+make test-validation
+```
+
 ### Run Integration Tests Only
 
 ```bash

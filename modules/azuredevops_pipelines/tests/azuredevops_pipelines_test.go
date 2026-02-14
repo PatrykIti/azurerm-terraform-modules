@@ -13,6 +13,7 @@ import (
 
 // Test basic azuredevops_pipelines creation
 func TestBasicAzuredevopsPipelines(t *testing.T) {
+	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
@@ -37,6 +38,7 @@ func TestBasicAzuredevopsPipelines(t *testing.T) {
 
 // Test complete azuredevops_pipelines configuration
 func TestCompleteAzuredevopsPipelines(t *testing.T) {
+	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
@@ -60,6 +62,7 @@ func TestCompleteAzuredevopsPipelines(t *testing.T) {
 
 // Test secure azuredevops_pipelines configuration
 func TestSecureAzuredevopsPipelines(t *testing.T) {
+	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
@@ -84,6 +87,7 @@ func TestSecureAzuredevopsPipelines(t *testing.T) {
 
 // Negative test cases for validation rules
 func TestAzuredevopsPipelinesValidationRules(t *testing.T) {
+	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/negative")

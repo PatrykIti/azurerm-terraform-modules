@@ -22,12 +22,66 @@ export AZDO_TEST_AZURE_RESOURCE_ID="/subscriptions/.../resourceGroups/.../provid
 
 ## Running Tests
 
+### Install Dependencies
+
+```bash
+go mod download
+```
+
+### Run All Tests
+
 ```bash
 make test
 ```
 
-## Test Fixtures
+### Run Basic Tests Only
+
+```bash
+make test-basic
+```
+
+### Run Complete Tests Only
+
+```bash
+make test-complete
+```
+
+### Run Secure Tests Only
+
+```bash
+make test-secure
+```
+
+### Run Validation Pattern
+
+```bash
+make test-validation
+```
+
+### Run Integration Tests Only
+
+```bash
+make test-integration
+```
+
+## Test Structure
+
+### Test Files
+
+- `azuredevops_elastic_pool_test.go` - Basic, complete, and secure tests
+- `integration_test.go` - Full apply test using the complete fixture
+- `performance_test.go` - Benchmarks are disabled by default
+
+### Test Fixtures
+
+The `fixtures/` directory contains Terraform configurations for different test scenarios:
 
 - `fixtures/basic/` - Basic module configuration
 - `fixtures/complete/` - Full optional configuration
 - `fixtures/secure/` - Security-focused configuration
+
+## Troubleshooting
+
+1. **Authentication errors**: Verify `AZDO_ORG_SERVICE_URL` and `AZDO_PERSONAL_ACCESS_TOKEN`
+2. **Missing endpoint context**: Provide all `AZDO_TEST_*` values used by fixtures
+3. **Timeouts**: Increase `TIMEOUT` in `tests/Makefile` for slower organizations
