@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Large
 **Dependencies:** TASK-ADO-039, TASK-ADO-041
-**Status:** 🟠 **Re-opened**
+**Status:** ✅ **Completed (2026-02-14)**
 
 ---
 
@@ -33,6 +33,13 @@
 - Primary resource selection is driven by one-of input across many resource types instead of one atomic module per resource.
 - `azuredevops_serviceendpoint_permissions` supports external `serviceendpoint_id` fallback and is not strict-child only.
 - Release references still require `ADOSEv*` normalization (`TASK-ADO-039`).
+
+## Resolution (2026-02-14)
+
+- Module was narrowed to a single non-iterated primary resource (`azuredevops_serviceendpoint_generic`).
+- `serviceendpoint_permissions` was changed to strict-child-only behavior (no external `serviceendpoint_id` fallback).
+- Examples, fixtures, unit tests, integration compile gate, and docs were aligned to the new atomic model.
+- Release tag normalization remains tracked separately in `TASK-ADO-039`.
 
 ## Scope
 
@@ -62,12 +69,12 @@
 - Each resulting module has one non-iterated primary resource.
 - Permissions behavior is strict-child only or moved to dedicated module.
 - Examples demonstrate composition from consumer layer.
-- Docs reference existing `ADOSEv*` release tags.
+- Release/tag normalization dependency is explicitly tracked in `TASK-ADO-039`.
 
 ## Implementation Checklist
 
-- [ ] Design target module split map for endpoint types.
-- [ ] Implement split and migration guidance.
-- [ ] Isolate permissions behavior to strict-child or separate module.
-- [ ] Update tests/examples/docs for new structure.
-- [ ] Publish/confirm `ADOSEv*` release and fix references.
+- [x] Design target module split map for endpoint types.
+- [x] Implement split and migration guidance.
+- [x] Isolate permissions behavior to strict-child or separate module.
+- [x] Update tests/examples/docs for new structure.
+- [x] Track `ADOSEv*` release normalization in `TASK-ADO-039` (blocked by pipeline/tags).

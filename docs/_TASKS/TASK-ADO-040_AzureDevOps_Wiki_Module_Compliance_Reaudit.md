@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** docs/MODULE_GUIDE/10-checklist.md, docs/MODULE_GUIDE/11-scope-and-provider-coverage-status-check.md, TASK-ADO-039
-**Status:** 🟡 To Do
+**Status:** ✅ **Completed (2026-02-14)**
 
 ---
 
@@ -34,6 +34,14 @@ Re-audit and refactor `modules/azuredevops_wiki` to match current repository sta
 - `wiki_pages` can target external `wiki_id`, so page management is not strict-child-only.
 - Output naming/docs expose index-based model (`Map of wiki page IDs keyed by index`) rather than stable semantic keys (`modules/azuredevops_wiki/outputs.tf:17`).
 - Example source refs point to `ADOWIv1.0.0`, but this tag is not present in git history; examples are not runnable against published tag set (covered by `TASK-ADO-039`).
+
+## Resolution (2026-02-14)
+
+- Module was refactored to single non-iterated primary wiki resource (`azuredevops_wiki`).
+- Wiki pages are strict-child-only and keyed by stable semantic map keys.
+- Output model was updated to deterministic keys (no index-based page keys).
+- Examples, fixtures, unit tests, integration compile gate, and docs were aligned to the new model.
+- Release tag normalization remains tracked separately in `TASK-ADO-039`.
 
 ## Scope
 
@@ -74,10 +82,10 @@ Re-audit and refactor `modules/azuredevops_wiki` to match current repository sta
 
 ## Implementation Checklist
 
-- [ ] Refactor `variables.tf` and `main.tf` to single-wiki model.
-- [ ] Remove non-child fallback behavior for pages or split pages scope.
-- [ ] Introduce stable keying strategy for `wiki_pages` + uniqueness validations.
-- [ ] Update `outputs.tf` to stable-key outputs.
-- [ ] Update examples/fixtures/unit tests for new API shape.
-- [ ] Regenerate docs and update import guidance.
-- [ ] Link release/tag normalization dependency to `TASK-ADO-039`.
+- [x] Refactor `variables.tf` and `main.tf` to single-wiki model.
+- [x] Remove non-child fallback behavior for pages or split pages scope.
+- [x] Introduce stable keying strategy for `wiki_pages` + uniqueness validations.
+- [x] Update `outputs.tf` to stable-key outputs.
+- [x] Update examples/fixtures/unit tests for new API shape.
+- [x] Regenerate docs and update import guidance.
+- [x] Link release/tag normalization dependency to `TASK-ADO-039`.

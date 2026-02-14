@@ -3,9 +3,10 @@
 mock_provider "azuredevops" {
   mock_resource "azuredevops_wiki" {
     defaults = {
-      id         = "wiki-0001"
-      remote_url = "https://dev.azure.com/org/project/_wiki/wikis/wiki-0001"
-      url        = "https://dev.azure.com/org/_apis/wiki/wikis/wiki-0001"
+      id         = "11111111-1111-1111-1111-111111111111"
+      name       = "core"
+      remote_url = "https://dev.azure.com/org/project/_wiki/wikis/11111111-1111-1111-1111-111111111111"
+      url        = "https://dev.azure.com/org/_apis/wiki/wikis/11111111-1111-1111-1111-111111111111"
     }
   }
 
@@ -19,37 +20,30 @@ mock_provider "azuredevops" {
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  wikis = {
-    project = {
-      type = "projectWiki"
-    }
+  wiki = {
+    name = "core"
+    type = "projectWiki"
   }
 
-  wiki_pages = [
-    {
-      wiki_key = "project"
-      path     = "/Home"
-      content  = "Home"
+  wiki_pages = {
+    home = {
+      path    = "/Home"
+      content = "Home"
     }
-  ]
+  }
 }
 
 run "outputs_plan" {
-  command = plan
+  command = apply
 
   assert {
-    condition     = length(keys(output.wiki_ids)) == 1
-    error_message = "wiki_ids should include configured wikis."
+    condition     = output.wiki_id == "11111111-1111-1111-1111-111111111111"
+    error_message = "wiki_id should return the created wiki ID."
   }
 
   assert {
-    condition     = length(keys(output.wiki_remote_urls)) == 1
-    error_message = "wiki_remote_urls should include configured wikis."
-  }
-
-  assert {
-    condition     = length(keys(output.wiki_urls)) == 1
-    error_message = "wiki_urls should include configured wikis."
+    condition     = output.wiki_name == "core"
+    error_message = "wiki_name should return the created wiki name."
   }
 
   assert {

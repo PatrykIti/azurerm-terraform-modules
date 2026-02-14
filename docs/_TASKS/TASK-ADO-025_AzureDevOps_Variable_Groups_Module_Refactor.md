@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-039, TASK-ADO-041
-**Status:** 🟠 **Re-opened**
+**Status:** ✅ **Completed (2026-02-14)**
 
 ---
 
@@ -33,6 +33,14 @@
 - `azuredevops_variable_group_permissions` accepts external `variable_group_id` fallback, so it is not strict-child only.
 - Existing validation hardening still needs completion for permissions map semantics.
 - Release references still require `ADOVGv*` normalization (`TASK-ADO-039`).
+
+## Resolution (2026-02-14)
+
+- Independent `azuredevops_library_permissions` scope was removed from this module for atomic-boundary compliance.
+- `azuredevops_variable_group_permissions` was converted to strict-child-only behavior (always attached to module-managed variable group).
+- Permission validation was hardened (non-empty maps, allowed values, unique keys).
+- Examples, fixtures, unit tests, integration compile gate, and docs were aligned to the new scope.
+- Release tag normalization remains tracked separately in `TASK-ADO-039`.
 
 ## Scope
 
@@ -62,12 +70,12 @@
 - Any retained permission resource is strict-child only.
 - Permissions validation is explicit and covered by negative tests.
 - Examples show composition for split permission modules.
-- Docs reference existing `ADOVGv*` release tags.
+- Release/tag normalization dependency is explicitly tracked in `TASK-ADO-039`.
 
 ## Implementation Checklist
 
-- [ ] Split `library_permissions` into dedicated module.
-- [ ] Remove fallback-based non-child behavior from retained resources.
-- [ ] Add/verify permissions map validations and tests.
-- [ ] Update examples/docs for composition model.
-- [ ] Publish/confirm `ADOVGv*` release and fix references.
+- [x] Split `library_permissions` out of this module scope to enforce atomic boundary.
+- [x] Remove fallback-based non-child behavior from retained resources.
+- [x] Add/verify permissions map validations and tests.
+- [x] Update examples/docs for composition model.
+- [x] Track `ADOVGv*` release normalization in `TASK-ADO-039` (blocked by pipeline/tags).

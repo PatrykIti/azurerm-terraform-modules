@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes security considerations for Azure DevOps wikis managed with Terraform.
+This document describes security considerations for Azure DevOps wiki resources managed with Terraform.
 
 ## Security Features
 
@@ -11,7 +11,7 @@ This document describes security considerations for Azure DevOps wikis managed w
 - Keep sensitive documentation in secure systems outside of wiki.
 
 ### 2. Access Control
-- Use project permissions to control who can edit wikis.
+- Use project permissions to control who can edit wiki content.
 - Limit contributor roles to trusted groups.
 
 ### 3. Repository-backed Wikis
@@ -25,20 +25,17 @@ module "azuredevops_wiki" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  wikis = {
-    project = {
-      name = "Project Wiki"
-      type = "projectWiki"
-    }
+  wiki = {
+    name = "Project Wiki"
+    type = "projectWiki"
   }
 
-  wiki_pages = [
-    {
-      wiki_key = "project"
-      path     = "/Home"
-      content  = "Welcome to the project wiki."
+  wiki_pages = {
+    home = {
+      path    = "/Home"
+      content = "Welcome to the project wiki."
     }
-  ]
+  }
 }
 ```
 
@@ -62,5 +59,5 @@ module "azuredevops_wiki" {
 ---
 
 **Module Version**: 1.0.0  
-**Last Updated**: 2025-12-24  
+**Last Updated**: 2026-02-14  
 **Security Contact**: patryk.ciechanski@patrykiti.pl

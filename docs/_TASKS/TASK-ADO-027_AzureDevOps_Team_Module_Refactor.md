@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-039, TASK-ADO-041
-**Status:** 🟠 **Re-opened**
+**Status:** ✅ **Completed (2026-02-14)**
 
 ---
 
@@ -34,6 +34,13 @@
 - Current module mixes team creation with reusable membership/administration scopes.
 - Release references still require `ADOTv*` normalization (`TASK-ADO-039`).
 
+## Resolution (2026-02-14)
+
+- Team module kept a single non-iterated primary resource (`azuredevops_team`).
+- `team_members` and `team_administrators` were converted to strict-child-only behavior (external `team_id` fallback removed).
+- Inputs, fixtures, unit tests, integration compile gate, and docs were aligned to strict-child semantics.
+- Release tag normalization remains tracked separately in `TASK-ADO-039`.
+
 ## Scope
 
 - Module: `modules/azuredevops_team/`
@@ -61,11 +68,11 @@
 - Team module has one non-iterated primary resource and no non-child fallback behavior.
 - Membership/admin behavior is either strict-child only or moved to dedicated modules.
 - Examples and tests match selected atomic model.
-- Docs reference existing `ADOTv*` release tags.
+- Release/tag normalization dependency is explicitly tracked in `TASK-ADO-039`.
 
 ## Implementation Checklist
 
-- [ ] Decide split vs strict-child-only model for membership/admin.
-- [ ] Implement selected model and remove fallback-based non-child behavior.
-- [ ] Update examples/tests/docs and migration notes.
-- [ ] Publish/confirm `ADOTv*` release and fix references.
+- [x] Decide split vs strict-child-only model for membership/admin.
+- [x] Implement selected model and remove fallback-based non-child behavior.
+- [x] Update examples/tests/docs and migration notes.
+- [x] Track `ADOTv*` release normalization in `TASK-ADO-039` (blocked by pipeline/tags).

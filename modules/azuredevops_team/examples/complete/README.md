@@ -50,7 +50,7 @@ terraform destroy
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_azuredevops_team"></a> [azuredevops\_team](#module\_azuredevops\_team) | ../../ | n/a |
+| <a name="module_azuredevops_team"></a> [azuredevops\_team](#module\_azuredevops\_team) | git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_team | ADOTv1.0.0 |
 
 ## Resources
 

@@ -8,7 +8,7 @@ Current version: **1.0.0**
 
 ## Description
 
-Azure DevOps wiki module for managing project and code wikis with pages.
+Azure DevOps wiki module for managing a single wiki and strict-child pages.
 
 ## Usage
 
@@ -20,20 +20,17 @@ module "azuredevops_wiki" {
 
   project_id = "00000000-0000-0000-0000-000000000000"
 
-  wikis = {
-    project = {
-      name = "Project Wiki"
-      type = "projectWiki"
-    }
+  wiki = {
+    name = "Project Wiki"
+    type = "projectWiki"
   }
 
-  wiki_pages = [
-    {
-      wiki_key = "project"
-      path     = "/Home"
-      content  = "Welcome to the project wiki."
+  wiki_pages = {
+    home = {
+      path    = "/Home"
+      content = "Welcome to the project wiki."
     }
-  ]
+  }
 }
 ```
 
@@ -42,14 +39,13 @@ module "azuredevops_wiki" {
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates creating a project wiki with a home page.
 - [Complete](examples/complete) - This example demonstrates a code wiki backed by a repository with multiple pages.
-- [Secure](examples/secure) - This example demonstrates a minimal wiki intended for security guidance.
+- [Secure](examples/secure) - This example demonstrates a wiki intended for security guidance.
 <!-- END_EXAMPLES -->
 
 ## Module Documentation
 
 - [docs/README.md](docs/README.md) - Module-specific documentation overview
-- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps wikis into the module
-
+- [docs/IMPORT.md](docs/IMPORT.md) - Import existing Azure DevOps wiki resources into the module
 
 <!-- BEGIN_TF_DOCS -->
 
@@ -83,17 +79,21 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Azure DevOps project ID. | `string` | n/a | yes |
-| <a name="input_wiki_pages"></a> [wiki\_pages](#input\_wiki\_pages) | List of wiki pages to manage. | <pre>list(object({<br/>    wiki_id  = optional(string)<br/>    wiki_key = optional(string)<br/>    path     = string<br/>    content  = string<br/>  }))</pre> | `[]` | no |
-| <a name="input_wikis"></a> [wikis](#input\_wikis) | Map of wikis to manage. | <pre>map(object({<br/>    name          = optional(string)<br/>    type          = string<br/>    repository_id = optional(string)<br/>    version       = optional(string)<br/>    mapped_path   = optional(string)<br/>  }))</pre> | `{}` | no |
+| <a name="input_wiki"></a> [wiki](#input\_wiki) | Wiki configuration managed by this module instance. | <pre>object({<br/>    name          = string<br/>    type          = string<br/>    repository_id = optional(string)<br/>    version       = optional(string)<br/>    mapped_path   = optional(string)<br/>  })</pre> | n/a | yes |
+| <a name="input_wiki_pages"></a> [wiki\_pages](#input\_wiki\_pages) | Map of wiki pages keyed by a stable semantic key. | <pre>map(object({<br/>    path    = string<br/>    content = string<br/>  }))</pre> | `{}` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_wiki_ids"></a> [wiki\_ids](#output\_wiki\_ids) | Map of wiki IDs keyed by wiki key. |
-| <a name="output_wiki_page_ids"></a> [wiki\_page\_ids](#output\_wiki\_page\_ids) | Map of wiki page IDs keyed by index. |
-| <a name="output_wiki_remote_urls"></a> [wiki\_remote\_urls](#output\_wiki\_remote\_urls) | Map of wiki remote URLs keyed by wiki key. |
-| <a name="output_wiki_urls"></a> [wiki\_urls](#output\_wiki\_urls) | Map of wiki REST URLs keyed by wiki key. |
+| <a name="output_wiki_id"></a> [wiki\_id](#output\_wiki\_id) | ID of the wiki created by this module. |
+| <a name="output_wiki_ids"></a> [wiki\_ids](#output\_wiki\_ids) | Map containing the wiki ID under the stable key `wiki`. |
+| <a name="output_wiki_name"></a> [wiki\_name](#output\_wiki\_name) | Name of the wiki created by this module. |
+| <a name="output_wiki_page_ids"></a> [wiki\_page\_ids](#output\_wiki\_page\_ids) | Map of wiki page IDs keyed by stable page key. |
+| <a name="output_wiki_remote_url"></a> [wiki\_remote\_url](#output\_wiki\_remote\_url) | Remote URL of the wiki created by this module. |
+| <a name="output_wiki_remote_urls"></a> [wiki\_remote\_urls](#output\_wiki\_remote\_urls) | Map containing the wiki remote URL under the stable key `wiki`. |
+| <a name="output_wiki_url"></a> [wiki\_url](#output\_wiki\_url) | REST API URL of the wiki created by this module. |
+| <a name="output_wiki_urls"></a> [wiki\_urls](#output\_wiki\_urls) | Map containing the wiki REST URL under the stable key `wiki`. |
 <!-- END_TF_DOCS -->
 
 ## Additional Documentation

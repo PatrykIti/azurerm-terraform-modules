@@ -4,14 +4,19 @@ mock_provider "azuredevops" {}
 
 variables {
   project_id = "00000000-0000-0000-0000-000000000000"
+
+  wiki = {
+    name = "core-wiki"
+    type = "projectWiki"
+  }
 }
 
 run "defaults_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_wiki.wiki) == 0
-    error_message = "No wikis should be created by default."
+    condition     = azuredevops_wiki.wiki.name == "core-wiki"
+    error_message = "One wiki should be created."
   }
 
   assert {

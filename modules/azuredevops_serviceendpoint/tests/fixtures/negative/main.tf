@@ -15,9 +15,20 @@ module "azuredevops_serviceendpoint" {
 
   project_id = var.project_id
 
+  serviceendpoint_generic = {
+    service_endpoint_name = "negative-endpoint"
+    server_url            = "https://example.endpoint.local"
+  }
+
   serviceendpoint_permissions = [
     {
-      principal = "vssgp.invalid"
+      principal = "vssgp.duplicate"
+      permissions = {
+        Use = "Allow"
+      }
+    },
+    {
+      principal = "vssgp.duplicate"
       permissions = {
         Use = "Allow"
       }

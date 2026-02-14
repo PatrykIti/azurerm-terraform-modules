@@ -13,71 +13,69 @@ variable "project_id" {
 }
 
 # -----------------------------------------------------------------------------
-# Wikis
+# Wiki
 # -----------------------------------------------------------------------------
 
-variable "wikis" {
-  description = "Map of wikis to manage."
-  type = map(object({
-    name          = optional(string)
+variable "wiki" {
+  description = "Wiki configuration managed by this module instance."
+  type = object({
+    name          = string
     type          = string
     repository_id = optional(string)
     version       = optional(string)
     mapped_path   = optional(string)
+  })
+
+  validation {
+    condition = (
+      length(trimspace(var.wiki.name)) > 0 &&
+      contains(["codeWiki", "projectWiki"], var.wiki.type)
+    )
+    error_message = "wiki.name must be non-empty and wiki.type must be codeWiki or projectWiki."
+  }
+
+  validation {
+    condition = (
+      var.wiki.repository_id == null || length(trimspace(var.wiki.repository_id)) > 0
+      ) && (
+      var.wiki.version == null || length(trimspace(var.wiki.version)) > 0
+      ) && (
+      var.wiki.mapped_path == null || length(trimspace(var.wiki.mapped_path)) > 0
+    )
+    error_message = "wiki.repository_id, wiki.version, and wiki.mapped_path must be non-empty strings when provided."
+  }
+}
+
+# -----------------------------------------------------------------------------
+# Wiki Pages (stable map keys)
+# -----------------------------------------------------------------------------
+
+variable "wiki_pages" {
+  description = "Map of wiki pages keyed by a stable semantic key."
+  type = map(object({
+    path    = string
+    content = string
   }))
   default = {}
 
   validation {
     condition = alltrue([
-      for wiki in values(var.wikis) : (
-        wiki.name == null || length(trimspace(wiki.name)) > 0
-      )
-    ])
-    error_message = "wikis.name must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for wiki in values(var.wikis) : contains(["codeWiki", "projectWiki"], wiki.type)
-    ])
-    error_message = "wikis.type must be codeWiki or projectWiki."
-  }
-}
-
-# -----------------------------------------------------------------------------
-# Wiki Pages
-# -----------------------------------------------------------------------------
-
-variable "wiki_pages" {
-  description = "List of wiki pages to manage."
-  type = list(object({
-    wiki_id  = optional(string)
-    wiki_key = optional(string)
-    path     = string
-    content  = string
-  }))
-  default = []
-
-  validation {
-    condition = alltrue([
-      for page in var.wiki_pages : (
-        (page.wiki_id != null) != (page.wiki_key != null)
-      )
-    ])
-    error_message = "wiki_pages must set exactly one of wiki_id or wiki_key."
-  }
-
-  validation {
-    condition = alltrue([
-      for page in var.wiki_pages : length(trimspace(page.path)) > 0
+      for page in values(var.wiki_pages) : length(trimspace(page.path)) > 0
     ])
     error_message = "wiki_pages.path must be a non-empty string."
   }
 
   validation {
     condition = alltrue([
-      for page in var.wiki_pages : length(page.content) > 0
+      for page in values(var.wiki_pages) : length(page.content) > 0
     ])
     error_message = "wiki_pages.content must be a non-empty string."
+  }
+
+  validation {
+    condition = length(distinct([
+      for page in values(var.wiki_pages) : page.path
+    ])) == length(var.wiki_pages)
+    error_message = "wiki_pages must have unique path values."
   }
 }

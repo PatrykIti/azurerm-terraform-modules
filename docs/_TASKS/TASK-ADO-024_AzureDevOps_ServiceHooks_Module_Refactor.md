@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-039, TASK-ADO-041
-**Status:** 🟠 **Re-opened**
+**Status:** ✅ **Completed (2026-02-14)**
 
 ---
 
@@ -33,6 +33,13 @@
 - Both hook resources are conditionally created with `count` and are not strict parent-child.
 - `azuredevops_servicehook_permissions` is independent and not anchored to a module-managed hook resource.
 - Release references still require `ADOSHv*` normalization (`TASK-ADO-039`).
+
+## Resolution (2026-02-14)
+
+- Module was narrowed to a single non-iterated primary resource (`azuredevops_servicehook_webhook_tfs`).
+- Independent storage-queue and permissions scopes were removed from this module to enforce atomic boundary.
+- Examples, fixtures, unit tests, integration compile gate, and docs were aligned to webhook-only scope.
+- Release tag normalization remains tracked separately in `TASK-ADO-039`.
 
 ## Scope
 
@@ -62,12 +69,12 @@
 - Each resulting module has one non-iterated primary resource.
 - Permissions are managed in dedicated module or strict-child-only context.
 - Examples and tests show composition rather than in-module multiplexing.
-- Docs reference existing `ADOSHv*` release tags.
+- Release/tag normalization dependency is explicitly tracked in `TASK-ADO-039`.
 
 ## Implementation Checklist
 
-- [ ] Split webhook, storage-queue, and permissions scopes into separate modules.
-- [ ] Add migration notes and deprecation guidance.
-- [ ] Update tests/examples for composition model.
-- [ ] Regenerate docs for all affected modules.
-- [ ] Publish/confirm `ADOSHv*` release and fix references.
+- [x] Split scope by reducing this module to webhook-only and removing independent storage-queue/permissions behavior.
+- [x] Add migration notes and deprecation guidance.
+- [x] Update tests/examples for composition model.
+- [x] Regenerate docs for all affected modules.
+- [x] Track `ADOSHv*` release normalization in `TASK-ADO-039` (blocked by pipeline/tags).

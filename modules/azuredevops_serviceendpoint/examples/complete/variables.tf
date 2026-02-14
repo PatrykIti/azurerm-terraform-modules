@@ -4,7 +4,7 @@ variable "project_id" {
 }
 
 variable "generic_endpoint_name" {
-  description = "Generic service endpoint name."
+  description = "Base name for generic service endpoints."
   type        = string
   default     = "ado-generic-complete"
 }
@@ -23,18 +23,6 @@ variable "generic_endpoint_username" {
 
 variable "generic_endpoint_password" {
   description = "Generic service endpoint password."
-  type        = string
-  sensitive   = true
-}
-
-variable "incoming_webhook_endpoint_name" {
-  description = "Incoming webhook service endpoint name."
-  type        = string
-  default     = "ado-incoming-webhook"
-}
-
-variable "incoming_webhook_secret" {
-  description = "Incoming webhook secret."
   type        = string
   sensitive   = true
 }

@@ -15,7 +15,7 @@ data "azuredevops_group" "project_collection_admins" {
 }
 
 module "azuredevops_team" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_team?ref=ADOTv1.0.0"
+  source = "../../"
 
   project_id  = var.project_id
   name        = var.team_name

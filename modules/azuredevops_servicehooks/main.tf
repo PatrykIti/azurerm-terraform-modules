@@ -1,24 +1,4 @@
-locals {
-  permission_value_map = {
-    allow  = "Allow"
-    deny   = "Deny"
-    notset = "NotSet"
-  }
-
-  servicehook_permissions = {
-    for permission in var.servicehook_permissions :
-    coalesce(permission.key, permission.principal) => {
-      project_id  = coalesce(permission.project_id, var.project_id)
-      principal   = permission.principal
-      permissions = { for name, status in permission.permissions : name => local.permission_value_map[lower(status)] }
-      replace     = try(permission.replace, true)
-    }
-  }
-}
-
 resource "azuredevops_servicehook_webhook_tfs" "webhook" {
-  count = var.webhook == null ? 0 : 1
-
   project_id                = var.project_id
   url                       = try(var.webhook.url, null)
   accept_untrusted_certs    = try(var.webhook.accept_untrusted_certs, null)
@@ -189,43 +169,4 @@ resource "azuredevops_servicehook_webhook_tfs" "webhook" {
       links_changed  = try(work_item_updated.value.links_changed, null)
     }
   }
-}
-
-resource "azuredevops_servicehook_storage_queue_pipelines" "storage_queue" {
-  count = var.storage_queue_hook == null ? 0 : 1
-
-  project_id   = var.project_id
-  account_name = try(var.storage_queue_hook.account_name, null)
-  account_key  = try(sensitive(var.storage_queue_hook.account_key), null)
-  queue_name   = try(var.storage_queue_hook.queue_name, null)
-  ttl          = try(var.storage_queue_hook.ttl, null)
-  visi_timeout = try(var.storage_queue_hook.visi_timeout, null)
-
-  dynamic "run_state_changed_event" {
-    for_each = try(var.storage_queue_hook.run_state_changed_event, null) == null ? [] : [var.storage_queue_hook.run_state_changed_event]
-    content {
-      pipeline_id       = try(run_state_changed_event.value.pipeline_id, null)
-      run_result_filter = try(run_state_changed_event.value.run_result_filter, null)
-      run_state_filter  = try(run_state_changed_event.value.run_state_filter, null)
-    }
-  }
-
-  dynamic "stage_state_changed_event" {
-    for_each = try(var.storage_queue_hook.stage_state_changed_event, null) == null ? [] : [var.storage_queue_hook.stage_state_changed_event]
-    content {
-      pipeline_id         = try(stage_state_changed_event.value.pipeline_id, null)
-      stage_name          = try(stage_state_changed_event.value.stage_name, null)
-      stage_result_filter = try(stage_state_changed_event.value.stage_result_filter, null)
-      stage_state_filter  = try(stage_state_changed_event.value.stage_state_filter, null)
-    }
-  }
-}
-
-resource "azuredevops_servicehook_permissions" "servicehook_permissions" {
-  for_each = local.servicehook_permissions
-
-  project_id  = each.value.project_id
-  principal   = each.value.principal
-  permissions = each.value.permissions
-  replace     = each.value.replace
 }

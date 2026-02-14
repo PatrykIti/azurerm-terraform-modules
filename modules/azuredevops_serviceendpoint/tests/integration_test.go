@@ -30,10 +30,12 @@ func TestAzuredevopsServiceendpointFullIntegration(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		genericEndpointID := terraform.Output(t, terraformOptions, "generic_serviceendpoint_id")
-		genericPermissions := terraform.OutputMap(t, terraformOptions, "generic_permissions")
+		primaryEndpointID := terraform.Output(t, terraformOptions, "primary_serviceendpoint_id")
+		secondaryEndpointID := terraform.Output(t, terraformOptions, "secondary_serviceendpoint_id")
+		primaryPermissions := terraform.OutputMap(t, terraformOptions, "primary_permissions")
 
-		assert.NotEmpty(t, genericEndpointID)
-		assert.NotEmpty(t, genericPermissions)
+		assert.NotEmpty(t, primaryEndpointID)
+		assert.NotEmpty(t, secondaryEndpointID)
+		assert.NotEmpty(t, primaryPermissions)
 	})
 }

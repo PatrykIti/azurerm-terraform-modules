@@ -110,7 +110,7 @@ func TestAzuredevopsTeamValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "team_members entries must set key when team_id is not provided")
+	assert.Contains(t, err.Error(), "team_members")
 }
 
 // Helper function to get terraform options

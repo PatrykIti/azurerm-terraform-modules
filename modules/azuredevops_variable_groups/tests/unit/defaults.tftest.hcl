@@ -26,9 +26,4 @@ run "defaults_plan" {
     condition     = length(azuredevops_variable_group_permissions.variable_group_permissions) == 0
     error_message = "No variable group permissions should be created by default."
   }
-
-  assert {
-    condition     = length(azuredevops_library_permissions.library_permissions) == 0
-    error_message = "No library permissions should be created by default."
-  }
 }

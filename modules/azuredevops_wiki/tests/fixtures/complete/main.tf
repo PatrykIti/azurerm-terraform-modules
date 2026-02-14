@@ -33,13 +33,18 @@ module "azuredevops_wiki" {
 
   project_id = var.project_id
 
-  wikis = {
-    code = {
-      name          = "${var.wiki_name_prefix}-complete"
-      type          = "codeWiki"
-      repository_id = azuredevops_git_repository.wiki_repo.id
-      version       = "master"
-      mapped_path   = "/"
+  wiki = {
+    name          = "${var.wiki_name_prefix}-complete"
+    type          = "codeWiki"
+    repository_id = azuredevops_git_repository.wiki_repo.id
+    version       = "master"
+    mapped_path   = "/"
+  }
+
+  wiki_pages = {
+    runbooks = {
+      path    = "/Runbooks"
+      content = "Runbooks and operational notes."
     }
   }
 

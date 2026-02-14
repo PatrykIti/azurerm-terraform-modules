@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes security considerations for Azure DevOps service hooks managed with Terraform.
+This document describes security considerations for Azure DevOps webhook service hooks managed with Terraform.
 
 ## Security Features
 
@@ -14,9 +14,9 @@ This document describes security considerations for Azure DevOps service hooks m
 - Avoid storing basic auth secrets directly in code.
 - Use external secret managers or environment variables for sensitive values.
 
-### 3. Permissions
-- Restrict service hook permissions to trusted groups only.
-- Avoid granting publish or edit permissions broadly.
+### 3. Event Scope Hardening
+- Prefer specific events and filters instead of broad subscriptions.
+- Keep webhook endpoints isolated per integration where feasible.
 
 ## Security Configuration Example
 
@@ -32,18 +32,6 @@ module "azuredevops_servicehooks" {
       branch = "refs/heads/main"
     }
   }
-
-  servicehook_permissions = [
-    {
-      principal = "vssgp.Uy0xLTktMTIzNDU2"
-      permissions = {
-        ViewSubscriptions   = "allow"
-        EditSubscriptions   = "deny"
-        DeleteSubscriptions = "deny"
-        PublishEvents       = "deny"
-      }
-    }
-  ]
 }
 ```
 
@@ -52,13 +40,13 @@ module "azuredevops_servicehooks" {
 - [ ] Use HTTPS endpoints and verify certificate trust.
 - [ ] Limit event scope with branch/repository filters.
 - [ ] Store webhook credentials outside of Terraform state.
-- [ ] Apply least-privilege permissions for service hooks.
+- [ ] Keep webhook subscriptions least-privilege and narrowly scoped.
 
 ## Common Security Mistakes to Avoid
 
 1. **Using HTTP endpoints without TLS**
 2. **Publishing all events without filters**
-3. **Granting edit/delete permissions to broad groups**
+3. **Embedding webhook credentials directly in code**
 
 ## Additional Resources
 
@@ -68,5 +56,5 @@ module "azuredevops_servicehooks" {
 ---
 
 **Module Version**: 1.0.0  
-**Last Updated**: 2025-12-24  
+**Last Updated**: 2026-02-14  
 **Security Contact**: patryk.ciechanski@patrykiti.pl

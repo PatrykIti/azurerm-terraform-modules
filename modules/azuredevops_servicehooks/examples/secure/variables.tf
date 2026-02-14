@@ -8,11 +8,6 @@ variable "webhook_url" {
   type        = string
 }
 
-variable "principal_descriptor" {
-  description = "Principal descriptor for service hook permissions."
-  type        = string
-}
-
 variable "area_path" {
   description = "Area path for work item filters."
   type        = string

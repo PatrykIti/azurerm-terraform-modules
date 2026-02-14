@@ -12,8 +12,3 @@ variable "principal_descriptor" {
   description = "Principal descriptor for variable group permissions."
   type        = string
 }
-
-variable "library_principal_descriptor" {
-  description = "Principal descriptor for library permissions."
-  type        = string
-}

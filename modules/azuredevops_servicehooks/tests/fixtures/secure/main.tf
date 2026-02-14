@@ -10,11 +10,6 @@ terraform {
 
 provider "azuredevops" {}
 
-data "azuredevops_group" "readers" {
-  project_id = var.project_id
-  name       = "Readers"
-}
-
 module "azuredevops_servicehooks" {
   source = "../../../"
 
@@ -24,19 +19,7 @@ module "azuredevops_servicehooks" {
     url = var.webhook_url
     work_item_updated = {
       work_item_type = "Bug"
+      changed_fields = "System.State"
     }
   }
-
-  servicehook_permissions = [
-    {
-      key       = "readers-permissions"
-      principal = data.azuredevops_group.readers.id
-      permissions = {
-        ViewSubscriptions   = "Allow"
-        EditSubscriptions   = "Deny"
-        DeleteSubscriptions = "Deny"
-        PublishEvents       = "Deny"
-      }
-    }
-  ]
 }

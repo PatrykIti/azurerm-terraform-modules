@@ -11,22 +11,19 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_wiki" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_wiki?ref=ADOWIv1.0.0"
+  source = "../../"
 
   project_id = var.project_id
 
-  wikis = {
-    project = {
-      name = "Secure Wiki"
-      type = "projectWiki"
-    }
+  wiki = {
+    name = "Secure Wiki"
+    type = "projectWiki"
   }
 
-  wiki_pages = [
-    {
-      wiki_key = "project"
-      path     = "/Security"
-      content  = "Security guidelines (no secrets stored here)."
+  wiki_pages = {
+    security = {
+      path    = "/Security"
+      content = "Security guidelines (no secrets stored here)."
     }
-  ]
+  }
 }

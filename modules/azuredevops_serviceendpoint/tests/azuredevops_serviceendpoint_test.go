@@ -56,13 +56,13 @@ func TestCompleteAzuredevopsServiceendpoint(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		genericEndpointID := terraform.Output(t, terraformOptions, "generic_serviceendpoint_id")
-		webhookEndpointID := terraform.Output(t, terraformOptions, "incomingwebhook_serviceendpoint_id")
-		genericPermissions := terraform.OutputMap(t, terraformOptions, "generic_permissions")
+		primaryEndpointID := terraform.Output(t, terraformOptions, "primary_serviceendpoint_id")
+		secondaryEndpointID := terraform.Output(t, terraformOptions, "secondary_serviceendpoint_id")
+		primaryPermissions := terraform.OutputMap(t, terraformOptions, "primary_permissions")
 
-		assert.NotEmpty(t, genericEndpointID)
-		assert.NotEmpty(t, webhookEndpointID)
-		assert.NotEmpty(t, genericPermissions)
+		assert.NotEmpty(t, primaryEndpointID)
+		assert.NotEmpty(t, secondaryEndpointID)
+		assert.NotEmpty(t, primaryPermissions)
 	})
 }
 
@@ -106,7 +106,7 @@ func TestAzuredevopsServiceendpointValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "Exactly one serviceendpoint_")
+	assert.Contains(t, err.Error(), "unique keys")
 }
 
 // Helper function to get terraform options
@@ -118,9 +118,8 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
-			"project_id":                    getProjectID(t),
-			"generic_endpoint_name_prefix":  fmt.Sprintf("ado-endpoint-%s", uniqueID),
-			"incoming_webhook_name_prefix":  fmt.Sprintf("ado-webhook-%s", uniqueID),
+			"project_id":                   getProjectID(t),
+			"generic_endpoint_name_prefix": fmt.Sprintf("ado-endpoint-%s", uniqueID),
 		},
 		NoColor: true,
 		RetryableTerraformErrors: map[string]string{

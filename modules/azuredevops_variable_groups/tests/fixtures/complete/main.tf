@@ -45,16 +45,4 @@ module "azuredevops_variable_groups" {
       }
     }
   ]
-
-  library_permissions = [
-    {
-      key       = "readers"
-      principal = data.azuredevops_group.readers.id
-      permissions = {
-        View   = "allow"
-        Create = "allow"
-        Use    = "allow"
-      }
-    }
-  ]
 }

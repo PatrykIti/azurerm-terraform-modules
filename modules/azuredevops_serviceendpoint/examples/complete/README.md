@@ -1,12 +1,11 @@
 # Complete Azure DevOps Service Endpoints Example
 
-This example demonstrates creating multiple service endpoints using module-level for_each.
+This example demonstrates creating multiple generic service endpoints using module-level `for_each`.
 
 ## Features
 
-- Generic service endpoint
-- Incoming webhook service endpoint
-- Permissions applied to the module-created endpoint
+- Multiple generic service endpoint instances
+- Explicit permissions on selected endpoint instance
 
 ## Usage
 
@@ -54,12 +53,10 @@ terraform destroy
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_generic_endpoint_name"></a> [generic\_endpoint\_name](#input\_generic\_endpoint\_name) | Generic service endpoint name. | `string` | `"ado-generic-complete"` | no |
+| <a name="input_generic_endpoint_name"></a> [generic\_endpoint\_name](#input\_generic\_endpoint\_name) | Base name for generic service endpoints. | `string` | `"ado-generic-complete"` | no |
 | <a name="input_generic_endpoint_password"></a> [generic\_endpoint\_password](#input\_generic\_endpoint\_password) | Generic service endpoint password. | `string` | n/a | yes |
 | <a name="input_generic_endpoint_url"></a> [generic\_endpoint\_url](#input\_generic\_endpoint\_url) | Generic service endpoint URL. | `string` | `"https://example.endpoint.local"` | no |
 | <a name="input_generic_endpoint_username"></a> [generic\_endpoint\_username](#input\_generic\_endpoint\_username) | Generic service endpoint username. | `string` | `"example-user"` | no |
-| <a name="input_incoming_webhook_endpoint_name"></a> [incoming\_webhook\_endpoint\_name](#input\_incoming\_webhook\_endpoint\_name) | Incoming webhook service endpoint name. | `string` | `"ado-incoming-webhook"` | no |
-| <a name="input_incoming_webhook_secret"></a> [incoming\_webhook\_secret](#input\_incoming\_webhook\_secret) | Incoming webhook secret. | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Azure DevOps project ID. | `string` | n/a | yes |
 
 ## Outputs

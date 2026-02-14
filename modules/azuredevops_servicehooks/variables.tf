@@ -13,7 +13,7 @@ variable "project_id" {
 }
 
 # -----------------------------------------------------------------------------
-# Webhook Service Hooks (TFS)
+# Webhook Service Hook (TFS)
 # -----------------------------------------------------------------------------
 
 variable "webhook" {
@@ -114,11 +114,10 @@ variable "webhook" {
       links_changed  = optional(bool)
     }))
   })
-  default   = null
   sensitive = true
 
   validation {
-    condition = var.webhook == null || (
+    condition = (
       length(trimspace(var.webhook.url)) > 0 &&
       (var.webhook.basic_auth_username == null || length(trimspace(var.webhook.basic_auth_username)) > 0) &&
       (var.webhook.basic_auth_password == null || length(trimspace(var.webhook.basic_auth_password)) > 0)
@@ -127,7 +126,7 @@ variable "webhook" {
   }
 
   validation {
-    condition = var.webhook == null || length(compact([
+    condition = length(compact([
       var.webhook.build_completed == null ? null : "build_completed",
       var.webhook.git_pull_request_commented == null ? null : "git_pull_request_commented",
       var.webhook.git_pull_request_created == null ? null : "git_pull_request_created",
@@ -152,12 +151,12 @@ variable "webhook" {
   }
 
   validation {
-    condition     = var.webhook == null || var.webhook.tfvc_checkin == null || length(trimspace(var.webhook.tfvc_checkin.path)) > 0
+    condition     = var.webhook.tfvc_checkin == null || length(trimspace(var.webhook.tfvc_checkin.path)) > 0
     error_message = "webhook.tfvc_checkin.path must be a non-empty string."
   }
 
   validation {
-    condition = var.webhook == null || var.webhook.resource_details_to_send == null || contains([
+    condition = var.webhook.resource_details_to_send == null || contains([
       "all",
       "minimal",
       "none",
@@ -166,7 +165,7 @@ variable "webhook" {
   }
 
   validation {
-    condition = var.webhook == null || var.webhook.messages_to_send == null || contains([
+    condition = var.webhook.messages_to_send == null || contains([
       "all",
       "text",
       "html",
@@ -177,7 +176,7 @@ variable "webhook" {
   }
 
   validation {
-    condition = var.webhook == null || var.webhook.detailed_messages_to_send == null || contains([
+    condition = var.webhook.detailed_messages_to_send == null || contains([
       "all",
       "text",
       "html",
@@ -185,109 +184,5 @@ variable "webhook" {
       "none",
     ], lower(var.webhook.detailed_messages_to_send))
     error_message = "webhook.detailed_messages_to_send must be one of: all, text, html, markdown, none."
-  }
-}
-
-# -----------------------------------------------------------------------------
-# Storage Queue Pipelines Hooks
-# -----------------------------------------------------------------------------
-
-variable "storage_queue_hook" {
-  description = "Storage queue pipeline hook configuration. Includes sensitive fields like account_key."
-  type = object({
-    account_name = string
-    account_key  = string
-    queue_name   = string
-    ttl          = optional(number)
-    visi_timeout = optional(number)
-    run_state_changed_event = optional(object({
-      pipeline_id       = optional(string)
-      run_result_filter = optional(string)
-      run_state_filter  = optional(string)
-    }))
-    stage_state_changed_event = optional(object({
-      pipeline_id         = optional(string)
-      stage_name          = optional(string)
-      stage_result_filter = optional(string)
-      stage_state_filter  = optional(string)
-    }))
-  })
-  default   = null
-  sensitive = true
-
-  validation {
-    condition = var.storage_queue_hook == null || (
-      length(trimspace(var.storage_queue_hook.account_name)) > 0 &&
-      length(trimspace(var.storage_queue_hook.account_key)) > 0 &&
-      length(trimspace(var.storage_queue_hook.queue_name)) > 0
-    )
-    error_message = "storage_queue_hook requires account_name, account_key, and queue_name."
-  }
-
-  validation {
-    condition = var.storage_queue_hook == null || (
-      (var.storage_queue_hook.run_state_changed_event == null) != (var.storage_queue_hook.stage_state_changed_event == null)
-    )
-    error_message = "storage_queue_hook must set exactly one of run_state_changed_event or stage_state_changed_event."
-  }
-
-  validation {
-    condition     = var.storage_queue_hook == null || var.storage_queue_hook.ttl == null || var.storage_queue_hook.ttl >= 0
-    error_message = "storage_queue_hook.ttl must be 0 or greater when provided."
-  }
-
-  validation {
-    condition     = var.storage_queue_hook == null || var.storage_queue_hook.visi_timeout == null || var.storage_queue_hook.visi_timeout >= 0
-    error_message = "storage_queue_hook.visi_timeout must be 0 or greater when provided."
-  }
-}
-
-# -----------------------------------------------------------------------------
-# Service Hook Permissions
-# -----------------------------------------------------------------------------
-
-variable "servicehook_permissions" {
-  description = "List of service hook permissions to assign."
-  type = list(object({
-    key         = optional(string)
-    principal   = string
-    permissions = map(string)
-    replace     = optional(bool, true)
-    project_id  = optional(string)
-  }))
-  default = []
-
-  validation {
-    condition = alltrue([
-      for permission in var.servicehook_permissions : (
-        length(trimspace(permission.principal)) > 0 &&
-        (permission.key == null || length(trimspace(permission.key)) > 0) &&
-        (permission.project_id == null || length(trimspace(permission.project_id)) > 0)
-      )
-    ])
-    error_message = "servicehook_permissions.principal must be non-empty; key/project_id must be non-empty when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for permission in var.servicehook_permissions : length(permission.permissions) > 0
-    ])
-    error_message = "servicehook_permissions.permissions must be a non-empty map."
-  }
-
-  validation {
-    condition = alltrue([
-      for permission in var.servicehook_permissions : alltrue([
-        for status in values(permission.permissions) : contains(["allow", "deny", "notset"], lower(status))
-      ])
-    ])
-    error_message = "servicehook_permissions.permissions values must be one of: Allow, Deny, NotSet."
-  }
-
-  validation {
-    condition = length(distinct([
-      for permission in var.servicehook_permissions : coalesce(permission.key, permission.principal)
-    ])) == length(var.servicehook_permissions)
-    error_message = "servicehook_permissions keys must be unique; set key when principal would collide."
   }
 }

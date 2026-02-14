@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-021, TASK-ADO-022, TASK-ADO-024, TASK-ADO-025, TASK-ADO-026, TASK-ADO-027, docs/MODULE_GUIDE/11-scope-and-provider-coverage-status-check.md, module-release workflow
-**Status:** 🟡 To Do
+**Status:** 🟠 **In Progress (blocked by release tags/pipeline)**
 
 ---
 
@@ -39,7 +39,14 @@ Before release normalization is marked done, each affected module must satisfy t
 
 - `module.json` uses `tag_prefix` with `v` in all 7 modules, but available Git tags are still only legacy non-`v` tags (`ADOPI1.0.0`, `ADOSE1.0.0`, `ADOSH1.0.0`, `ADOT1.0.0`, `ADOVG1.0.0`, `ADOWI1.0.0`, `ADOWK1.0.0`).
 - Root module catalog still points to non-`v` releases for these 7 modules (`README.md` Azure DevOps table), which conflicts with current release convention.
-- Atomic-boundary closure is still open in dependent tasks `021/022/024/025/026/027`.
+- Atomic-boundary closure is still open in dependent tasks `021` and `026`.
+
+## Progress Snapshot (2026-02-14)
+
+- Atomic-boundary closure evidence completed: `TASK-ADO-022`, `TASK-ADO-024`, `TASK-ADO-025`, `TASK-ADO-027`, `TASK-ADO-040`.
+- Atomic-boundary closure still open: `TASK-ADO-021` (`azuredevops_pipelines`) and `TASK-ADO-026` (`azuredevops_work_items`).
+- `docs/_TASKS/README.md` board was refreshed to reflect done vs in-progress state.
+- Changelog traceability note was added under `docs/_CHANGELOG/089-2026-02-14-ado-atomic-realignment-wave2.md`.
 
 ## Scope
 
@@ -83,9 +90,9 @@ Before release normalization is marked done, each affected module must satisfy t
 ## Implementation Checklist
 
 - [ ] Verify and document current tag state for all 7 modules (`git tag -l '<PREFIX>*'` evidence).
-- [ ] Verify atomic-boundary closure evidence for all 7 modules.
+- [ ] Verify atomic-boundary closure evidence for all 7 modules (5/7 complete: `022/024/025/027/040`).
 - [ ] Execute/verify module release pipeline to publish `v`-prefixed patch tags for each module.
 - [ ] Update root `README.md` version links to new `v` tags.
 - [ ] Attach module audit closure reports (status + matrix + action plan).
-- [ ] Update `docs/_TASKS/README.md` status/counts.
-- [ ] Add changelog note documenting release-tag normalization policy.
+- [x] Update `docs/_TASKS/README.md` status/counts.
+- [x] Add changelog note documenting release-tag normalization policy.

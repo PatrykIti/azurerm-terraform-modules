@@ -1,4 +1,4 @@
-# Test outputs for Azure DevOps Service Endpoints
+# Test outputs for Azure DevOps Service Endpoint (Generic)
 
 mock_provider "azuredevops" {
   mock_resource "azuredevops_serviceendpoint_generic" {
@@ -21,8 +21,6 @@ variables {
   serviceendpoint_generic = {
     service_endpoint_name = "generic-endpoint"
     server_url            = "https://example.endpoint.local"
-    username              = "user"
-    password              = "pass"
   }
 
   serviceendpoint_permissions = [
