@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [096](./096-2026-02-15-ado-environments-compliance-fixes.md) | 2026-02-15 | Azure DevOps environments compliance fixes | Breaking Change / Maintenance |
 | [095](./095-2026-02-14-ado-repository-refactor-closure.md) | 2026-02-14 | Azure DevOps repository refactor closure | Maintenance / Documentation |
 | [094](./094-2026-02-14-ado-environments-refactor-board-reverification.md) | 2026-02-14 | Azure DevOps environments refactor board re-verification | Maintenance / Documentation |
 | [093](./093-2026-02-14-ado-extension-refactor-closure.md) | 2026-02-14 | Azure DevOps extension refactor closure | Maintenance / Documentation |

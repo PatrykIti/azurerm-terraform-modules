@@ -21,7 +21,7 @@ run "defaults_plan" {
   }
 
   assert {
-    condition     = length(azuredevops_check_approval.check_approval) == 0
+    condition     = length(azuredevops_check_approval.check_approval_environment) == 0
     error_message = "No checks should be created by default."
   }
 }

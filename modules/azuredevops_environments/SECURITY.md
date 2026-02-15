@@ -2,62 +2,36 @@
 
 ## Overview
 
-This document describes security considerations for Azure DevOps environments and checks managed with Terraform.
+This module manages Azure DevOps environments and checks. Secure defaults are focused on explicit deployment gates.
 
-## Security Features
+## Security Controls in Module
 
-### 1. Environment Checks
-- Require approvals before deployments.
-- Enforce branch control and business hours to restrict release windows.
+- Approval checks (`check_approvals`)
+- Branch control checks (`check_branch_controls`)
+- Business hours checks (`check_business_hours`)
+- Exclusive lock checks (`check_exclusive_locks`)
+- Required template checks (`check_required_templates`)
+- REST API checks (`check_rest_apis`)
 
-### 2. Exclusive Locks
-- Use exclusive lock checks to prevent concurrent deployments.
+## Scope Rules
 
-### 3. Required Templates
-- Enforce pipeline templates to standardize deployments.
+- Root `check_*` inputs protect the environment resource.
+- Nested checks in `kubernetes_resources[*].checks` protect the backing service endpoint.
+- The module does not expose arbitrary check targets.
 
-## Security Configuration Example
+## Secure Example
 
-```hcl
-module "azuredevops_environments" {
-  source = "./modules/azuredevops_environments"
+Use `examples/secure` as the hardened baseline configuration for production-like environments.
 
-  project_id  = "00000000-0000-0000-0000-000000000000"
-  name        = "ado-env-prod"
-  description = "Production environment"
+## Hardening Checklist
 
-  check_approvals = [
-    {
-      name                 = "prod-approval"
-      approvers            = ["00000000-0000-0000-0000-000000000000"]
-      requester_can_approve = false
-    }
-  ]
-}
-```
+- [ ] Require approvals for sensitive environments.
+- [ ] Use exclusive locks to prevent concurrent deployments.
+- [ ] Restrict branches for protected environments/resources.
+- [ ] Limit deployment windows with business hours.
+- [ ] Enforce required templates for governance.
 
-For a hardened configuration, see the secure example in `modules/azuredevops_environments/examples/secure`.
+## References
 
-## Security Hardening Checklist
-
-- [ ] Require approvals for production environments.
-- [ ] Use exclusive locks to prevent parallel deployments.
-- [ ] Restrict deployments to approved branches.
-- [ ] Define business hours for sensitive environments.
-
-## Common Security Mistakes to Avoid
-
-1. **Skipping approvals for production environments**
-2. **Allowing deployments outside approved hours**
-3. **Leaving environments without explicit checks**
-
-## Additional Resources
-
-- [Approvals and Checks](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals?view=azure-devops)
-- [Environments](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/environments?view=azure-devops)
-
----
-
-**Module Version**: 1.0.0  
-**Last Updated**: 2025-12-24  
-**Security Contact**: patryk.ciechanski@patrykiti.pl
+- https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals
+- https://learn.microsoft.com/en-us/azure/devops/pipelines/process/environments

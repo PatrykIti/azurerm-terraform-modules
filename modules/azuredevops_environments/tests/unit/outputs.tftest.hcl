@@ -58,4 +58,9 @@ run "outputs_apply" {
     condition     = length(keys(output.check_ids.environment.approvals)) == 1
     error_message = "check_ids should include configured approvals."
   }
+
+  assert {
+    condition     = length(keys(output.check_ids.kubernetes_resources)) == 1
+    error_message = "check_ids should include kubernetes resource grouping."
+  }
 }

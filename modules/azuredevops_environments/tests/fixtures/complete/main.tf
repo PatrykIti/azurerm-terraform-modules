@@ -62,6 +62,15 @@ module "azuredevops_environments" {
       namespace           = "default"
       service_endpoint_id = azuredevops_serviceendpoint_kubernetes.example.id
       cluster_name        = "example-aks"
+      checks = {
+        branch_controls = [
+          {
+            name                     = "k8s-endpoint-branch-control"
+            allowed_branches         = "refs/heads/main"
+            verify_branch_protection = true
+          }
+        ]
+      }
     }
   ]
 
@@ -75,7 +84,7 @@ module "azuredevops_environments" {
 
   check_branch_controls = [
     {
-      name                     = "env-branch-control"
+      name                     = "environment-branch-control"
       allowed_branches         = "refs/heads/main"
       verify_branch_protection = true
     }
