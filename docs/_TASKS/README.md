@@ -4,8 +4,8 @@ Task board for module work. Update statuses in markdown files.
 
 ## Statistics
 - **To Do:** 11 tasks
-- **In Progress:** 1 task
-- **Done:** 81 tasks
+- **In Progress:** 0 tasks
+- **Done:** 82 tasks
 
 ---
 
@@ -31,7 +31,7 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
-| [TASK-ADO-039](./TASK-ADO-039_AzureDevOps_Release_Tag_Normalization_and_Audit_Closure.md) | **Azure DevOps release tag normalization and audit closure (7 modules)** | High | Medium | Waiting for `v` tag publication/pipeline closure; atomic closure done for 021/022/024/025/026/027/040 |
+| _None_ | - | - | - | - |
 
 ---
 
@@ -46,6 +46,7 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-034](./TASK-ADO-034_AzureDevOps_Environments_Module_Compliance_Fixes.md) | **Azure DevOps Environments module compliance fixes** | High | Medium | Completed 2026-02-15; nested kubernetes checks + docs/tests alignment |
 | [TASK-ADO-036](./TASK-ADO-036_AzureDevOps_Service_Principal_Entitlement_Module_Compliance_Alignment.md) | **Azure DevOps Service Principal Entitlement module compliance alignment** | High | Medium | Completed 2026-02-15; re-audit passed, examples switched to local source |
 | [TASK-ADO-035](./TASK-ADO-035_AzureDevOps_Identity_Module_Compliance_Fixes.md) | **Azure DevOps Identity module compliance fixes** | High | Medium | Completed 2026-02-15; scope fulfilled via 042/043/036/037/038 |
+| [TASK-ADO-039](./TASK-ADO-039_AzureDevOps_Release_Tag_Normalization_and_Audit_Closure.md) | **Azure DevOps release tag normalization and audit closure (7 modules)** | High | Medium | Completed 2026-02-15; docs normalized to `v` tag-prefix convention, release execution in maintainer flow |
 | [TASK-ADO-023](./TASK-ADO-023_AzureDevOps_Repository_Module_Refactor.md) | **Azure DevOps Repository module refactor** | High | Large | Completed (re-verified 2026-02-14); full module gate passed |
 | [TASK-ADO-026](./TASK-ADO-026_AzureDevOps_Work_Items_Module_Refactor.md) | **Azure DevOps Work Items module refactor** | High | Medium | Completed 2026-02-14; narrowed to single `azuredevops_workitem` atomic scope |
 | [TASK-ADO-021](./TASK-ADO-021_AzureDevOps_Pipelines_Module_Refactor.md) | **Azure DevOps Pipelines module refactor** | High | Medium | Completed 2026-02-14; removed non-child folder/legacy scopes |

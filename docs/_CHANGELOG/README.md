@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [099](./099-2026-02-15-ado-release-tag-normalization-task-closure.md) | 2026-02-15 | Azure DevOps release tag normalization task closure | Maintenance / Documentation |
 | [098](./098-2026-02-15-ado-identity-compliance-task-closure.md) | 2026-02-15 | Azure DevOps identity compliance task closure | Maintenance / Documentation |
 | [097](./097-2026-02-15-ado-service-principal-entitlement-compliance-closure.md) | 2026-02-15 | Azure DevOps service principal entitlement compliance closure | Maintenance / Documentation |
 | [096](./096-2026-02-15-ado-environments-compliance-fixes.md) | 2026-02-15 | Azure DevOps environments compliance fixes | Breaking Change / Maintenance |
