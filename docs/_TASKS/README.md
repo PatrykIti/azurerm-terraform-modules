@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 12 tasks
+- **To Do:** 11 tasks
 - **In Progress:** 1 task
-- **Done:** 79 tasks
+- **Done:** 81 tasks
 
 ---
 
@@ -24,7 +24,6 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-014](./TASK-014_Virtual_Network_Module_Alignment.md) | **Virtual Network module alignment (docs + examples + tests)** | High | Medium | `modules/azurerm_virtual_network/` |
 | [TASK-032](./TASK-032_Container_Registry_Module.md) | **Azure Container Registry module (full feature scope)** | High | Large | `modules/azurerm_container_registry/` |
 | [TASK-034](./TASK-034_Azure_Bastion_Host_Module.md) | **Azure Bastion Host module (full feature scope)** | High | Medium | `modules/azurerm_bastion_host/` |
-| [TASK-ADO-036](./TASK-ADO-036_AzureDevOps_Service_Principal_Entitlement_Module_Compliance_Alignment.md) | **Azure DevOps Service Principal Entitlement module compliance alignment** | High | Medium | `modules/azuredevops_service_principal_entitlement/` |
 
 ---
 
@@ -45,6 +44,8 @@ Task board for module work. Update statuses in markdown files.
 | [TASK-ADO-020](./TASK-ADO-020_AzureDevOps_Extension_Module_Refactor.md) | **Azure DevOps Extension module refactor** | Medium | Small | Completed 2026-02-14; single-resource API and module gate re-verified |
 | [TASK-ADO-017](./TASK-ADO-017_AzureDevOps_Environments_Module_Refactor.md) | **Azure DevOps Environments module refactor** | High | Medium | Completed (re-verified 2026-02-14); follow-up hardening tracked under `TASK-ADO-034` |
 | [TASK-ADO-034](./TASK-ADO-034_AzureDevOps_Environments_Module_Compliance_Fixes.md) | **Azure DevOps Environments module compliance fixes** | High | Medium | Completed 2026-02-15; nested kubernetes checks + docs/tests alignment |
+| [TASK-ADO-036](./TASK-ADO-036_AzureDevOps_Service_Principal_Entitlement_Module_Compliance_Alignment.md) | **Azure DevOps Service Principal Entitlement module compliance alignment** | High | Medium | Completed 2026-02-15; re-audit passed, examples switched to local source |
+| [TASK-ADO-035](./TASK-ADO-035_AzureDevOps_Identity_Module_Compliance_Fixes.md) | **Azure DevOps Identity module compliance fixes** | High | Medium | Completed 2026-02-15; scope fulfilled via 042/043/036/037/038 |
 | [TASK-ADO-023](./TASK-ADO-023_AzureDevOps_Repository_Module_Refactor.md) | **Azure DevOps Repository module refactor** | High | Large | Completed (re-verified 2026-02-14); full module gate passed |
 | [TASK-ADO-026](./TASK-ADO-026_AzureDevOps_Work_Items_Module_Refactor.md) | **Azure DevOps Work Items module refactor** | High | Medium | Completed 2026-02-14; narrowed to single `azuredevops_workitem` atomic scope |
 | [TASK-ADO-021](./TASK-ADO-021_AzureDevOps_Pipelines_Module_Refactor.md) | **Azure DevOps Pipelines module refactor** | High | Medium | Completed 2026-02-14; removed non-child folder/legacy scopes |

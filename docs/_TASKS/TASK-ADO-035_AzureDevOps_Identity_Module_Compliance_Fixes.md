@@ -5,13 +5,23 @@
 **Category:** Azure DevOps Modules  
 **Estimated Effort:** Medium  
 **Dependencies:** TASK-ADO-018, docs/MODULE_GUIDE, docs/TESTING_GUIDE, docs/TERRAFORM_BEST_PRACTICES_GUIDE.md  
-**Status:** 🟡 To Do
+**Status:** ✅ **Done** (2026-02-15)
 
 ---
 
 ## Overview
 
 Align and rename `modules/azuredevops_identity` -> `modules/azuredevops_group` to reflect the anchor resource. Enforce the “anchor resource” rule: we only manage sub-resources that hang off the module-managed group (created or imported). Independent resources are split into dedicated modules.
+
+## Completion Summary (2026-02-15)
+
+- Planned rename/split scope from this task has been fulfilled by subsequent implementation work.
+- Identity-to-group boundary realignment is complete in `modules/azuredevops_group` (covered by `TASK-ADO-042` and `TASK-ADO-043`).
+- Independent resources were split into dedicated modules and aligned in follow-up tasks:
+  - `modules/azuredevops_service_principal_entitlement` (`TASK-ADO-036`),
+  - `modules/azuredevops_securityrole_assignment` (`TASK-ADO-037`),
+  - `modules/azuredevops_user_entitlement` (`TASK-ADO-038`).
+- As a result, this task is closed as fulfilled/superseded by completed implementation tasks.
 
 ## Scope
 
