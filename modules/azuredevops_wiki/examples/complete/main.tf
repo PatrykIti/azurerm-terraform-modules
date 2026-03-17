@@ -22,15 +22,4 @@ module "azuredevops_wiki" {
     version       = var.repository_version
     mapped_path   = "/"
   }
-
-  wiki_pages = {
-    runbooks = {
-      path    = "/Runbooks"
-      content = "Runbooks and operational notes."
-    }
-    oncall = {
-      path    = "/Runbooks/OnCall"
-      content = "On-call procedures and escalation paths."
-    }
-  }
 }

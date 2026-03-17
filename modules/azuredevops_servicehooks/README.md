@@ -33,7 +33,7 @@ For multiple webhooks, use module-level `for_each` in your configuration.
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates creating a simple webhook service hook.
-- [Complete](examples/complete) - This example demonstrates module-level for_each for multiple webhook subscriptions.
+- [Complete](examples/complete) - This example demonstrates module-level `for_each` for multiple webhook subscriptions.
 - [Secure](examples/secure) - This example demonstrates a filtered webhook configuration for work item updates.
 <!-- END_EXAMPLES -->
 

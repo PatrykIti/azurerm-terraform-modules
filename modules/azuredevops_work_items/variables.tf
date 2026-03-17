@@ -90,7 +90,7 @@ variable "parent_id" {
 }
 
 variable "custom_fields" {
-  description = "Custom fields to set on the work item."
+  description = "Project-specific custom fields to set on the work item. Do not use System. or Custom. prefixes."
   type        = map(string)
   default     = null
 
@@ -100,5 +100,13 @@ variable "custom_fields" {
       length(trimspace(key)) > 0 && length(trimspace(value)) > 0
     ])
     error_message = "custom_fields keys and values must be non-empty strings when provided."
+  }
+
+  validation {
+    condition = var.custom_fields == null || alltrue([
+      for key in keys(var.custom_fields) :
+      !startswith(key, "System.") && !startswith(key, "Custom.")
+    ])
+    error_message = "custom_fields keys must not start with System. or Custom.; use dedicated module inputs for supported system fields and provide only custom field keys here."
   }
 }

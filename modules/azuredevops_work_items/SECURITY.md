@@ -29,10 +29,6 @@ module "azuredevops_work_items" {
   type       = "Issue"
 
   tags = ["terraform", "security-reviewed"]
-
-  custom_fields = {
-    "System.Description" = "Managed via Terraform"
-  }
 }
 ```
 

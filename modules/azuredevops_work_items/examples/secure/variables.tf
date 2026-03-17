@@ -20,9 +20,3 @@ variable "iteration_path" {
   type        = string
   default     = "\\"
 }
-
-variable "description" {
-  description = "Description text for the work item."
-  type        = string
-  default     = "Work item managed by Terraform secure example."
-}

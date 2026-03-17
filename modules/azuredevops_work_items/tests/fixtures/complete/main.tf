@@ -16,7 +16,6 @@ module "work_item_parent" {
   project_id = var.project_id
   title      = "${var.work_item_title_prefix}-parent"
   type       = "Task"
-  state      = "Active"
 }
 
 module "work_item_child" {

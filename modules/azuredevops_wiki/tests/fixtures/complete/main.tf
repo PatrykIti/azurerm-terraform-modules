@@ -41,12 +41,5 @@ module "azuredevops_wiki" {
     mapped_path   = "/"
   }
 
-  wiki_pages = {
-    runbooks = {
-      path    = "/Runbooks"
-      content = "Runbooks and operational notes."
-    }
-  }
-
   depends_on = [azuredevops_git_repository_file.wiki_seed]
 }

@@ -41,12 +41,5 @@ module "azuredevops_wiki" {
     mapped_path   = "/"
   }
 
-  wiki_pages = {
-    security = {
-      path    = "/Security"
-      content = "Security guidance"
-    }
-  }
-
   depends_on = [azuredevops_git_repository_file.wiki_seed]
 }

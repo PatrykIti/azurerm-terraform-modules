@@ -14,6 +14,8 @@ This module manages a single Azure DevOps wiki and optional strict-child wiki pa
 - The module creates exactly one wiki per instance.
 - `wiki_pages` use stable map keys to keep Terraform addresses deterministic.
 - Pages are always attached to the wiki created by this module.
+- `wiki_pages` are supported for `projectWiki`.
+- For `codeWiki`, manage the wiki itself through the module and keep `wiki_pages = {}`; the provider does not expose version-descriptor arguments required for code-wiki page operations.
 
 ## Inputs (Highlights)
 

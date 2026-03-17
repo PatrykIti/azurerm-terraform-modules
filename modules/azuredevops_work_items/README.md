@@ -10,6 +10,8 @@ Current version: **1.0.0**
 
 Azure DevOps work items module for managing a single work item resource (atomic scope).
 
+`state` values are process- and work-item-type-specific in Azure DevOps. `custom_fields` are intended for project-specific custom fields only and should not be used for system fields that already have dedicated module inputs.
+
 ## Usage
 
 ```hcl
@@ -22,7 +24,6 @@ module "azuredevops_work_items" {
 
   title = "Example Work Item"
   type  = "Issue"
-  state = "Active"
 }
 ```
 
@@ -56,7 +57,7 @@ module "work_items" {
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates creating a simple work item.
 - [Complete](examples/complete) - This example demonstrates parent/child work item composition using two module instances.
-- [Secure](examples/secure) - This example demonstrates stricter field usage (area/iteration/custom fields) for a single work item.
+- [Secure](examples/secure) - This example demonstrates stricter field usage (area/iteration/tags) for a single work item.
 <!-- END_EXAMPLES -->
 
 ## Module Documentation
@@ -96,7 +97,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_area_path"></a> [area\_path](#input\_area\_path) | Area path for the work item. | `string` | `null` | no |
-| <a name="input_custom_fields"></a> [custom\_fields](#input\_custom\_fields) | Custom fields to set on the work item. | `map(string)` | `null` | no |
+| <a name="input_custom_fields"></a> [custom\_fields](#input\_custom\_fields) | Project-specific custom fields to set on the work item. Do not use System. or Custom. prefixes. | `map(string)` | `null` | no |
 | <a name="input_iteration_path"></a> [iteration\_path](#input\_iteration\_path) | Iteration path for the work item. | `string` | `null` | no |
 | <a name="input_parent_id"></a> [parent\_id](#input\_parent\_id) | Parent work item ID. | `number` | `null` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Azure DevOps project ID for the work item. | `string` | n/a | yes |

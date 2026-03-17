@@ -64,8 +64,8 @@ go test -v -run TestBasicAzuredevopsWiki -timeout 30m
 The `fixtures/` directory contains Terraform configurations for different test scenarios:
 
 - `fixtures/basic/` - Basic project wiki configuration
-- `fixtures/complete/` - Wiki with multiple pages
-- `fixtures/secure/` - Minimal wiki with security guidance
+- `fixtures/complete/` - Code wiki backed by a repository
+- `fixtures/secure/` - Minimal repository-backed code wiki
 - `fixtures/negative/` - Negative test cases
 
 ## Debugging Tests

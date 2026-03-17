@@ -44,7 +44,7 @@ module "azuredevops_serviceendpoint" {
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates creating a single generic service endpoint.
-- [Complete](examples/complete) - This example demonstrates creating multiple generic service endpoints using module-level for_each.
+- [Complete](examples/complete) - This example demonstrates creating multiple generic service endpoints using module-level `for_each`.
 - [Secure](examples/secure) - This example demonstrates a service endpoint with explicit permission assignment.
 <!-- END_EXAMPLES -->
 

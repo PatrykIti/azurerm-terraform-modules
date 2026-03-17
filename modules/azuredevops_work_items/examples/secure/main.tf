@@ -17,12 +17,7 @@ module "azuredevops_work_items" {
 
   title          = var.title
   type           = "Issue"
-  state          = "Active"
   area_path      = var.area_path
   iteration_path = var.iteration_path
   tags           = ["terraform", "secure"]
-
-  custom_fields = {
-    "System.Description" = var.description
-  }
 }

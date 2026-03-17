@@ -17,11 +17,6 @@ module "azuredevops_work_items" {
 
   title = "${var.work_item_title_prefix}-secure"
   type  = "Task"
-  state = "Active"
 
   tags = ["terraform", "secure"]
-
-  custom_fields = {
-    "System.Description" = "Secure fixture managed by Terraform"
-  }
 }

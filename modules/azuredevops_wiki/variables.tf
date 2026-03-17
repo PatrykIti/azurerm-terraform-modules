@@ -78,4 +78,9 @@ variable "wiki_pages" {
     ])) == length(var.wiki_pages)
     error_message = "wiki_pages must have unique path values."
   }
+
+  validation {
+    condition     = var.wiki.type != "codeWiki" || length(var.wiki_pages) == 0
+    error_message = "wiki_pages are supported only for projectWiki. The microsoft/azuredevops v1.12.2 provider does not expose version descriptor arguments required for codeWiki page operations."
+  }
 }

@@ -13,6 +13,8 @@ This module manages a single `azuredevops_workitem` resource per module instance
 - Use module-level `for_each` in consumer code to manage multiple work items.
 - Cross-scope resources (processes, queries, and query/area/iteration/tagging permissions) are intentionally out of scope for this atomic module.
 - Requires `project_id`, `title`, and `type`.
+- `state` values depend on the Azure DevOps process/work item type used by the target project.
+- `custom_fields` are for project-specific custom fields, not for system fields already modeled as dedicated inputs.
 
 ## Outputs (Highlights)
 

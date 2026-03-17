@@ -61,7 +61,35 @@ run "invalid_custom_fields_empty_value" {
 
   variables {
     custom_fields = {
-      "System.Description" = ""
+      "RiskRating" = ""
+    }
+  }
+
+  expect_failures = [
+    var.custom_fields,
+  ]
+}
+
+run "invalid_custom_fields_system_prefix" {
+  command = plan
+
+  variables {
+    custom_fields = {
+      "System.Description" = "value"
+    }
+  }
+
+  expect_failures = [
+    var.custom_fields,
+  ]
+}
+
+run "invalid_custom_fields_custom_prefix" {
+  command = plan
+
+  variables {
+    custom_fields = {
+      "Custom.RiskRating" = "High"
     }
   }
 

@@ -10,6 +10,8 @@ Current version: **1.0.0**
 
 Azure DevOps wiki module for managing a single wiki and strict-child pages.
 
+`wiki_pages` are supported for `projectWiki`. For `codeWiki`, use the module to manage the wiki itself; the `microsoft/azuredevops v1.12.2` provider does not expose the version-descriptor arguments required for code-wiki page operations.
+
 ## Usage
 
 ```hcl
@@ -38,8 +40,8 @@ module "azuredevops_wiki" {
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates creating a project wiki with a home page.
-- [Complete](examples/complete) - This example demonstrates a code wiki backed by a repository with multiple pages.
-- [Secure](examples/secure) - This example demonstrates a wiki intended for security guidance.
+- [Complete](examples/complete) - This example demonstrates a code wiki backed by a repository.
+- [Secure](examples/secure) - This example demonstrates a minimal wiki intended for security guidance.
 <!-- END_EXAMPLES -->
 
 ## Module Documentation

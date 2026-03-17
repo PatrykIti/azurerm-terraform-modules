@@ -16,6 +16,5 @@ module "azuredevops_work_items" {
   project_id = var.project_id
   title      = "Example Work Item"
   type       = "Issue"
-  state      = "Active"
   tags       = ["terraform"]
 }

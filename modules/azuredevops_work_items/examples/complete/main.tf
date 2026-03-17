@@ -16,7 +16,6 @@ module "work_item_parent" {
   project_id = var.project_id
   title      = var.parent_title
   type       = "Task"
-  state      = "Active"
   tags       = ["terraform", "parent"]
 }
 
@@ -26,7 +25,6 @@ module "work_item_child" {
   project_id = var.project_id
   title      = var.child_title
   type       = "Task"
-  state      = "New"
   parent_id  = tonumber(module.work_item_parent.work_item_id)
   tags       = ["terraform", "child"]
 }

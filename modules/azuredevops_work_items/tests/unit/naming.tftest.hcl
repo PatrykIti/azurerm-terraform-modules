@@ -6,7 +6,7 @@ variables {
   project_id = "00000000-0000-0000-0000-000000000000"
   title      = "Naming Work Item"
   type       = "Task"
-  state      = "Active"
+  state      = "To Do"
 }
 
 run "work_item_plan" {
@@ -18,7 +18,7 @@ run "work_item_plan" {
   }
 
   assert {
-    condition     = azuredevops_workitem.work_item.state == "Active"
+    condition     = azuredevops_workitem.work_item.state == "To Do"
     error_message = "Work item state should match the input."
   }
 }

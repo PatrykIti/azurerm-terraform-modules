@@ -63,3 +63,28 @@ run "duplicate_page_paths" {
     var.wiki_pages,
   ]
 }
+
+run "code_wiki_pages_not_supported" {
+  command = plan
+
+  variables {
+    wiki = {
+      name          = "code-wiki"
+      type          = "codeWiki"
+      repository_id = "11111111-1111-1111-1111-111111111111"
+      version       = "main"
+      mapped_path   = "/"
+    }
+
+    wiki_pages = {
+      runbooks = {
+        path    = "/Runbooks"
+        content = "Runbooks"
+      }
+    }
+  }
+
+  expect_failures = [
+    var.wiki_pages,
+  ]
+}
