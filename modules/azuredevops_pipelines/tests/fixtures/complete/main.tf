@@ -30,12 +30,10 @@ resource "azuredevops_serviceendpoint_generic" "example" {
 }
 
 locals {
-  folder_path = "\\Pipelines-${var.random_suffix}"
-
   pipelines = {
     app = {
       name     = "pip-ado-cmp-app-${var.random_suffix}"
-      path     = local.folder_path
+      path     = "\\Pipelines-app-${var.random_suffix}"
       yml_path = var.yaml_path
       schedules = [
         {
@@ -66,7 +64,7 @@ locals {
     }
     release = {
       name     = "pip-ado-cmp-rel-${var.random_suffix}"
-      path     = local.folder_path
+      path     = "\\Pipelines-release-${var.random_suffix}"
       yml_path = "azure-pipelines-release.yml"
       ci_trigger = {
         use_yaml = true
