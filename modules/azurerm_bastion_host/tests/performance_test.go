@@ -24,7 +24,7 @@ func BenchmarkBastionHostCreationSimple(b *testing.B) {
 		terraform.InitAndApply(b, terraformOptions)
 
 		b.StopTimer()
-		terraform.Destroy(b, terraformOptions)
+		destroyWithRetry(b, terraformOptions)
 		b.StartTimer()
 	}
 }
@@ -39,7 +39,7 @@ func TestBastionHostCreationTime(t *testing.T) {
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(t, testFolder)
 
-	defer terraform.Destroy(t, terraformOptions)
+	defer destroyWithRetry(t, terraformOptions)
 
 	start := time.Now()
 	terraform.InitAndApply(t, terraformOptions)

@@ -11,18 +11,19 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/gruntwork-io/terratest/modules/random"
+	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/require"
 )
 
 // TestConfig holds common test configuration
 type TestConfig struct {
-	SubscriptionID    string
-	TenantID         string
-	ClientID         string
-	ClientSecret     string
-	Location         string
-	ResourceGroup    string
-	UniqueID         string
+	SubscriptionID string
+	TenantID       string
+	ClientID       string
+	ClientSecret   string
+	Location       string
+	ResourceGroup  string
+	UniqueID       string
 }
 
 // GetTestConfig returns a test configuration with required Azure credentials
@@ -48,12 +49,12 @@ func GetTestConfig(t *testing.T) *TestConfig {
 
 	return &TestConfig{
 		SubscriptionID: subscriptionID,
-		TenantID:      tenantID,
-		ClientID:      clientID,
-		ClientSecret:  clientSecret,
-		Location:      location,
-		ResourceGroup: fmt.Sprintf("rg-test-bastion_host-%s", uniqueID),
-		UniqueID:      uniqueID,
+		TenantID:       tenantID,
+		ClientID:       clientID,
+		ClientSecret:   clientSecret,
+		Location:       location,
+		ResourceGroup:  fmt.Sprintf("rg-test-bastion_host-%s", uniqueID),
+		UniqueID:       uniqueID,
 	}
 }
 
@@ -97,4 +98,48 @@ func GenerateResourceName(prefix string, uniqueID string) string {
 		name = name[:24]
 	}
 	return strings.ToLower(name)
+}
+
+// destroyWithRetry handles Azure eventual consistency when Bastion releases subnet/PIP references.
+func destroyWithRetry(t testing.TB, terraformOptions *terraform.Options) {
+	t.Helper()
+
+	const (
+		maxAttempts         = 8
+		waitBetweenAttempts = 30 * time.Second
+	)
+
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		_, err := terraform.DestroyE(t, terraformOptions)
+		if err == nil {
+			return
+		}
+
+		if !isRetryableBastionDestroyError(err.Error()) || attempt == maxAttempts {
+			require.NoError(t, err, "terraform destroy failed")
+			return
+		}
+
+		t.Logf("terraform destroy hit transient Bastion dependency (%d/%d), retrying in %s: %v", attempt, maxAttempts, waitBetweenAttempts, err)
+		time.Sleep(waitBetweenAttempts)
+	}
+}
+
+func isRetryableBastionDestroyError(errMsg string) bool {
+	normalized := strings.ToLower(errMsg)
+	retryableFragments := []string{
+		"inusesubnetcannotbedeleted",
+		"publicipaddresscannotbedeleted",
+		"azurebastionsubnet is in use",
+		"public ip address is in use",
+		"is in use by another resource",
+	}
+
+	for _, fragment := range retryableFragments {
+		if strings.Contains(normalized, fragment) {
+			return true
+		}
+	}
+
+	return false
 }

@@ -18,7 +18,7 @@ func TestBasicBastionHost(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		destroyWithRetry(t, getTerraformOptions(t, testFolder))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -46,7 +46,7 @@ func TestCompleteBastionHost(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		destroyWithRetry(t, getTerraformOptions(t, testFolder))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -72,7 +72,7 @@ func TestSecureBastionHost(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		destroyWithRetry(t, getTerraformOptions(t, testFolder))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -93,7 +93,7 @@ func TestBastionHostIPConnect(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/ip-connect")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		destroyWithRetry(t, getTerraformOptions(t, testFolder))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -114,7 +114,7 @@ func TestBastionHostTunneling(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/tunneling")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		destroyWithRetry(t, getTerraformOptions(t, testFolder))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -135,7 +135,7 @@ func TestBastionHostShareableLink(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/shareable-link")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		destroyWithRetry(t, getTerraformOptions(t, testFolder))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -156,7 +156,7 @@ func TestBastionHostFileCopy(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/file-copy")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		destroyWithRetry(t, getTerraformOptions(t, testFolder))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -177,7 +177,7 @@ func TestBastionHostDiagnosticSettings(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/diagnostic-settings")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		destroyWithRetry(t, getTerraformOptions(t, testFolder))
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -237,13 +237,13 @@ func BenchmarkBastionHostCreation(b *testing.B) {
 	testFolder := test_structure.CopyTerraformFolderToTemp(b, "..", "tests/fixtures/basic")
 	terraformOptions := getTerraformOptions(b, testFolder)
 
-	defer terraform.Destroy(b, terraformOptions)
+	defer destroyWithRetry(b, terraformOptions)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])
 		terraform.InitAndApply(b, terraformOptions)
-		terraform.Destroy(b, terraformOptions)
+		destroyWithRetry(b, terraformOptions)
 	}
 }
 

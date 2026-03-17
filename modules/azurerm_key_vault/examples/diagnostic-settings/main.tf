@@ -18,7 +18,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 }
 
 module "key_vault" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_key_vault?ref=KVv1.0.0"
 
   name                = "kvdiagexample001"
   resource_group_name = azurerm_resource_group.example.name
