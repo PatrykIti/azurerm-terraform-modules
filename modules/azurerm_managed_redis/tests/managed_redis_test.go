@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
-	"time"
 
-	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
@@ -182,26 +180,5 @@ func BenchmarkManagedRedisCreation(b *testing.B) {
 }
 
 func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
-	PrepareTerraformWorkingDirs(t, terraformDir)
-
-	timestamp := time.Now().UnixNano() % 1000
-	baseID := strings.ToLower(random.UniqueId())
-	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
-
-	return &terraform.Options{
-		TerraformDir: terraformDir,
-		Vars: map[string]interface{}{
-			"random_suffix": uniqueID,
-			"location":      "northeurope",
-		},
-		NoColor: true,
-		RetryableTerraformErrors: map[string]string{
-			".*timeout.*":               "Timeout error - retrying",
-			".*ResourceGroupNotFound.*": "Resource group not found - retrying",
-			".*AlreadyExists.*":         "Resource already exists - retrying",
-			".*TooManyRequests.*":       "Too many requests - retrying",
-		},
-		MaxRetries:         3,
-		TimeBetweenRetries: 10 * time.Second,
-	}
+	return NewTerraformOptions(t, terraformDir)
 }
