@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_managed_redis",
+  "title": "Managed Redis",
+  "commit_scope": "managed-redis",
+  "tag_prefix": "AMRv",
+  "description": "Azure Managed Redis Terraform module with enterprise-grade features"
+}

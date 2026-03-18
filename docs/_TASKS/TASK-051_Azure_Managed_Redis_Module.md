@@ -5,7 +5,7 @@
 **Category:** New Module / Cache  
 **Estimated Effort:** Large  
 **Dependencies:** TASK-003 (module scaffold generator baseline)  
-**Status:** Planned
+**Status:** Done (2026-03-18)
 
 ---
 
