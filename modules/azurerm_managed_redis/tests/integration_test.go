@@ -112,3 +112,23 @@ func TestManagedRedisGeoReplicationIntegration(t *testing.T) {
 		assert.Len(t, linkedIDs, 1)
 	})
 }
+
+// TestManagedRedisCompliance performs simple compliance checks.
+func TestManagedRedisCompliance(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test in short mode")
+	}
+	t.Parallel()
+
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
+	terraformOptions := getTerraformOptions(t, testFolder)
+	defer terraform.Destroy(t, terraformOptions)
+
+	terraform.InitAndApply(t, terraformOptions)
+
+	resourceName := OutputString(t, terraformOptions, "managed_redis_name")
+	publicNetworkAccess := OutputString(t, terraformOptions, "public_network_access")
+
+	assert.NotEmpty(t, resourceName)
+	assert.Equal(t, "Disabled", publicNetworkAccess)
+}

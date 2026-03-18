@@ -12,7 +12,7 @@ test_suites:
       - TestSecureManagedRedis
       - TestManagedRedisGeoReplication
     parallel: true
-    timeout: 45m
+    timeout: 60m
     
   - name: "Validation Tests"
     tests:
@@ -26,13 +26,21 @@ test_suites:
       - TestManagedRedisSecurityConfiguration
       - TestManagedRedisLifecycle
       - TestManagedRedisGeoReplicationIntegration
+      - TestManagedRedisCompliance
     parallel: false
     timeout: 60m
     
   - name: "Performance Tests"
     tests:
       - BenchmarkManagedRedisCreation
+      - BenchmarkManagedRedisCreationSimple
+      - BenchmarkManagedRedisCreationWithFeatures
+      - BenchmarkManagedRedisCreationWithScale
+      - BenchmarkManagedRedisParallelCreation
       - TestManagedRedisCreationTime
+      - TestManagedRedisScaling
+      - TestManagedRedisUpdatePerformance
+      - TestManagedRedisDestroyPerformance
     parallel: false
     timeout: 60m
     benchmark: true

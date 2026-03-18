@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,6 +13,96 @@ import (
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/require"
 )
+
+// TestConfig holds common test configuration.
+// NOTE: Keep in sync with test_env.sh and CI secrets.
+type TestConfig struct {
+	SubscriptionID string
+	TenantID       string
+	ClientID       string
+	ClientSecret   string
+	Location       string
+	ResourceGroup  string
+	UniqueID       string
+}
+
+// GetTestConfig returns a normalized test configuration using ARM_* / AZURE_* env vars.
+func GetTestConfig(t *testing.T) *TestConfig {
+	subscriptionID := coalesceEnv(
+		strings.TrimSpace(os.Getenv("ARM_SUBSCRIPTION_ID")),
+		strings.TrimSpace(os.Getenv("AZURE_SUBSCRIPTION_ID")),
+	)
+	require.NotEmpty(t, subscriptionID, "ARM_SUBSCRIPTION_ID or AZURE_SUBSCRIPTION_ID environment variable must be set")
+
+	tenantID := coalesceEnv(
+		strings.TrimSpace(os.Getenv("ARM_TENANT_ID")),
+		strings.TrimSpace(os.Getenv("AZURE_TENANT_ID")),
+	)
+	require.NotEmpty(t, tenantID, "ARM_TENANT_ID or AZURE_TENANT_ID environment variable must be set")
+
+	clientID := coalesceEnv(
+		strings.TrimSpace(os.Getenv("ARM_CLIENT_ID")),
+		strings.TrimSpace(os.Getenv("AZURE_CLIENT_ID")),
+	)
+	require.NotEmpty(t, clientID, "ARM_CLIENT_ID or AZURE_CLIENT_ID environment variable must be set")
+
+	clientSecret := coalesceEnv(
+		strings.TrimSpace(os.Getenv("ARM_CLIENT_SECRET")),
+		strings.TrimSpace(os.Getenv("AZURE_CLIENT_SECRET")),
+	)
+	require.NotEmpty(t, clientSecret, "ARM_CLIENT_SECRET or AZURE_CLIENT_SECRET environment variable must be set")
+
+	location := coalesceEnv(
+		strings.TrimSpace(os.Getenv("ARM_LOCATION")),
+		strings.TrimSpace(os.Getenv("AZURE_LOCATION")),
+		"westeurope",
+	)
+
+	uniqueID := strings.ToLower(random.UniqueId())
+
+	return &TestConfig{
+		SubscriptionID: subscriptionID,
+		TenantID:       tenantID,
+		ClientID:       clientID,
+		ClientSecret:   clientSecret,
+		Location:       location,
+		ResourceGroup:  fmt.Sprintf("rg-test-managed-redis-%s", uniqueID),
+		UniqueID:       uniqueID,
+	}
+}
+
+// WaitForResourceDeletion waits for a resource to be deleted.
+func WaitForResourceDeletion(ctx context.Context, checkFunc func() (bool, error), timeout time.Duration) error {
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+
+	timeoutCh := time.After(timeout)
+
+	for {
+		select {
+		case <-timeoutCh:
+			return fmt.Errorf("timeout waiting for resource deletion")
+		case <-ticker.C:
+			exists, err := checkFunc()
+			if err != nil {
+				return fmt.Errorf("error checking resource existence: %w", err)
+			}
+			if !exists {
+				return nil
+			}
+		}
+	}
+}
+
+// GenerateResourceName generates a unique resource name for testing.
+func GenerateResourceName(prefix string, uniqueID string) string {
+	name := fmt.Sprintf("%s%s", prefix, uniqueID)
+	name = strings.ReplaceAll(name, "-", "")
+	if len(name) > 63 {
+		name = name[:63]
+	}
+	return strings.ToLower(name)
+}
 
 // PrepareTerraformWorkingDirs removes local Terraform artifacts from copied fixtures.
 // This prevents stale module snapshots in .terraform from previous runs.
@@ -88,25 +179,45 @@ func coalesceEnv(values ...string) string {
 	return ""
 }
 
-// NewTerraformOptions returns normalized Terratest options with retries and env wiring.
-func NewTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
-	t.Helper()
-	PrepareTerraformWorkingDirs(t, terraformDir)
-
-	timestamp := time.Now().UnixNano() % 1000
-	baseID := strings.ToLower(random.UniqueId())
-	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
-
+// GetTestConfigForOptions returns a non-testing variant of TestConfig for benchmark/setup code.
+func GetTestConfigForOptions() *TestConfig {
 	location := coalesceEnv(
 		strings.TrimSpace(os.Getenv("ARM_LOCATION")),
 		strings.TrimSpace(os.Getenv("AZURE_LOCATION")),
 		"northeurope",
 	)
 
+	timestamp := time.Now().UnixNano() % 1000
+	baseID := strings.ToLower(random.UniqueId())
+	uniqueID := fmt.Sprintf("%s%03d", baseID[:5], timestamp)
+
+	return &TestConfig{
+		SubscriptionID: coalesceEnv(strings.TrimSpace(os.Getenv("ARM_SUBSCRIPTION_ID")), strings.TrimSpace(os.Getenv("AZURE_SUBSCRIPTION_ID"))),
+		TenantID:       coalesceEnv(strings.TrimSpace(os.Getenv("ARM_TENANT_ID")), strings.TrimSpace(os.Getenv("AZURE_TENANT_ID"))),
+		ClientID:       coalesceEnv(strings.TrimSpace(os.Getenv("ARM_CLIENT_ID")), strings.TrimSpace(os.Getenv("AZURE_CLIENT_ID"))),
+		ClientSecret:   coalesceEnv(strings.TrimSpace(os.Getenv("ARM_CLIENT_SECRET")), strings.TrimSpace(os.Getenv("AZURE_CLIENT_SECRET"))),
+		Location:       location,
+		ResourceGroup:  fmt.Sprintf("rg-test-managed-redis-%s", uniqueID),
+		UniqueID:       uniqueID,
+	}
+}
+
+// NewTerraformOptions returns normalized Terratest options with retries and env wiring.
+func NewTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
+	t.Helper()
+	PrepareTerraformWorkingDirs(t, terraformDir)
+
+	testConfig := GetTestConfigForOptions()
+
+	location := coalesceEnv(
+		testConfig.Location,
+		"northeurope",
+	)
+
 	return &terraform.Options{
 		TerraformDir: terraformDir,
 		Vars: map[string]interface{}{
-			"random_suffix": uniqueID,
+			"random_suffix": testConfig.UniqueID,
 			"location":      location,
 		},
 		EnvVars: NormalizedTerraformEnv(),

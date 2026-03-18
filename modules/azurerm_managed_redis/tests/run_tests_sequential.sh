@@ -45,8 +45,16 @@ tests=(
     "TestManagedRedisSecurityConfiguration"
     "TestManagedRedisLifecycle"
     "TestManagedRedisGeoReplicationIntegration"
+    "TestManagedRedisCompliance"
     "TestManagedRedisCreationTime"
+    "TestManagedRedisScaling"
+    "TestManagedRedisUpdatePerformance"
+    "TestManagedRedisDestroyPerformance"
     "BenchmarkManagedRedisCreation"
+    "BenchmarkManagedRedisCreationSimple"
+    "BenchmarkManagedRedisCreationWithFeatures"
+    "BenchmarkManagedRedisCreationWithScale"
+    "BenchmarkManagedRedisParallelCreation"
 )
 
 echo "Starting sequential test execution for azurerm_managed_redis"

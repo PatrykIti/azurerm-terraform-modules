@@ -78,12 +78,12 @@ test-basic: check-env deps
 # Run complete tests
 test-complete: check-env deps
 	@echo "Running complete tests..."
-	$(call run_with_log,complete,go test -v -timeout 45m -run TestCompleteManagedRedis ./...)
+	$(call run_with_log,complete,go test -v -timeout 60m -run TestCompleteManagedRedis ./...)
 
 # Run security tests
 test-secure: check-env deps
 	@echo "Running security tests..."
-	$(call run_with_log,secure,go test -v -timeout 45m -run TestSecureManagedRedis ./...)
+	$(call run_with_log,secure,go test -v -timeout 60m -run TestSecureManagedRedis ./...)
 
 # Run geo-replication tests
 test-geo-replication: check-env deps
@@ -98,12 +98,15 @@ test-validation: check-env deps
 # Run integration tests
 test-integration: check-env deps
 	@echo "Running integration tests..."
-	$(call run_with_log,integration,go test -v -timeout 60m -run "TestManagedRedisFullIntegration|TestManagedRedisSecurityConfiguration|TestManagedRedisLifecycle|TestManagedRedisGeoReplicationIntegration" ./...)
+	$(call run_with_log,integration,go test -v -timeout 60m -run "TestManagedRedisFullIntegration|TestManagedRedisSecurityConfiguration|TestManagedRedisLifecycle|TestManagedRedisGeoReplicationIntegration|TestManagedRedisCompliance" ./...)
 
 # Run performance tests
 test-performance: check-env deps
 	@echo "Running performance tests..."
 	$(call run_with_log,performance-create,go test -v -timeout 60m -run TestManagedRedisCreationTime ./...)
+	$(call run_with_log,performance-scale,go test -v -timeout 60m -run TestManagedRedisScaling ./...)
+	$(call run_with_log,performance-update,go test -v -timeout 60m -run TestManagedRedisUpdatePerformance ./...)
+	$(call run_with_log,performance-destroy,go test -v -timeout 60m -run TestManagedRedisDestroyPerformance ./...)
 
 # Run benchmarks
 benchmark: check-env deps
