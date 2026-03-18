@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_group_entitlement" {
-  source = "../../"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_group_entitlement?ref=ADOGEv1.0.0"
 
   group_entitlement = {
     key                  = "example-complete-group"
