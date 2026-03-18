@@ -2,10 +2,10 @@ package test
 
 import "testing"
 
-func TestAzuredevopsProjectPermissionsPerformance(t *testing.T) {
+func BenchmarkAzuredevopsProjectPermissions(b *testing.B) {
 	if testing.Short() {
-		t.Skip("Azure DevOps project permissions benchmarks are not enabled")
+		b.Skip("Skipping benchmark in short mode")
 	}
 
-	t.Skip("Performance tests are not implemented for this module")
+	b.Skip("Azure DevOps project permissions benchmarks are not enabled")
 }

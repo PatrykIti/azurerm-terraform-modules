@@ -3,5 +3,5 @@
   "title": "Azure DevOps Pipelines",
   "commit_scope": "azuredevops-pipelines",
   "tag_prefix": "ADOPIv",
-  "description": "Azure DevOps pipelines module for managing a build definition with folders, permissions, and authorizations"
+  "description": "Azure DevOps pipelines module for managing a build definition with strict-child permissions and resource authorizations"
 }

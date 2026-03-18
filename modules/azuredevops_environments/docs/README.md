@@ -2,53 +2,54 @@
 
 ## Overview
 
-This module manages Azure DevOps environments resources and related configuration.
+This module manages one Azure DevOps environment and optional child resources:
+
+- Kubernetes environment resources (`azuredevops_environment_resource_kubernetes`)
+- Environment-level checks (`check_*` root inputs)
+- Kubernetes-resource checks (`kubernetes_resources[*].checks`)
+
+## Targeting Model
+
+- Root `check_*` inputs always target the module-managed environment (`target_resource_type = "environment"`).
+- Nested checks under `kubernetes_resources[*].checks` target the Kubernetes backing service endpoint (`target_resource_type = "endpoint"`).
+  This is required because the Azure DevOps provider supports check targets: `endpoint`, `environment`, `queue`, `repository`, `securefile`, `variablegroup`.
+- External `target_resource_id` / `target_resource_type` inputs are intentionally not exposed.
 
 ## Managed Resources
 
-- `azuredevops_check_approval`
-- `azuredevops_check_branch_control`
-- `azuredevops_check_business_hours`
-- `azuredevops_check_exclusive_lock`
-- `azuredevops_check_required_template`
-- `azuredevops_check_rest_api`
 - `azuredevops_environment`
 - `azuredevops_environment_resource_kubernetes`
+- `azuredevops_check_approval` (environment and kubernetes-endpoint scoped)
+- `azuredevops_check_branch_control` (environment and kubernetes-endpoint scoped)
+- `azuredevops_check_business_hours` (environment and kubernetes-endpoint scoped)
+- `azuredevops_check_exclusive_lock` (environment and kubernetes-endpoint scoped)
+- `azuredevops_check_required_template` (environment and kubernetes-endpoint scoped)
+- `azuredevops_check_rest_api` (environment and kubernetes-endpoint scoped)
 
-## Usage Notes
+## Input Rules
 
-- Requires `project_id` for project scoping.
-- Use `git::https://...//modules/azuredevops_environments?ref=ADOEvX.Y.Z` for module source.
-- Environment checks are configured via root `check_*` inputs.
-- Kubernetes environment resources do not support approvals and checks.
-- Optional child resources are created only when corresponding inputs are set.
-- Use stable names and unique names per list to avoid address churn.
+- `name` fields are required and validated for all checks.
+- Check names must be unique within each list.
+- `kubernetes_resources[*].name` values must be unique.
+- Structured inputs use `object` / `list(object)` with validation for early failures.
 
-## Inputs (Highlights)
+## Outputs
 
-- Required: `name`, `project_id`
-- Optional: see `../README.md` and `../variables.tf`.
-
-## Outputs (Highlights)
-
-- `check_ids`
 - `environment_id`
 - `kubernetes_resource_ids`
+- `check_ids`
+
+`check_ids` is grouped by:
+- `environment`
+- `kubernetes_resources[resource_name]`
 
 ## Import Existing Resources
 
-See [IMPORT.md](./IMPORT.md) for import blocks and IDs.
-
-## Troubleshooting
-
-- **Permission errors**: ensure the PAT has rights for the target resource scope.
-- **Plan drift**: align inputs with existing state or leave optional inputs unset.
-- **Duplicate keys**: ensure list/object inputs use unique keys or names.
+See [IMPORT.md](./IMPORT.md).
 
 ## Related Docs
 
-- [README.md](../README.md) - module usage and inputs/outputs
-- [IMPORT.md](./IMPORT.md) - import guide
-- [VERSIONING.md](../VERSIONING.md) - tag format and release flow
-- [SECURITY.md](../SECURITY.md) - security guidance
-- [CONTRIBUTING.md](../CONTRIBUTING.md) - contribution rules
+- [README.md](../README.md)
+- [SECURITY.md](../SECURITY.md)
+- [VERSIONING.md](../VERSIONING.md)
+- [CONTRIBUTING.md](../CONTRIBUTING.md)

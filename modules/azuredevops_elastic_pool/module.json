@@ -1,0 +1,7 @@
+{
+  "name": "azuredevops_elastic_pool",
+  "title": "Azure DevOps Elastic Pool",
+  "commit_scope": "azuredevops-elastic-pool",
+  "tag_prefix": "ADOEPv",
+  "description": "Azure DevOps elastic pool module for managing a single elastic pool"
+}

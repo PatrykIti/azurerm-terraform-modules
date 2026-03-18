@@ -1,6 +1,8 @@
 package test
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -17,12 +19,16 @@ func TestAzuredevopsVariableGroupsFullIntegration(t *testing.T) {
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
+	terraformOptions := getTerraformOptions(t, testFolder)
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		if _, err := os.Stat(filepath.Join(testFolder, ".test-data", "TerraformOptions.json")); err == nil {
+			terraform.Destroy(t, test_structure.LoadTerraformOptions(t, testFolder))
+			return
+		}
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
@@ -36,6 +42,5 @@ func TestAzuredevopsVariableGroupsFullIntegration(t *testing.T) {
 
 		stateList := terraform.RunTerraformCommand(t, terraformOptions, "state", "list")
 		assert.Contains(t, stateList, "module.azuredevops_variable_groups.azuredevops_variable_group_permissions.variable_group_permissions[\"readers\"]")
-		assert.Contains(t, stateList, "module.azuredevops_variable_groups.azuredevops_library_permissions.library_permissions[\"readers\"]")
 	})
 }

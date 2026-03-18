@@ -12,8 +12,7 @@ variable "random_suffix" {
 variable "team_administrators" {
   description = "Optional team administrator assignments."
   type = list(object({
-    key               = optional(string)
-    team_id           = optional(string)
+    key               = string
     admin_descriptors = list(string)
     mode              = optional(string, "add")
   }))

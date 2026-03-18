@@ -15,18 +15,15 @@ module "azuredevops_wiki" {
 
   project_id = var.project_id
 
-  wikis = {
-    project = {
-      name = "${var.wiki_name_prefix}-basic"
-      type = "projectWiki"
-    }
+  wiki = {
+    name = "${var.wiki_name_prefix}-basic"
+    type = "projectWiki"
   }
 
-  wiki_pages = [
-    {
-      wiki_key = "project"
-      path     = "/Home"
-      content  = "Basic wiki page"
+  wiki_pages = {
+    home = {
+      path    = "/Home"
+      content = "Basic wiki page"
     }
-  ]
+  }
 }

@@ -1,4 +1,10 @@
 locals {
+  permission_value_map = {
+    allow  = "Allow"
+    deny   = "Deny"
+    notset = "NotSet"
+  }
+
   variable_group_variables = [
     for variable in var.variables : {
       name         = variable.name
@@ -10,12 +16,11 @@ locals {
 
   variable_group_permissions = {
     for permission in var.variable_group_permissions :
-    coalesce(permission.key, permission.principal) => permission
-  }
-
-  library_permissions = {
-    for permission in var.library_permissions :
-    coalesce(permission.key, permission.principal) => permission
+    coalesce(permission.key, permission.principal) => {
+      principal   = permission.principal
+      permissions = { for name, status in permission.permissions : name => local.permission_value_map[lower(status)] }
+      replace     = try(permission.replace, true)
+    }
   }
 }
 
@@ -49,17 +54,8 @@ resource "azuredevops_variable_group_permissions" "variable_group_permissions" {
   for_each = local.variable_group_permissions
 
   project_id        = var.project_id
-  variable_group_id = coalesce(each.value.variable_group_id, azuredevops_variable_group.variable_group.id)
+  variable_group_id = azuredevops_variable_group.variable_group.id
   principal         = each.value.principal
   permissions       = each.value.permissions
   replace           = each.value.replace
-}
-
-resource "azuredevops_library_permissions" "library_permissions" {
-  for_each = local.library_permissions
-
-  project_id  = var.project_id
-  principal   = each.value.principal
-  permissions = each.value.permissions
-  replace     = each.value.replace
 }

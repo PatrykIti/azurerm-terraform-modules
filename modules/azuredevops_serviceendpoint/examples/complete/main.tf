@@ -16,15 +16,11 @@ data "azuredevops_group" "project_collection_admins" {
 
 locals {
   serviceendpoints = {
-    generic = {
-      serviceendpoint_generic = {
-        service_endpoint_name = var.generic_endpoint_name
-        server_url            = var.generic_endpoint_url
-        username              = var.generic_endpoint_username
-        password              = var.generic_endpoint_password
-        description           = "Managed by Terraform"
-      }
-      serviceendpoint_incomingwebhook = null
+    shared = {
+      service_endpoint_name = "${var.generic_endpoint_name}-shared"
+      server_url            = var.generic_endpoint_url
+      username              = var.generic_endpoint_username
+      password              = var.generic_endpoint_password
       permissions = [
         {
           principal = data.azuredevops_group.project_collection_admins.id
@@ -35,28 +31,29 @@ locals {
         }
       ]
     }
-    incomingwebhook = {
-      serviceendpoint_generic = null
-      serviceendpoint_incomingwebhook = {
-        service_endpoint_name = var.incoming_webhook_endpoint_name
-        webhook_name          = "example_webhook"
-        secret                = var.incoming_webhook_secret
-        http_header           = "X-Hub-Signature"
-        description           = "Managed by Terraform"
-      }
-      permissions = []
+    readonly = {
+      service_endpoint_name = "${var.generic_endpoint_name}-readonly"
+      server_url            = var.generic_endpoint_url
+      username              = var.generic_endpoint_username
+      password              = var.generic_endpoint_password
+      permissions           = []
     }
   }
 }
 
 module "azuredevops_serviceendpoint" {
-  source   = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_serviceendpoint?ref=ADOSEv1.0.0"
+  source   = "../../"
   for_each = local.serviceendpoints
 
   project_id = var.project_id
 
-  serviceendpoint_generic         = each.value.serviceendpoint_generic
-  serviceendpoint_incomingwebhook = each.value.serviceendpoint_incomingwebhook
+  serviceendpoint_generic = {
+    service_endpoint_name = each.value.service_endpoint_name
+    server_url            = each.value.server_url
+    username              = each.value.username
+    password              = each.value.password
+    description           = "Managed by Terraform"
+  }
 
   serviceendpoint_permissions = each.value.permissions
 }

@@ -22,14 +22,3 @@ variable "generic_endpoint_password" {
   default   = "example-password"
   sensitive = true
 }
-
-variable "incoming_webhook_name_prefix" {
-  type    = string
-  default = "ado-webhook"
-}
-
-variable "incoming_webhook_secret" {
-  type      = string
-  default   = "example-secret"
-  sensitive = true
-}

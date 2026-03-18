@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_servicehooks" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_servicehooks?ref=ADOSHv1.0.0"
+  source = "../../"
 
   project_id = var.project_id
 
@@ -23,17 +23,4 @@ module "azuredevops_servicehooks" {
       changed_fields = "System.State"
     }
   }
-
-  servicehook_permissions = [
-    {
-      key       = "restricted-permissions"
-      principal = var.principal_descriptor
-      permissions = {
-        ViewSubscriptions   = "Allow"
-        EditSubscriptions   = "Deny"
-        DeleteSubscriptions = "Deny"
-        PublishEvents       = "Deny"
-      }
-    }
-  ]
 }

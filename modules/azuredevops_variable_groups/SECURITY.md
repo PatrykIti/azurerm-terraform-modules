@@ -11,7 +11,7 @@ This document describes security considerations for Azure DevOps variable groups
 - Use Key Vault-backed variable groups for centralized secret storage.
 
 ### 2. Access Control
-- Restrict variable group and library permissions to trusted groups.
+- Restrict variable group permissions to trusted groups.
 - Avoid granting `Administer` or `Owner` unless required.
 
 ### 3. Pipeline Access

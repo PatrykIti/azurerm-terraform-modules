@@ -3,5 +3,5 @@
   "title": "Azure DevOps Work Items",
   "commit_scope": "azuredevops-work-items",
   "tag_prefix": "ADOWKv",
-  "description": "Azure DevOps work items module for managing work items, processes, queries, and permissions"
+  "description": "Azure DevOps work items module for managing a single work item resource"
 }

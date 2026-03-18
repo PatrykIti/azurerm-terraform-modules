@@ -1,6 +1,6 @@
 # Complete Variable Groups Example
 
-This example demonstrates a variable group with Key Vault integration, variable group permissions, and library permissions.
+This example demonstrates a variable group with Key Vault integration and variable-group permissions.
 
 <!-- BEGIN_TF_DOCS -->
 
@@ -31,7 +31,6 @@ No resources.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_key_vault_service_endpoint_id"></a> [key\_vault\_service\_endpoint\_id](#input\_key\_vault\_service\_endpoint\_id) | Service endpoint ID for the Key Vault integration. | `string` | n/a | yes |
-| <a name="input_library_principal_descriptor"></a> [library\_principal\_descriptor](#input\_library\_principal\_descriptor) | Principal descriptor for library permissions. | `string` | n/a | yes |
 | <a name="input_principal_descriptor"></a> [principal\_descriptor](#input\_principal\_descriptor) | Principal descriptor for variable group permissions. | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Azure DevOps project ID. | `string` | n/a | yes |
 

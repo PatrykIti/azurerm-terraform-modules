@@ -11,22 +11,19 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_wiki" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_wiki?ref=ADOWIv1.0.0"
+  source = "../../"
 
   project_id = var.project_id
 
-  wikis = {
-    project = {
-      name = "Project Wiki"
-      type = "projectWiki"
-    }
+  wiki = {
+    name = "Project Wiki"
+    type = "projectWiki"
   }
 
-  wiki_pages = [
-    {
-      wiki_key = "project"
-      path     = "/Home"
-      content  = "Welcome to the project wiki."
+  wiki_pages = {
+    home = {
+      path    = "/Home"
+      content = "Welcome to the project wiki."
     }
-  ]
+  }
 }

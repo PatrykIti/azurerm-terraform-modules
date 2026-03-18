@@ -21,27 +21,12 @@ run "defaults_plan" {
   }
 
   assert {
-    condition     = length(azuredevops_build_folder.build_folder) == 0
-    error_message = "No build folders should be created by default."
-  }
-
-  assert {
     condition     = length(azuredevops_build_definition_permissions.build_definition_permissions) == 0
     error_message = "No build definition permissions should be created by default."
   }
 
   assert {
-    condition     = length(azuredevops_build_folder_permissions.build_folder_permissions) == 0
-    error_message = "No build folder permissions should be created by default."
-  }
-
-  assert {
     condition     = length(azuredevops_pipeline_authorization.pipeline_authorization) == 0
     error_message = "No pipeline authorizations should be created by default."
-  }
-
-  assert {
-    condition     = length(azuredevops_pipeline_authorization.resource_authorization) == 0
-    error_message = "No resource authorizations should be created by default."
   }
 }

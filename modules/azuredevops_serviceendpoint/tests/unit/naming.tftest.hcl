@@ -17,12 +17,12 @@ run "serviceendpoint_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_serviceendpoint_generic.generic) == 1
-    error_message = "serviceendpoint_generic should create one endpoint."
+    condition     = azuredevops_serviceendpoint_generic.generic.service_endpoint_name == "generic-endpoint"
+    error_message = "service_endpoint_name should match the input."
   }
 
   assert {
-    condition     = azuredevops_serviceendpoint_generic.generic[0].service_endpoint_name == "generic-endpoint"
-    error_message = "service_endpoint_name should match the input."
+    condition     = azuredevops_serviceendpoint_generic.generic.server_url == "https://example.endpoint.local"
+    error_message = "server_url should match the input."
   }
 }

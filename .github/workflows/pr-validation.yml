@@ -139,83 +139,23 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Check PR title follows conventional commits
-        # Skip validation for Dependabot PRs
-        if: ${{ !startsWith(github.head_ref, 'dependabot/') }}
-        uses: amannn/action-semantic-pull-request@v6
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+      - name: Checkout repository
+        uses: actions/checkout@v5
         with:
-          types: |
-            feat
-            fix
-            docs
-            style
-            refactor
-            perf
-            test
-            build
-            ci
-            chore
-            revert
-          scopes: |
-            storage-account
-            postgresql-flexible-server-database
-            postgresql-flexible-server
-            virtual-network
-            kubernetes-cluster
-            kubernetes-secrets
-            application-insights
-            log-analytics-workspace
-            monitor-data-collection-endpoint
-            monitor-data-collection-rule
-            monitor-dce
-            monitor-dcr
-            monitor-private-link-scope
-            network-security-group
-            ai-services
-            application-insights-workbook
-            cognitive-account
-            eventhub
-            eventhub-namespace
-            linux-function-app
-            linux-virtual-machine
-            private-dns-zone
-            private-dns-zone-vnet-link
-            private-endpoint
-            redis-cache
-            role-assignment
-            role-definition
-            user-assigned-identity
-            windows-function-app
-            windows-virtual-machine
-            route-table
-            subnet
-            azuredevops-agent-pools
-            azuredevops-artifacts-feed
-            azuredevops-environments
-            azuredevops-extension
-            # Azure DevOps identity split scopes
-            azuredevops-group
-            azuredevops-service-principal-entitlement
-            azuredevops-securityrole-assignment
-            azuredevops-user-entitlement
-            azuredevops-pipelines
-            azuredevops-project
-            azuredevops-project-permissions
-            azuredevops-repository
-            azuredevops-serviceendpoint
-            azuredevops-servicehooks
-            azuredevops-team
-            azuredevops-variable-groups
-            azuredevops-wiki
-            azuredevops-work-items
-            app-gateway
-            bastion-host
-            container-registry
-            key-vault
-            app-service
-            sql-database
+          token: ${{ secrets.PAT || github.token }}
+
+      - name: Build allowed scopes
+        id: allowed-scopes
+        shell: bash
+        run: |
+          mapfile -t MODULE_SCOPES < <(
+            find modules -mindepth 2 -maxdepth 2 -name module.json -print0 \
+              | xargs -0 jq -r '.commit_scope // empty' \
+              | sed '/^$/d' \
+              | sort -u
+          )
+
+          SHARED_SCOPES=(
             core
             deps
             deps-dev
@@ -230,6 +170,35 @@ jobs:
             examples
             modules
             scripts
+          )
+
+          {
+            echo "scopes<<EOF"
+            printf '%s\n' "${MODULE_SCOPES[@]}"
+            printf '%s\n' "${SHARED_SCOPES[@]}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Check PR title follows conventional commits
+        # Skip validation for Dependabot PRs
+        if: ${{ !startsWith(github.head_ref, 'dependabot/') }}
+        uses: amannn/action-semantic-pull-request@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT || github.token }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+          scopes: ${{ steps.allowed-scopes.outputs.scopes }}
           requireScope: false
           subjectPattern: ^(?![A-Z]).+$
           subjectPatternError: |

@@ -1,6 +1,6 @@
 # Secure Service Hooks Example
 
-This example demonstrates a filtered webhook with restricted permissions and stable keys.
+This example demonstrates a filtered webhook configuration for work item updates.
 
 <!-- BEGIN_TF_DOCS -->
 
@@ -31,7 +31,6 @@ No resources.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_area_path"></a> [area\_path](#input\_area\_path) | Area path for work item filters. | `string` | `""` | no |
-| <a name="input_principal_descriptor"></a> [principal\_descriptor](#input\_principal\_descriptor) | Principal descriptor for service hook permissions. | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Azure DevOps project ID. | `string` | n/a | yes |
 | <a name="input_webhook_url"></a> [webhook\_url](#input\_webhook\_url) | Webhook URL for service hook delivery. | `string` | n/a | yes |
 
@@ -39,6 +38,5 @@ No resources.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_servicehook_permission_ids"></a> [servicehook\_permission\_ids](#output\_servicehook\_permission\_ids) | Service hook permission IDs created in this example. |
 | <a name="output_webhook_id"></a> [webhook\_id](#output\_webhook\_id) | Webhook ID created in this example. |
 <!-- END_TF_DOCS -->

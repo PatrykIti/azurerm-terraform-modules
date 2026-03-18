@@ -8,10 +8,9 @@ terraform {
   }
 }
 
-# Negative test cases - should fail validation
 provider "azuredevops" {}
 
-# This should fail because group_descriptor is provided but empty
+# Invalid membership entry: key is empty string.
 module "azuredevops_group" {
   source = "../../../"
 
@@ -19,8 +18,7 @@ module "azuredevops_group" {
 
   group_memberships = [
     {
-      key                = "missing-group"
-      group_descriptor   = ""
+      key                = ""
       member_descriptors = ["vssgp.invalid-member"]
     }
   ]

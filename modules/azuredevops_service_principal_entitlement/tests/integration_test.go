@@ -1,6 +1,8 @@
 package test
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -18,12 +20,16 @@ func TestAzuredevopsServicePrincipalEntitlementFullIntegration(t *testing.T) {
 	originID := requireServicePrincipalOriginID(t, "AZDO_SERVICE_PRINCIPAL_ORIGIN_ID_COMPLETE")
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
+	terraformOptions := getTerraformOptions(t, testFolder, originID)
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder, originID))
+		if _, err := os.Stat(filepath.Join(testFolder, ".test-data", "TerraformOptions.json")); err == nil {
+			terraform.Destroy(t, test_structure.LoadTerraformOptions(t, testFolder))
+			return
+		}
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder, originID)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})

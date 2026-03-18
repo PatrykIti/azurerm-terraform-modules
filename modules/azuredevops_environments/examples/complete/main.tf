@@ -49,7 +49,7 @@ EOT
 }
 
 module "azuredevops_environments" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_environments?ref=ADOEv1.0.0"
+  source = "../../"
 
   project_id  = var.project_id
   name        = "ado-env-complete-example"
@@ -61,6 +61,15 @@ module "azuredevops_environments" {
       namespace           = "default"
       service_endpoint_id = azuredevops_serviceendpoint_kubernetes.example.id
       cluster_name        = "example-aks"
+      checks = {
+        branch_controls = [
+          {
+            name                     = "k8s-endpoint-branch-control"
+            allowed_branches         = "refs/heads/main"
+            verify_branch_protection = true
+          }
+        ]
+      }
     }
   ]
 
@@ -74,7 +83,7 @@ module "azuredevops_environments" {
 
   check_branch_controls = [
     {
-      name                     = "Require protected branches"
+      name                     = "environment-branch-control"
       allowed_branches         = "refs/heads/main"
       verify_branch_protection = true
     }

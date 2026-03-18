@@ -28,14 +28,14 @@ module "azuredevops_environments" {
 
 - This module manages a single environment; use module-level `for_each` to manage multiple environments.
 - Root-level `check_*` inputs always target the environment resource.
-- Kubernetes environment resources do not support approvals and checks.
+- Nested checks under `kubernetes_resources[*].checks` are attached to the backing service endpoint (`target_resource_type = "endpoint"`) because the provider does not expose `environmentResource` as a check target type.
 - All checks require a `name` and must be unique per list.
 
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates creating a basic Azure DevOps environment.
-- [Complete](examples/complete) - This example demonstrates an environment with a Kubernetes resource and environment-level approvals and branch control.
+- [Complete](examples/complete) - This example demonstrates an environment with a Kubernetes resource, environment-level checks, and nested Kubernetes-endpoint checks.
 - [Secure](examples/secure) - This example demonstrates environment approvals, exclusive locks, and business hours.
 <!-- END_EXAMPLES -->
 
@@ -69,12 +69,18 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azuredevops_check_approval.check_approval](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_approval) | resource |
-| [azuredevops_check_branch_control.check_branch_control](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_branch_control) | resource |
-| [azuredevops_check_business_hours.check_business_hours](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_business_hours) | resource |
-| [azuredevops_check_exclusive_lock.check_exclusive_lock](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_exclusive_lock) | resource |
-| [azuredevops_check_required_template.check_required_template](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_required_template) | resource |
-| [azuredevops_check_rest_api.check_rest_api](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_rest_api) | resource |
+| [azuredevops_check_approval.check_approval_environment](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_approval) | resource |
+| [azuredevops_check_approval.check_approval_kubernetes](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_approval) | resource |
+| [azuredevops_check_branch_control.check_branch_control_environment](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_branch_control) | resource |
+| [azuredevops_check_branch_control.check_branch_control_kubernetes](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_branch_control) | resource |
+| [azuredevops_check_business_hours.check_business_hours_environment](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_business_hours) | resource |
+| [azuredevops_check_business_hours.check_business_hours_kubernetes](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_business_hours) | resource |
+| [azuredevops_check_exclusive_lock.check_exclusive_lock_environment](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_exclusive_lock) | resource |
+| [azuredevops_check_exclusive_lock.check_exclusive_lock_kubernetes](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_exclusive_lock) | resource |
+| [azuredevops_check_required_template.check_required_template_environment](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_required_template) | resource |
+| [azuredevops_check_required_template.check_required_template_kubernetes](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_required_template) | resource |
+| [azuredevops_check_rest_api.check_rest_api_environment](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_rest_api) | resource |
+| [azuredevops_check_rest_api.check_rest_api_kubernetes](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/check_rest_api) | resource |
 | [azuredevops_environment.environment](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/environment) | resource |
 | [azuredevops_environment_resource_kubernetes.environment_resource_kubernetes](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2/docs/resources/environment_resource_kubernetes) | resource |
 
@@ -89,7 +95,7 @@ No modules.
 | <a name="input_check_required_templates"></a> [check\_required\_templates](#input\_check\_required\_templates) | List of required template checks to configure for the environment. | <pre>list(object({<br/>    name = string<br/>    required_templates = list(object({<br/>      template_path   = string<br/>      repository_name = string<br/>      repository_ref  = string<br/>      repository_type = optional(string)<br/>    }))<br/>  }))</pre> | `[]` | no |
 | <a name="input_check_rest_apis"></a> [check\_rest\_apis](#input\_check\_rest\_apis) | List of REST API checks to configure for the environment. | <pre>list(object({<br/>    name                            = string<br/>    connected_service_name_selector = string<br/>    connected_service_name          = string<br/>    method                          = string<br/>    body                            = optional(string)<br/>    headers                         = optional(string)<br/>    retry_interval                  = optional(number)<br/>    success_criteria                = optional(string)<br/>    url_suffix                      = optional(string)<br/>    variable_group_name             = optional(string)<br/>    completion_event                = optional(string)<br/>    timeout                         = optional(string)<br/>  }))</pre> | `[]` | no |
 | <a name="input_description"></a> [description](#input\_description) | Optional description for the Azure DevOps environment. | `string` | `null` | no |
-| <a name="input_kubernetes_resources"></a> [kubernetes\_resources](#input\_kubernetes\_resources) | List of Kubernetes resources to attach to the environment. | <pre>list(object({<br/>    name                = string<br/>    service_endpoint_id = string<br/>    namespace           = string<br/>    cluster_name        = optional(string)<br/>    tags                = optional(list(string))<br/>  }))</pre> | `[]` | no |
+| <a name="input_kubernetes_resources"></a> [kubernetes\_resources](#input\_kubernetes\_resources) | List of Kubernetes resources attached to the environment. Optional checks can be nested under checks and target the backing service endpoint. | <pre>list(object({<br/>    name                = string<br/>    service_endpoint_id = string<br/>    namespace           = string<br/>    cluster_name        = optional(string)<br/>    tags                = optional(list(string))<br/>    checks = optional(object({<br/>      approvals = optional(list(object({<br/>        name                       = string<br/>        approvers                  = list(string)<br/>        instructions               = optional(string)<br/>        minimum_required_approvers = optional(number)<br/>        requester_can_approve      = optional(bool)<br/>        timeout                    = optional(number)<br/>      })), [])<br/>      branch_controls = optional(list(object({<br/>        name                             = string<br/>        allowed_branches                 = optional(string)<br/>        verify_branch_protection         = optional(bool)<br/>        ignore_unknown_protection_status = optional(bool)<br/>        timeout                          = optional(number)<br/>      })), [])<br/>      business_hours = optional(list(object({<br/>        name       = string<br/>        start_time = string<br/>        end_time   = string<br/>        time_zone  = string<br/>        monday     = optional(bool)<br/>        tuesday    = optional(bool)<br/>        wednesday  = optional(bool)<br/>        thursday   = optional(bool)<br/>        friday     = optional(bool)<br/>        saturday   = optional(bool)<br/>        sunday     = optional(bool)<br/>        timeout    = optional(number)<br/>      })), [])<br/>      exclusive_locks = optional(list(object({<br/>        name    = string<br/>        timeout = optional(number)<br/>      })), [])<br/>      required_templates = optional(list(object({<br/>        name = string<br/>        required_templates = list(object({<br/>          template_path   = string<br/>          repository_name = string<br/>          repository_ref  = string<br/>          repository_type = optional(string)<br/>        }))<br/>      })), [])<br/>      rest_apis = optional(list(object({<br/>        name                            = string<br/>        connected_service_name_selector = string<br/>        connected_service_name          = string<br/>        method                          = string<br/>        body                            = optional(string)<br/>        headers                         = optional(string)<br/>        retry_interval                  = optional(number)<br/>        success_criteria                = optional(string)<br/>        url_suffix                      = optional(string)<br/>        variable_group_name             = optional(string)<br/>        completion_event                = optional(string)<br/>        timeout                         = optional(string)<br/>      })), [])<br/>    }), {})<br/>  }))</pre> | `[]` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name of the Azure DevOps environment. | `string` | n/a | yes |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Azure DevOps project ID. | `string` | n/a | yes |
 
@@ -97,7 +103,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_check_ids"></a> [check\_ids](#output\_check\_ids) | Map of environment-level check IDs keyed by check name. |
+| <a name="output_check_ids"></a> [check\_ids](#output\_check\_ids) | Map of check IDs grouped by target: environment and kubernetes\_resources. |
 | <a name="output_environment_id"></a> [environment\_id](#output\_environment\_id) | ID of the Azure DevOps environment managed by this module. |
 | <a name="output_kubernetes_resource_ids"></a> [kubernetes\_resource\_ids](#output\_kubernetes\_resource\_ids) | Map of Kubernetes resource IDs keyed by resource name. |
 <!-- END_TF_DOCS -->

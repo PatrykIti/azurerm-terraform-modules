@@ -1,6 +1,8 @@
 package test
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -17,12 +19,16 @@ func TestAzuredevopsServiceendpointFullIntegration(t *testing.T) {
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
+	terraformOptions := getTerraformOptions(t, testFolder)
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		if _, err := os.Stat(filepath.Join(testFolder, ".test-data", "TerraformOptions.json")); err == nil {
+			terraform.Destroy(t, test_structure.LoadTerraformOptions(t, testFolder))
+			return
+		}
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
@@ -30,10 +36,12 @@ func TestAzuredevopsServiceendpointFullIntegration(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
-		genericEndpointID := terraform.Output(t, terraformOptions, "generic_serviceendpoint_id")
-		genericPermissions := terraform.OutputMap(t, terraformOptions, "generic_permissions")
+		primaryEndpointID := terraform.Output(t, terraformOptions, "primary_serviceendpoint_id")
+		secondaryEndpointID := terraform.Output(t, terraformOptions, "secondary_serviceendpoint_id")
+		primaryPermissions := terraform.OutputMap(t, terraformOptions, "primary_permissions")
 
-		assert.NotEmpty(t, genericEndpointID)
-		assert.NotEmpty(t, genericPermissions)
+		assert.NotEmpty(t, primaryEndpointID)
+		assert.NotEmpty(t, secondaryEndpointID)
+		assert.NotEmpty(t, primaryPermissions)
 	})
 }

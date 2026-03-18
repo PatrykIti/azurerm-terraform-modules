@@ -3,213 +3,79 @@
 
 **Priority:** 🔴 High
 **Category:** Azure DevOps Modules
-**Estimated Effort:** Medium
-**Dependencies:** TASK-ADO-014
-**Status:** ✅ **Done** (2025-12-28)
+**Estimated Effort:** Large
+**Dependencies:** TASK-ADO-039, TASK-ADO-041
+**Status:** ✅ **Completed (2026-02-14)**
 
 ---
 
 ## Overview
 
-Refactor `modules/azuredevops_work_items` to align with MODULE_GUIDE/TESTING_GUIDE/TERRAFORM_BEST_PRACTICES.
-Introduce stable keys for all list-based resources, stronger validation, and optional key-based references
-between work items, query folders, and queries.
-The main `azuredevops_workitem` must be a single (non-iterated) resource with flat inputs; for multiple work items use module-level `for_each`.
+`modules/azuredevops_work_items` was a composite module spanning multiple independent provider resource families and required decomposition.
 
-## Updated Rules (Re-opened)
+## Planning Assumption
 
-- Main resource is single (non-iterated); use module-level `for_each` in environment config to manage multiple instances.
-- Prefer `list(object)` for collections; use `map` only when provider requires key/value semantics.
-- Use simple, stable `for_each` keys based on unique fields (name, principal_id, service_principal_id, group_name, etc.); never index-based.
-- Follow docs/MODULE_GUIDE/, docs/TESTING_GUIDE, docs/TERRAFORM_BEST_PRACTICES_GUIDE.md.
+- No active production consumers yet (owner confirmation, 2026-02-13).
+- Breaking changes are explicitly allowed for atomic-boundary alignment.
+- Backward-compatibility shims are optional; prioritize clean target architecture.
 
-## Scope (Provider Resources)
+## Mandatory Rule (Atomic Boundary)
 
-- `azuredevops_workitem`
-- `azuredevops_workitemquery`
-- `azuredevops_workitemquery_folder`
-- `azuredevops_workitemquery_permissions`
-- `azuredevops_workitemtrackingprocess_process`
-- `azuredevops_area_permissions`
-- `azuredevops_iteration_permissions`
-- `azuredevops_tagging_permissions`
+- Primary resource in a module must be single and non-iterated (`no for_each`, `no count` on primary block).
+- Additional resources may remain only when they are strict children of that primary resource.
+- Strict child means direct dependency on module-managed primary resource and no external-ID fallback.
+- If a resource can operate without module primary resource (for example via external `*_id` input), it must be moved to a separate atomic module.
+- Multiplicity belongs in consumer configuration via module-level `for_each`.
 
-## Current Gaps (Summary)
+## Current Gaps
 
-- `work_items` are modeled as a list and iterated; should be a single resource with flat inputs and module-level `for_each`.
-- Index-based `for_each` for work items, queries, folders, and permissions causes unstable resource addresses.
-- No `key` inputs for list items; outputs are keyed by index instead of stable identifiers.
-- No support for referencing module-created query folders/queries by key.
-- `project_id` is required even for org-scoped processes; no validation to enforce project_id when needed.
-- `path` fields for permissions are optional with no non-empty validation.
-- ID fields (`parent_id`, etc.) are typed as strings and lack basic validation (non-empty/positive).
-- Outputs omit query folder IDs and all permissions IDs.
-- Missing `docs/IMPORT.md` and README Terraform docs are not generated.
+- Module contained multiple independent primary scopes (`workitem`, `process`, `query_folder`, `query`, and multiple permissions resources).
+- Several resources were iterable primaries in the same module (`for_each` on non-child families).
+- Query and permission resources could be managed independently from work item creation, violating atomic boundary.
+- Release references still require `ADOWKv*` normalization (`TASK-ADO-039`).
 
-## Target Module Design
+## Resolution (2026-02-14)
 
-### Inputs (Project Context)
+- Module was narrowed to a single non-iterated primary resource (`azuredevops_workitem`).
+- Independent scopes were removed from this module: process, query folders, queries, and permissions families.
+- Inputs, outputs, examples, fixtures, unit tests, integration compile gate, and docs were aligned to work-item-only atomic scope.
+- Composition pattern for parent/child work items is demonstrated in examples/tests using multiple module instances.
+- Release tag normalization remains tracked separately in `TASK-ADO-039`.
 
-- project_id (optional string) — default project for project-scoped resources.
+## Scope
 
-Validation rules:
-- If any project-scoped entry omits `project_id`, module `project_id` must be set.
+- Module: `modules/azuredevops_work_items/`
+- Examples: `modules/azuredevops_work_items/examples/*`
+- Tests: `modules/azuredevops_work_items/tests/*`
+- Docs: module README + scope docs + root release/version references
 
-### Inputs (Processes)
+## Docs to Update
 
-- processes (list(object)):
-  - key (optional string) for stable for_each
-  - name (string, required)
-  - parent_process_type_id (string, required)
-  - description (optional string)
-  - is_default (optional bool)
-  - is_enabled (optional bool)
-  - reference_name (optional string)
-
-Validation rules:
-- name/reference_name must be non-empty when provided.
-- for_each key = `coalesce(key, name)` with uniqueness validation.
-
-### Inputs (Work Item)
-
-Single work item per module instance (no list).
-- project_id (optional string)
-- title (string, required)
-- type (string, required)
-- state (optional string)
-- tags (optional list(string))
-- area_path (optional string)
-- iteration_path (optional string)
-- parent_id (optional number)
-- custom_fields (optional map(string))
-- verify provider schema for additional optional fields and add if applicable
-
-Validation rules:
-- title/type must be non-empty strings.
-- parent_id must be a positive number when provided.
-
-### Inputs (Query Folders)
-
-- query_folders (list(object)):
-  - key (optional string) for stable for_each
-  - project_id (optional string)
-  - name (string, required)
-  - area (optional string)
-  - parent_id (optional number)
-  - parent_key (optional string)
-
-Validation rules:
-- name must be non-empty.
-- Exactly one of `area`, `parent_id`, or `parent_key`.
-- `parent_key` must reference an existing folder key.
-- for_each key = `coalesce(key, name)` with uniqueness validation.
-
-### Inputs (Queries)
-
-- queries (list(object)):
-  - key (optional string) for stable for_each
-  - project_id (optional string)
-  - name (string, required)
-  - wiql (string, required)
-  - area (optional string)
-  - parent_id (optional number)
-  - parent_key (optional string)
-
-Validation rules:
-- name/wiql must be non-empty.
-- Exactly one of `area`, `parent_id`, or `parent_key`.
-- `parent_key` must reference an existing folder key.
-- for_each key = `coalesce(key, name)` with uniqueness validation.
-
-### Inputs (Query Permissions)
-
-- query_permissions (list(object)):
-  - key (optional string) for stable for_each
-  - project_id (optional string)
-  - path (optional string)
-  - query_key (optional string)
-  - folder_key (optional string)
-  - principal (string, required)
-  - permissions (map(string), required)
-  - replace (optional bool)
-
-Validation rules:
-- Exactly one of `path`, `query_key`, or `folder_key`.
-- `query_key`/`folder_key` must reference existing keys.
-- path must be non-empty when provided.
-- for_each key = `coalesce(key, principal, path, query_key, folder_key)` with uniqueness validation.
-
-Behavior:
-- When `query_key` or `folder_key` is set, derive `path` from module-created resources.
-
-### Inputs (Area / Iteration / Tagging Permissions)
-
-- area_permissions / iteration_permissions / tagging_permissions (list(object)):
-  - key (optional string) for stable for_each
-  - project_id (optional string)
-  - path (string, required)
-  - principal (string, required)
-  - permissions (map(string), required)
-  - replace (optional bool)
-
-Validation rules:
-- path must be non-empty.
-- for_each key = `coalesce(key, principal, path)` with uniqueness validation.
-
-### Outputs
-
-- process_ids (map, keyed by process key)
-- work_item_id (string)
-- query_folder_ids (map, keyed by folder key)
-- query_ids (map, keyed by query key)
-- query_permission_ids / area_permission_ids / iteration_permission_ids / tagging_permission_ids (maps keyed by entry key)
-
-## Examples
-
-Update examples to show stable keys and key-based references:
-- basic: single work item.
-- complete: process + query folder + query + permissions referencing `query_key`/`folder_key`.
-- secure: area/iteration/tagging permissions with explicit paths and keys.
-
-## Tests
-
-Update tests per TESTING_GUIDE:
-
-- Unit:
-  - key uniqueness validation for all list inputs.
-  - project_id required when project-scoped entries omit it.
-  - parent_id validation for work item.
-  - query permissions selector validation (path vs query_key vs folder_key).
-- Integration:
-  - create folder + query + permissions using key-based references.
-  - create work item with parent_id.
-- Negative:
-  - duplicate keys.
-  - invalid parent_id/query_key references.
-  - missing project_id when required.
-
-## Docs to Update After Completion
-
+- `modules/azuredevops_work_items/README.md`
+- `modules/azuredevops_work_items/docs/README.md`
+- `README.md`
 - `docs/_TASKS/README.md`
-- `docs/_CHANGELOG/README.md`
-- `docs/_CHANGELOG/NNN-YYYY-MM-DD-ado-work-items-refactor.md`
-- `modules/azuredevops_work_items/docs/IMPORT.md`
+
+## Work Items
+
+- **Atomic decomposition:** split module into resource-family modules (work item, process, query folders/queries, permissions families).
+- **Strict-child policy:** prevent cross-family fallback behavior inside a single module.
+- **Migration path:** document breaking changes and composition examples for consumers.
+- **Tests/examples:** rebuild tests and examples around composition of atomic modules.
+- **Release normalization:** align tags and links with `ADOWKv*` (`TASK-ADO-039`).
 
 ## Acceptance Criteria
 
-- Module aligns with MODULE_GUIDE and TERRAFORM_BEST_PRACTICES (stable keys, validations, cross-field rules).
-- Project-scoped resources validate `project_id` availability.
-- Key-based references for query folders/queries are supported.
-- Outputs keyed by stable, human-readable keys.
-- README + examples + docs/IMPORT.md updated.
-- Unit + integration + negative tests updated and passing.
+- No module spans multiple independent work-item resource families.
+- Each resulting module has one non-iterated primary resource.
+- Cross-family fallback linking is removed from module internals.
+- Examples and tests use composition in consumer layer.
+- Release/tag normalization dependency is explicitly tracked in `TASK-ADO-039`.
 
 ## Implementation Checklist
 
-- [x] Update variables.tf: move `processes` to list(object), replace `work_items` list with a single work item input, add validations and project_id gating.
-- [x] Refactor main.tf for stable for_each on list resources and defaulted IDs.
-- [x] Update outputs.tf with `work_item_id` and stable maps for other resources.
-- [x] Add `docs/IMPORT.md` and regenerate README (terraform-docs).
-- [x] Update examples (basic/complete/secure) to use the new single work item interface.
-- [x] Update tests (fixtures, unit, terratest, test_config).
-- [x] make docs + update examples list.
+- [x] Define target split map for work-item resource families.
+- [x] Implement decomposition with migration guidance.
+- [x] Remove non-child fallback coupling.
+- [x] Update tests/examples/docs to composition model.
+- [x] Track `ADOWKv*` release normalization in `TASK-ADO-039` (blocked by pipeline/tags).

@@ -1,0 +1,83 @@
+# Terraform artifacts
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!terraform.tfvars.example
+.terraform/
+.terraform.lock.hcl
+.terraform.tfstate.lock.info
+terraform.tfstate.d/
+crash.log
+crash.*.log
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc
+
+# Test output and reports
+test_outputs/
+test-results/
+test-results.xml
+coverage.out
+coverage.html
+security-report.json
+*.test
+*.log
+
+# Go artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+
+# IDE and editor files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+# Debug files
+debug/
+*.pprof
+
+# Benchmark results
+benchmark_results/
+*.bench
+
+# Local testing configurations
+local_test_config.yaml
+local_test_config.yml
+
+# Generated documentation
+generated_docs/
+
+# Cache directories
+.cache/
+.tmp/

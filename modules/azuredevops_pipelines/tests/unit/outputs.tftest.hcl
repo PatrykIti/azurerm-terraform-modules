@@ -7,12 +7,6 @@ mock_provider "azuredevops" {
     }
     override_during = plan
   }
-
-  mock_resource "azuredevops_build_folder" {
-    defaults = {
-      id = "folder-0001"
-    }
-  }
 }
 
 variables {
@@ -23,13 +17,6 @@ variables {
     repo_type = "TfsGit"
     yml_path  = "azure-pipelines.yml"
   }
-
-  build_folders = [
-    {
-      key  = "pipelines"
-      path = "\\Pipelines"
-    }
-  ]
 
   pipeline_authorizations = [
     {
@@ -48,12 +35,7 @@ run "outputs_plan" {
   }
 
   assert {
-    condition     = contains(keys(output.build_folder_ids), "pipelines")
-    error_message = "build_folder_ids should be keyed by the folder key."
-  }
-
-  assert {
     condition     = azuredevops_pipeline_authorization.pipeline_authorization["endpoint:endpoint-0001"].pipeline_id == 1
-    error_message = "pipeline_authorizations should default pipeline_id to the module build definition."
+    error_message = "pipeline_authorizations should always bind to the module build definition."
   }
 }

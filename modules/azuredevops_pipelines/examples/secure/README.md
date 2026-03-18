@@ -1,6 +1,6 @@
 # Secure Azure DevOps Pipelines Example
 
-This example demonstrates a pipeline with restricted permissions and explicit authorizations.
+This example demonstrates a pipeline with strict-child permissions and explicit resource authorizations.
 
 ## Features
 

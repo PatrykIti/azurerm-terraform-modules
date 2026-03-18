@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_variable_groups" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_variable_groups?ref=ADOVGv1.0.0"
+  source = "../../"
 
   project_id = var.project_id
   name       = "secure-vars"

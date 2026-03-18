@@ -2,14 +2,12 @@
 
 ## Overview
 
-This module manages Azure DevOps pipelines resources and related configuration.
+This module manages one Azure DevOps build definition per module instance, plus strict-child permissions and resource authorizations.
 
 ## Managed Resources
 
 - `azuredevops_build_definition`
 - `azuredevops_build_definition_permissions`
-- `azuredevops_build_folder`
-- `azuredevops_build_folder_permissions`
 - `azuredevops_pipeline_authorization`
 
 ## Usage Notes
@@ -17,7 +15,7 @@ This module manages Azure DevOps pipelines resources and related configuration.
 - Requires `project_id` for project scoping.
 - Use `git::https://...//modules/azuredevops_pipelines?ref=ADOPIvX.Y.Z` for module source.
 - Optional child resources are created only when corresponding inputs are set.
-- Use stable keys and unique names for list/object inputs to avoid address churn.
+- Use stable keys and unique names for list/object inputs to avoid address churn. Build folders and folder permissions are intentionally out of scope for this atomic module.
 
 ## Inputs (Highlights)
 
@@ -27,7 +25,6 @@ This module manages Azure DevOps pipelines resources and related configuration.
 ## Outputs (Highlights)
 
 - `build_definition_id`
-- `build_folder_ids`
 
 ## Import Existing Resources
 

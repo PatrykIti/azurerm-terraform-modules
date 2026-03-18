@@ -2,17 +2,13 @@
 
 ## Overview
 
-This document describes security considerations for Azure DevOps agent pools and elastic pools managed by Terraform.
+This document describes security considerations for Azure DevOps agent pools managed by Terraform.
 
 ## Security Features
 
 ### 1. Agent Pools
 - Use dedicated pools for sensitive workloads.
 - Separate hosted and self-hosted pools by purpose.
-
-### 2. Elastic Pools
-- Restrict service endpoints to least privilege.
-- Limit max capacity to avoid unexpected spend.
 
 ## Security Configuration Example
 
@@ -29,13 +25,10 @@ module "azuredevops_agent_pools" {
 ## Security Hardening Checklist
 
 - [ ] Limit pool usage to approved projects.
-- [ ] Use least-privilege service endpoints for elastic pools.
-- [ ] Cap elastic pool max capacity.
 
 ## Common Security Mistakes to Avoid
 
 1. **Sharing a single pool across high/low trust workloads**
-2. **Allowing elastic pools to scale without limits**
 
 ## Additional Resources
 

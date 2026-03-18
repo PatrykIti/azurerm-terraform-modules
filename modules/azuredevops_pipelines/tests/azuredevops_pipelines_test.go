@@ -1,6 +1,8 @@
 package test
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -13,15 +15,20 @@ import (
 
 // Test basic azuredevops_pipelines creation
 func TestBasicAzuredevopsPipelines(t *testing.T) {
+	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
+	terraformOptions := getTerraformOptions(t, testFolder)
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		destroyAllowMissingPipeline(t, getTerraformOptions(t, testFolder))
+		if _, err := os.Stat(filepath.Join(testFolder, ".test-data", "TerraformOptions.json")); err == nil {
+			destroyAllowMissingPipeline(t, test_structure.LoadTerraformOptions(t, testFolder))
+			return
+		}
+		destroyAllowMissingPipeline(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
@@ -37,15 +44,20 @@ func TestBasicAzuredevopsPipelines(t *testing.T) {
 
 // Test complete azuredevops_pipelines configuration
 func TestCompleteAzuredevopsPipelines(t *testing.T) {
+	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
+	terraformOptions := getTerraformOptions(t, testFolder)
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		destroyAllowMissingPipeline(t, getTerraformOptions(t, testFolder))
+		if _, err := os.Stat(filepath.Join(testFolder, ".test-data", "TerraformOptions.json")); err == nil {
+			destroyAllowMissingPipeline(t, test_structure.LoadTerraformOptions(t, testFolder))
+			return
+		}
+		destroyAllowMissingPipeline(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
@@ -54,24 +66,26 @@ func TestCompleteAzuredevopsPipelines(t *testing.T) {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 
 		buildDefinitionIDs := terraform.OutputMap(t, terraformOptions, "build_definition_ids")
-		buildFolderIDs := terraform.OutputMap(t, terraformOptions, "build_folder_ids")
-
 		assert.NotEmpty(t, buildDefinitionIDs)
-		assert.NotEmpty(t, buildFolderIDs)
 	})
 }
 
 // Test secure azuredevops_pipelines configuration
 func TestSecureAzuredevopsPipelines(t *testing.T) {
+	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
+	terraformOptions := getTerraformOptions(t, testFolder)
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		destroyAllowMissingPipeline(t, getTerraformOptions(t, testFolder))
+		if _, err := os.Stat(filepath.Join(testFolder, ".test-data", "TerraformOptions.json")); err == nil {
+			destroyAllowMissingPipeline(t, test_structure.LoadTerraformOptions(t, testFolder))
+			return
+		}
+		destroyAllowMissingPipeline(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
@@ -87,6 +101,7 @@ func TestSecureAzuredevopsPipelines(t *testing.T) {
 
 // Negative test cases for validation rules
 func TestAzuredevopsPipelinesValidationRules(t *testing.T) {
+	t.Parallel()
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/negative")
@@ -97,7 +112,7 @@ func TestAzuredevopsPipelinesValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "pipeline_authorizations.pipeline_id must be a non-empty string when provided")
+	assert.Contains(t, err.Error(), "pipeline_authorizations.resource_id must be a non-empty string")
 }
 
 // Helper function to get terraform options

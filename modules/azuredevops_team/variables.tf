@@ -38,14 +38,13 @@ variable "description" {
 }
 
 # -----------------------------------------------------------------------------
-# Team Members
+# Team Members (strict-child only)
 # -----------------------------------------------------------------------------
 
 variable "team_members" {
-  description = "List of team membership assignments."
+  description = "List of team membership assignments for the team created by this module."
   type = list(object({
-    key                = optional(string)
-    team_id            = optional(string)
+    key                = string
     member_descriptors = list(string)
     mode               = optional(string, "add")
   }))
@@ -53,29 +52,9 @@ variable "team_members" {
 
   validation {
     condition = alltrue([
-      for membership in var.team_members : (
-        membership.team_id == null || length(trimspace(membership.team_id)) > 0
-      )
+      for membership in var.team_members : length(trimspace(membership.key)) > 0
     ])
-    error_message = "team_members.team_id must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for membership in var.team_members : (
-        membership.key == null || length(trimspace(membership.key)) > 0
-      )
-    ])
-    error_message = "team_members.key must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for membership in var.team_members : (
-        membership.team_id != null || membership.key != null
-      )
-    ])
-    error_message = "team_members entries must set key when team_id is not provided."
+    error_message = "team_members.key must be a non-empty string."
   }
 
   validation {
@@ -99,21 +78,20 @@ variable "team_members" {
 
   validation {
     condition = length(var.team_members) == length(distinct([
-      for membership in var.team_members : try(coalesce(membership.key, membership.team_id), "")
+      for membership in var.team_members : membership.key
     ]))
-    error_message = "team_members entries must be unique by key or team_id."
+    error_message = "team_members entries must be unique by key."
   }
 }
 
 # -----------------------------------------------------------------------------
-# Team Administrators
+# Team Administrators (strict-child only)
 # -----------------------------------------------------------------------------
 
 variable "team_administrators" {
-  description = "List of team administrator assignments."
+  description = "List of team administrator assignments for the team created by this module."
   type = list(object({
-    key               = optional(string)
-    team_id           = optional(string)
+    key               = string
     admin_descriptors = list(string)
     mode              = optional(string, "add")
   }))
@@ -121,29 +99,9 @@ variable "team_administrators" {
 
   validation {
     condition = alltrue([
-      for admin in var.team_administrators : (
-        admin.team_id == null || length(trimspace(admin.team_id)) > 0
-      )
+      for admin in var.team_administrators : length(trimspace(admin.key)) > 0
     ])
-    error_message = "team_administrators.team_id must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for admin in var.team_administrators : (
-        admin.key == null || length(trimspace(admin.key)) > 0
-      )
-    ])
-    error_message = "team_administrators.key must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = alltrue([
-      for admin in var.team_administrators : (
-        admin.team_id != null || admin.key != null
-      )
-    ])
-    error_message = "team_administrators entries must set key when team_id is not provided."
+    error_message = "team_administrators.key must be a non-empty string."
   }
 
   validation {
@@ -167,8 +125,8 @@ variable "team_administrators" {
 
   validation {
     condition = length(var.team_administrators) == length(distinct([
-      for admin in var.team_administrators : try(coalesce(admin.key, admin.team_id), "")
+      for admin in var.team_administrators : admin.key
     ]))
-    error_message = "team_administrators entries must be unique by key or team_id."
+    error_message = "team_administrators entries must be unique by key."
   }
 }

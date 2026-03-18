@@ -100,7 +100,7 @@ func TestAzuredevopsWikiValidationRules(t *testing.T) {
 
 	_, err := terraform.InitAndPlanE(t, terraformOptions)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "wiki_id or wiki_key")
+	assert.Contains(t, err.Error(), "unique path values")
 }
 
 // Helper function to get terraform options

@@ -33,7 +33,7 @@ resource "azuredevops_serviceendpoint_generic" "example" {
 }
 
 module "azuredevops_pipelines" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_pipelines?ref=ADOPIv1.0.0"
+  source = "../../"
 
   project_id = var.project_id
 

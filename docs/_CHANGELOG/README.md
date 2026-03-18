@@ -6,6 +6,19 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [100](./100-2026-03-18-ado-live-test-harness-stabilization-wave3.md) | 2026-03-18 | Azure DevOps live test harness stabilization wave 3 | Maintenance / Documentation |
+| [099](./099-2026-02-15-ado-release-tag-normalization-task-closure.md) | 2026-02-15 | Azure DevOps release tag normalization task closure | Maintenance / Documentation |
+| [098](./098-2026-02-15-ado-identity-compliance-task-closure.md) | 2026-02-15 | Azure DevOps identity compliance task closure | Maintenance / Documentation |
+| [097](./097-2026-02-15-ado-service-principal-entitlement-compliance-closure.md) | 2026-02-15 | Azure DevOps service principal entitlement compliance closure | Maintenance / Documentation |
+| [096](./096-2026-02-15-ado-environments-compliance-fixes.md) | 2026-02-15 | Azure DevOps environments compliance fixes | Breaking Change / Maintenance |
+| [095](./095-2026-02-14-ado-repository-refactor-closure.md) | 2026-02-14 | Azure DevOps repository refactor closure | Maintenance / Documentation |
+| [094](./094-2026-02-14-ado-environments-refactor-board-reverification.md) | 2026-02-14 | Azure DevOps environments refactor board re-verification | Maintenance / Documentation |
+| [093](./093-2026-02-14-ado-extension-refactor-closure.md) | 2026-02-14 | Azure DevOps extension refactor closure | Maintenance / Documentation |
+| [092](./092-2026-02-14-ado-artifacts-feed-refactor-closure.md) | 2026-02-14 | Azure DevOps artifacts feed refactor closure | Maintenance / Documentation |
+| [091](./091-2026-02-14-ado-test-harness-consistency-alignment.md) | 2026-02-14 | Azure DevOps test harness consistency alignment | Maintenance / Documentation |
+| [090](./090-2026-02-14-ado-pipelines-work-items-atomic-realignment.md) | 2026-02-14 | Azure DevOps pipelines/work-items atomic realignment | Breaking Change / Maintenance |
+| [089](./089-2026-02-14-ado-atomic-realignment-wave2.md) | 2026-02-14 | Azure DevOps atomic realignment wave 2 (5 modules) | Breaking Change / Maintenance |
+| [088](./088-2026-02-13-ado-agent-pools-group-atomic-boundary-split.md) | 2026-02-13 | Azure DevOps agent pools/group atomic boundary split | Breaking Change / Maintenance |
 | [087](./087-2026-01-30-eventhub-module.md) | 2026-01-30 | Event Hub module | Feature |
 | [086](./086-2026-01-30-eventhub-namespace-module.md) | 2026-01-30 | Event Hub Namespace module | Feature |
 | [085](./085-2026-01-30-windows-function-app-module.md) | 2026-01-30 | Windows Function App module | Feature |

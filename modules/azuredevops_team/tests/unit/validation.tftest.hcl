@@ -33,24 +33,7 @@ run "missing_team_member_key" {
   variables {
     team_members = [
       {
-        member_descriptors = ["vssgp.member"]
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.team_members,
-  ]
-}
-
-run "empty_team_member_team_id" {
-  command = plan
-
-  variables {
-    team_members = [
-      {
-        key                = "members"
-        team_id            = " "
+        key                = " "
         member_descriptors = ["vssgp.member"]
       }
     ]
@@ -118,48 +101,13 @@ run "team_member_mode_default" {
   }
 }
 
-run "team_member_team_id_default" {
-  command = plan
-
-  variables {
-    team_members = [
-      {
-        key                = "members"
-        member_descriptors = ["vssgp.member"]
-      }
-    ]
-  }
-
-  assert {
-    condition     = azuredevops_team_members.team_members["members"].team_id == azuredevops_team.team.id
-    error_message = "team_members.team_id should default to the module team ID."
-  }
-}
-
 run "missing_team_admin_key" {
   command = plan
 
   variables {
     team_administrators = [
       {
-        admin_descriptors = ["vssgp.admin"]
-      }
-    ]
-  }
-
-  expect_failures = [
-    var.team_administrators,
-  ]
-}
-
-run "empty_team_admin_team_id" {
-  command = plan
-
-  variables {
-    team_administrators = [
-      {
-        key               = "admins"
-        team_id           = " "
+        key               = " "
         admin_descriptors = ["vssgp.admin"]
       }
     ]

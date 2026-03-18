@@ -79,11 +79,9 @@ azurerm-terraform-modules/
 **Jobs**:
 
 #### `detect-changes`
-- Parses PR title scopes (e.g., `feat(azurerm_virtual_network): ...`) for module names.
-- Builds a `commit_scope` → module map from `module.json` and resolves scopes accordingly.
-- Prefers PR-title scopes when present; path-based detection is a fallback only.
-- Warns when path changes include modules not listed in the PR title scope.
-- Generates dynamic `paths-filter` based on current module list, ignoring Terraform caches (`.terraform`, lockfiles, state, plans, crash logs).
+- Parses PR title scopes (for example `feat(storage-account): ...` or `fix(azuredevops-team): ...`).
+- Builds a `commit_scope` -> module map from `module.json` and resolves scopes accordingly.
+- For PRs, module selection is title-driven. If the PR title does not contain module scopes, no per-module matrix is created.
 - For workflow_dispatch with `module` input, uses that module directly.
 - Outputs:
   - `modules` (JSON array)
@@ -127,15 +125,16 @@ azurerm-terraform-modules/
 **Jobs**:
 
 #### `detect-changes`
-- Same detection strategy as Module CI (scope-first; path-only fallback).
+- Same detection strategy as Module CI: title-driven module resolution from PR scope.
 - Ignores non-module scopes (e.g., `core`, `docs`, `ci`) when parsing PR titles.
 - Outputs module matrix.
 
 #### `validate-pr-title`
 - Uses `amannn/action-semantic-pull-request@v6`.
 - Enforces conventional commit style.
-- Scopes include module names and core tooling scopes (manually maintained).
-- Identity split scopes added: `azuredevops-group`, `azuredevops-user-entitlement`, `azuredevops-service-principal-entitlement`, `azuredevops-securityrole-assignment`.
+- Builds allowed module scopes dynamically from `modules/*/module.json`.
+- Appends shared repository scopes such as `docs`, `ci`, `tests`, `workflows`, `scripts`, `core`, and `deps`.
+- New modules therefore do not require manual scope-list updates in the workflow.
 
 #### `terraform-fmt` (matrix)
 - Runs `terraform fmt -check -recursive` across module subdirs containing `.tf`.
@@ -211,11 +210,17 @@ azurerm-terraform-modules/
 - If manual input `modules` is provided, uses it directly.
 - Otherwise attempts to detect the PR number from the merge commit.
 - Uses `gh api` to fetch the PR title and parse scope(s).
+- Falls back to the merge commit subject if PR metadata is unavailable.
+- With squash merge, the merged commit subject is the PR title, so release routing remains title-driven.
 - Builds a module list using `commit_scope` from `module.json` (no path detection).
 
 **Release behavior**:
 - Calls `module-release.yml` via `workflow_call`.
 - Releases are **sequential** (`max-parallel: 1`) to avoid root README conflicts.
+- `semantic-release` then decides the bump type per module:
+  - `feat` -> minor
+  - `fix`, `docs`, `refactor`, `perf`, `revert` -> patch
+  - `build`, `ci`, `chore`, `style`, `test` -> no release
 
 **Scripts and actions used**:
 - Uses `gh api` to fetch PR title for scope parsing (no repo scripts).
@@ -275,7 +280,8 @@ This section lists which workflows call which scripts and where updates are expe
 | `scripts/update-module-version.sh` | `module-release.yml` via `prepareCmd` | `modules/<module>/README.md` | Updates `<!-- BEGIN_VERSION -->` block. Reads `tag_prefix` from `module.json` and preserves existing version style. |
 | `scripts/update-examples-list.sh` | `pr-validation.yml`, `module-release.yml` | `modules/<module>/README.md` | Rebuilds the examples list between markers. |
 | `scripts/update-module-docs.sh` | `pr-validation.yml`, `module-release.yml` | `modules/<module>/README.md` | Runs terraform-docs with module `.terraform-docs.yml` using inject mode. |
-| `scripts/update-root-readme.sh` | `module-release.yml` via `prepareCmd` | `README.md` | Expects module table and badges section to exist; otherwise minimal/no changes. |
+| `scripts/update-root-readme.sh` | `module-release.yml` via `prepareCmd` | `README.md` | Regenerates root README badge/table sections using repository metadata and tags. |
+| `scripts/update-readme-indexes.js` | `scripts/update-root-readme.sh` | `README.md`, `modules/README.md` | Builds sorted README indexes from `module.json` and current tags. |
 | `.github/actions/module-runner/run-module-action.sh` | `module-ci.yml` (security job) | `modules/<module>/tfsec-results.sarif`, `modules/<module>/checkov-results.sarif` | Generated only for security scans. |
 | `scripts/create-new-module.sh` | Manual | `modules/<module>/**` | Scaffold script; writes examples with `source = "../../"`. |
 | `scripts/create-module-json.sh` | Manual | `modules/<module>/module.json`, `modules/<module>/.releaserc.js` | Creates release metadata; currently azurerm-centric defaults. |
@@ -291,13 +297,14 @@ Scripts listed here are invoked by workflows directly or via semantic-release.
 | `scripts/update-examples-list.sh` | `pr-validation.yml`, `module-release.yml` | Rebuilds module examples list in README | Updates content between `BEGIN_EXAMPLES` markers. |
 | `scripts/update-module-docs.sh` | `pr-validation.yml`, `module-release.yml` | Runs terraform-docs inject for module README | Skips update if markers missing. |
 | `scripts/update-module-version.sh` | `module-release.yml` | Updates module README version block | Reads `tag_prefix` from `module.json` and preserves README formatting. |
-| `scripts/update-root-readme.sh` | `module-release.yml` | Updates root README module table and badges | No-op if expected markers do not exist. |
+| `scripts/update-root-readme.sh` | `module-release.yml` | Regenerates root README badge/table sections for release | Wraps `scripts/update-readme-indexes.js` and updates source snippet tags. |
+| `scripts/update-readme-indexes.js` | manual, `scripts/update-root-readme.sh` | Regenerates root/module README indexes from `module.json` + tags | Supports release override for the module being published. |
 | `scripts/semantic-release-multi-scope-plugin.js` | `module-release.yml` | Filters commits to target scope for module release | Mutates `context.commits` for analysis. |
 
 ## Known Risks and Gaps (Task-009 audit)
 
-1. **Root README entry required**: `scripts/update-root-readme.sh` updates rows only if the module is listed in the root tables; missing rows are reported and remain unchanged.
-2. **Badge label coupling**: Badge updates rely on `MODULE_DISPLAY_NAME`; if it diverges from the README badge label, duplicates can appear.
+1. **PR-title dependency**: module validation/release routing is title-driven for PRs and squash merges; a module PR without module scopes in the title will not create a module matrix.
+2. **README marker dependency**: README index regeneration relies on the marker blocks in `README.md` and `modules/README.md`.
 3. **Shell compatibility in release**: `@semantic-release/exec` runs in `/bin/sh`; bash-only conditionals (`[[ ... ]]`) will be skipped and may prevent release-time updates.
 4. **Missing template in updater**: `scripts/update-module-releaserc.sh` references `scripts/templates/.releaserc.auto.js`, which does not exist.
 
@@ -334,6 +341,25 @@ Scripts listed here are invoked by workflows directly or via semantic-release.
 - `security`: runs tfsec and Checkov via Docker and uploads SARIF.
 
 ## Workflow Interactions
+
+### PR Title Convention
+
+For module PRs, the title should already be in its final squash-merge form:
+
+```text
+<type>(<scope>[,<scope>...]): <subject>
+```
+
+Examples:
+- `feat(storage-account): add immutability policy support`
+- `fix(azuredevops-serviceendpoint): correct generic endpoint validation`
+- `docs(azuredevops-team,azuredevops-wiki): align import docs and examples`
+
+Rules:
+- Use the module `commit_scope` from `modules/<module>/module.json`.
+- Multiple module scopes are comma-separated.
+- Non-module scopes such as `docs` or `ci` are valid for repository-only changes, but they do not create a module matrix or module release selection.
+- Because squash merge is used, the PR title is effectively the release-driving commit subject on `main`.
 
 ### PR Flow
 

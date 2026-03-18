@@ -123,17 +123,16 @@ variable "key_vault" {
 }
 
 # -----------------------------------------------------------------------------
-# Variable Group Permissions
+# Variable Group Permissions (strict-child only)
 # -----------------------------------------------------------------------------
 
 variable "variable_group_permissions" {
-  description = "List of variable group permissions to assign. If variable_group_id is omitted, the module variable group is used."
+  description = "List of variable group permissions to assign to the variable group created by this module."
   type = list(object({
-    key               = optional(string)
-    variable_group_id = optional(string)
-    principal         = string
-    permissions       = map(string)
-    replace           = optional(bool, true)
+    key         = optional(string)
+    principal   = string
+    permissions = map(string)
+    replace     = optional(bool, true)
   }))
   default = []
 
@@ -155,11 +154,18 @@ variable "variable_group_permissions" {
 
   validation {
     condition = alltrue([
-      for perm in var.variable_group_permissions : (
-        perm.variable_group_id == null || length(trimspace(perm.variable_group_id)) > 0
-      )
+      for perm in var.variable_group_permissions : length(perm.permissions) > 0
     ])
-    error_message = "variable_group_permissions.variable_group_id must be a non-empty string when provided."
+    error_message = "variable_group_permissions.permissions must be a non-empty map."
+  }
+
+  validation {
+    condition = alltrue([
+      for perm in var.variable_group_permissions : alltrue([
+        for status in values(perm.permissions) : contains(["allow", "deny", "notset"], lower(status))
+      ])
+    ])
+    error_message = "variable_group_permissions.permissions values must be one of: Allow, Deny, NotSet."
   }
 
   validation {
@@ -167,43 +173,5 @@ variable "variable_group_permissions" {
       for perm in var.variable_group_permissions : coalesce(perm.key, perm.principal)
     ])) == length(var.variable_group_permissions)
     error_message = "variable_group_permissions keys must be unique; set key when principal would collide."
-  }
-}
-
-# -----------------------------------------------------------------------------
-# Library Permissions
-# -----------------------------------------------------------------------------
-
-variable "library_permissions" {
-  description = "List of library permissions to assign."
-  type = list(object({
-    key         = optional(string)
-    principal   = string
-    permissions = map(string)
-    replace     = optional(bool, true)
-  }))
-  default = []
-
-  validation {
-    condition = alltrue([
-      for perm in var.library_permissions : length(trimspace(perm.principal)) > 0
-    ])
-    error_message = "library_permissions.principal must be a non-empty string."
-  }
-
-  validation {
-    condition = alltrue([
-      for perm in var.library_permissions : (
-        perm.key == null || length(trimspace(perm.key)) > 0
-      )
-    ])
-    error_message = "library_permissions.key must be a non-empty string when provided."
-  }
-
-  validation {
-    condition = length(distinct([
-      for perm in var.library_permissions : coalesce(perm.key, perm.principal)
-    ])) == length(var.library_permissions)
-    error_message = "library_permissions keys must be unique; set key when principal would collide."
   }
 }

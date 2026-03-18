@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_service_principal_entitlement" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_service_principal_entitlement?ref=ADOSPEv1.0.0"
+  source = "../../"
 
   origin_id            = var.service_principal_origin_id
   account_license_type = "stakeholder"

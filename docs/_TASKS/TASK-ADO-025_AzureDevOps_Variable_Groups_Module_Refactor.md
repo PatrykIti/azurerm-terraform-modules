@@ -1,153 +1,81 @@
 # TASK-ADO-025: Azure DevOps Variable Groups Module Refactor
 # FileName: TASK-ADO-025_AzureDevOps_Variable_Groups_Module_Refactor.md
 
-**Priority:** 🟡 Medium
+**Priority:** 🔴 High
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
-**Dependencies:** TASK-ADO-010
-**Status:** ✅ **Done** (2025-12-28)
+**Dependencies:** TASK-ADO-039, TASK-ADO-041
+**Status:** ✅ **Completed (2026-02-14)**
 
 ---
 
 ## Overview
 
-Refactor `modules/azuredevops_variable_groups` to align with MODULE_GUIDE/TESTING_GUIDE/TERRAFORM_BEST_PRACTICES.
-The main `azuredevops_variable_group` must be a single (non-iterated) resource with flat inputs.
-Permissions should use list(object) with stable for_each keys; for multiple groups use module-level for_each.
+`modules/azuredevops_variable_groups` still mixes atomic scopes and requires strict boundary alignment.
 
-## Updated Rules (Re-opened)
+## Planning Assumption
 
-- Main resource is single (non-iterated); use module-level `for_each` in environment config to manage multiple instances.
-- Prefer `list(object)` for collections; use `map` only when provider requires key/value semantics.
-- Use simple, stable `for_each` keys based on unique fields (name, principal_id, service_principal_id, group_name, etc.); never index-based.
-- Follow docs/MODULE_GUIDE/, docs/TESTING_GUIDE, docs/TERRAFORM_BEST_PRACTICES_GUIDE.md.
+- No active production consumers yet (owner confirmation, 2026-02-13).
+- Breaking changes are explicitly allowed for atomic-boundary alignment.
+- Backward-compatibility shims are optional; prioritize clean target architecture.
 
-## Scope (Provider Resources)
+## Mandatory Rule (Atomic Boundary)
 
-- `azuredevops_variable_group`
-- `azuredevops_variable_group_permissions`
-- `azuredevops_library_permissions`
+- Primary resource in a module must be single and non-iterated (`no for_each`, `no count` on primary block).
+- Additional resources may remain only when they are strict children of that primary resource.
+- Strict child means direct dependency on module-managed primary resource and no external-ID fallback.
+- If a resource can operate without module primary resource (for example via external `*_id` input), it must be moved to a separate atomic module.
+- Multiplicity belongs in consumer configuration via module-level `for_each`.
 
-## Current Gaps (Summary)
+## Current Gaps
 
-- `azuredevops_variable_group` is iterated via `var.variable_groups` map; core inputs are nested.
-- `key_vaults` is modeled as a list and does not match provider block semantics (`key_vault`); max-one is not enforced.
-- `variable_group_permissions` and `library_permissions` use index-based for_each, producing unstable addresses.
-- `variable_group_permissions` does not validate/default the target group when `variable_group_id` is omitted.
-- Outputs are maps keyed by group key; module should expose single outputs for a single group.
-- Examples use random suffix provider and dynamic names (violates fixed-name examples rule).
-- Missing `docs/IMPORT.md`.
+- `azuredevops_library_permissions` is independent from `azuredevops_variable_group` and should be split.
+- `azuredevops_variable_group_permissions` accepts external `variable_group_id` fallback, so it is not strict-child only.
+- Existing validation hardening still needs completion for permissions map semantics.
+- Release references still require `ADOVGv*` normalization (`TASK-ADO-039`).
 
-## Target Module Design
+## Resolution (2026-02-14)
 
-### Inputs (Core Variable Group)
+- Independent `azuredevops_library_permissions` scope was removed from this module for atomic-boundary compliance.
+- `azuredevops_variable_group_permissions` was converted to strict-child-only behavior (always attached to module-managed variable group).
+- Permission validation was hardened (non-empty maps, allowed values, unique keys).
+- Examples, fixtures, unit tests, integration compile gate, and docs were aligned to the new scope.
+- Release tag normalization remains tracked separately in `TASK-ADO-039`.
 
-Flat variables for the main group:
-- name (string, required)
-- project_id (string, required)
-- description (optional string)
-- allow_access (bool, default false)
+## Scope
 
-### Inputs (Variables)
+- Module: `modules/azuredevops_variable_groups/`
+- Examples: `modules/azuredevops_variable_groups/examples/*`
+- Tests: `modules/azuredevops_variable_groups/tests/*`
+- Docs: module README + root release/version references
 
-- variables (list(object)):
-  - name (string, required)
-  - value (optional string)
-  - secret_value (optional string)
-  - is_secret (optional bool)
+## Docs to Update
 
-Validation rules:
-- name must be non-empty
-- exactly one of value or secret_value must be set
-- if secret_value is set, is_secret must be true (or auto-defaulted to true)
-- if is_secret is true, secret_value is required
-
-### Inputs (Key Vault)
-
-Single optional object `key_vault`:
-- name (string, required)
-- service_endpoint_id (string, required)
-- search_depth (optional number)
-
-Validation rules:
-- name and service_endpoint_id must be non-empty
-- search_depth >= 0 when provided
-
-### Inputs (Variable Group Permissions)
-
-- variable_group_permissions (list(object)):
-  - key (optional string) for stable for_each
-  - variable_group_id (optional string) — default to module variable group ID when omitted
-  - principal (string, required)
-  - permissions (map(string), required)
-  - replace (optional bool, default true)
-
-Validation rules:
-- principal must be non-empty
-- for_each key = `coalesce(key, principal)` with uniqueness validation
-- when variable_group_id is omitted, module variable group must be present
-
-### Inputs (Library Permissions)
-
-- library_permissions (list(object)):
-  - key (optional string) for stable for_each
-  - principal (string, required)
-  - permissions (map(string), required)
-  - replace (optional bool, default true)
-
-Validation rules:
-- principal must be non-empty
-- for_each key = `coalesce(key, principal)` with uniqueness validation
-
-### Outputs
-
-- variable_group_id (string)
-- variable_group_name (string)
-
-## Examples
-
-Update examples to show single group usage with fixed names:
-- basic: one variable group with plain variables
-- complete: variable group + key_vault + variable group permissions + library permissions
-- secure: allow_access false + secret variables
-
-## Tests
-
-Update tests per TESTING_GUIDE:
-
-- Unit:
-  - variable name required
-  - value vs secret_value exclusivity
-  - secret_value requires is_secret
-  - key_vault required fields and search_depth validation
-  - stable key uniqueness for permissions
-- Integration:
-  - create variable group + permissions
-- Negative:
-  - variable with both value and secret_value
-  - secret_value without is_secret
-  - duplicate permission keys
-
-## Docs to Update After Completion
-
+- `modules/azuredevops_variable_groups/README.md`
+- `modules/azuredevops_variable_groups/docs/README.md`
+- `README.md`
 - `docs/_TASKS/README.md`
-- `docs/_CHANGELOG/README.md`
-- `docs/_CHANGELOG/NNN-YYYY-MM-DD-ado-variable-groups-refactor.md`
+
+## Work Items
+
+- **Atomic split:** move `library_permissions` to dedicated atomic module.
+- **Strict-child cleanup:** either remove external `variable_group_id` fallback from this module or split variable-group permissions to dedicated module.
+- **Validation hardening:** enforce non-empty permissions maps and allowed values.
+- **Tests/examples:** update for new composition pattern and negative validation coverage.
+- **Release normalization:** align tags and links with `ADOVGv*` (`TASK-ADO-039`).
 
 ## Acceptance Criteria
 
-- Module follows MODULE_GUIDE and TERRAFORM_BEST_PRACTICES (single variable group, flat inputs, stable keys).
-- Permissions can target the module group by default or external IDs when provided.
-- Outputs are single values (id/name) and safe for missing optional blocks.
-- Examples updated with fixed names; `docs/IMPORT.md` added.
-- Unit + integration + negative tests updated and passing.
+- No independent permissions scope remains in this module.
+- Any retained permission resource is strict-child only.
+- Permissions validation is explicit and covered by negative tests.
+- Examples show composition for split permission modules.
+- Release/tag normalization dependency is explicitly tracked in `TASK-ADO-039`.
 
 ## Implementation Checklist
 
-- [ ] Refactor variables.tf: replace `variable_groups` map with flat inputs; add validations and optional key fields.
-- [ ] Refactor main.tf: single `azuredevops_variable_group`; optional `key_vault`; stable for_each for permissions.
-- [ ] Update outputs.tf: `variable_group_id` and `variable_group_name` outputs.
-- [ ] Add `docs/IMPORT.md`.
-- [ ] Update examples (fixed names, single group usage).
-- [ ] Update tests (fixtures, unit, terratest, test_config).
-- [ ] make docs + update README.
+- [x] Split `library_permissions` out of this module scope to enforce atomic boundary.
+- [x] Remove fallback-based non-child behavior from retained resources.
+- [x] Add/verify permissions map validations and tests.
+- [x] Update examples/docs for composition model.
+- [x] Track `ADOVGv*` release normalization in `TASK-ADO-039` (blocked by pipeline/tags).

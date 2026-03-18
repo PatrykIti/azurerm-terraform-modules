@@ -46,7 +46,7 @@ azurerm-terraform-modules/
 
 ### Prerequisites
 
-- Terraform >= 1.3.0
+- Terraform >= 1.12.2
 - Azure CLI configured with appropriate permissions
 - Go >= 1.21 (for Terratest)
 - Git
@@ -161,27 +161,52 @@ Before submitting your PR, ensure:
 
 ### PR Title Format
 
-Use conventional commits:
-- `feat(storage-account): add lifecycle management support`
-- `fix(virtual-network): correct subnet CIDR validation`
-- `docs(key-vault): update access policy examples`
-- `chore(deps): update azurerm provider to 4.36.0`
-- `ci(workflows): update module detection logic`
-- `test(storage-account): add integration tests`
+PR title is the source of truth for:
+- module selection in `pr-validation.yml`
+- module selection in `module-ci.yml`
+- release selection in `release-changed-modules.yml`
+
+Because this repository uses squash merge, the merged commit title on `main` comes from the PR title. That means the PR title must already be in the final conventional-commit form you want semantic-release to analyze.
+
+Use this format:
+
+```text
+<type>(<scope>[,<scope>...]): <subject>
+```
+
+For module PRs, use the module `commit_scope` from `modules/<module>/module.json`.
+
+Examples:
+- `feat(storage-account): add immutability policy support`
+- `fix(azuredevops-serviceendpoint): correct generic endpoint validation`
+- `docs(azuredevops-team,azuredevops-wiki): align import docs and examples`
+- `refactor(monitor-private-link-scope): simplify scoped service locals`
+- `chore(docs): refresh workflow documentation`
+
+Release impact for module scopes:
+- `feat` -> minor release
+- `fix`, `docs`, `refactor`, `perf`, `revert` -> patch release
+- `build`, `ci`, `chore`, `style`, `test` -> no release
+- `BREAKING CHANGE:` in the body/notes -> major release
+
+Repository-only scopes such as `docs`, `ci`, `tests`, `workflows`, `templates`, `semantic-release`, `security`, `terraform-docs`, `examples`, `modules`, `scripts`, `core`, `deps`, and `deps-dev` are valid for non-module PRs, but they do not trigger per-module release selection.
+
+If a PR touches one or more modules and you want module validation/release routing to work correctly, include those module scopes in the PR title.
 
 ### Automated CI/CD
 
 When you create a PR, the following workflows will run automatically:
 
 1. **PR Validation** (`pr-validation.yml`):
-   - Validates PR title and commit messages
+   - Validates PR title in conventional-commit format
+   - Builds allowed module scopes dynamically from `modules/*/module.json`
    - Checks Terraform formatting
    - Runs TFLint analysis
    - Verifies documentation is up-to-date
    - Quick security scan
 
 2. **Module CI** (`module-ci.yml`):
-   - Detects changed modules
+   - Resolves modules from the PR title scope list
    - Runs module-specific validation
    - Executes tests (if configured)
    - Performs security scanning
@@ -200,8 +225,9 @@ When you create a PR, the following workflows will run automatically:
 ### Module Versioning
 
 Each module is versioned independently:
-- **Tag Format**: `<module_name>/v<MAJOR>.<MINOR>.<PATCH>`
-- **Example**: `azurerm_storage_account/v1.0.0`
+- **Tag Format**: `<TAG_PREFIX>v<MAJOR>.<MINOR>.<PATCH>`
+- **Examples**: `SAv2.1.0`, `AKSv2.1.0`, `ADOAFv2.0.0`
+- `TAG_PREFIX` comes from `modules/<module>/module.json`
 
 ### Version Guidelines
 
@@ -211,20 +237,16 @@ Each module is versioned independently:
 
 ### Release Workflow
 
-Releases are managed through the `module-release.yml` workflow:
+Normal module releases are driven by `release-changed-modules.yml` after a PR is squash-merged to `main`.
 
-1. Go to Actions → Module Release
-2. Click "Run workflow"
-3. Select:
-   - Module to release
-   - Version number
-   - Release notes (optional)
-4. Workflow will:
-   - Validate version format
-   - Run final validation
-   - Update module-config.yml
-   - Create git tag
-   - Create GitHub release
+Release flow:
+1. The workflow reads the merged PR title.
+2. It extracts module scopes from the title.
+3. It resolves those scopes through `modules/*/module.json`.
+4. It runs `semantic-release` for each resolved module.
+5. `semantic-release` decides whether to release based on the PR title type (`feat`, `fix`, `docs`, etc.).
+
+Maintainers can still run `module-release.yml` manually for dry runs or targeted release operations, but the normal path is: correctly titled PR -> squash merge -> automatic release detection.
 
 ## 🧪 Testing
 

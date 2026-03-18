@@ -11,7 +11,7 @@ terraform {
 
 provider "azuredevops" {}
 
-# This should fail due to missing key when team_id is omitted
+# This should fail due to missing key for team_members.
 module "azuredevops_team" {
   source = "../../../"
 

@@ -11,14 +11,14 @@ terraform {
 provider "azuredevops" {}
 
 resource "azuredevops_group" "member" {
-  display_name = "${var.group_name_prefix}-members"
+  display_name = "ado-group-security-members"
   description  = "Membership source group"
 }
 
 module "azuredevops_group" {
   source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_group?ref=ADOGv1.0.0"
 
-  group_display_name = "${var.group_name_prefix}-security"
+  group_display_name = "ado-group-security"
   group_description  = "Security reviewers"
 
   group_memberships = [
@@ -28,13 +28,4 @@ module "azuredevops_group" {
       mode               = "overwrite"
     }
   ]
-
-  group_entitlements = var.aad_group_display_name != "" ? [
-    {
-      key                  = "stakeholder-group"
-      display_name         = var.aad_group_display_name
-      account_license_type = "stakeholder"
-      licensing_source     = "account"
-    }
-  ] : []
 }

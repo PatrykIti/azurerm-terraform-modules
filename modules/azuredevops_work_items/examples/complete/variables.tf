@@ -3,13 +3,14 @@ variable "project_id" {
   type        = string
 }
 
-variable "parent_process_type_id" {
-  description = "Parent process type ID for custom processes."
+variable "parent_title" {
+  description = "Title for the parent work item."
   type        = string
-  default     = "adcc42ab-9882-485e-a3ed-7678f01f66bc"
+  default     = "Example Parent Work Item"
 }
 
-variable "principal_descriptor" {
-  description = "Principal descriptor for query permissions."
+variable "child_title" {
+  description = "Title for the child work item."
   type        = string
+  default     = "Example Child Work Item"
 }

@@ -3,5 +3,5 @@
   "title": "Azure DevOps Service Hooks",
   "commit_scope": "azuredevops-servicehooks",
   "tag_prefix": "ADOSHv",
-  "description": "Azure DevOps service hooks module for managing single webhook/storage queue subscriptions and permissions (use module-level for_each for multiples)"
+  "description": "Azure DevOps service hooks module for managing single webhook subscription (use module-level for_each for multiples)"
 }

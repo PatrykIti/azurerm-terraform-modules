@@ -5,7 +5,7 @@
 **Category:** Azure DevOps Modules
 **Estimated Effort:** Medium
 **Dependencies:** TASK-ADO-017
-**Status:** To Do
+**Status:** ✅ **Done** (2026-02-15)
 
 ---
 
@@ -372,6 +372,25 @@ output "check_ids" {
   }
 }
 ```
+## Completion Summary (2026-02-15)
+
+- Refactored module to strict target-by-placement model:
+  - root `check_*` inputs create environment-targeted checks,
+  - nested `kubernetes_resources[*].checks` create endpoint-targeted checks bound to kubernetes resource definitions.
+- Removed external check targeting from module API (`target_resource_id`/`target_resource_type` are no longer user inputs).
+- Added stable-name nested check maps for all supported check types (approvals, branch control, business hours, exclusive lock, required template, rest API).
+- Extended outputs with grouped check IDs for `environment` and `kubernetes_resources`.
+- Updated examples, fixtures, unit tests, docs, import guidance, security guide, and versioning guide to match the new model.
+- Removed module root terraform artifacts (`.terraform/`, `.terraform.lock.hcl`).
+
+## Verification Evidence (2026-02-15)
+
+- Module `init` + `validate`: passed
+- Examples `basic|complete|secure` `init` + `validate`: passed
+- Unit tests: `terraform test -test-directory=tests/unit` -> 13 passed, 0 failed
+- Integration compile gate: `go test -run TestDoesNotExist ./...` in `modules/azuredevops_environments/tests` -> passed
+- Evidence log: `/tmp/task_ado_034_checks_20260215_212259.log`
+
 ## Scope
 
 - `modules/azuredevops_environments/main.tf`
@@ -415,13 +434,13 @@ Outside module:
 
 ## Implementation Checklist
 
-- [ ] Remove `.terraform/` and `.terraform.lock.hcl` from `modules/azuredevops_environments` and add to ignore list if needed.
-- [ ] Remove external environment ID inputs and move Kubernetes checks under `kubernetes_resources[*].checks`; keep root checks for environment-only.
-- [ ] Update check resources to target environment or kubernetes implicitly (no `target_resource_type`/`target_resource_id` inputs).
-- [ ] Require stable `name` keys for all checks; map `display_name = name` where needed.
-- [ ] Align nested checks structure with `modules/azuredevops_repository` policy nesting patterns in docs/examples.
-- [ ] Update outputs to group environment vs kubernetes checks by resource name.
-- [ ] Rename the Kubernetes environment resource local name and update references in outputs, tests, README, and import docs.
-- [ ] Regenerate terraform-docs for examples and verify README alignment.
-- [ ] Add a secure example reference to `SECURITY.md`.
-- [ ] Update `VERSIONING.md` provider matrix and examples to Azure DevOps context.
+- [x] Remove `.terraform/` and `.terraform.lock.hcl` from `modules/azuredevops_environments` and add to ignore list if needed.
+- [x] Remove external environment ID inputs and move Kubernetes checks under `kubernetes_resources[*].checks`; keep root checks for environment-only.
+- [x] Update check resources to target environment or kubernetes implicitly (no `target_resource_type`/`target_resource_id` inputs).
+- [x] Require stable `name` keys for all checks; map `display_name = name` where needed.
+- [x] Align nested checks structure with `modules/azuredevops_repository` policy nesting patterns in docs/examples.
+- [x] Update outputs to group environment vs kubernetes checks by resource name.
+- [x] Rename the Kubernetes environment resource local name and update references in outputs, tests, README, and import docs.
+- [x] Regenerate terraform-docs for examples and verify README alignment.
+- [x] Add a secure example reference to `SECURITY.md`.
+- [x] Update `VERSIONING.md` provider matrix and examples to Azure DevOps context.

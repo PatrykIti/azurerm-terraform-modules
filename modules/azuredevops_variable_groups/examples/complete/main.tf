@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "azuredevops_variable_groups" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_variable_groups?ref=ADOVGv1.0.0"
+  source = "../../"
 
   project_id = var.project_id
   name       = "app-vars"
@@ -43,18 +43,6 @@ module "azuredevops_variable_groups" {
       permissions = {
         View = "allow"
         Use  = "allow"
-      }
-    }
-  ]
-
-  library_permissions = [
-    {
-      key       = "library-access"
-      principal = var.library_principal_descriptor
-      permissions = {
-        View   = "allow"
-        Create = "allow"
-        Use    = "allow"
       }
     }
   ]

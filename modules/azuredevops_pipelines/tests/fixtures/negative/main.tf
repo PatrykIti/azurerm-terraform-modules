@@ -25,9 +25,8 @@ module "azuredevops_pipelines" {
 
   pipeline_authorizations = [
     {
-      resource_id = "00000000-0000-0000-0000-000000000000"
+      resource_id = ""
       type        = "endpoint"
-      pipeline_id = ""
     }
   ]
 }

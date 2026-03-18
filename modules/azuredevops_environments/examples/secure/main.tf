@@ -15,7 +15,7 @@ data "azuredevops_group" "project_collection_admins" {
 }
 
 module "azuredevops_environments" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_environments?ref=ADOEv1.0.0"
+  source = "../../"
 
   project_id  = var.project_id
   name        = "ado-env-secure-example"
@@ -38,7 +38,7 @@ module "azuredevops_environments" {
 
   check_business_hours = [
     {
-      name       = "Business hours gate"
+      name       = "business-hours-gate"
       start_time = "08:00"
       end_time   = "18:00"
       time_zone  = "UTC"

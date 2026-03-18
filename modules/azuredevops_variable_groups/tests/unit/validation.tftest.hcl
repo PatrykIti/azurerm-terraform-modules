@@ -174,12 +174,12 @@ run "duplicate_variable_group_permission_keys" {
   ]
 }
 
-run "duplicate_library_permission_keys" {
+run "invalid_variable_group_permission_value" {
   command = plan
 
   variables {
     project_id = "00000000-0000-0000-0000-000000000000"
-    name       = "library-dup"
+    name       = "perm-invalid"
 
     variables = [
       {
@@ -188,25 +188,17 @@ run "duplicate_library_permission_keys" {
       }
     ]
 
-    library_permissions = [
+    variable_group_permissions = [
       {
-        key       = "dup"
         principal = "user-1"
         permissions = {
-          View = "allow"
-        }
-      },
-      {
-        key       = "dup"
-        principal = "user-2"
-        permissions = {
-          View = "allow"
+          View = "unknown"
         }
       }
     ]
   }
 
   expect_failures = [
-    var.library_permissions,
+    var.variable_group_permissions,
   ]
 }

@@ -11,14 +11,14 @@ terraform {
 provider "azuredevops" {}
 
 resource "azuredevops_group" "member" {
-  display_name = "${var.group_name_prefix}-members"
+  display_name = "ado-group-members"
   description  = "Membership source group"
 }
 
 module "azuredevops_group" {
   source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_group?ref=ADOGv1.0.0"
 
-  group_display_name = "${var.group_name_prefix}-platform"
+  group_display_name = "ado-group-platform"
   group_description  = "Platform engineering group"
 
   group_memberships = [
@@ -28,13 +28,4 @@ module "azuredevops_group" {
       mode               = "add"
     }
   ]
-
-  group_entitlements = var.aad_group_display_name != "" ? [
-    {
-      key                  = "group-entitlement"
-      display_name         = var.aad_group_display_name
-      account_license_type = "basic"
-      licensing_source     = "account"
-    }
-  ] : []
 }

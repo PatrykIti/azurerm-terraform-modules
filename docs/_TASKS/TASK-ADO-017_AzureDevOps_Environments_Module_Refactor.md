@@ -136,3 +136,18 @@ Update tests per TESTING_GUIDE:
 - [x] Update examples (fixed names, remove random provider).
 - [x] Update tests (fixtures, unit, terratest, test_config).
 - [x] make docs + update README.
+
+---
+
+## Re-Verification (2026-02-14)
+
+Task remained in To Do board column as re-opened marker, but module gate for `modules/azuredevops_environments` passed end-to-end:
+- module `init` + `validate`
+- examples `basic|complete|secure` `init` + `validate`
+- `terraform test -test-directory=tests/unit`
+- integration compile: `go test -c -run 'Test.*Integration' ./...` in `modules/azuredevops_environments/tests`
+
+Evidence log:
+- `/tmp/task_ado_017_checks_20260214_230757.log`
+
+Board status moved to **Done**. Follow-up hardening remains tracked independently under `TASK-ADO-034`.

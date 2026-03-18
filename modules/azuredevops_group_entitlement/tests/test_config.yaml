@@ -1,0 +1,33 @@
+# Test configuration for CI/CD integration
+
+test_suites:
+  - name: "Basic Tests"
+    tests:
+      - TestBasicAzuredevopsGroupEntitlement
+    parallel: true
+    timeout: 15m
+
+  - name: "Complete Tests"
+    tests:
+      - TestCompleteAzuredevopsGroupEntitlement
+      - TestSecureAzuredevopsGroupEntitlement
+    parallel: true
+    timeout: 30m
+
+  - name: "Validation Tests"
+    tests:
+      - TestAzuredevopsGroupEntitlementValidationRules
+    parallel: true
+    timeout: 10m
+
+  - name: "Integration Tests"
+    tests:
+      - TestAzuredevopsGroupEntitlementFullIntegration
+    parallel: false
+    timeout: 45m
+
+environment:
+  required_vars:
+    - AZDO_ORG_SERVICE_URL
+    - AZDO_PERSONAL_ACCESS_TOKEN
+    - AZDO_GROUP_DISPLAY_NAME

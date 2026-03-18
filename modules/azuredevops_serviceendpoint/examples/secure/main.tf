@@ -15,7 +15,7 @@ data "azuredevops_group" "project_collection_admins" {
 }
 
 module "azuredevops_serviceendpoint" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_serviceendpoint?ref=ADOSEv1.0.0"
+  source = "../../"
 
   project_id = var.project_id
 

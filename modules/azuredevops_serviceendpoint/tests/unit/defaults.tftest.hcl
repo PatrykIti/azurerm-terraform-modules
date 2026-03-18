@@ -1,4 +1,4 @@
-# Test default settings for Azure DevOps Service Endpoints
+# Test default settings for Azure DevOps Service Endpoint (Generic)
 
 mock_provider "azuredevops" {
   mock_resource "azuredevops_serviceendpoint_generic" {
@@ -15,8 +15,6 @@ variables {
   serviceendpoint_generic = {
     service_endpoint_name = "generic-endpoint"
     server_url            = "https://example.endpoint.local"
-    username              = "user"
-    password              = "pass"
   }
 }
 
@@ -24,8 +22,8 @@ run "defaults_plan" {
   command = plan
 
   assert {
-    condition     = length(azuredevops_serviceendpoint_generic.generic) == 1
-    error_message = "One generic service endpoint should be created."
+    condition     = azuredevops_serviceendpoint_generic.generic.service_endpoint_name == "generic-endpoint"
+    error_message = "The generic service endpoint should be created with the provided name."
   }
 
   assert {
