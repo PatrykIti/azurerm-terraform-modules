@@ -1,6 +1,8 @@
 package test
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -17,10 +19,15 @@ func TestBasicAzuredevopsExtension(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	vars := getExtensionVarsFromEnv()
+	terraformOptions := getTerraformOptions(testFolder, vars)
 	shouldCleanup := true
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		if shouldCleanup {
-			terraform.Destroy(t, getTerraformOptions(testFolder, vars))
+			if _, err := os.Stat(filepath.Join(testFolder, ".test-data", "TerraformOptions.json")); err == nil {
+				terraform.Destroy(t, test_structure.LoadTerraformOptions(t, testFolder))
+				return
+			}
+			terraform.Destroy(t, terraformOptions)
 			return
 		}
 
@@ -28,7 +35,6 @@ func TestBasicAzuredevopsExtension(t *testing.T) {
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(testFolder, vars)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		created, err := applyWithImportIfInstalled(t, terraformOptions, buildBasicImportTargets(t, vars))
 		require.NoError(t, err)
@@ -56,10 +62,15 @@ func TestCompleteAzuredevopsExtension(t *testing.T) {
 	vars := map[string]interface{}{
 		"extensions": extensions,
 	}
+	terraformOptions := getTerraformOptions(testFolder, vars)
 	shouldCleanup := true
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		if shouldCleanup {
-			terraform.Destroy(t, getTerraformOptions(testFolder, vars))
+			if _, err := os.Stat(filepath.Join(testFolder, ".test-data", "TerraformOptions.json")); err == nil {
+				terraform.Destroy(t, test_structure.LoadTerraformOptions(t, testFolder))
+				return
+			}
+			terraform.Destroy(t, terraformOptions)
 			return
 		}
 
@@ -67,7 +78,6 @@ func TestCompleteAzuredevopsExtension(t *testing.T) {
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(testFolder, vars)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		created, err := applyWithImportIfInstalled(t, terraformOptions, buildForEachImportTargets(t, extensions))
 		require.NoError(t, err)
@@ -96,10 +106,15 @@ func TestSecureAzuredevopsExtension(t *testing.T) {
 	vars := map[string]interface{}{
 		"approved_extensions": extensions,
 	}
+	terraformOptions := getTerraformOptions(testFolder, vars)
 	shouldCleanup := true
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		if shouldCleanup {
-			terraform.Destroy(t, getTerraformOptions(testFolder, vars))
+			if _, err := os.Stat(filepath.Join(testFolder, ".test-data", "TerraformOptions.json")); err == nil {
+				terraform.Destroy(t, test_structure.LoadTerraformOptions(t, testFolder))
+				return
+			}
+			terraform.Destroy(t, terraformOptions)
 			return
 		}
 
@@ -107,7 +122,6 @@ func TestSecureAzuredevopsExtension(t *testing.T) {
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(testFolder, vars)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		created, err := applyWithImportIfInstalled(t, terraformOptions, buildForEachImportTargets(t, extensions))
 		require.NoError(t, err)
@@ -148,8 +162,10 @@ func getTerraformOptions(terraformDir string, vars map[string]interface{}) *terr
 		Vars:         vars,
 		NoColor:      true,
 		RetryableTerraformErrors: map[string]string{
-			".*timeout.*":         "Timeout error - retrying",
-			".*TooManyRequests.*": "Too many requests - retrying",
+			".*timeout.*":                  "Timeout error - retrying",
+			".*TooManyRequests.*":          "Too many requests - retrying",
+			".*connection reset by peer.*": "Azure DevOps connection reset - retrying",
+			".*invalid character '<' looking for beginning of value.*": "Azure DevOps returned HTML instead of JSON - retrying",
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,

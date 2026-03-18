@@ -1,6 +1,8 @@
 package test
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -18,12 +20,16 @@ func TestAzuredevopsGroupEntitlementFullIntegration(t *testing.T) {
 	requireADOGroupEntitlementEnv(t, fixtureName)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
+	terraformOptions := getTerraformOptions(t, testFolder, fixtureName)
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder, fixtureName))
+		if _, err := os.Stat(filepath.Join(testFolder, ".test-data", "TerraformOptions.json")); err == nil {
+			terraform.Destroy(t, test_structure.LoadTerraformOptions(t, testFolder))
+			return
+		}
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "setup", func() {
-		terraformOptions := getTerraformOptions(t, testFolder, fixtureName)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 	})
 

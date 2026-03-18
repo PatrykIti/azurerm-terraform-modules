@@ -2,6 +2,8 @@ package test
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -18,12 +20,16 @@ func TestBasicAzuredevopsGroup(t *testing.T) {
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
+	terraformOptions := getTerraformOptions(t, testFolder)
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		if _, err := os.Stat(filepath.Join(testFolder, ".test-data", "TerraformOptions.json")); err == nil {
+			terraform.Destroy(t, test_structure.LoadTerraformOptions(t, testFolder))
+			return
+		}
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
@@ -45,12 +51,16 @@ func TestCompleteAzuredevopsGroup(t *testing.T) {
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
+	terraformOptions := getTerraformOptions(t, testFolder)
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		if _, err := os.Stat(filepath.Join(testFolder, ".test-data", "TerraformOptions.json")); err == nil {
+			terraform.Destroy(t, test_structure.LoadTerraformOptions(t, testFolder))
+			return
+		}
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
@@ -74,12 +84,16 @@ func TestSecureAzuredevopsGroup(t *testing.T) {
 	requireADOEnv(t)
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
+	terraformOptions := getTerraformOptions(t, testFolder)
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		if _, err := os.Stat(filepath.Join(testFolder, ".test-data", "TerraformOptions.json")); err == nil {
+			terraform.Destroy(t, test_structure.LoadTerraformOptions(t, testFolder))
+			return
+		}
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
 		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
 		terraform.InitAndApply(t, terraformOptions)
 	})
@@ -122,8 +136,10 @@ func getTerraformOptions(t testing.TB, terraformDir string) *terraform.Options {
 		},
 		NoColor: true,
 		RetryableTerraformErrors: map[string]string{
-			".*timeout.*":         "Timeout error - retrying",
-			".*TooManyRequests.*": "Too many requests - retrying",
+			".*timeout.*":                  "Timeout error - retrying",
+			".*TooManyRequests.*":          "Too many requests - retrying",
+			".*connection reset by peer.*": "Azure DevOps connection reset - retrying",
+			".*invalid character '<' looking for beginning of value.*": "Azure DevOps returned HTML instead of JSON - retrying",
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,

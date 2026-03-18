@@ -5,7 +5,7 @@ Task board for module work. Update statuses in markdown files.
 ## Statistics
 - **To Do:** 11 tasks
 - **In Progress:** 0 tasks
-- **Done:** 82 tasks
+- **Done:** 83 tasks
 
 ---
 
@@ -39,6 +39,7 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-ADO-044](./TASK-ADO-044_AzureDevOps_Live_Test_Harness_Stabilization_Wave3.md) | **Azure DevOps live test harness stabilization wave 3** | Medium | Medium | Completed 2026-03-18; deterministic cleanup + transient retry coverage for remaining ADO test suites |
 | [TASK-ADO-041](./TASK-ADO-041_AzureDevOps_Test_Harness_Consistency_Alignment.md) | **Azure DevOps test harness consistency alignment** | Medium | Medium | Completed 2026-02-14; harness parity + compile gate across all `azuredevops_*` tests |
 | [TASK-ADO-019](./TASK-ADO-019_AzureDevOps_Artifacts_Feed_Module_Refactor.md) | **Azure DevOps Artifacts Feed module refactor** | Medium | Medium | Completed 2026-02-14; provider-schema-aligned re-opened refactor verified by full module gate |
 | [TASK-ADO-020](./TASK-ADO-020_AzureDevOps_Extension_Module_Refactor.md) | **Azure DevOps Extension module refactor** | Medium | Small | Completed 2026-02-14; single-resource API and module gate re-verified |

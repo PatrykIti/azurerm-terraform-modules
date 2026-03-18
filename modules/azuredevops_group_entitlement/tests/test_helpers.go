@@ -76,8 +76,10 @@ func getTerraformOptions(t testing.TB, terraformDir string, fixtureName string) 
 		Vars:         vars,
 		NoColor:      true,
 		RetryableTerraformErrors: map[string]string{
-			".*timeout.*":         "Timeout error - retrying",
-			".*TooManyRequests.*": "Too many requests - retrying",
+			".*timeout.*":                  "Timeout error - retrying",
+			".*TooManyRequests.*":          "Too many requests - retrying",
+			".*connection reset by peer.*": "Azure DevOps connection reset - retrying",
+			".*invalid character '<' looking for beginning of value.*": "Azure DevOps returned HTML instead of JSON - retrying",
 		},
 		MaxRetries:         3,
 		TimeBetweenRetries: 10 * time.Second,
