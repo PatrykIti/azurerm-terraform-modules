@@ -34,7 +34,7 @@ locals {
 
 module "azuredevops_servicehooks" {
   for_each = local.webhooks
-  source   = "../../"
+  source   = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_servicehooks?ref=ADOSHv1.0.0"
 
   project_id = var.project_id
   webhook    = each.value
