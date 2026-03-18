@@ -16,7 +16,7 @@ resource "azuredevops_group" "member" {
 }
 
 module "azuredevops_group" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_group?ref=ADOGv1.0.0"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_group?ref=ADOGv2.0.0"
 
   group_display_name = "ado-group-platform"
   group_description  = "Platform engineering group"
