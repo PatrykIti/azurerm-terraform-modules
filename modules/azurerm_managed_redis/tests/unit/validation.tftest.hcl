@@ -141,3 +141,22 @@ run "geo_replication_limits_linked_ids" {
     var.geo_replication,
   ]
 }
+
+run "redisearch_requires_no_eviction" {
+  command = plan
+
+  variables {
+    default_database = {
+      eviction_policy = "VolatileLRU"
+      modules = [
+        {
+          name = "RediSearch"
+        }
+      ]
+    }
+  }
+
+  expect_failures = [
+    var.default_database,
+  ]
+}

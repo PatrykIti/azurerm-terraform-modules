@@ -17,7 +17,8 @@ func TestBasicManagedRedis(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -47,7 +48,8 @@ func TestCompleteManagedRedis(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -77,7 +79,8 @@ func TestSecureManagedRedis(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {
@@ -105,7 +108,8 @@ func TestManagedRedisGeoReplication(t *testing.T) {
 
 	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/geo-replication")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraform.Destroy(t, getTerraformOptions(t, testFolder))
+		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		terraform.Destroy(t, terraformOptions)
 	})
 
 	test_structure.RunTestStage(t, "deploy", func() {

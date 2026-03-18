@@ -43,6 +43,7 @@ run "default_database_modules_render" {
 
   variables {
     default_database = {
+      eviction_policy = "NoEviction"
       modules = [
         {
           name = "RedisJSON"

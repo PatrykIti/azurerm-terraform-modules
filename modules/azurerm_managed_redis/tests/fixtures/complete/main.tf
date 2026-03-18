@@ -39,6 +39,7 @@ module "managed_redis" {
 
   default_database = {
     access_keys_authentication_enabled = true
+    eviction_policy                    = "NoEviction"
     geo_replication_group_name         = var.geo_replication_group_name
     modules = [
       {

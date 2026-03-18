@@ -248,6 +248,14 @@ variable "default_database" {
     )
     error_message = "Only RediSearch and RedisJSON modules are supported with geo-replication."
   }
+
+  validation {
+    condition = var.default_database == null || (
+      !contains([for redis_module in try(var.default_database.modules, []) : redis_module.name], "RediSearch") ||
+      var.default_database.eviction_policy == "NoEviction"
+    )
+    error_message = "default_database.eviction_policy must be NoEviction when the RediSearch module is enabled."
+  }
 }
 
 variable "identity" {
