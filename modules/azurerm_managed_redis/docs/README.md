@@ -25,7 +25,8 @@ settings. The module is atomic and intentionally avoids cross-resource glue.
   Vault key and be referenced in `customer_managed_key.user_assigned_identity_id`.
 - **Diagnostics**: Diagnostic destinations such as Log Analytics, Event Hub,
   and Storage Account are intentionally passed in as IDs and managed outside
-  this module.
+  this module. Connection logs are configured on the default database resource,
+  while platform metrics are configured on the Managed Redis instance.
 
 ## Out of Scope
 

@@ -94,7 +94,8 @@ No modules.
 |------|------|
 | [azurerm_managed_redis.managed_redis](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/managed_redis) | resource |
 | [azurerm_managed_redis_geo_replication.geo_replication](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/managed_redis_geo_replication) | resource |
-| [azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
+| [azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings_logs](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
+| [azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings_metrics](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0/docs/resources/monitor_diagnostic_setting) | resource |
 
 ## Inputs
 

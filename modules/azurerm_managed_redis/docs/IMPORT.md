@@ -107,10 +107,19 @@ import {
 
 After defining matching `monitoring` entries:
 
+**Connection logs**
 ```hcl
 import {
-  to = module.managed_redis.azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings["diag"]
+  to = module.managed_redis.azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings_logs["diag"]
   id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Cache/redisEnterprise/<managed-redis-name>/databases/default|diag"
+}
+```
+
+**Platform metrics**
+```hcl
+import {
+  to = module.managed_redis.azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings_metrics["diag"]
+  id = "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Cache/redisEnterprise/<managed-redis-name>|diag"
 }
 ```
 

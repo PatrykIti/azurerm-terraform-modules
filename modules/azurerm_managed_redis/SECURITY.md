@@ -28,6 +28,7 @@ keeps cross-resource security wiring outside the module boundary.
 3. **Control diagnostic destinations**
    - Send diagnostics only to approved Log Analytics workspaces, Event Hubs, or Storage Accounts.
    - Apply least-privilege access to those destination resources.
+   - Remember that connection logs and platform metrics use different diagnostic setting targets in Azure Managed Redis.
 
 4. **Review persistence carefully**
    - AOF/RDB persistence settings become part of Terraform state.

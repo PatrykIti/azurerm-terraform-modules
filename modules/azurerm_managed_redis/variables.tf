@@ -435,8 +435,11 @@ variable "monitoring" {
   }
 
   validation {
-    condition     = length(var.monitoring) == 0 || var.default_database != null
-    error_message = "monitoring requires default_database to exist because Managed Redis diagnostics target the default database resource."
+    condition = alltrue([
+      for ds in var.monitoring :
+      (ds.log_categories == null || length(ds.log_categories) == 0) || var.default_database != null
+    ])
+    error_message = "monitoring entries that configure log_categories require default_database to exist because Managed Redis connection logs target the default database resource."
   }
 }
 

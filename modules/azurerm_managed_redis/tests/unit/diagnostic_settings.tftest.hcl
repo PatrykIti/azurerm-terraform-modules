@@ -38,8 +38,13 @@ run "diagnostic_setting_created" {
   }
 
   assert {
-    condition     = length(azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings) == 1
-    error_message = "A diagnostic setting should be created when categories are supplied."
+    condition     = length(azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings_logs) == 1
+    error_message = "A log diagnostic setting should be created when log categories are supplied."
+  }
+
+  assert {
+    condition     = length(azurerm_monitor_diagnostic_setting.monitor_diagnostic_settings_metrics) == 1
+    error_message = "A metric diagnostic setting should be created when metric categories are supplied."
   }
 }
 
