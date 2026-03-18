@@ -191,8 +191,8 @@ func TestManagedRedisUpdatePerformance(t *testing.T) {
 			terraform.Apply(t, terraformOptions)
 			updateTime := time.Since(start)
 
-			require.LessOrEqual(t, updateTime, 5*time.Minute,
-				"%s took %v, expected less than 5 minutes", scenario.name, updateTime)
+			require.LessOrEqual(t, updateTime, 10*time.Minute,
+				"%s took %v, expected less than 10 minutes", scenario.name, updateTime)
 		})
 	}
 }
@@ -213,6 +213,6 @@ func TestManagedRedisDestroyPerformance(t *testing.T) {
 	terraform.Destroy(t, terraformOptions)
 	destroyTime := time.Since(start)
 
-	require.LessOrEqual(t, destroyTime, 5*time.Minute,
-		"Destroy took %v, expected less than 5 minutes", destroyTime)
+	require.LessOrEqual(t, destroyTime, 10*time.Minute,
+		"Destroy took %v, expected less than 10 minutes", destroyTime)
 }

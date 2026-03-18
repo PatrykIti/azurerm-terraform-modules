@@ -160,3 +160,23 @@ run "redisearch_requires_no_eviction" {
     var.default_database,
   ]
 }
+
+run "redisearch_requires_enterprise_cluster" {
+  command = plan
+
+  variables {
+    default_database = {
+      clustering_policy = "OSSCluster"
+      eviction_policy   = "NoEviction"
+      modules = [
+        {
+          name = "RediSearch"
+        }
+      ]
+    }
+  }
+
+  expect_failures = [
+    var.default_database,
+  ]
+}

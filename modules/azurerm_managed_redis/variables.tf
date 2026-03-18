@@ -256,6 +256,14 @@ variable "default_database" {
     )
     error_message = "default_database.eviction_policy must be NoEviction when the RediSearch module is enabled."
   }
+
+  validation {
+    condition = var.default_database == null || (
+      !contains([for redis_module in try(var.default_database.modules, []) : redis_module.name], "RediSearch") ||
+      var.default_database.clustering_policy == "EnterpriseCluster"
+    )
+    error_message = "default_database.clustering_policy must be EnterpriseCluster when the RediSearch module is enabled."
+  }
 }
 
 variable "identity" {

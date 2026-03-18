@@ -42,7 +42,7 @@ module "managed_redis" {
   default_database = {
     access_keys_authentication_enabled = true
     client_protocol                    = "Encrypted"
-    clustering_policy                  = "OSSCluster"
+    clustering_policy                  = "EnterpriseCluster"
     eviction_policy                    = "NoEviction"
     geo_replication_group_name         = "managed-redis-complete-group"
     modules = [
