@@ -42,7 +42,7 @@ locals {
 }
 
 module "azuredevops_serviceendpoint" {
-  source   = "../../"
+  source   = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_serviceendpoint?ref=ADOSEv1.0.0"
   for_each = local.serviceendpoints
 
   project_id = var.project_id
