@@ -10,7 +10,7 @@
 [![AI Services](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AISv*&label=AI%20Services&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AISv1.0.0)
 [![Application Insights](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=APPINSv*&label=Application%20Insights&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.1.0)
 [![Application Insights Workbook](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AIWBv*&label=Application%20Insights%20Workbook&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AIWBv1.0.0)
-[![Azure DevOps Agent Pools](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAPv*&label=Azure%20DevOps%20Agent%20Pools&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAPv1.0.0)
+[![Azure DevOps Agent Pools](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAPv*&label=Azure%20DevOps%20Agent%20Pools&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAPv2.0.0)
 [![Azure DevOps Artifacts Feed](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOAFv*&label=Azure%20DevOps%20Artifacts%20Feed&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAFv2.0.0)
 [![Azure DevOps Environments](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOEv*&label=Azure%20DevOps%20Environments&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOEv1.0.0)
 [![Azure DevOps Extension](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOEXv*&label=Azure%20DevOps%20Extension&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOEXv1.0.0)
@@ -150,7 +150,7 @@ Note: `azuredevops_identity` has been split into `azuredevops_group`, `azuredevo
 <!-- AZUREDEVOPS_MODULES_TABLE_START -->
 | Module | Status | Version | Description |
 | --- | --- | --- | --- |
-| [Azure DevOps Agent Pools](./modules/azuredevops_agent_pools/) | ✅ Completed | [ADOAPv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAPv1.0.0) | Azure DevOps agent pools module for managing a single agent pool |
+| [Azure DevOps Agent Pools](./modules/azuredevops_agent_pools/) | ✅ Completed | [ADOAPv2.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAPv2.0.0) | Azure DevOps agent pools module for managing a single agent pool |
 | [Azure DevOps Artifacts Feed](./modules/azuredevops_artifacts_feed/) | ✅ Completed | [ADOAFv2.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOAFv2.0.0) | Azure DevOps artifacts feed module for managing a feed, retention policies, and permissions |
 | [Azure DevOps Elastic Pool](./modules/azuredevops_elastic_pool/) | 🧪 Development | vUnreleased | Azure DevOps elastic pool module for managing a single elastic pool |
 | [Azure DevOps Environments](./modules/azuredevops_environments/) | ✅ Completed | [ADOEv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOEv1.0.0) | Azure DevOps environments module for a single environment with optional resources and checks |
