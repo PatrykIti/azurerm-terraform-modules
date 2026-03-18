@@ -11,7 +11,7 @@ terraform {
 provider "azuredevops" {}
 
 module "work_item_parent" {
-  source = "../../"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_work_items?ref=ADOWKv1.0.0"
 
   project_id = var.project_id
   title      = var.parent_title
@@ -20,7 +20,7 @@ module "work_item_parent" {
 }
 
 module "work_item_child" {
-  source = "../../"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azuredevops_work_items?ref=ADOWKv1.0.0"
 
   project_id = var.project_id
   title      = var.child_title

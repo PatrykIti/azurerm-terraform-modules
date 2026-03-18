@@ -29,6 +29,7 @@
 [![Azure DevOps User Entitlement](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOUv*&label=Azure%20DevOps%20User%20Entitlement&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOUv1.0.0)
 [![Azure DevOps Variable Groups](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOVGv*&label=Azure%20DevOps%20Variable%20Groups&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOVGv1.0.0)
 [![Azure DevOps Wiki](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOWIv*&label=Azure%20DevOps%20Wiki&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOWIv1.0.0)
+[![Azure DevOps Work Items](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=ADOWKv*&label=Azure%20DevOps%20Work%20Items&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOWKv1.0.0)
 [![Bastion Host](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=BASTIONv*&label=Bastion%20Host&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/BASTIONv1.0.0)
 [![Cognitive Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=COGv*&label=Cognitive%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/COGv1.0.0)
 [![Event Hub](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=EHv*&label=Event%20Hub&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/EHv1.0.0)
@@ -177,7 +178,7 @@ Note: `azuredevops_identity` has been split into `azuredevops_group`, `azuredevo
 | [Azure DevOps User Entitlement](./modules/azuredevops_user_entitlement/) | ✅ Completed | [ADOUv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOUv1.0.0) | Azure DevOps module for managing user entitlements |
 | [Azure DevOps Variable Groups](./modules/azuredevops_variable_groups/) | ✅ Completed | [ADOVGv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOVGv1.0.0) | Azure DevOps variable groups module for managing a single variable group, strict-child permissions, and optional Key Vault integration |
 | [Azure DevOps Wiki](./modules/azuredevops_wiki/) | ✅ Completed | [ADOWIv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOWIv1.0.0) | Azure DevOps wiki module for managing a single wiki and strict-child pages |
-| [Azure DevOps Work Items](./modules/azuredevops_work_items/) | 🧪 Development | vUnreleased | Azure DevOps work items module for managing a single work item resource |
+| [Azure DevOps Work Items](./modules/azuredevops_work_items/) | ✅ Completed | [ADOWKv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/ADOWKv1.0.0) | Azure DevOps work items module for managing a single work item resource |
 <!-- AZUREDEVOPS_MODULES_TABLE_END -->
 
 Versions are sourced from module changelogs and release tags. Modules without a tagged release remain in Development.
