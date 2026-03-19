@@ -73,7 +73,7 @@ resource "azurerm_key_vault_key" "example" {
 }
 
 module "managed_redis" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_managed_redis?ref=AMRv1.0.0"
 
   name                = "managed-redis-cmk-example"
   resource_group_name = azurerm_resource_group.example.name

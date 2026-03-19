@@ -27,7 +27,7 @@ resource "azurerm_log_analytics_workspace" "example" {
 }
 
 module "managed_redis" {
-  source = "../../"
+  source = "github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_managed_redis?ref=AMRv1.0.0"
 
   name                = "managed-redis-complete-example"
   resource_group_name = azurerm_resource_group.example.name
