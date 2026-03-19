@@ -1,0 +1,7 @@
+{
+  "name": "kubernetes_role_binding",
+  "title": "Kubernetes Role Binding",
+  "commit_scope": "kubernetes-role-binding",
+  "tag_prefix": "KRB",
+  "description": "Azure Kubernetes Role Binding Terraform module with enterprise-grade features"
+}

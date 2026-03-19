@@ -1,0 +1,7 @@
+{
+  "name": "kubernetes_namespace",
+  "title": "Kubernetes Namespace",
+  "commit_scope": "kubernetes-namespace",
+  "tag_prefix": "KNSv",
+  "description": "Kubernetes namespace Terraform module for managing a single namespace in an existing cluster"
+}

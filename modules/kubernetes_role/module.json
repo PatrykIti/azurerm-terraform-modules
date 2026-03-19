@@ -1,0 +1,7 @@
+{
+  "name": "kubernetes_role",
+  "title": "Kubernetes Role",
+  "commit_scope": "kubernetes-role",
+  "tag_prefix": "KROLE",
+  "description": "Azure Kubernetes Role Terraform module with enterprise-grade features"
+}
