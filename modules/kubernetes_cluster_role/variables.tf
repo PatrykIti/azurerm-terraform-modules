@@ -1,135 +1,70 @@
-# Core Kubernetes Cluster Role Variables
 variable "name" {
-  description = "The name of the kubernetes_cluster_role. Must be globally unique."
+  description = "ClusterRole name. Must be a valid DNS-1123 label."
   type        = string
 
   validation {
-    condition     = can(regex("^[a-z0-9]{3,24}$", var.name))
-    error_message = "Kubernetes Cluster Role name must be between 3 and 24 characters long and use numbers and lower-case letters only."
-  }
-}
-
-variable "resource_group_name" {
-  description = "The name of the resource group in which to create the kubernetes_cluster_role."
-  type        = string
-}
-
-variable "location" {
-  description = "The Azure Region where the Kubernetes Cluster Role should exist."
-  type        = string
-}
-
-# TODO: Add specific configuration variables for this resource type
-# Example variables based on common Azure resource patterns:
-
-# variable "account_tier" {
-#   description = "Defines the Tier to use for this resource. Valid options are Standard and Premium."
-#   type        = string
-#   default     = "Standard"
-#
-#   validation {
-#     condition     = contains(["Standard", "Premium"], var.account_tier)
-#     error_message = "Account tier must be either 'Standard' or 'Premium'."
-#   }
-# }
-
-# variable "account_replication_type" {
-#   description = "Defines the type of replication to use for this resource."
-#   type        = string
-#   default     = "ZRS"
-#
-#   validation {
-#     condition     = contains(["LRS", "GRS", "RAGRS", "ZRS", "GZRS", "RAGZRS"], var.account_replication_type)
-#     error_message = "Valid replication types are LRS, GRS, RAGRS, ZRS, GZRS, RAGZRS."
-#   }
-# }
-
-# Security Configuration
-variable "security_settings" {
-  description = "Security configuration for the kubernetes_cluster_role."
-  type = object({
-    https_traffic_only_enabled      = optional(bool, true)
-    min_tls_version                 = optional(string, "TLS1_2")
-    public_network_access_enabled   = optional(bool, false)
-    shared_access_key_enabled       = optional(bool, false)
-    allow_nested_items_to_be_public = optional(bool, false)
-  })
-  default = {
-    https_traffic_only_enabled      = true
-    min_tls_version                 = "TLS1_2"
-    public_network_access_enabled   = false
-    shared_access_key_enabled       = false
-    allow_nested_items_to_be_public = false
+    condition     = length(var.name) > 0 && length(var.name) <= 253
+    error_message = "name must be between 1 and 253 characters."
   }
 
   validation {
-    condition     = contains(["TLS1_0", "TLS1_1", "TLS1_2"], var.security_settings.min_tls_version)
-    error_message = "The min_tls_version must be one of: TLS1_0, TLS1_1, TLS1_2."
+    condition     = can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", var.name))
+    error_message = "name must be a valid DNS-1123 label (lowercase letters, numbers, hyphens)."
   }
 }
 
-# Network Rules
-variable "network_rules" {
-  description = "Network rules configuration for the kubernetes_cluster_role."
-  type = object({
-    default_action             = optional(string, "Deny")
-    bypass                     = optional(list(string), ["AzureServices"])
-    ip_rules                   = optional(list(string), [])
-    virtual_network_subnet_ids = optional(list(string), [])
-  })
-  default = null
-
-  validation {
-    condition     = var.network_rules == null || contains(["Allow", "Deny"], var.network_rules.default_action)
-    error_message = "The default_action must be either 'Allow' or 'Deny'."
-  }
-}
-
-# Private Endpoints
-variable "private_endpoints" {
-  description = "List of private endpoints to create for the kubernetes_cluster_role."
-  type = list(object({
-    name                            = string
-    subnet_id                       = string
-    subresource_names               = optional(list(string), ["kubernetes_cluster_role"])
-    private_dns_zone_ids            = optional(list(string), [])
-    private_service_connection_name = optional(string)
-    is_manual_connection            = optional(bool, false)
-    request_message                 = optional(string)
-    tags                            = optional(map(string), {})
-  }))
-  default = []
-}
-
-# Diagnostic Settings
-variable "diagnostic_settings" {
-  description = "Diagnostic settings configuration for audit logging."
-  type = object({
-    enabled                    = optional(bool, false)
-    log_analytics_workspace_id = optional(string)
-    storage_account_id         = optional(string)
-    eventhub_auth_rule_id      = optional(string)
-    logs = optional(object({
-      # TODO: Add specific log categories for this resource type
-      # Example log categories (update based on actual resource):
-      # storage_read     = optional(bool, true)
-      # storage_write    = optional(bool, true)
-      # storage_delete   = optional(bool, true)
-      retention_days = optional(number, 7)
-    }), {})
-    metrics = optional(object({
-      enabled        = optional(bool, true)
-      retention_days = optional(number, 7)
-    }), {})
-  })
-  default = {
-    enabled = false
-  }
-}
-
-# Tags
-variable "tags" {
-  description = "A mapping of tags to assign to the resource."
+variable "labels" {
+  description = "Labels to apply to the ClusterRole."
   type        = map(string)
   default     = {}
+}
+
+variable "annotations" {
+  description = "Annotations to apply to the ClusterRole."
+  type        = map(string)
+  default     = {}
+}
+
+variable "rules" {
+  description = "Policy rules for the ClusterRole."
+  type = list(object({
+    api_groups        = optional(list(string))
+    resources         = optional(list(string))
+    verbs             = list(string)
+    resource_names    = optional(list(string))
+    non_resource_urls = optional(list(string))
+  }))
+  default = []
+
+  validation {
+    condition     = length(var.rules) > 0 || var.aggregation_rule != null
+    error_message = "Either rules or aggregation_rule must be provided."
+  }
+
+  validation {
+    condition = alltrue([
+      for rule in var.rules :
+      length(rule.verbs) > 0 &&
+      (
+        (try(length(rule.resources), 0) > 0) ||
+        (try(length(rule.non_resource_urls), 0) > 0)
+      )
+    ])
+    error_message = "Each rules entry must define verbs and at least one of resources or non_resource_urls."
+  }
+}
+
+variable "aggregation_rule" {
+  description = "Optional aggregation rule used to compose this ClusterRole from labels on other ClusterRoles."
+  type = object({
+    cluster_role_selectors = list(object({
+      match_labels = optional(map(string))
+      match_expressions = optional(list(object({
+        key      = optional(string)
+        operator = optional(string)
+        values   = optional(set(string))
+      })), [])
+    }))
+  })
+  default = null
 }

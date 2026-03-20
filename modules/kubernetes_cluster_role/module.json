@@ -2,6 +2,6 @@
   "name": "kubernetes_cluster_role",
   "title": "Kubernetes Cluster Role",
   "commit_scope": "kubernetes-cluster-role",
-  "tag_prefix": "KCR",
-  "description": "Azure Kubernetes Cluster Role Terraform module with enterprise-grade features"
+  "tag_prefix": "KCRv",
+  "description": "Kubernetes ClusterRole Terraform module for managing a single cluster-scoped RBAC role"
 }
