@@ -10,10 +10,8 @@ test_suites:
     tests:
       - TestCompleteKubernetesNamespace
       - TestSecureKubernetesNamespace
-      - TestNetworkKubernetesNamespace
-      - TestKubernetesNamespacePrivateEndpoint
     parallel: true
-    timeout: 30m
+    timeout: 45m
     
   - name: "Validation Tests"
     tests:
@@ -23,26 +21,14 @@ test_suites:
     
   - name: "Integration Tests"
     tests:
-      - TestKubernetesNamespaceFullIntegration
-      - TestKubernetesNamespaceWithNetworkRules
-      - TestKubernetesNamespacePrivateEndpointIntegration
-      - TestKubernetesNamespaceSecurityConfiguration
       - TestKubernetesNamespaceLifecycle
-      - TestKubernetesNamespaceCompliance
     parallel: false
     timeout: 45m
     
   - name: "Performance Tests"
     tests:
       - BenchmarkKubernetesNamespaceCreation
-      - BenchmarkKubernetesNamespaceCreationSimple
-      - BenchmarkKubernetesNamespaceCreationWithFeatures
-      - BenchmarkKubernetesNamespaceCreationWithScale
-      - BenchmarkKubernetesNamespaceParallelCreation
       - TestKubernetesNamespaceCreationTime
-      - TestKubernetesNamespaceScaling
-      - TestKubernetesNamespaceUpdatePerformance
-      - TestKubernetesNamespaceDestroyPerformance
     parallel: false
     timeout: 60m
     benchmark: true

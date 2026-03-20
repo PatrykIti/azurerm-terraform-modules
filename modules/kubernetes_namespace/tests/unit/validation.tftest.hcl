@@ -1,16 +1,21 @@
-# Placeholder validation test for Kubernetes Namespace
+# Validation tests for Kubernetes Namespace module
 
-variables {
-  name                = "example-kubernetes_namespace"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
+mock_provider "kubernetes" {
+  mock_resource "kubernetes_namespace_v1" {}
 }
 
-run "validation_plan" {
+variables {
+  name = "app"
+}
+
+run "too_long_name" {
   command = plan
 
-  assert {
-    condition     = true
-    error_message = "Update validation tests for Kubernetes Namespace."
+  variables {
+    name = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   }
+
+  expect_failures = [
+    var.name,
+  ]
 }

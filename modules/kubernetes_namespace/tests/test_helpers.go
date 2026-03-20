@@ -16,13 +16,13 @@ import (
 
 // TestConfig holds common test configuration
 type TestConfig struct {
-	SubscriptionID    string
-	TenantID         string
-	ClientID         string
-	ClientSecret     string
-	Location         string
-	ResourceGroup    string
-	UniqueID         string
+	SubscriptionID string
+	TenantID       string
+	ClientID       string
+	ClientSecret   string
+	Location       string
+	ResourceGroup  string
+	UniqueID       string
 }
 
 // GetTestConfig returns a test configuration with required Azure credentials
@@ -48,12 +48,12 @@ func GetTestConfig(t *testing.T) *TestConfig {
 
 	return &TestConfig{
 		SubscriptionID: subscriptionID,
-		TenantID:      tenantID,
-		ClientID:      clientID,
-		ClientSecret:  clientSecret,
-		Location:      location,
-		ResourceGroup: fmt.Sprintf("rg-test-kubernetes_namespace-%s", uniqueID),
-		UniqueID:      uniqueID,
+		TenantID:       tenantID,
+		ClientID:       clientID,
+		ClientSecret:   clientSecret,
+		Location:       location,
+		ResourceGroup:  fmt.Sprintf("rg-test-kubernetes-namespace-%s", uniqueID),
+		UniqueID:       uniqueID,
 	}
 }
 
@@ -89,9 +89,7 @@ func WaitForResourceDeletion(ctx context.Context, checkFunc func() (bool, error)
 
 // GenerateResourceName generates a unique resource name for testing
 func GenerateResourceName(prefix string, uniqueID string) string {
-	// Ensure the name meets Azure naming requirements
 	name := fmt.Sprintf("%s%s", prefix, uniqueID)
-	// Remove any invalid characters and ensure length limits
 	name = strings.ReplaceAll(name, "-", "")
 	if len(name) > 24 {
 		name = name[:24]

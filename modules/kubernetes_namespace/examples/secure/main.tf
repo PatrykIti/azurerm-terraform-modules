@@ -1,23 +1,32 @@
-provider "azurerm" {
-  features {}
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.20.0"
+    }
+  }
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-kubernetes_namespace-secure-example"
-  location = "West Europe"
-}
+provider "kubernetes" {}
 
 module "kubernetes_namespace" {
   source = "../../"
 
-  name                = "kubernetesnamespaceexample003"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name = var.namespace_name
 
-  # Add security-focused configuration here
-
-  tags = {
+  labels = {
     Environment = "Production"
     Example     = "Secure"
   }
+
+  annotations = {
+    "owner.team"                         = "platform"
+    "pod-security.kubernetes.io/enforce" = "restricted"
+    "pod-security.kubernetes.io/audit"   = "restricted"
+    "pod-security.kubernetes.io/warn"    = "restricted"
+  }
+
+  wait_for_default_service_account = true
 }

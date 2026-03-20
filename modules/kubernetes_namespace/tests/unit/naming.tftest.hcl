@@ -1,16 +1,33 @@
-# Placeholder naming test for Kubernetes Namespace
+# Naming validation tests for Kubernetes Namespace module
 
-variables {
-  name                = "example-kubernetes_namespace"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
+mock_provider "kubernetes" {
+  mock_resource "kubernetes_namespace_v1" {}
 }
 
-run "naming_plan" {
+variables {
+  name = "app"
+}
+
+run "invalid_name_uppercase" {
   command = plan
 
-  assert {
-    condition     = true
-    error_message = "Update naming tests for Kubernetes Namespace."
+  variables {
+    name = "InvalidName"
   }
+
+  expect_failures = [
+    var.name,
+  ]
+}
+
+run "invalid_name_special_chars" {
+  command = plan
+
+  variables {
+    name = "invalid_name"
+  }
+
+  expect_failures = [
+    var.name,
+  ]
 }

@@ -1,5 +1,5 @@
-variable "location" {
-  description = "Azure region for resources"
+variable "namespace_name" {
+  description = "Namespace name for the example."
   type        = string
-  default     = "West Europe"
+  default     = "intent-resolver"
 }

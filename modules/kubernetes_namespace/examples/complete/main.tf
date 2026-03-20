@@ -1,23 +1,33 @@
-provider "azurerm" {
-  features {}
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.20.0"
+    }
+  }
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-kubernetes_namespace-complete-example"
-  location = "West Europe"
-}
+provider "kubernetes" {}
 
 module "kubernetes_namespace" {
   source = "../../"
 
-  name                = "kubernetesnamespaceexample002"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name = var.namespace_name
 
-  # Add more comprehensive configuration here
-
-  tags = {
-    Environment = "Development"
-    Example     = "Complete"
+  labels = {
+    "app.kubernetes.io/name"       = "intent-resolver"
+    "app.kubernetes.io/managed-by" = "terraform"
+    Environment                    = "Development"
+    Example                        = "Complete"
   }
+
+  annotations = {
+    "owner.team"       = "genai"
+    "support.channel"  = "#platform"
+    "example.scenario" = "complete"
+  }
+
+  wait_for_default_service_account = true
 }
