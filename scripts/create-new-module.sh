@@ -41,7 +41,7 @@ Options:
   -h, --help                 Show this help and exit.
 
 Arguments:
-  module_name    - Technical name (e.g., azurerm_virtual_network)
+  module_name    - Technical name (e.g., azurerm_virtual_network, kubernetes_namespace)
   display_name   - Human-readable name (e.g., "Virtual Network")
   prefix         - Version prefix (e.g., VN for Virtual Network)
   scope          - Commit scope (e.g., virtual-network)
@@ -49,6 +49,7 @@ Arguments:
 
 Examples:
   $0 azurerm_virtual_network "Virtual Network" VN virtual-network "Manages Azure Virtual Networks with subnets and peering"
+  $0 kubernetes_namespace "Kubernetes Namespace" KNS kubernetes-namespace "Manages Kubernetes namespaces in an existing cluster"
   $0 --with-private-endpoint azurerm_storage_account "Storage Account" SA storage-account "Manages storage accounts"
   $0 --examples=basic,secure azurerm_subnet "Subnet" SN subnet "Manages Azure subnets"
 
@@ -119,8 +120,14 @@ contains_example() {
     return 1
 }
 
-# Derive module type from name (remove azurerm_ prefix)
-MODULE_TYPE="${MODULE_NAME#azurerm_}"
+# Derive module type from name (remove known provider prefix)
+MODULE_TYPE="$MODULE_NAME"
+for known_prefix in azurerm_ azuredevops_ kubernetes_; do
+    if [[ "$MODULE_TYPE" == "${known_prefix}"* ]]; then
+        MODULE_TYPE="${MODULE_TYPE#${known_prefix}}"
+        break
+    fi
+done
 MODULE_PASCAL="$(echo "$MODULE_TYPE" | awk -F'_' '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))}1' | tr -d ' ')"
 
 EXAMPLES=()

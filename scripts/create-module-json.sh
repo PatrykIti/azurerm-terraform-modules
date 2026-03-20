@@ -9,19 +9,24 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 convert_name() {
     local module_name=$1
     local format=$2
+    local base_name="$module_name"
+
+    for prefix in azurerm_ azuredevops_ kubernetes_; do
+        if [[ "$base_name" == "${prefix}"* ]]; then
+            base_name="${base_name#${prefix}}"
+            break
+        fi
+    done
     
     case $format in
         "title")
-            # azurerm_storage_account -> Storage Account
-            echo "$module_name" | sed 's/azurerm_//' | sed 's/_/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))}1'
+            echo "$base_name" | sed 's/_/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))}1'
             ;;
         "scope")
-            # azurerm_storage_account -> storage-account
-            echo "$module_name" | sed 's/azurerm_//' | sed 's/_/-/g'
+            echo "$base_name" | sed 's/_/-/g'
             ;;
         "prefix")
-            # azurerm_storage_account -> SAv
-            local words=$(echo "$module_name" | sed 's/azurerm_//' | sed 's/_/ /g')
+            local words=$(echo "$base_name" | sed 's/_/ /g')
             local prefix=""
             for word in $words; do
                 prefix="${prefix}$(echo $word | cut -c1 | tr '[:lower:]' '[:upper:]')"
@@ -47,6 +52,13 @@ TITLE=${2:-$(convert_name "$MODULE_NAME" "title")}
 SCOPE=${3:-$(convert_name "$MODULE_NAME" "scope")}
 PREFIX=${4:-$(convert_name "$MODULE_NAME" "prefix")}
 
+PROVIDER_LABEL="Azure"
+if [[ "$MODULE_NAME" == azuredevops_* ]]; then
+    PROVIDER_LABEL="Azure DevOps"
+elif [[ "$MODULE_NAME" == kubernetes_* ]]; then
+    PROVIDER_LABEL="Kubernetes"
+fi
+
 # Create module.json
 MODULE_JSON_PATH="$MODULE_DIR/module.json"
 
@@ -62,7 +74,7 @@ cat > "$MODULE_JSON_PATH" << EOF
   "title": "$TITLE",
   "commit_scope": "$SCOPE",
   "tag_prefix": "$PREFIX",
-  "description": "Azure $TITLE Terraform module with enterprise-grade features"
+  "description": "$PROVIDER_LABEL $TITLE Terraform module with enterprise-grade features"
 }
 EOF
 

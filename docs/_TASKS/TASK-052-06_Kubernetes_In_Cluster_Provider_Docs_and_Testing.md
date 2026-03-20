@@ -5,7 +5,7 @@
 **Category:** Documentation / Testing / Provider Model  
 **Estimated Effort:** Medium  
 **Dependencies:** TASK-052-01, TASK-052-02, TASK-052-03, TASK-052-04, TASK-052-05  
-**Status:** Planned
+**Status:** Done (2026-03-20)
 
 ---
 
@@ -34,7 +34,7 @@ providera i apply lifecycle.
 ## Deliverables
 
 - Spójna sekcja w docs wyjaśniająca:
-  - dlaczego moduly maja prefix `azurerm_`, mimo ze uzywaja providera `kubernetes`
+  - dlaczego moduly maja prefix `kubernetes_`, mimo ze repo historycznie bylo skupione na `azurerm_*`
   - kiedy używać osobnego stanu/workspace
   - jak mapować Entra users/groups do Kubernetes subjects
 - Updated repo indexes po wdrozeniu

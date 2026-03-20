@@ -5,7 +5,7 @@
 **Category:** New Module / Kubernetes In-Cluster  
 **Estimated Effort:** Medium  
 **Dependencies:** TASK-052  
-**Status:** Planned
+**Status:** Done (2026-03-20)
 
 ---
 

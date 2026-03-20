@@ -3,9 +3,9 @@
 Task board for module work. Update statuses in markdown files.
 
 ## Statistics
-- **To Do:** 12 tasks
+- **To Do:** 11 tasks
 - **In Progress:** 0 tasks
-- **Done:** 84 tasks
+- **Done:** 85 tasks
 
 ---
 
@@ -13,7 +13,6 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
-| [TASK-052](./TASK-052_Kubernetes_In_Cluster_Namespace_and_RBAC_Modules.md) | **Kubernetes in-cluster namespace and RBAC modules** | High | Large | `kubernetes_namespace`, `kubernetes_role`, `kubernetes_role_binding`, `kubernetes_cluster_role`, `kubernetes_cluster_role_binding` |
 | [TASK-050](./TASK-050_Final_Six_AzureRM_Modules_Compliance_Alignment.md) | **Final six AzureRM modules compliance alignment** | High | Large | `azurerm_redis_cache`, `azurerm_role_assignment`, `azurerm_role_definition`, `azurerm_user_assigned_identity`, `azurerm_windows_function_app`, `azurerm_windows_virtual_machine` |
 | [TASK-042](./TASK-042_Linux_Function_App_Compliance_Reaudit.md) | **Linux Function App compliance re-audit** | High | Large | `modules/azurerm_linux_function_app/` |
 | [TASK-043](./TASK-043_Linux_Virtual_Machine_Compliance_Reaudit.md) | **Linux Virtual Machine compliance re-audit** | High | Large | `modules/azurerm_linux_virtual_machine/` |
@@ -40,6 +39,7 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-052](./TASK-052_Kubernetes_In_Cluster_Namespace_and_RBAC_Modules.md) | **Kubernetes in-cluster namespace and RBAC modules** | High | Large | Completed 2026-03-20; added five new `kubernetes_*` modules, repo naming/docs/index support, examples, unit tests, and Terratest scaffolding |
 | [TASK-051](./TASK-051_Azure_Managed_Redis_Module.md) | **Azure Managed Redis module (full feature scope)** | High | Large | Completed 2026-03-18; new `azurerm_managed_redis` module with geo-replication, diagnostics, examples, docs, and unit coverage |
 | [TASK-ADO-044](./TASK-ADO-044_AzureDevOps_Live_Test_Harness_Stabilization_Wave3.md) | **Azure DevOps live test harness stabilization wave 3** | Medium | Medium | Completed 2026-03-18; deterministic cleanup + transient retry coverage for remaining ADO test suites |
 | [TASK-ADO-041](./TASK-ADO-041_AzureDevOps_Test_Harness_Consistency_Alignment.md) | **Azure DevOps test harness consistency alignment** | Medium | Medium | Completed 2026-02-14; harness parity + compile gate across all `azuredevops_*` tests |

@@ -2,7 +2,7 @@
 
 This directory contains all Terraform modules published from this repository. Each module has its own README, examples, and changelog. Modules are atomic and manage a single primary resource; cross-resource glue (private endpoints, RBAC, budgets) lives in dedicated modules or higher-level compositions.
 
-- Naming convention: `azurerm_<resource>` for AzureRM and `azuredevops_<resource>` for Azure DevOps.
+- Naming convention: `azurerm_<resource>` for AzureRM, `kubernetes_<resource>` for in-cluster Kubernetes, and `azuredevops_<resource>` for Azure DevOps.
 - Release tag prefixes come from each module's `module.json` (for example: `SAv1.2.2`).
 
 ## AzureRM Modules
@@ -22,8 +22,8 @@ This directory contains all Terraform modules published from this repository. Ea
 | [Kubernetes Secrets](./azurerm_kubernetes_secrets/) (`azurerm_kubernetes_secrets`) | `AKSSv` | Azure Kubernetes Secrets Terraform module with enterprise-grade features |
 | [Linux Function App](./azurerm_linux_function_app/) (`azurerm_linux_function_app`) | `LFUNCv` | Azure Linux Function App Terraform module with enterprise-grade features |
 | [Linux Virtual Machine](./azurerm_linux_virtual_machine/) (`azurerm_linux_virtual_machine`) | `LINUXVMv` | Azure Linux Virtual Machine Terraform module with enterprise-grade features |
-| [Managed Redis](./azurerm_managed_redis/) (`azurerm_managed_redis`) | `AMRv` | Azure Managed Redis Terraform module with geo-replication membership and diagnostics support |
 | [Log Analytics Workspace](./azurerm_log_analytics_workspace/) (`azurerm_log_analytics_workspace`) | `LAWv` | Azure Log Analytics Workspace Terraform module with workspace and sub-resource management |
+| [Managed Redis](./azurerm_managed_redis/) (`azurerm_managed_redis`) | `AMRv` | Azure Managed Redis Terraform module with enterprise-grade features |
 | [Monitor Data Collection Endpoint](./azurerm_monitor_data_collection_endpoint/) (`azurerm_monitor_data_collection_endpoint`) | `DCEv` | Azure Monitor Data Collection Endpoint Terraform module with enterprise-grade features |
 | [Monitor Data Collection Rule](./azurerm_monitor_data_collection_rule/) (`azurerm_monitor_data_collection_rule`) | `DCRv` | Azure Monitor Data Collection Rule Terraform module with enterprise-grade features |
 | [Monitor Private Link Scope](./azurerm_monitor_private_link_scope/) (`azurerm_monitor_private_link_scope`) | `AMPLSv` | Azure Monitor Private Link Scope Terraform module with enterprise-grade features |
@@ -44,6 +44,18 @@ This directory contains all Terraform modules published from this repository. Ea
 | [Windows Function App](./azurerm_windows_function_app/) (`azurerm_windows_function_app`) | `WFUNCv` | Azure Windows Function App Terraform module with enterprise-grade features |
 | [Windows Virtual Machine](./azurerm_windows_virtual_machine/) (`azurerm_windows_virtual_machine`) | `WINDOWSVMv` | Azure Windows Virtual Machine Terraform module with enterprise-grade features |
 <!-- MODULES_INDEX_AZURERM_END -->
+
+## Kubernetes Modules
+
+<!-- MODULES_INDEX_KUBERNETES_START -->
+| Module | Tag Prefix | Description |
+| --- | --- | --- |
+| [Kubernetes Cluster Role](./kubernetes_cluster_role/) (`kubernetes_cluster_role`) | `KCRv` | Kubernetes ClusterRole Terraform module for managing a single cluster-scoped RBAC role |
+| [Kubernetes Cluster Role Binding](./kubernetes_cluster_role_binding/) (`kubernetes_cluster_role_binding`) | `KCRBv` | Kubernetes ClusterRoleBinding Terraform module for binding a cluster role to subjects |
+| [Kubernetes Namespace](./kubernetes_namespace/) (`kubernetes_namespace`) | `KNSv` | Kubernetes namespace Terraform module for managing a single namespace in an existing cluster |
+| [Kubernetes Role](./kubernetes_role/) (`kubernetes_role`) | `KROLEv` | Kubernetes Role Terraform module for managing a single namespace-scoped RBAC role |
+| [Kubernetes Role Binding](./kubernetes_role_binding/) (`kubernetes_role_binding`) | `KRBv` | Kubernetes RoleBinding Terraform module for binding a namespace-scoped role to subjects |
+<!-- MODULES_INDEX_KUBERNETES_END -->
 
 ## Azure DevOps Modules
 

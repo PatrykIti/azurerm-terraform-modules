@@ -5,7 +5,7 @@
 **Category:** New Modules / Kubernetes In-Cluster Access  
 **Estimated Effort:** Large  
 **Dependencies:** TASK-003 (module scaffold generator baseline), existing `azurerm_kubernetes_secrets` patterns  
-**Status:** Planned
+**Status:** Done (2026-03-20)
 
 ---
 
@@ -145,3 +145,18 @@ potem dostosowany z template generatora do rzeczywistego providera `kubernetes`.
 - `docs/_CHANGELOG/<new-entry>.md`
 - `modules/README.md`
 - `README.md`
+
+---
+
+## Completion Notes
+
+- Added:
+  - `modules/kubernetes_namespace`
+  - `modules/kubernetes_role`
+  - `modules/kubernetes_role_binding`
+  - `modules/kubernetes_cluster_role`
+  - `modules/kubernetes_cluster_role_binding`
+- All five modules now use the `kubernetes` provider with repo-standard
+  scaffold, examples, docs, unit tests, fixtures, and Terratest harness.
+- Repo naming/documentation tooling was extended so `kubernetes_*` is handled as
+  a first-class module family in guides, generators, and README indexes.
