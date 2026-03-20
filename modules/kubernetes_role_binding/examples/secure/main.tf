@@ -1,23 +1,45 @@
-provider "azurerm" {
-  features {}
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.20.0"
+    }
+  }
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-kubernetes_role_binding-secure-example"
-  location = "West Europe"
+provider "kubernetes" {}
+
+resource "kubernetes_role_v1" "role" {
+  metadata {
+    name      = "intent-resolver-reader"
+    namespace = var.namespace
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["pods", "services", "endpoints"]
+    verbs      = ["get", "list", "watch"]
+  }
 }
 
 module "kubernetes_role_binding" {
   source = "../../"
 
-  name                = "kubernetesrolebindingexample003"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name      = "intent-resolver-reader-sa"
+  namespace = var.namespace
 
-  # Add security-focused configuration here
-
-  tags = {
-    Environment = "Production"
-    Example     = "Secure"
+  role_ref = {
+    kind = "Role"
+    name = kubernetes_role_v1.role.metadata[0].name
   }
+
+  subjects = [
+    {
+      kind      = "ServiceAccount"
+      name      = "intent-resolver"
+      namespace = var.namespace
+    }
+  ]
 }

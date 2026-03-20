@@ -1,16 +1,29 @@
-# Placeholder validation test for Kubernetes Role
+# Validation tests for Kubernetes Role module
 
-variables {
-  name                = "example-kubernetes_role"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
+mock_provider "kubernetes" {
+  mock_resource "kubernetes_role_v1" {}
 }
 
-run "validation_plan" {
+variables {
+  name      = "intent-resolver-read"
+  namespace = "intent-resolver"
+  rules = [
+    {
+      api_groups = [""]
+      resources  = ["pods"]
+      verbs      = ["get"]
+    }
+  ]
+}
+
+run "missing_rules" {
   command = plan
 
-  assert {
-    condition     = true
-    error_message = "Update validation tests for Kubernetes Role."
+  variables {
+    rules = []
   }
+
+  expect_failures = [
+    var.rules,
+  ]
 }

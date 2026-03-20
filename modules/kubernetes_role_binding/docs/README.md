@@ -2,15 +2,21 @@
 
 ## Overview
 
-This directory contains additional documentation for the Kubernetes Role Binding module.
+This module manages a single namespace-scoped Kubernetes `RoleBinding` in an
+existing cluster.
 
-## Contents
+## Managed Resources
 
-- Architecture diagrams (coming soon)
-- Best practices guide (coming soon)
-- Troubleshooting guide (coming soon)
-- Migration guides (coming soon)
+- `kubernetes_role_binding_v1`
 
-## Contributing
+## Usage Notes
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines on adding documentation.
+- The target namespace and referenced role must already exist.
+- Subjects can be `User`, `Group`, or `ServiceAccount`.
+- For `ServiceAccount` subjects, namespace must be provided explicitly.
+
+## Out of Scope
+
+- Namespace lifecycle
+- Role lifecycle
+- Cluster-scoped RBAC

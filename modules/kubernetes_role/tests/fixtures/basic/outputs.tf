@@ -1,9 +1,9 @@
-output "kubernetes_role_id" {
-  description = "The ID of the created Kubernetes Role"
-  value       = module.kubernetes_role.id
+output "role_name" {
+  description = "Created role name."
+  value       = module.kubernetes_role.name
 }
 
-output "kubernetes_role_name" {
-  description = "The name of the created Kubernetes Role"
-  value       = module.kubernetes_role.name
+output "role_namespace" {
+  description = "Created role namespace."
+  value       = module.kubernetes_role.namespace
 }

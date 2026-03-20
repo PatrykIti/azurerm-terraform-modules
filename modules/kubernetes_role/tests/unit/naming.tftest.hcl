@@ -1,16 +1,41 @@
-# Placeholder naming test for Kubernetes Role
+# Naming validation tests for Kubernetes Role module
 
-variables {
-  name                = "example-kubernetes_role"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
+mock_provider "kubernetes" {
+  mock_resource "kubernetes_role_v1" {}
 }
 
-run "naming_plan" {
+variables {
+  name      = "intent-resolver-read"
+  namespace = "intent-resolver"
+  rules = [
+    {
+      api_groups = [""]
+      resources  = ["pods"]
+      verbs      = ["get"]
+    }
+  ]
+}
+
+run "invalid_name_uppercase" {
   command = plan
 
-  assert {
-    condition     = true
-    error_message = "Update naming tests for Kubernetes Role."
+  variables {
+    name = "InvalidName"
   }
+
+  expect_failures = [
+    var.name,
+  ]
+}
+
+run "invalid_namespace" {
+  command = plan
+
+  variables {
+    namespace = "InvalidNamespace"
+  }
+
+  expect_failures = [
+    var.namespace,
+  ]
 }

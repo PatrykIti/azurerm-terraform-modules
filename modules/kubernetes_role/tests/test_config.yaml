@@ -10,10 +10,8 @@ test_suites:
     tests:
       - TestCompleteKubernetesRole
       - TestSecureKubernetesRole
-      - TestNetworkKubernetesRole
-      - TestKubernetesRolePrivateEndpoint
     parallel: true
-    timeout: 30m
+    timeout: 45m
     
   - name: "Validation Tests"
     tests:
@@ -23,26 +21,14 @@ test_suites:
     
   - name: "Integration Tests"
     tests:
-      - TestKubernetesRoleFullIntegration
-      - TestKubernetesRoleWithNetworkRules
-      - TestKubernetesRolePrivateEndpointIntegration
-      - TestKubernetesRoleSecurityConfiguration
       - TestKubernetesRoleLifecycle
-      - TestKubernetesRoleCompliance
     parallel: false
     timeout: 45m
     
   - name: "Performance Tests"
     tests:
       - BenchmarkKubernetesRoleCreation
-      - BenchmarkKubernetesRoleCreationSimple
-      - BenchmarkKubernetesRoleCreationWithFeatures
-      - BenchmarkKubernetesRoleCreationWithScale
-      - BenchmarkKubernetesRoleParallelCreation
       - TestKubernetesRoleCreationTime
-      - TestKubernetesRoleScaling
-      - TestKubernetesRoleUpdatePerformance
-      - TestKubernetesRoleDestroyPerformance
     parallel: false
     timeout: 60m
     benchmark: true

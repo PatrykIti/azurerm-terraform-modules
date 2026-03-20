@@ -1,4 +1,4 @@
-# Terraform Azure Kubernetes Role Module
+# Terraform Kubernetes Role Module
 
 ## Module Version
 
@@ -8,31 +8,47 @@ Current version: **vUnreleased**
 
 ## Description
 
-Kubernetes Role Terraform module for managing a single namespace-scoped RBAC role
+Kubernetes Role Terraform module for managing a single namespace-scoped RBAC
+role in an existing cluster.
 
 ## Usage
 
 ```hcl
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.20.0"
+    }
+  }
+}
+
+provider "kubernetes" {}
+
 module "kubernetes_role" {
   source = "path/to/kubernetes_role"
 
-  # Required variables
-  name                = "example-kubernetes_role"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name      = "intent-resolver-read"
+  namespace = "intent-resolver"
 
-  # Optional configuration
-  tags = {
-    Environment = "Development"
-    Project     = "Example"
-  }
+  rules = [
+    {
+      api_groups = [""]
+      resources  = ["pods", "services", "endpoints"]
+      verbs      = ["get", "list", "watch"]
+    }
+  ]
 }
 ```
 
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-<!-- Examples list will be auto-generated here -->
+- [Basic](examples/basic) - This example creates a read-only namespace-scoped role for pods, services, and endpoints.
+- [Complete](examples/complete) - This example creates a role that combines namespace read access with `pods/portforward`.
+- [Secure](examples/secure) - This example creates a least-privilege namespace role with narrow resource names.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
@@ -45,3 +61,5 @@ module "kubernetes_role" {
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [docs/README.md](docs/README.md) - Scope and provider notes
+- [docs/IMPORT.md](docs/IMPORT.md) - Importing existing roles

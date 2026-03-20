@@ -1,21 +1,44 @@
-provider "azurerm" {
-  features {}
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.20.0"
+    }
+  }
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-kubernetes_role_binding-basic-example"
-  location = "West Europe"
+provider "kubernetes" {}
+
+resource "kubernetes_role_v1" "role" {
+  metadata {
+    name      = "intent-resolver-read"
+    namespace = var.namespace
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["pods", "services", "endpoints"]
+    verbs      = ["get", "list", "watch"]
+  }
 }
 
 module "kubernetes_role_binding" {
   source = "../../"
 
-  name                = "kubernetesrolebindingexample001"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name      = "intent-resolver-read-user"
+  namespace = var.namespace
 
-  tags = {
-    Environment = "Development"
-    Example     = "Basic"
+  role_ref = {
+    kind = "Role"
+    name = kubernetes_role_v1.role.metadata[0].name
   }
+
+  subjects = [
+    {
+      kind = "User"
+      name = var.user_object_id
+    }
+  ]
 }

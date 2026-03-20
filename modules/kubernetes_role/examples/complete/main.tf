@@ -1,23 +1,33 @@
-provider "azurerm" {
-  features {}
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.20.0"
+    }
+  }
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-kubernetes_role-complete-example"
-  location = "West Europe"
-}
+provider "kubernetes" {}
 
 module "kubernetes_role" {
   source = "../../"
 
-  name                = "kubernetesroleexample002"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name      = "intent-resolver-read-portforward"
+  namespace = var.namespace
 
-  # Add more comprehensive configuration here
-
-  tags = {
-    Environment = "Development"
-    Example     = "Complete"
-  }
+  rules = [
+    {
+      api_groups = [""]
+      resources  = ["pods", "services", "endpoints"]
+      verbs      = ["get", "list", "watch"]
+    },
+    {
+      api_groups     = [""]
+      resources      = ["pods/portforward"]
+      verbs          = ["create"]
+      resource_names = ["intent-resolver-api"]
+    }
+  ]
 }

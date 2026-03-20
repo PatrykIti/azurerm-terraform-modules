@@ -1,5 +1,5 @@
-variable "location" {
-  description = "Azure region for resources"
+variable "namespace" {
+  description = "Namespace where the role binding is created."
   type        = string
-  default     = "West Europe"
+  default     = "intent-resolver"
 }

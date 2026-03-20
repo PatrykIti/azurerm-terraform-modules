@@ -1,9 +1,9 @@
-output "kubernetes_role_binding_id" {
-  description = "The ID of the created Kubernetes Role Binding"
-  value       = module.kubernetes_role_binding.id
+output "role_binding_name" {
+  description = "Created RoleBinding name."
+  value       = module.kubernetes_role_binding.name
 }
 
-output "kubernetes_role_binding_name" {
-  description = "The name of the created Kubernetes Role Binding"
-  value       = module.kubernetes_role_binding.name
+output "role_binding_subjects" {
+  description = "Subjects bound by the RoleBinding."
+  value       = module.kubernetes_role_binding.subjects
 }

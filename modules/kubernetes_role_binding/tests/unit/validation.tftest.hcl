@@ -1,16 +1,44 @@
-# Placeholder validation test for Kubernetes Role Binding
+# Validation tests for Kubernetes RoleBinding module
 
-variables {
-  name                = "example-kubernetes_role_binding"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
+mock_provider "kubernetes" {
+  mock_resource "kubernetes_role_binding_v1" {}
 }
 
-run "validation_plan" {
+variables {
+  name      = "intent-resolver-read-users"
+  namespace = "intent-resolver"
+  role_ref = {
+    name = "intent-resolver-read"
+  }
+  subjects = [
+    {
+      kind = "User"
+      name = "00000000-0000-0000-0000-000000000000"
+    }
+  ]
+}
+
+run "missing_subjects" {
   command = plan
 
-  assert {
-    condition     = true
-    error_message = "Update validation tests for Kubernetes Role Binding."
+  variables {
+    subjects = []
   }
+
+  expect_failures = [var.subjects]
+}
+
+run "service_account_requires_namespace" {
+  command = plan
+
+  variables {
+    subjects = [
+      {
+        kind = "ServiceAccount"
+        name = "intent-resolver"
+      }
+    ]
+  }
+
+  expect_failures = [var.subjects]
 }

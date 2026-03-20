@@ -2,15 +2,26 @@
 
 ## Overview
 
-This directory contains additional documentation for the Kubernetes Role module.
+This module manages a single namespace-scoped Kubernetes `Role` in an existing
+cluster. It uses the `kubernetes` provider and is intended for in-cluster RBAC.
 
-## Contents
+## Managed Resources
 
-- Architecture diagrams (coming soon)
-- Best practices guide (coming soon)
-- Troubleshooting guide (coming soon)
-- Migration guides (coming soon)
+- `kubernetes_role_v1`
 
-## Contributing
+## Usage Notes
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines on adding documentation.
+- The target namespace must already exist before applying this module.
+- This module is namespace-scoped and should be paired with
+  `kubernetes_role_binding` to grant access to subjects.
+- Use this module for least-privilege grants such as:
+  - read access to pods/services/endpoints
+  - `pods/portforward`
+  - narrowly scoped resource names
+
+## Out of Scope
+
+- Namespace creation
+- Role bindings
+- Cluster-scoped RBAC
+- Workload resources

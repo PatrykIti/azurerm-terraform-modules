@@ -1,33 +1,6 @@
 # Complete Kubernetes Role Example
 
-This example demonstrates a comprehensive deployment of Kubernetes Role with all available features and configurations.
-
-## Features
-
-- Full kubernetes_role configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
-
-## Key Configuration
-
-This comprehensive example showcases all available features of the kubernetes_role module, demonstrating enterprise-grade capabilities suitable for production environments.
-
-## Usage
-
-```bash
-terraform init
-terraform plan
-terraform apply
-```
-
-## Cleanup
-
-```bash
-terraform destroy
-```
+This example creates a namespace role for read access plus `pods/portforward`.
 
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->

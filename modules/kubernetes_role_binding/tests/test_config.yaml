@@ -10,10 +10,8 @@ test_suites:
     tests:
       - TestCompleteKubernetesRoleBinding
       - TestSecureKubernetesRoleBinding
-      - TestNetworkKubernetesRoleBinding
-      - TestKubernetesRoleBindingPrivateEndpoint
     parallel: true
-    timeout: 30m
+    timeout: 45m
     
   - name: "Validation Tests"
     tests:
@@ -23,26 +21,14 @@ test_suites:
     
   - name: "Integration Tests"
     tests:
-      - TestKubernetesRoleBindingFullIntegration
-      - TestKubernetesRoleBindingWithNetworkRules
-      - TestKubernetesRoleBindingPrivateEndpointIntegration
-      - TestKubernetesRoleBindingSecurityConfiguration
       - TestKubernetesRoleBindingLifecycle
-      - TestKubernetesRoleBindingCompliance
     parallel: false
     timeout: 45m
     
   - name: "Performance Tests"
     tests:
       - BenchmarkKubernetesRoleBindingCreation
-      - BenchmarkKubernetesRoleBindingCreationSimple
-      - BenchmarkKubernetesRoleBindingCreationWithFeatures
-      - BenchmarkKubernetesRoleBindingCreationWithScale
-      - BenchmarkKubernetesRoleBindingParallelCreation
       - TestKubernetesRoleBindingCreationTime
-      - TestKubernetesRoleBindingScaling
-      - TestKubernetesRoleBindingUpdatePerformance
-      - TestKubernetesRoleBindingDestroyPerformance
     parallel: false
     timeout: 60m
     benchmark: true

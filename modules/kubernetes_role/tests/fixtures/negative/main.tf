@@ -1,23 +1,20 @@
-# Negative test cases - should fail validation
-provider "azurerm" {
-  features {}
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.20.0"
+    }
+  }
 }
 
-resource "azurerm_resource_group" "test" {
-  name     = "rg-kubernetes_role-negative-test"
-  location = "West Europe"
-}
+provider "kubernetes" {}
 
-# This should fail due to invalid name
 module "kubernetes_role" {
   source = "../../../"
 
-  name                = "INVALID-NAME-WITH-UPPERCASE" # Should fail validation
-  resource_group_name = azurerm_resource_group.test.name
-  location            = azurerm_resource_group.test.location
-
-  tags = {
-    Environment = "Test"
-    Scenario    = "Negative"
-  }
+  name      = "intent-resolver-read"
+  namespace = "intent-resolver"
+  rules     = []
 }

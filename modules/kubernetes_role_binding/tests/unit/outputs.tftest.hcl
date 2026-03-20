@@ -1,16 +1,52 @@
-# Placeholder outputs test for Kubernetes Role Binding
+# Output tests for Kubernetes RoleBinding module
 
-variables {
-  name                = "example-kubernetes_role_binding"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
+mock_provider "kubernetes" {
+  mock_resource "kubernetes_role_binding_v1" {
+    defaults = {
+      id = "intent-resolver/intent-resolver-read-users"
+      metadata = {
+        name      = "intent-resolver-read-users"
+        namespace = "intent-resolver"
+      }
+    }
+  }
 }
 
-run "outputs_plan" {
-  command = plan
+variables {
+  name      = "intent-resolver-read-users"
+  namespace = "intent-resolver"
+  role_ref = {
+    kind = "Role"
+    name = "intent-resolver-read"
+  }
+  subjects = [
+    {
+      kind = "User"
+      name = "00000000-0000-0000-0000-000000000000"
+    }
+  ]
+}
+
+run "verify_outputs" {
+  command = apply
 
   assert {
-    condition     = true
-    error_message = "Update outputs tests for Kubernetes Role Binding."
+    condition     = output.name == "intent-resolver-read-users"
+    error_message = "name output should match the RoleBinding name."
+  }
+
+  assert {
+    condition     = output.namespace == "intent-resolver"
+    error_message = "namespace output should match the RoleBinding namespace."
+  }
+
+  assert {
+    condition     = output.role_ref.name == "intent-resolver-read"
+    error_message = "role_ref output should match the referenced role."
+  }
+
+  assert {
+    condition     = length(output.subjects) == 1
+    error_message = "subjects output should contain one subject."
   }
 }

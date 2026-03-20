@@ -1,4 +1,4 @@
-# Terraform Azure Kubernetes Role Binding Module
+# Terraform Kubernetes Role Binding Module
 
 ## Module Version
 
@@ -8,31 +8,51 @@ Current version: **vUnreleased**
 
 ## Description
 
-Kubernetes RoleBinding Terraform module for binding a namespace-scoped role to subjects
+Kubernetes RoleBinding Terraform module for binding a namespace-scoped role to
+subjects in an existing cluster.
 
 ## Usage
 
 ```hcl
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.20.0"
+    }
+  }
+}
+
+provider "kubernetes" {}
+
 module "kubernetes_role_binding" {
   source = "path/to/kubernetes_role_binding"
 
-  # Required variables
-  name                = "example-kubernetes_role_binding"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name      = "intent-resolver-read-users"
+  namespace = "intent-resolver"
 
-  # Optional configuration
-  tags = {
-    Environment = "Development"
-    Project     = "Example"
+  role_ref = {
+    kind = "Role"
+    name = "intent-resolver-read"
   }
+
+  subjects = [
+    {
+      kind = "User"
+      name = "00000000-0000-0000-0000-000000000000"
+    }
+  ]
 }
 ```
 
 ## Examples
 
 <!-- BEGIN_EXAMPLES -->
-<!-- Examples list will be auto-generated here -->
+- [Basic](examples/basic) - This example binds a namespace-scoped Role to a single user.
+- [Complete](examples/complete) - This example binds a namespace role to multiple users.
+- [Secure](examples/secure) - This example binds a namespace role to a service account with explicit namespace scoping.
 <!-- END_EXAMPLES -->
 
 <!-- BEGIN_TF_DOCS -->
@@ -45,3 +65,5 @@ module "kubernetes_role_binding" {
 - [VERSIONING.md](VERSIONING.md) - Module versioning and release process
 - [SECURITY.md](SECURITY.md) - Security features and configuration guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [docs/README.md](docs/README.md) - Scope and provider notes
+- [docs/IMPORT.md](docs/IMPORT.md) - Importing existing role bindings
