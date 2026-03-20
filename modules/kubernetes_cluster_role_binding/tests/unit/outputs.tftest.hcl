@@ -1,16 +1,31 @@
-# Placeholder outputs test for Kubernetes Cluster Role Binding
+# Output tests for Kubernetes Cluster Role Binding
 
-variables {
-  name                = "example-kubernetes_cluster_role_binding"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
+mock_provider "kubernetes" {
+  mock_resource "kubernetes_cluster_role_binding_v1" {
+    defaults = {
+      id = "namespace-reader-user"
+      metadata = {
+        name = "namespace-reader-user"
+      }
+    }
+  }
 }
 
-run "outputs_plan" {
-  command = plan
+variables {
+  name = "namespace-reader-user"
+  role_ref = {
+    name = "namespace-reader"
+  }
+  subjects = [{
+    kind = "User"
+    name = "00000000-0000-0000-0000-000000000000"
+  }]
+}
 
+run "verify_outputs" {
+  command = apply
   assert {
-    condition     = true
-    error_message = "Update outputs tests for Kubernetes Cluster Role Binding."
+    condition     = output.name == "namespace-reader-user"
+    error_message = "name output should match ClusterRoleBinding name."
   }
 }

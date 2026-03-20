@@ -1,23 +1,27 @@
-provider "azurerm" {
-  features {}
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.20.0"
+    }
+  }
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-kubernetes_cluster_role-secure-example"
-  location = "West Europe"
-}
+provider "kubernetes" {}
 
 module "kubernetes_cluster_role" {
   source = "../../"
 
-  name                = "kubernetesclusterroleexample003"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name = "named-namespace-reader"
 
-  # Add security-focused configuration here
-
-  tags = {
-    Environment = "Production"
-    Example     = "Secure"
-  }
+  rules = [
+    {
+      api_groups     = [""]
+      resources      = ["namespaces"]
+      verbs          = ["get"]
+      resource_names = ["intent-resolver"]
+    }
+  ]
 }

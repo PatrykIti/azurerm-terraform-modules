@@ -1,16 +1,30 @@
-# Placeholder naming test for Kubernetes Cluster Role Binding
+# Naming tests for Kubernetes Cluster Role Binding
 
-variables {
-  name                = "example-kubernetes_cluster_role_binding"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
+mock_provider "kubernetes" {
+  mock_resource "kubernetes_cluster_role_binding_v1" {}
 }
 
-run "naming_plan" {
+variables {
+  name = "namespace-reader-user"
+  role_ref = {
+    name = "namespace-reader"
+  }
+  subjects = [
+    {
+      kind = "User"
+      name = "00000000-0000-0000-0000-000000000000"
+    }
+  ]
+}
+
+run "invalid_name_uppercase" {
   command = plan
 
-  assert {
-    condition     = true
-    error_message = "Update naming tests for Kubernetes Cluster Role Binding."
+  variables {
+    name = "InvalidName"
   }
+
+  expect_failures = [
+    var.name,
+  ]
 }

@@ -1,5 +1,5 @@
-variable "location" {
-  description = "Azure region for resources"
+variable "unused" {
+  description = "Placeholder variable."
   type        = string
-  default     = "West Europe"
+  default     = ""
 }

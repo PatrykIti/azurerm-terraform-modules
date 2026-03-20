@@ -2,15 +2,21 @@
 
 ## Overview
 
-This directory contains additional documentation for the Kubernetes Cluster Role module.
+This module manages a single cluster-scoped Kubernetes `ClusterRole` in an
+existing cluster.
 
-## Contents
+## Managed Resources
 
-- Architecture diagrams (coming soon)
-- Best practices guide (coming soon)
-- Troubleshooting guide (coming soon)
-- Migration guides (coming soon)
+- `kubernetes_cluster_role_v1`
 
-## Contributing
+## Usage Notes
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines on adding documentation.
+- Use this module for cluster-scoped read or administrative roles.
+- `aggregation_rule` is supported when you need a label-driven composed role.
+- Cluster roles should be granted carefully because they are not namespace-bound.
+
+## Out of Scope
+
+- ClusterRole bindings
+- Namespace-scoped roles
+- Namespace lifecycle

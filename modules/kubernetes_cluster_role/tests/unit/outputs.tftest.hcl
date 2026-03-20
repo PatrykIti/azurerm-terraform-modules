@@ -1,16 +1,28 @@
-# Placeholder outputs test for Kubernetes Cluster Role
+# Output tests for Kubernetes Cluster Role
 
-variables {
-  name                = "example-kubernetes_cluster_role"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
+mock_provider "kubernetes" {
+  mock_resource "kubernetes_cluster_role_v1" {
+    defaults = {
+      id = "namespace-reader"
+      metadata = {
+        name = "namespace-reader"
+      }
+    }
+  }
 }
 
-run "outputs_plan" {
-  command = plan
+variables {
+  name = "namespace-reader"
+  rules = [{
+    resources = ["namespaces"]
+    verbs     = ["get"]
+  }]
+}
 
+run "verify_outputs" {
+  command = apply
   assert {
-    condition     = true
-    error_message = "Update outputs tests for Kubernetes Cluster Role."
+    condition     = output.name == "namespace-reader"
+    error_message = "name output should match ClusterRole name."
   }
 }

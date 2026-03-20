@@ -1,33 +1,6 @@
 # Complete Kubernetes Cluster Role Binding Example
 
-This example demonstrates a comprehensive deployment of Kubernetes Cluster Role Binding with all available features and configurations.
-
-## Features
-
-- Full kubernetes_cluster_role_binding configuration with all features enabled
-- Advanced networking configuration
-- Diagnostic settings for monitoring and auditing
-- Complete lifecycle management
-- Advanced security settings
-- High availability configuration
-
-## Key Configuration
-
-This comprehensive example showcases all available features of the kubernetes_cluster_role_binding module, demonstrating enterprise-grade capabilities suitable for production environments.
-
-## Usage
-
-```bash
-terraform init
-terraform plan
-terraform apply
-```
-
-## Cleanup
-
-```bash
-terraform destroy
-```
+This example binds a cluster discovery role to two users.
 
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->

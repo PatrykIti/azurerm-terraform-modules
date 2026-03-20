@@ -1,16 +1,28 @@
-# Placeholder validation test for Kubernetes Cluster Role
+# Validation tests for Kubernetes Cluster Role
 
-variables {
-  name                = "example-kubernetes_cluster_role"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
+mock_provider "kubernetes" {
+  mock_resource "kubernetes_cluster_role_v1" {}
 }
 
-run "validation_plan" {
+variables {
+  name = "namespace-reader"
+  rules = [
+    {
+      resources = ["namespaces"]
+      verbs     = ["get"]
+    }
+  ]
+}
+
+run "missing_rules_and_aggregation" {
   command = plan
 
-  assert {
-    condition     = true
-    error_message = "Update validation tests for Kubernetes Cluster Role."
+  variables {
+    rules            = []
+    aggregation_rule = null
   }
+
+  expect_failures = [
+    var.rules,
+  ]
 }

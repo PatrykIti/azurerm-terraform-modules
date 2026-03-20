@@ -1,21 +1,26 @@
-provider "azurerm" {
-  features {}
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.20.0"
+    }
+  }
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-kubernetes_cluster_role-basic-example"
-  location = "West Europe"
-}
+provider "kubernetes" {}
 
 module "kubernetes_cluster_role" {
   source = "../../"
 
-  name                = "kubernetesclusterroleexample001"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name = "namespace-reader"
 
-  tags = {
-    Environment = "Development"
-    Example     = "Basic"
-  }
+  rules = [
+    {
+      api_groups = [""]
+      resources  = ["namespaces"]
+      verbs      = ["get", "list", "watch"]
+    }
+  ]
 }

@@ -1,5 +1,5 @@
-variable "location" {
-  description = "Azure region for resources"
+variable "namespace" {
+  description = "Namespace where the service account exists."
   type        = string
-  default     = "West Europe"
+  default     = "observability"
 }

@@ -1,23 +1,30 @@
-provider "azurerm" {
-  features {}
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.20.0"
+    }
+  }
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-kubernetes_cluster_role-complete-example"
-  location = "West Europe"
-}
+provider "kubernetes" {}
 
 module "kubernetes_cluster_role" {
   source = "../../"
 
-  name                = "kubernetesclusterroleexample002"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name = "namespace-and-pod-discovery"
 
-  # Add more comprehensive configuration here
-
-  tags = {
-    Environment = "Development"
-    Example     = "Complete"
-  }
+  rules = [
+    {
+      api_groups = [""]
+      resources  = ["namespaces", "pods"]
+      verbs      = ["get", "list", "watch"]
+    },
+    {
+      non_resource_urls = ["/api", "/api/*", "/healthz"]
+      verbs             = ["get"]
+    }
+  ]
 }

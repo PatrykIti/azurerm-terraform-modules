@@ -1,23 +1,42 @@
-provider "azurerm" {
-  features {}
+terraform {
+  required_version = ">= 1.12.2"
+
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.20.0"
+    }
+  }
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-kubernetes_cluster_role_binding-secure-example"
-  location = "West Europe"
+provider "kubernetes" {}
+
+resource "kubernetes_cluster_role_v1" "role" {
+  metadata {
+    name = "observability-read-only"
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["namespaces", "pods"]
+    verbs      = ["get", "list", "watch"]
+  }
 }
 
 module "kubernetes_cluster_role_binding" {
   source = "../../"
 
-  name                = "kubernetesclusterrolebindingexample003"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
+  name = "observability-read-only-sa"
 
-  # Add security-focused configuration here
-
-  tags = {
-    Environment = "Production"
-    Example     = "Secure"
+  role_ref = {
+    name = kubernetes_cluster_role_v1.role.metadata[0].name
   }
+
+  subjects = [
+    {
+      kind      = "ServiceAccount"
+      name      = "observability-reader"
+      namespace = var.namespace
+    }
+  ]
 }

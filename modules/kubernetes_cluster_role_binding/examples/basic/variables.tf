@@ -1,5 +1,5 @@
-variable "location" {
-  description = "Azure region for resources"
+variable "user_object_id" {
+  description = "Example user object ID."
   type        = string
-  default     = "West Europe"
+  default     = "00000000-0000-0000-0000-000000000000"
 }

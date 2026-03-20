@@ -1,16 +1,27 @@
-# Placeholder naming test for Kubernetes Cluster Role
+# Naming tests for Kubernetes Cluster Role
 
-variables {
-  name                = "example-kubernetes_cluster_role"
-  resource_group_name = "test-rg"
-  location            = "northeurope"
+mock_provider "kubernetes" {
+  mock_resource "kubernetes_cluster_role_v1" {}
 }
 
-run "naming_plan" {
+variables {
+  name = "namespace-reader"
+  rules = [
+    {
+      resources = ["namespaces"]
+      verbs     = ["get"]
+    }
+  ]
+}
+
+run "invalid_name_uppercase" {
   command = plan
 
-  assert {
-    condition     = true
-    error_message = "Update naming tests for Kubernetes Cluster Role."
+  variables {
+    name = "InvalidName"
   }
+
+  expect_failures = [
+    var.name,
+  ]
 }

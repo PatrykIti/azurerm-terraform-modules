@@ -2,15 +2,15 @@
 
 ## Overview
 
-This directory contains additional documentation for the Kubernetes Cluster Role Binding module.
+This module manages a single cluster-scoped Kubernetes `ClusterRoleBinding` in
+an existing cluster.
 
-## Contents
+## Managed Resources
 
-- Architecture diagrams (coming soon)
-- Best practices guide (coming soon)
-- Troubleshooting guide (coming soon)
-- Migration guides (coming soon)
+- `kubernetes_cluster_role_binding_v1`
 
-## Contributing
+## Usage Notes
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines on adding documentation.
+- The referenced `ClusterRole` must already exist.
+- Subjects can be `User`, `Group`, or `ServiceAccount`.
+- Bind cluster-wide permissions carefully because they apply across namespaces.
