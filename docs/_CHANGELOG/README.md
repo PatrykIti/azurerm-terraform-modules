@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [101](./101-2026-03-18-managed-redis-module.md) | 2026-03-18 | Managed Redis module | Feature |
 | [100](./100-2026-03-18-ado-live-test-harness-stabilization-wave3.md) | 2026-03-18 | Azure DevOps live test harness stabilization wave 3 | Maintenance / Documentation |
 | [099](./099-2026-02-15-ado-release-tag-normalization-task-closure.md) | 2026-02-15 | Azure DevOps release tag normalization task closure | Maintenance / Documentation |
 | [098](./098-2026-02-15-ado-identity-compliance-task-closure.md) | 2026-02-15 | Azure DevOps identity compliance task closure | Maintenance / Documentation |

@@ -22,6 +22,7 @@ This directory contains all Terraform modules published from this repository. Ea
 | [Kubernetes Secrets](./azurerm_kubernetes_secrets/) (`azurerm_kubernetes_secrets`) | `AKSSv` | Azure Kubernetes Secrets Terraform module with enterprise-grade features |
 | [Linux Function App](./azurerm_linux_function_app/) (`azurerm_linux_function_app`) | `LFUNCv` | Azure Linux Function App Terraform module with enterprise-grade features |
 | [Linux Virtual Machine](./azurerm_linux_virtual_machine/) (`azurerm_linux_virtual_machine`) | `LINUXVMv` | Azure Linux Virtual Machine Terraform module with enterprise-grade features |
+| [Managed Redis](./azurerm_managed_redis/) (`azurerm_managed_redis`) | `AMRv` | Azure Managed Redis Terraform module with geo-replication membership and diagnostics support |
 | [Log Analytics Workspace](./azurerm_log_analytics_workspace/) (`azurerm_log_analytics_workspace`) | `LAWv` | Azure Log Analytics Workspace Terraform module with workspace and sub-resource management |
 | [Monitor Data Collection Endpoint](./azurerm_monitor_data_collection_endpoint/) (`azurerm_monitor_data_collection_endpoint`) | `DCEv` | Azure Monitor Data Collection Endpoint Terraform module with enterprise-grade features |
 | [Monitor Data Collection Rule](./azurerm_monitor_data_collection_rule/) (`azurerm_monitor_data_collection_rule`) | `DCRv` | Azure Monitor Data Collection Rule Terraform module with enterprise-grade features |
