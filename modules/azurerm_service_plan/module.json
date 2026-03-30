@@ -1,0 +1,7 @@
+{
+  "name": "azurerm_service_plan",
+  "title": "App Service Plan",
+  "commit_scope": "service-plan",
+  "tag_prefix": "ASPv",
+  "description": "Azure App Service Plan Terraform module with enterprise-grade features"
+}

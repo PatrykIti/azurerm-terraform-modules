@@ -4,7 +4,7 @@ SHELL := /bin/bash
 # Variables
 TIMEOUT ?= 90m
 TEST_FILTER ?= Test
-PARALLEL ?= 1
+PARALLEL ?= 8
 AZURE_LOCATION ?= northeurope
 LOG_DIR ?= test_outputs
 LOG_TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)
@@ -73,32 +73,38 @@ test-single: check-env deps
 # Run basic tests only
 test-basic: check-env deps
 	@echo "Running basic tests..."
-	$(call run_with_log,basic,go test -v -timeout 30m -run TestBasicKubernetesClusterRole ./...)
+	$(call run_with_log,basic,go test -v -timeout 15m -run TestBasicServicePlan ./...)
 
 # Run complete tests
 test-complete: check-env deps
 	@echo "Running complete tests..."
-	$(call run_with_log,complete,go test -v -timeout 30m -run TestCompleteKubernetesClusterRole ./...)
+	$(call run_with_log,complete,go test -v -timeout 30m -run TestCompleteServicePlan ./...)
 
 # Run security tests
 test-secure: check-env deps
 	@echo "Running security tests..."
-	$(call run_with_log,secure,go test -v -timeout 30m -run TestSecureKubernetesClusterRole ./...)
+	$(call run_with_log,secure,go test -v -timeout 30m -run TestSecureServicePlan ./...)
+
+# Run elastic premium tests
+test-elastic: check-env deps
+	@echo "Running elastic premium tests..."
+	$(call run_with_log,elastic,go test -v -timeout 30m -run TestElasticPremiumServicePlan ./...)
 
 # Run validation tests
 test-validation: check-env deps
 	@echo "Running validation tests..."
-	$(call run_with_log,validation,go test -v -timeout 10m -run TestKubernetesClusterRoleValidationRules ./...)
+	$(call run_with_log,validation,go test -v -timeout 10m -run TestServicePlanValidationRules ./...)
 
 # Run integration tests
 test-integration: check-env deps
 	@echo "Running integration tests..."
-	$(call run_with_log,integration,go test -v -timeout 45m -run TestKubernetesClusterRoleLifecycle ./...)
+	$(call run_with_log,integration,go test -v -timeout 45m -run TestServicePlanFullIntegration ./...)
 
 # Run performance tests
 test-performance: check-env deps
 	@echo "Running performance tests..."
-	$(call run_with_log,performance-create,go test -v -timeout 60m -run TestKubernetesClusterRoleCreationTime ./...)
+	$(call run_with_log,performance-create,go test -v -timeout 60m -run TestServicePlanCreationTime ./...)
+	$(call run_with_log,performance-scale,go test -v -timeout 60m -run TestServicePlanScaling ./...)
 
 # Run benchmarks
 benchmark: check-env deps
@@ -188,23 +194,22 @@ help:
 	@echo "Available targets:"
 	@echo "  make test                 - Run all tests"
 	@echo "  make test-single TEST_NAME=TestName - Run specific test"
-	@echo "  make test-basic           - Run basic tests only"
-	@echo "  make test-complete        - Run complete tests"
-	@echo "  make test-secure          - Run security tests"
-	@echo "  make test-validation      - Run validation tests"
-	@echo "  make test-integration     - Run integration tests"
-	@echo "  make test-performance     - Run performance tests"
-	@echo "  make test-quick           - Run quick smoke tests (with -short flag)"
-	@echo "  make benchmark            - Run benchmarks"
-	@echo "  make test-coverage        - Run tests with coverage"
-	@echo "  make test-race            - Run tests with race detection"
-	@echo "  make test-junit           - Generate JUnit report"
-	@echo "  make validate-fixtures    - Validate Terraform fixtures"
-	@echo "  make clean                - Clean test artifacts"
-	@echo "  make fmt                  - Format Go code"
-	@echo "  make lint                 - Run linters"
-	@echo "  make security             - Run security scan"
-	@echo "  make ci                   - Run CI pipeline"
-	@echo "  make cd                   - Run CD pipeline (includes integration tests)"
-
-.PHONY: check-env deps test test-single test-basic test-complete test-secure test-validation test-integration test-performance benchmark test-coverage test-race test-junit clean validate-fixtures fmt-check fmt lint security test-quick ci cd help
+	@echo "  make test-basic          - Run basic tests only"
+	@echo "  make test-complete       - Run complete tests"
+	@echo "  make test-secure         - Run security tests"
+	@echo "  make test-elastic        - Run Elastic Premium tests"
+	@echo "  make test-validation     - Run validation tests"
+	@echo "  make test-integration    - Run integration tests"
+	@echo "  make test-performance    - Run performance tests"
+	@echo "  make test-quick          - Run quick smoke tests (with -short flag)"
+	@echo "  make benchmark           - Run benchmarks"
+	@echo "  make test-coverage       - Run tests with coverage"
+	@echo "  make test-race           - Run tests with race detection"
+	@echo "  make test-junit          - Generate JUnit report"
+	@echo "  make validate-fixtures   - Validate Terraform fixtures"
+	@echo "  make clean               - Clean test artifacts"
+	@echo "  make fmt                 - Format Go code"
+	@echo "  make lint                - Run linters"
+	@echo "  make security            - Run security scan"
+	@echo "  make ci                  - Run CI pipeline"
+	@echo "  make cd                  - Run CD pipeline"

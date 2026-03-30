@@ -5,7 +5,7 @@ Task board for module work. Update statuses in markdown files.
 ## Statistics
 - **To Do:** 11 tasks
 - **In Progress:** 0 tasks
-- **Done:** 85 tasks
+- **Done:** 86 tasks
 
 ---
 
@@ -39,6 +39,7 @@ Task board for module work. Update statuses in markdown files.
 
 | ID | Title | Priority | Effort | Notes |
 |----|-------|----------|--------|-------|
+| [TASK-053](./TASK-053_Azure_App_Service_Plan_Module.md) | **Azure App Service Plan module (full feature scope)** | High | Large | Completed 2026-03-30; new `azurerm_service_plan` module with diagnostics, examples, PGFS-style unit/Terratest scaffolding, and repo/task index updates |
 | [TASK-052](./TASK-052_Kubernetes_In_Cluster_Namespace_and_RBAC_Modules.md) | **Kubernetes in-cluster namespace and RBAC modules** | High | Large | Completed 2026-03-20; added five new `kubernetes_*` modules, repo naming/docs/index support, examples, unit tests, and Terratest scaffolding |
 | [TASK-051](./TASK-051_Azure_Managed_Redis_Module.md) | **Azure Managed Redis module (full feature scope)** | High | Large | Completed 2026-03-18; new `azurerm_managed_redis` module with geo-replication, diagnostics, examples, docs, and unit coverage |
 | [TASK-ADO-044](./TASK-ADO-044_AzureDevOps_Live_Test_Harness_Stabilization_Wave3.md) | **Azure DevOps live test harness stabilization wave 3** | Medium | Medium | Completed 2026-03-18; deterministic cleanup + transient retry coverage for remaining ADO test suites |

@@ -11,6 +11,7 @@ This directory contains all Terraform modules published from this repository. Ea
 | Module | Tag Prefix | Description |
 | --- | --- | --- |
 | [AI Services](./azurerm_ai_services/) (`azurerm_ai_services`) | `AISv` | Azure AI Services Terraform module with identity, CMK, network ACLs, and diagnostics support |
+| [App Service Plan](./azurerm_service_plan/) (`azurerm_service_plan`) | `ASPv` | Azure App Service Plan Terraform module with enterprise-grade features |
 | [Application Insights](./azurerm_application_insights/) (`azurerm_application_insights`) | `APPINSv` | Azure Application Insights Terraform module with enterprise-grade features |
 | [Application Insights Workbook](./azurerm_application_insights_workbook/) (`azurerm_application_insights_workbook`) | `AIWBv` | Azure Application Insights Workbook Terraform module |
 | [Bastion Host](./azurerm_bastion_host/) (`azurerm_bastion_host`) | `BASTIONv` | Azure Bastion Host Terraform module with diagnostic settings support |

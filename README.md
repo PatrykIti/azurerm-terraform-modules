@@ -122,6 +122,7 @@ module "storage_account" {
 | Module | Status | Version | Description |
 | --- | --- | --- | --- |
 | [AI Services](./modules/azurerm_ai_services/) | ✅ Completed | [AISv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AISv1.0.0) | Azure AI Services Terraform module with identity, CMK, network ACLs, and diagnostics support |
+| [App Service Plan](./modules/azurerm_service_plan/) | 🧪 Development | vUnreleased | Azure App Service Plan Terraform module with enterprise-grade features |
 | [Application Insights](./modules/azurerm_application_insights/) | ✅ Completed | [APPINSv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.1.0) | Azure Application Insights Terraform module with enterprise-grade features |
 | [Application Insights Workbook](./modules/azurerm_application_insights_workbook/) | ✅ Completed | [AIWBv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AIWBv1.0.0) | Azure Application Insights Workbook Terraform module |
 | [Bastion Host](./modules/azurerm_bastion_host/) | ✅ Completed | [BASTIONv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/BASTIONv1.0.0) | Azure Bastion Host Terraform module with diagnostic settings support |
