@@ -17,13 +17,6 @@ resource "azurerm_monitor_diagnostic_setting" "monitor_diagnostic_settings" {
   eventhub_name                  = each.value.eventhub_name
   partner_solution_id            = each.value.partner_solution_id
 
-  dynamic "enabled_log" {
-    for_each = each.value.log_categories != null ? each.value.log_categories : []
-    content {
-      category = enabled_log.value
-    }
-  }
-
   dynamic "enabled_metric" {
     for_each = each.value.metric_categories != null ? each.value.metric_categories : []
     content {

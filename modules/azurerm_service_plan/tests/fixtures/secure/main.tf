@@ -50,7 +50,6 @@ module "service_plan" {
     {
       name                       = "asp-secure"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-      log_categories             = ["AppServiceConsoleLogs"]
       metric_categories          = ["AllMetrics"]
     }
   ]

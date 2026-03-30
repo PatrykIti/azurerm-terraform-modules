@@ -24,8 +24,9 @@ glue for apps, private networking, RBAC, and observability workspaces.
 - **Premium autoscale flag**: `premium_plan_auto_scale_enabled` is only valid
   for Premium v2/v3/v4 SKUs.
 - **Zone balancing**: Requires a supported SKU and `worker_count > 1`.
-- **Diagnostics**: Use `diagnostic_settings` to export supported logs and
-  metrics for `Microsoft.Web/serverfarms`.
+- **Diagnostics**: Use `diagnostic_settings` to export `AllMetrics`. Plan-level
+  log categories are intentionally excluded in this module because live
+  `serverfarms` deployments without hosted workloads reject them.
 
 ## Out of Scope
 

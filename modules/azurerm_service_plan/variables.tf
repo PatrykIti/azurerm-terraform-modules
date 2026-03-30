@@ -214,11 +214,14 @@ variable "diagnostic_settings" {
   description = <<-EOT
     Diagnostic settings for the App Service Plan.
 
-    Supported categories for Microsoft.Web/serverfarms used by this module:
-    - log_categories: AppServiceConsoleLogs
+    For deterministic plan-level deployments in this module, only metrics are
+    enabled:
     - metric_categories: AllMetrics
 
-    Entries with no log or metric categories are skipped and reported in
+    Log categories are intentionally excluded because live App Service Plan
+    deployments without hosted workloads reject plan-level log categories.
+
+    Entries with no metric categories are skipped and reported in
     diagnostic_settings_skipped.
   EOT
 
@@ -258,6 +261,14 @@ variable "diagnostic_settings" {
   validation {
     condition = alltrue([
       for diagnostic_setting in var.diagnostic_settings :
+      diagnostic_setting.log_categories == null || length(diagnostic_setting.log_categories) == 0
+    ])
+    error_message = "diagnostic_settings.log_categories are not supported for this module; use metric_categories = [\"AllMetrics\"] instead."
+  }
+
+  validation {
+    condition = alltrue([
+      for diagnostic_setting in var.diagnostic_settings :
       diagnostic_setting.log_analytics_workspace_id != null ||
       diagnostic_setting.storage_account_id != null ||
       diagnostic_setting.eventhub_authorization_rule_id != null ||
@@ -286,16 +297,6 @@ variable "diagnostic_settings" {
       ], diagnostic_setting.log_analytics_destination_type)
     ])
     error_message = "diagnostic_settings.log_analytics_destination_type must be either Dedicated or AzureDiagnostics."
-  }
-
-  validation {
-    condition = alltrue(flatten([
-      for diagnostic_setting in var.diagnostic_settings : [
-        for category in(diagnostic_setting.log_categories == null ? [] : diagnostic_setting.log_categories) :
-        contains(["AppServiceConsoleLogs"], trimspace(category))
-      ]
-    ]))
-    error_message = "diagnostic_settings.log_categories must use supported values: AppServiceConsoleLogs."
   }
 
   validation {

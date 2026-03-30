@@ -34,8 +34,8 @@ secrets for the apps that run on top of the plan.
 ### 3) Monitoring and Auditability
 
 - **Diagnostic settings**: Configure `diagnostic_settings` to stream supported
-  App Service Plan logs and metrics to Log Analytics, Storage, Event Hub, or a
-  partner solution.
+  App Service Plan metrics to Log Analytics, Storage, Event Hub, or a partner
+  solution.
 - **Tags**: Use resource tags for ownership, environment classification, and
   policy-based governance.
 

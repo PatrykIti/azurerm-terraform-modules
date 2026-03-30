@@ -151,14 +151,14 @@ run "diagnostic_settings_invalid_metric_category" {
   ]
 }
 
-run "diagnostic_settings_invalid_log_category" {
+run "diagnostic_settings_logs_not_supported" {
   command = plan
 
   variables {
     diagnostic_settings = [
       {
         name                       = "asp-diag"
-        log_categories             = ["Audit"]
+        log_categories             = ["AppServiceConsoleLogs"]
         log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.OperationalInsights/workspaces/law"
       }
     ]
