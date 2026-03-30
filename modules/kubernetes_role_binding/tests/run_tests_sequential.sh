@@ -17,7 +17,11 @@ run_test() {
     
     echo "Running test: $test_name"
     
-    go test -v -timeout 60m -run "^${test_name}$" . 2>&1 | tee "$log_file"
+    if [[ "$test_name" == Benchmark* ]]; then
+        go test -v -timeout 60m -run=^$ -bench "^${test_name}$" . 2>&1 | tee "$log_file"
+    else
+        go test -v -timeout 60m -run "^${test_name}$" . 2>&1 | tee "$log_file"
+    fi
     local exit_status=${PIPESTATUS[0]}
     
     cat > "$output_file" << EOF
