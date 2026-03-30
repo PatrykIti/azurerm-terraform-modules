@@ -55,8 +55,8 @@ module "kubernetes_cluster" {
   network_profile = {
     network_plugin = "azure"
     network_policy = "azure"
-    service_cidr   = "172.30.0.0/16"
-    dns_service_ip = "172.30.0.10"
+    service_cidr   = "172.24.0.0/16"
+    dns_service_ip = "172.24.0.10"
   }
 }
 provider "kubernetes" {
