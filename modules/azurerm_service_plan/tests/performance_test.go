@@ -43,7 +43,6 @@ func BenchmarkServicePlanCreationWithFeatures(b *testing.B) {
 	}{
 		{name: "B1", skuName: "B1"},
 		{name: "S1", skuName: "S1"},
-		{name: "P1v3", skuName: "P1v3"},
 	}
 
 	for _, fc := range featureConfigs {

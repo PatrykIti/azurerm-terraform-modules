@@ -6,11 +6,10 @@ test_suites:
     parallel: true
     timeout: 15m
 
-  - name: "Feature Tests"
+  - name: "Complete Feature Tests"
     tests:
       - TestCompleteServicePlan
       - TestSecureServicePlan
-      - TestElasticPremiumServicePlan
     parallel: true
     timeout: 30m
 
@@ -23,7 +22,7 @@ test_suites:
   - name: "Integration Tests"
     tests:
       - TestServicePlanFullIntegration
-      - TestServicePlanElasticPremiumIntegration
+      - TestServicePlanWithDiagnosticSettings
       - TestServicePlanSecureConfiguration
       - TestServicePlanLifecycle
       - TestServicePlanCompliance
@@ -110,7 +109,7 @@ stages:
   - name: "integration"
     description: "Run integration tests"
     test_suites:
-      - "Feature Tests"
+      - "Complete Feature Tests"
       - "Integration Tests"
     fail_fast: false
 

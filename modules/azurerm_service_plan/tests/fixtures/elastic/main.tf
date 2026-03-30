@@ -32,10 +32,9 @@ module "service_plan" {
   location            = azurerm_resource_group.example.location
 
   service_plan = {
-    os_type                         = "Linux"
-    sku_name                        = "EP1"
-    premium_plan_auto_scale_enabled = true
-    maximum_elastic_worker_count    = 20
+    os_type                      = "Linux"
+    sku_name                     = "EP1"
+    maximum_elastic_worker_count = 20
   }
 
   tags = {

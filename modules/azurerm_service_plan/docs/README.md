@@ -21,6 +21,8 @@ glue for apps, private networking, RBAC, and observability workspaces.
 - **Elastic scaling**: `service_plan.maximum_elastic_worker_count` is supported
   for Elastic Premium plans and Premium plans with
   `premium_plan_auto_scale_enabled = true`.
+- **Premium autoscale flag**: `premium_plan_auto_scale_enabled` is only valid
+  for Premium v2/v3/v4 SKUs.
 - **Zone balancing**: Requires a supported SKU and `worker_count > 1`.
 - **Diagnostics**: Use `diagnostic_settings` to export supported logs and
   metrics for `Microsoft.Web/serverfarms`.

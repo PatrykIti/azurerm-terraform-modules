@@ -44,10 +44,9 @@ module "service_plan" {
   location            = azurerm_resource_group.example.location
 
   service_plan = {
-    os_type    = "Linux"
-    sku_name   = "P1v3"
-    worker_count = 2
-    zone_balancing_enabled = true
+    os_type      = "Linux"
+    sku_name     = "S1"
+    worker_count = 1
   }
 
   tags = {
@@ -61,8 +60,8 @@ module "service_plan" {
 
 <!-- BEGIN_EXAMPLES -->
 - [Basic](examples/basic) - This example demonstrates a minimal App Service Plan deployment using a shared
-- [Complete](examples/complete) - This example demonstrates a Premium Linux App Service Plan with explicit worker
-- [Elastic Premium](examples/elastic-premium) - This example demonstrates an Elastic Premium Linux App Service Plan with
+- [Complete](examples/complete) - This example demonstrates a Standard Linux App Service Plan with explicit
+- [Elastic Premium](examples/elastic-premium) - This example demonstrates an Elastic Premium Linux App Service Plan with a
 - [Secure](examples/secure) - This example demonstrates an operationally hardened App Service Plan baseline
 <!-- END_EXAMPLES -->
 
@@ -101,7 +100,7 @@ No modules.
 | <a name="input_location"></a> [location](#input\_location) | Azure region where the App Service Plan is created.<br/>Typically match the resource group location. | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Name of the App Service Plan.<br/>Provide a non-empty plan name that is unique within the resource group. | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group where the App Service Plan is created.<br/>The resource group must already exist. | `string` | n/a | yes |
-| <a name="input_service_plan"></a> [service\_plan](#input\_service\_plan) | Core App Service Plan configuration.<br/><br/>os\_type: Operating system type for workloads hosted by the plan.<br/>sku\_name: App Service Plan SKU supported by azurerm 4.57.0.<br/>app\_service\_environment\_id: Optional App Service Environment v3 ID for isolated plans.<br/>premium\_plan\_auto\_scale\_enabled: Enable autoscale support on Premium plans.<br/>maximum\_elastic\_worker\_count: Maximum number of elastic workers for Elastic Premium or Premium autoscale plans.<br/>worker\_count: Number of workers allocated to the plan.<br/>per\_site\_scaling\_enabled: Enable per-site scaling across apps hosted on the plan.<br/>zone\_balancing\_enabled: Balance workers across availability zones when supported.<br/>timeouts: Optional custom create/read/update/delete timeouts. | <pre>object({<br/>    os_type                    = string<br/>    sku_name                   = string<br/>    app_service_environment_id = optional(string)<br/><br/>    premium_plan_auto_scale_enabled = optional(bool, false)<br/>    maximum_elastic_worker_count    = optional(number)<br/>    worker_count                    = optional(number)<br/>    per_site_scaling_enabled        = optional(bool, false)<br/>    zone_balancing_enabled          = optional(bool, false)<br/><br/>    timeouts = optional(object({<br/>      create = optional(string)<br/>      read   = optional(string)<br/>      update = optional(string)<br/>      delete = optional(string)<br/>    }))<br/>  })</pre> | n/a | yes |
+| <a name="input_service_plan"></a> [service\_plan](#input\_service\_plan) | Core App Service Plan configuration.<br/><br/>os\_type: Operating system type for workloads hosted by the plan.<br/>sku\_name: App Service Plan SKU supported by azurerm 4.57.0.<br/>app\_service\_environment\_id: Optional App Service Environment v3 ID for isolated plans.<br/>premium\_plan\_auto\_scale\_enabled: Enable autoscale support on Premium v2/v3/v4 plans.<br/>maximum\_elastic\_worker\_count: Maximum number of elastic workers for Elastic Premium or Premium autoscale plans.<br/>worker\_count: Number of workers allocated to the plan.<br/>per\_site\_scaling\_enabled: Enable per-site scaling across apps hosted on the plan.<br/>zone\_balancing\_enabled: Balance workers across availability zones when supported.<br/>timeouts: Optional custom create/read/update/delete timeouts. | <pre>object({<br/>    os_type                    = string<br/>    sku_name                   = string<br/>    app_service_environment_id = optional(string)<br/><br/>    premium_plan_auto_scale_enabled = optional(bool, false)<br/>    maximum_elastic_worker_count    = optional(number)<br/>    worker_count                    = optional(number)<br/>    per_site_scaling_enabled        = optional(bool, false)<br/>    zone_balancing_enabled          = optional(bool, false)<br/><br/>    timeouts = optional(object({<br/>      create = optional(string)<br/>      read   = optional(string)<br/>      update = optional(string)<br/>      delete = optional(string)<br/>    }))<br/>  })</pre> | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the App Service Plan.<br/>Provide a map of string keys and values. | `map(string)` | `{}` | no |
 
 ## Outputs

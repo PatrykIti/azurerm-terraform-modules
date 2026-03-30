@@ -63,9 +63,9 @@ make test-integration
 The `fixtures/` directory contains Terraform configurations for different test scenarios:
 
 - `fixtures/basic/` - Basic module configuration
-- `fixtures/complete/` - Premium plan with diagnostics and zonal balancing
-- `fixtures/secure/` - Operationally hardened baseline
-- `fixtures/elastic/` - Elastic Premium scaling scenario
+- `fixtures/complete/` - Standard Linux plan with diagnostics and per-site scaling
+- `fixtures/secure/` - Operationally hardened Windows baseline with diagnostics
+- `fixtures/elastic/` - Optional Elastic Premium scenario for manual quota-aware runs
 - `fixtures/negative/` - Negative validation case
 
 ## Debugging Tests

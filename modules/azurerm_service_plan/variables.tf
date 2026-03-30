@@ -45,7 +45,7 @@ variable "service_plan" {
     os_type: Operating system type for workloads hosted by the plan.
     sku_name: App Service Plan SKU supported by azurerm 4.57.0.
     app_service_environment_id: Optional App Service Environment v3 ID for isolated plans.
-    premium_plan_auto_scale_enabled: Enable autoscale support on Premium plans.
+    premium_plan_auto_scale_enabled: Enable autoscale support on Premium v2/v3/v4 plans.
     maximum_elastic_worker_count: Maximum number of elastic workers for Elastic Premium or Premium autoscale plans.
     worker_count: Number of workers allocated to the plan.
     per_site_scaling_enabled: Enable per-site scaling across apps hosted on the plan.
@@ -160,10 +160,9 @@ variable "service_plan" {
 
   validation {
     condition = !var.service_plan.premium_plan_auto_scale_enabled || (
-      startswith(var.service_plan.sku_name, "P") ||
-      startswith(var.service_plan.sku_name, "EP")
+      startswith(var.service_plan.sku_name, "P")
     )
-    error_message = "service_plan.premium_plan_auto_scale_enabled can only be enabled for Premium or Elastic Premium SKUs."
+    error_message = "service_plan.premium_plan_auto_scale_enabled can only be enabled for Premium v2/v3/v4 SKUs."
   }
 
   validation {

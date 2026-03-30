@@ -35,10 +35,9 @@ module "service_plan" {
 
   service_plan = {
     os_type                  = "Linux"
-    sku_name                 = "P1v3"
-    worker_count             = 2
+    sku_name                 = "S1"
+    worker_count             = 1
     per_site_scaling_enabled = true
-    zone_balancing_enabled   = true
   }
 
   diagnostic_settings = [

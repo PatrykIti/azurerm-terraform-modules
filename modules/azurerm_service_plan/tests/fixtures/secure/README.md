@@ -1,7 +1,7 @@
 # Secure App Service Plan Test Fixture
 
-This fixture deploys a production-style App Service Plan baseline with zonal
-balancing and centralized diagnostics.
+This fixture deploys a production-style Windows App Service Plan baseline with
+centralized diagnostics.
 
 ## Usage
 

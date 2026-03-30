@@ -42,7 +42,7 @@ secrets for the apps that run on top of the plan.
 ## Secure Configuration Example
 
 A hardened operational baseline is provided in `examples/secure`, which shows:
-- Premium plan capacity with zonal balancing
+- Explicit worker capacity on a Standard plan
 - Centralized diagnostics to Log Analytics
 - Explicit production-style tagging
 

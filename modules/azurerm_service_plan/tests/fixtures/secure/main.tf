@@ -41,10 +41,9 @@ module "service_plan" {
   location            = azurerm_resource_group.example.location
 
   service_plan = {
-    os_type                = "WindowsContainer"
-    sku_name               = "P1v3"
-    worker_count           = 2
-    zone_balancing_enabled = true
+    os_type      = "Windows"
+    sku_name     = "S1"
+    worker_count = 1
   }
 
   diagnostic_settings = [

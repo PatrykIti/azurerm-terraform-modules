@@ -174,12 +174,28 @@ run "valid_elastic_premium_configuration" {
 
   variables {
     service_plan = {
+      os_type                      = "Linux"
+      sku_name                     = "EP1"
+      maximum_elastic_worker_count = 20
+    }
+  }
+}
+
+run "elastic_premium_rejects_premium_autoscale_flag" {
+  command = plan
+
+  variables {
+    service_plan = {
       os_type                         = "Linux"
       sku_name                        = "EP1"
       premium_plan_auto_scale_enabled = true
       maximum_elastic_worker_count    = 20
     }
   }
+
+  expect_failures = [
+    var.service_plan
+  ]
 }
 
 run "valid_premium_autoscale_configuration" {

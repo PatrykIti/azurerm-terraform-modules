@@ -1,7 +1,7 @@
 # Elastic Premium App Service Plan Test Fixture
 
-This fixture deploys an Elastic Premium Linux App Service Plan with autoscale
-support enabled.
+This fixture deploys an Elastic Premium Linux App Service Plan with an
+explicit elastic worker ceiling. It is intended for manual, quota-aware runs.
 
 ## Usage
 

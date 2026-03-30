@@ -1,7 +1,7 @@
 # Complete App Service Plan Test Fixture
 
-This fixture deploys a Premium Linux App Service Plan with diagnostic settings
-and zone balancing enabled.
+This fixture deploys a Standard Linux App Service Plan with diagnostic settings
+and per-site scaling enabled.
 
 ## Usage
 

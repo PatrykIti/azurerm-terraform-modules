@@ -62,6 +62,12 @@ os_type            = "Linux"
 sku_name           = "P1v3"
 ```
 
+Use a quota-safe SKU for the simplest import parity when possible, for example:
+
+```hcl
+sku_name           = "S1"
+```
+
 Get current values with Azure CLI:
 
 ```bash

@@ -8,9 +8,9 @@ output "service_plan_name" {
   value       = module.service_plan.name
 }
 
-output "zone_balancing_enabled" {
-  description = "Whether zone balancing is enabled."
-  value       = module.service_plan.zone_balancing_enabled
+output "per_site_scaling_enabled" {
+  description = "Whether per-site scaling is enabled."
+  value       = module.service_plan.per_site_scaling_enabled
 }
 
 output "diagnostic_settings_skipped" {

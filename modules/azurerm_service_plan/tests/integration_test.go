@@ -32,13 +32,15 @@ func TestServicePlanFullIntegration(t *testing.T) {
 
 		resourceName := terraform.Output(t, terraformOptions, "service_plan_name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
-		zoneBalancingEnabled := OutputBool(t, terraformOptions, "zone_balancing_enabled")
+		perSiteScalingEnabled := OutputBool(t, terraformOptions, "per_site_scaling_enabled")
 		workerCount := OutputInt(t, terraformOptions, "worker_count")
+		diagnosticSettingsSkippedCount := OutputInt(t, terraformOptions, "diagnostic_settings_skipped_count")
 
 		assert.NotEmpty(t, resourceName)
 		assert.NotEmpty(t, resourceGroupName)
-		assert.True(t, zoneBalancingEnabled)
-		assert.Equal(t, 2, workerCount)
+		assert.True(t, perSiteScalingEnabled)
+		assert.Equal(t, 1, workerCount)
+		assert.Equal(t, 0, diagnosticSettingsSkippedCount)
 
 		helper := NewServicePlanHelper(t)
 		servicePlan := helper.GetServicePlan(t, resourceGroupName, resourceName)
@@ -49,14 +51,14 @@ func TestServicePlanFullIntegration(t *testing.T) {
 	})
 }
 
-// TestServicePlanElasticPremiumIntegration validates Elastic Premium configuration.
-func TestServicePlanElasticPremiumIntegration(t *testing.T) {
+// TestServicePlanWithDiagnosticSettings validates complete fixture diagnostics.
+func TestServicePlanWithDiagnosticSettings(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/elastic")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
 	defer test_structure.RunTestStage(t, "cleanup", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
 		terraform.Destroy(t, terraformOptions)
@@ -70,11 +72,8 @@ func TestServicePlanElasticPremiumIntegration(t *testing.T) {
 
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		premiumPlanAutoScaleEnabled := OutputBool(t, terraformOptions, "premium_plan_auto_scale_enabled")
-		maximumElasticWorkerCount := OutputInt(t, terraformOptions, "maximum_elastic_worker_count")
-
-		assert.True(t, premiumPlanAutoScaleEnabled)
-		assert.Equal(t, 20, maximumElasticWorkerCount)
+		diagnosticSettingsSkippedCount := OutputInt(t, terraformOptions, "diagnostic_settings_skipped_count")
+		assert.Equal(t, 0, diagnosticSettingsSkippedCount)
 	})
 }
 
@@ -99,11 +98,15 @@ func TestServicePlanSecureConfiguration(t *testing.T) {
 
 	test_structure.RunTestStage(t, "validate", func() {
 		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
+		resourceName := terraform.Output(t, terraformOptions, "service_plan_name")
+		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 		reserved := OutputBool(t, terraformOptions, "reserved")
-		zoneBalancingEnabled := OutputBool(t, terraformOptions, "zone_balancing_enabled")
+		diagnosticSettingsSkippedCount := OutputInt(t, terraformOptions, "diagnostic_settings_skipped_count")
 
+		assert.NotEmpty(t, resourceName)
+		assert.NotEmpty(t, resourceGroupName)
 		assert.False(t, reserved)
-		assert.True(t, zoneBalancingEnabled)
+		assert.Equal(t, 0, diagnosticSettingsSkippedCount)
 	})
 }
 
@@ -135,15 +138,15 @@ func TestServicePlanCompliance(t *testing.T) {
 	}
 	t.Parallel()
 
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/complete")
+	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/secure")
 	terraformOptions := getTerraformOptions(t, testFolder)
 	defer terraform.Destroy(t, terraformOptions)
 
 	terraform.InitAndApply(t, terraformOptions)
 
 	resourceName := terraform.Output(t, terraformOptions, "service_plan_name")
-	zoneBalancingEnabled := OutputBool(t, terraformOptions, "zone_balancing_enabled")
+	reserved := OutputBool(t, terraformOptions, "reserved")
 
 	assert.NotEmpty(t, resourceName)
-	assert.True(t, zoneBalancingEnabled)
+	assert.False(t, reserved)
 }

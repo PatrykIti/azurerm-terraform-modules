@@ -1,13 +1,12 @@
 # Secure App Service Plan Example
 
 This example demonstrates an operationally hardened App Service Plan baseline
-with zonal worker placement and centralized diagnostics for container-hosting
-scenarios.
+with centralized diagnostics and explicit production-oriented tagging.
 
 ## Features
 
-- Creates a Premium v3 Windows Container App Service Plan
-- Enables zone balancing with more than one worker
+- Creates a Standard Windows App Service Plan
+- Uses explicit worker capacity for deterministic hosting
 - Streams supported logs and metrics to Log Analytics
 - Applies explicit production-oriented tags
 

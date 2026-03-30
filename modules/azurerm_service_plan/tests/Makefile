@@ -85,10 +85,10 @@ test-secure: check-env deps
 	@echo "Running security tests..."
 	$(call run_with_log,secure,go test -v -timeout 30m -run TestSecureServicePlan ./...)
 
-# Run elastic premium tests
-test-elastic: check-env deps
-	@echo "Running elastic premium tests..."
-	$(call run_with_log,elastic,go test -v -timeout 30m -run TestElasticPremiumServicePlan ./...)
+# Run diagnostics tests
+test-diagnostics: check-env deps
+	@echo "Running diagnostics tests..."
+	$(call run_with_log,diagnostics,go test -v -timeout 20m -run TestServicePlanWithDiagnosticSettings ./...)
 
 # Run validation tests
 test-validation: check-env deps
@@ -197,7 +197,7 @@ help:
 	@echo "  make test-basic          - Run basic tests only"
 	@echo "  make test-complete       - Run complete tests"
 	@echo "  make test-secure         - Run security tests"
-	@echo "  make test-elastic        - Run Elastic Premium tests"
+	@echo "  make test-diagnostics    - Run diagnostics tests"
 	@echo "  make test-validation     - Run validation tests"
 	@echo "  make test-integration    - Run integration tests"
 	@echo "  make test-performance    - Run performance tests"

@@ -57,7 +57,7 @@ func TestBasicServicePlan(t *testing.T) {
 	})
 }
 
-// Test complete service_plan with diagnostics and zone balancing.
+// Test complete service_plan with diagnostics and per-site scaling.
 func TestCompleteServicePlan(t *testing.T) {
 	t.Parallel()
 
@@ -81,14 +81,16 @@ func TestCompleteServicePlan(t *testing.T) {
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 		reserved := OutputBool(t, terraformOptions, "reserved")
 		workerCount := OutputInt(t, terraformOptions, "worker_count")
-		zoneBalancingEnabled := OutputBool(t, terraformOptions, "zone_balancing_enabled")
+		perSiteScalingEnabled := OutputBool(t, terraformOptions, "per_site_scaling_enabled")
+		diagnosticSettingsSkippedCount := OutputInt(t, terraformOptions, "diagnostic_settings_skipped_count")
 
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, resourceName)
 		assert.NotEmpty(t, resourceGroupName)
 		assert.True(t, reserved)
-		assert.Equal(t, 2, workerCount)
-		assert.True(t, zoneBalancingEnabled)
+		assert.Equal(t, 1, workerCount)
+		assert.True(t, perSiteScalingEnabled)
+		assert.Equal(t, 0, diagnosticSettingsSkippedCount)
 
 		helper := NewServicePlanHelper(t)
 		servicePlan := helper.GetServicePlan(t, resourceGroupName, resourceName)
@@ -122,48 +124,20 @@ func TestSecureServicePlan(t *testing.T) {
 		resourceName := terraform.Output(t, terraformOptions, "service_plan_name")
 		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
 		reserved := OutputBool(t, terraformOptions, "reserved")
-		zoneBalancingEnabled := OutputBool(t, terraformOptions, "zone_balancing_enabled")
+		diagnosticSettingsSkippedCount := OutputInt(t, terraformOptions, "diagnostic_settings_skipped_count")
 
 		assert.NotEmpty(t, resourceID)
 		assert.NotEmpty(t, resourceName)
 		assert.NotEmpty(t, resourceGroupName)
 		assert.False(t, reserved)
-		assert.True(t, zoneBalancingEnabled)
-	})
-}
+		assert.Equal(t, 0, diagnosticSettingsSkippedCount)
 
-// Test Elastic Premium configuration.
-func TestElasticPremiumServicePlan(t *testing.T) {
-	t.Parallel()
-
-	testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/elastic")
-	defer test_structure.RunTestStage(t, "cleanup", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-		terraform.Destroy(t, terraformOptions)
-	})
-
-	test_structure.RunTestStage(t, "deploy", func() {
-		terraformOptions := getTerraformOptions(t, testFolder)
-		test_structure.SaveTerraformOptions(t, testFolder, terraformOptions)
-		terraform.InitAndApply(t, terraformOptions)
-	})
-
-	test_structure.RunTestStage(t, "validate", func() {
-		terraformOptions := test_structure.LoadTerraformOptions(t, testFolder)
-
-		resourceID := terraform.Output(t, terraformOptions, "service_plan_id")
-		resourceName := terraform.Output(t, terraformOptions, "service_plan_name")
-		resourceGroupName := terraform.Output(t, terraformOptions, "resource_group_name")
-		reserved := OutputBool(t, terraformOptions, "reserved")
-		premiumPlanAutoScaleEnabled := OutputBool(t, terraformOptions, "premium_plan_auto_scale_enabled")
-		maximumElasticWorkerCount := OutputInt(t, terraformOptions, "maximum_elastic_worker_count")
-
-		assert.NotEmpty(t, resourceID)
-		assert.NotEmpty(t, resourceName)
-		assert.NotEmpty(t, resourceGroupName)
-		assert.True(t, reserved)
-		assert.True(t, premiumPlanAutoScaleEnabled)
-		assert.Equal(t, 20, maximumElasticWorkerCount)
+		helper := NewServicePlanHelper(t)
+		servicePlan := helper.GetServicePlan(t, resourceGroupName, resourceName)
+		ValidateServicePlanTags(t, servicePlan, map[string]string{
+			"Environment": "Test",
+			"Example":     "Secure",
+		})
 	})
 }
 

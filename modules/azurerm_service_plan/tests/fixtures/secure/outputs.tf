@@ -18,7 +18,7 @@ output "reserved" {
   value       = module.service_plan.reserved
 }
 
-output "zone_balancing_enabled" {
-  description = "Whether zone balancing is enabled."
-  value       = module.service_plan.zone_balancing_enabled
+output "diagnostic_settings_skipped_count" {
+  description = "Number of diagnostic settings skipped due to missing categories."
+  value       = length(module.service_plan.diagnostic_settings_skipped)
 }
