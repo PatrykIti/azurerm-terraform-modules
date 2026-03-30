@@ -51,7 +51,7 @@ module "service_plan" {
     {
       name                       = "asp-complete"
       log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
-      log_categories             = ["AppServiceConsoleLogs", "AppServicePlatformLogs"]
+      log_categories             = ["AppServiceConsoleLogs"]
       metric_categories          = ["AllMetrics"]
     }
   ]

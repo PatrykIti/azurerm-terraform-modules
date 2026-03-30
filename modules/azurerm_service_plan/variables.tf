@@ -214,8 +214,8 @@ variable "diagnostic_settings" {
   description = <<-EOT
     Diagnostic settings for the App Service Plan.
 
-    Supported categories for Microsoft.Web/serverfarms (azurerm 4.57.0):
-    - log_categories: AppServiceConsoleLogs, AppServicePlatformLogs
+    Supported categories for Microsoft.Web/serverfarms used by this module:
+    - log_categories: AppServiceConsoleLogs
     - metric_categories: AllMetrics
 
     Entries with no log or metric categories are skipped and reported in
@@ -292,10 +292,10 @@ variable "diagnostic_settings" {
     condition = alltrue(flatten([
       for diagnostic_setting in var.diagnostic_settings : [
         for category in(diagnostic_setting.log_categories == null ? [] : diagnostic_setting.log_categories) :
-        contains(["AppServiceConsoleLogs", "AppServicePlatformLogs"], trimspace(category))
+        contains(["AppServiceConsoleLogs"], trimspace(category))
       ]
     ]))
-    error_message = "diagnostic_settings.log_categories must use supported values: AppServiceConsoleLogs, AppServicePlatformLogs."
+    error_message = "diagnostic_settings.log_categories must use supported values: AppServiceConsoleLogs."
   }
 
   validation {

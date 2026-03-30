@@ -28,7 +28,7 @@ run "diagnostic_settings_valid" {
     diagnostic_settings = [
       {
         name                       = "asp-diag"
-        log_categories             = ["AppServiceConsoleLogs", "AppServicePlatformLogs"]
+        log_categories             = ["AppServiceConsoleLogs"]
         metric_categories          = ["AllMetrics"]
         log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/test-law"
       }
