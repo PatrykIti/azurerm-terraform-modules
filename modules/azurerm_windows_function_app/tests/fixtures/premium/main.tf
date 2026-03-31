@@ -4,39 +4,39 @@ provider "azurerm" {
 
 locals {
   suffix               = substr(var.random_suffix, 0, 8)
-  resource_group_name  = "rg-wfunc-net-${local.suffix}"
-  storage_account_name = "stwfn${local.suffix}"
-  service_plan_name    = "asp-wfunc-net-${local.suffix}"
-  function_app_name    = "wfuncnet${local.suffix}"
+  resource_group_name  = "rg-wfunc-prem-${local.suffix}"
+  storage_account_name = "stwfprem${local.suffix}"
+  service_plan_name    = "asp-wfunc-prem-${local.suffix}"
+  function_app_name    = "wfuncprem${local.suffix}"
 }
 
-resource "azurerm_resource_group" "test" {
+resource "azurerm_resource_group" "example" {
   name     = local.resource_group_name
   location = var.location
 }
 
 resource "azurerm_storage_account" "example" {
   name                     = local.storage_account_name
-  resource_group_name      = azurerm_resource_group.test.name
-  location                 = azurerm_resource_group.test.location
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
 
 resource "azurerm_service_plan" "example" {
   name                = local.service_plan_name
-  resource_group_name = azurerm_resource_group.test.name
-  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
   os_type             = "Windows"
-  sku_name            = "Y1"
+  sku_name            = "EP1"
 }
 
 module "windows_function_app" {
   source = "../../../"
 
   name                = local.function_app_name
-  resource_group_name = azurerm_resource_group.test.name
-  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
   service_plan_id     = azurerm_service_plan.example.id
 
   storage_configuration = {
@@ -46,6 +46,7 @@ module "windows_function_app" {
 
   application_configuration = {
     functions_extension_version = "~4"
+    app_settings                = var.app_settings
   }
 
   access_configuration = {
@@ -53,22 +54,10 @@ module "windows_function_app" {
   }
 
   site_config = {
-    ip_restriction_default_action = "Deny"
-    ip_restriction = [
-      {
-        name       = "office"
-        priority   = 100
-        action     = "Allow"
-        ip_address = "203.0.113.0/24"
-      }
-    ]
     application_stack = {
-      node_version = "~18"
+      dotnet_version = "v8.0"
     }
   }
 
-  tags = {
-    Environment = "Test"
-    Scenario    = "Network"
-  }
+  tags = var.module_tags
 }
