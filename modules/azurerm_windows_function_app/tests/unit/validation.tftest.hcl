@@ -91,6 +91,30 @@ run "auth_settings_v2_requires_provider" {
   ]
 }
 
+run "auth_settings_v2_extended_provider_fields" {
+  command = plan
+
+  variables {
+    auth_settings_v2 = {
+      auth_enabled = true
+      login        = {}
+      active_directory_v2 = {
+        client_id                            = "unit-client-id"
+        tenant_auth_endpoint                 = "https://login.microsoftonline.com/unit-tenant/v2.0/"
+        client_secret_certificate_thumbprint = "THUMBPRINT"
+      }
+      custom_oidc_v2 = [
+        {
+          name                          = "unit-oidc"
+          client_id                     = "unit-client-id"
+          openid_configuration_endpoint = "https://issuer.example/.well-known/openid-configuration"
+          name_claim_type               = "name"
+        }
+      ]
+    }
+  }
+}
+
 run "client_certificate_mode_requires_enabled" {
   command = plan
 
