@@ -140,7 +140,7 @@ resource "azurerm_linux_function_app" "linux_function_app" {
       forward_proxy_custom_scheme_header_name = auth_settings_v2.value.forward_proxy_custom_scheme_header_name
 
       dynamic "login" {
-        for_each = [1]
+        for_each = var.auth_settings_v2.login != null ? [var.auth_settings_v2.login] : []
         content {
           logout_endpoint                   = try(auth_settings_v2.value.login.logout_endpoint, null)
           token_store_enabled               = try(auth_settings_v2.value.login.token_store_enabled, null)
