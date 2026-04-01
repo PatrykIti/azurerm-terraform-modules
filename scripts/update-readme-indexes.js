@@ -97,11 +97,23 @@ function loadModules() {
         description: moduleJson.description || '',
         tagPrefix: moduleJson.tag_prefix,
         commitScope: moduleJson.commit_scope || '',
-        provider: entry.name.startsWith('azuredevops_') ? 'azuredevops' : 'azurerm'
+        provider: detectProvider(entry.name)
       };
     })
     .filter(Boolean)
     .sort((left, right) => left.title.localeCompare(right.title, 'en', { sensitivity: 'base' }));
+}
+
+function detectProvider(moduleName) {
+  if (moduleName.startsWith('azuredevops_')) {
+    return 'azuredevops';
+  }
+
+  if (moduleName.startsWith('kubernetes_')) {
+    return 'kubernetes';
+  }
+
+  return 'azurerm';
 }
 
 function buildReleasedTagMap(moduleList, targetModule, targetVersion) {
@@ -288,6 +300,7 @@ function ensureMarkedSection(content, startMarker, endMarker, replacement, fallb
 
 function updateRootReadme() {
   const azurermModules = modules.filter((moduleDef) => moduleDef.provider === 'azurerm');
+  const kubernetesModules = modules.filter((moduleDef) => moduleDef.provider === 'kubernetes');
   const azureDevOpsModules = modules.filter((moduleDef) => moduleDef.provider === 'azuredevops');
 
   let content = fs.readFileSync(rootReadmePath, 'utf8');
@@ -306,8 +319,17 @@ function updateRootReadme() {
     '<!-- AZURERM_MODULES_TABLE_START -->',
     '<!-- AZURERM_MODULES_TABLE_END -->',
     renderRootTable(azurermModules),
-    /(### AzureRM Modules\s*\n\n)([\s\S]*?)(\n### Azure DevOps Modules)/,
+    /(### AzureRM Modules\s*\n\n)([\s\S]*?)(\n### Kubernetes Modules)/,
     (replacement) => `$1<!-- AZURERM_MODULES_TABLE_START -->\n${replacement}\n<!-- AZURERM_MODULES_TABLE_END -->$3`
+  );
+
+  content = ensureMarkedSection(
+    content,
+    '<!-- KUBERNETES_MODULES_TABLE_START -->',
+    '<!-- KUBERNETES_MODULES_TABLE_END -->',
+    renderRootTable(kubernetesModules),
+    /(### Kubernetes Modules\s*\n\n)([\s\S]*?)(\n### Azure DevOps Modules)/,
+    (replacement) => `$1<!-- KUBERNETES_MODULES_TABLE_START -->\n${replacement}\n<!-- KUBERNETES_MODULES_TABLE_END -->$3`
   );
 
   content = ensureMarkedSection(
@@ -325,6 +347,7 @@ function updateRootReadme() {
 
 function updateModulesReadme() {
   const azurermModules = modules.filter((moduleDef) => moduleDef.provider === 'azurerm');
+  const kubernetesModules = modules.filter((moduleDef) => moduleDef.provider === 'kubernetes');
   const azureDevOpsModules = modules.filter((moduleDef) => moduleDef.provider === 'azuredevops');
 
   let content = fs.readFileSync(modulesReadmePath, 'utf8');
@@ -334,8 +357,17 @@ function updateModulesReadme() {
     '<!-- MODULES_INDEX_AZURERM_START -->',
     '<!-- MODULES_INDEX_AZURERM_END -->',
     renderModulesIndexTable(azurermModules),
-    /(## AzureRM Modules\s*\n\n)([\s\S]*?)(\n## Azure DevOps Modules)/,
+    /(## AzureRM Modules\s*\n\n)([\s\S]*?)(\n## Kubernetes Modules)/,
     (replacement) => `$1<!-- MODULES_INDEX_AZURERM_START -->\n${replacement}\n<!-- MODULES_INDEX_AZURERM_END -->$3`
+  );
+
+  content = ensureMarkedSection(
+    content,
+    '<!-- MODULES_INDEX_KUBERNETES_START -->',
+    '<!-- MODULES_INDEX_KUBERNETES_END -->',
+    renderModulesIndexTable(kubernetesModules),
+    /(## Kubernetes Modules\s*\n\n)([\s\S]*?)(\n## Azure DevOps Modules)/,
+    (replacement) => `$1<!-- MODULES_INDEX_KUBERNETES_START -->\n${replacement}\n<!-- MODULES_INDEX_KUBERNETES_END -->$3`
   );
 
   content = ensureMarkedSection(

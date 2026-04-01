@@ -28,7 +28,7 @@ resource "azurerm_service_plan" "example" {
   resource_group_name = azurerm_resource_group.test.name
   location            = azurerm_resource_group.test.location
   os_type             = "Windows"
-  sku_name            = "EP1"
+  sku_name            = "Y1"
 }
 
 module "windows_function_app" {

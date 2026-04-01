@@ -1,0 +1,7 @@
+{
+  "name": "kubernetes_role",
+  "title": "Kubernetes Role",
+  "commit_scope": "kubernetes-role",
+  "tag_prefix": "KROLEv",
+  "description": "Kubernetes Role Terraform module for managing a single namespace-scoped RBAC role"
+}

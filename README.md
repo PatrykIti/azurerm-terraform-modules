@@ -5,6 +5,7 @@
 [![Azure](https://img.shields.io/badge/Azure-0078D4?logo=microsoft-azure&logoColor=white)](https://azure.microsoft.com/)
 [![AzureRM Provider](https://img.shields.io/badge/AzureRM_Provider-4.57.0-blue?logo=terraform)](https://registry.terraform.io/providers/hashicorp/azurerm/4.57.0)
 [![Azure DevOps Provider](https://img.shields.io/badge/Azure_DevOps_Provider-1.12.2-blue?logo=azuredevops)](https://registry.terraform.io/providers/microsoft/azuredevops/1.12.2)
+[![Kubernetes Provider](https://img.shields.io/badge/Kubernetes_Provider-%3E%3D2.20.0-blue?logo=kubernetes)](https://registry.terraform.io/providers/hashicorp/kubernetes)
 
 <!-- MODULE BADGES START -->
 [![AI Services](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=AISv*&label=AI%20Services&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AISv1.0.0)
@@ -81,8 +82,9 @@ Modules are **atomic**: each module manages a single primary resource with no ne
 
 ```
 azurerm-terraform-modules/
-├── modules/                             # Terraform modules (azurerm_* and azuredevops_*)
+├── modules/                             # Terraform modules (azurerm_*, azuredevops_*, kubernetes_*)
 │   ├── azurerm_<resource>/              # Azure Resource Manager modules
+│   ├── kubernetes_<resource>/           # In-cluster Kubernetes modules
 │   └── azuredevops_<resource>/          # Azure DevOps modules
 ├── docs/                                # Global documentation
 │   ├── MODULE_GUIDE/                    # Module creation guide
@@ -120,6 +122,7 @@ module "storage_account" {
 | Module | Status | Version | Description |
 | --- | --- | --- | --- |
 | [AI Services](./modules/azurerm_ai_services/) | ✅ Completed | [AISv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AISv1.0.0) | Azure AI Services Terraform module with identity, CMK, network ACLs, and diagnostics support |
+| [App Service Plan](./modules/azurerm_service_plan/) | 🧪 Development | vUnreleased | Azure App Service Plan Terraform module with enterprise-grade features |
 | [Application Insights](./modules/azurerm_application_insights/) | ✅ Completed | [APPINSv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/APPINSv1.1.0) | Azure Application Insights Terraform module with enterprise-grade features |
 | [Application Insights Workbook](./modules/azurerm_application_insights_workbook/) | ✅ Completed | [AIWBv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/AIWBv1.0.0) | Azure Application Insights Workbook Terraform module |
 | [Bastion Host](./modules/azurerm_bastion_host/) | ✅ Completed | [BASTIONv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/BASTIONv1.0.0) | Azure Bastion Host Terraform module with diagnostic settings support |
@@ -153,6 +156,18 @@ module "storage_account" {
 | [Windows Function App](./modules/azurerm_windows_function_app/) | ✅ Completed | [WFUNCv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/WFUNCv1.0.0) | Azure Windows Function App Terraform module with enterprise-grade features |
 | [Windows Virtual Machine](./modules/azurerm_windows_virtual_machine/) | ✅ Completed | [WINDOWSVMv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/WINDOWSVMv1.0.0) | Azure Windows Virtual Machine Terraform module with enterprise-grade features |
 <!-- AZURERM_MODULES_TABLE_END -->
+
+### Kubernetes Modules
+
+<!-- KUBERNETES_MODULES_TABLE_START -->
+| Module | Status | Version | Description |
+| --- | --- | --- | --- |
+| [Kubernetes Cluster Role](./modules/kubernetes_cluster_role/) | 🧪 Development | vUnreleased | Kubernetes ClusterRole Terraform module for managing a single cluster-scoped RBAC role |
+| [Kubernetes Cluster Role Binding](./modules/kubernetes_cluster_role_binding/) | 🧪 Development | vUnreleased | Kubernetes ClusterRoleBinding Terraform module for binding a cluster role to subjects |
+| [Kubernetes Namespace](./modules/kubernetes_namespace/) | 🧪 Development | vUnreleased | Kubernetes namespace Terraform module for managing a single namespace in an existing cluster |
+| [Kubernetes Role](./modules/kubernetes_role/) | 🧪 Development | vUnreleased | Kubernetes Role Terraform module for managing a single namespace-scoped RBAC role |
+| [Kubernetes Role Binding](./modules/kubernetes_role_binding/) | 🧪 Development | vUnreleased | Kubernetes RoleBinding Terraform module for binding a namespace-scoped role to subjects |
+<!-- KUBERNETES_MODULES_TABLE_END -->
 
 ### Azure DevOps Modules
 
@@ -206,6 +221,7 @@ Other modules include their own example catalogs under `modules/<module>/example
 
 - [Terraform](https://www.terraform.io/downloads.html) >= 1.12.2
 - [AzureRM Provider](https://registry.terraform.io/providers/hashicorp/azurerm) 4.57.0 (for `azurerm_*` modules)
+- [Kubernetes Provider](https://registry.terraform.io/providers/hashicorp/kubernetes) >= 2.20.0 (for `kubernetes_*` modules)
 - [Azure DevOps Provider](https://registry.terraform.io/providers/microsoft/azuredevops) 1.12.2 (for `azuredevops_*` modules)
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) (for Azure authentication and examples)
 - [Go](https://golang.org/doc/install) >= 1.21 (for Terratest)
