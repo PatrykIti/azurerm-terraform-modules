@@ -373,20 +373,6 @@ variable "auth_settings_v2" {
     condition     = var.auth_settings_v2 == null || var.auth_settings_v2.login != null
     error_message = "auth_settings_v2 requires a login block."
   }
-
-  validation {
-    condition = var.auth_settings_v2 == null || anytrue([
-      var.auth_settings_v2.active_directory_v2 != null,
-      var.auth_settings_v2.apple_v2 != null,
-      length(coalesce(try(var.auth_settings_v2.custom_oidc_v2, null), [])) > 0,
-      var.auth_settings_v2.facebook_v2 != null,
-      var.auth_settings_v2.github_v2 != null,
-      var.auth_settings_v2.google_v2 != null,
-      var.auth_settings_v2.microsoft_v2 != null,
-      var.auth_settings_v2.twitter_v2 != null
-    ])
-    error_message = "auth_settings_v2 requires at least one identity provider block (active_directory_v2, apple_v2, custom_oidc_v2, facebook_v2, github_v2, google_v2, microsoft_v2, or twitter_v2)."
-  }
 }
 
 variable "site_configuration" {
