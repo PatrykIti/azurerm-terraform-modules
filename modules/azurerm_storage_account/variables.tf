@@ -347,7 +347,7 @@ variable "blob_properties" {
 
 # Queue Properties with logging
 variable "queue_properties" {
-  description = "Queue service properties including logging configuration."
+  description = "Queue service properties including logging configuration. Defaults to null: no azurerm_storage_account_queue_properties resource is created unless the caller passes this input (pass {} to enable queue logging with defaults)."
   type = object({
     logging = optional(object({
       delete                = optional(bool, true)
@@ -363,7 +363,7 @@ variable "queue_properties" {
       retention_policy_days = 7
     })
   })
-  default = {}
+  default = null
 }
 
 # Identity configuration
