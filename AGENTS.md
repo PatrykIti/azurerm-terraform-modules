@@ -5,7 +5,7 @@ This summary is based on `docs/MODULE_GUIDE/*` plus existing repo conventions fo
 
 ## Core Standards
 
-- **Naming**: module folders must be `azurerm_<resource>` or `azuredevops_<resource>`.
+- **Naming**: module folders must be `azurerm_<resource>`, `azuredevops_<resource>`, or `kubernetes_<resource>` when the module's primary scope is in-cluster Kubernetes resources managed through the `kubernetes` provider.
 - **Gold standard**: `modules/azurerm_kubernetes_cluster` defines the canonical structure and style; document any deviations required by resource-specific constraints.
 - **Security-first**: secure defaults are the easiest path; document risks explicitly.
 - **Consistency**: consistent structure, naming, and patterns across all modules.

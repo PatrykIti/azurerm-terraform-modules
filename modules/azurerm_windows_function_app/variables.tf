@@ -288,17 +288,18 @@ variable "auth_settings_v2" {
     unauthenticated_action                  = optional(string)
 
     active_directory_v2 = optional(object({
-      client_id                       = string
-      tenant_auth_endpoint            = string
-      client_secret_setting_name      = optional(string)
-      allowed_audiences               = optional(list(string))
-      allowed_applications            = optional(list(string))
-      allowed_groups                  = optional(list(string))
-      allowed_identities              = optional(list(string))
-      jwt_allowed_client_applications = optional(list(string))
-      jwt_allowed_groups              = optional(list(string))
-      login_parameters                = optional(map(string))
-      www_authentication_disabled     = optional(bool)
+      client_id                            = string
+      tenant_auth_endpoint                 = string
+      client_secret_setting_name           = optional(string)
+      client_secret_certificate_thumbprint = optional(string)
+      allowed_audiences                    = optional(list(string))
+      allowed_applications                 = optional(list(string))
+      allowed_groups                       = optional(list(string))
+      allowed_identities                   = optional(list(string))
+      jwt_allowed_client_applications      = optional(list(string))
+      jwt_allowed_groups                   = optional(list(string))
+      login_parameters                     = optional(map(string))
+      www_authentication_disabled          = optional(bool)
     }))
 
     apple_v2 = optional(object({
@@ -317,6 +318,7 @@ variable "auth_settings_v2" {
       openid_configuration_endpoint = string
       client_credential_method      = optional(string)
       client_secret_setting_name    = optional(string)
+      name_claim_type               = optional(string)
       scopes                        = optional(list(string))
     })))
 
@@ -686,17 +688,18 @@ variable "slots" {
       unauthenticated_action                  = optional(string)
 
       active_directory_v2 = optional(object({
-        client_id                       = string
-        tenant_auth_endpoint            = string
-        client_secret_setting_name      = optional(string)
-        allowed_audiences               = optional(list(string))
-        allowed_applications            = optional(list(string))
-        allowed_groups                  = optional(list(string))
-        allowed_identities              = optional(list(string))
-        jwt_allowed_client_applications = optional(list(string))
-        jwt_allowed_groups              = optional(list(string))
-        login_parameters                = optional(map(string))
-        www_authentication_disabled     = optional(bool)
+        client_id                            = string
+        tenant_auth_endpoint                 = string
+        client_secret_setting_name           = optional(string)
+        client_secret_certificate_thumbprint = optional(string)
+        allowed_audiences                    = optional(list(string))
+        allowed_applications                 = optional(list(string))
+        allowed_groups                       = optional(list(string))
+        allowed_identities                   = optional(list(string))
+        jwt_allowed_client_applications      = optional(list(string))
+        jwt_allowed_groups                   = optional(list(string))
+        login_parameters                     = optional(map(string))
+        www_authentication_disabled          = optional(bool)
       }))
 
       apple_v2 = optional(object({
@@ -715,6 +718,7 @@ variable "slots" {
         openid_configuration_endpoint = string
         client_credential_method      = optional(string)
         client_secret_setting_name    = optional(string)
+        name_claim_type               = optional(string)
         scopes                        = optional(list(string))
       })))
 

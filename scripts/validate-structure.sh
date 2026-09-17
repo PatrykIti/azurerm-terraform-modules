@@ -56,9 +56,12 @@ check_module() {
 }
 
 # Check each module directory
-for dir in */; do
-    if [[ "$dir" =~ ^azurerm_ ]] || [[ "$dir" =~ ^modules/ ]]; then
-        check_module "${dir%/}"
+for dir in modules/*/; do
+    dir="${dir%/}"
+    module_name="$(basename "$dir")"
+
+    if [[ "$module_name" =~ ^azurerm_ ]] || [[ "$module_name" =~ ^azuredevops_ ]] || [[ "$module_name" =~ ^kubernetes_ ]]; then
+        check_module "$dir"
     fi
 done
 

@@ -201,7 +201,7 @@ func TestWindowsFunctionAppScaling(t *testing.T) {
 
 	// Create multiple instances sequentially
 	for i := 0; i < instanceCount; i++ {
-		testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/basic")
+		testFolder := test_structure.CopyTerraformFolderToTemp(t, "..", "tests/fixtures/premium")
 		terraformOptions := getTerraformOptions(t, testFolder)
 		// Override the random_suffix for each iteration
 		terraformOptions.Vars["random_suffix"] = fmt.Sprintf("scale%d%s", i, terraformOptions.Vars["random_suffix"].(string)[:5])

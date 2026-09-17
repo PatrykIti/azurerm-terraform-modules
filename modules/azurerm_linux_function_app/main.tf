@@ -140,18 +140,19 @@ resource "azurerm_linux_function_app" "linux_function_app" {
       forward_proxy_custom_scheme_header_name = auth_settings_v2.value.forward_proxy_custom_scheme_header_name
 
       dynamic "login" {
-        for_each = auth_settings_v2.value.login != null ? [auth_settings_v2.value.login] : []
+        for_each = var.auth_settings_v2.login != null ? [var.auth_settings_v2.login] : []
         content {
-          token_store_enabled               = login.value.token_store_enabled
-          token_refresh_extension_time      = login.value.token_refresh_extension_time
-          token_store_path                  = login.value.token_store_path
-          token_store_sas_setting_name      = login.value.token_store_sas_setting_name
-          preserve_url_fragments_for_logins = login.value.preserve_url_fragments_for_logins
-          allowed_external_redirect_urls    = login.value.allowed_external_redirect_urls
-          cookie_expiration_convention      = login.value.cookie_expiration_convention
-          cookie_expiration_time            = login.value.cookie_expiration_time
-          validate_nonce                    = login.value.validate_nonce
-          nonce_expiration_time             = login.value.nonce_expiration_time
+          logout_endpoint                   = try(auth_settings_v2.value.login.logout_endpoint, null)
+          token_store_enabled               = try(auth_settings_v2.value.login.token_store_enabled, null)
+          token_refresh_extension_time      = try(auth_settings_v2.value.login.token_refresh_extension_time, null)
+          token_store_path                  = try(auth_settings_v2.value.login.token_store_path, null)
+          token_store_sas_setting_name      = try(auth_settings_v2.value.login.token_store_sas_setting_name, null)
+          preserve_url_fragments_for_logins = try(auth_settings_v2.value.login.preserve_url_fragments_for_logins, null)
+          allowed_external_redirect_urls    = try(auth_settings_v2.value.login.allowed_external_redirect_urls, null)
+          cookie_expiration_convention      = try(auth_settings_v2.value.login.cookie_expiration_convention, null)
+          cookie_expiration_time            = try(auth_settings_v2.value.login.cookie_expiration_time, null)
+          validate_nonce                    = try(auth_settings_v2.value.login.validate_nonce, null)
+          nonce_expiration_time             = try(auth_settings_v2.value.login.nonce_expiration_time, null)
         }
       }
 
@@ -167,10 +168,18 @@ resource "azurerm_linux_function_app" "linux_function_app" {
       dynamic "active_directory_v2" {
         for_each = auth_settings_v2.value.active_directory_v2 != null ? [auth_settings_v2.value.active_directory_v2] : []
         content {
-          client_id                  = active_directory_v2.value.client_id
-          tenant_auth_endpoint       = active_directory_v2.value.tenant_auth_endpoint
-          client_secret_setting_name = active_directory_v2.value.client_secret_setting_name
-          allowed_audiences          = active_directory_v2.value.allowed_audiences
+          client_id                            = active_directory_v2.value.client_id
+          tenant_auth_endpoint                 = active_directory_v2.value.tenant_auth_endpoint
+          client_secret_setting_name           = active_directory_v2.value.client_secret_setting_name
+          client_secret_certificate_thumbprint = active_directory_v2.value.client_secret_certificate_thumbprint
+          allowed_audiences                    = active_directory_v2.value.allowed_audiences
+          allowed_applications                 = active_directory_v2.value.allowed_applications
+          allowed_groups                       = active_directory_v2.value.allowed_groups
+          allowed_identities                   = active_directory_v2.value.allowed_identities
+          jwt_allowed_client_applications      = active_directory_v2.value.jwt_allowed_client_applications
+          jwt_allowed_groups                   = active_directory_v2.value.jwt_allowed_groups
+          login_parameters                     = active_directory_v2.value.login_parameters
+          www_authentication_disabled          = active_directory_v2.value.www_authentication_disabled
         }
       }
 
@@ -180,7 +189,9 @@ resource "azurerm_linux_function_app" "linux_function_app" {
           name                          = custom_oidc_v2.value.name
           client_id                     = custom_oidc_v2.value.client_id
           openid_configuration_endpoint = custom_oidc_v2.value.openid_configuration_endpoint
+          client_credential_method      = custom_oidc_v2.value.client_credential_method
           client_secret_setting_name    = custom_oidc_v2.value.client_secret_setting_name
+          scopes                        = custom_oidc_v2.value.scopes
         }
       }
 
@@ -189,6 +200,7 @@ resource "azurerm_linux_function_app" "linux_function_app" {
         content {
           app_id                  = facebook_v2.value.app_id
           app_secret_setting_name = facebook_v2.value.app_secret_setting_name
+          graph_api_version       = facebook_v2.value.graph_api_version
           login_scopes            = facebook_v2.value.login_scopes
         }
       }
@@ -528,18 +540,19 @@ resource "azurerm_linux_function_app_slot" "linux_function_app_slot" {
       forward_proxy_custom_scheme_header_name = auth_settings_v2.value.forward_proxy_custom_scheme_header_name
 
       dynamic "login" {
-        for_each = auth_settings_v2.value.login != null ? [auth_settings_v2.value.login] : []
+        for_each = [1]
         content {
-          token_store_enabled               = login.value.token_store_enabled
-          token_refresh_extension_time      = login.value.token_refresh_extension_time
-          token_store_path                  = login.value.token_store_path
-          token_store_sas_setting_name      = login.value.token_store_sas_setting_name
-          preserve_url_fragments_for_logins = login.value.preserve_url_fragments_for_logins
-          allowed_external_redirect_urls    = login.value.allowed_external_redirect_urls
-          cookie_expiration_convention      = login.value.cookie_expiration_convention
-          cookie_expiration_time            = login.value.cookie_expiration_time
-          validate_nonce                    = login.value.validate_nonce
-          nonce_expiration_time             = login.value.nonce_expiration_time
+          logout_endpoint                   = try(auth_settings_v2.value.login.logout_endpoint, null)
+          token_store_enabled               = try(auth_settings_v2.value.login.token_store_enabled, null)
+          token_refresh_extension_time      = try(auth_settings_v2.value.login.token_refresh_extension_time, null)
+          token_store_path                  = try(auth_settings_v2.value.login.token_store_path, null)
+          token_store_sas_setting_name      = try(auth_settings_v2.value.login.token_store_sas_setting_name, null)
+          preserve_url_fragments_for_logins = try(auth_settings_v2.value.login.preserve_url_fragments_for_logins, null)
+          allowed_external_redirect_urls    = try(auth_settings_v2.value.login.allowed_external_redirect_urls, null)
+          cookie_expiration_convention      = try(auth_settings_v2.value.login.cookie_expiration_convention, null)
+          cookie_expiration_time            = try(auth_settings_v2.value.login.cookie_expiration_time, null)
+          validate_nonce                    = try(auth_settings_v2.value.login.validate_nonce, null)
+          nonce_expiration_time             = try(auth_settings_v2.value.login.nonce_expiration_time, null)
         }
       }
 
@@ -555,10 +568,18 @@ resource "azurerm_linux_function_app_slot" "linux_function_app_slot" {
       dynamic "active_directory_v2" {
         for_each = auth_settings_v2.value.active_directory_v2 != null ? [auth_settings_v2.value.active_directory_v2] : []
         content {
-          client_id                  = active_directory_v2.value.client_id
-          tenant_auth_endpoint       = active_directory_v2.value.tenant_auth_endpoint
-          client_secret_setting_name = active_directory_v2.value.client_secret_setting_name
-          allowed_audiences          = active_directory_v2.value.allowed_audiences
+          client_id                            = active_directory_v2.value.client_id
+          tenant_auth_endpoint                 = active_directory_v2.value.tenant_auth_endpoint
+          client_secret_setting_name           = active_directory_v2.value.client_secret_setting_name
+          client_secret_certificate_thumbprint = active_directory_v2.value.client_secret_certificate_thumbprint
+          allowed_audiences                    = active_directory_v2.value.allowed_audiences
+          allowed_applications                 = active_directory_v2.value.allowed_applications
+          allowed_groups                       = active_directory_v2.value.allowed_groups
+          allowed_identities                   = active_directory_v2.value.allowed_identities
+          jwt_allowed_client_applications      = active_directory_v2.value.jwt_allowed_client_applications
+          jwt_allowed_groups                   = active_directory_v2.value.jwt_allowed_groups
+          login_parameters                     = active_directory_v2.value.login_parameters
+          www_authentication_disabled          = active_directory_v2.value.www_authentication_disabled
         }
       }
 
@@ -568,7 +589,9 @@ resource "azurerm_linux_function_app_slot" "linux_function_app_slot" {
           name                          = custom_oidc_v2.value.name
           client_id                     = custom_oidc_v2.value.client_id
           openid_configuration_endpoint = custom_oidc_v2.value.openid_configuration_endpoint
+          client_credential_method      = custom_oidc_v2.value.client_credential_method
           client_secret_setting_name    = custom_oidc_v2.value.client_secret_setting_name
+          scopes                        = custom_oidc_v2.value.scopes
         }
       }
 
@@ -577,6 +600,7 @@ resource "azurerm_linux_function_app_slot" "linux_function_app_slot" {
         content {
           app_id                  = facebook_v2.value.app_id
           app_secret_setting_name = facebook_v2.value.app_secret_setting_name
+          graph_api_version       = facebook_v2.value.graph_api_version
           login_scopes            = facebook_v2.value.login_scopes
         }
       }

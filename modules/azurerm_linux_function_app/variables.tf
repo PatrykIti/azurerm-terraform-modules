@@ -287,6 +287,7 @@ variable "auth_settings_v2" {
     forward_proxy_custom_scheme_header_name = optional(string)
 
     login = optional(object({
+      logout_endpoint                   = optional(string)
       token_store_enabled               = optional(bool)
       token_refresh_extension_time      = optional(number)
       token_store_path                  = optional(string)
@@ -306,18 +307,29 @@ variable "auth_settings_v2" {
     }))
 
     active_directory_v2 = optional(object({
-      client_id                  = string
-      tenant_auth_endpoint       = string
-      client_secret_setting_name = optional(string)
-      allowed_audiences          = optional(list(string))
-      login_scopes               = optional(list(string))
+      client_id                            = string
+      tenant_auth_endpoint                 = string
+      client_secret_setting_name           = optional(string)
+      client_secret_certificate_thumbprint = optional(string)
+      allowed_audiences                    = optional(list(string))
+      allowed_applications                 = optional(list(string))
+      allowed_groups                       = optional(list(string))
+      allowed_identities                   = optional(list(string))
+      jwt_allowed_client_applications      = optional(list(string))
+      jwt_allowed_groups                   = optional(list(string))
+      login_parameters                     = optional(map(string))
+      www_authentication_disabled          = optional(bool)
+      login_scopes                         = optional(list(string))
     }))
 
     custom_oidc_v2 = optional(list(object({
       name                          = string
       client_id                     = string
       openid_configuration_endpoint = string
+      client_credential_method      = optional(string)
       client_secret_setting_name    = optional(string)
+      name_claim_type               = optional(string)
+      scopes                        = optional(list(string))
       allowed_audiences             = optional(list(string))
       login_scopes                  = optional(list(string))
     })))
@@ -325,6 +337,7 @@ variable "auth_settings_v2" {
     facebook_v2 = optional(object({
       app_id                  = string
       app_secret_setting_name = string
+      graph_api_version       = optional(string)
       login_scopes            = optional(list(string))
     }))
 
@@ -355,6 +368,11 @@ variable "auth_settings_v2" {
   })
   default   = null
   sensitive = true
+
+  validation {
+    condition     = var.auth_settings_v2 == null || var.auth_settings_v2.login != null
+    error_message = "auth_settings_v2 requires a login block."
+  }
 }
 
 variable "site_configuration" {
@@ -650,6 +668,7 @@ variable "slots" {
       forward_proxy_custom_scheme_header_name = optional(string)
 
       login = optional(object({
+        logout_endpoint                   = optional(string)
         token_store_enabled               = optional(bool)
         token_refresh_extension_time      = optional(number)
         token_store_path                  = optional(string)
@@ -669,18 +688,29 @@ variable "slots" {
       }))
 
       active_directory_v2 = optional(object({
-        client_id                  = string
-        tenant_auth_endpoint       = string
-        client_secret_setting_name = optional(string)
-        allowed_audiences          = optional(list(string))
-        login_scopes               = optional(list(string))
+        client_id                            = string
+        tenant_auth_endpoint                 = string
+        client_secret_setting_name           = optional(string)
+        client_secret_certificate_thumbprint = optional(string)
+        allowed_audiences                    = optional(list(string))
+        allowed_applications                 = optional(list(string))
+        allowed_groups                       = optional(list(string))
+        allowed_identities                   = optional(list(string))
+        jwt_allowed_client_applications      = optional(list(string))
+        jwt_allowed_groups                   = optional(list(string))
+        login_parameters                     = optional(map(string))
+        www_authentication_disabled          = optional(bool)
+        login_scopes                         = optional(list(string))
       }))
 
       custom_oidc_v2 = optional(list(object({
         name                          = string
         client_id                     = string
         openid_configuration_endpoint = string
+        client_credential_method      = optional(string)
         client_secret_setting_name    = optional(string)
+        name_claim_type               = optional(string)
+        scopes                        = optional(list(string))
         allowed_audiences             = optional(list(string))
         login_scopes                  = optional(list(string))
       })))
@@ -688,6 +718,7 @@ variable "slots" {
       facebook_v2 = optional(object({
         app_id                  = string
         app_secret_setting_name = string
+        graph_api_version       = optional(string)
         login_scopes            = optional(list(string))
       }))
 
@@ -822,6 +853,29 @@ variable "slots" {
       for slot in var.slots : slot.auth_settings == null || slot.auth_settings_v2 == null
     ])
     error_message = "auth_settings and auth_settings_v2 are mutually exclusive for slots."
+  }
+
+  validation {
+    condition = alltrue([
+      for slot in var.slots : slot.auth_settings_v2 == null || slot.auth_settings_v2.login != null
+    ])
+    error_message = "slot.auth_settings_v2 requires a login block."
+  }
+
+  validation {
+    condition = alltrue([
+      for slot in var.slots : slot.auth_settings_v2 == null || anytrue([
+        slot.auth_settings_v2.active_directory_v2 != null,
+        slot.auth_settings_v2.apple_v2 != null,
+        length(coalesce(try(slot.auth_settings_v2.custom_oidc_v2, null), [])) > 0,
+        slot.auth_settings_v2.facebook_v2 != null,
+        slot.auth_settings_v2.github_v2 != null,
+        slot.auth_settings_v2.google_v2 != null,
+        slot.auth_settings_v2.microsoft_v2 != null,
+        slot.auth_settings_v2.twitter_v2 != null
+      ])
+    ])
+    error_message = "slot.auth_settings_v2 requires at least one identity provider block."
   }
 
   validation {

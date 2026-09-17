@@ -23,7 +23,7 @@ resource "azurerm_service_plan" "example" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   os_type             = "Linux"
-  sku_name            = "EP1"
+  sku_name            = "Y1"
 }
 
 resource "azurerm_log_analytics_workspace" "example" {

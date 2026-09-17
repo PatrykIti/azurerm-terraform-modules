@@ -6,6 +6,7 @@ Project Change Log.
 
 | No. | Date | Title | Type |
 |-----|------|-------|------|
+| [102](./102-2026-03-20-kubernetes-in-cluster-rbac-modules.md) | 2026-03-20 | Kubernetes in-cluster namespace and RBAC modules | Feature / Documentation |
 | [101](./101-2026-03-18-managed-redis-module.md) | 2026-03-18 | Managed Redis module | Feature |
 | [100](./100-2026-03-18-ado-live-test-harness-stabilization-wave3.md) | 2026-03-18 | Azure DevOps live test harness stabilization wave 3 | Maintenance / Documentation |
 | [099](./099-2026-02-15-ado-release-tag-normalization-task-closure.md) | 2026-02-15 | Azure DevOps release tag normalization task closure | Maintenance / Documentation |

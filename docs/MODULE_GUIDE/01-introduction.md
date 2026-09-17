@@ -19,14 +19,15 @@ Module names are critical for identification and organization. They MUST follow 
 
 - `azurerm_<main_resource_type>` for AzureRM provider modules
 - `azuredevops_<main_resource_type>` for Azure DevOps provider modules
+- `kubernetes_<main_resource_type>` for in-cluster Kubernetes modules that primarily use the `kubernetes` provider
 
 The name should reflect the primary Azure resource the module manages. If the module orchestrates multiple primary resources, choose the most significant one.
 
-Note: The repository name may still reference AzureRM. Azure DevOps modules are still expected to use the `azuredevops_` prefix and live alongside `azurerm_` modules.
+Note: The repository name may still reference AzureRM. Azure DevOps modules and in-cluster Kubernetes modules are still expected to use the `azuredevops_` and `kubernetes_` prefixes and live alongside `azurerm_` modules.
 
 ### Examples
 
-- **Correct**: `azurerm_storage_account`, `azurerm_virtual_network`, `azuredevops_project`, `azuredevops_repository`
+- **Correct**: `azurerm_storage_account`, `azurerm_virtual_network`, `azuredevops_project`, `azuredevops_repository`, `kubernetes_namespace`, `kubernetes_role_binding`
 - **Incorrect**: `storage`, `vnet_module`, `Azure-AKS`, `azdo_project`
 
 ## Primary Resource Requirement

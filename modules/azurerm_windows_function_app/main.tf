@@ -153,17 +153,18 @@ resource "azurerm_windows_function_app" "windows_function_app" {
       dynamic "active_directory_v2" {
         for_each = auth_settings_v2.value.active_directory_v2 == null ? [] : [auth_settings_v2.value.active_directory_v2]
         content {
-          client_id                       = active_directory_v2.value.client_id
-          tenant_auth_endpoint            = active_directory_v2.value.tenant_auth_endpoint
-          client_secret_setting_name      = active_directory_v2.value.client_secret_setting_name
-          allowed_audiences               = active_directory_v2.value.allowed_audiences
-          allowed_applications            = active_directory_v2.value.allowed_applications
-          allowed_groups                  = active_directory_v2.value.allowed_groups
-          allowed_identities              = active_directory_v2.value.allowed_identities
-          jwt_allowed_client_applications = active_directory_v2.value.jwt_allowed_client_applications
-          jwt_allowed_groups              = active_directory_v2.value.jwt_allowed_groups
-          login_parameters                = active_directory_v2.value.login_parameters
-          www_authentication_disabled     = active_directory_v2.value.www_authentication_disabled
+          client_id                            = active_directory_v2.value.client_id
+          tenant_auth_endpoint                 = active_directory_v2.value.tenant_auth_endpoint
+          client_secret_setting_name           = active_directory_v2.value.client_secret_setting_name
+          client_secret_certificate_thumbprint = active_directory_v2.value.client_secret_certificate_thumbprint
+          allowed_audiences                    = active_directory_v2.value.allowed_audiences
+          allowed_applications                 = active_directory_v2.value.allowed_applications
+          allowed_groups                       = active_directory_v2.value.allowed_groups
+          allowed_identities                   = active_directory_v2.value.allowed_identities
+          jwt_allowed_client_applications      = active_directory_v2.value.jwt_allowed_client_applications
+          jwt_allowed_groups                   = active_directory_v2.value.jwt_allowed_groups
+          login_parameters                     = active_directory_v2.value.login_parameters
+          www_authentication_disabled          = active_directory_v2.value.www_authentication_disabled
         }
       }
 
@@ -191,6 +192,7 @@ resource "azurerm_windows_function_app" "windows_function_app" {
           openid_configuration_endpoint = custom_oidc_v2.value.openid_configuration_endpoint
           client_credential_method      = custom_oidc_v2.value.client_credential_method
           client_secret_setting_name    = custom_oidc_v2.value.client_secret_setting_name
+          name_claim_type               = custom_oidc_v2.value.name_claim_type
           scopes                        = custom_oidc_v2.value.scopes
         }
       }
@@ -586,17 +588,18 @@ resource "azurerm_windows_function_app_slot" "windows_function_app_slot" {
       dynamic "active_directory_v2" {
         for_each = auth_settings_v2.value.active_directory_v2 == null ? [] : [auth_settings_v2.value.active_directory_v2]
         content {
-          client_id                       = active_directory_v2.value.client_id
-          tenant_auth_endpoint            = active_directory_v2.value.tenant_auth_endpoint
-          client_secret_setting_name      = active_directory_v2.value.client_secret_setting_name
-          allowed_audiences               = active_directory_v2.value.allowed_audiences
-          allowed_applications            = active_directory_v2.value.allowed_applications
-          allowed_groups                  = active_directory_v2.value.allowed_groups
-          allowed_identities              = active_directory_v2.value.allowed_identities
-          jwt_allowed_client_applications = active_directory_v2.value.jwt_allowed_client_applications
-          jwt_allowed_groups              = active_directory_v2.value.jwt_allowed_groups
-          login_parameters                = active_directory_v2.value.login_parameters
-          www_authentication_disabled     = active_directory_v2.value.www_authentication_disabled
+          client_id                            = active_directory_v2.value.client_id
+          tenant_auth_endpoint                 = active_directory_v2.value.tenant_auth_endpoint
+          client_secret_setting_name           = active_directory_v2.value.client_secret_setting_name
+          client_secret_certificate_thumbprint = active_directory_v2.value.client_secret_certificate_thumbprint
+          allowed_audiences                    = active_directory_v2.value.allowed_audiences
+          allowed_applications                 = active_directory_v2.value.allowed_applications
+          allowed_groups                       = active_directory_v2.value.allowed_groups
+          allowed_identities                   = active_directory_v2.value.allowed_identities
+          jwt_allowed_client_applications      = active_directory_v2.value.jwt_allowed_client_applications
+          jwt_allowed_groups                   = active_directory_v2.value.jwt_allowed_groups
+          login_parameters                     = active_directory_v2.value.login_parameters
+          www_authentication_disabled          = active_directory_v2.value.www_authentication_disabled
         }
       }
 
@@ -624,6 +627,7 @@ resource "azurerm_windows_function_app_slot" "windows_function_app_slot" {
           openid_configuration_endpoint = custom_oidc_v2.value.openid_configuration_endpoint
           client_credential_method      = custom_oidc_v2.value.client_credential_method
           client_secret_setting_name    = custom_oidc_v2.value.client_secret_setting_name
+          name_claim_type               = custom_oidc_v2.value.name_claim_type
           scopes                        = custom_oidc_v2.value.scopes
         }
       }

@@ -1,0 +1,7 @@
+{
+  "name": "kubernetes_cluster_role_binding",
+  "title": "Kubernetes Cluster Role Binding",
+  "commit_scope": "kubernetes-cluster-role-binding",
+  "tag_prefix": "KCRBv",
+  "description": "Kubernetes ClusterRoleBinding Terraform module for binding a cluster role to subjects"
+}

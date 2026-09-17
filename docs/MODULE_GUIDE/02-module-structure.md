@@ -1,6 +1,6 @@
 # 2. Module Structure
 
-A consistent directory structure is essential for maintainability and ease of use. Every new module MUST adhere to the structure outlined below. This structure is based on the `azurerm_kubernetes_cluster` module, which serves as the gold standard. If a specific service requires deviations, document the rationale in the module documentation. Use `azurerm_` for AzureRM modules and `azuredevops_` for Azure DevOps modules.
+A consistent directory structure is essential for maintainability and ease of use. Every new module MUST adhere to the structure outlined below. This structure is based on the `azurerm_kubernetes_cluster` module, which serves as the gold standard. If a specific service requires deviations, document the rationale in the module documentation. Use `azurerm_` for AzureRM modules, `azuredevops_` for Azure DevOps modules, and `kubernetes_` for in-cluster Kubernetes modules managed primarily through the `kubernetes` provider.
 
 ## Standard Directory Layout
 
