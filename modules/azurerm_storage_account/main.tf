@@ -343,8 +343,11 @@ resource "azurerm_storage_share" "storage_share" {
 }
 
 # Queue Properties (separate resource as queue_properties block is deprecated)
+# Genuinely opt-in: the resource is created only when the caller passes the
+# queue_properties input (null by default). The nested logging optional() would
+# otherwise fill a non-null default and force the resource on every caller.
 resource "azurerm_storage_account_queue_properties" "queue_properties" {
-  count = var.queue_properties.logging != null ? 1 : 0
+  count = var.queue_properties != null && var.queue_properties.logging != null ? 1 : 0
 
   storage_account_id = azurerm_storage_account.storage_account.id
 
