@@ -54,7 +54,7 @@
 [![Role Assignment](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=RAv*&label=Role%20Assignment&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RAv1.0.0)
 [![Role Definition](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=RDv*&label=Role%20Definition&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RDv1.0.0)
 [![Route Table](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=RTv*&label=Route%20Table&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.1.0)
-[![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv2.1.0)
+[![Storage Account](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SAv*&label=Storage%20Account&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv3.0.0)
 [![Subnet](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=SNv*&label=Subnet&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SNv1.1.0)
 [![User Assigned Identity](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=UAIv*&label=User%20Assigned%20Identity&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/UAIv1.0.0)
 [![Virtual Network](https://img.shields.io/github/v/tag/PatrykIti/azurerm-terraform-modules?filter=VNv*&label=Virtual%20Network&color=success)](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/VNv1.2.0)
@@ -107,7 +107,7 @@ Azure DevOps modules use the `azuredevops` provider and typically require a PAT 
 Example module reference:
 ```hcl
 module "storage_account" {
-  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv1.2.2"
+  source = "git::https://github.com/PatrykIti/azurerm-terraform-modules//modules/azurerm_storage_account?ref=SAv3.0.0"
   # See module README for configuration details
 }
 ```
@@ -146,7 +146,7 @@ module "storage_account" {
 | [Role Assignment](./modules/azurerm_role_assignment/) | ✅ Completed | [RAv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RAv1.0.0) | Manages Azure RBAC role assignments |
 | [Role Definition](./modules/azurerm_role_definition/) | ✅ Completed | [RDv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RDv1.0.0) | Manages Azure RBAC role definitions |
 | [Route Table](./modules/azurerm_route_table/) | ✅ Completed | [RTv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/RTv1.1.0) | Manages Azure Route Tables with custom routes configuration, BGP route propagation settings, and subnet associations |
-| [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv2.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv2.1.0) | Azure Storage Account Terraform module with enterprise-grade security features |
+| [Storage Account](./modules/azurerm_storage_account/) | ✅ Completed | [SAv3.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SAv3.0.0) | Azure Storage Account Terraform module with enterprise-grade security features |
 | [Subnet](./modules/azurerm_subnet/) | ✅ Completed | [SNv1.1.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/SNv1.1.0) | Azure Subnet Terraform module for managing subnets with service endpoints, delegations, network policies, and enterprise-grade security features |
 | [User Assigned Identity](./modules/azurerm_user_assigned_identity/) | ✅ Completed | [UAIv1.0.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/UAIv1.0.0) | Manages Azure User Assigned Identities and federated identity credentials |
 | [Virtual Network](./modules/azurerm_virtual_network/) | ✅ Completed | [VNv1.2.0](https://github.com/PatrykIti/azurerm-terraform-modules/releases/tag/VNv1.2.0) | Azure Virtual Network Terraform module with advanced networking features |
